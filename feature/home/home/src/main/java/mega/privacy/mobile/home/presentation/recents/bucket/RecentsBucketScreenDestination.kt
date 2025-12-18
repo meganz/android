@@ -17,6 +17,7 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
                 factory.create(
                     RecentsBucketViewModel.Args(
                         identifier = navKey.identifier,
+                        isMediaBucket = navKey.isMediaBucket,
                         folderName = navKey.folderName,
                         nodeSourceType = navKey.nodeSourceType,
                         timestamp = navKey.timestamp,

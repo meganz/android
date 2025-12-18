@@ -171,7 +171,7 @@ internal fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues.excludingBottomPadding()),
                     contentPadding = PaddingValues(top = 12.dp, bottom = 80.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
                         it.content(Modifier, navigationHandler::navigate, transferHandler)

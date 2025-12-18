@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.serialization.NavKeySerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 @Serializable
@@ -13,8 +14,9 @@ data object RecentsScreenNavKey : NavKey
 @Serializable
 data class RecentsBucketScreenNavKey(
     val identifier: String,
+    val isMediaBucket: Boolean,
     val folderName: String,
-    val nodeSourceType: mega.privacy.android.domain.entity.node.NodeSourceType,
+    val nodeSourceType: NodeSourceType,
     val timestamp: Long,
     val fileCount: Int,
 ) : NavKey

@@ -23,13 +23,16 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-internal fun RecentDateHeader(timestamp: Long) {
+internal fun RecentDateHeader(
+    timestamp: Long,
+    modifier: Modifier = Modifier
+) {
     ThemedSurface {
         MegaText(
             text = FormatRecentsDate(timestamp),
             textColor = TextColor.Secondary,
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .testTag(DATE_HEADER_TEST_TAG)

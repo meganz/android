@@ -56,6 +56,7 @@ class RecentsBucketViewModelTest {
     private fun initViewModel(
         args: RecentsBucketViewModel.Args = RecentsBucketViewModel.Args(
             identifier = testIdentifier,
+            isMediaBucket = false,
             folderName = testFolderName,
             nodeSourceType = testNodeSourceType,
             timestamp = testTimestamp,
@@ -233,6 +234,7 @@ class RecentsBucketViewModelTest {
         initViewModel(
             args = RecentsBucketViewModel.Args(
                 identifier = testId,
+                isMediaBucket = false,
                 folderName = testFolderName,
                 nodeSourceType = testNodeSourceType,
                 timestamp = testTimestamp,

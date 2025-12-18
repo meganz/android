@@ -153,7 +153,7 @@ class RecentsListItemViewTest {
                     icon = icon,
                     parentFolderName = parentFolderName,
                     time = time,
-                    isMediaBucket = false,
+                    isBucket = false,
                     onItemClicked = {},
                     onMenuClicked = {}
                 )
@@ -165,7 +165,7 @@ class RecentsListItemViewTest {
     }
 
     @Test
-    fun `test that media bucket menu button is displayed when isMediaBucket is true`() {
+    fun `test that menu button is not displayed when isBucket is true`() {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 RecentsListItemView(
@@ -173,14 +173,13 @@ class RecentsListItemViewTest {
                     icon = icon,
                     parentFolderName = parentFolderName,
                     time = time,
-                    isMediaBucket = true,
+                    isBucket = true,
                     onItemClicked = {},
                     onMenuClicked = {}
                 )
             }
         }
 
-        composeRule.onNodeWithTag(MEDIA_BUCKET_MENU_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(MENU_TEST_TAG).assertDoesNotExist()
     }
 

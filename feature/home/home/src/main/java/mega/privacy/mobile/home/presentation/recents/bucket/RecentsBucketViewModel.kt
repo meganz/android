@@ -31,9 +31,12 @@ class RecentsBucketViewModel @AssistedInject constructor(
 
     private val _uiState = MutableStateFlow(
         RecentsBucketUiState(
+            isLoading = args.isMediaBucket,
+            isMediaBucket = args.isMediaBucket,
             fileCount = args.fileCount,
             timestamp = args.timestamp,
-            parentFolderName = LocalizedText.Literal(args.folderName)
+            parentFolderName = LocalizedText.Literal(args.folderName),
+            nodeSourceType = args.nodeSourceType
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -89,6 +92,7 @@ class RecentsBucketViewModel @AssistedInject constructor(
 
     data class Args(
         val identifier: String,
+        val isMediaBucket: Boolean,
         val folderName: String,
         val nodeSourceType: NodeSourceType,
         val timestamp: Long,

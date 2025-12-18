@@ -88,6 +88,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                 onNavigate(
                     RecentsBucketScreenNavKey(
                         identifier = item.bucket.identifier,
+                        isMediaBucket = item.isMediaBucket,
                         folderName = item.parentFolderName.get(context),
                         nodeSourceType = item.nodeSourceType,
                         timestamp = item.bucket.timestamp,

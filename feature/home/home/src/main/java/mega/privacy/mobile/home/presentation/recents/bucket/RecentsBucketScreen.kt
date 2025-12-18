@@ -1,6 +1,7 @@
 package mega.privacy.mobile.home.presentation.recents.bucket
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -29,7 +31,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
-import mega.privacy.mobile.home.presentation.recents.view.FormatRecentsDate
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsMediaGridView
+import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,23 +48,15 @@ fun RecentsBucketScreen(
     var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
     val listState = rememberLazyListState()
 
-    val title = pluralStringResource(
-        NodeComponentsR.plurals.num_files_with_parameter,
-        uiState.fileCount,
-        uiState.fileCount
-    )
-    val subtitle = "${
-        FormatRecentsDate(
-            timestamp = uiState.timestamp,
-            dateFormatPattern = "d MMM yyyy"
-        )
-    } · ${uiState.parentFolderName.text}"
-
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             MegaTopAppBar(
-                title = title,
-                subtitle = subtitle,
+                title = pluralStringResource(
+                    NodeComponentsR.plurals.num_files_with_parameter,
+                    uiState.fileCount,
+                    uiState.fileCount
+                ),
+                subtitle = "Added to ${uiState.parentFolderName.text}", // TODO localize,
                 navigationType = AppBarNavigationType.Back(onBack),
                 actions = emptyList(),
             )
@@ -116,26 +111,47 @@ internal fun RecentsBucketScreenContent(
         }
 
         else -> {
-            NodeListView(
-                nodeUiItemList = uiState.nodeUiItems,
-                onMenuClick = onMenuClick,
-                onItemClicked = { item ->
-                    val node = item.node
-                    if (node is TypedFileNode) {
-                        onFileClicked(node)
-                    }
-                },
-                onLongClick = onLongClick,
-                onEnterMediaDiscoveryClick = { /** No-op */ },
-                sortConfiguration = NodeSortConfiguration.default,
-                onSortOrderClick = { /** No-op */ },
-                onChangeViewTypeClick = { /** No-op */ },
-                showSortOrder = false,
-                listState = listState,
-                showMediaDiscoveryButton = false,
+            Column(
                 modifier = modifier,
-                showChangeViewType = false,
-            )
+            ) {
+                RecentDateHeader(
+                    modifier = Modifier.padding(bottom = 1.dp),
+                    timestamp = uiState.timestamp
+                )
+
+                if (uiState.isMediaBucket) {
+                    RecentsMediaGridView(
+                        nodeUiItems = uiState.nodeUiItems,
+                        onItemClicked = { item ->
+                            val node = item.node
+                            if (node is TypedFileNode) {
+                                onFileClicked(node)
+                            }
+                        },
+                        onLongClick = onLongClick,
+                    )
+                } else {
+                    NodeListView(
+                        nodeUiItemList = uiState.nodeUiItems,
+                        onMenuClick = onMenuClick,
+                        onItemClicked = { item ->
+                            val node = item.node
+                            if (node is TypedFileNode) {
+                                onFileClicked(node)
+                            }
+                        },
+                        onLongClick = onLongClick,
+                        onEnterMediaDiscoveryClick = { /** No-op */ },
+                        sortConfiguration = NodeSortConfiguration.default,
+                        onSortOrderClick = { /** No-op */ },
+                        onChangeViewTypeClick = { /** No-op */ },
+                        showSortOrder = false,
+                        listState = listState,
+                        showMediaDiscoveryButton = false,
+                        showChangeViewType = false,
+                    )
+                }
+            }
         }
     }
 }

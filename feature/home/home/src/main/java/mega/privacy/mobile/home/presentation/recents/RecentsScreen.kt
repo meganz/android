@@ -78,6 +78,7 @@ fun RecentsScreen(
                 onNavigate(
                     RecentsBucketScreenNavKey(
                         identifier = item.bucket.identifier,
+                        isMediaBucket = item.isMediaBucket,
                         folderName = item.bucket.parentFolderName,
                         nodeSourceType = item.nodeSourceType,
                         timestamp = item.bucket.timestamp,

@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.model
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 
 /**
  * This class is used to display list items on screen
@@ -35,7 +36,7 @@ data class NodeUiItem<T : TypedNode>(
     val subtitle: NodeSubtitleText = NodeSubtitleText.Empty,
     val formattedDescription: LocalizedText? = null,
     val iconRes: Int = 0,
-    val thumbnailData: Any? = null,
+    val thumbnailData: ThumbnailData? = null,
     val accessPermissionIcon: Int? = null,
     val showIsVerified: Boolean = false,
     val showLink: Boolean = false,

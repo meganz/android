@@ -44,14 +44,12 @@ import mega.privacy.mobile.home.presentation.recents.model.text
  * Composable for the recent actions list item
  *
  * @param item The RecentActionUiItem to display
- * @param isExpanded Whether the media bucket is expanded in the list
  * @param onMenuClicked Callback when the menu button is clicked
  * @param onItemClicked Callback when the item is clicked
  */
 @Composable
 fun RecentsListItemView(
     item: RecentsUiItem,
-    isExpanded: Boolean = false,
     onMenuClicked: () -> Unit,
     onItemClicked: () -> Unit,
 ) {
@@ -70,8 +68,7 @@ fun RecentsListItemView(
         showFavourite = item.isFavourite,
         showVersion = item.isUpdate,
         isSensitive = item.isSensitive,
-        isMediaBucket = item.isMediaBucket,
-        isExpanded = isExpanded,
+        isBucket = !item.isSingleNode,
         onMenuClicked = onMenuClicked,
         onItemClicked = onItemClicked,
     )
@@ -90,8 +87,7 @@ fun RecentsListItemView(
  * @param showFavourite Whether to show the favourite icon
  * @param showVersion Whether to show the version icon
  * @param isSensitive Whether the item is sensitive
- * @param isMediaBucket Whether the item is a media bucket (e.g. multi images)
- * @param isExpanded Whether the media bucket is expanded in the list
+ * @param isBucket Whether the item is a bucket (e.g. multi images)
  * @param onMenuClicked Callback when the menu button is clicked
  * @param onItemClicked Callback when the item is clicked
  */
@@ -107,8 +103,7 @@ fun RecentsListItemView(
     showFavourite: Boolean = false,
     showVersion: Boolean = false,
     isSensitive: Boolean = false,
-    isMediaBucket: Boolean = false,
-    isExpanded: Boolean = false,
+    isBucket: Boolean = false,
     onMenuClicked: () -> Unit,
     onItemClicked: () -> Unit,
 ) {
@@ -247,7 +242,7 @@ fun RecentsListItemView(
             }
         }
 
-        if (!isMediaBucket) {
+        if (!isBucket) {
             MegaIcon(
                 imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
                 contentDescription = "3 dots",
@@ -259,23 +254,6 @@ fun RecentsListItemView(
                         onMenuClicked()
                     }
                     .testTag(MENU_TEST_TAG)
-            )
-        } else {
-            MegaIcon(
-                imageVector = if (isExpanded) {
-                    IconPack.Small.Thin.Outline.ChevronUp
-                } else {
-                    IconPack.Small.Thin.Outline.ChevronDown
-                },
-                contentDescription = "Dropdown",
-                tint = IconColor.Secondary,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .size(24.dp)
-                    .clickable {
-                        onMenuClicked()
-                    }
-                    .testTag(MEDIA_BUCKET_MENU_TEST_TAG)
             )
         }
     }
@@ -352,7 +330,7 @@ private fun RecentsListItemViewMultiFilePreview() {
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_image_stack_medium_solid,
             time = "08:00",
-            isMediaBucket = true,
+            isBucket = true,
             parentFolderName = "Very Long Folder Name, Very Long Folder Name",
             onItemClicked = {},
             onMenuClicked = {}

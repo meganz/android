@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.recents.bucket.model
 
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
@@ -15,8 +16,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
  */
 data class RecentsBucketUiState(
     val nodeUiItems: List<NodeUiItem<TypedNode>> = emptyList(),
+    val isMediaBucket: Boolean = false,
     val isLoading: Boolean = true,
     val fileCount: Int = 0,
     val timestamp: Long = 0L,
     val parentFolderName: LocalizedText = LocalizedText.Literal(""),
+    val nodeSourceType: NodeSourceType
 )
