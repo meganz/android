@@ -330,14 +330,12 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
             context: Context,
             mediaHandle: Long,
             folderName: String,
-            isOpenByMDIcon: Boolean = false,
             isFromFolderLink: Boolean = true,
         ) {
             val intent = Intent(context, MediaDiscoveryActivity::class.java).apply {
                 putExtra(INTENT_KEY_CURRENT_FOLDER_ID, mediaHandle)
                 putExtra(INTENT_KEY_CURRENT_FOLDER_NAME, folderName)
                 putExtra(INTENT_KEY_FROM_FOLDER_LINK, isFromFolderLink)
-                putExtra(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON, isOpenByMDIcon)
             }
             context.startActivity(intent)
         }
@@ -345,7 +343,5 @@ class MediaDiscoveryActivity : BaseActivity(), PermissionRequester, SnackbarShow
         internal const val INTENT_KEY_CURRENT_FOLDER_ID = "CURRENT_FOLDER_ID"
         internal const val INTENT_KEY_FROM_FOLDER_LINK = "FROM_FOLDER_LINK"
         internal const val INTENT_KEY_CURRENT_FOLDER_NAME = "CURRENT_FOLDER_NAME"
-        private const val INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON =
-            "OPEN_MEDIA_DISCOVERY_BY_MD_ICON"
     }
 }

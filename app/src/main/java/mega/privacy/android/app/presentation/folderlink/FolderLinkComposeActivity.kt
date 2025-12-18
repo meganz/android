@@ -48,7 +48,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetc
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
@@ -66,6 +65,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -316,12 +316,11 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     private fun onEnterMediaDiscoveryClick() {
         viewModel.clearAllSelection()
         val mediaHandle = viewModel.state.value.parentNode?.id?.longValue ?: -1
-        MediaDiscoveryActivity.startMDActivity(
+        megaNavigator.openMediaDiscoveryActivity(
             context = this@FolderLinkComposeActivity,
-            mediaHandle = mediaHandle,
+            folderId = NodeId(mediaHandle),
             folderName = viewModel.state.value.title,
-            isOpenByMDIcon = true,
-            isFromFolderLink = true
+            isFromFolderLink = true,
         )
     }
 

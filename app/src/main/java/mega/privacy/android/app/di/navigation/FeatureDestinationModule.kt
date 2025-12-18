@@ -41,7 +41,7 @@ class FeatureDestinationModule {
             megaChatRequestHandler,
             chatManagement,
             setChatVideoInDeviceUseCase,
-            rtcAudioManagerGateway
+            rtcAudioManagerGateway,
         )
 
     @Provides

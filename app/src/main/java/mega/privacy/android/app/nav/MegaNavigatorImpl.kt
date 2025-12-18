@@ -959,8 +959,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             context = context,
             mediaHandle = folderId.longValue,
             folderName = folderName,
-            isOpenByMDIcon = true,
-            isFromFolderLink = false
+            isFromFolderLink = isFromFolderLink
         )
     }
 }
