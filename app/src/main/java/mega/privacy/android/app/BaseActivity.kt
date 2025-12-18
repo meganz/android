@@ -955,6 +955,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
         return false
     }
 
+    protected fun rootNodeDoesNotExist() = megaApi.rootNode == null
+
     /**
      * Checks if should refresh session due to karere or init megaChatAp if the init state is not
      * the right one.

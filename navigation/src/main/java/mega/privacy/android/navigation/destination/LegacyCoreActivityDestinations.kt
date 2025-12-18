@@ -31,7 +31,8 @@ data object AchievementNavKey : NavKey
 data class WebSiteNavKey(val url: String) : NoSessionNavKey.Optional
 
 @Serializable
-data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey {
+@Parcelize
+data class ContactsNavKey(val navType: NavType = NavType.List) : NavKey, Parcelable {
     @Keep
     enum class NavType {
         List,

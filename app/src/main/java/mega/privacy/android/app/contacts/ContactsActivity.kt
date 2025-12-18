@@ -100,7 +100,18 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (rootNodeDoesNotExist()) {
+            // If the intent comes from a PendingIntent, then is set as a new Intent
+            // extra to be reused after to be relaunched it will crash. This fixes the issue.
+            intent = Intent(this.applicationContext, ContactsActivity::class.java).also {
+                it.putExtra(EXTRA_SHOW_SENT_REQUESTS, showSentRequests)
+                it.putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, showReceivedRequests)
+            }
+        }
+
+        if (shouldRefreshSessionDueToSDK(true)
+            || shouldRefreshSessionDueToKarere()
+        ) {
             return
         }
 

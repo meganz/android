@@ -515,6 +515,7 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".contacts.ContactsActivity"
+            android:exported="false"
             android:launchMode="singleTop" />
         <activity
             android:name=".meeting.activity.MeetingActivity"

@@ -33,7 +33,8 @@ class GlobalOnContactRequestsUpdateHandler @Inject constructor(
                 val notificationBuilder: ContactsAdvancedNotificationBuilder =
                     ContactsAdvancedNotificationBuilder.newInstance(
                         appContext,
-                        megaApi
+                        megaApi,
+                        applicationScope,
                     )
                 notificationBuilder.removeAllIncomingContactNotifications()
                 applicationScope.launch {
@@ -50,7 +51,8 @@ class GlobalOnContactRequestsUpdateHandler @Inject constructor(
                 val notificationBuilder: ContactsAdvancedNotificationBuilder =
                     ContactsAdvancedNotificationBuilder.newInstance(
                         appContext,
-                        megaApi
+                        megaApi,
+                        applicationScope,
                     )
                 notificationBuilder.showAcceptanceContactRequestNotification(cr.targetEmail)
                 Timber.d(
