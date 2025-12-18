@@ -2,8 +2,8 @@ package mega.privacy.android.navigation.contract.home
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 
 /**
@@ -22,7 +22,7 @@ interface HomeWidget {
     @Composable
     fun DisplayWidget(
         modifier: Modifier,
-        onNavigate: (NavKey) -> Unit,
+        navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     )
 }

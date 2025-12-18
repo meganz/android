@@ -27,6 +27,7 @@ import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import mega.privacy.mobile.home.presentation.recents.view.DATE_HEADER_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.view.FIRST_LINE_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.view.MENU_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.view.RECENTS_EMPTY_TEXT_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.view.RECENTS_HIDDEN_BUTTON_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.view.RECENTS_HIDDEN_TEXT_TEST_TAG
@@ -54,6 +55,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -89,6 +91,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -131,6 +134,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -167,6 +171,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -213,6 +218,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -265,6 +271,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -310,6 +317,7 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -353,6 +361,7 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -397,6 +406,7 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -439,6 +449,7 @@ class RecentsWidgetTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -481,6 +492,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onBucketClicked = { clickedItem = it },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
@@ -501,6 +513,127 @@ class RecentsWidgetTest {
     }
 
     @Test
+    fun `test that onMenuClicked is called with correct node and CLOUD_DRIVE source type when menu is clicked on single node item`() {
+        val mockNode = createMockTypedFileNode(name = "Document.pdf")
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isEqualTo(mockNode)
+        assertThat(clickedSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+    }
+
+    @Test
+    fun `test that menu button is not displayed for bucket items`() {
+        val mockNode = createMockTypedFileNode(name = "Image.jpg")
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.MediaBucketImagesOnly(5),
+            parentFolderName = LocalizedText.Literal("Photos"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_image_stack_medium_solid,
+            isMediaBucket = true,
+            nodes = listOf(mockNode, mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onMenuClicked is not called when firstNode is null`() {
+        var menuClicked = false
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = emptyList(),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ ->
+                        menuClicked = true
+                    },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)
+            .assertCountEquals(0)
+
+        assertThat(menuClicked).isFalse()
+    }
+
+    @Test
     fun `test that onWidgetOptionsClicked is called when menu button is clicked`() {
         var optionsClicked = false
 
@@ -512,6 +645,7 @@ class RecentsWidgetTest {
                         isNodesLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = { optionsClicked = true },
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -537,6 +671,7 @@ class RecentsWidgetTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -570,6 +705,7 @@ class RecentsWidgetTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -598,6 +734,7 @@ class RecentsWidgetTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = { showActivityClicked = true },
                     onUploadClicked = {},
@@ -633,6 +770,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -667,6 +805,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -701,6 +840,7 @@ class RecentsWidgetTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -725,6 +865,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -750,6 +891,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -780,6 +922,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -806,6 +949,7 @@ class RecentsWidgetTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = { uploadClicked = true },
@@ -832,6 +976,7 @@ class RecentsWidgetTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},
@@ -854,6 +999,7 @@ class RecentsWidgetTest {
                         isNodesLoading = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
                     onWidgetOptionsClicked = {},
                     onShowRecentActivity = {},
                     onUploadClicked = {},

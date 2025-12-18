@@ -5,10 +5,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.feature.myaccount.R
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.destination.MyAccountNavKey
@@ -29,7 +29,7 @@ class MyAccountHomeWidget @Inject constructor() : HomeWidget {
     @Composable
     override fun DisplayWidget(
         modifier: Modifier,
-        onNavigate: (NavKey) -> Unit,
+        navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
         val viewModel = hiltViewModel<MyAccountWidgetViewModel>()
@@ -39,7 +39,7 @@ class MyAccountHomeWidget @Inject constructor() : HomeWidget {
             state = state,
             modifier = modifier,
             onClick = {
-                onNavigate(
+                navigationHandler.navigate(
                     when (state.storageQuotaLevel) {
                         QuotaLevel.Success -> {
                             MyAccountNavKey()

@@ -174,7 +174,7 @@ internal fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
-                        it.content(Modifier, navigationHandler::navigate, transferHandler)
+                        it.content(Modifier, navigationHandler, transferHandler)
                     }
                 }
             }

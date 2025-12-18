@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 
@@ -24,7 +24,7 @@ class MultiCardExampleHomeWidget(
     @Composable
     override fun DisplayWidget(
         modifier: Modifier,
-        onNavigate: (NavKey) -> Unit,
+        navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
         PhotoHomeWidgetCard(

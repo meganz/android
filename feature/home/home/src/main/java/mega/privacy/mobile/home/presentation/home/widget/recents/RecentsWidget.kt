@@ -18,7 +18,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
@@ -27,7 +26,10 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +37,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -65,12 +68,13 @@ class RecentsWidget @Inject constructor() : HomeWidget {
     @Composable
     override fun DisplayWidget(
         modifier: Modifier,
-        onNavigate: (NavKey) -> Unit,
+        navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
         val viewModel = hiltViewModel<RecentsViewModel, RecentsViewModel.Factory> { factory ->
             factory.create(maxBucketCount = RecentsWidgetConstants.WIDGET_MAX_BUCKETS)
         }
+        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val coroutineScope = rememberCoroutineScope()
         val snackBarEventQueue = rememberSnackBarQueue()
@@ -84,8 +88,16 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onFileClicked = { node, source ->
                 openedFileNode = node to source
             },
+            onMenuClicked = { node, source ->
+                navigationHandler.navigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = node.id.longValue,
+                        nodeSourceType = source
+                    )
+                )
+            },
             onBucketClicked = { item ->
-                onNavigate(
+                navigationHandler.navigate(
                     RecentsBucketScreenNavKey(
                         identifier = item.bucket.identifier,
                         isMediaBucket = item.isMediaBucket,
@@ -99,10 +111,10 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onWidgetOptionsClicked = { showOptionsBottomSheet = true },
             onShowRecentActivity = viewModel::showRecentActivity,
             onUploadClicked = {
-                onNavigate(HomeFabOptionsBottomSheetNavKey)
+                navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
             },
             onViewAllClicked = {
-                onNavigate(RecentsScreenNavKey)
+                navigationHandler.navigate(RecentsScreenNavKey)
             }
         )
 
@@ -114,7 +126,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                 onActionHandled = { openedFileNode = null },
                 nodeSourceType = source,
                 onDownloadEvent = transferHandler::setTransferEvent,
-                onNavigate = onNavigate,
+                onNavigate = navigationHandler::navigate,
             )
         }
 
@@ -130,6 +142,14 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                 }
             },
         )
+
+        HandleNodeOptionsResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = transferHandler::setTransferEvent,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
     }
 }
 
@@ -137,6 +157,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
 fun RecentsView(
     uiState: RecentsUiState,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
+    onMenuClicked: (TypedFileNode, NodeSourceType) -> Unit,
     onBucketClicked: (RecentsUiItem) -> Unit = {},
     onShowRecentActivity: () -> Unit,
     onWidgetOptionsClicked: () -> Unit,
@@ -187,7 +208,9 @@ fun RecentsView(
                                 }
                             },
                             onMenuClicked = {
-                                // TODO: Handle menu click
+                                item.firstNode?.let { node ->
+                                    onMenuClicked(node, item.nodeSourceType)
+                                }
                             }
                         )
                     }
@@ -229,6 +252,7 @@ private fun RecentsViewPreview() {
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
+            onMenuClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
             onUploadClicked = {},
@@ -248,6 +272,7 @@ private fun RecentsHiddenViewPreview() {
                 isHideRecentsEnabled = true
             ),
             onFileClicked = { _, _ -> },
+            onMenuClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
             onUploadClicked = {},
@@ -267,6 +292,7 @@ private fun RecentsViewEmptyPreview() {
                 isHiddenNodeSettingsLoading = false
             ),
             onFileClicked = { _, _ -> },
+            onMenuClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
             onUploadClicked = {},
@@ -286,6 +312,7 @@ private fun RecentsViewLoadingPreview() {
                 isHiddenNodeSettingsLoading = true
             ),
             onFileClicked = { _, _ -> },
+            onMenuClicked = { _, _ -> },
             onWidgetOptionsClicked = {},
             onShowRecentActivity = {},
             onUploadClicked = {},

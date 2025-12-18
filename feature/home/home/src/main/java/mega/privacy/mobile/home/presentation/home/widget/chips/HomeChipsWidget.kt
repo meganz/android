@@ -18,6 +18,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.destination.ChatListNavKey
@@ -39,10 +40,10 @@ class HomeChipsWidget @Inject constructor(
     @Composable
     override fun DisplayWidget(
         modifier: Modifier,
-        onNavigate: (NavKey) -> Unit,
+        navigationHandler: NavigationHandler,
         transferHandler: TransferHandler,
     ) {
-        HomeChips(modifier = modifier, onNavigate = onNavigate)
+        HomeChips(modifier = modifier, onNavigate = navigationHandler::navigate)
     }
 }
 

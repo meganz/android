@@ -35,10 +35,10 @@ class HomeViewModel @Inject constructor(
                     }.map {
                         HomeWidgetItem(
                             it.identifier,
-                            { modifier, onNavigate, transferHandler ->
+                            { modifier, navigationHandler, transferHandler ->
                                 it.DisplayWidget(
                                     modifier = modifier,
-                                    onNavigate = onNavigate,
+                                    navigationHandler = navigationHandler,
                                     transferHandler = transferHandler
                                 )
                             })
