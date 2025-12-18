@@ -132,6 +132,9 @@ data class TestPasswordNavKey(
 data class OfflineInfoNavKey(val handle: String) : NavKey
 
 @Serializable
+data class FileInfoNavKey(val handle: Long) : NavKey
+
+@Serializable
 @Parcelize
 data object SyncListNavKey : NavKey, Parcelable
 

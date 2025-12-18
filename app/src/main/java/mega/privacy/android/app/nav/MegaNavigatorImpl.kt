@@ -91,6 +91,7 @@ import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
@@ -697,10 +698,15 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openFileInfoActivity(context: Context, handle: Long) {
-        context.startActivity(
-            Intent(context, FileInfoActivity::class.java)
-                .putExtra(Constants.HANDLE, handle)
-        )
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = FileInfoNavKey(handle = handle)
+        ) {
+            context.startActivity(
+                Intent(context, FileInfoActivity::class.java)
+                    .putExtra(Constants.HANDLE, handle)
+            )
+        }
     }
 
     override fun openOfflineFileInfoActivity(

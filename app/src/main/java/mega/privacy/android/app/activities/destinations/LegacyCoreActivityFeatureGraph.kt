@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestinati
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
+import mega.privacy.android.app.activities.navigation.fileInfoScreen
 import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
@@ -85,5 +86,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
             legacyPhotosSearch(navigationHandler::back, navigationHandler::returnResult)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
+            fileInfoScreen(navigationHandler::back)
         }
-}
+    }
