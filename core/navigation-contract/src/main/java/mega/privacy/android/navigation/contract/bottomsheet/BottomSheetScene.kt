@@ -1,6 +1,7 @@
 package mega.privacy.android.navigation.contract.bottomsheet
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -35,9 +36,8 @@ class BottomSheetScene<T : Any>(
             onDismissRequest = {
                 onBack()
             },
-            modifier = Modifier.Companion,
+            modifier = Modifier.statusBarsPadding(),
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
-            windowInsets = null,
         ) {
             sheetEntry.Content()
         }

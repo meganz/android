@@ -37,7 +37,6 @@ import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -182,14 +181,11 @@ internal fun CloudDriveContent(
         }
     }
 
-    EventEffect(
-        event = nodeActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = { nodeId ->
+    LaunchedEffect(nodeActionState.renameNodeRequestEvent) {
+        if (nodeActionState.renameNodeRequestEvent is StateEventWithContentTriggered) {
             onAction(CloudDriveAction.DeselectAllItems)
-            navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
         }
-    )
+    }
 
     LaunchedEffect(uiState.isLoading) {
         if (uiState.isLoading) {

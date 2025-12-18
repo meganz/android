@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -37,17 +38,6 @@ fun HandleNodeOptionsResult(
             }
         }
     }
-    val sendToChatLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.sendToChatActivityResultContract
-    ) { result ->
-        result?.let { sendToChatResult ->
-            nodeOptionsActionViewModel.attachNodeToChats(
-                nodeHandles = sendToChatResult.nodeIds,
-                chatIds = sendToChatResult.chatIds,
-                userHandles = sendToChatResult.userHandles
-            )
-        }
-    }
 
     LaunchedEffect(nodeBottomSheetResult.value) {
         when (val result = nodeBottomSheetResult.value) {
@@ -61,6 +51,7 @@ fun HandleNodeOptionsResult(
 
             is NodeOptionsBottomSheetResult.Rename -> {
                 nodeOptionsActionViewModel.handleRenameNodeRequest(result.nodeId)
+                onNavigate(RenameNodeDialogNavKey(result.nodeId.longValue))
             }
 
             is NodeOptionsBottomSheetResult.NodeNameCollision -> {

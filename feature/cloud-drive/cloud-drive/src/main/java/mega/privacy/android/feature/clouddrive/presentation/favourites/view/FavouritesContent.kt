@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -30,23 +29,18 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
-import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -71,34 +65,21 @@ internal fun FavouritesContent(
     onAction: (FavouritesAction) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
+    showNodeOptionsBottomSheet: (NodeOptionsBottomSheetNavKey) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(
-        navigationHandler = navigationHandler,
-        viewModel = nodeOptionsActionViewModel
-    ),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    var visibleNodeOptionId by rememberNodeId(null)
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(visibleNodeOptionId) {
-        if (visibleNodeOptionId != null) {
-            nodeOptionSheetState.show()
-        } else {
-            nodeOptionSheetState.hide()
-        }
-    }
 
     EventEffect(
         event = nodeActionState.downloadEvent,
@@ -167,7 +148,14 @@ internal fun FavouritesContent(
                 isNextPageLoading = false,
                 isHiddenNodesEnabled = false,
                 showHiddenNodes = false,
-                onMenuClicked = { visibleNodeOptionId = it.id },
+                onMenuClicked = {
+                    showNodeOptionsBottomSheet(
+                        NodeOptionsBottomSheetNavKey(
+                            nodeHandle = it.id.longValue,
+                            nodeSourceType = NodeSourceType.FAVOURITES
+                        )
+                    )
+                },
                 onItemClicked = { onAction(ItemClicked(it)) },
                 onLongClicked = { onAction(ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
@@ -204,32 +192,6 @@ internal fun FavouritesContent(
                 onDownloadEvent = onTransfer,
                 sortOrder = uiState.selectedSortOrder
             )
-        }
-
-        // Todo: We will remove this, and replace it with NavigationHandler
-        // Temporary solution to show node options bottom sheet, because navigation file
-        // is not yet implemented in node-components module.
-        visibleNodeOptionId?.let { nodeId ->
-            MegaModalBottomSheet(
-                modifier = Modifier.statusBarsPadding(),
-                sheetState = nodeOptionSheetState,
-                onDismissRequest = {
-                    visibleNodeOptionId = null
-                },
-                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-            ) {
-                NodeOptionsBottomSheetRoute(
-                    navigationHandler = navigationHandler,
-                    onDismiss = {
-                        visibleNodeOptionId = null
-                    },
-                    nodeId = nodeId.longValue,
-                    nodeSourceType = NodeSourceType.FAVOURITES,
-                    onTransfer = onTransfer,
-                    actionHandler = nodeActionHandler,
-                    nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                )
-            }
         }
 
         if (showSortBottomSheet) {

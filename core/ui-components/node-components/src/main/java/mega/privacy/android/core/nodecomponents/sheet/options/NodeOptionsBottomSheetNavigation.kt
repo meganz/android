@@ -41,29 +41,6 @@ sealed class NodeOptionsBottomSheetResult() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-internal fun NavGraphBuilder.nodeOptionsBottomSheet(
-    navigationHandler: NavigationHandler,
-    onTransfer: (TransferTriggerEvent) -> Unit,
-) {
-    megaBottomSheet<NodeOptionsBottomSheetNavKey> {
-        val args = it.toRoute<NodeOptionsBottomSheetNavKey>()
-
-        if (args.nodeHandle == -1L) {
-            navigationHandler.back()
-            return@megaBottomSheet
-        }
-
-        NodeOptionsBottomSheetRoute(
-            navigationHandler = navigationHandler,
-            onDismiss = navigationHandler::back,
-            nodeId = args.nodeHandle,
-            nodeSourceType = args.nodeSourceType,
-            onTransfer = onTransfer,
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
     navigationHandler: NavigationHandler,
     returnResult: (String, NodeOptionsBottomSheetResult) -> Unit,

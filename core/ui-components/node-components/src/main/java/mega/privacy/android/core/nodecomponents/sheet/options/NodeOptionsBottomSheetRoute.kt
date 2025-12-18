@@ -85,7 +85,6 @@ fun NodeOptionsBottomSheetRoute(
             )
         }
     }
-    val snackbarQueue = rememberSnackBarQueue()
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()

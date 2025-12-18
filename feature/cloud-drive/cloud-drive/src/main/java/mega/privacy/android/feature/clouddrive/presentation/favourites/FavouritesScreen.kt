@@ -3,9 +3,12 @@ package mega.privacy.android.feature.clouddrive.presentation.favourites
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEventWithContentTriggered
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -51,6 +54,12 @@ fun FavouritesScreen(
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
+    }
+
+    LaunchedEffect(nodeOptionsActionUiState.renameNodeRequestEvent) {
+        if (nodeOptionsActionUiState.renameNodeRequestEvent is StateEventWithContentTriggered) {
+            viewModel.processAction(DeselectAllItems)
+        }
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -102,8 +111,8 @@ fun FavouritesScreen(
                 onAction = viewModel::processAction,
                 onTransfer = onTransfer,
                 onSortNodes = viewModel::setCloudSortOrder,
+                showNodeOptionsBottomSheet = navigationHandler::navigate,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                nodeActionHandler = nodeActionHandler,
             )
         }
     )

@@ -76,6 +76,8 @@ class CloudDriveFeatureDestination : FeatureDestination {
             favouritesScreen(
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent,
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
             )
 
             openPasswordLinkDialog(
