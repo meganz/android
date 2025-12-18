@@ -3182,7 +3182,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.PHOTOS -> {
                 if (isInAlbumContent) {
-                    if (albumContentFragment is AlbumContentFragment) {
+                    if (albumContentFragment is AlbumContentFragment && albumContentFragment?.isVisible == true) {
                         val title = (albumContentFragment as? AlbumContentFragment)
                             ?.getCurrentAlbumTitle()
                         supportActionBar?.setTitle(title)
