@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
+import android.os.Parcelable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -9,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
@@ -19,10 +21,11 @@ import mega.privacy.android.feature.payment.presentation.billing.BillingViewMode
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
+@Parcelize
 data class LoginNavKey(
     val action: String? = null,
     val link: String? = null,
-) : NoSessionNavKey.Mandatory
+) : NoSessionNavKey.Mandatory, Parcelable
 
 internal fun NavGraphBuilder.loginScreen(
     navController: NavController,

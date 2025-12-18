@@ -159,11 +159,12 @@ data class SyncSelectStopBackupDestinationNavKey(
 ) : NavKey
 
 @Serializable
+@Parcelize
 data class UpgradeAccountNavKey(
     val isUpgrade: Boolean = true,
     val isNewAccount: Boolean = false,
     val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
-) : NavKey
+) : NavKey, Parcelable
 
 @Serializable
 @Parcelize

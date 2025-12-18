@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.settings.SettingsActivity
@@ -33,7 +32,7 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -303,24 +302,19 @@ class CameraUploadsNotificationManager @Inject constructor(
      */
     private suspend fun showStorageOverQuotaNotification() {
         val pendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivity<ManagerActivity>(
-            context = context,
-            createPendingIntent = { intent ->
-                intent.action = ACTION_OVER_QUOTA_STORAGE
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
-            singleActivityPendingIntent = {
-                MegaActivity.getPendingIntentWithExtraDestination(
-                    context = context,
-                    navKey = OverQuotaDialogNavKey(isOverQuota = true),
-                )
-            }
-        )
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, OverQuotaDialogNavKey>(
+                context = context,
+                createPendingIntent = { intent ->
+                    intent.action = ACTION_OVER_QUOTA_STORAGE
+                    PendingIntent.getActivity(
+                        context,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                },
+                singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
+            )
         val notification = createNotification(
             title = context.getString(R.string.overquota_alert_title),
             content = context.getString(R.string.download_show_info),

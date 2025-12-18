@@ -12,13 +12,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.clouddrive.CloudDrivePendingIntentMapper
 import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.app.presentation.filestorage.FileStoragePendingIntentMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
-import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserPendingIntentMapper
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -36,8 +33,12 @@ import mega.privacy.android.domain.usecase.node.DoesNodeExistUseCase
 import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
+import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
 import java.util.zip.ZipFile
@@ -57,9 +58,6 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
     private val doesNodeExistUseCase: DoesNodeExistUseCase,
     private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
-    private val cloudDrivePendingIntentMapper: CloudDrivePendingIntentMapper,
-    private val zipBrowserPendingIntentMapper: ZipBrowserPendingIntentMapper,
-    private val fileStoragePendingIntentMapper: FileStoragePendingIntentMapper,
     private val megaNavigator: MegaNavigator,
 ) : TransfersActionGroupFinishNotificationBuilder {
     private val resources get() = context.resources
@@ -280,7 +278,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                 } else {
                     ZipBrowserComposeActivity::class.java
                 }
-                megaNavigator.getPendingIntentConsideringSingleActivity(
+                megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                     context = context,
                     legacyActivityClass = legacyActivity,
                     createPendingIntent = { intent ->
@@ -288,11 +286,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                         intent.putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
                         createPendingIntent(intent, previewFile.absolutePath.hashCode())
                     },
-                    singleActivityPendingIntent = {
-                        zipBrowserPendingIntentMapper(
-                            context,
-                            previewFile.absolutePath,
-                        )
+                    singleActivityDestination = {
+                        LegacyZipBrowserNavKey(previewFile.absolutePath)
                     }
                 )
             }
@@ -346,7 +341,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
             } else {
                 FileStorageActivity::class.java
             }
-            megaNavigator.getPendingIntentConsideringSingleActivity(
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination(
                 context = context,
                 legacyActivityClass = legacyActivity,
                 createPendingIntent = { intent ->
@@ -363,12 +358,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     )
                     createPendingIntent(intent = intent, requestCode = actionGroup.groupId)
                 },
-                singleActivityPendingIntent = {
-                    fileStoragePendingIntentMapper(
-                        context,
-                        actionGroup.destination,
-                        actionGroup.selectedNames,
-                    )
+                singleActivityDestination = {
+                    LegacyFileExplorerNavKey(actionGroup.destination, actionGroup.selectedNames)
                 }
             )
         }
@@ -376,7 +367,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
         !uploadLocationExists -> null
 
         else -> { // is not download
-            megaNavigator.getPendingIntentConsideringSingleActivity<ManagerActivity>(
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, CloudDriveNavKey>(
                 context = context,
                 createPendingIntent = { intent ->
                     intent.action = Constants.ACTION_OPEN_FOLDER
@@ -390,11 +381,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     )
                     createPendingIntent(intent, actionGroup.groupId)
                 },
-                singleActivityPendingIntent = {
-                    cloudDrivePendingIntentMapper(
-                        context,
-                        actionGroup.pendingTransferNodeId?.nodeId,
-                        actionGroup.selectedNames
+                singleActivityDestination = {
+                    CloudDriveNavKey(
+                        nodeHandle = actionGroup.pendingTransferNodeId?.nodeId?.longValue ?: -1,
+                        highlightedNodeNames = actionGroup.selectedNames,
                     )
                 }
             )

@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
@@ -94,8 +95,8 @@ import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
-import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
+import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
@@ -930,6 +931,18 @@ internal class MegaNavigatorImpl @Inject constructor(
     } else {
         createPendingIntent(Intent(context, legacyActivityClass))
     }
+
+    override suspend fun <T> getPendingIntentConsideringSingleActivityWithDestination(
+        context: Context,
+        legacyActivityClass: Class<out Activity>,
+        createPendingIntent: (Intent) -> PendingIntent,
+        singleActivityDestination: () -> T,
+    ): PendingIntent where T : NavKey, T : Parcelable =
+        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            MegaActivity.getPendingIntentWithExtraDestination(context, singleActivityDestination())
+        } else {
+            createPendingIntent(Intent(context, legacyActivityClass))
+        }
 
     @SuppressLint("ManagerActivityIntent")
     private suspend fun navigateToManagerActivity(

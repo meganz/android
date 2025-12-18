@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
@@ -592,6 +593,26 @@ interface AppNavigator {
     ): PendingIntent
 
     /**
+     * Get a PendingIntent considering the SingleActivity feature flag.
+     * If SingleActivity is enabled, returns the PendingIntent to the single activity with provided destination.
+     * Otherwise, creates an Intent for the legacy activity and uses createPendingIntent to create the PendingIntent.
+     *
+     * If more than one destination is needed, please consider using getPendingIntentConsideringSingleActivity and create the intent with MegaActivity companion helper functions
+     *
+     * @param context The Context
+     * @param legacyActivityClass The Activity class to create the Intent for when SingleActivity is disabled
+     * @param createPendingIntent A lambda that creates a PendingIntent from an Intent
+     * @param singleActivityDestination A lambda that creates the NavKey destination to use when SingleActivity is enabled
+     * @return The appropriate PendingIntent based on the feature flag
+     */
+    suspend fun <T> getPendingIntentConsideringSingleActivityWithDestination(
+        context: Context,
+        legacyActivityClass: Class<out Activity>,
+        createPendingIntent: (Intent) -> PendingIntent,
+        singleActivityDestination: () -> T,
+    ): PendingIntent where T : NavKey, T : Parcelable
+
+    /**
      * Open Media Discovery Activity
      *
      * @param context The context
@@ -626,3 +647,28 @@ suspend inline fun <reified T : Activity> AppNavigator.getPendingIntentConsideri
     createPendingIntent = createPendingIntent,
     singleActivityPendingIntent = singleActivityPendingIntent,
 )
+
+/**
+ * Get a PendingIntent considering the SingleActivity feature flag using reified generics.
+ * If SingleActivity is enabled, returns the PendingIntent to the single activity with provided destination.
+ * Otherwise, creates an Intent for the legacy activity and uses createPendingIntent to create the PendingIntent.
+ *
+ * If more than one destination is needed, please consider using getPendingIntentConsideringSingleActivity and create the intent with MegaActivity companion helper functions
+ *
+ * @param N The Activity class to create the Intent for when SingleActivity is disabled
+ * @param context The Context
+ * @param createPendingIntent A lambda that creates a PendingIntent from an Intent
+ * @param singleActivityDestination A lambda that creates the NavKey destination to use when SingleActivity is enabled
+ * @return The appropriate PendingIntent based on the feature flag
+ */
+suspend inline fun <reified A, N> AppNavigator.getPendingIntentConsideringSingleActivityWithDestination(
+    context: Context,
+    noinline createPendingIntent: (Intent) -> PendingIntent,
+    noinline singleActivityDestination: () -> N,
+): PendingIntent where N : NavKey, N : Parcelable, A : Activity =
+    getPendingIntentConsideringSingleActivityWithDestination(
+        context = context,
+        legacyActivityClass = A::class.java,
+        createPendingIntent = createPendingIntent,
+        singleActivityDestination = singleActivityDestination,
+    )

@@ -14,7 +14,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -26,7 +25,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.TransfersNavKey
-import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -118,7 +117,7 @@ class TransfersActivity : AppCompatActivity() {
             context: Context,
             tab: TransfersNavKey.Tab? = null,
         ): PendingIntent =
-            megaNavigator.getPendingIntentConsideringSingleActivity<TransfersActivity>(
+            megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<TransfersActivity, TransfersNavKey>(
                 context = context,
                 createPendingIntent = { intent ->
                     if (tab != null) {
@@ -131,12 +130,7 @@ class TransfersActivity : AppCompatActivity() {
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
                 },
-                singleActivityPendingIntent = {
-                    MegaActivity.getPendingIntentWithExtraDestination(
-                        context = context,
-                        navKey = TransfersNavKey(tab),
-                    )
-                }
+                singleActivityDestination = { TransfersNavKey(tab) }
             )
     }
 }

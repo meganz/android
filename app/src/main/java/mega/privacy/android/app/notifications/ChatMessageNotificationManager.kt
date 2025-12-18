@@ -97,27 +97,27 @@ class ChatMessageNotificationManager @Inject constructor(
 
         val pendingIntent =
             megaNavigator.getPendingIntentConsideringSingleActivity<ManagerActivity>(
-            context = context,
-            createPendingIntent = { intent ->
-                intent.apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                    putExtra(Constants.CHAT_ID, chat.chatId)
+                context = context,
+                createPendingIntent = { intent ->
+                    intent.apply {
+                        flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
+                        putExtra(Constants.CHAT_ID, chat.chatId)
+                    }
+                    PendingIntent.getActivity(
+                        context,
+                        msg.messageId.toInt(),
+                        intent,
+                        PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                },
+                singleActivityPendingIntent = {
+                    MegaActivity.getPendingIntentWithExtraDestinations(
+                        context,
+                        listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
+                    )
                 }
-                PendingIntent.getActivity(
-                    context,
-                    msg.messageId.toInt(),
-                    intent,
-                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-                )
-            },
-            singleActivityPendingIntent = {
-                MegaActivity.getPendingIntentWithExtraDestinations(
-                    context,
-                    listOf(ChatListNavKey(), ChatNavKey(chat.chatId, null))
-                )
-            }
-        )
+            )
 
         val notificationColor = ContextCompat.getColor(context, R.color.red_600_red_300)
         val title = EmojiUtilsShortcodes.emojify(chat.title)
