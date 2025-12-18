@@ -37,7 +37,12 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 clearResultFlow = navigationHandler::clearResult
             )
 
-            rubbishBin(navigationHandler, transferHandler)
+            rubbishBin(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler,
+                nodeResultFlow = navigationHandler::monitorResult,
+                clearResultFlow = navigationHandler::clearResult
+            )
 
             shares(navigationHandler, transferHandler)
 

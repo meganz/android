@@ -16,8 +16,6 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -79,13 +77,18 @@ class RestoreActionClickHandler @Inject constructor(
                                         destinationHandle,
                                         message
                                     )
-                                } ?: provider.postMessage(message)
+                                } ?: run {
+                                    provider.postMessage(message)
+                                    provider.viewModel.dismiss()
+                                }
                             } else {
                                 provider.postMessage(message)
+                                provider.viewModel.dismiss()
                             }
                         }
                     }.onFailure { throwable ->
                         Timber.e(throwable)
+                        provider.viewModel.dismiss()
                     }
                 }
             }
@@ -98,20 +101,10 @@ class RestoreActionClickHandler @Inject constructor(
         destinationHandle: Long,
         message: String,
     ) {
-        val locateActionLabel = provider.context.getString(
-            sharedResR.string.transfers_notification_location_action
-        )
-        provider.viewModel.postMessageWithAction(
+        provider.viewModel.onRestoreSuccess(
             message = message,
-            actionLabel = locateActionLabel,
-            actionClick = {
-                provider.viewModel.navigateWithNavKey(
-                    CloudDriveNavKey(
-                        nodeHandle = destinationHandle,
-                        highlightedNodeHandle = restoredNodeHandle,
-                    )
-                )
-            }
+            parentHandle = destinationHandle,
+            restoredNodeHandle = restoredNodeHandle
         )
     }
 }

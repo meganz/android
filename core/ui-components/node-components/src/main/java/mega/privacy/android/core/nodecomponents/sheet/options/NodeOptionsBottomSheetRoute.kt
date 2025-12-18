@@ -41,13 +41,13 @@ import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.text
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.megaActivityResultContract
 import timber.log.Timber
 
@@ -62,6 +62,7 @@ fun NodeOptionsBottomSheetRoute(
     onNavigate: (NavKey) -> Unit = {},
     onRename: (NodeId) -> Unit = {},
     onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
+    onRestoreSuccess: (RestoreSuccess.RestoreData) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     actionHandler: NodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -149,6 +150,12 @@ fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.nodeNameCollisionsResult,
         onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         action = onCollisionResult
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.restoreSuccessEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRestoreSuccessEvent,
+        action = onRestoreSuccess
     )
 
     NodeOptionsBottomSheetContent(

@@ -1,8 +1,6 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -12,7 +10,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
-import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
@@ -27,17 +24,22 @@ data class NodeOptionsBottomSheetNavKey(
 }
 
 sealed class NodeOptionsBottomSheetResult() {
-    data class Navigation(val navKey: NavKey) :
-        NodeOptionsBottomSheetResult()
+    data class Navigation(val navKey: NavKey) : NodeOptionsBottomSheetResult()
 
-    data class Transfer(val event: TransferTriggerEvent) :
-        NodeOptionsBottomSheetResult()
+    data class Transfer(val event: TransferTriggerEvent) : NodeOptionsBottomSheetResult()
 
-    data class Rename(val nodeId: NodeId) :
-        NodeOptionsBottomSheetResult()
+    data class Rename(val nodeId: NodeId) : NodeOptionsBottomSheetResult()
 
     data class NodeNameCollision(val result: NodeNameCollisionsResult) :
         NodeOptionsBottomSheetResult()
+
+    data class RestoreSuccess(val data: RestoreData) : NodeOptionsBottomSheetResult() {
+        data class RestoreData(
+            val message: String,
+            val parentHandle: Long,
+            val restoredNodeHandle: Long,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +82,12 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                     NodeOptionsBottomSheetResult.NodeNameCollision(result)
                 )
             },
+            onRestoreSuccess = { data ->
+                returnResult(
+                    NodeOptionsBottomSheetNavKey.RESULT,
+                    NodeOptionsBottomSheetResult.RestoreSuccess(data)
+                )
+            }
         )
     }
 }

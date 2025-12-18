@@ -4,7 +4,6 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -29,8 +28,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -46,11 +43,10 @@ import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
-import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -97,8 +93,6 @@ internal fun RubbishBinScreen(
     )
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var visibleNodeOptionId by rememberNodeId(null)
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showClearRubbishBinDialog by remember { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -213,7 +207,12 @@ internal fun RubbishBinScreen(
                             } else {
                                 add(
                                     MenuActionWithClick(RubbishBinAppBarAction.More) {
-                                        visibleNodeOptionId = uiState.currentFolderId
+                                        navigationHandler.navigate(
+                                            NodeOptionsBottomSheetNavKey(
+                                                nodeHandle = uiState.currentFolderId.longValue,
+                                                nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                            )
+                                        )
                                     },
                                 )
                             }
@@ -270,7 +269,12 @@ internal fun RubbishBinScreen(
                     items = uiState.items,
                     listContentPadding = innerPadding,
                     onMenuClicked = { nodeUiItem ->
-                        visibleNodeOptionId = nodeUiItem.node.id
+                        navigationHandler.navigate(
+                            NodeOptionsBottomSheetNavKey(
+                                nodeHandle = nodeUiItem.node.id.longValue,
+                                nodeSourceType = NodeSourceType.RUBBISH_BIN
+                            )
+                        )
                     },
                     onItemClicked = { nodeUiItem ->
                         viewModel.onItemClicked(nodeUiItem)
@@ -290,26 +294,6 @@ internal fun RubbishBinScreen(
                     inSelectionMode = uiState.isInSelectionMode,
                 )
             }
-        }
-    }
-
-    // Show node options bottom sheet
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = { visibleNodeOptionId = null },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-        ) {
-            NodeOptionsBottomSheetRoute(
-                navigationHandler = navigationHandler,
-                onDismiss = { visibleNodeOptionId = null },
-                nodeId = nodeId.longValue,
-                nodeSourceType = NodeSourceType.RUBBISH_BIN,
-                onTransfer = onTransfer,
-                actionHandler = actionHandler,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            )
         }
     }
 

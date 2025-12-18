@@ -4,16 +4,21 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.SnackbarAttributes
+import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 @Composable
@@ -24,6 +29,7 @@ fun HandleNodeOptionsResult(
     nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
     clearResultFlow: (String) -> Unit,
 ) {
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val megaResultContract = rememberMegaResultContract()
     val snackbarQueue = rememberSnackBarQueue()
@@ -67,6 +73,30 @@ fun HandleNodeOptionsResult(
                         NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
                         else -> Timber.d("Not implemented")
                     }
+                }
+            }
+
+            is NodeOptionsBottomSheetResult.RestoreSuccess -> {
+                val data = result.data
+                val locateActionLabel = context.getString(
+                    sharedResR.string.transfers_notification_location_action
+                )
+                coroutineScope.launch {
+                    snackbarQueue.queueMessage(
+                        SnackbarAttributes(
+                            message = data.message,
+                            duration = SnackbarDuration.Long,
+                            action = locateActionLabel,
+                            actionClick = {
+                                onNavigate(
+                                    CloudDriveNavKey(
+                                        nodeHandle = data.parentHandle,
+                                        highlightedNodeHandle = data.restoredNodeHandle
+                                    )
+                                )
+                            }
+                        )
+                    )
                 }
             }
 
