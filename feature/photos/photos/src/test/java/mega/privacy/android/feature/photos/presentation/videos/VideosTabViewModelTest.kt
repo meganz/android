@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
+import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
@@ -10,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.Offline
@@ -17,11 +21,13 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
@@ -66,9 +72,10 @@ class VideosTabViewModelTest {
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
+    private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val fileNodeContentToNavKeyMapper = mock<FileNodeContentToNavKeyMapper>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
-
     private val expectedId = NodeId(1L)
     private val expectedVideo = mock<VideoUiEntity> {
         on { id }.thenReturn(expectedId)
@@ -139,6 +146,8 @@ class VideosTabViewModelTest {
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            fileNodeContentToNavKeyMapper = fileNodeContentToNavKeyMapper,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
         )
@@ -156,6 +165,8 @@ class VideosTabViewModelTest {
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase,
+            getNodeContentUriUseCase,
+            fileNodeContentToNavKeyMapper,
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
         )
@@ -513,6 +524,46 @@ class VideosTabViewModelTest {
             assertThat(actual.selectedTypedNodes).isEmpty()
         }
 
+    @Test
+    fun `test that navigateToVideoPlayer is updated as expected`() = runTest {
+        val video1 = createVideoUiEntity(handle = 1L)
+        val video2 = createVideoUiEntity(handle = 2L)
+
+        val mockNavKey = mock<NavKey>()
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
+            )
+        ).thenReturn(mockNavKey)
+
+        val expectedContentUri = NodeContentUri.RemoteContentUri("test url", false)
+        whenever(getNodeContentUriUseCase(any())).thenReturn(expectedContentUri)
+
+        initVideosForFilter(videos = listOf(video1, video2))
+
+        val actual = underTest.uiState
+            .filterIsInstance<VideosTabUiState.Data>()
+            .first { it.allVideoEntities.isNotEmpty() }
+        assertThat(actual.allVideoEntities).isNotEmpty()
+        assertThat(actual.allVideoEntities).hasSize(2)
+
+        underTest.onItemClicked(video1)
+
+        var navigateToVideoPlayer = underTest.navigateToVideoPlayerEvent
+            .first { it != consumed() }
+        assertThat(navigateToVideoPlayer).isEqualTo(triggered(mockNavKey))
+
+        underTest.resetNavigateToVideoPlayer()
+        navigateToVideoPlayer = underTest.navigateToVideoPlayerEvent
+            .first { it == consumed() }
+        assertThat(navigateToVideoPlayer).isEqualTo(consumed())
+    }
+
     @ParameterizedTest(name = "when the showHiddenItems is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that uiState is updated correctly`(
@@ -535,6 +586,7 @@ class VideosTabViewModelTest {
         val actual = underTest.uiState
             .filterIsInstance<VideosTabUiState.Data>()
             .first { it.allVideoEntities.isNotEmpty() }
+
 
         assertThat(actual.allVideoEntities).isNotEmpty()
         assertThat(actual.showHiddenItems).isEqualTo(showHiddenItems)
@@ -563,7 +615,7 @@ class VideosTabViewModelTest {
     @ParameterizedTest(name = " and monitorHiddenNodesEnabledUseCase {0}")
     @ValueSource(booleans = [true, false])
     fun `test that case that showHiddenItems is updated correctly`(
-        hiddenNodeEnabled: Boolean
+        hiddenNodeEnabled: Boolean,
     ) = runTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
             flow {

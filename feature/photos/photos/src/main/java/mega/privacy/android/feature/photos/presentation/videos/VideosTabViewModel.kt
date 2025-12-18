@@ -2,7 +2,11 @@ package mega.privacy.android.feature.photos.presentation.videos
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,13 +23,17 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
@@ -52,6 +60,8 @@ class VideosTabViewModel @Inject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
@@ -66,7 +76,14 @@ class VideosTabViewModel @Inject constructor(
         false
     )
 
-    internal val uiState: StateFlow<VideosTabUiState> by lazy {
+    private val navigateToVideoPlayerFlow =
+        MutableStateFlow<StateEventWithContent<NavKey>>(consumed())
+    internal val navigateToVideoPlayerEvent: StateFlow<StateEventWithContent<NavKey>>
+            by lazy(LazyThreadSafetyMode.NONE) {
+                navigateToVideoPlayerFlow
+            }
+
+    internal val uiState: StateFlow<VideosTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
         triggerFlow.flatMapLatest {
             flow {
                 emit(VideosTabUiState.Loading)
@@ -205,8 +222,41 @@ class VideosTabViewModel @Inject constructor(
 
     internal fun onItemClicked(item: VideoUiEntity) {
         if (selectedVideoIdsFlow.value.isNotEmpty()) {
-            toggleItemSelection(item = item)
+            toggleItemSelection(item)
+        } else {
+            navigateToVideoPlayer(item)
         }
+    }
+
+    private fun navigateToVideoPlayer(item: VideoUiEntity) {
+        viewModelScope.launch {
+            val state = uiState.value as? VideosTabUiState.Data ?: return@launch
+            val videoNode = state.allVideoNodes.firstOrNull { it.id == item.id } ?: return@launch
+            val content = FileNodeContent.AudioOrVideo(uri = getNodeContentUriUseCase(videoNode))
+
+            val isSearchMode = !state.query.isNullOrEmpty()
+            fileNodeContentToNavKeyMapper(
+                content = content,
+                fileNode = videoNode,
+                nodeSourceType = if (isSearchMode) {
+                    NodeSourceType.SEARCH
+                } else {
+                    NodeSourceType.VIDEOS
+                },
+                sortOrder = state.sortOrder,
+                searchedItems = if (isSearchMode) {
+                    state.allVideoNodes.map { it.id.longValue }
+                } else {
+                    null
+                }
+            )?.let { navKey ->
+                navigateToVideoPlayerFlow.update { triggered(navKey) }
+            }
+        }
+    }
+
+    internal fun resetNavigateToVideoPlayer() {
+        navigateToVideoPlayerFlow.update { consumed() }
     }
 
     internal fun onItemLongClicked(item: VideoUiEntity) {

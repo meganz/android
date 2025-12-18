@@ -263,6 +263,7 @@ data class LegacyMediaPlayerNavKey(
     val parentHandle: Long,
     val fileHandle: Long,
     val fileTypeInfo: FileTypeInfo,
+    val searchedItems: List<Long>? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

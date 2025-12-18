@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
@@ -75,6 +76,15 @@ fun VideosTabRoute(
     viewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val navigateEvent by viewModel.navigateToVideoPlayerEvent.collectAsStateWithLifecycle()
+
+    NavigationEventEffect(
+        event = navigateEvent,
+        onConsumed = viewModel::resetNavigateToVideoPlayer
+    ) {
+        navigationHandler.navigate(it)
+    }
+
     VideosTabScreen(
         uiState = uiState,
         onClick = viewModel::onItemClicked,
@@ -104,7 +114,7 @@ internal fun VideosTabScreen(
     nodeActionHandler: NodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel
-    ),
+    )
 ) {
     val lazyListState = rememberLazyListState()
     val durationInSecondsTextMapper = remember { DurationInSecondsTextMapper() }

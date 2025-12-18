@@ -36,6 +36,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         textEditorMode: TextEditorMode = TextEditorMode.View,
+        searchedItems: List<Long>? = null,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
         return when (content) {
@@ -68,6 +69,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 parentHandle = fileNode.parentId.longValue,
                 fileHandle = fileNode.id.longValue,
                 fileTypeInfo = fileNode.type,
+                searchedItems = searchedItems
             )
 
             is FileNodeContent.LocalZipFile -> LegacyZipBrowserNavKey(

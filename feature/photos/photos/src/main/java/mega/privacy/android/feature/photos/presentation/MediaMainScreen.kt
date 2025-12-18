@@ -499,9 +499,9 @@ fun MediaMainScreen(
                             MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
                                 if (currentTabIndex == MediaScreen.Videos.ordinal) {
                                     isVideosTabSearchBarVisible = true
+                                } else {
+                                    navigateToLegacyPhotosSearch(LegacyPhotosSearchNavKey)
                                 }
-
-                                navigateToLegacyPhotosSearch(LegacyPhotosSearchNavKey)
                             }
                         )
 

@@ -273,7 +273,7 @@ fun VideoNameWithLabel(
         builder.appendInlineContent(inlineContentId)
     }.toAnnotatedString()
 
-    var finalText by remember { mutableStateOf(text) }
+    var finalText by remember(text) { mutableStateOf(text) }
     val textLayoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     val textLayoutResult = textLayoutResultState.value
 
