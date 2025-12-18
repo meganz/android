@@ -178,7 +178,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
 
     private fun createPendingIntent(
         intent: Intent,
-        requestCode: Int = System.currentTimeMillis().toInt(),
+        requestCode: Int,
     ) = intent.let {
         PendingIntent.getActivity(
             context,
@@ -286,7 +286,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     createPendingIntent = { intent ->
                         if (isLoggedIn) intent.action = Constants.ACTION_EXPLORE_ZIP
                         intent.putExtra(EXTRA_PATH_ZIP, previewFile.absolutePath)
-                        createPendingIntent(intent)
+                        createPendingIntent(intent, previewFile.absolutePath.hashCode())
                     },
                     singleActivityPendingIntent = {
                         zipBrowserPendingIntentMapper(
@@ -304,7 +304,8 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     actionGroup.singleFileName
                 )
                 createPendingIntent(
-                    Intent.createChooser(previewIntent, chooserTitle)
+                    Intent.createChooser(previewIntent, chooserTitle),
+                    actionGroup.singleFileName.hashCode(),
                 )
             }
 
@@ -315,7 +316,10 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     createPendingIntent = { intent ->
                         intent.action = Constants.ACTION_SHOW_WARNING
                         intent.putExtra(Constants.INTENT_EXTRA_WARNING_MESSAGE, warningMessage)
-                        createPendingIntent(intent)
+                        createPendingIntent(
+                            intent = intent,
+                            requestCode = R.string.intent_not_available
+                        )
                     },
                     singleActivityPendingIntent = {
                         MegaActivity.getPendingIntentForWarningMessage(
@@ -357,7 +361,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                         FileStorageActivity.EXTRA_FILE_NAMES,
                         ArrayList(actionGroup.selectedNames)
                     )
-                    createPendingIntent(intent)
+                    createPendingIntent(intent = intent, requestCode = actionGroup.groupId)
                 },
                 singleActivityPendingIntent = {
                     fileStoragePendingIntentMapper(
@@ -384,7 +388,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                         FileStorageActivity.EXTRA_FILE_NAMES,
                         ArrayList(actionGroup.selectedNames)
                     )
-                    createPendingIntent(intent)
+                    createPendingIntent(intent, actionGroup.groupId)
                 },
                 singleActivityPendingIntent = {
                     cloudDrivePendingIntentMapper(

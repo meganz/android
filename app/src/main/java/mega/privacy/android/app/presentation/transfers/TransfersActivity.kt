@@ -126,7 +126,7 @@ class TransfersActivity : AppCompatActivity() {
                     }
                     PendingIntent.getActivity(
                         context,
-                        System.currentTimeMillis().toInt(),
+                        tab?.hashCode() ?: -1,
                         intent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )

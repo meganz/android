@@ -106,7 +106,7 @@ class DefaultTransfersActionGroupProgressNotificationBuilder @Inject constructor
         } else {
             PendingIntent.getActivity(
                 context,
-                System.currentTimeMillis().toInt(),
+                TransfersNavKey.Tab.Active.hashCode(),
                 Intent(context, LoadingPreviewActivity::class.java).apply {
                     putExtra(EXTRA_TRANSFER_TAG, actionGroup.singleTransferTag)
                 },
