@@ -20,6 +20,7 @@ import mega.privacy.android.app.presentation.meeting.managechathistory.navigatio
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
+import mega.privacy.android.app.presentation.documentscanner.navigation.saveScannedDocumentsLegacyDestination
 import mega.privacy.android.app.presentation.pdfviewer.legacyPdfViewerScreen
 import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
@@ -89,5 +90,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyPhotosSearch(navigationHandler::back, navigationHandler::returnResult)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             fileInfoScreen(navigationHandler::back)
+            saveScannedDocumentsLegacyDestination(navigationHandler::back)
         }
     }

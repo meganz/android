@@ -98,6 +98,7 @@ import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
@@ -789,14 +790,24 @@ internal class MegaNavigatorImpl @Inject constructor(
         scanPdfUri: Uri,
         scanSoloImageUri: Uri?,
     ) {
-        val intent = SaveScannedDocumentsActivity.getIntent(
+        navigateForSingleActivity(
             context = context,
-            fromChat = originatedFromChat,
-            parentHandle = cloudDriveParentHandle,
-            pdfUri = scanPdfUri,
-            imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
-        )
-        context.startActivity(intent)
+            singleActivityDestination = SaveScannedDocumentsNavKey(
+                originatedFromChat = originatedFromChat,
+                cloudDriveParentHandle = cloudDriveParentHandle,
+                scanPdfUri = scanPdfUri.toString(),
+                scanSoloImageUri = scanSoloImageUri?.toString(),
+            )
+        ) {
+            val intent = SaveScannedDocumentsActivity.getIntent(
+                context = context,
+                fromChat = originatedFromChat,
+                parentHandle = cloudDriveParentHandle,
+                pdfUri = scanPdfUri,
+                imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
+            )
+            context.startActivity(intent)
+        }
     }
 
     override fun openSearchActivity(
