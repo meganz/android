@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
@@ -59,15 +58,17 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
     private val _uiState = MutableStateFlow(MediaCameraUploadUiState())
-    internal val uiState = _uiState
-        .onStart { startMonitoring() }
-        .asUiStateFlow(
-            scope = viewModelScope,
-            initialValue = MediaCameraUploadUiState()
-        )
+    internal val uiState = _uiState.asUiStateFlow(
+        scope = viewModelScope,
+        initialValue = MediaCameraUploadUiState()
+    )
 
     private var isCameraUploadsFirstSyncTriggered = false
     private var isCameraUploadsUploading = false
+
+    init {
+        startMonitoring()
+    }
 
     private fun startMonitoring() {
         monitorCameraUploadShownStatus()

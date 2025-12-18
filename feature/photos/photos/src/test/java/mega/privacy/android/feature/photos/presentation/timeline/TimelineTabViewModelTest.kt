@@ -3,18 +3,15 @@ package mega.privacy.android.feature.photos.presentation.timeline
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -24,9 +21,8 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
@@ -77,11 +73,13 @@ class TimelineTabViewModelTest {
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+
+    private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
 
     @BeforeEach
     fun setup() {
+        whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
         underTest = TimelineTabViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
@@ -91,8 +89,7 @@ class TimelineTabViewModelTest {
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getBusinessStatusUseCase = getBusinessStatusUseCase
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase
         )
     }
 
@@ -107,8 +104,7 @@ class TimelineTabViewModelTest {
             getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper,
-            monitorAccountDetailUseCase,
-            getBusinessStatusUseCase
+            monitorHiddenNodesEnabledUseCase
         )
     }
 
@@ -1512,14 +1508,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.BUSINESS
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Active
+            isHiddenNodesEnabledFlow.emit(true)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()
@@ -1587,14 +1576,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.FREE
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()
@@ -1662,14 +1644,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.FREE
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()
@@ -1734,14 +1709,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.FREE
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()
@@ -1805,14 +1773,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.FREE
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()
@@ -1876,14 +1837,7 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
-            val mockLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.FREE
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn mockLevelDetail
-            }
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Expired
+            isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 underTest.onSelectAllPhotos()

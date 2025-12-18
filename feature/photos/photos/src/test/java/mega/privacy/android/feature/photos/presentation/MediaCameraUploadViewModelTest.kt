@@ -67,6 +67,8 @@ class MediaCameraUploadViewModelTest {
     private var cameraUploadsStatusFlow =
         MutableStateFlow<CameraUploadsStatusInfo>(CameraUploadsStatusInfo.Unknown)
     private var cameraUploadShownFlow = MutableStateFlow(false)
+    private var enableCameraUploadBannerVisibilityFlow = MutableStateFlow(false)
+    private var isCameraUploadsEnabledFlow = MutableStateFlow(false)
 
     @BeforeEach
     fun setup() = runTest {
@@ -79,6 +81,12 @@ class MediaCameraUploadViewModelTest {
         whenever(getFeatureFlagValueUseCase(any())) doReturn true
         whenever(hasMediaPermissionUseCase()) doReturn true
         whenever(isCameraUploadsEnabledUseCase()) doReturn true
+        enableCameraUploadBannerVisibilityFlow = MutableStateFlow(false)
+        whenever(
+            monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
+        ) doReturn enableCameraUploadBannerVisibilityFlow
+        isCameraUploadsEnabledFlow = MutableStateFlow(false)
+        whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn isCameraUploadsEnabledFlow
 
         underTest = MediaCameraUploadViewModel(
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
@@ -314,12 +322,8 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that enable CU banner is displayed when the visibility is visible and the CU is not enabled`() =
         runTest {
-            whenever(
-                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
-            ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
-                false
-            )
+            enableCameraUploadBannerVisibilityFlow.emit(true)
+            isCameraUploadsEnabledFlow.emit(false)
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().shouldShowEnableCUBanner).isTrue()
@@ -329,12 +333,8 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that enable CU banner visibility is reset if visible`() =
         runTest {
-            whenever(
-                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
-            ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
-                false
-            )
+            enableCameraUploadBannerVisibilityFlow.emit(true)
+            isCameraUploadsEnabledFlow.emit(false)
 
             underTest.uiState.test { cancelAndConsumeRemainingEvents() }
             verify(resetEnableCameraUploadBannerVisibilityUseCase).invoke()
