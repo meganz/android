@@ -152,6 +152,30 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
+    /**
+     * Only use navKey if current activity is MegaActivity
+     * Otherwise, use legacy navigation
+     */
+    private fun navigateIfInSingleActivity(
+        singleActivityDestination: NavKey?,
+        legacyNavigation: suspend () -> Unit,
+    ) {
+        applicationScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                .onFailure {
+                    legacyNavigation()
+                }.onSuccess { singleActivity ->
+                    val isMegaActivity =
+                        activityLifecycleHandler.getCurrentActivity() is MegaActivity
+                    if (singleActivity && isMegaActivity) {
+                        singleActivityDestination?.let { navigationQueue.emit(it) }
+                    } else {
+                        legacyNavigation()
+                    }
+                }
+        }
+    }
+
     override fun launchMegaActivityIfNeeded(context: Context) {
         val isMegaActivity =
             activityLifecycleHandler.getCurrentActivity() is MegaActivity
@@ -206,8 +230,8 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openUpgradeAccount(context: Context, source: UpgradeAccountSource) {
-        navigateForSingleActivity(
-            context = context, singleActivityDestination = UpgradeAccountNavKey(source = source)
+        navigateIfInSingleActivity(
+            singleActivityDestination = UpgradeAccountNavKey(source = source)
         ) {
             ChooseAccountActivity.navigateToUpgradeAccount(
                 context = context, source = source
