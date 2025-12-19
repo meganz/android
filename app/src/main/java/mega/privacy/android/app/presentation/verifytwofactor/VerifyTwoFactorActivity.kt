@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.verifytwofactor
 
-import android.app.Activity
 import android.content.ClipboardManager
-import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -19,7 +17,6 @@ import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_EMAIL
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity.Companion.KEY_NEW_PASSWORD
@@ -34,6 +31,8 @@ import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.MyAccountNavKey
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_EACCESS
 import nz.mega.sdk.MegaError.API_EEXIST
@@ -47,6 +46,7 @@ import nz.mega.sdk.MegaRequest.TYPE_GET_CHANGE_EMAIL_LINK
 import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK
 import nz.mega.sdk.MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Activity for verifying two factor authentication code
@@ -61,6 +61,9 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
     }
 
     private val viewModel by viewModels<VerifyTwoFactorViewModel>()
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     /**
      * @see KEY_VERIFY_TYPE
@@ -464,7 +467,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                 if (!request.flag) {
                     // Send live event to notify.
                     Timber.d("Pin correct: Two-Factor Authentication disabled")
-                    setResult(Activity.RESULT_OK)
+                    setResult(RESULT_OK)
                     showAlert(R.string.label_2fa_disabled, INVALID_VALUE)
                 } else {
                     Timber.w("Disable 2fa failed.")
@@ -495,10 +498,15 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
                     viewModel.logout()
                 } else {
                     //Intent to MyAccount
-                    val resetPassIntent = Intent(this, ManagerActivity::class.java)
-                    resetPassIntent.action = ACTION_PASS_CHANGED
-                    resetPassIntent.putExtra(RESULT, e.errorCode)
-                    startActivity(resetPassIntent)
+                    megaNavigator.openManagerActivity(
+                        context = this,
+                        action = ACTION_PASS_CHANGED,
+                        bundle = Bundle().apply { putInt(RESULT, e.errorCode) },
+                        singleActivityDestination = MyAccountNavKey(
+                            action = ACTION_PASS_CHANGED,
+                            resultCode = e.errorCode
+                        )
+                    )
                     finish()
                 }
             }
@@ -507,15 +515,16 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         }
     }
 
-    private val listener = OptionalMegaRequestListenerInterface(onRequestStart = { request ->
-        Timber.d("Start ${request.type}: ${request.requestString} request.")
+    private val listener = OptionalMegaRequestListenerInterface(
+        onRequestStart = { request ->
+            Timber.d("Start ${request.type}: ${request.requestString} request.")
 
-        // If there's an in-progress request (except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
-        // quitting the activity is not allowed.
-        if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
-            onBackPressedCallback.isEnabled = true
-        }
-    },
+            // If there's an in-progress request (except checking 2fa status request, TYPE_MULTI_FACTOR_AUTH_CHECK),
+            // quitting the activity is not allowed.
+            if (request.type != TYPE_MULTI_FACTOR_AUTH_CHECK) {
+                onBackPressedCallback.isEnabled = true
+            }
+        },
         onRequestFinish = { request, error ->
             Timber.d("${request.type}: ${request.requestString} finished.")
 
