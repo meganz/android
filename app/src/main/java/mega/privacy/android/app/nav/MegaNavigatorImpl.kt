@@ -204,8 +204,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         isOverQuota: Int?,
         flags: Int,
     ) {
-        navigateForSingleActivity(
-            context = context,
+        navigateIfInSingleActivity(
             singleActivityDestination = ChatNavKey(
                 chatId = chatId,
                 action = action,
