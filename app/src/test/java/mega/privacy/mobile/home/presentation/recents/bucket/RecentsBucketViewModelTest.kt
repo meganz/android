@@ -3,6 +3,8 @@ package mega.privacy.mobile.home.presentation.recents.bucket
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
@@ -15,7 +17,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -23,8 +27,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -37,6 +44,8 @@ class RecentsBucketViewModelTest {
     private val getRecentActionBucketByIdUseCase = mock<GetRecentActionBucketByIdUseCase>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
     private val recentsParentFolderNameMapper = mock<RecentsParentFolderNameMapper>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
 
     private val testIdentifier = "test_bucket_identifier"
     private val testNodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -49,8 +58,12 @@ class RecentsBucketViewModelTest {
         reset(
             getRecentActionBucketByIdUseCase,
             nodeUiItemMapper,
-            recentsParentFolderNameMapper
+            recentsParentFolderNameMapper,
+            monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase
         )
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
     }
 
     private fun initViewModel(
@@ -68,6 +81,8 @@ class RecentsBucketViewModelTest {
             getRecentActionBucketByIdUseCase = getRecentActionBucketByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             recentsParentFolderNameMapper = recentsParentFolderNameMapper,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -82,7 +97,7 @@ class RecentsBucketViewModelTest {
             val state = awaitItem()
             // After loading completes, isLoading should be false
             assertThat(state.isLoading).isFalse()
-            assertThat(state.nodeUiItems).isEmpty()
+            assertThat(state.items).isEmpty()
             // Verify initial parentFolderName is set from args
             assertThat(state.parentFolderName).isEqualTo(LocalizedText.Literal(testFolderName))
             cancelAndIgnoreRemainingEvents()
@@ -127,9 +142,9 @@ class RecentsBucketViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.isLoading).isFalse()
-            assertThat(state.nodeUiItems).hasSize(2)
-            assertThat(state.nodeUiItems[0].node).isEqualTo(node1)
-            assertThat(state.nodeUiItems[1].node).isEqualTo(node2)
+            assertThat(state.items).hasSize(2)
+            assertThat(state.items[0].node).isEqualTo(node1)
+            assertThat(state.items[1].node).isEqualTo(node2)
             assertThat(state.fileCount).isEqualTo(bucket.nodes.size)
             assertThat(state.timestamp).isEqualTo(bucket.timestamp)
             assertThat(state.parentFolderName).isEqualTo(expectedParentFolderName)
@@ -179,9 +194,9 @@ class RecentsBucketViewModelTest {
                 val state = awaitItem()
                 // Verify isLoading is set to false
                 assertThat(state.isLoading).isFalse()
-                // Verify nodeUiItems are set from mapper
-                assertThat(state.nodeUiItems).hasSize(3)
-                assertThat(state.nodeUiItems).containsExactly(nodeUiItem1, nodeUiItem2, nodeUiItem3)
+                // Verify items are set from mapper
+                assertThat(state.items).hasSize(3)
+                assertThat(state.items).containsExactly(nodeUiItem1, nodeUiItem2, nodeUiItem3)
                 // Verify fileCount is set from bucket.nodes.size
                 assertThat(state.fileCount).isEqualTo(bucket.nodes.size)
                 assertThat(state.fileCount).isEqualTo(3)
@@ -195,7 +210,7 @@ class RecentsBucketViewModelTest {
         }
 
     @Test
-    fun `test that when bucket is null, isLoading is set to false and nodeUiItems remain empty`() =
+    fun `test that when bucket is null, isLoading is set to false and items remain empty`() =
         runTest {
             whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
 
@@ -205,7 +220,7 @@ class RecentsBucketViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isLoading).isFalse()
-                assertThat(state.nodeUiItems).isEmpty()
+                assertThat(state.items).isEmpty()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -221,7 +236,7 @@ class RecentsBucketViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.isLoading).isFalse()
-            assertThat(state.nodeUiItems).isEmpty()
+            assertThat(state.items).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -243,6 +258,129 @@ class RecentsBucketViewModelTest {
         )
         advanceUntilIdle()
     }
+
+    @Test
+    fun `test that excludeSensitives is false when hidden nodes disabled`() = runTest {
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.excludeSensitives).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that excludeSensitives is true when hidden nodes enabled and showHiddenNodes is false`() =
+        runTest {
+            val bucket = createMockRecentActionBucket()
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+            whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = any(),
+                    existingItems = anyOrNull(),
+                    nodeSourceType = any(),
+                    isPublicNodes = any(),
+                    showPublicLinkCreationTime = any(),
+                    highlightedNodeId = anyOrNull(),
+                    highlightedNames = anyOrNull(),
+                    isContactVerificationOn = any(),
+                )
+            ).thenReturn(emptyList())
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.excludeSensitives).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that excludeSensitives is false when hidden nodes enabled and showHiddenNodes is true`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.excludeSensitives).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that getRecentActionBucketByIdUseCase is called with correct excludeSensitives value`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
+                bucketIdentifier = testIdentifier,
+                excludeSensitives = true
+            )
+        }
+
+    @Test
+    fun `test that bucket is reloaded when excludeSensitives changes from false to true`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
+                flowOf(false, true) // First false, then true
+            )
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+
+            initViewModel()
+            advanceUntilIdle()
+
+            // Should be called at least twice: once on init, once when excludeSensitives changes
+            verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
+                bucketIdentifier = testIdentifier,
+                excludeSensitives = false
+            )
+            verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
+                bucketIdentifier = testIdentifier,
+                excludeSensitives = true
+            )
+        }
+
+    @Test
+    fun `test that bucket is reloaded when showHiddenNodes changes from false to true`() =
+        runTest {
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(
+                flowOf(false, true)
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            val inOrder = inOrder(getRecentActionBucketByIdUseCase)
+            inOrder.verify(getRecentActionBucketByIdUseCase)
+                .invoke(bucketIdentifier = testIdentifier, excludeSensitives = true)
+            inOrder.verify(getRecentActionBucketByIdUseCase)
+                .invoke(bucketIdentifier = testIdentifier, excludeSensitives = false)
+        }
+
 
     private fun createMockFileNode(
         name: String = "testFile.txt",

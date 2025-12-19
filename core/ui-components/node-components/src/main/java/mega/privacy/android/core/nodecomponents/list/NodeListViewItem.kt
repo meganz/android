@@ -194,7 +194,7 @@ fun NodeListViewItem(
                     data = thumbnailData,
                     defaultImage = icon,
                     contentDescription = "Thumbnail",
-                    blurImage = showBlurEffect && isSensitive
+                    blurImage = showBlurEffect
                 )
             }
         },

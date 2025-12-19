@@ -104,7 +104,7 @@ internal fun RecentsBucketScreenContent(
             }
         }
 
-        uiState.nodeUiItems.isEmpty() -> {
+        uiState.isEmpty -> {
             Box(modifier = modifier) {
                 // TODO: Add empty view
             }
@@ -121,7 +121,7 @@ internal fun RecentsBucketScreenContent(
 
                 if (uiState.isMediaBucket) {
                     RecentsMediaGridView(
-                        nodeUiItems = uiState.nodeUiItems,
+                        nodeUiItems = uiState.items,
                         onItemClicked = { item ->
                             val node = item.node
                             if (node is TypedFileNode) {
@@ -132,7 +132,7 @@ internal fun RecentsBucketScreenContent(
                     )
                 } else {
                     NodeListView(
-                        nodeUiItemList = uiState.nodeUiItems,
+                        nodeUiItemList = uiState.items,
                         onMenuClick = onMenuClick,
                         onItemClicked = { item ->
                             val node = item.node

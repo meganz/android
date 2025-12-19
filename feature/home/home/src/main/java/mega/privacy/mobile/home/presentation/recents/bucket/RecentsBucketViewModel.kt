@@ -8,12 +8,17 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
 import timber.log.Timber
@@ -27,11 +32,12 @@ class RecentsBucketViewModel @AssistedInject constructor(
     private val getRecentActionBucketByIdUseCase: GetRecentActionBucketByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
         RecentsBucketUiState(
-            isLoading = args.isMediaBucket,
             isMediaBucket = args.isMediaBucket,
             fileCount = args.fileCount,
             timestamp = args.timestamp,
@@ -42,15 +48,17 @@ class RecentsBucketViewModel @AssistedInject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        loadBucket()
+        monitorHiddenNodesState()
     }
 
-    private fun loadBucket() {
+    private fun loadBucket(
+        excludeSensitives: Boolean = uiState.value.excludeSensitives,
+    ) {
         viewModelScope.launch {
             runCatching {
                 val bucket = getRecentActionBucketByIdUseCase(
                     bucketIdentifier = args.identifier,
-                    excludeSensitives = false
+                    excludeSensitives = excludeSensitives,
                 )
                 if (bucket != null) {
                     val nodeUiItems = nodeUiItemMapper(
@@ -61,10 +69,11 @@ class RecentsBucketViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            nodeUiItems = nodeUiItems,
+                            items = nodeUiItems,
                             fileCount = bucket.nodes.size,
                             timestamp = bucket.timestamp,
                             parentFolderName = parentFolderName,
+                            excludeSensitives = excludeSensitives
                         )
                     }
                 } else {
@@ -82,6 +91,23 @@ class RecentsBucketViewModel @AssistedInject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun monitorHiddenNodesState() {
+        viewModelScope.launch {
+            combine(
+                monitorHiddenNodesEnabledUseCase(),
+                monitorShowHiddenItemsUseCase()
+            ) { isHiddenNodesEnabled, showHiddenNodes ->
+                isHiddenNodesEnabled to showHiddenNodes
+            }
+                .catch {
+                    Timber.e(it, "Failed to monitor hidden nodes state")
+                }
+                .collectLatest { (isHiddenNodesEnabled, showHiddenNodes) ->
+                    loadBucket(excludeSensitives = isHiddenNodesEnabled && !showHiddenNodes)
+                }
         }
     }
 

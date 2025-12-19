@@ -91,7 +91,7 @@ fun MediaGridViewItem(
             defaultImage = defaultImage,
             contentDescription = "",
             contentScale = ContentScale.Crop,
-            blurImage = showBlurEffect && isSensitive
+            blurImage = showBlurEffect
         )
 
         if (showFavourite) {

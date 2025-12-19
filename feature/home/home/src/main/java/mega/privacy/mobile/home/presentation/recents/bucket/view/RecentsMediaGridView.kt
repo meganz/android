@@ -40,6 +40,7 @@ fun <T : TypedNode> RecentsMediaGridView(
                 isSelected = uiItem.isSelected,
                 showFavourite = uiItem.showFavourite,
                 isSensitive = uiItem.isSensitive,
+                showBlurEffect = uiItem.showBlurEffect,
                 onClick = { onItemClicked(uiItem) },
                 onLongClick = { onLongClick(uiItem) },
             )

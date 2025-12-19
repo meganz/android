@@ -12,6 +12,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -298,6 +299,50 @@ class NodeUiItemMapperTest {
 
             assertThat(result).hasSize(1)
             assertThat(result[0].isHighlighted).isTrue()
+        }
+
+    @Test
+    fun `test that invoke sets showBlurEffect to true when node is sensitive and has supported file type`() =
+        runTest {
+            val mockSensitiveImageNode = createMockFileNode(
+                id = 4L,
+                name = "sensitive_image.jpg",
+                isMarkedSensitive = true,
+            )
+            whenever(mockSensitiveImageNode.type).thenReturn(
+                StaticImageFileTypeInfo("image/jpeg", "jpg")
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockSensitiveImageNode),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].isSensitive).isTrue()
+            assertThat(result[0].showBlurEffect).isTrue()
+        }
+
+    @Test
+    fun `test that invoke sets showBlurEffect to false when node is not sensitive and has supported file type`() =
+        runTest {
+            val mockSensitiveImageNode = createMockFileNode(
+                id = 4L,
+                name = "sensitive_image.jpg",
+                isMarkedSensitive = false,
+            )
+            whenever(mockSensitiveImageNode.type).thenReturn(
+                StaticImageFileTypeInfo("image/jpeg", "jpg")
+            )
+
+            val result = underTest(
+                nodeList = listOf(mockSensitiveImageNode),
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            )
+
+            assertThat(result).hasSize(1)
+            assertThat(result[0].isSensitive).isFalse()
+            assertThat(result[0].showBlurEffect).isFalse()
         }
 
     @Test

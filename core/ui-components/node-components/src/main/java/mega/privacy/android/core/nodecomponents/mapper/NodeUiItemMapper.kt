@@ -79,6 +79,11 @@ class NodeUiItemMapper @Inject constructor(
                     durationInSecondsTextMapper(duration)
                 }
             } else null
+            val isSensitive = nodeSourceType !in setOf(
+                NodeSourceType.INCOMING_SHARES,
+                NodeSourceType.OUTGOING_SHARES,
+                NodeSourceType.LINKS,
+            ) && (node.isMarkedSensitive || node.isSensitiveInherited)
             NodeUiItem(
                 node = node,
                 isSelected = selectedNodeIds?.contains(node.id) ?: false,
@@ -102,12 +107,8 @@ class NodeUiItemMapper @Inject constructor(
                         && (node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
                 showLink = node.exportedData != null,
                 showFavourite = node.isFavourite && node.isIncomingShare.not(),
-                isSensitive = nodeSourceType !in setOf(
-                    NodeSourceType.INCOMING_SHARES,
-                    NodeSourceType.OUTGOING_SHARES,
-                    NodeSourceType.LINKS,
-                ) && (node.isMarkedSensitive || node.isSensitiveInherited),
-                showBlurEffect = shouldShowBlurEffect(node),
+                isSensitive = isSensitive,
+                showBlurEffect = shouldShowBlurEffect(isSensitive, node),
                 isFolderNode = node is TypedFolderNode,
                 isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,
                 duration = duration,
@@ -128,8 +129,8 @@ class NodeUiItemMapper @Inject constructor(
         }
     }
 
-    private fun shouldShowBlurEffect(node: TypedNode): Boolean {
-        return (node as? FileNode)?.type?.let { fileTypeInfo ->
+    private fun shouldShowBlurEffect(isSensitive: Boolean, node: TypedNode): Boolean {
+        return isSensitive && (node as? FileNode)?.type?.let { fileTypeInfo ->
             fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
         } == true
     }
