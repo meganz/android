@@ -21,9 +21,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
-import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.filestorage.FileStorageActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationView
@@ -31,6 +30,7 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,6 +46,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     @Inject
     lateinit var qrCodeMapper: QRCodeMapper
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val viewModel: TwoFactorAuthenticationViewModel by viewModels()
 
@@ -161,13 +164,11 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             }
 
             isSaveToTextFileSuccessful(key, result) -> {
-                val intent =
-                    Intent(
-                        this@TwoFactorAuthenticationActivity,
-                        ManagerActivity::class.java
-                    )
-                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                startActivity(intent)
+                megaNavigator.openManagerActivity(
+                    this@TwoFactorAuthenticationActivity,
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
+                    singleActivityDestination = null, //we just need to finish the activity in this case
+                )
                 finish()
                 viewModel.setIsRkExportSuccessfullyEvent(true)
             }
