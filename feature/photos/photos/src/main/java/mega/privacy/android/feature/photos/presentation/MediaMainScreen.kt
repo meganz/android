@@ -177,9 +177,6 @@ fun MediaMainRoute(
                 }
             }
         },
-        onNavigateToRenameNav = {
-            navigationHandler.navigate(it)
-        },
     )
 
     LaunchedEffect(
@@ -260,6 +257,7 @@ fun MediaMainRoute(
     )
 }
 
+@SuppressLint("ComposeModifierMissing")
 @Composable
 fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
@@ -292,7 +290,6 @@ fun MediaMainScreen(
     setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
-    modifier: Modifier = Modifier,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -397,7 +394,7 @@ fun MediaMainScreen(
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             AddContentFab(
                 visible = currentTabIndex == MediaScreen.Albums.ordinal,
@@ -597,7 +594,9 @@ fun MediaMainScreen(
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && isVideosSelectionMode,
                 nodeActionHandler = nodeActionHandle,
                 selectedNodes = selectedVideoNodes,
-                isSelecting = false
+                isSelecting = false,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                onNavigate = navigationHandler::navigate
             )
         }
     ) { paddingValues ->
@@ -620,7 +619,7 @@ fun MediaMainScreen(
                             tabItem = getTabItem(),
                             content = { _, modifier ->
                                 MediaContent(
-                                    modifier = Modifier.fillMaxSize(),
+                                    modifier = modifier.fillMaxSize(),
                                     timelineContentPadding = PaddingValues(
                                         bottom = if (isTimelineInSelectionMode || isVideosSelectionMode) {
                                             paddingValues.calculateBottomPadding()
@@ -842,14 +841,8 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        MediaScreen.Videos -> VideosTabRoute(
-            onTransfer = onTransfer,
-            navigationHandler = navigationHandler
-        )
-
-        MediaScreen.Playlists -> VideoPlaylistsTabRoute(
-            modifier = modifier
-        )
+        MediaScreen.Videos -> VideosTabRoute(navigationHandler)
+        MediaScreen.Playlists -> VideoPlaylistsTabRoute(modifier)
     }
 }
 

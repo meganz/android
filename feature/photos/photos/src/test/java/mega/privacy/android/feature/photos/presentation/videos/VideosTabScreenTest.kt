@@ -7,14 +7,11 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.components.DURATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.components.LOCATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
@@ -48,12 +45,8 @@ class VideosTabScreenTest {
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
         navigationHandler: NavigationHandler = mock(),
-        onTransfer: (TransferTriggerEvent) -> Unit = {},
         locationOptionSelected: (LocationFilterOption) -> Unit = {},
         durationOptionSelected: (DurationFilterOption) -> Unit = {},
-        onDismissNodeOptionsBottomSheet: () -> Unit = {},
-        nodeOptionsActionViewModel: NodeOptionsActionViewModel = mock(),
-        nodeActionHandler: NodeActionHandler = mock()
     ) {
         composeTestRule.setContent {
             VideosTabScreen(
@@ -63,12 +56,8 @@ class VideosTabScreenTest {
                 onLongClick = onLongClick,
                 onSortNodes = onSortNodes,
                 navigationHandler = navigationHandler,
-                onTransfer = onTransfer,
                 locationOptionSelected = locationOptionSelected,
                 durationOptionSelected = durationOptionSelected,
-                onDismissNodeOptionsBottomSheet = onDismissNodeOptionsBottomSheet,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                nodeActionHandler = nodeActionHandler
             )
         }
     }

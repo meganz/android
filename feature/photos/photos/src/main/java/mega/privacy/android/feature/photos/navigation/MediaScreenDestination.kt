@@ -10,6 +10,8 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
@@ -39,6 +41,15 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             .collectAsStateWithLifecycle(null)
         val mediaAlbumNavigationFlow by mediaAlbumNavigationFlow(LegacyPhotosSearchNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
+        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+
+        HandleNodeOptionsResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
 
         LaunchedEffect(photoSelectionResult) {
             if (photoSelectionResult != null) {
