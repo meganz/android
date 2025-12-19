@@ -23,6 +23,7 @@ import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 fun RecentsLazyListView(
     items: List<RecentsUiItem>,
     onFileClicked: (TypedFileNode, NodeSourceType) -> Unit,
+    onMenuClicked: (TypedFileNode, NodeSourceType) -> Unit,
     onBucketClicked: (RecentsUiItem) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -55,7 +56,9 @@ fun RecentsLazyListView(
                         }
                     },
                     onMenuClicked = {
-                        // TODO: Handle menu click
+                        item.firstNode?.let { node ->
+                            onMenuClicked(node, item.nodeSourceType)
+                        }
                     }
                 )
             }
@@ -71,6 +74,7 @@ private fun RecentsLazyListViewPreview() {
             items = mockRecentsUiItemList(),
             onFileClicked = { _, _ -> },
             onBucketClicked = { },
+            onMenuClicked = { _, _ -> },
         )
     }
 }

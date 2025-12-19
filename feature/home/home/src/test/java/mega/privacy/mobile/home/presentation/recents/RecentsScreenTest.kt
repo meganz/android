@@ -65,9 +65,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -89,9 +90,10 @@ class RecentsScreenTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -116,9 +118,10 @@ class RecentsScreenTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = { showActivityClicked = true },
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -140,9 +143,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -164,9 +168,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -193,9 +198,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -216,9 +222,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -238,9 +245,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -262,9 +270,10 @@ class RecentsScreenTest {
                         isHiddenNodeSettingsLoading = false,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = { uploadClicked = true },
-                    onBucketClicked = {}
+                    onUploadClicked = { uploadClicked = true }
                 )
             }
         }
@@ -294,9 +303,10 @@ class RecentsScreenTest {
                         isHideRecentsEnabled = true,
                     ),
                     onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }
@@ -334,9 +344,10 @@ class RecentsScreenTest {
                         clickedNode = node
                         clickedSourceType = sourceType
                     },
+                    onMenuClicked = { _, _ -> },
+                    onBucketClicked = { },
                     onShowRecentActivity = {},
-                    onUploadClicked = {},
-                    onBucketClicked = {}
+                    onUploadClicked = {}
                 )
             }
         }

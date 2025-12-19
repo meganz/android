@@ -3,6 +3,8 @@ package mega.privacy.mobile.home.presentation.recents
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.RecentsScreenNavKey
@@ -17,11 +19,21 @@ fun EntryProviderScope<NavKey>.recentsScreen(
             hiltViewModel<RecentsViewModel, RecentsViewModel.Factory> { factory ->
                 factory.create(maxBucketCount = SCREEN_MAX_BUCKETS)
             }
+        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+
         RecentsScreen(
             viewModel = viewModel,
             onNavigate = navigationHandler::navigate,
             transferHandler = transferHandler,
             onBack = navigationHandler::back,
+        )
+
+        HandleNodeOptionsResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = transferHandler::setTransferEvent,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
         )
     }
 }

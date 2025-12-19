@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.mobile.home.presentation.recents.view.MENU_TEST_TAG
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -50,7 +51,8 @@ class RecentsLazyListViewTest {
                     onFileClicked = { node, sourceType ->
                         clickedNode = node
                         clickedSourceType = sourceType
-                    }
+                    },
+                    onMenuClicked = { _, _ -> }
                 )
             }
         }
@@ -85,7 +87,8 @@ class RecentsLazyListViewTest {
                     onFileClicked = { node, sourceType ->
                         clickedNode = node
                         clickedSourceType = sourceType
-                    }
+                    },
+                    onMenuClicked = { _, _ -> }
                 )
             }
         }
@@ -96,6 +99,103 @@ class RecentsLazyListViewTest {
 
         assertThat(clickedNode).isEqualTo(mockNode)
         assertThat(clickedSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+    }
+
+    @Test
+    fun `test that onMenuClicked is called with correct node and CLOUD_DRIVE source type when menu is clicked on single node item`() {
+        val mockNode = createMockTypedFileNode(name = "Document.pdf")
+        var clickedNode: TypedFileNode? = null
+        var clickedSourceType: NodeSourceType? = null
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsLazyListView(
+                    items = listOf(item),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { node, sourceType ->
+                        clickedNode = node
+                        clickedSourceType = sourceType
+                    }
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(clickedNode).isEqualTo(mockNode)
+        assertThat(clickedSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+    }
+
+    @Test
+    fun `test that menu button is not displayed for bucket items`() {
+        val mockNode = createMockTypedFileNode(name = "Image.jpg")
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.MediaBucketImagesOnly(5),
+            parentFolderName = LocalizedText.Literal("Photos"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_image_stack_medium_solid,
+            isMediaBucket = true,
+            nodes = listOf(mockNode, mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsLazyListView(
+                    items = listOf(item),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> }
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)
+            .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onMenuClicked is not called when firstNode is null`() {
+        var menuClicked = false
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = emptyList(),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsLazyListView(
+                    items = listOf(item),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ ->
+                        menuClicked = true
+                    }
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)
+            .assertCountEquals(0)
+
+        assertThat(menuClicked).isFalse()
     }
 
     @Test
@@ -117,7 +217,8 @@ class RecentsLazyListViewTest {
             AndroidThemeForPreviews {
                 RecentsLazyListView(
                     items = listOf(item1, item2),
-                    onFileClicked = { _, _ -> }
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> }
                 )
             }
         }
@@ -161,6 +262,7 @@ class RecentsLazyListViewTest {
             nodes = nodes,
             parentFolderSharesType = parentFolderSharesType,
         )
+        val isSingleNode = nodes.size == 1 && !isMediaBucket
         return RecentsUiItem(
             title = title,
             icon = icon,
@@ -174,7 +276,7 @@ class RecentsLazyListViewTest {
             isFavourite = isFavourite,
             nodeLabel = nodeLabel,
             bucket = mockBucket,
-            isSingleNode = !isMediaBucket,
+            isSingleNode = isSingleNode,
             isSensitive = isSensitive
         )
     }
