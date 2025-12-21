@@ -1044,6 +1044,10 @@ public class PDFView extends RelativeLayout {
      * @return true if whole document can displayed at once, false otherwise
      */
     public boolean documentFitsView() {
+        if (pdfFile == null) {
+            return true;
+        }
+
         float len = pdfFile.getDocLen(1);
         if (swipeVertical) {
             return len < getHeight();
