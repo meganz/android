@@ -478,7 +478,7 @@ class FetchNodesViewModelTest {
             args = FetchNodesViewModel.Args(
                 session = "test-session",
                 isFromLogin = false,
-                refreshEvent = RefreshEvent.Refresh
+                refreshEvent = RefreshEvent.ManualRefresh
             )
         )
         advanceUntilIdle()

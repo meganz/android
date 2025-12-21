@@ -565,13 +565,13 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             backStack.addAll(listOf(Destination1, Destination3))
 
-            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.Refresh))
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.ManualRefresh))
 
             val lastDestination = backStack.last() as? FetchingContentNavKey
             assertThat(lastDestination).isNotNull()
             assertThat(lastDestination?.session).isEqualTo(initialSession)
             assertThat(lastDestination?.isFromLogin).isFalse()
-            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.Refresh)
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ManualRefresh)
         }
 
     @Test
@@ -612,12 +612,12 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             backStack.addAll(listOf(Destination1, Destination2))
 
-            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.Refresh))
+            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.ManualRefresh))
 
             val lastDestination = backStack.last() as? FetchingContentNavKey
             assertThat(lastDestination).isNotNull()
-            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.Refresh)
-            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false, RefreshEvent.Refresh))
+            assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ManualRefresh)
+            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false, RefreshEvent.ManualRefresh))
         }
 
     @Test

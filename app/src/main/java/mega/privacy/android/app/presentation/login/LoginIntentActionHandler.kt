@@ -90,7 +90,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         return@ReadyToFinish
                     }
 
-                    Constants.ACTION_REFRESH == intentAction -> {
+                    Constants.ACTION_REFRESH == intentAction || LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT == intentAction -> {
                         Timber.d("Intent to refresh")
                         activity.apply {
                             setResult(Activity.RESULT_OK)
@@ -371,7 +371,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                     }
                                 }
 
-                                if (loginUiState.rootNodesExists) {
+                                if (loginUiState.rootNodesExists && action != LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT) {
                                     var newIntent =
                                         Intent(activity, ManagerActivity::class.java)
 

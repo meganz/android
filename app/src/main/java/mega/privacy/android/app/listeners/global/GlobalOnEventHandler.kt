@@ -7,6 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.usecase.orientation.InitializeAdaptiveLayoutUseCase
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInAppUseCas
 import mega.privacy.android.domain.usecase.domainmigration.UpdateDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastMiscStateUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaEvent
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
@@ -56,7 +58,10 @@ class GlobalOnEventHandler @Inject constructor(
                     StorageState.Change -> refreshAccountDetail()
                     StorageState.PayWall -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
 
-                    else -> sendMyAccountUpdateBroadcast(MyAccountUpdate.Action.STORAGE_STATE_CHANGED, state)
+                    else -> sendMyAccountUpdateBroadcast(
+                        MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
+                        state
+                    )
                 }
             }
 
@@ -87,11 +92,20 @@ class GlobalOnEventHandler @Inject constructor(
      * Login screen should be shown.
      */
     private fun showLoginFetchingNodes() {
-        appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
-            putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            action = LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        })
+        applicationScope.launch {
+            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+                appContext.startActivity(Intent(appContext, MegaActivity::class.java).apply {
+                    action = LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+            } else {
+                appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    action = LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                })
+            }
+        }
     }
 
     private fun refreshAccountDetail() {
@@ -142,7 +156,10 @@ class GlobalOnEventHandler @Inject constructor(
     /**
      * Send broadcast to App Event
      */
-    private fun sendMyAccountUpdateBroadcast(action: MyAccountUpdate.Action, storageState: StorageState?) =
+    private fun sendMyAccountUpdateBroadcast(
+        action: MyAccountUpdate.Action,
+        storageState: StorageState?,
+    ) =
         applicationScope.launch {
             val data = MyAccountUpdate(
                 action = action,

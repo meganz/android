@@ -107,10 +107,10 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     private fun performFetchNodesOrLogin() = runCatching {
         viewModelScope.launch {
-            if (args.refreshEvent == RefreshEvent.ChangeEnvironment) {
-                Timber.d("Environment changed")
+            if (args.refreshEvent == RefreshEvent.ChangeEnvironment || args.refreshEvent == RefreshEvent.SdkReload) {
+                Timber.d("Fast login due to ${args.refreshEvent} event")
                 fastLogin(session = args.session, refreshChatUrl = true)
-            } else if (args.refreshEvent == RefreshEvent.Refresh) {
+            } else if (args.refreshEvent == RefreshEvent.ManualRefresh) {
                 Timber.d("Refresh event - fetch nodes")
                 fetchNodes(isRefreshSession = true)
             } else if (isMegaApiLoggedInUseCase()) {

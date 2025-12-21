@@ -137,7 +137,7 @@ class MegaActivity : ComponentActivity() {
     private suspend fun consumeActions() {
         when (intent.action) {
             Constants.ACTION_REFRESH -> {
-                globalStateViewModel.refreshSession(RefreshEvent.Refresh)
+                globalStateViewModel.refreshSession(RefreshEvent.ManualRefresh)
                 intent.action = null
             }
 
@@ -152,6 +152,11 @@ class MegaActivity : ComponentActivity() {
                     intent.action = null
                     intent.data = null
                 }
+            }
+
+            LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT -> {
+                globalStateViewModel.refreshSession(RefreshEvent.SdkReload)
+                intent.action = null
             }
         }
     }
