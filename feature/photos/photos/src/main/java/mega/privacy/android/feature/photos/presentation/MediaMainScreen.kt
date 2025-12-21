@@ -902,6 +902,12 @@ private fun NodeActionEventHandler(
             onActionFinished()
         }
     )
+
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss,
+        action = onActionFinished
+    )
 }
 
 @CombinedThemePreviews
