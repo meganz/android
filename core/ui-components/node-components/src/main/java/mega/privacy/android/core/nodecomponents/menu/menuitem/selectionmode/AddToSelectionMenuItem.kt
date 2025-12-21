@@ -1,0 +1,26 @@
+package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
+
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import javax.inject.Inject
+
+class AddToSelectionMenuItem @Inject constructor(
+    override val menuAction: AddToMenuAction
+) : NodeSelectionMenuItem<MenuActionWithIcon> {
+    override suspend fun shouldDisplay(
+        hasNodeAccessPermission: Boolean,
+        selectedNodes: List<TypedNode>,
+        canBeMovedToTarget: Boolean,
+        noNodeInBackups: Boolean,
+        noNodeTakenDown: Boolean,
+    ): Boolean {
+        val allFilesAreVideo = selectedNodes.all { node ->
+            node is FileNode && node.type is VideoFileTypeInfo
+        }
+        return allFilesAreVideo
+    }
+}

@@ -2,6 +2,7 @@ package mega.privacy.android.app.nav
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
+import mega.privacy.android.app.activities.contract.AddToAlbumActivityContract
 import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivityContract
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
@@ -48,4 +49,7 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
 
     override val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
         get() = OpenMultipleDocumentsPersistable()
+
+    override val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
+        get() = AddToAlbumActivityContract()
 }

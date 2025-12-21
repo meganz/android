@@ -164,6 +164,7 @@ class NodeActionClickHandlerTest {
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
+    private val mockAddToAlbumLauncher = mock<ActivityResultLauncher<Pair<Array<Long>, Int>>>()
 
     private val mockSingleNodeActionProvider = SingleNodeActionProvider(
         viewModel = mockViewModel,
@@ -178,7 +179,8 @@ class NodeActionClickHandlerTest {
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
-        versionsLauncher = mockVersionsLauncher
+        versionsLauncher = mockVersionsLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher
     )
 
     private val mockMultipleNodesActionProvider = MultipleNodesActionProvider(
@@ -193,7 +195,8 @@ class NodeActionClickHandlerTest {
         shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
-        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher
     )
 
     @get:Rule
@@ -250,7 +253,8 @@ class NodeActionClickHandlerTest {
             mockRestoreLauncher,
             mockSendToChatLauncher,
             mockHiddenNodesOnboardingLauncher,
-            mockGetNodeShareDataUseCase
+            mockGetNodeShareDataUseCase,
+            mockAddToAlbumLauncher
         )
     }
 

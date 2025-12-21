@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToAlbumSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DisputeTakeDownSelectionMenuItem
@@ -57,6 +59,8 @@ abstract class NodeSelectionModeModule {
             removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
+            addToSelectionMenuItem: AddToSelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
@@ -72,7 +76,9 @@ abstract class NodeSelectionModeModule {
             shareFolderSelectionMenuItem,
             removeShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addToSelectionMenuItem,
+            addToAlbumSelectionMenuItem
         )
 
         @Provides
@@ -122,6 +128,8 @@ abstract class NodeSelectionModeModule {
             removeShareSelectionMenuItem: RemoveShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
+            addToSelectionMenuItem: AddToSelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -134,7 +142,9 @@ abstract class NodeSelectionModeModule {
             shareFolderSelectionMenuItem,
             removeShareSelectionMenuItem,
             disputeTakeDownSelectionMenuItem,
-            shareSelectionMenuItem
+            shareSelectionMenuItem,
+            addToSelectionMenuItem,
+            addToAlbumSelectionMenuItem
         )
 
 

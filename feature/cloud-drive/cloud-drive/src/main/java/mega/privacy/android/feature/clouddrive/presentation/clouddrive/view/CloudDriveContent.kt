@@ -198,6 +198,13 @@ internal fun CloudDriveContent(
         }
     }
 
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss
+    ) {
+        onAction(CloudDriveAction.DeselectAllItems)
+    }
+
     Column(
         modifier = modifier
             .padding(contentPadding.excludingBottomPadding())

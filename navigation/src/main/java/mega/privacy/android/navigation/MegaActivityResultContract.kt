@@ -81,4 +81,9 @@ interface MegaActivityResultContract {
      * Contract for opening a multiple documents and persisting their URIs.
      */
     val openMultipleDocumentsPersistable: ActivityResultContract<Array<String>, List<@JvmSuppressWildcards Uri>>
+
+    /**
+     * Contract for add to in file operations.
+     */
+    val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
 }

@@ -5,6 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToAlbumActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
@@ -84,7 +86,9 @@ object NodeActionHandlerModule {
         unhideAction: UnhideActionClickHandler,
         favouriteAction: FavouriteActionClickHandler,
         removeFavouriteAction: RemoveFavouriteActionClickHandler,
-        syncAction: SyncActionClickHandler
+        syncAction: SyncActionClickHandler,
+        addToActionClickHandler: AddToActionClickHandler,
+        addToAlbumActionClickHandler: AddToAlbumActionClickHandler
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -116,7 +120,9 @@ object NodeActionHandlerModule {
             unhideAction,
             favouriteAction,
             removeFavouriteAction,
-            syncAction
+            syncAction,
+            addToActionClickHandler,
+            addToAlbumActionClickHandler
         )
     }
 
@@ -149,7 +155,9 @@ object NodeActionHandlerModule {
         removeShareAction: RemoveShareActionClickHandler,
         renameNodeAction: RenameNodeActionClickHandler,
         shareAction: ShareActionClickHandler,
-        unhideAction: UnhideActionClickHandler
+        unhideAction: UnhideActionClickHandler,
+        addToActionClickHandler: AddToActionClickHandler,
+        addToAlbumActionClickHandler: AddToAlbumActionClickHandler
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,
@@ -172,7 +180,9 @@ object NodeActionHandlerModule {
             removeShareAction,
             renameNodeAction,
             shareAction,
-            unhideAction
+            unhideAction,
+            addToActionClickHandler,
+            addToAlbumActionClickHandler
         )
     }
 }

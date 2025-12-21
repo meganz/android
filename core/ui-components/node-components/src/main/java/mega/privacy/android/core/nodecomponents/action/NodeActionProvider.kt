@@ -23,6 +23,7 @@ data class SingleNodeActionProvider(
     override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
     val versionsLauncher: ActivityResultLauncher<Long>,
 ) : NodeActionProvider(
     viewModel = viewModel,
@@ -36,7 +37,8 @@ data class SingleNodeActionProvider(
     shareFolderLauncher = shareFolderLauncher,
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
-    hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+    hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+    addToAlbumLauncher = addToAlbumLauncher
 )
 
 /**
@@ -55,6 +57,7 @@ data class MultipleNodesActionProvider(
     override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>
 ) : NodeActionProvider(
     viewModel = viewModel,
     context = context,
@@ -68,6 +71,7 @@ data class MultipleNodesActionProvider(
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+    addToAlbumLauncher = addToAlbumLauncher
 )
 
 open class NodeActionProvider(
@@ -82,5 +86,6 @@ open class NodeActionProvider(
     open val shareFolderLauncher: ActivityResultLauncher<LongArray>,
     open val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     open val sendToChatLauncher: ActivityResultLauncher<LongArray>,
-    open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>
+    open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
+    open val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
 )

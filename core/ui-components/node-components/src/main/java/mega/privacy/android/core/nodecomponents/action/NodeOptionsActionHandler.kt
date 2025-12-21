@@ -103,6 +103,15 @@ internal fun rememberSingleNodeActionHandler(
         nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
+    val addToAlbumLauncher =
+        rememberLauncherForActivityResult(
+            contract = megaActivityResultContract.addToAlbumResultContract
+        ) { message ->
+            if (!message.isNullOrEmpty()) {
+                nodeOptionsActionViewModel.postMessage(message)
+            }
+        }
+
     return remember(
         nodeOptionsActionViewModel,
         versionsLauncher,
@@ -112,6 +121,7 @@ internal fun rememberSingleNodeActionHandler(
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
+        addToAlbumLauncher,
         coroutineScope,
         navigationHandler,
         megaNavigator
@@ -132,7 +142,8 @@ internal fun rememberSingleNodeActionHandler(
                 shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
-                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+                addToAlbumLauncher = addToAlbumLauncher
             )
 
             nodeOptionsActionViewModel.handleSingleNodeAction(action) { handler ->
@@ -220,6 +231,15 @@ internal fun rememberMultipleNodesActionHandler(
         nodeOptionsActionViewModel.handleHiddenNodesOnboardingResult(result, true)
     }
 
+    val addToAlbumLauncher =
+        rememberLauncherForActivityResult(
+            contract = megaActivityResultContract.addToAlbumResultContract
+        ) { message ->
+            if (!message.isNullOrEmpty()) {
+                nodeOptionsActionViewModel.postMessage(message)
+            }
+        }
+
     return remember(
         nodeOptionsActionViewModel,
         moveLauncher,
@@ -228,6 +248,7 @@ internal fun rememberMultipleNodesActionHandler(
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
+        addToAlbumLauncher,
         coroutineScope,
         navigationHandler,
         megaNavigator
@@ -247,7 +268,8 @@ internal fun rememberMultipleNodesActionHandler(
                 shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
-                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher
+                hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
+                addToAlbumLauncher = addToAlbumLauncher
             )
 
             nodeOptionsActionViewModel.handleMultipleNodesAction(action) { handler ->
