@@ -3,6 +3,7 @@ package mega.privacy.android.data.gateway
 import android.content.Intent
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.BatteryInfo
+import java.util.Calendar
 
 /**
  * Device gateway
@@ -131,4 +132,9 @@ interface DeviceGateway {
      * Get current timezone
      */
     fun getTimezone(): String
+
+    /**
+     * Get [java.util.Calendar] instance.
+     */
+    fun getCalendar(): Calendar
 }

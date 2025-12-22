@@ -21,6 +21,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
+import mega.privacy.android.domain.usecase.environment.GetCalendarUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
@@ -56,6 +57,7 @@ internal class SaveScannedDocumentsViewModelTest {
 
     private val validateScanFilenameUseCase = spy<ValidateScanFilenameUseCase>()
     private val renameFileAndDeleteOriginalUseCase = mock<RenameFileAndDeleteOriginalUseCase>()
+    private val getCalendarUseCase = mock<GetCalendarUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
 
     private val cloudDriveParentHandle = 123456L
@@ -74,13 +76,14 @@ internal class SaveScannedDocumentsViewModelTest {
             validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
             savedStateHandle = savedStateHandle,
+            getCalendarUseCase = getCalendarUseCase
         )
     }
 
     @BeforeEach
     fun reset() {
         savedStateHandle = SavedStateHandle(mapOf())
-        reset(renameFileAndDeleteOriginalUseCase)
+        reset(renameFileAndDeleteOriginalUseCase, getCalendarUseCase)
     }
 
     @Test
@@ -142,10 +145,12 @@ internal class SaveScannedDocumentsViewModelTest {
     @Test
     fun `test that the default filename ends with PDF upon initialization`() = runTest {
         val format = "Scanned_%1\$s"
+        val calendar = Calendar.getInstance()
+        whenever(getCalendarUseCase()) doReturn calendar
         val dateString = String.format(
             Locale.getDefault(),
             DATE_TIME_FORMAT,
-            Calendar.getInstance(),
+            calendar,
         )
 
         savedStateHandle[INITIAL_FILENAME_FORMAT] = format

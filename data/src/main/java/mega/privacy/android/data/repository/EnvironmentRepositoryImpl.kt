@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import timber.log.Timber
+import java.util.Calendar
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -144,4 +145,6 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
         .takeIf { it.size() > 0 }
         ?.get(0)
         ?: Locale.getDefault()
+
+    override fun getCalendar(): Calendar = deviceGateway.getCalendar()
 }

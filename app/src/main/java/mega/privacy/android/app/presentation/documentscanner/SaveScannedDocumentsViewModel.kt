@@ -21,13 +21,13 @@ import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
+import mega.privacy.android.domain.usecase.environment.GetCalendarUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEvent
 import timber.log.Timber
-import java.util.Calendar
 import java.util.Locale
 import javax.inject.Inject
 
@@ -45,6 +45,7 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
     private val savedStateHandle: SavedStateHandle,
+    private val getCalendarUseCase: GetCalendarUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaveScannedDocumentsUiState())
@@ -82,7 +83,7 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
                     val formattedDateTime = String.format(
                         Locale.getDefault(),
                         DATE_TIME_FORMAT,
-                        Calendar.getInstance(),
+                        getCalendarUseCase(),
                     )
                     val initialFilename = String.format(
                         Locale.getDefault(),
