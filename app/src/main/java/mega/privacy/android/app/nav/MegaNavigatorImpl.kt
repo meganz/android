@@ -55,9 +55,11 @@ import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
@@ -87,6 +89,7 @@ import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -129,6 +132,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val navigationQueue: NavigationEventQueue,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
@@ -640,10 +644,10 @@ internal class MegaNavigatorImpl @Inject constructor(
         pdfIntent.apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeId.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
-            putExtra(Constants.INTENT_EXTRA_KEY_APP, true)
+            putExtra(INTENT_EXTRA_KEY_HANDLE, nodeId.longValue)
+            putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, type)
+            putExtra(INTENT_EXTRA_KEY_APP, true)
         }
         nodeContentUriIntentMapper(
             intent = pdfIntent,
@@ -759,6 +763,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateForSingleActivity(
             context = context,
             legacyNavigation = {
+                @Suppress("DEPRECATION")
                 openFileContactListActivity(context = context, handle = handle)
             },
             singleActivityDestination = FileContactInfoNavKey(
@@ -883,12 +888,12 @@ internal class MegaNavigatorImpl @Inject constructor(
 
     override fun openAskForCustomizedPlan(
         context: Context,
-        myEmail: String?,
+        email: String?,
         accountType: AccountType,
     ) {
         AlertsAndWarnings.askForCustomizedPlan(
             context = context,
-            myEmail = myEmail,
+            myEmail = email,
             accountType = accountType
         )
     }
@@ -997,5 +1002,25 @@ internal class MegaNavigatorImpl @Inject constructor(
             folderName = folderName,
             isFromFolderLink = isFromFolderLink
         )
+    }
+
+    override suspend fun sendMessageConsideringSingleActivity(context: Context, message: String) {
+        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            launchMegaActivityIfNeeded(context)
+            snackbarEventQueue.queueMessage(message)
+        } else {
+            navigateToManagerActivity(
+                context = context,
+                action = Constants.ACTION_SHOW_WARNING,
+                data = null,
+                flags = FLAG_ACTIVITY_CLEAR_TOP,
+                bundle = Bundle().apply {
+                    putString(
+                        Constants.INTENT_EXTRA_WARNING_MESSAGE,
+                        message,
+                    )
+                }
+            )
+        }
     }
 }

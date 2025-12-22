@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -17,12 +18,19 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -40,12 +48,13 @@ class MegaNavigatorImplTest {
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val navigationQueue = mock<NavigationEventQueue>()
     private val activityLifecycleHandler = mock<ActivityLifecycleHandler>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     private lateinit var underTest: MegaNavigatorImpl
 
     private val context = mock<Context>()
 
-    @BeforeEach
+    @BeforeAll
     fun setup() {
         underTest = MegaNavigatorImpl(
             applicationScope = applicationScope,
@@ -58,10 +67,11 @@ class MegaNavigatorImplTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationQueue = navigationQueue,
             activityLifecycleHandler = activityLifecycleHandler,
+            snackbarEventQueue = snackbarEventQueue
         )
     }
 
-    @BeforeAll
+    @BeforeEach
     fun cleanUp() {
         reset(
             nodeContentUriIntentMapper,
@@ -72,7 +82,8 @@ class MegaNavigatorImplTest {
             mediaPlayerIntentMapper,
             getFeatureFlagValueUseCase,
             navigationQueue,
-            activityLifecycleHandler
+            activityLifecycleHandler,
+            snackbarEventQueue,
         )
     }
 
@@ -174,6 +185,45 @@ class MegaNavigatorImplTest {
             )
 
             assertThat(createPendingIntentCalled).isFalse()
+        }
+
+    @Test
+    fun `test that sendMessageConsideringSingleActivity queues message to snackbarEventQueue when SingleActivity is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            val message = "Test warning message"
+
+            underTest.sendMessageConsideringSingleActivity(context, message)
+
+            verify(snackbarEventQueue).queueMessage(message)
+            verify(context, never()).startActivity(argThat<Intent> {
+                component?.className == MegaActivity::class.java.name
+            })
+        }
+
+    @Test
+    fun `test that sendMessageConsideringSingleActivity launches MegaActivity when SingleActivity is enabled and current activity is not MegaActivity`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(null)
+            val message = "Test warning message"
+
+            underTest.sendMessageConsideringSingleActivity(context, message)
+
+            verify(context, atLeastOnce()).startActivity(any())
+            verify(snackbarEventQueue).queueMessage(message)
+        }
+
+    @Test
+    fun `test that sendMessageConsideringSingleActivity does not call snackbarEventQueue when SingleActivity is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            val message = "Test warning message"
+
+            underTest.sendMessageConsideringSingleActivity(context, message)
+
+            verifyNoInteractions(snackbarEventQueue)
         }
 }
 

@@ -626,6 +626,16 @@ interface AppNavigator {
         folderName: String,
         isFromFolderLink: Boolean,
     )
+
+    /**
+     * Send a snackbar message considering SingleActivity feature flag.
+     * @param context The context
+     * @param message The message to send
+     */
+    suspend fun sendMessageConsideringSingleActivity(
+        context: Context,
+        message: String,
+    )
 }
 
 /**

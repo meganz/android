@@ -30,7 +30,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
@@ -178,7 +177,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
                     event = uiState.copySuccessEvent,
                     onConsumed = viewModel::resetCopySuccessEvent,
                 ) {
-                    launchManagerActivityAfterCopy()
+                    sendMessageAfterCopy()
                 }
             }
         }
@@ -228,16 +227,11 @@ class FileLinkComposeActivity : PasscodeActivity(),
         selectImportFolderLauncher.launch(intent)
     }
 
-    private fun launchManagerActivityAfterCopy() {
-        Intent(this, ManagerActivity::class.java).apply {
-            action = Constants.ACTION_SHOW_WARNING
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            putExtra(
-                Constants.INTENT_EXTRA_WARNING_MESSAGE,
-                getString(R.string.context_correctly_copied)
-            )
-            startActivity(this)
-        }
+    private suspend fun sendMessageAfterCopy() {
+        megaNavigator.sendMessageConsideringSingleActivity(
+            context = this,
+            message = getString(R.string.context_correctly_copied)
+        )
         finish()
     }
 
