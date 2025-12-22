@@ -30,6 +30,8 @@ import mega.privacy.android.data.facade.VideoCompressionFacade
 import mega.privacy.android.data.facade.WorkManagerGatewayImpl
 import mega.privacy.android.data.facade.WorkerClassGatewayImpl
 import mega.privacy.android.data.facade.chat.ChatStorageFacade
+import mega.privacy.android.data.gateway.AgeSignalsGateway
+import mega.privacy.android.data.gateway.AgeSignalsGatewayImpl
 import mega.privacy.android.data.gateway.AdsGateway
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -326,4 +328,8 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindMediaTimelinePreferencesGateway(implementation: MediaTimelinePreferencesDataStore): MediaTimelinePreferencesGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindAgeSignalsGateway(implementation: AgeSignalsGatewayImpl): AgeSignalsGateway
 }

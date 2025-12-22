@@ -1,13 +1,10 @@
 package mega.privacy.android.data.repository.agesignal
 
-import android.content.Context
 import com.google.android.play.agesignals.AgeSignalsException
-import com.google.android.play.agesignals.AgeSignalsManagerFactory
-import com.google.android.play.agesignals.AgeSignalsRequest
 import com.google.android.play.agesignals.model.AgeSignalsVerificationStatus
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.gateway.AgeSignalsGateway
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus.AdultVerified
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus.RequiresMinorRestriction
@@ -26,23 +23,19 @@ import javax.inject.Inject
  * From January 1, 2026, the API will return live responses. All exceptions are handled
  * by defaulting to RequiresMinorRestriction for legal compliance.
  */
-class AgeSignalRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+internal class AgeSignalRepositoryImpl @Inject constructor(
+    private val ageSignalsGateway: AgeSignalsGateway,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : AgeSignalRepository {
-
-    private val ageSignalsManager = AgeSignalsManagerFactory.create(context)
 
     override suspend fun fetchAgeSignal(): UserAgeComplianceStatus =
         withContext(defaultDispatcher) {
             runCatching {
-                val request = AgeSignalsRequest.builder().build()
-
-                // 1. Use coroutine extension to suspend and await the asynchronous result
-                val result = ageSignalsManager.checkAgeSignals(request).result
+                // 1. Use suspend function to get the user status
+                val userStatus = ageSignalsGateway.checkAgeSignals()
 
                 // 2. Map the Google Play API user status directly to our domain compliance status
-                when (result.userStatus()) {
+                when (userStatus) {
                     AgeSignalsVerificationStatus.VERIFIED -> AdultVerified
 
                     // All non-VERIFIED states mandate the restrictive flow for compliance.
