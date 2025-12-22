@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuitem.AddToPlaylistBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.CopyBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.DeletePermanentlyBottomSheetMenuItem
@@ -46,6 +47,7 @@ import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.domain.qualifier.features.Videos
 import javax.inject.Singleton
 
 /**
@@ -447,6 +449,85 @@ abstract class NodeActionsBottomSheetModule {
                 verifyMenuAction,
                 versionsMenuAction,
                 viewInFolderMenuAction,
+            )
+        }
+
+        /**
+         * Provide cloudDrive toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @Videos
+        @Singleton
+        fun provideVideosBottomSheetOptions(
+            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
+            copyMenuAction: CopyBottomSheetMenuItem,
+            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
+            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            editMenuAction: EditBottomSheetMenuItem,
+            favouriteMenuAction: FavouriteBottomSheetMenuItem,
+            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
+            getLinkMenuAction: GetLinkBottomSheetMenuItem,
+            infoMenuAction: InfoBottomSheetMenuItem,
+            labelMenuAction: LabelBottomSheetMenuItem,
+            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
+            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
+            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
+            moveMenuAction: MoveBottomSheetMenuItem,
+            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
+            openWithMenuAction: OpenWithBottomSheetMenuItem,
+            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
+            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
+            renameMenuAction: RenameBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+            restoreMenuAction: RestoreBottomSheetMenuItem,
+            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
+            shareMenuAction: ShareBottomSheetMenuItem,
+            shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
+            slideshowMenuAction: SlideshowBottomSheetMenuItem,
+            trashMenuAction: TrashBottomSheetMenuItem,
+            verifyMenuAction: VerifyBottomSheetMenuItem,
+            versionsMenuAction: VersionsBottomSheetMenuItem,
+            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+            addToPlaylistBottomSheetMenuItem: AddToPlaylistBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                availableOfflineMenuAction,
+                removeOfflineMenuAction,
+                copyMenuAction,
+                deletePermanentlyMenuAction,
+                disputeTakeDownMenuAction,
+                downloadMenuAction,
+                editMenuAction,
+                favouriteMenuAction,
+                removeFavouriteMenuAction,
+                getLinkMenuAction,
+                infoMenuAction,
+                labelMenuAction,
+                leaveShareMenuAction,
+                manageLinkMenuAction,
+                manageShareFolderBottomSheetMenuItem,
+                moveMenuAction,
+                openLocationMenuAction,
+                openWithMenuAction,
+                removeLinkMenuAction,
+                removeShareMenuAction,
+                renameMenuAction,
+                hideMenuAction,
+                unhideMenuAction,
+                restoreMenuAction,
+                sendToChatMenuAction,
+                shareMenuAction,
+                shareFolderMenuAction,
+                slideshowMenuAction,
+                trashMenuAction,
+                verifyMenuAction,
+                versionsMenuAction,
+                viewInFolderMenuAction,
+                addToPlaylistBottomSheetMenuItem
             )
         }
     }

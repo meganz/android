@@ -191,6 +191,7 @@ interface IconPackInterface {
                 val Pen2: ImageVector
                 val Phone01: ImageVector
                 val Play: ImageVector
+                val Playlist: ImageVector
                 val PlaySquare: ImageVector
                 val Plus: ImageVector
                 val PlusCircle: ImageVector
