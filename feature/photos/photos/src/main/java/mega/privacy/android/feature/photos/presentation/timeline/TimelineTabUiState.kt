@@ -1,10 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.timeline
 
 import androidx.annotation.StringRes
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -17,16 +14,15 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 data class TimelineTabUiState(
     val isLoading: Boolean = true,
-    val allPhotos: ImmutableList<PhotoResult> = persistentListOf(),
-    val displayedPhotos: ImmutableList<PhotosNodeContentType> = persistentListOf(),
-    val daysCardPhotos: ImmutableList<PhotosNodeListCard> = persistentListOf(),
-    val monthsCardPhotos: ImmutableList<PhotosNodeListCard> = persistentListOf(),
-    val yearsCardPhotos: ImmutableList<PhotosNodeListCard> = persistentListOf(),
+    val allPhotos: List<PhotoResult> = emptyList(),
+    val displayedPhotos: List<PhotosNodeContentType> = emptyList(),
+    val daysCardPhotos: List<PhotosNodeListCard> = emptyList(),
+    val monthsCardPhotos: List<PhotosNodeListCard> = emptyList(),
+    val yearsCardPhotos: List<PhotosNodeListCard> = emptyList(),
     val gridSize: TimelineGridSize = TimelineGridSize.Default,
     val selectedPhotoCount: Int = 0,
     val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
     val isPaginationEnabled: Boolean = false,
-    val selectedPhotosInTypedNode: ImmutableList<TypedNode> = persistentListOf(),
 )
 
 data class TimelineTabActionUiState(
@@ -39,8 +35,8 @@ data class TimelineTabNormalModeActionUiState(
 )
 
 data class TimelineTabSelectionModeActionUiState(
-    val bottomBarActions: ImmutableList<TimelineSelectionMenuAction> = persistentListOf(),
-    val bottomSheetActions: ImmutableList<TimelineSelectionMenuAction> = persistentListOf(),
+    val bottomBarActions: List<TimelineSelectionMenuAction> = emptyList(),
+    val bottomSheetActions: List<TimelineSelectionMenuAction> = emptyList(),
 )
 
 enum class TimelineTabSortOptions(

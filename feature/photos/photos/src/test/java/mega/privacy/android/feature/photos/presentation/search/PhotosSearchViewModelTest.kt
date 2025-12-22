@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
@@ -26,7 +27,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.feature.photos.mapper.AlbumTitleStringMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
@@ -342,8 +342,7 @@ internal class PhotosSearchViewModelTest {
             )
             val photoResult = PhotoResult(
                 photo = expectedPhoto,
-                isMarkedSensitive = false,
-                inTypedNode = null,
+                isMarkedSensitive = false
             )
             val timelinePhotosResult = TimelinePhotosResult(
                 allPhotos = listOf(photoResult),
@@ -460,8 +459,7 @@ internal class PhotosSearchViewModelTest {
         )
         val photoResult = PhotoResult(
             photo = expectedPhoto,
-            isMarkedSensitive = false,
-            inTypedNode = null,
+            isMarkedSensitive = false
         )
         val timelinePhotosResult = TimelinePhotosResult(
             allPhotos = listOf(photoResult),

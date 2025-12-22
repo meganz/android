@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
@@ -74,12 +76,14 @@ class TimelineTabViewModelTest {
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
 
     @BeforeEach
-    fun setup() {
+    fun setup() = runTest {
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
+        whenever(getNodeListByIdsUseCase(nodeIds = any())) doReturn emptyList()
         underTest = TimelineTabViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
@@ -89,7 +93,8 @@ class TimelineTabViewModelTest {
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getNodeListByIdsUseCase = getNodeListByIdsUseCase
         )
     }
 
@@ -104,7 +109,8 @@ class TimelineTabViewModelTest {
             getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper,
-            monitorHiddenNodesEnabledUseCase
+            monitorHiddenNodesEnabledUseCase,
+            getNodeListByIdsUseCase
         )
     }
 
@@ -122,8 +128,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult1 = PhotoResult(
             photo = photo1,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photoUiState1 = mock<PhotoUiState.Image>()
         whenever(
@@ -136,8 +141,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult2 = PhotoResult(
             photo = photo2,
-            isMarkedSensitive = true,
-            inTypedNode = null
+            isMarkedSensitive = true
         )
         val photosResult = TimelinePhotosResult(
             allPhotos = listOf(photoResult1, photoResult2),
@@ -337,8 +341,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult1 = PhotoResult(
             photo = photo1,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo1UiState = mock<PhotoUiState.Image>()
         whenever(
@@ -352,8 +355,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult2 = PhotoResult(
             photo = photo2,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo2UiState = mock<PhotoUiState.Image>()
         whenever(
@@ -412,8 +414,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -427,8 +428,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -496,8 +496,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -511,8 +510,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -566,8 +564,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -581,8 +578,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -635,8 +631,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -650,8 +645,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -740,8 +734,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -755,8 +748,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image>()
             whenever(
@@ -853,8 +845,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult1 = PhotoResult(
             photo = photo1,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo1UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo1Id
@@ -871,8 +862,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult2 = PhotoResult(
             photo = photo2,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo2UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo2Id
@@ -929,8 +919,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult1 = PhotoResult(
             photo = photo1,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo1UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo1Id
@@ -947,8 +936,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult2 = PhotoResult(
             photo = photo2,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo2UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo2Id
@@ -1006,8 +994,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult1 = PhotoResult(
             photo = photo1,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo1UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo1Id
@@ -1024,8 +1011,7 @@ class TimelineTabViewModelTest {
         }
         val photoResult2 = PhotoResult(
             photo = photo2,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photo2UiState = mock<PhotoUiState.Image> {
             on { id } doReturn photo2Id
@@ -1082,8 +1068,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo1Id
@@ -1100,8 +1085,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo2Id
@@ -1156,8 +1140,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo1Id
@@ -1174,8 +1157,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo2Id
@@ -1236,8 +1218,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo1UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo1Id
@@ -1254,8 +1235,7 @@ class TimelineTabViewModelTest {
             }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
             val photo2UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo2Id
@@ -1324,14 +1304,9 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val exportedDataMock = mock<ExportedData>()
-            val typedNode = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1340,6 +1315,16 @@ class TimelineTabViewModelTest {
             whenever(
                 monitorTimelinePhotosUseCase.invoke(request = any())
             ) doReturn flowOf(photosResult)
+            val exportedDataMock = mock<ExportedData>()
+            val typedNode = mock<TypedNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { exportedData } doReturn exportedDataMock
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             val photoUiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photoId
             }
@@ -1388,14 +1373,9 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockFileTypeInfo
             }
-            val exportedDataMock1 = mock<ExportedData>()
-            val typedNode1 = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock1
-            }
             val photoResult1 = PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode1
+                isMarkedSensitive = false
             )
             val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
             val photo2Id = 2L
@@ -1404,14 +1384,9 @@ class TimelineTabViewModelTest {
                 on { modificationTime } doReturn now
                 on { fileTypeInfo } doReturn mockTextFileTypeInfo
             }
-            val exportedDataMock2 = mock<ExportedData>()
-            val typedNode2 = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock2
-            }
             val photoResult2 = PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode2
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult1, photoResult2)
@@ -1420,6 +1395,24 @@ class TimelineTabViewModelTest {
             whenever(
                 monitorTimelinePhotosUseCase.invoke(request = any())
             ) doReturn flowOf(photosResult)
+            val exportedDataMock1 = mock<ExportedData>()
+            val typedNode1 = mock<TypedNode> {
+                on { id } doReturn NodeId(photo1Id)
+                on { exportedData } doReturn exportedDataMock1
+            }
+            val exportedDataMock2 = mock<ExportedData>()
+            val typedNode2 = mock<TypedNode> {
+                on { id } doReturn NodeId(photo2Id)
+                on { exportedData } doReturn exportedDataMock2
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(
+                        NodeId(longValue = photo1Id),
+                        NodeId(longValue = photo2Id)
+                    )
+                )
+            ) doReturn listOf(typedNode1, typedNode2)
             val photo1UiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photo1Id
             }
@@ -1473,14 +1466,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn false
             }
-            val exportedDataMock = mock<ExportedData>()
-            val typedNode = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = true,
-                inTypedNode = typedNode
+                isMarkedSensitive = true
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1505,6 +1493,16 @@ class TimelineTabViewModelTest {
                     sortOrder = any()
                 )
             ) doReturn sortResult
+            val exportedDataMock = mock<ExportedData>()
+            val typedNode = mock<TypedNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { exportedData } doReturn exportedDataMock
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
@@ -1541,14 +1539,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn true
             }
-            val exportedDataMock = mock<ExportedData>()
-            val typedNode = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1560,6 +1553,16 @@ class TimelineTabViewModelTest {
             val photoUiState = mock<PhotoUiState.Image> {
                 on { id } doReturn photoId
             }
+            val exportedDataMock = mock<ExportedData>()
+            val typedNode = mock<TypedNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { exportedData } doReturn exportedDataMock
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             whenever(
                 photoUiStateMapper.invoke(photo = photo)
             ) doReturn photoUiState
@@ -1609,14 +1612,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn true
             }
-            val exportedDataMock = mock<ExportedData>()
-            val typedNode = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1641,6 +1639,16 @@ class TimelineTabViewModelTest {
                     sortOrder = any()
                 )
             ) doReturn sortResult
+            val exportedDataMock = mock<ExportedData>()
+            val typedNode = mock<TypedNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { exportedData } doReturn exportedDataMock
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
@@ -1674,14 +1682,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn true
             }
-            val exportedDataMock = mock<ExportedData>()
-            val typedNode = mock<TypedNode> {
-                on { exportedData } doReturn exportedDataMock
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1709,6 +1712,16 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
+            val exportedDataMock = mock<ExportedData>()
+            val typedNode = mock<TypedNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { exportedData } doReturn exportedDataMock
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
@@ -1739,13 +1752,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn true
             }
-            val typedNode = mock<TypedFileNode> {
-                on { type } doReturn mockFileTypeInfo
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1773,6 +1782,15 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
+            val typedNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { type } doReturn mockFileTypeInfo
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {
@@ -1803,13 +1821,9 @@ class TimelineTabViewModelTest {
                 on { fileTypeInfo } doReturn mockFileTypeInfo
                 on { isSensitiveInherited } doReturn true
             }
-            val typedNode = mock<TypedFileNode> {
-                on { type } doReturn mockFileTypeInfo
-            }
             val photoResult = PhotoResult(
                 photo = photo,
-                isMarkedSensitive = false,
-                inTypedNode = typedNode
+                isMarkedSensitive = false
             )
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn listOf(photoResult)
@@ -1837,6 +1851,15 @@ class TimelineTabViewModelTest {
             whenever(
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
+            val typedNode = mock<TypedFileNode> {
+                on { id } doReturn NodeId(longValue = photoId)
+                on { type } doReturn mockFileTypeInfo
+            }
+            whenever(
+                getNodeListByIdsUseCase(
+                    nodeIds = listOf(NodeId(longValue = photoId))
+                )
+            ) doReturn listOf(typedNode)
             isHiddenNodesEnabledFlow.emit(false)
 
             underTest.uiState.test {

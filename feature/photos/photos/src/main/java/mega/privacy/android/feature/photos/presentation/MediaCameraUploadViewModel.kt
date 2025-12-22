@@ -3,7 +3,6 @@ package mega.privacy.android.feature.photos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -400,7 +399,7 @@ class MediaCameraUploadViewModel @Inject constructor(
         _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }
     }
 
-    internal suspend fun updateCUPageEnablementBasedOnDisplayedPhotos(photos: ImmutableList<PhotosNodeContentType>) {
+    internal suspend fun updateCUPageEnablementBasedOnDisplayedPhotos(photos: List<PhotosNodeContentType>) {
         runCatching { isCameraUploadsEnabledUseCase() }
             .onSuccess { isCameraUploadsEnabled ->
                 _uiState.update { it.copy(enableCameraUploadPageShowing = photos.isEmpty() && !isCameraUploadsEnabled) }

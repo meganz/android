@@ -51,7 +51,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.chip.MegaChip
@@ -621,9 +620,9 @@ private fun LazyListState.isScrolledToTop() = remember(this) {
 
 private fun calculateScrollIndex(
     photo: PhotosNodeListCard,
-    displayedPhotos: ImmutableList<PhotosNodeContentType>,
-    daysCardPhotos: ImmutableList<PhotosNodeListCard>,
-    monthsCardPhotos: ImmutableList<PhotosNodeListCard>,
+    displayedPhotos: List<PhotosNodeContentType>,
+    daysCardPhotos: List<PhotosNodeListCard>,
+    monthsCardPhotos: List<PhotosNodeListCard>,
 ): Int {
     return when (photo) {
         is PhotosNodeListCard.Years -> {

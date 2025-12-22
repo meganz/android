@@ -2,7 +2,6 @@ package mega.privacy.android.domain.entity.photos
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
  * A model to request timeline photos.
@@ -30,7 +29,6 @@ data class TimelineSortedPhotosResult(
 data class PhotoResult(
     val photo: Photo,
     val isMarkedSensitive: Boolean,
-    val inTypedNode: TypedNode?,
 )
 
 sealed class PhotoDateResult(

@@ -7,12 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.AccountLevelDetail
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.domain.entity.photos.PhotoResult
@@ -20,15 +15,12 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -49,12 +41,10 @@ class MonitorTimelinePhotosUseCaseTest {
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase = mock()
     private val loadNextPageOfPhotosUseCase: LoadNextPageOfPhotosUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
     private val getCloudDrivePhotos: FilterCloudDrivePhotos = mock()
     private val getCameraUploadPhotos: FilterCameraUploadPhotos = mock()
-    private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
-    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
@@ -63,7 +53,7 @@ class MonitorTimelinePhotosUseCaseTest {
     fun setup() {
         runTest {
             whenever(getTimelineFilterPreferencesUseCase()) doReturn null
-            whenever(getBusinessStatusUseCase()) doReturn BusinessAccountStatus.Active
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
         }
 
         underTest = MonitorTimelinePhotosUseCase(
@@ -73,12 +63,10 @@ class MonitorTimelinePhotosUseCaseTest {
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             loadNextPageOfPhotosUseCase = loadNextPageOfPhotosUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             getCloudDrivePhotos = getCloudDrivePhotos,
             getCameraUploadPhotos = getCameraUploadPhotos,
-            getBusinessStatusUseCase = getBusinessStatusUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase
         )
     }
 
@@ -89,12 +77,10 @@ class MonitorTimelinePhotosUseCaseTest {
             getTimelinePhotosUseCase,
             loadNextPageOfPhotosUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase,
+            monitorHiddenNodesEnabledUseCase,
             getTimelineFilterPreferencesUseCase,
             getCloudDrivePhotos,
             getCameraUploadPhotos,
-            getBusinessStatusUseCase,
-            getNodeByIdUseCase
         )
     }
 
@@ -123,15 +109,9 @@ class MonitorTimelinePhotosUseCaseTest {
             }
             val allPhotosList = listOf(photo1, photo2, photo3)
 
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             whenever(monitorPaginatedTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
             whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
             underTest(request = request).test {
                 assertThat(expectMostRecentItem().allPhotos.size).isEqualTo(3)
@@ -167,16 +147,9 @@ class MonitorTimelinePhotosUseCaseTest {
             on { isSensitiveInherited } doReturn true
         }
         val allPhotosList = listOf(photo1, photo2, photo3)
-        val accountLevelDetail = mock<AccountLevelDetail> {
-            on { accountType } doReturn AccountType.PRO_III
-        }
-        val accountDetail = mock<AccountDetail> {
-            on { levelDetail } doReturn accountLevelDetail
-        }
-
         whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
         whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-        whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+        whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
         underTest(request = request).test {
             assertThat(expectMostRecentItem().allPhotos.size).isEqualTo(3)
@@ -198,16 +171,9 @@ class MonitorTimelinePhotosUseCaseTest {
                 on { isSensitiveInherited } doReturn false
             }
             val allPhotosList = listOf(photo1)
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
-
             whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
             whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
             underTest(request = request).test {
                 val item = expectMostRecentItem()
@@ -220,12 +186,6 @@ class MonitorTimelinePhotosUseCaseTest {
     fun `test that sensitive photos are successfully filtered when hidden nodes flag is active`() =
         runTest(dispatcher) {
             val request = TimelinePhotosRequest(isPaginationEnabled = false)
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             val now = LocalDateTime.now()
             val photo1Id = 1L
             val photo1 = mock<Photo.Image> {
@@ -251,7 +211,7 @@ class MonitorTimelinePhotosUseCaseTest {
             val allPhotosList = listOf(photo1, photo2, photo3)
             whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
             whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(false)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
             underTest(request = request).test {
                 val item = expectMostRecentItem()
@@ -267,12 +227,6 @@ class MonitorTimelinePhotosUseCaseTest {
     fun `test that sensitive photos are included as non-sensitive photos when should show hidden items`() =
         runTest(dispatcher) {
             val request = TimelinePhotosRequest(isPaginationEnabled = false)
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             val now = LocalDateTime.now()
             val photo1Id = 1L
             val photo1 = mock<Photo.Image> {
@@ -298,7 +252,7 @@ class MonitorTimelinePhotosUseCaseTest {
             val allPhotosList = listOf(photo1, photo2, photo3)
             whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
             whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
             underTest(request = request).test {
                 val item = expectMostRecentItem()
@@ -326,13 +280,11 @@ class MonitorTimelinePhotosUseCaseTest {
         val unsortedPhotos = listOf(
             PhotoResult(
                 photo = photo2,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             ),
             PhotoResult(
                 photo = photo1,
-                isMarkedSensitive = false,
-                inTypedNode = null
+                isMarkedSensitive = false
             )
         )
         val isPaginationEnabled = true
@@ -368,13 +320,11 @@ class MonitorTimelinePhotosUseCaseTest {
             val unsortedPhotos = listOf(
                 PhotoResult(
                     photo = photo2,
-                    isMarkedSensitive = false,
-                    inTypedNode = null
+                    isMarkedSensitive = false
                 ),
                 PhotoResult(
                     photo = photo1,
-                    isMarkedSensitive = false,
-                    inTypedNode = null
+                    isMarkedSensitive = false
                 )
             )
             val isPaginationEnabled = false
@@ -410,13 +360,11 @@ class MonitorTimelinePhotosUseCaseTest {
             val unsortedPhotos = listOf(
                 PhotoResult(
                     photo = photo2,
-                    isMarkedSensitive = false,
-                    inTypedNode = null
+                    isMarkedSensitive = false
                 ),
                 PhotoResult(
                     photo = photo1,
-                    isMarkedSensitive = false,
-                    inTypedNode = null
+                    isMarkedSensitive = false
                 )
             )
             val isPaginationEnabled = false
@@ -442,8 +390,7 @@ class MonitorTimelinePhotosUseCaseTest {
         }
         val photoTodayResult = PhotoResult(
             photo = photoToday,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photoLastMonth = mock<Photo.Image> {
             on { id } doReturn 2
@@ -453,8 +400,7 @@ class MonitorTimelinePhotosUseCaseTest {
         }
         val photoLastMonthResult = PhotoResult(
             photo = photoLastMonth,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photoLastYear = mock<Photo.Image> {
             on { id } doReturn 3
@@ -464,8 +410,7 @@ class MonitorTimelinePhotosUseCaseTest {
         }
         val photoLastYearResult = PhotoResult(
             photo = photoLastYear,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photos = listOf(photoTodayResult, photoLastMonthResult, photoLastYearResult)
 
@@ -503,12 +448,6 @@ class MonitorTimelinePhotosUseCaseTest {
                 isPaginationEnabled = false,
                 selectedFilterFlow = flowOf(newFilter)
             )
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
             val now = LocalDateTime.now()
             val photo1Id = 1L
             val photo1 = mock<Photo.Image> {
@@ -534,38 +473,9 @@ class MonitorTimelinePhotosUseCaseTest {
             val allPhotosList = listOf(photo1, photo2, photo3)
             whenever(getTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
             whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(false)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
 
             underTest(request = request).test { cancelAndConsumeRemainingEvents() }
             verify(getCloudDrivePhotos).invoke(source = allPhotosList)
-        }
-
-    @Test
-    fun `test that the correct typed node is returned`() =
-        runTest(dispatcher) {
-            val request = TimelinePhotosRequest(isPaginationEnabled = false)
-            val accountLevelDetail = mock<AccountLevelDetail> {
-                on { accountType } doReturn AccountType.PRO_III
-            }
-            val accountDetail = mock<AccountDetail> {
-                on { levelDetail } doReturn accountLevelDetail
-            }
-            val now = LocalDateTime.now()
-            val photoId = 1L
-            val photo = mock<Photo.Image> {
-                on { id } doReturn photoId
-                on { modificationTime } doReturn now.minusDays(1)
-                on { isSensitive } doReturn false
-                on { isSensitiveInherited } doReturn false
-            }
-            whenever(getTimelinePhotosUseCase()) doReturn flowOf(listOf(photo))
-            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(false)
-            whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
-            val typedNode = mock<TypedNode>()
-            whenever(getNodeByIdUseCase(id = any())) doReturn typedNode
-
-            underTest(request = request).test {
-                assertThat(expectMostRecentItem().allPhotos[0].inTypedNode).isEqualTo(typedNode)
-            }
         }
 }

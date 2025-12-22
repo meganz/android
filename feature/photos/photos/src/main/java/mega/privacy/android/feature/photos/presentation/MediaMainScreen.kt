@@ -208,6 +208,7 @@ fun MediaMainRoute(
         timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
+        selectedPhotosInTypedNode = timelineViewModel.selectedPhotosInTypedNode,
         actionHandler = nodeActionHandler::invoke,
         navigateToAlbumContent = navigateToAlbumContent,
         setEnableCUPage = { shouldShow ->
@@ -263,6 +264,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
+    selectedPhotosInTypedNode: List<TypedNode>,
     nodeActionHandle: NodeActionHandler,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -544,7 +546,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.Download -> {
                             actionHandler(
                                 DownloadMenuAction(),
-                                timelineTabUiState.selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -552,7 +554,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.ShareLink -> {
                             actionHandler(
                                 GetLinkMenuAction(),
-                                timelineTabUiState.selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -560,7 +562,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.SendToChat -> {
                             actionHandler(
                                 SendToChatMenuAction(),
-                                timelineTabUiState.selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -568,7 +570,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.Share -> {
                             actionHandler(
                                 ShareMenuAction(),
-                                timelineTabUiState.selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -576,7 +578,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.MoveToRubbishBin -> {
                             actionHandler(
                                 TrashMenuAction(),
-                                timelineTabUiState.selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -706,7 +708,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.RemoveLink -> {
                         actionHandler(
                             RemoveLinkMenuAction(),
-                            timelineTabUiState.selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -715,7 +717,7 @@ fun MediaMainScreen(
                         Analytics.tracker.trackEvent(TimelineHideNodeMenuItemEvent)
                         actionHandler(
                             HideMenuAction(),
-                            timelineTabUiState.selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -723,7 +725,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Unhide -> {
                         actionHandler(
                             UnhideMenuAction(),
-                            timelineTabUiState.selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -731,7 +733,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Move -> {
                         actionHandler(
                             MoveMenuAction(),
-                            timelineTabUiState.selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -739,7 +741,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Copy -> {
                         actionHandler(
                             CopyMenuAction(),
-                            timelineTabUiState.selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -747,7 +749,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.AddToAlbum -> {
                         onNavigateToAddToAlbum(
                             LegacyAddToAlbumActivityNavKey(
-                                photoIds = timelineTabUiState.selectedPhotosInTypedNode.map { it.id.longValue },
+                                photoIds = selectedPhotosInTypedNode.map { it.id.longValue },
                                 viewType = 0
                             )
                         )
@@ -919,6 +921,7 @@ fun PhotosMainScreenPreview() {
             timelineTabActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
+            selectedPhotosInTypedNode = emptyList(),
             actionHandler = { _, _ -> },
             navigateToAlbumContent = {},
             setEnableCUPage = {},

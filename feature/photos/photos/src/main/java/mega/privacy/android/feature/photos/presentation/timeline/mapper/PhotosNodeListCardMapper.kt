@@ -1,7 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.timeline.mapper
 
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
@@ -12,7 +10,7 @@ class PhotosNodeListCardMapper @Inject constructor(
     private val photoUiStateMapper: PhotoUiStateMapper,
 ) {
 
-    operator fun invoke(photosDateResults: List<PhotoDateResult>): ImmutableList<PhotosNodeListCard> =
+    operator fun invoke(photosDateResults: List<PhotoDateResult>): List<PhotosNodeListCard> =
         photosDateResults.map {
             when (it) {
                 is PhotoDateResult.Day -> {
@@ -46,5 +44,5 @@ class PhotosNodeListCardMapper @Inject constructor(
                     )
                 }
             }
-        }.toImmutableList()
+        }
 }

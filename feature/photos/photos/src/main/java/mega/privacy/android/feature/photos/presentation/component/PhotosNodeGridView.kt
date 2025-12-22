@@ -41,7 +41,6 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,7 +79,7 @@ import kotlin.time.Duration
 
 @Composable
 fun PhotosNodeGridView(
-    items: ImmutableList<PhotosNodeContentType>,
+    items: List<PhotosNodeContentType>,
     gridSize: TimelineGridSize,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onClick: (node: PhotoNodeUiState) -> Unit,

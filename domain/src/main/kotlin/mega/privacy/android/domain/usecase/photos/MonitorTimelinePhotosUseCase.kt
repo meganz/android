@@ -2,16 +2,13 @@ package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.account.AccountDetail
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoDateResult
 import mega.privacy.android.domain.entity.photos.PhotoResult
@@ -19,17 +16,13 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
 import java.time.ZoneId
@@ -45,12 +38,10 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val loadNextPageOfPhotosUseCase: LoadNextPageOfPhotosUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val getCloudDrivePhotos: FilterCloudDrivePhotos,
     private val getCameraUploadPhotos: FilterCameraUploadPhotos,
-    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
 ) {
 
     private val dayMonthDateFormatter =
@@ -70,79 +61,19 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     operator fun invoke(request: TimelinePhotosRequest): Flow<TimelinePhotosResult> {
         val timelinePhotoSource =
             getTimelinePhotoSource(isPaginationEnabled = request.isPaginationEnabled)
-        val showHiddenItemsSource = monitorShowHiddenItemsUseCase()
-        val accountDetailSource = monitorAccountDetailUseCase()
-
         return combine(
             flow = timelinePhotoSource,
-            flow2 = showHiddenItemsSource,
-            flow3 = accountDetailSource,
-            flow4 = request.selectedFilterFlow
-        ) { photos, showHiddenItems, accountDetail, newFilter ->
-            photos.toGetAndMonitorTimelinePhotosResult(
+            flow2 = monitorShowHiddenItemsUseCase().distinctUntilChanged(),
+            flow3 = monitorHiddenNodesEnabledUseCase().distinctUntilChanged(),
+            flow4 = request.selectedFilterFlow.distinctUntilChanged()
+        ) { photos, showHiddenItems, isHiddenNodesEnabled, newFilter ->
+            processTimelinePhotos(
+                photos = photos,
                 showHiddenItems = showHiddenItems,
-                accountDetail = accountDetail,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
                 shouldApplyFilterFromPreference = newFilter != null
             )
-        }.flowOn(ioDispatcher)
-    }
-
-    private suspend fun List<Photo>.toGetAndMonitorTimelinePhotosResult(
-        showHiddenItems: Boolean?,
-        accountDetail: AccountDetail?,
-        shouldApplyFilterFromPreference: Boolean,
-    ): TimelinePhotosResult = withContext(defaultDispatcher) {
-        val accountType = accountDetail?.levelDetail?.accountType
-        val isPaidAccount = accountType?.isPaid
-        val businessStatus = if (accountType?.isBusinessAccount == true) {
-            getBusinessStatusUseCase()
-        } else null
-        val shouldBeMarkedSensitive =
-            accountDetail != null && isPaidAccount == true && businessStatus != BusinessAccountStatus.Expired
-        val allPhotos =
-            this@toGetAndMonitorTimelinePhotosResult.toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-        val filteredByMediaType = filterByMediaType(
-            photos = allPhotos,
-            shouldBeMarkedSensitive = shouldBeMarkedSensitive,
-            shouldApplyFilterFromPreference = shouldApplyFilterFromPreference
-        )
-        val nonSensitivePhotos = filterNonSensitivePhotos(
-            showHiddenItems = showHiddenItems,
-            photos = filteredByMediaType,
-            isPaidAccount = isPaidAccount,
-            businessStatus = businessStatus
-        )
-        TimelinePhotosResult(
-            allPhotos = allPhotos,
-            nonSensitivePhotos = nonSensitivePhotos
-        )
-    }
-
-    private suspend fun filterByMediaType(
-        shouldBeMarkedSensitive: Boolean,
-        shouldApplyFilterFromPreference: Boolean,
-        photos: List<PhotoResult>,
-    ): List<PhotoResult> {
-        return runCatching {
-            getTimelineFilterPreferencesUseCase()?.let { preferences ->
-                val arePreferencesRemembered =
-                    preferences[TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value].toBoolean()
-                if (arePreferencesRemembered || shouldApplyFilterFromPreference) {
-                    val mediaType = preferences[TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value]
-                        ?: TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_ALL_MEDIA.value
-                    val mediaSource = preferences[TimelinePreferencesJSON.JSON_KEY_LOCATION.value]
-                        ?: TimelinePreferencesJSON.JSON_VAL_LOCATION_ALL_LOCATION.value
-                    filterPhotosByMediaType(
-                        mediaType = mediaType,
-                        mediaSource = mediaSource,
-                        shouldBeMarkedSensitive = shouldBeMarkedSensitive,
-                        photos = photos
-                    )
-                } else {
-                    photos
-                }
-            } ?: run { photos }
-        }.getOrElse { photos }
+        }.flowOn(defaultDispatcher)
     }
 
     private fun getTimelinePhotoSource(isPaginationEnabled: Boolean): Flow<List<Photo>> {
@@ -153,121 +84,92 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         }
     }
 
-    private suspend fun filterPhotosByMediaType(
-        mediaType: String,
-        mediaSource: String,
-        shouldBeMarkedSensitive: Boolean,
-        photos: List<PhotoResult>,
-    ): List<PhotoResult> = when (mediaType) {
-        TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_ALL_MEDIA.value -> {
-            when (mediaSource) {
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_ALL_LOCATION.value -> {
-                    photos
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CLOUD_DRIVE.value -> {
-                    getCloudDrivePhotos(source = photos.map { it.photo })
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value -> {
-                    getCameraUploadPhotos(source = photos.map { it.photo })
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                else -> photos
-            }
-        }
-
-        TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_IMAGES.value -> {
-            when (mediaSource) {
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_ALL_LOCATION.value -> {
-                    photos
-                        .map { it.photo }
-                        .filterIsInstance<Photo.Image>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CLOUD_DRIVE.value -> {
-                    getCloudDrivePhotos(source = photos.map { it.photo })
-                        .filterIsInstance<Photo.Image>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value -> {
-                    getCameraUploadPhotos(source = photos.map { it.photo })
-                        .filterIsInstance<Photo.Image>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                else -> photos
-            }
-        }
-
-        TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_VIDEOS.value -> {
-            when (mediaSource) {
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_ALL_LOCATION.value -> {
-                    photos
-                        .map { it.photo }
-                        .filterIsInstance<Photo.Video>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CLOUD_DRIVE.value -> {
-                    getCloudDrivePhotos(source = photos.map { it.photo })
-                        .filterIsInstance<Photo.Video>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value -> {
-                    getCameraUploadPhotos(source = photos.map { it.photo })
-                        .filterIsInstance<Photo.Video>()
-                        .toPhotoResult(shouldBeMarkedSensitive = shouldBeMarkedSensitive)
-                }
-
-                else -> photos
-            }
-        }
-
-        else -> photos
-    }
-
-    private suspend fun List<Photo>.toPhotoResult(shouldBeMarkedSensitive: Boolean): List<PhotoResult> {
-        return coroutineScope {
-            mapAsync { photo ->
-                runCatching {
-                    val inTypedNode = getNodeByIdUseCase(id = NodeId(photo.id))
-                    PhotoResult(
-                        photo = photo,
-                        isMarkedSensitive = shouldBeMarkedSensitive && (photo.isSensitive || photo.isSensitiveInherited),
-                        inTypedNode = inTypedNode
-                    )
-                }.getOrDefault(
-                    defaultValue = PhotoResult(
-                        photo = photo,
-                        isMarkedSensitive = shouldBeMarkedSensitive && (photo.isSensitive || photo.isSensitiveInherited),
-                        inTypedNode = null
-                    )
-                )
-            }
-        }
-    }
-
-    private fun filterNonSensitivePhotos(
-        photos: List<PhotoResult>,
+    private suspend fun processTimelinePhotos(
+        photos: List<Photo>,
         showHiddenItems: Boolean?,
-        isPaidAccount: Boolean?,
-        businessStatus: BusinessAccountStatus?,
-    ): List<PhotoResult> {
-        val showHiddenItems = showHiddenItems ?: return photos
-        val isPaid = isPaidAccount ?: return photos
-        return if (showHiddenItems || !isPaid || businessStatus == BusinessAccountStatus.Expired) {
-            photos
-        } else {
-            // We don't directly use the it.isMarkedSensitive here because it.isMarkedSensitive
-            // is used to display non sensitive photos but with sensitive design.
-            photos.filter { !it.photo.isSensitive && !it.photo.isSensitiveInherited }
+        isHiddenNodesEnabled: Boolean,
+        shouldApplyFilterFromPreference: Boolean,
+    ): TimelinePhotosResult {
+        val allPhotos = photos.map { photo ->
+            photo.toPhotoResult(isHiddenNodesEnabled = isHiddenNodesEnabled)
         }
+        val nonSensitivePhotos = photos.filterPhotos(
+            isHiddenNodesEnabled = isHiddenNodesEnabled,
+            shouldApplyFilterFromPreference = shouldApplyFilterFromPreference,
+            showHiddenItems = showHiddenItems ?: true,
+        )
+        return TimelinePhotosResult(
+            allPhotos = allPhotos,
+            nonSensitivePhotos = nonSensitivePhotos
+        )
+    }
+
+    private suspend fun List<Photo>.filterPhotos(
+        isHiddenNodesEnabled: Boolean,
+        shouldApplyFilterFromPreference: Boolean,
+        showHiddenItems: Boolean,
+    ): List<PhotoResult> {
+        val preferences = runCatching {
+            getTimelineFilterPreferencesUseCase()
+        }.getOrNull()
+        val arePreferencesRemembered = preferences
+            ?.get(TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value)
+            .toBoolean()
+        val shouldFilterMedia = arePreferencesRemembered || shouldApplyFilterFromPreference
+        val mediaSource = if (shouldFilterMedia) {
+            preferences?.get(TimelinePreferencesJSON.JSON_KEY_LOCATION.value)
+                ?: TimelinePreferencesJSON.JSON_VAL_LOCATION_ALL_LOCATION.value
+        } else null
+        val mediaType = if (shouldFilterMedia) {
+            preferences?.get(TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value)
+                ?: TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_ALL_MEDIA.value
+        } else null
+        val shouldSkipNonSensitiveCheck = showHiddenItems || !isHiddenNodesEnabled
+        var mediaFilteredResult: List<Photo> = this
+        // Filter by media source
+        mediaFilteredResult = when (mediaSource) {
+            TimelinePreferencesJSON.JSON_VAL_LOCATION_CLOUD_DRIVE.value -> {
+                getCloudDrivePhotos(source = mediaFilteredResult)
+            }
+
+            TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value -> {
+                getCameraUploadPhotos(source = mediaFilteredResult)
+            }
+
+            else -> mediaFilteredResult
+        }
+        // Filter by media type
+        mediaFilteredResult = when (mediaType) {
+            TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_IMAGES.value -> {
+                mediaFilteredResult.filterIsInstance<Photo.Image>()
+            }
+
+            TimelinePreferencesJSON.JSON_VAL_MEDIA_TYPE_VIDEOS.value -> {
+                mediaFilteredResult.filterIsInstance<Photo.Video>()
+            }
+
+            else -> mediaFilteredResult
+        }
+
+        return mediaFilteredResult
+            .asSequence()
+            .filter { photo ->
+                // We don't directly use the photo.isMarkedSensitive here because photo.isMarkedSensitive
+                // is used to display non sensitive photos but with sensitive design.
+                val isNotSensitive = !photo.isSensitive && !photo.isSensitiveInherited
+                shouldSkipNonSensitiveCheck || isNotSensitive
+            }
+            .map { photo ->
+                photo.toPhotoResult(isHiddenNodesEnabled = isHiddenNodesEnabled)
+            }
+            .toList()
+    }
+
+    private fun Photo.toPhotoResult(isHiddenNodesEnabled: Boolean): PhotoResult {
+        return PhotoResult(
+            photo = this,
+            isMarkedSensitive = isHiddenNodesEnabled && (this.isSensitive || this.isSensitiveInherited)
+        )
     }
 
     suspend fun sortPhotos(
@@ -291,10 +193,16 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
                     else -> photos
                 }
             }
+            val nowYear = Year.now()
             val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
             val photosInYear = async { createYearsCardList(dayPhotos = dayPhotos) }
-            val photosInMonth = async { createMonthsCardList(dayPhotos = dayPhotos) }
-            val photosInDay = async { createDaysCardList(dayPhotos = dayPhotos) }
+            val photosInMonth = async {
+                createMonthsCardList(
+                    dayPhotos = dayPhotos,
+                    nowYear = nowYear
+                )
+            }
+            val photosInDay = async { createDaysCardList(dayPhotos = dayPhotos, nowYear = nowYear) }
             TimelineSortedPhotosResult(
                 sortedPhotos = sortedPhotos,
                 photosInDay = photosInDay.await(),
@@ -306,17 +214,17 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     private fun groupPhotosByDay(sortedPhotos: List<PhotoResult>): Map<PhotoResult, Int> {
         if (sortedPhotos.isEmpty()) return emptyMap()
 
-        return sortedPhotos
-            .groupingBy { it.photo.modificationTime.toLocalDate().toEpochDay() }
-            .aggregate { _, accumulator: Pair<PhotoResult, Int>?, element, first ->
-                if (first) {
-                    element to 1
-                } else {
-                    accumulator!!.copy(second = accumulator.second + 1)
-                }
+        val map = LinkedHashMap<Long, Pair<PhotoResult, Int>>()
+        for (photo in sortedPhotos) {
+            val key = photo.photo.modificationTime.toLocalDate().toEpochDay()
+            val current = map[key]
+            if (current == null) {
+                map[key] = photo to 1
+            } else {
+                map[key] = current.first to current.second + 1
             }
-            .values
-            .toMap()
+        }
+        return map.values.associate { it }
     }
 
     private fun createYearsCardList(dayPhotos: Map<PhotoResult, Int>): List<PhotoDateResult> =
@@ -333,13 +241,16 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         )
     }
 
-    private fun createMonthsCardList(dayPhotos: Map<PhotoResult, Int>): List<PhotoDateResult> =
+    private fun createMonthsCardList(
+        dayPhotos: Map<PhotoResult, Int>,
+        nowYear: Year,
+    ): List<PhotoDateResult> =
         dayPhotos.keys
             .distinctBy { YearMonth.from(it.photo.modificationTime) }
-            .map { createMonthCard(it) }.toList()
+            .map { createMonthCard(photo = it, nowYear = nowYear) }.toList()
 
-    private fun createMonthCard(photo: PhotoResult): PhotoDateResult {
-        val sameYear = Year.from(LocalDate.now()) == Year.from(photo.photo.modificationTime)
+    private fun createMonthCard(photo: PhotoResult, nowYear: Year): PhotoDateResult {
+        val sameYear = nowYear == Year.from(photo.photo.modificationTime)
         val startDate = Date.from(
             photo.photo.modificationTime.toLocalDate().atStartOfDay()
                 .atZone(ZoneId.systemDefault())
@@ -356,11 +267,19 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
         )
     }
 
-    private fun createDaysCardList(dayPhotos: Map<PhotoResult, Int>): List<PhotoDateResult> =
-        dayPhotos.map { (photo, count) -> createDaysCard(photo = photo, photosCount = count) }
+    private fun createDaysCardList(
+        dayPhotos: Map<PhotoResult, Int>,
+        nowYear: Year,
+    ): List<PhotoDateResult> = dayPhotos.map { (photo, count) ->
+        createDaysCard(photo = photo, photosCount = count, nowYear = nowYear)
+    }
 
-    private fun createDaysCard(photo: PhotoResult, photosCount: Int): PhotoDateResult {
-        val sameYear = Year.from(LocalDate.now()) == Year.from(photo.photo.modificationTime)
+    private fun createDaysCard(
+        photo: PhotoResult,
+        photosCount: Int,
+        nowYear: Year,
+    ): PhotoDateResult {
+        val sameYear = nowYear == Year.from(photo.photo.modificationTime)
         val date = if (sameYear) {
             dayMonthDateFormatter.format(photo.photo.modificationTime)
         } else {

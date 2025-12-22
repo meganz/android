@@ -27,7 +27,6 @@ import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.chip.SelectionChipStyle
@@ -48,7 +47,7 @@ import kotlin.time.Duration
 
 @Composable
 internal fun PhotosNodeListCardListView(
-    photos: ImmutableList<PhotosNodeListCard>,
+    photos: List<PhotosNodeListCard>,
     onClick: (photo: PhotosNodeListCard) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),

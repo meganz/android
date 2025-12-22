@@ -41,8 +41,7 @@ class PhotosNodeListCardMapperTest {
         val date = "2022-01-01"
         val photoResult = PhotoResult(
             photo = photo,
-            isMarkedSensitive = false,
-            inTypedNode = null
+            isMarkedSensitive = false
         )
         val photoCount = 1
         val photosDateResults = listOf(
