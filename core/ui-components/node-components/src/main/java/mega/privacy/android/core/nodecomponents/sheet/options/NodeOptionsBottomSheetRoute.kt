@@ -53,7 +53,7 @@ import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NodeOptionsBottomSheetRoute(
+internal fun NodeOptionsBottomSheetRoute(
     navigationHandler: NavigationHandler,
     onDismiss: () -> Unit,
     nodeId: Long,

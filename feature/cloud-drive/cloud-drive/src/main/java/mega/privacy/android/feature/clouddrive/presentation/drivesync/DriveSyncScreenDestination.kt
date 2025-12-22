@@ -3,10 +3,8 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
@@ -20,8 +18,6 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
-    nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
-    clearResultFlow: (String) -> Unit,
 ) {
     entry<DriveSyncNavKey> { key ->
         val viewModel = hiltViewModel<DriveSyncViewModel>()
@@ -36,8 +32,8 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             onTransfer = onTransfer,
-            nodeResultFlow = nodeResultFlow,
-            clearResultFlow = clearResultFlow,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
         )
 
         DriveSyncScreen(

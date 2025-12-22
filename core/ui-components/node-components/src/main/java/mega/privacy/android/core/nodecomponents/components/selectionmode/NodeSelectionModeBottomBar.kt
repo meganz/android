@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +49,7 @@ fun NodeSelectionModeBottomBar(
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel? = null, // pass the ViewModel if the component needs to handle shares events
     onNavigate: (NavKey) -> Unit = {},
+    onTransfer: (TransferTriggerEvent) -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -66,6 +68,12 @@ fun NodeSelectionModeBottomBar(
                 )
             }
         }
+
+        EventEffect(
+            event = nodeActionState.downloadEvent,
+            onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+            action = onTransfer
+        )
 
         if (visible) {
             EventEffect(

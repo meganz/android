@@ -3,10 +3,8 @@ package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -16,8 +14,6 @@ import mega.privacy.android.navigation.destination.SearchNodeNavKey
 fun EntryProviderScope<NavKey>.rubbishBin(
     navigationHandler: NavigationHandler,
     transferHandler: TransferHandler,
-    nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
-    clearResultFlow: (String) -> Unit,
 ) {
     entry<RubbishBinNavKey> { key ->
         val viewModel = hiltViewModel<NewRubbishBinViewModel, NewRubbishBinViewModel.Factory>(
@@ -31,8 +27,8 @@ fun EntryProviderScope<NavKey>.rubbishBin(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             onTransfer = transferHandler::setTransferEvent,
-            nodeResultFlow = nodeResultFlow,
-            clearResultFlow = clearResultFlow,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
         )
 
         RubbishBinScreen(

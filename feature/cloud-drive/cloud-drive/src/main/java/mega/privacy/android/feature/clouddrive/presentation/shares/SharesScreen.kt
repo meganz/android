@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -26,13 +24,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.sheets.MegaModalBottomSheet
-import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -43,17 +38,14 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetRoute
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
-import mega.privacy.android.core.sharedcomponents.node.rememberNodeId
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -106,9 +98,6 @@ internal fun SharesScreen(
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    // Node options modal state
-    var visibleNodeOptionId by rememberNodeId(null)
-    val nodeOptionSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val megaResultContract = rememberMegaResultContract()
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
@@ -217,7 +206,8 @@ internal fun SharesScreen(
                 selectedNodes = getSelectedNodes(),
                 isSelecting = false,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                onNavigate = navigationHandler::navigate
+                onNavigate = navigationHandler::navigate,
+                onTransfer = onTransfer
             )
         },
     ) { paddingValues ->
@@ -237,7 +227,14 @@ internal fun SharesScreen(
                         uiState = incomingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = incomingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                                )
+                            )
+                        },
                         onSortOrderClick = { showSortBottomSheet = true },
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()
@@ -252,7 +249,14 @@ internal fun SharesScreen(
                         uiState = outgoingSharesUiState,
                         navigationHandler = navigationHandler,
                         onAction = outgoingSharesViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.OUTGOING_SHARES
+                                )
+                            )
+                        },
                         onSortOrderClick = { showSortBottomSheet = true },
                         contentPadding = PaddingValues(
                             bottom = paddingValues.calculateBottomPadding()
@@ -267,7 +271,14 @@ internal fun SharesScreen(
                         uiState = linksUiState,
                         navigationHandler = navigationHandler,
                         onAction = linksViewModel::processAction,
-                        onShowNodeOptions = { visibleNodeOptionId = it },
+                        onShowNodeOptions = { nodeId ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeId.longValue,
+                                    nodeSourceType = NodeSourceType.LINKS
+                                )
+                            )
+                        },
                         onSortOrderClick = { showSortBottomSheet = true },
                         onTransfer = onTransfer,
                         contentPadding = PaddingValues(
@@ -310,11 +321,11 @@ internal fun SharesScreen(
         )
     }
 
-    EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
-    )
+    LaunchedEffect(nodeActionState.downloadEvent) {
+        if (nodeActionState.downloadEvent is StateEventWithContentTriggered) {
+            deselectAllItems()
+        }
+    }
 
     // Reset selection mode after handling move, copy, delete action
     LaunchedEffect(nodeActionState.infoToShowEvent) {
@@ -330,49 +341,11 @@ internal fun SharesScreen(
         }
     }
 
-    EventEffect(
-        event = nodeActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = { nodeId ->
+    LaunchedEffect(nodeActionState.renameNodeRequestEvent) {
+        if (nodeActionState.renameNodeRequestEvent is StateEventWithContentTriggered) {
             deselectAllItems()
-            navigationHandler.navigate(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
-        }
-    )
-
-
-    // Node options modal
-    LaunchedEffect(visibleNodeOptionId) {
-        if (visibleNodeOptionId != null) {
-            nodeOptionSheetState.show()
-        } else {
-            nodeOptionSheetState.hide()
         }
     }
-
-    // Todo: We will remove this, and replace it with NavigationHandler
-    visibleNodeOptionId?.let { nodeId ->
-        MegaModalBottomSheet(
-            modifier = Modifier.statusBarsPadding(),
-            sheetState = nodeOptionSheetState,
-            onDismissRequest = {
-                visibleNodeOptionId = null
-            },
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1
-        ) {
-            NodeOptionsBottomSheetRoute(
-                navigationHandler = navigationHandler,
-                onDismiss = {
-                    visibleNodeOptionId = null
-                },
-                nodeId = nodeId.longValue,
-                nodeSourceType = selectedTab.toNodeSourceType(),
-                onTransfer = onTransfer,
-                actionHandler = nodeActionHandler,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-            )
-        }
-    }
-
 
     if (showSortBottomSheet) {
         val selectedSortConfiguration = when (selectedTab) {
