@@ -222,7 +222,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             } doReturn listOf(mockNodeSelectionModeMenuItem)
         }
@@ -1009,7 +1010,8 @@ class NodeOptionsActionViewModelTest {
                 hasNodeAccessPermission = true,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = false, // Should be false when node cannot be moved to rubbish bin
-                noNodeInBackups = true
+                noNodeInBackups = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
         }
 
@@ -1036,7 +1038,8 @@ class NodeOptionsActionViewModelTest {
                 hasNodeAccessPermission = true,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = true,
-                noNodeInBackups = false // Should be false when node is in backups
+                noNodeInBackups = false, // Should be false when node is in backups
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
         }
 
@@ -1055,8 +1058,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
-
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1093,7 +1096,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1131,7 +1135,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1168,7 +1173,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1219,7 +1225,8 @@ class NodeOptionsActionViewModelTest {
                     hasNodeAccessPermission = any(),
                     selectedNodes = any(),
                     allNodeCanBeMovedToTarget = any(),
-                    noNodeInBackups = any()
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
                 )
             ).thenReturn(items)
 
@@ -1252,6 +1259,74 @@ class NodeOptionsActionViewModelTest {
 
                 // Verify both lists are equal
                 assertThat(finalState.visibleActions).isEqualTo(finalState.availableActions)
+            }
+        }
+
+    @Test
+    fun `test updateSelectionModeAvailableActions sets visibleActions is based on showAsActionOrder`() =
+        runTest {
+            val actions = listOf(
+                mock<MoveMenuAction>(),
+                mock<CopyMenuAction>(),
+                mock<DownloadMenuAction>(),
+                mock<TrashMenuAction>(),
+                mock<HideMenuAction>(),
+            )
+
+            val items = actions
+                .map { action ->
+                    mock<NodeSelectionModeMenuItem> {
+                        on { this.action } doReturn action
+                        when (action) {
+                            is TrashMenuAction -> on { showAsActionOrder }.then { 100 }
+                            is HideMenuAction -> on { showAsActionOrder }.then { 200 }
+                            else -> on { showAsActionOrder }.then { null }
+                        }
+                    }
+                }
+
+            initViewModel()
+
+            whenever(
+                nodeSelectionModeActionMapper(
+                    options = any(),
+                    hasNodeAccessPermission = any(),
+                    selectedNodes = any(),
+                    allNodeCanBeMovedToTarget = any(),
+                    noNodeInBackups = any(),
+                    nodeSourceType = any()
+                )
+            ).thenReturn(items)
+
+            val selectedNodes = setOf(mockFileNode)
+            val nodeSourceType = NodeSourceType.CLOUD_DRIVE
+
+            viewModel.uiState.test {
+                awaitItem()
+
+                viewModel.updateSelectionModeAvailableActions(selectedNodes, nodeSourceType)
+
+                val finalState = awaitItem()
+
+                // Verify availableActions contains all 3 actions
+                assertThat(finalState.availableActions).hasSize(5)
+                assertThat(finalState.availableActions).containsExactly(
+                    actions[0],
+                    actions[1],
+                    actions[2],
+                    actions[3],
+                    actions[4],
+                )
+
+                // Verify visibleActions is the same as availableActions (no More action added)
+                assertThat(finalState.visibleActions).hasSize(5)
+                assertThat(finalState.visibleActions).containsExactly(
+                    actions[3],
+                    actions[4],
+                    actions[0],
+                    actions[1],
+                    NodeSelectionAction.More
+                )
             }
         }
 

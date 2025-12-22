@@ -5,6 +5,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -23,6 +24,7 @@ class HideSelectionMenuItem @Inject constructor(
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
         if (!hasNodeAccessPermission || !noNodeTakenDown || !noNodeInBackups) {
             return false

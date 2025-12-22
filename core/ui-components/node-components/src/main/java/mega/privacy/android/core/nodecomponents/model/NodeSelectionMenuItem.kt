@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.contract.NavigationHandler
 
@@ -30,8 +32,6 @@ interface NodeSelectionMenuItem<T : MenuActionWithIcon> {
      * @param canBeMovedToTarget
      * @param noNodeInBackups
      * @param noNodeTakenDown
-     * @param allFileNodes
-     * @param resultCount
      * @return [Boolean]
      */
     suspend fun shouldDisplay(
@@ -40,6 +40,7 @@ interface NodeSelectionMenuItem<T : MenuActionWithIcon> {
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE
     ): Boolean
 
     /**
@@ -64,4 +65,7 @@ interface NodeSelectionMenuItem<T : MenuActionWithIcon> {
      * Menu action item
      */
     val menuAction: T
+
+    val showAsActionOrder: Int?
+        get() = null
 }

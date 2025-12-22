@@ -5,6 +5,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
@@ -17,6 +18,7 @@ class AddToSelectionMenuItem @Inject constructor(
         canBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
+        nodeSourceType: NodeSourceType
     ): Boolean {
         val allFilesAreVideo = selectedNodes.all { node ->
             node is FileNode && node.type is VideoFileTypeInfo

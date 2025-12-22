@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRe
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -740,9 +741,11 @@ class NodeOptionsActionViewModel @Inject constructor(
                 hasNodeAccessPermission = hasAccessPermission,
                 selectedNodes = selectedNodes.toList(),
                 allNodeCanBeMovedToTarget = canBeMovedToTarget,
-                noNodeInBackups = !anyNodeInBackups
+                noNodeInBackups = !anyNodeInBackups,
+                nodeSourceType = nodeSourceType
+            ).orderAction(
+                nodeSourceType, selectedNodes.size > 1
             ).map { it.action }
-                .sortedBy { it.orderInCategory }
 
             val visibleActions = if (availableActions.size > DEFAULT_MAX_VISIBLE_ITEMS) {
                 availableActions.take(DEFAULT_MAX_VISIBLE_ITEMS) + NodeSelectionAction.More
@@ -757,6 +760,23 @@ class NodeOptionsActionViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun List<NodeSelectionModeMenuItem>.orderAction(
+        nodeSourceType: NodeSourceType, isMultipleSelected: Boolean
+    ): List<NodeSelectionModeMenuItem> {
+        val baseList = sortedBy { it.action.orderInCategory }
+
+        // When NodeSourceType is Links and multiple nodes are selected, sort the items by orderInCategory.
+        if (nodeSourceType == NodeSourceType.LINKS && isMultipleSelected) return baseList
+
+        val topActions = filter { it.showAsActionOrder != null }
+            .sortedBy { it.showAsActionOrder }
+            .take(DEFAULT_MAX_VISIBLE_ITEMS)
+
+        val remaining = baseList.filterNot { it in topActions }
+
+        return topActions + remaining
     }
 
     private suspend fun canSelectedNodesBeMovedToRubbishBin(

@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.mapper
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ class NodeSelectionModeActionMapper @Inject constructor() {
         selectedNodes: List<TypedNode>,
         allNodeCanBeMovedToTarget: Boolean,
         noNodeInBackups: Boolean,
+        nodeSourceType: NodeSourceType,
     ): List<NodeSelectionModeMenuItem> {
         val noNodeTakenDown = selectedNodes.none { node -> node.isTakenDown }
         return options
@@ -36,11 +38,13 @@ class NodeSelectionModeActionMapper @Inject constructor() {
                     canBeMovedToTarget = allNodeCanBeMovedToTarget,
                     noNodeInBackups = noNodeInBackups,
                     noNodeTakenDown = noNodeTakenDown,
+                    nodeSourceType = nodeSourceType,
                 )
             }.map { option ->
                 NodeSelectionModeMenuItem(
                     action = option.menuAction,
                     handler = option.buildHandler(selectedNodes),
+                    showAsActionOrder = option.showAsActionOrder
                 )
             }
     }
