@@ -169,8 +169,6 @@ internal class AndroidDeviceGateway @Inject constructor(
         }.catch {
             Timber.e(it, "An Exception occurred when monitoring the device power connection")
         }.toSharedFlow(appScope)
-
-    override fun getCalendar(): java.util.Calendar = java.util.Calendar.getInstance()
 }
 
 private fun <T> Flow<T>.toSharedFlow(

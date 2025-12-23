@@ -21,12 +21,12 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
-import mega.privacy.android.domain.usecase.environment.GetCalendarUseCase
 import mega.privacy.android.domain.usecase.file.RenameFileAndDeleteOriginalUseCase
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSaveImageToCloudDriveEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEvent
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -57,7 +57,6 @@ internal class SaveScannedDocumentsViewModelTest {
 
     private val validateScanFilenameUseCase = spy<ValidateScanFilenameUseCase>()
     private val renameFileAndDeleteOriginalUseCase = mock<RenameFileAndDeleteOriginalUseCase>()
-    private val getCalendarUseCase = mock<GetCalendarUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
 
     private val cloudDriveParentHandle = 123456L
@@ -71,19 +70,25 @@ internal class SaveScannedDocumentsViewModelTest {
         on { path } doReturn "/data/user/0/app_location/cache/test_solo_scan.jpg"
     }
 
+    private var originalLocale = Locale.getDefault()
+
     private fun initViewModel() {
         underTest = SaveScannedDocumentsViewModel(
             validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
             savedStateHandle = savedStateHandle,
-            getCalendarUseCase = getCalendarUseCase
         )
     }
 
     @BeforeEach
     fun reset() {
         savedStateHandle = SavedStateHandle(mapOf())
-        reset(renameFileAndDeleteOriginalUseCase, getCalendarUseCase)
+        reset(renameFileAndDeleteOriginalUseCase)
+    }
+
+    @AfterEach
+    fun tearDown() {
+        Locale.setDefault(originalLocale)
     }
 
     @Test
@@ -144,27 +149,30 @@ internal class SaveScannedDocumentsViewModelTest {
 
     @Test
     fun `test that the default filename ends with PDF upon initialization`() = runTest {
-        val format = "Scanned_%1\$s"
         val calendar = Calendar.getInstance()
-        whenever(getCalendarUseCase()) doReturn calendar
-        val dateString = String.format(
-            Locale.getDefault(),
-            DATE_TIME_FORMAT,
-            calendar,
-        )
+        Locale.setDefault(Locale.ENGLISH)
+        Mockito.mockStatic(Calendar::class.java).use {
+            val format = "Scanned_%1\$s"
+            whenever(Calendar.getInstance()) doReturn calendar
+            val dateString = String.format(
+                Locale.getDefault(),
+                DATE_TIME_FORMAT,
+                calendar,
+            )
 
-        savedStateHandle[INITIAL_FILENAME_FORMAT] = format
+            savedStateHandle[INITIAL_FILENAME_FORMAT] = format
 
-        val expectedFilename = String.format(
-            Locale.getDefault(),
-            format,
-            dateString,
-        ) + ".pdf"
+            val expectedFilename = String.format(
+                Locale.getDefault(),
+                format,
+                dateString,
+            ) + ".pdf"
 
-        initViewModel()
+            initViewModel()
 
-        underTest.uiState.test {
-            assertThat(awaitItem().filename).isEqualTo(expectedFilename)
+            underTest.uiState.test {
+                assertThat(awaitItem().filename).isEqualTo(expectedFilename)
+            }
         }
     }
 
