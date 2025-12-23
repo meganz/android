@@ -406,7 +406,7 @@ class FileInfoActivity : BaseActivity() {
         nodeDestination?.let {
             lifecycleScope.launch {
                 navigationQueue.emit(nodeDestination, NavPriority.Default, true)
-                finish()
+                megaNavigator.launchMegaActivityIfNeeded(this@FileInfoActivity)
             }
         } ?: locationInfo?.let {
             handleLocationClick(this, adapterType, locationInfo)

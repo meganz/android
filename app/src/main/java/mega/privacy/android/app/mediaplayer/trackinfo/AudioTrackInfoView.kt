@@ -62,7 +62,7 @@ import java.io.File
 fun AudioTrackInfoView(
     uiState: TrackInfoState,
     metadata: Metadata,
-    onLocationClicked: (location: LocationInfo?) -> Unit,
+    onLocationClicked: () -> Unit,
     onCheckedChange: (isChecked: Boolean) -> Unit,
 ) {
     Column(
@@ -195,7 +195,7 @@ fun AudioNodeInfoView(
     onCheckedChange: (isChecked: Boolean) -> Unit,
     sizeValue: String?,
     locationValue: LocationInfo?,
-    onLocationClicked: (location: LocationInfo?) -> Unit,
+    onLocationClicked: () -> Unit,
     addedValue: String?,
     lastModifiedValue: String?,
 ) {
@@ -211,7 +211,8 @@ fun AudioNodeInfoView(
                     value = isEnabled ?: false,
                     role = Role.Switch,
                     onValueChange = { onCheckedChange(it) }
-                ).testTag(OFFLINE_OPTION_TEST_TAG),
+                )
+                .testTag(OFFLINE_OPTION_TEST_TAG),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -265,9 +266,7 @@ fun AudioNodeInfoView(
             color = colorResource(R.color.accent_900),
             modifier = Modifier
                 .padding(top = 4.dp, start = 72.dp)
-                .clickable {
-                    onLocationClicked(locationValue)
-                }
+                .clickable { onLocationClicked() }
                 .testTag(AUDIO_LOCATION_TEST_TAG)
         )
 

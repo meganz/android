@@ -7,24 +7,31 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoViewModel
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,8 +39,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.reset
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.wheneverBlocking
 import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
@@ -47,9 +57,9 @@ class TrackInfoViewModelTest {
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
-    private val getOfflinePathForNodeUseCase = mock<GetOfflinePathForNodeUseCase>()
-    private val getNodeByHandle = mock<GetNodeByHandle>()
     private val getNodeLocationInfoUseCase = mock<GetNodeLocationInfo>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -58,22 +68,21 @@ class TrackInfoViewModelTest {
 
     private fun initUnderTest() {
         underTest = TrackInfoViewModel(
-            getOfflinePathForNodeUseCase = getOfflinePathForNodeUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getAudioNodeByHandleUseCase = getAudioNodeByHandleUseCase,
             fileSizeStringMapper = fileSizeStringMapper,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
-            getNodeByHandle = getNodeByHandle,
-            getNodeLocationInfoUseCase = getNodeLocationInfoUseCase
+            getNodeLocationInfoUseCase = getNodeLocationInfoUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getNodeLocationUseCase = getNodeLocationUseCase,
         )
     }
 
     @AfterEach
     fun resetMocks() {
         reset(
-            getOfflinePathForNodeUseCase,
             monitorStorageStateEventUseCase,
             getAudioNodeByHandleUseCase,
             fileSizeStringMapper,
@@ -81,9 +90,12 @@ class TrackInfoViewModelTest {
             fileSizeStringMapper,
             removeOfflineNodeUseCase,
             durationInSecondsTextMapper,
-            getNodeByHandle,
-            getNodeLocationInfoUseCase
+            getNodeLocationInfoUseCase,
+            getFeatureFlagValueUseCase,
+            getNodeLocationUseCase,
         )
+
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
     }
 
     @Test
@@ -101,6 +113,56 @@ class TrackInfoViewModelTest {
             assertThat(actual.durationString).isEmpty()
             assertThat(actual.offlineRemovedEvent).isEqualTo(consumed)
             assertThat(actual.transferTriggerEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that getNodeLocationByIdUseCase is not invoked and nodeDestination is not updated if single activity flag is disabled`() =
+        runTest {
+            val handle = 123L
+            val nodeId = NodeId(handle)
+            val node = mock<TypedAudioNode> {
+                on { id } doReturn nodeId
+            }
+
+            whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn false
+
+            initUnderTest()
+            underTest.getNodeDestination(node)
+            advanceUntilIdle()
+
+            underTest.state.map { it.nodeDestination }.test {
+                assertThat(awaitItem()).isNull()
+            }
+            verifyNoInteractions(getNodeLocationUseCase)
+
+        }
+
+    @Test
+    fun `test that nodeDestination is updated if single activity flag is enabled`() = runTest {
+        val handle = 100L
+        val nodeId = NodeId(handle)
+        val node = mock<TypedAudioNode> {
+            on { id } doReturn nodeId
+        }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn node
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.CLOUD_DRIVE
+        }
+        val expected = listOf(HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = handle)))
+
+        whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
+        whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
+
+        initUnderTest()
+        underTest.getNodeDestination(node)
+        advanceUntilIdle()
+
+        underTest.state.map { it.nodeDestination }.test {
+            assertThat(awaitItem()).isEqualTo(expected)
         }
     }
 

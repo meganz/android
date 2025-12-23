@@ -1078,6 +1078,10 @@ object MegaNodeUtil {
      * @param location location info
      */
     @JvmStatic
+    @Deprecated(
+        message = "Use GetNodeLocationUseCase or GetNodeLocationByIdUseCase " +
+                "and NodeLocation.getDestination extension fun instead"
+    )
     fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
         val intent = Intent(activity, ManagerActivity::class.java)
 

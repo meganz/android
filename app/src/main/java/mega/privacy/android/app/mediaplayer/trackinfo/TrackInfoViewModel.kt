@@ -9,18 +9,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.extensions.getDestination
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.offline.GetOfflinePathForNodeUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -30,15 +33,15 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TrackInfoViewModel @Inject constructor(
-    private val getOfflinePathForNodeUseCase: GetOfflinePathForNodeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getAudioNodeByHandleUseCase: GetAudioNodeByHandleUseCase,
-    private val getNodeByHandle: GetNodeByHandle,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val removeOfflineNodeUseCase: RemoveOfflineNodeUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val getNodeLocationInfoUseCase: GetNodeLocationInfo,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TrackInfoState())
     internal val state = _state.asStateFlow()
@@ -66,7 +69,21 @@ class TrackInfoViewModel @Inject constructor(
                     durationString = durationString
                 )
             }
+            getNodeDestination(audioNode)
         } ?: Timber.e("Failed to get audio node by handle: $handle")
+
+    internal suspend fun getNodeDestination(node: TypedAudioNode) {
+        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+            runCatching {
+                getNodeLocationUseCase(node)
+            }.onSuccess { nodeLocation ->
+                val nodeDestination = nodeLocation.getDestination()
+                _state.update { state -> state.copy(nodeDestination = nodeDestination) }
+            }.onFailure {
+                Timber.e("Failed to get node location: $it")
+            }
+        }
+    }
 
     /**
      * Make a node available offline, or remove it from offline.

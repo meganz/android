@@ -1,11 +1,12 @@
 package mega.privacy.android.app.mediaplayer.trackinfo
 
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.mediaplayer.service.Metadata
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import java.io.File
 
 /**
@@ -15,6 +16,7 @@ import java.io.File
  * @property availableOffline if this node is available in offline
  * @property size the human readable size of this node
  * @property location the human readable location of this node
+ * @property nodeDestination List of NavKey where the app needs to navigate if the user wants to see the location.
  * @property added the human readable added time of this node
  * @property lastModified the human readable last modified time of this node
  * @property durationString the duration string of the audio
@@ -27,6 +29,7 @@ data class TrackInfoState(
     val availableOffline: Boolean = false,
     val size: String = "",
     val location: LocationInfo? = null,
+    val nodeDestination: List<NavKey>? = null,
     val added: Long = 0,
     val lastModified: Long = 0,
     val durationString: String = "",

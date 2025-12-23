@@ -309,15 +309,6 @@ interface MegaNodeUtilWrapper {
     ): LocationInfo?
 
     /**
-     * Handle click event of the location text.
-     *
-     * @param activity current activity
-     * @param adapterType node source adapter type
-     * @param location location info
-     */
-    fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo)
-
-    /**
      * Launch [ZipBrowserActivity] to preview a zip file.
      *
      * @param context Android context.

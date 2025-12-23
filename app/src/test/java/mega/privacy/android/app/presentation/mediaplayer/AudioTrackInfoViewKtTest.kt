@@ -30,7 +30,7 @@ import java.io.File
 
 @RunWith(AndroidJUnit4::class)
 internal class AudioTrackInfoViewKtTest {
-    @get: Rule
+    @get:Rule
     val composeTestRule = createComposeRule()
 
     private val expectTitleString = "Title test"
@@ -62,7 +62,7 @@ internal class AudioTrackInfoViewKtTest {
     private fun setComposeContent(
         trackInfoState: TrackInfoState,
         metadata: Metadata,
-        onLocationClicked: (location: LocationInfo?) -> Unit = {},
+        onLocationClicked: () -> Unit = {},
         onCheckedChange: (isChecked: Boolean) -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -98,7 +98,7 @@ internal class AudioTrackInfoViewKtTest {
         onCheckedChange: (isChecked: Boolean) -> Unit = {},
         sizeValue: String? = null,
         locationValue: LocationInfo? = null,
-        onLocationClicked: (location: LocationInfo?) -> Unit = {},
+        onLocationClicked: () -> Unit = {},
         addedValue: String? = null,
         lastModifiedValue: String? = null,
     ) {

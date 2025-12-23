@@ -14,7 +14,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.utils.Constants.URL_INDICATOR
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
-import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener
@@ -147,10 +146,6 @@ class MegaNodeUtilFacade @Inject constructor(
         fromIncomingShare: Boolean,
         handle: Long,
     ) = MegaNodeUtil.getNodeLocationInfo(adapterType, fromIncomingShare, handle)
-
-    override fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        MegaNodeUtil.handleLocationClick(activity, adapterType, location)
-    }
 
     override fun openZip(
         context: Context,
