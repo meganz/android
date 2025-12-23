@@ -11,11 +11,9 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -34,11 +32,9 @@ class CloudDriveDeepLinkHandler @Inject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
-    private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
     snackbarEventQueue: SnackbarEventQueue,
-    private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
-    private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
 ) : DeepLinkHandler(snackbarEventQueue) {
 
     override suspend fun getNavKeys(
@@ -61,11 +57,10 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                         ?.let { getNodeIdFromBase64UseCase(it) }?.longValue?.let { handle ->
                             getNodeByIdUseCase(NodeId(handle))
                         }
-                    val nodeSourceType = when {
-                        node == null || isNodeInCloudDriveUseCase(node.id.longValue) -> NodeSourceType.CLOUD_DRIVE
-                        isNodeInRubbishBinUseCase(node.id) -> NodeSourceType.RUBBISH_BIN
-                        else -> NodeSourceType.INCOMING_SHARES
-                    }
+                    val nodeLocation = node?.let { getNodeLocationUseCase(it) }
+                    val nodeSourceType = nodeLocation?.nodeSourceType
+                        ?: NodeSourceType.CLOUD_DRIVE
+                    val ancestorIds = nodeLocation?.ancestorIds ?: emptyList()
                     val previewDestination = (node as? TypedFileNode)?.let { fileNode ->
                         runCatching {
                             fileNodeContentToNavKeyMapper(
@@ -77,15 +72,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                     }
                     val highlightedNode =
                         node?.id.takeIf { node is FileNode && previewDestination == null }
-                    val ancestorIds = node?.let {
-                        getAncestorsIdsUseCase(it)
-                            .dropLast(if (nodeSourceType == NodeSourceType.INCOMING_SHARES) 0 else 1)
-                    } ?: emptyList()
                     val highlightedInRoot = if (ancestorIds.isEmpty()) highlightedNode else null
-                    val rootDestination: NavKey = when (nodeSourceType) {
-                        NodeSourceType.RUBBISH_BIN -> RubbishBinNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
-                        else -> SharesNavKey
-                    }
 
                     val childDestinations = runCatching {
                         buildList {
@@ -118,6 +105,10 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                                 )
                             )
                         } else {
+                            val rootDestination = when (nodeSourceType) {
+                                NodeSourceType.RUBBISH_BIN -> RubbishBinNavKey(highlightedNodeHandle = highlightedInRoot?.longValue)
+                                else -> SharesNavKey
+                            }
                             add(rootDestination)
                             addAll(childDestinations)
                         }

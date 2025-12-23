@@ -9,16 +9,15 @@ import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.DefaultTypedFolderNode
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.node.GetAncestorsIdsUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInCloudDriveUseCase
-import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DeepLinksAfterFetchNodesDialogNavKey
@@ -33,8 +32,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyValueClass
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
@@ -54,9 +51,7 @@ class CloudDriveDeepLinkHandlerTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getFileNodeContentForFileNodeUseCase = mock<GetFileNodeContentForFileNodeUseCase>()
     private val fileNodeContentToNavKeyMapper = mock<FileNodeContentToNavKeyMapper>()
-    private val getAncestorsIdsUseCase = mock<GetAncestorsIdsUseCase>()
-    private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
-    private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
 
@@ -67,11 +62,9 @@ class CloudDriveDeepLinkHandlerTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
             fileNodeContentToNavKeyMapper = fileNodeContentToNavKeyMapper,
-            getAncestorsIdsUseCase = getAncestorsIdsUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
-            isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
+            getNodeLocationUseCase = getNodeLocationUseCase,
         )
     }
 
@@ -82,14 +75,10 @@ class CloudDriveDeepLinkHandlerTest {
             getNodeByIdUseCase,
             getFileNodeContentForFileNodeUseCase,
             fileNodeContentToNavKeyMapper,
-            getAncestorsIdsUseCase,
             snackbarEventQueue,
-            isNodeInCloudDriveUseCase,
-            isNodeInRubbishBinUseCase,
             rootNodeExistsUseCase,
+            getNodeLocationUseCase,
         )
-        wheneverBlocking { isNodeInCloudDriveUseCase(any()) } doReturn true
-        wheneverBlocking { isNodeInRubbishBinUseCase(anyValueClass()) } doReturn false
         wheneverBlocking { rootNodeExistsUseCase() } doReturn true
     }
 
@@ -232,9 +221,14 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = parentId,
         )
+        val nodeLocation = NodeLocation(
+            node = folderNode,
+            ancestorIds = listOf(parentId),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
-        whenever(getAncestorsIdsUseCase(folderNode)) doReturn listOf(parentId, rootId)
+        whenever(getNodeLocationUseCase(folderNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -272,12 +266,17 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = parentId
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -318,12 +317,17 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = parentId,
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId, grandParentId),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -364,9 +368,14 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = NodeId(-1L),
         )
+        val nodeLocation = NodeLocation(
+            node = folderNode,
+            ancestorIds = emptyList(),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn folderNode
-        whenever(getAncestorsIdsUseCase(folderNode)) doReturn emptyList()
+        whenever(getNodeLocationUseCase(folderNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -413,13 +422,18 @@ class CloudDriveDeepLinkHandlerTest {
             nodeSourceType = null,
             mimeType = "application/pdf"
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = emptyList(),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(
             fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
         ) doReturn previewNavKey
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -450,13 +464,17 @@ class CloudDriveDeepLinkHandlerTest {
         val fileNode = createMockFileNode(
             id = nodeId.longValue,
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = emptyList(),
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn true
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
 
@@ -478,14 +496,17 @@ class CloudDriveDeepLinkHandlerTest {
         val fileNode = createMockFileNode(
             id = nodeId.longValue,
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = emptyList(),
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
-        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn true
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
 
@@ -513,14 +534,17 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = parentId,
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId, grandParentId),
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
-        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn true
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -568,12 +592,15 @@ class CloudDriveDeepLinkHandlerTest {
                 false
             )
         )
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
-        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn true
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId, grandParentId),
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+        )
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId, rootId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
         val previewNavKey = LegacyPdfViewerNavKey(
             nodeHandle = nodeId.longValue,
             nodeContentUri = fileNodeContent.uri,
@@ -624,14 +651,17 @@ class CloudDriveDeepLinkHandlerTest {
             id = nodeId.longValue,
             parentId = parentId,
         )
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId, grandParentId),
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
+        )
         val fileNodeContent = FileNodeContent.Other(localFile = null)
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
-        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn false
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
@@ -679,12 +709,15 @@ class CloudDriveDeepLinkHandlerTest {
                 false
             )
         )
-        whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
-        whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn false
+        val nodeLocation = NodeLocation(
+            node = fileNode,
+            ancestorIds = listOf(parentId, grandParentId),
+            nodeSourceType = NodeSourceType.INCOMING_SHARES,
+        )
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(getAncestorsIdsUseCase(fileNode)) doReturn listOf(parentId, grandParentId)
+        whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
         val previewNavKey = LegacyPdfViewerNavKey(
             nodeHandle = nodeId.longValue,
             nodeContentUri = fileNodeContent.uri,
