@@ -24,9 +24,11 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.R as NodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeListView
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -41,6 +43,7 @@ fun RecentsBucketScreen(
     viewModel: RecentsBucketViewModel,
     onNavigate: (NavKey) -> Unit,
     transferHandler: TransferHandler,
+    nodeActionHandler: NodeActionHandler,
     onBack: () -> Unit,
     nodeSourceType: NodeSourceType,
 ) {
@@ -70,7 +73,14 @@ fun RecentsBucketScreen(
             onFileClicked = { node ->
                 openedFileNode = node to nodeSourceType
             },
-            onMenuClick = { }, // TODO handle node option modal
+            onMenuClick = {
+                onNavigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = it.id.longValue,
+                        nodeSourceType = nodeSourceType
+                    )
+                )
+            },
             onLongClick = { }, // TODO handle selection mode
         )
 
