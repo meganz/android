@@ -30,7 +30,6 @@ import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
-import mega.privacy.android.data.mapper.node.NodeLocationMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
@@ -44,7 +43,6 @@ import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ShareData
@@ -145,7 +143,6 @@ internal class NodeRepositoryImplTest {
 
     private val fileNodeMapper = mock<FileNodeMapper>()
     private val nodeMapper = mock<NodeMapper>()
-    private val nodeLocationMapper = mock<NodeLocationMapper>()
 
     private val nodeListMapper = mock<NodeListMapper>()
     private val nodePathMapper = mock<NodePathMapper>()
@@ -190,7 +187,6 @@ internal class NodeRepositoryImplTest {
             nodeLabelMapper = nodeLabelMapper,
             typedNodeMapper = typedNodeMapper,
             nodePathMapper = nodePathMapper,
-            nodeLocationMapper = nodeLocationMapper,
         )
     }
 
@@ -223,7 +219,6 @@ internal class NodeRepositoryImplTest {
             megaNodeMapper,
             workManagerGateway,
             nodePathMapper,
-            nodeLocationMapper
         )
     }
 
@@ -1760,123 +1755,6 @@ internal class NodeRepositoryImplTest {
 
         assertThat(underTest.getFullNodePathById(nodeId)).isEqualTo(expected)
     }
-
-    @Test
-    fun `test that getNodeLocationById returns null when node does not exist`() = runTest {
-        val nodeId = NodeId(123L)
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
-
-        val actual = underTest.getNodeLocationById(nodeId)
-
-        assertThat(actual).isNull()
-        verify(megaApiGateway).getMegaNodeByHandle(nodeId.longValue)
-        verifyNoInteractions(nodeLocationMapper)
-    }
-
-    @Test
-    fun `test that getNodeLocationById returns mapped NodeLocation when node exists`() = runTest {
-        val nodeId = NodeId(123L)
-        val parentNodeHandle = 456L
-        val node = mock<MegaNode> {
-            on { parentHandle }.thenReturn(parentNodeHandle)
-        }
-        val rootParent = mock<MegaNode>()
-        val rootNode = mock<MegaNode>()
-        val rubbishBinNode = mock<MegaNode>()
-        val expectedLocation = NodeLocation.CloudDrive
-
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(node)
-        whenever(megaApiGateway.getMegaNodeByHandle(parentNodeHandle)).thenReturn(rootParent)
-        whenever(megaApiGateway.getParentNode(rootParent)).thenReturn(null)
-        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
-        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-        whenever(
-            nodeLocationMapper(
-                node = eq(node),
-                rootParent = eq(rootParent),
-                getRootNode = any(),
-                getRubbishBinNode = any(),
-            )
-        ).thenReturn(expectedLocation)
-
-        val actual = underTest.getNodeLocationById(nodeId)
-
-        assertThat(actual).isEqualTo(expectedLocation)
-        verify(megaApiGateway).getMegaNodeByHandle(nodeId.longValue)
-        verify(nodeLocationMapper).invoke(
-            node = eq(node),
-            rootParent = eq(rootParent),
-            getRootNode = any(),
-            getRubbishBinNode = any(),
-        )
-    }
-
-    @Test
-    fun `test that getNodeLocationById calls getRootParentNode with node parentHandle`() = runTest {
-        val nodeId = NodeId(123L)
-        val parentNodeHandle = 456L
-        val node = mock<MegaNode> {
-            on { parentHandle }.thenReturn(parentNodeHandle)
-        }
-        val rootParent = mock<MegaNode>()
-        val rootNode = mock<MegaNode>()
-        val rubbishBinNode = mock<MegaNode>()
-        val expectedLocation = NodeLocation.CloudDrive
-
-        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(node)
-        whenever(megaApiGateway.getMegaNodeByHandle(parentNodeHandle)).thenReturn(rootParent)
-        whenever(megaApiGateway.getParentNode(rootParent)).thenReturn(null)
-        whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
-        whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-        whenever(
-            nodeLocationMapper(
-                node = any(),
-                rootParent = any(),
-                getRootNode = any(),
-                getRubbishBinNode = any(),
-            )
-        ).thenReturn(expectedLocation)
-
-        underTest.getNodeLocationById(nodeId)
-
-        verify(megaApiGateway).getMegaNodeByHandle(parentNodeHandle)
-    }
-
-    @Test
-    fun `test that getNodeLocationById uses node as rootParent when getRootParentNode returns null`() =
-        runTest {
-            val nodeId = NodeId(123L)
-            val parentNodeHandle = 456L
-            val node = mock<MegaNode> {
-                on { parentHandle }.thenReturn(parentNodeHandle)
-            }
-            val rootNode = mock<MegaNode>()
-            val rubbishBinNode = mock<MegaNode>()
-            val expectedLocation = NodeLocation.CloudDrive
-
-            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(node)
-            whenever(megaApiGateway.getMegaNodeByHandle(parentNodeHandle)).thenReturn(null)
-            whenever(megaApiGateway.getRootNode()).thenReturn(rootNode)
-            whenever(megaApiGateway.getRubbishBinNode()).thenReturn(rubbishBinNode)
-            whenever(
-                nodeLocationMapper(
-                    node = eq(node),
-                    rootParent = eq(node),
-                    getRootNode = any(),
-                    getRubbishBinNode = any(),
-                )
-            ).thenReturn(expectedLocation)
-
-            val actual = underTest.getNodeLocationById(nodeId)
-
-            assertThat(actual).isEqualTo(expectedLocation)
-            verify(nodeLocationMapper).invoke(
-                node = eq(node),
-                rootParent = eq(node),
-                getRootNode = any(),
-                getRubbishBinNode = any(),
-            )
-        }
 
     private fun provideNodeId() = Stream.of(
         Arguments.of(null),

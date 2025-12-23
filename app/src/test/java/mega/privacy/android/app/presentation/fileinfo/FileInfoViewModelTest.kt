@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishBinUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
@@ -156,8 +157,7 @@ internal class FileInfoViewModelTest {
     private val monitorAccountDetailsUseCase = mock<MonitorAccountDetailUseCase>()
     private val isMasterBusinessAccountUseCase = mock<IsMasterBusinessAccountUseCase>()
     private val isBusinessAccountActiveUseCase = mock<IsBusinessAccountActiveUseCase>()
-    private val getNodeLocationByIdUseCase =
-        mock<mega.privacy.android.domain.usecase.fileinfo.GetNodeLocationByIdUseCase>()
+    private val getNodeLocationByIdUseCase = mock<GetNodeLocationByIdUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 

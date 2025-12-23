@@ -67,22 +67,15 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
-import mega.privacy.android.domain.entity.NodeLocation
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.DriveSyncNavKey
-import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.destination.RubbishBinNavKey
-import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -193,7 +186,7 @@ class FileInfoActivity : BaseActivity() {
                     onLocationClick = {
                         this.navigateToLocation(
                             uiState.nodeLocationInfo,
-                            uiState.nodeLocation
+                            uiState.nodeDestination
                         )
                     },
                     availableOfflineChanged = { availableOffline ->
@@ -408,66 +401,15 @@ class FileInfoActivity : BaseActivity() {
 
     private fun navigateToLocation(
         locationInfo: LocationInfo?,
-        nodeLocation: NodeLocation?,
+        nodeDestination: List<NavKey>?,
     ) {
-        val nodeId = viewModel.getCurrentNodeId()
-        val parentId = viewModel.getCurrentNodeParentId()
-        nodeLocation?.let {
-            val destination: NavKey? = getDestination(nodeLocation, nodeId, parentId)
+        nodeDestination?.let {
             lifecycleScope.launch {
-                destination?.let { navigationQueue.emit(destination, NavPriority.Default, true) }
+                navigationQueue.emit(nodeDestination, NavPriority.Default, true)
                 finish()
             }
         } ?: locationInfo?.let {
             handleLocationClick(this, adapterType, locationInfo)
-        }
-    }
-
-    private fun getDestination(
-        nodeLocation: NodeLocation,
-        nodeId: NodeId?,
-        parentId: NodeId?,
-    ): NavKey? = when (nodeLocation) {
-        NodeLocation.CloudDriveRoot -> {
-            nodeId?.let {
-                HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue))
-            }
-        }
-
-        NodeLocation.CloudDrive -> {
-            parentId?.let {
-                CloudDriveNavKey(
-                    nodeHandle = parentId.longValue,
-                    highlightedNodeHandle = nodeId?.longValue ?: -1L
-                )
-            }
-        }
-
-        NodeLocation.RubbishBinRoot -> {
-            RubbishBinNavKey()
-        }
-
-        NodeLocation.RubbishBin -> {
-            parentId?.let {
-                RubbishBinNavKey(
-                    handle = parentId.longValue,
-                    highlightedNodeHandle = nodeId?.longValue ?: -1L
-                )
-            }
-        }
-
-        NodeLocation.IncomingSharesRoot -> {
-            SharesNavKey
-        }
-
-        NodeLocation.IncomingShares -> {
-            parentId?.let {
-                CloudDriveNavKey(
-                    nodeHandle = parentId.longValue,
-                    highlightedNodeHandle = nodeId?.longValue ?: -1L,
-                    nodeSourceType = NodeSourceType.INCOMING_SHARES
-                )
-            }
         }
     }
 
