@@ -851,4 +851,16 @@ class NodeOptionsActionViewModel @Inject constructor(
             it.copy(dismissEvent = consumed)
         }
     }
+
+    fun onActionTriggered() {
+        uiState.update {
+            it.copy(actionTriggeredEvent = triggered)
+        }
+    }
+
+    fun resetActionTriggered() {
+        uiState.update {
+            it.copy(actionTriggeredEvent = consumed)
+        }
+    }
 }

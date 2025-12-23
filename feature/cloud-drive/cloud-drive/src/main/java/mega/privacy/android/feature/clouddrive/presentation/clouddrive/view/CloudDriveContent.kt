@@ -52,7 +52,6 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -127,64 +126,17 @@ internal fun CloudDriveContent(
             }
         }
     }
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
-        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
-        onHandleNodesWithoutConflict = { collisionType, nodes ->
-            when (collisionType) {
-                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> { /* No-op for other types */
-                }
-            }
-        },
-    )
     var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = { event ->
-            onTransfer(event)
-            onAction(CloudDriveAction.DeselectAllItems)
-        }
-    )
-
     LaunchedEffect(uiState.selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             uiState.selectedNodes.toSet(),
             nodeSourceType = uiState.nodeSourceType
         )
-    }
-
-    // Reset selection mode after handling move, copy, delete action
-    LaunchedEffect(nodeActionState.infoToShowEvent) {
-        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
-            onAction(CloudDriveAction.DeselectAllItems)
-        }
-    }
-
-    // Reset selection mode after handling name collision
-    LaunchedEffect(nodeActionState.nodeNameCollisionsResult) {
-        if (nodeActionState.nodeNameCollisionsResult is StateEventWithContentTriggered) {
-            onAction(CloudDriveAction.DeselectAllItems)
-        }
-    }
-
-    LaunchedEffect(nodeActionState.renameNodeRequestEvent) {
-        if (nodeActionState.renameNodeRequestEvent is StateEventWithContentTriggered) {
-            onAction(CloudDriveAction.DeselectAllItems)
-        }
     }
 
     LaunchedEffect(uiState.isLoading) {
@@ -197,6 +149,14 @@ internal fun CloudDriveContent(
             shouldShowSkeleton = false
         }
     }
+
+    EventEffect(
+        event = nodeActionState.actionTriggeredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetActionTriggered
+    ) {
+        onAction(CloudDriveAction.DeselectAllItems)
+    }
+
 
     EventEffect(
         event = nodeActionState.dismissEvent,

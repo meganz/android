@@ -1,92 +1,128 @@
-package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
+package mega.privacy.android.core.nodecomponents.action
 
-import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogViewM3
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
-import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 /**
- * Handles node option events and displays appropriate dialogs
+ * Handles node option events and triggers appropriate actions based on the event.
  *
- * @param megaNavigator Navigator for handling navigation actions
- * @param nodeActionState Current state of node actions
- * @param nameCollisionLauncher Launcher for handling name collision resolution
- * @param snackbarHostState State for showing snackbar messages
- * @param onNodeNameCollisionResultHandled Callback when node name collision result is handled
- * @param onInfoToShowEventConsumed Callback when info to show event is consumed
- * @param onForeignNodeDialogShown Callback when foreign node dialog is shown
- * @param onQuotaDialogShown Callback when quota dialog is shown
- * @param onHandleNodesWithoutConflict Callback to handle nodes without conflicts, receives collision type and node map
+ * @param nodeActionState The current state of node actions.
+ * @param onCopyNodes Callback to handle copying nodes.
+ * @param onMoveNodes Callback to handle moving nodes.
+ * @param consumeNameCollisionResult Callback to consume the name collision result.
+ * @param consumeInfoToShow Callback to consume the info to show event.
+ * @param consumeForeignNodeDialog Callback to consume the foreign node dialog event.
+ * @param consumeQuotaDialog Callback to consume the quota dialog event.
  */
 @Composable
-fun HandleNodeOptionEvent(
-    megaNavigator: MegaNavigator,
+fun HandleNodeOptionsActionEvent(
     nodeActionState: NodeActionState,
-    nameCollisionLauncher: ManagedActivityResultLauncher<ArrayList<NameCollision>, String?>,
-    snackbarHostState: SnackbarHostState?,
-    onNodeNameCollisionResultHandled: () -> Unit,
-    onInfoToShowEventConsumed: () -> Unit,
-    onForeignNodeDialogShown: () -> Unit,
-    onQuotaDialogShown: () -> Unit,
-    onHandleNodesWithoutConflict: (NodeNameCollisionType, Map<Long, Long>) -> Unit,
+    onCopyNodes: (nodes: Map<Long, Long>) -> Unit,
+    onMoveNodes: (nodes: Map<Long, Long>) -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+    consumeNameCollisionResult: () -> Unit,
+    consumeInfoToShow: () -> Unit,
+    consumeForeignNodeDialog: () -> Unit,
+    consumeQuotaDialog: () -> Unit,
+    consumeDownloadEvent: () -> Unit,
+    onActionTriggered: () -> Unit = {},
 ) {
+    val snackbarQueue = rememberSnackBarQueue()
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var isShowForeignDialog by rememberSaveable { mutableStateOf(false) }
     var isOverQuota by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarQueue.queueMessage(message)
+            }
+        }
+    }
+
     EventEffect(
         event = nodeActionState.nodeNameCollisionsResult,
-        onConsumed = onNodeNameCollisionResultHandled,
+        onConsumed = consumeNameCollisionResult,
         action = {
+            onActionTriggered()
             handleNodesNameCollisionResult(
                 nameCollisionActivityLauncher = nameCollisionLauncher,
                 result = it,
-                onHandleNodesWithoutConflict = onHandleNodesWithoutConflict
+                onHandleNodesWithoutConflict = { collisionType, nodes ->
+                    when (collisionType) {
+                        NodeNameCollisionType.MOVE -> onMoveNodes(nodes)
+                        NodeNameCollisionType.COPY -> onCopyNodes(nodes)
+                        else -> {
+                            /* No-op for other types */
+                        }
+                    }
+                }
             )
         }
     )
 
     EventEffect(
         event = nodeActionState.infoToShowEvent,
-        onConsumed = onInfoToShowEventConsumed,
+        onConsumed = consumeInfoToShow,
     ) {
-        snackbarHostState?.showAutoDurationSnackbar(it.get(context))
+        onActionTriggered()
+        snackbarQueue.queueMessage(it.get(context))
     }
 
     EventEffect(
         event = nodeActionState.showForeignNodeDialog,
-        onConsumed = onForeignNodeDialogShown,
+        onConsumed = consumeForeignNodeDialog,
         action = {
+            onActionTriggered()
             isShowForeignDialog = true
         }
     )
 
     EventEffect(
         event = nodeActionState.showQuotaDialog,
-        onConsumed = onQuotaDialogShown,
+        onConsumed = consumeQuotaDialog,
         action = {
+            onActionTriggered()
             isOverQuota = it
         }
     )
 
+    EventEffect(
+        event = nodeActionState.downloadEvent,
+        onConsumed = consumeDownloadEvent,
+        action = {
+            onActionTriggered()
+            onTransfer(it)
+        }
+    )
 
     if (isShowForeignDialog) {
         BasicDialog(
@@ -145,6 +181,7 @@ fun handleNodesNameCollisionResult(
             NodeNameCollisionType.MOVE, NodeNameCollisionType.COPY -> {
                 onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
             }
+
             else -> Timber.d("Not implemented")
         }
     }

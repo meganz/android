@@ -52,4 +52,5 @@ data class NodeActionState(
     val navigationEvent: StateEventWithContent<NavKey> = consumed(),
     val restoreSuccessEvent: StateEventWithContent<RestoreSuccess.RestoreData> = consumed(),
     val dismissEvent: StateEvent = consumed,
+    val actionTriggeredEvent: StateEvent = consumed,
 )

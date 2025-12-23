@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsResult
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
@@ -43,7 +43,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             .collectAsStateWithLifecycle(null)
         val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
 
-        HandleNodeOptionsResult(
+        HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             onTransfer = onTransfer,

@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +29,6 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
@@ -48,19 +46,15 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -80,8 +74,6 @@ internal fun RubbishBinScreen(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
-    val megaNavigator = rememberMegaNavigator()
-    val megaResultContract = rememberMegaResultContract()
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -96,17 +88,6 @@ internal fun RubbishBinScreen(
     var showClearRubbishBinDialog by remember { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(message)
-            }
-        }
-    }
 
     val spanCount = rememberDynamicSpanCount(
         isListView = uiState.currentViewType == ViewType.LIST
@@ -146,26 +127,6 @@ internal fun RubbishBinScreen(
             NodeSourceType.RUBBISH_BIN
         )
     }
-
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
-        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
-        onHandleNodesWithoutConflict = { collisionType, nodes ->
-            when (collisionType) {
-                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> {
-                    /* No-op for other types */
-                }
-            }
-        },
-    )
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier

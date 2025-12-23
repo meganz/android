@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
+import mega.privacy.android.core.nodecomponents.action.HandleNodeOptionsActionEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -22,7 +24,7 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 
 @Composable
-fun HandleNodeOptionsResult(
+fun HandleNodeOptionsActionResult(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     onNavigate: (NavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -44,6 +46,20 @@ fun HandleNodeOptionsResult(
             }
         }
     }
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    HandleNodeOptionsActionEvent(
+        nodeActionState = nodeActionState,
+        onCopyNodes = nodeOptionsActionViewModel::copyNodes,
+        onMoveNodes = nodeOptionsActionViewModel::moveNodes,
+        onTransfer = onTransfer,
+        consumeNameCollisionResult = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        consumeInfoToShow = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
+        consumeForeignNodeDialog = nodeOptionsActionViewModel::markForeignNodeDialogShown,
+        consumeQuotaDialog = nodeOptionsActionViewModel::markQuotaDialogShown,
+        consumeDownloadEvent = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
+    )
 
     LaunchedEffect(nodeBottomSheetResult.value) {
         when (val result = nodeBottomSheetResult.value) {

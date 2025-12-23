@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -81,24 +80,11 @@ internal fun FavouritesContent(
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = onTransfer
-    )
-
     LaunchedEffect(uiState.selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             uiState.selectedNodes.toSet(),
             NodeSourceType.FAVOURITES
         )
-    }
-
-    // Reset selection mode after handling move, copy, delete action
-    LaunchedEffect(nodeActionState.infoToShowEvent) {
-        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
-            onAction(FavouritesAction.DeselectAllItems)
-        }
     }
 
     LaunchedEffect(uiState.isLoading) {

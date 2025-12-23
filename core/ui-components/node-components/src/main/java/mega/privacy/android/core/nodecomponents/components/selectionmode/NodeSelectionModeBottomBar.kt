@@ -69,12 +69,6 @@ fun NodeSelectionModeBottomBar(
             }
         }
 
-        EventEffect(
-            event = nodeActionState.downloadEvent,
-            onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-            action = onTransfer
-        )
-
         if (visible) {
             EventEffect(
                 event = nodeActionState.shareFolderDialogEvent,

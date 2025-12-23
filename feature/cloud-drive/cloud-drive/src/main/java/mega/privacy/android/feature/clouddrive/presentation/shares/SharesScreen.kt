@@ -24,7 +24,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -46,11 +46,9 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.HandleNodeOptionEvent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -295,56 +293,18 @@ internal fun SharesScreen(
         )
     }
 
-    HandleNodeOptionEvent(
-        megaNavigator = megaNavigator,
-        nodeActionState = nodeActionState,
-        nameCollisionLauncher = nameCollisionLauncher,
-        snackbarHostState = snackbarHostState,
-        onNodeNameCollisionResultHandled = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        onInfoToShowEventConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        onForeignNodeDialogShown = nodeOptionsActionViewModel::markForeignNodeDialogShown,
-        onQuotaDialogShown = nodeOptionsActionViewModel::markQuotaDialogShown,
-        onHandleNodesWithoutConflict = { collisionType, nodes ->
-            when (collisionType) {
-                NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                else -> { /* No-op for other types */
-                }
-            }
-        },
-    )
+    EventEffect(
+        nodeActionState.actionTriggeredEvent,
+        nodeOptionsActionViewModel::resetActionTriggered
+    ) {
+        deselectAllItems()
+    }
 
     LaunchedEffect(selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             selectedNodes = getSelectedNodes().toSet(),
             nodeSourceType = selectedTab.toNodeSourceType()
         )
-    }
-
-    LaunchedEffect(nodeActionState.downloadEvent) {
-        if (nodeActionState.downloadEvent is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
-    }
-
-    // Reset selection mode after handling move, copy, delete action
-    LaunchedEffect(nodeActionState.infoToShowEvent) {
-        if (nodeActionState.infoToShowEvent is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
-    }
-
-    // Reset selection mode after handling name collision
-    LaunchedEffect(nodeActionState.nodeNameCollisionsResult) {
-        if (nodeActionState.nodeNameCollisionsResult is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
-    }
-
-    LaunchedEffect(nodeActionState.renameNodeRequestEvent) {
-        if (nodeActionState.renameNodeRequestEvent is StateEventWithContentTriggered) {
-            deselectAllItems()
-        }
     }
 
     if (showSortBottomSheet) {

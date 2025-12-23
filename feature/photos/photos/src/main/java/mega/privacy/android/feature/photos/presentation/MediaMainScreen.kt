@@ -4,7 +4,6 @@ package mega.privacy.android.feature.photos.presentation
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -53,7 +51,6 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
@@ -64,8 +61,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
-import mega.privacy.android.domain.entity.node.NameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -110,7 +105,6 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
-import timber.log.Timber
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -152,6 +146,7 @@ fun MediaMainRoute(
             }
         }
     }
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     // Follow the same behavior as the existing code. We can improve this in phase 2.
     LifecycleResumeEffect(Unit) {
@@ -160,23 +155,16 @@ fun MediaMainRoute(
         onPauseOrDispose {}
     }
 
-    NodeActionEventHandler(
-        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-        nameCollisionLauncher = nameCollisionLauncher,
-        onTransfer = onTransfer,
-        onShowSnackBar = {
-            scope.launch {
-                snackBarEventQueue.queueMessage(it)
-            }
-        },
-        onActionFinished = {
-            if (videosTabUiState is VideosTabUiState.Data) {
-                val state = videosTabUiState as VideosTabUiState.Data
-                if (state.selectedTypedNodes.isNotEmpty()) {
-                    videosTabViewModel.clearSelection()
-                }
-            }
-        },
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss,
+        action = videosTabViewModel::clearSelection
+    )
+
+    EventEffect(
+        nodeActionState.actionTriggeredEvent,
+        nodeOptionsActionViewModel::resetActionTriggered,
+        action = videosTabViewModel::clearSelection
     )
 
     LaunchedEffect(
@@ -666,7 +654,6 @@ fun MediaMainScreen(
                                     clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                                     onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                     onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
-                                    onTransfer = onTransfer,
                                     navigationHandler = navigationHandler,
                                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                                     updateIsWarningBannerShown = updateIsWarningBannerShown,
@@ -793,7 +780,6 @@ private fun MediaScreen.MediaContent(
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     onDismissEnableCameraUploadsBanner: () -> Unit,
     navigationHandler: NavigationHandler,
-    onTransfer: (TransferTriggerEvent) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
@@ -846,70 +832,6 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Videos -> VideosTabRoute(navigationHandler)
         MediaScreen.Playlists -> VideoPlaylistsTabRoute(modifier)
     }
-}
-
-@Composable
-private fun NodeActionEventHandler(
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
-    nameCollisionLauncher: ManagedActivityResultLauncher<ArrayList<NameCollision>, String?>,
-    onTransfer: (TransferTriggerEvent) -> Unit,
-    onShowSnackBar: (message: String) -> Unit,
-    onActionFinished: () -> Unit = {},
-    onNavigateToRenameNav: (NavKey) -> Unit = {},
-) {
-    val context = LocalContext.current
-    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-
-    EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = { event ->
-            onTransfer(event)
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.infoToShowEvent,
-        onConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        action = { info ->
-            onShowSnackBar(info.get(context))
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.nodeNameCollisionsResult,
-        onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        action = {
-            if (it.conflictNodes.isNotEmpty()) {
-                nameCollisionLauncher.launch(it.conflictNodes.values.toCollection(ArrayList()))
-            }
-            if (it.noConflictNodes.isNotEmpty()) {
-                when (it.type) {
-                    NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(it.noConflictNodes)
-                    NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(it.noConflictNodes)
-                    else -> Timber.d("Not implemented")
-                }
-            }
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = { nodeId ->
-            onNavigateToRenameNav(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.dismissEvent,
-        onConsumed = nodeOptionsActionViewModel::resetDismiss,
-        action = onActionFinished
-    )
 }
 
 @CombinedThemePreviews
