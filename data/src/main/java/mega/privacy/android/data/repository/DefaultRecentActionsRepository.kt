@@ -15,6 +15,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -94,10 +96,17 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     /**
      * Generate identifier from bucket properties
-     * For example: m_true-u_false-t_1713248239-ue_ht@mega.co.nz-pni_100124500130291
+     * For example: M_true-U_false-D_2025-12-22-UE_ht@mega.co.nz-PNH_100124500130291
      */
-    private fun generateIdentifier(bucket: MegaRecentActionBucket): String =
-        "m_${bucket.isMedia}-u_${bucket.isUpdate}-t_${bucket.timestamp}-ue_${bucket.userEmail}-pni_${bucket.parentHandle}"
+    private fun generateIdentifier(bucket: MegaRecentActionBucket): String {
+        // Each bucket is created based on date, so timestamp is converted to date only
+        val date = Instant.ofEpochSecond(bucket.timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .toString()
+
+        return "M_${bucket.isMedia}-U_${bucket.isUpdate}-D_${date}-UE_${bucket.userEmail}-PNH_${bucket.parentHandle}"
+    }
 
     companion object {
         /**

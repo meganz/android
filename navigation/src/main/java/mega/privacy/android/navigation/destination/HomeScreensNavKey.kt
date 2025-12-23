@@ -16,6 +16,7 @@ data class RecentsBucketScreenNavKey(
     val identifier: String,
     val isMediaBucket: Boolean,
     val folderName: String,
+    val folderHandle: Long = -1L,
     val nodeSourceType: NodeSourceType,
     val timestamp: Long,
     val fileCount: Int,

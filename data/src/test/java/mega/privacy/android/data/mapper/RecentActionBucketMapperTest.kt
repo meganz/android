@@ -30,7 +30,7 @@ class RecentActionBucketMapperTest {
 
     @Test
     fun `test that mapper returns correct value`() = runTest {
-        val identifier = "m_false-u_true-t_12-ue_something@email.com-pni_1"
+        val identifier = "M_false-U_true-D_1970-01-01-UE_something@email.com-PNH_1"
         val actual = underTest.invoke(
             identifier = identifier,
             megaRecentActionBucket = recentActionBucket,

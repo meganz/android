@@ -19,6 +19,7 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
                         identifier = navKey.identifier,
                         isMediaBucket = navKey.isMediaBucket,
                         folderName = navKey.folderName,
+                        folderHandle = navKey.folderHandle,
                         nodeSourceType = navKey.nodeSourceType,
                         timestamp = navKey.timestamp,
                         fileCount = navKey.fileCount,

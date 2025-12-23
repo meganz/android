@@ -17,6 +17,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -85,6 +86,13 @@ fun RecentsBucketScreen(
                 onNavigate = onNavigate,
             )
         }
+    }
+
+    EventEffect(
+        event = uiState.navigateBack,
+        onConsumed = { viewModel.onNavigateBackEventConsumed() }
+    ) {
+        onBack()
     }
 }
 

@@ -234,20 +234,22 @@ class CloudDriveViewModel @AssistedInject constructor(
             monitorNodeUpdatesByIdUseCase(
                 nodeId = NodeId(navKey.nodeHandle),
                 nodeSourceType = nodeSourceType
-            ).collectLatest { change ->
-                if (change == NodeChanges.Remove) {
-                    // If current folder is moved to rubbish bin, navigate back
-                    _uiState.update {
-                        it.copy(navigateBack = triggered)
-                    }
-                } else {
-                    updateTitle()
-                    // If nodes are currently loading, ignore updates
-                    if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
-                        refreshNodes()
+            )
+                .catch { Timber.e(it) }
+                .collectLatest { change ->
+                    if (change == NodeChanges.Remove) {
+                        // If current folder is moved to rubbish bin, navigate back
+                        _uiState.update {
+                            it.copy(navigateBack = triggered)
+                        }
+                    } else {
+                        updateTitle()
+                        // If nodes are currently loading, ignore updates
+                        if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
+                            refreshNodes()
+                        }
                     }
                 }
-            }
         }
     }
 

@@ -102,6 +102,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                         identifier = item.bucket.identifier,
                         isMediaBucket = item.isMediaBucket,
                         folderName = item.parentFolderName.get(context),
+                        folderHandle = item.bucket.parentNodeId.longValue,
                         nodeSourceType = item.nodeSourceType,
                         timestamp = item.bucket.timestamp,
                         fileCount = item.bucket.nodes.size,

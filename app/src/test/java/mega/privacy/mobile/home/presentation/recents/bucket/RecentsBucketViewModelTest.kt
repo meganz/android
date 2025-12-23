@@ -2,8 +2,10 @@ package mega.privacy.mobile.home.presentation.recents.bucket
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -13,10 +15,12 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -46,10 +50,12 @@ class RecentsBucketViewModelTest {
     private val recentsParentFolderNameMapper = mock<RecentsParentFolderNameMapper>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorNodeUpdatesByIdUseCase = mock<MonitorNodeUpdatesByIdUseCase>()
 
     private val testIdentifier = "test_bucket_identifier"
     private val testNodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val testFolderName = "Test Folder"
+    private val testFolderHandle = 1234L
     private val testTimestamp = 1234567890L
     private val testFileCount = 2
 
@@ -60,10 +66,12 @@ class RecentsBucketViewModelTest {
             nodeUiItemMapper,
             recentsParentFolderNameMapper,
             monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase
+            monitorShowHiddenItemsUseCase,
+            monitorNodeUpdatesByIdUseCase
         )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
     }
 
     private fun initViewModel(
@@ -71,10 +79,11 @@ class RecentsBucketViewModelTest {
             identifier = testIdentifier,
             isMediaBucket = false,
             folderName = testFolderName,
+            folderHandle = testFolderHandle,
             nodeSourceType = testNodeSourceType,
             timestamp = testTimestamp,
             fileCount = testFileCount,
-        )
+        ),
     ) {
         underTest = RecentsBucketViewModel(
             args = args,
@@ -83,6 +92,7 @@ class RecentsBucketViewModelTest {
             recentsParentFolderNameMapper = recentsParentFolderNameMapper,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase
         )
     }
 
@@ -251,6 +261,7 @@ class RecentsBucketViewModelTest {
                 identifier = testId,
                 isMediaBucket = false,
                 folderName = testFolderName,
+                folderHandle = testFolderHandle,
                 nodeSourceType = testNodeSourceType,
                 timestamp = testTimestamp,
                 fileCount = testFileCount,
@@ -365,11 +376,14 @@ class RecentsBucketViewModelTest {
     @Test
     fun `test that bucket is reloaded when showHiddenNodes changes from false to true`() =
         runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
             whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(
                 flowOf(false, true)
             )
+            whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+                .thenReturn(nodeUpdatesFlow)
 
             initViewModel()
             advanceUntilIdle()
@@ -381,6 +395,192 @@ class RecentsBucketViewModelTest {
                 .invoke(bucketIdentifier = testIdentifier, excludeSensitives = false)
         }
 
+    @Test
+    fun `test that monitorNodeUpdates triggers navigateBack when NodeChanges_Remove is received`() =
+        runTest {
+            val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+            whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+                .thenReturn(nodeUpdatesFlow)
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isLoading).isFalse()
+                advanceUntilIdle()
+
+                nodeUpdatesFlow.emit(NodeChanges.Remove)
+                advanceUntilIdle()
+
+                val updatedState = awaitItem()
+                assertThat(updatedState.navigateBack).isEqualTo(triggered)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates triggers loadBucket when NodeChanges_Attributes is received`() =
+        runTest {
+            val node1 = createMockFileNode(name = "file1.txt")
+            val node2 = createMockFileNode(name = "file2.txt")
+            val bucket = createMockRecentActionBucket(
+                identifier = testIdentifier,
+                nodes = listOf(node1, node2),
+            )
+
+            val nodeUiItem1 = createMockNodeUiItem(node1)
+            val nodeUiItem2 = createMockNodeUiItem(node2)
+
+            whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+            whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+            whenever(
+                nodeUiItemMapper(
+                    nodeList = any(),
+                    existingItems = anyOrNull(),
+                    nodeSourceType = any(),
+                    isPublicNodes = any(),
+                    showPublicLinkCreationTime = any(),
+                    highlightedNodeId = anyOrNull(),
+                    highlightedNames = anyOrNull(),
+                    isContactVerificationOn = any(),
+                )
+            ).thenReturn(listOf(nodeUiItem1, nodeUiItem2))
+            whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+                .thenReturn(flowOf(NodeChanges.Attributes))
+
+            initViewModel()
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.isLoading).isFalse()
+
+                advanceUntilIdle()
+
+                verify(getRecentActionBucketByIdUseCase, atLeastOnce()).invoke(
+                    bucketIdentifier = testIdentifier,
+                    excludeSensitives = false
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates handles multiple NodeChanges correctly`() = runTest {
+        val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+            .thenReturn(nodeUpdatesFlow)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isFalse()
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeChanges.Attributes)
+            advanceUntilIdle()
+            nodeUpdatesFlow.emit(NodeChanges.Remove)
+            advanceUntilIdle()
+
+            val finalState = awaitItem()
+            assertThat(finalState.navigateBack).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates handles rapid NodeChanges`() = runTest {
+        val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+            .thenReturn(nodeUpdatesFlow)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isFalse()
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeChanges.Attributes)
+            nodeUpdatesFlow.emit(NodeChanges.Attributes)
+            nodeUpdatesFlow.emit(NodeChanges.Attributes)
+            nodeUpdatesFlow.emit(NodeChanges.Remove)
+            advanceUntilIdle()
+
+            val finalState = awaitItem()
+            assertThat(finalState.navigateBack).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger navigateBack for Attributes`() = runTest {
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+            .thenReturn(flowOf(NodeChanges.Attributes))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.navigateBack).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger loadBucket for Remove`() = runTest {
+        val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+            .thenReturn(nodeUpdatesFlow)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isFalse()
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeChanges.Remove)
+            advanceUntilIdle()
+
+            val updatedState = awaitItem()
+            assertThat(updatedState.navigateBack).isEqualTo(triggered)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onNavigateBackEventConsumed consumes the navigate back event`() = runTest {
+        val nodeUpdatesFlow = MutableSharedFlow<NodeChanges>()
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(testFolderHandle), testNodeSourceType))
+            .thenReturn(nodeUpdatesFlow)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.isLoading).isFalse()
+            advanceUntilIdle()
+
+            nodeUpdatesFlow.emit(NodeChanges.Remove)
+            advanceUntilIdle()
+
+            val stateAfterRemove = awaitItem()
+            assertThat(stateAfterRemove.navigateBack).isEqualTo(triggered)
+
+            underTest.onNavigateBackEventConsumed()
+            val stateAfterConsume = awaitItem()
+            assertThat(stateAfterConsume.navigateBack).isEqualTo(consumed)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun createMockFileNode(
         name: String = "testFile.txt",

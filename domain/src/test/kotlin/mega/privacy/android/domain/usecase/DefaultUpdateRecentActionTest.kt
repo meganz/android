@@ -12,6 +12,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultUpdateRecentActionTest {
@@ -33,8 +35,12 @@ class DefaultUpdateRecentActionTest {
         parentNodeId: NodeId,
         userEmail: String,
     ): RecentActionBucket {
+        val date = Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
+            .toString()
         val identifier =
-            "m_$isMedia-u_$isUpdate-t_$timestamp-ue_$userEmail-pni_${parentNodeId.longValue}"
+            "M_$isMedia-U_$isUpdate-D_$date-UE_$userEmail-PNH_${parentNodeId.longValue}"
         return RecentActionBucket(
             identifier = identifier,
             isMedia = isMedia,
@@ -52,7 +58,7 @@ class DefaultUpdateRecentActionTest {
         val bucket2 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "1")
         val bucket3 = createBucket(isMedia = false, isUpdate = false, 0L, NodeId(1L), "1")
         val bucket4 = createBucket(isMedia = true, isUpdate = false, 0L, NodeId(1L), "1")
-        val bucket5 = createBucket(isMedia = true, isUpdate = true, 1L, NodeId(1L), "1")
+        val bucket5 = createBucket(isMedia = true, isUpdate = true, 86400000L, NodeId(1L), "1")
         val bucket6 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(0L), "1")
         val bucket7 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "2")
 
@@ -82,7 +88,7 @@ class DefaultUpdateRecentActionTest {
             val item1 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(2L), "1")
             val item2 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(3L), "1")
 
-            val expected = createBucket(isMedia = true, isUpdate = true, 1L, NodeId(0L), "1")
+            val expected = createBucket(isMedia = true, isUpdate = true, 86400000L, NodeId(0L), "1")
 
             val cachedActionList = listOf(current, item1, item2)
 

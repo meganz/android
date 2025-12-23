@@ -6,16 +6,22 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -30,10 +36,11 @@ import timber.log.Timber
 class RecentsBucketViewModel @AssistedInject constructor(
     @Assisted val args: Args,
     private val getRecentActionBucketByIdUseCase: GetRecentActionBucketByIdUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
-    private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper,
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val recentsParentFolderNameMapper: RecentsParentFolderNameMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -42,6 +49,7 @@ class RecentsBucketViewModel @AssistedInject constructor(
             fileCount = args.fileCount,
             timestamp = args.timestamp,
             parentFolderName = LocalizedText.Literal(args.folderName),
+            parentFolderHandle = args.folderHandle,
             nodeSourceType = args.nodeSourceType
         )
     )
@@ -49,6 +57,7 @@ class RecentsBucketViewModel @AssistedInject constructor(
 
     init {
         monitorHiddenNodesState()
+        monitorNodeUpdates()
     }
 
     private fun loadBucket(
@@ -94,6 +103,27 @@ class RecentsBucketViewModel @AssistedInject constructor(
         }
     }
 
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            uiState.firstOrNull { !it.isLoading }
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(uiState.value.parentFolderHandle),
+                nodeSourceType = uiState.value.nodeSourceType
+            )
+                .catch { Timber.e(it) }
+                .collectLatest { change ->
+                    if (change == NodeChanges.Remove) {
+                        // If current folder is moved to rubbish bin, navigate back
+                        _uiState.update {
+                            it.copy(navigateBack = triggered)
+                        }
+                    } else {
+                        loadBucket()
+                    }
+                }
+        }
+    }
+
     private fun monitorHiddenNodesState() {
         viewModelScope.launch {
             combine(
@@ -111,6 +141,15 @@ class RecentsBucketViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Consume navigate back event
+     */
+    fun onNavigateBackEventConsumed() {
+        _uiState.update { state ->
+            state.copy(navigateBack = consumed)
+        }
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(args: Args): RecentsBucketViewModel
@@ -120,6 +159,7 @@ class RecentsBucketViewModel @AssistedInject constructor(
         val identifier: String,
         val isMediaBucket: Boolean,
         val folderName: String,
+        val folderHandle: Long,
         val nodeSourceType: NodeSourceType,
         val timestamp: Long,
         val fileCount: Int,

@@ -1,5 +1,7 @@
 package mega.privacy.mobile.home.presentation.recents.bucket.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -13,8 +15,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
  * @param fileCount number of files in the bucket
  * @param timestamp timestamp of the bucket
  * @param parentFolderName localized name of the parent folder
+ * @param parentFolderHandle handle of the parent folder
  * @param nodeSourceType source type of the nodes
  * @param excludeSensitives whether sensitive items are excluded
+ * @param navigateBack event to navigate back
  */
 data class RecentsBucketUiState(
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
@@ -23,8 +27,10 @@ data class RecentsBucketUiState(
     val fileCount: Int = 0,
     val timestamp: Long = 0L,
     val parentFolderName: LocalizedText = LocalizedText.Literal(""),
+    val parentFolderHandle: Long = -1L,
     val nodeSourceType: NodeSourceType,
     val excludeSensitives: Boolean = false,
+    val navigateBack: StateEvent = consumed,
 ) {
 
     /**
