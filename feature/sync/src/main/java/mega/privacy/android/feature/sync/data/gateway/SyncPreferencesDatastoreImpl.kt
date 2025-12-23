@@ -25,6 +25,7 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
     private val syncOnlyByWiFiKey = booleanPreferencesKey("syncOnlyByWiFi")
     private val syncOnlyByChargingKey = booleanPreferencesKey("syncOnlyByCharging")
     private val syncFrequencyKey = intPreferencesKey("syncFrequency")
+    private val shouldRunForegroundKey = booleanPreferencesKey("shouldRunForeground")
 
     override suspend fun setOnboardingShown(shown: Boolean) {
         dataStore.edit {
@@ -61,6 +62,15 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
 
     override suspend fun getSyncFrequencyMinutes(): Int? =
         dataStore.data.map { it[syncFrequencyKey] }.first()
+
+    override suspend fun setShouldRunForeground(shouldRun: Boolean) {
+        dataStore.edit {
+            it[shouldRunForegroundKey] = shouldRun
+        }
+    }
+
+    override suspend fun getShouldRunForeground(): Boolean? =
+        dataStore.data.map { it[shouldRunForegroundKey] }.first()
 }
 
 internal val Context.syncPrefsDataStore: DataStore<Preferences> by preferencesDataStore(

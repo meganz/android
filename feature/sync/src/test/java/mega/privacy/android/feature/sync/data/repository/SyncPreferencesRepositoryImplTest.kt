@@ -154,4 +154,29 @@ internal class SyncPreferencesRepositoryImplTest {
 
             assertThat(result).isEqualTo(15)
         }
+
+    @Test
+    fun `test that setShouldRunForeground calls setShouldRunForeground on datastore`() = runTest {
+        underTest.setShouldRunForeground(true)
+
+        verify(syncPreferencesDatastore).setShouldRunForeground(true)
+    }
+
+    @Test
+    fun `test that getShouldRunForeground returns value from datastore`() = runTest {
+        whenever(syncPreferencesDatastore.getShouldRunForeground()).thenReturn(true)
+
+        val result = underTest.getShouldRunForeground()
+
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that getShouldRunForeground returns false when datastore returns null`() = runTest {
+        whenever(syncPreferencesDatastore.getShouldRunForeground()).thenReturn(null)
+
+        val result = underTest.getShouldRunForeground()
+
+        assertThat(result).isFalse()
+    }
 }

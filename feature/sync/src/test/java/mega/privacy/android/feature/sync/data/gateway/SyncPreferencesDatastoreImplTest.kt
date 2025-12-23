@@ -139,4 +139,25 @@ internal class SyncPreferencesDatastoreImplTest {
 
         assertThat(result).isNull()
     }
+
+    @ParameterizedTest(name = "should run foreground state: {0}")
+    @ValueSource(booleans = [true, false])
+    internal fun `test that getShouldRunForeground returns correct value`(
+        shouldRunForeground: Boolean,
+    ) = runTest {
+        whenever(preferences.get<Boolean>(any())).thenReturn(shouldRunForeground)
+
+        val result = underTest.getShouldRunForeground()
+
+        assertThat(result).isEqualTo(shouldRunForeground)
+    }
+
+    @Test
+    internal fun `test that getShouldRunForeground returns null when not set`() = runTest {
+        whenever(preferences.get<Boolean>(any())).thenReturn(null)
+
+        val result = underTest.getShouldRunForeground()
+
+        assertThat(result).isNull()
+    }
 }
