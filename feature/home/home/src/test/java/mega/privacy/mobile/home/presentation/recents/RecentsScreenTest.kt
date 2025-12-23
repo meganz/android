@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import mega.privacy.mobile.home.presentation.recents.view.FIRST_LINE_TEST_TAG
@@ -32,6 +31,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.time.Instant
+import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 class RecentsScreenTest {
@@ -385,9 +386,15 @@ class RecentsScreenTest {
         isSensitive: Boolean = false,
         parentNodeId: NodeId = NodeId(1L),
     ): RecentsUiItem {
+        val dateTimestamp = Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond()
         val mockBucket = RecentActionBucket(
             identifier = "$timestamp $isUpdate",
             timestamp = timestamp,
+            dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",
             parentNodeId = parentNodeId,
             isUpdate = isUpdate,
@@ -400,7 +407,6 @@ class RecentsScreenTest {
             icon = icon,
             shareIcon = shareIcon,
             parentFolderName = parentFolderName,
-            timestampText = RecentsTimestampText(timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = isUpdate,
             updatedByText = updatedByText,

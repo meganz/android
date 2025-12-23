@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
+import java.time.Instant
+import java.time.ZoneId
 
 internal class SampleRecentActionDataProvider :
     PreviewParameterProvider<List<RecentActionBucketUiEntity>> {
@@ -56,6 +58,11 @@ internal class SampleRecentActionDataProvider :
     private val recentBucket1 = RecentActionBucket(
         identifier = "bucket1",
         timestamp = System.currentTimeMillis() / 1000,
+        dateTimestamp = Instant.ofEpochSecond(System.currentTimeMillis() / 1000)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond(),
         userEmail = "user1@mail.com",
         parentNodeId = NodeId(1L),
         isUpdate = false,

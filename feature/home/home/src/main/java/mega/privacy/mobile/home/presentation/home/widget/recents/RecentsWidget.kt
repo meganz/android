@@ -47,7 +47,6 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWid
 import mega.privacy.mobile.home.presentation.recents.RecentsViewModel
 import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
@@ -191,7 +190,7 @@ fun RecentsView(
 
             else -> {
                 val grouped = remember(uiState.recentActionItems) {
-                    uiState.recentActionItems.groupBy { it.timestampText.dateOnlyTimestamp }
+                    uiState.recentActionItems.groupBy { it.bucket.dateTimestamp }
                 }
                 grouped.forEach { (dateTimestamp, itemsForDate) ->
                     RecentDateHeader(dateTimestamp)
@@ -338,6 +337,7 @@ internal fun createMockRecentsUiItem(
     val mockBucket = RecentActionBucket(
         identifier = "bucket_$timestamp",
         timestamp = timestamp,
+        dateTimestamp = timestamp,
         userEmail = "test@example.com",
         parentNodeId = NodeId(1L),
         isUpdate = isUpdate,
@@ -349,7 +349,6 @@ internal fun createMockRecentsUiItem(
         icon = icon,
         shareIcon = shareIcon,
         parentFolderName = parentFolderName,
-        timestampText = RecentsTimestampText(timestamp),
         isMediaBucket = isMediaBucket,
         isUpdate = isUpdate,
         updatedByText = updatedByText,

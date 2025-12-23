@@ -30,6 +30,8 @@ internal class DefaultRecentActionsRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
 
+    private val systemZoneId = ZoneId.systemDefault()
+
     override suspend fun getRecentActions(
         excludeSensitives: Boolean,
         maxBucketCount: Int,
@@ -40,8 +42,10 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 .map { bucket ->
                     bucket to megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
                 }.mapAsync {
+                    val (identifier, dateTimestamp) = generateIdentifier(it.first)
                     recentActionBucketMapper(
-                        identifier = generateIdentifier(it.first),
+                        identifier = identifier,
+                        dateTimestamp = dateTimestamp,
                         megaRecentActionBucket = it.first,
                         megaNodes = it.second
                     )
@@ -66,14 +70,19 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         bucketIdentifier: String,
         excludeSensitives: Boolean,
     ): RecentActionBucketUnTyped? = withContext(ioDispatcher) {
-        val matchingBucket = getMegaRecentAction(excludeSensitives = excludeSensitives)
-            .firstOrNull { bucket ->
-                generateIdentifier(bucket) == bucketIdentifier
+        val (matchingBucket, identifier, dateTimestamp) = getMegaRecentAction(excludeSensitives = excludeSensitives)
+            .firstNotNullOfOrNull { bucket ->
+                val (identifier, dateTimestamp) = generateIdentifier(bucket)
+                if (identifier == bucketIdentifier) Triple(
+                    bucket,
+                    identifier,
+                    dateTimestamp
+                ) else null
             } ?: return@withContext null
         val megaNodes = megaApiGateway.getNodesFromMegaNodeList(matchingBucket.nodes)
-
         recentActionBucketMapper(
-            identifier = generateIdentifier(matchingBucket),
+            identifier = identifier,
+            dateTimestamp = dateTimestamp,
             megaRecentActionBucket = matchingBucket,
             megaNodes = megaNodes
         )
@@ -96,16 +105,25 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     /**
      * Generate identifier from bucket properties
-     * For example: M_true-U_false-D_2025-12-22-UE_ht@mega.co.nz-PNH_100124500130291
+     * For example: M:true|U:false|D:1766472783|UE:ht@mega.co.nz|PNH:100124500130291
+     * @return Pair of identifier and dateTimestamp
      */
-    private fun generateIdentifier(bucket: MegaRecentActionBucket): String {
+    private fun generateIdentifier(bucket: MegaRecentActionBucket): Pair<String, Long> {
         // Each bucket is created based on date, so timestamp is converted to date only
-        val date = Instant.ofEpochSecond(bucket.timestamp)
-            .atZone(ZoneId.systemDefault())
+        val dateTimestamp = Instant.ofEpochSecond(bucket.timestamp)
+            .atZone(systemZoneId)
             .toLocalDate()
-            .toString()
+            .atStartOfDay(systemZoneId)
+            .toEpochSecond()
 
-        return "M_${bucket.isMedia}-U_${bucket.isUpdate}-D_${date}-UE_${bucket.userEmail}-PNH_${bucket.parentHandle}"
+        val identifier = buildString {
+            append("M:").append(bucket.isMedia)
+            append("|U:").append(bucket.isUpdate)
+            append("|D:").append(dateTimestamp)
+            append("|UE:").append(bucket.userEmail)
+            append("|PNH:").append(bucket.parentHandle)
+        }
+        return identifier to dateTimestamp
     }
 
     companion object {

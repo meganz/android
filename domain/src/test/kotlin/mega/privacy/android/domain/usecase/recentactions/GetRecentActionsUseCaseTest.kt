@@ -41,6 +41,7 @@ class GetRecentActionsUseCaseTest {
     private val dummyRecentActionBucketUnTyped = RecentActionBucketUnTyped(
         identifier = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_321",
         timestamp = 0L,
+        dateTimestamp = 0L,
         userEmail = "aaa@aaa.com",
         parentNodeId = NodeId(321L),
         isUpdate = false,
@@ -102,6 +103,7 @@ class GetRecentActionsUseCaseTest {
             RecentActionBucketUnTyped(
                 identifier = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_0",
                 timestamp = 0L,
+                dateTimestamp = 0L,
                 userEmail = "aaa@aaa.com",
                 parentNodeId = NodeId(0L),
                 isUpdate = false,
@@ -134,7 +136,7 @@ class GetRecentActionsUseCaseTest {
         val buckets = listOf(dummyRecentActionBucketUnTyped)
         val bucketWithNodes = dummyRecentActionBucket
         val bucketWithoutNodes = mock<RecentActionBucket> {
-            on { nodes }.thenReturn(emptyList<TypedFileNode>())
+            on { nodes }.thenReturn(emptyList())
         }
         val mapperResult = listOf(bucketWithNodes, bucketWithoutNodes)
 

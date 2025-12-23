@@ -55,12 +55,10 @@ fun RecentsListItemView(
 ) {
     val titleText = item.title.text()
     val parentFolderNameText = item.parentFolderName.text
-    val timeText = item.timestampText.formatTime()
 
     RecentsListItemView(
         title = titleText,
         parentFolderName = parentFolderNameText,
-        time = timeText,
         icon = item.icon,
         shareIcon = item.shareIcon,
         updatedByText = item.updatedByText?.text,
@@ -95,7 +93,6 @@ fun RecentsListItemView(
 fun RecentsListItemView(
     title: String,
     parentFolderName: String,
-    time: String,
     @DrawableRes icon: Int = IconPackR.drawable.ic_generic_medium_solid,
     @DrawableRes shareIcon: Int? = null,
     updatedByText: String? = null,
@@ -231,14 +228,6 @@ fun RecentsListItemView(
                         .size(16.dp)
                         .testTag(ACTION_ICON_TEST_TAG)
                 )
-
-                MegaText(
-                    text = time,
-                    textColor = TextColor.Secondary,
-                    style = AppTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .testTag(TIME_TEST_TAG),
-                )
             }
         }
 
@@ -278,7 +267,6 @@ private fun RecentsListItemViewPreview() {
         RecentsListItemView(
             title = "Invoice_October_reviewed.xlsx",
             icon = IconPackR.drawable.ic_spreadsheet_medium_solid,
-            time = "12:00 PM",
             parentFolderName = "Cloud drive",
             onItemClicked = {},
             onMenuClicked = {}
@@ -295,7 +283,6 @@ private fun RecentsListItemView2Preview() {
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_video_medium_solid,
             shareIcon = IconPackR.drawable.ic_folder_users_small_solid,
-            time = "08:00",
             parentFolderName = "Tech Share",
             onItemClicked = {},
             onMenuClicked = {}
@@ -313,7 +300,6 @@ private fun RecentsListItemViewUpdatePreview() {
             showFavourite = true,
             showVersion = true,
             shareIcon = IconPackR.drawable.ic_folder_users_small_solid,
-            time = "08:00",
             parentFolderName = "Very Long Folder Name, Very Long Folder Name",
             onItemClicked = {},
             onMenuClicked = {}
@@ -329,7 +315,6 @@ private fun RecentsListItemViewMultiFilePreview() {
             title = "14 images",
             updatedByText = "[A]added by[/A] [B]John Doe[/B]",
             icon = IconPackR.drawable.ic_image_stack_medium_solid,
-            time = "08:00",
             isBucket = true,
             parentFolderName = "Very Long Folder Name, Very Long Folder Name",
             onItemClicked = {},

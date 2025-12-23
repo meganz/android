@@ -594,11 +594,13 @@ class RecentsBucketViewModelTest {
     private fun createMockRecentActionBucket(
         identifier: String = "test_bucket",
         timestamp: Long = 1234567890L,
+        dateTimestamp: Long = 1234567890L,
         nodes: List<TypedFileNode> = listOf(createMockFileNode()),
         parentFolderName: String = "Test Folder",
     ): RecentActionBucket = RecentActionBucket(
         identifier = identifier,
         timestamp = timestamp,
+        dateTimestamp = dateTimestamp,
         userEmail = "test@example.com",
         parentNodeId = NodeId(1L),
         isUpdate = false,

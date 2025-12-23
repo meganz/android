@@ -366,9 +366,9 @@ class RecentsUiItemMapperTest {
 
         val result = underTest(bucket)
 
-        // Note: formatTime() and formatDate() are @Composable functions and cannot be tested in unit tests
-        // We only verify that the timestamp is correctly stored
-        assertThat(result.timestampText.timestamp).isEqualTo(timestamp)
+        // Note: timestamp is now stored in the bucket, not in timestampText
+        // Verify that the bucket timestamp is correctly stored
+        assertThat(result.bucket.timestamp).isEqualTo(timestamp)
     }
 
     @Test
@@ -620,6 +620,7 @@ class RecentsUiItemMapperTest {
     private fun createMockRecentActionBucket(
         nodes: List<TypedFileNode>,
         timestamp: Long = 1234567890L,
+        dateTimestamp: Long = 1234567890L,
         isUpdate: Boolean = false,
         isMedia: Boolean = false,
         currentUserIsOwner: Boolean = true,
@@ -630,6 +631,7 @@ class RecentsUiItemMapperTest {
     ): RecentActionBucket = mock {
         on { it.nodes }.thenReturn(nodes)
         on { it.timestamp }.thenReturn(timestamp)
+        on { it.dateTimestamp }.thenReturn(dateTimestamp)
         on { it.isUpdate }.thenReturn(isUpdate)
         on { it.isMedia }.thenReturn(isMedia)
         on { it.currentUserIsOwner }.thenReturn(currentUserIsOwner)

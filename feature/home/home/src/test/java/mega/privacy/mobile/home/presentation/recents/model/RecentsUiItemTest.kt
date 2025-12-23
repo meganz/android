@@ -2,14 +2,12 @@ package mega.privacy.mobile.home.presentation.recents.model
 
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -109,6 +107,7 @@ class RecentsUiItemTest {
     ): RecentActionBucket = mock {
         on { it.nodes }.thenReturn(nodes)
         on { it.timestamp }.thenReturn(1234567890L)
+        on { it.dateTimestamp }.thenReturn(1234567890L)
         on { it.userEmail }.thenReturn("test@example.com")
         on { it.parentNodeId }.thenReturn(NodeId(1L))
         on { it.isUpdate }.thenReturn(false)
@@ -124,7 +123,6 @@ class RecentsUiItemTest {
             icon = IconPackR.drawable.ic_generic_medium_solid,
             shareIcon = null,
             parentFolderName = LocalizedText.Literal("Test Folder"),
-            timestampText = RecentsTimestampText(1234567890L),
             isMediaBucket = false,
             isUpdate = false,
             updatedByText = null,

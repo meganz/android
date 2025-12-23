@@ -124,6 +124,7 @@ class RecentsParentFolderNameMapperTest {
         on { it.nodes }.thenReturn(listOf(node))
         on { it.parentFolderName }.thenReturn(parentFolderName)
         on { it.isNodeKeyDecrypted }.thenReturn(isNodeKeyDecrypted)
+        on { it.dateTimestamp }.thenReturn(1234567890L)
     }
 }
 

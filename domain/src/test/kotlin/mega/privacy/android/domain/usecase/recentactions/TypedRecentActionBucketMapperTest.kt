@@ -80,6 +80,7 @@ class TypedRecentActionBucketMapperTest {
     private fun createBucket(
         identifier: String = "test-identifier",
         timestamp: Long = 1234567890L,
+        dateTimestamp: Long = 1234567890L,
         userEmail: String = "test@example.com",
         parentNodeId: NodeId = NodeId(100L),
         isUpdate: Boolean = false,
@@ -88,6 +89,7 @@ class TypedRecentActionBucketMapperTest {
     ): RecentActionBucketUnTyped = RecentActionBucketUnTyped(
         identifier = identifier,
         timestamp = timestamp,
+        dateTimestamp = dateTimestamp,
         userEmail = userEmail,
         parentNodeId = parentNodeId,
         isUpdate = isUpdate,

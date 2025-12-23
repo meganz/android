@@ -8,7 +8,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.mobile.home.presentation.recents.view.MENU_TEST_TAG
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -17,12 +16,13 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.time.Instant
+import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 class RecentsLazyListViewTest {
@@ -252,9 +252,15 @@ class RecentsLazyListViewTest {
         parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
         isSensitive: Boolean = false,
     ): RecentsUiItem {
+        val dateTimestamp = Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond()
         val mockBucket = RecentActionBucket(
             identifier = "$timestamp $userName $isMediaBucket",
             timestamp = timestamp,
+            dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",
             parentNodeId = NodeId(1L),
             isUpdate = isUpdate,
@@ -268,7 +274,6 @@ class RecentsLazyListViewTest {
             icon = icon,
             shareIcon = shareIcon,
             parentFolderName = parentFolderName,
-            timestampText = RecentsTimestampText(timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = isUpdate,
             updatedByText = updatedByText,

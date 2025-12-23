@@ -33,7 +33,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     shareIcon = shareIcon,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -43,7 +42,6 @@ class RecentsListItemViewTest {
 
         composeRule.onNodeWithTag(FIRST_LINE_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(FOLDER_NAME_TEST_TAG, true).assertExists()
-        composeRule.onNodeWithTag(TIME_TEST_TAG, true).assertTextEquals(time)
         composeRule.onNodeWithTag(ICON_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(ACTION_ICON_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(MENU_TEST_TAG, true).assertExists()
@@ -57,7 +55,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     showFavourite = true,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -76,7 +73,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     shareIcon = shareIcon,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -95,7 +91,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     label = NodeLabel.RED,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -114,7 +109,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     updatedByText = updatedByText,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -133,7 +127,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     showVersion = true,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -152,7 +145,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     isBucket = false,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -172,7 +164,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     isBucket = true,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -190,7 +181,6 @@ class RecentsListItemViewTest {
                 RecentsListItemView(
                     title = title,
                     parentFolderName = parentFolderName,
-                    time = time,
                     onItemClicked = {},
                     onMenuClicked = {}
                 )
@@ -210,7 +200,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     showFavourite = false,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -229,7 +218,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     shareIcon = null,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -248,7 +236,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     label = null,
                     onItemClicked = {},
                     onMenuClicked = {}
@@ -267,7 +254,6 @@ class RecentsListItemViewTest {
                     title = title,
                     icon = icon,
                     parentFolderName = parentFolderName,
-                    time = time,
                     updatedByText = null,
                     onItemClicked = {},
                     onMenuClicked = {}

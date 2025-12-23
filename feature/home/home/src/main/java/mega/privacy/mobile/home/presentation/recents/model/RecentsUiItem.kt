@@ -28,7 +28,6 @@ data class RecentsUiItem(
     @DrawableRes val icon: Int,
     @DrawableRes val shareIcon: Int?,
     val parentFolderName: LocalizedText,
-    val timestampText: RecentsTimestampText,
     val isMediaBucket: Boolean,
     val isUpdate: Boolean,
     val updatedByText: LocalizedText?,

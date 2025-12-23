@@ -39,6 +39,11 @@ class DefaultUpdateRecentActionTest {
             .atZone(ZoneOffset.UTC)
             .toLocalDate()
             .toString()
+        val dateTimestamp = Instant.ofEpochMilli(timestamp)
+            .atZone(ZoneOffset.UTC)
+            .toLocalDate()
+            .atStartOfDay(ZoneOffset.UTC)
+            .toEpochSecond()
         val identifier =
             "M_$isMedia-U_$isUpdate-D_$date-UE_$userEmail-PNH_${parentNodeId.longValue}"
         return RecentActionBucket(
@@ -46,6 +51,7 @@ class DefaultUpdateRecentActionTest {
             isMedia = isMedia,
             isUpdate = isUpdate,
             timestamp = timestamp,
+            dateTimestamp = dateTimestamp,
             parentNodeId = parentNodeId,
             userEmail = userEmail,
             nodes = emptyList(),

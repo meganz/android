@@ -14,11 +14,13 @@ import javax.inject.Inject
 internal class RecentActionBucketMapper @Inject constructor(private val nodeMapper: NodeMapper) {
     suspend operator fun invoke(
         identifier: String,
+        dateTimestamp: Long,
         megaRecentActionBucket: MegaRecentActionBucket,
         megaNodes: List<MegaNode>,
     ) = RecentActionBucketUnTyped(
         identifier = identifier,
         timestamp = megaRecentActionBucket.timestamp,
+        dateTimestamp = dateTimestamp,
         userEmail = megaRecentActionBucket.userEmail,
         parentNodeId = NodeId(megaRecentActionBucket.parentHandle),
         isUpdate = megaRecentActionBucket.isUpdate,

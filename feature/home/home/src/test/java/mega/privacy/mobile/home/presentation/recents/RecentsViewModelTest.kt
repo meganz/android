@@ -21,7 +21,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseC
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import org.junit.jupiter.api.BeforeEach
@@ -496,10 +495,12 @@ class RecentsViewModelTest {
 
     private fun createMockRecentActionBucket(
         timestamp: Long = 1234567890L,
+        dateTimestamp: Long = 1234567890L,
         identifier: String = "test_bucket",
         nodes: List<TypedFileNode> = listOf(createMockFileNode()),
     ): RecentActionBucket = mock {
         on { it.timestamp }.thenReturn(timestamp)
+        on { it.dateTimestamp }.thenReturn(dateTimestamp)
         on { it.nodes }.thenReturn(nodes)
         on { it.identifier }.thenReturn(identifier)
     }
@@ -516,7 +517,6 @@ class RecentsViewModelTest {
         timestamp: Long = 1234567890L,
         bucket: RecentActionBucket = createMockRecentActionBucket(),
     ): RecentsUiItem = mock {
-        on { it.timestampText }.thenReturn(RecentsTimestampText(timestamp))
         on { it.bucket }.thenReturn(bucket)
     }
 }

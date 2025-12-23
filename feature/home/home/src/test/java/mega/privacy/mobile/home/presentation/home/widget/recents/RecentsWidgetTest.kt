@@ -22,7 +22,6 @@ import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_ME
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants.WIDGET_MAX_BUCKETS
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import mega.privacy.mobile.home.presentation.recents.view.DATE_HEADER_TEST_TAG
@@ -37,6 +36,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import java.time.Instant
+import java.time.ZoneId
 
 @RunWith(AndroidJUnit4::class)
 class RecentsWidgetTest {
@@ -1037,9 +1038,15 @@ class RecentsWidgetTest {
         isSensitive: Boolean = false,
     ): RecentsUiItem {
         val isSingleNode = nodes.size == 1
+        val dateTimestamp = Instant.ofEpochSecond(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond()
         val mockBucket = RecentActionBucket(
             identifier = "id1",
             timestamp = timestamp,
+            dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",
             parentNodeId = NodeId(1L),
             isUpdate = isUpdate,
@@ -1052,7 +1059,6 @@ class RecentsWidgetTest {
             icon = icon,
             shareIcon = shareIcon,
             parentFolderName = parentFolderName,
-            timestampText = RecentsTimestampText(timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = isUpdate,
             updatedByText = updatedByText,

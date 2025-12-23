@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
-import mega.privacy.mobile.home.presentation.recents.model.RecentsTimestampText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import javax.inject.Inject
 
@@ -47,7 +46,6 @@ class RecentActionUiItemMapper @Inject constructor(
                 item.parentFolderSharesType != RecentActionsSharesType.NONE
             },
             parentFolderName = recentsParentFolderNameMapper(item),
-            timestampText = RecentsTimestampText(item.timestamp),
             isMediaBucket = isMediaBucket,
             isUpdate = item.isUpdate,
             updatedByText = getUpdatedByText(item),

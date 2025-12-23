@@ -28,7 +28,7 @@ fun RecentsLazyListView(
     modifier: Modifier = Modifier,
 ) {
     val grouped = remember(items) {
-        items.groupBy { it.timestampText.dateOnlyTimestamp }
+        items.groupBy { it.bucket.dateTimestamp }
     }
 
     LazyColumn(

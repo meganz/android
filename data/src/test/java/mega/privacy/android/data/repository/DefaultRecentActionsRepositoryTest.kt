@@ -28,6 +28,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -69,6 +71,7 @@ class DefaultRecentActionsRepositoryTest {
             isMedia = true,
             isUpdate = true,
             timestamp = 0L,
+            dateTimestamp = 0L,
             parentNodeId = NodeId(1L),
             userEmail = "1",
             nodes = listOf(mock<FileNode>())
@@ -85,7 +88,7 @@ class DefaultRecentActionsRepositoryTest {
         whenever(megaApiGateway.copyBucketList(any())).thenReturn(mock())
         whenever(recentActionsMapper(any())).thenReturn(list)
         whenever(megaApiGateway.getNodesFromMegaNodeList(any())).thenReturn(listOf(mock<MegaNode>()))
-        whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(recentActionBucket)
+        whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(recentActionBucket)
 
         val result = underTest.getRecentActions(false, 500)
 
@@ -110,6 +113,7 @@ class DefaultRecentActionsRepositoryTest {
             isMedia = true,
             isUpdate = true,
             timestamp = 0L,
+            dateTimestamp = 0L,
             parentNodeId = NodeId(1L),
             userEmail = "1",
             nodes = listOf(mock<FileNode>())
@@ -125,7 +129,7 @@ class DefaultRecentActionsRepositoryTest {
         whenever(megaApiGateway.copyBucketList(any())).thenReturn(mock())
         whenever(recentActionsMapper(any())).thenReturn(list)
         whenever(megaApiGateway.getNodesFromMegaNodeList(any())).thenReturn(listOf(mock<MegaNode>()))
-        whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(recentActionBucket)
+        whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(recentActionBucket)
 
         val result = underTest.getRecentActions(false, maxBucketCount = 5)
 
@@ -152,6 +156,7 @@ class DefaultRecentActionsRepositoryTest {
                 isMedia = true,
                 isUpdate = true,
                 timestamp = 0L,
+                dateTimestamp = 0L,
                 parentNodeId = NodeId(1L),
                 userEmail = "1",
                 nodes = listOf(mock<FileNode>())
@@ -167,7 +172,7 @@ class DefaultRecentActionsRepositoryTest {
             whenever(megaApiGateway.copyBucketList(any())).thenReturn(mock())
             whenever(recentActionsMapper(any())).thenReturn(list)
             whenever(megaApiGateway.getNodesFromMegaNodeList(any())).thenReturn(listOf(mock<MegaNode>()))
-            whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(recentActionBucket)
+            whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(recentActionBucket)
 
             val result = underTest.getRecentActions(false, maxBucketCount = 10)
 
@@ -209,6 +214,7 @@ class DefaultRecentActionsRepositoryTest {
             isMedia = true,
             isUpdate = true,
             timestamp = 0L,
+            dateTimestamp = 0L,
             parentNodeId = NodeId(1L),
             userEmail = "1",
             nodes = listOf(mock<FileNode>())
@@ -224,7 +230,7 @@ class DefaultRecentActionsRepositoryTest {
         whenever(megaApiGateway.copyBucketList(any())).thenReturn(mock())
         whenever(recentActionsMapper(any())).thenReturn(list)
         whenever(megaApiGateway.getNodesFromMegaNodeList(any())).thenReturn(listOf(mock<MegaNode>()))
-        whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(recentActionBucket)
+        whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(recentActionBucket)
 
         underTest.getRecentActions(false, maxBucketCount = 5)
 
@@ -301,8 +307,14 @@ class DefaultRecentActionsRepositoryTest {
         whenever(megaApiGateway.copyBucket(bucket2)).thenReturn(copiedBucket2)
         whenever(megaApiGateway.copyBucket(bucket3)).thenReturn(copiedBucket3)
 
-        // Generate identifier for bucket2: "M_true-U_true-D_1970-01-01-UE_user2@example.com-PNH_200"
-        val targetIdentifier = "M_true-U_true-D_1970-01-01-UE_user2@example.com-PNH_200"
+        // Calculate dateTimestamp for bucket2 (timestamp = 2000L)
+        val dateTimestamp = Instant.ofEpochSecond(2000L)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+            .atStartOfDay(ZoneId.systemDefault())
+            .toEpochSecond()
+        // Generate identifier for bucket2
+        val targetIdentifier = "M:true|U:true|D:${dateTimestamp}|UE:user2@example.com|PNH:200"
 
         whenever(megaApiGateway.getRecentActionsAsync(any(), any(), any(), any())).thenAnswer {
             (it.arguments[3] as MegaRequestListenerInterface).onRequestFinish(
@@ -320,11 +332,12 @@ class DefaultRecentActionsRepositoryTest {
             isMedia = true,
             isUpdate = true,
             timestamp = 2000L,
+            dateTimestamp = dateTimestamp,
             parentNodeId = NodeId(200L),
             userEmail = "user2@example.com",
             nodes = listOf(mock<FileNode>())
         )
-        whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(expectedBucket)
+        whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(expectedBucket)
 
         val result = underTest.getRecentActionBucketByIdentifier(targetIdentifier, false)
 
@@ -471,7 +484,13 @@ class DefaultRecentActionsRepositoryTest {
             whenever(megaApiGateway.copyBucket(bucket2)).thenReturn(copiedBucket2)
             whenever(megaApiGateway.copyBucket(bucket3)).thenReturn(copiedBucket3)
 
-            val targetIdentifier = "M_true-U_true-D_2025-01-02-UE_user2@example.com-PNH_200"
+            // Calculate dateTimestamp for bucket2 (timestamp2 = 1735776000L)
+            val dateTimestamp = Instant.ofEpochSecond(timestamp2)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate()
+                .atStartOfDay(ZoneId.systemDefault())
+                .toEpochSecond()
+            val targetIdentifier = "M:true|U:true|D:${dateTimestamp}|UE:user2@example.com|PNH:200"
 
             whenever(megaApiGateway.getRecentActionsAsync(any(), any(), any(), any())).thenAnswer {
                 (it.arguments[3] as MegaRequestListenerInterface).onRequestFinish(
@@ -489,11 +508,12 @@ class DefaultRecentActionsRepositoryTest {
                 isMedia = true,
                 isUpdate = true,
                 timestamp = timestamp2,
+                dateTimestamp = dateTimestamp,
                 parentNodeId = NodeId(200L),
                 userEmail = "user2@example.com",
                 nodes = listOf(mock<FileNode>())
             )
-            whenever(recentActionBucketMapper(any(), any(), any())).thenReturn(expectedBucket)
+            whenever(recentActionBucketMapper(any(), any(), any(), any())).thenReturn(expectedBucket)
 
             underTest.getRecentActionBucketByIdentifier(targetIdentifier, false)
 
