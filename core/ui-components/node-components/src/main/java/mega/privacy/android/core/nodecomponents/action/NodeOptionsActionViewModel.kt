@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -143,7 +144,7 @@ class NodeOptionsActionViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<NodeActionState>
-        field = MutableStateFlow(NodeActionState())
+        field: MutableStateFlow<NodeActionState> = MutableStateFlow(NodeActionState())
 
     private var rubbishBinNode: UnTypedNode? = null
     private var updateSelectionJob: Job? = null
@@ -849,6 +850,18 @@ class NodeOptionsActionViewModel @Inject constructor(
     fun resetDismiss() {
         uiState.update {
             it.copy(dismissEvent = consumed)
+        }
+    }
+
+    fun triggerAddVideoToPlaylistResultEvent(result: AddVideoToPlaylistResult) {
+        uiState.update {
+            it.copy(addVideoToPlaylistResultEvent = triggered(result))
+        }
+    }
+
+    fun resetAddVideoToPlaylistResultEvent() {
+        uiState.update {
+            it.copy(addVideoToPlaylistResultEvent = consumed())
         }
     }
 

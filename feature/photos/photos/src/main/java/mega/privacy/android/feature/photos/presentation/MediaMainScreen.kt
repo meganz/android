@@ -4,6 +4,7 @@ package mega.privacy.android.feature.photos.presentation
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
@@ -51,6 +54,7 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
@@ -61,6 +65,9 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
+import mega.privacy.android.domain.entity.node.NameCollision
+import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -105,6 +112,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
+import timber.log.Timber
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -137,6 +145,9 @@ fun MediaMainRoute(
     val snackBarEventQueue = rememberSnackBarQueue()
     val megaResultContract = rememberMegaResultContract()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    var addToPlaylistIsRetry by rememberSaveable { mutableStateOf(false) }
+    var addedVideoHandle by rememberSaveable { mutableStateOf<Long?>(null) }
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
@@ -148,12 +159,80 @@ fun MediaMainRoute(
     }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
+    val videoToPlaylistLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.videoToPlaylistActivityContract
+    ) { result ->
+        scope.launch {
+            if (result == null) return@launch
+            addedVideoHandle = result.videoHandle
+            if (result.isRetry) {
+                val attributes = SnackbarAttributes(
+                    message = result.message,
+                    action = context.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
+                    actionClick = {
+                        addToPlaylistIsRetry = true
+                    }
+                )
+                snackBarEventQueue.queueMessage(attributes)
+            } else {
+                snackBarEventQueue.queueMessage(result.message)
+            }
+        }
+    }
+
+    LaunchedEffect(addToPlaylistIsRetry) {
+        if (addToPlaylistIsRetry && addedVideoHandle != null) {
+            addedVideoHandle?.let {
+                videoToPlaylistLauncher.launch(it)
+                addToPlaylistIsRetry = false
+                addedVideoHandle = null
+            }
+        }
+    }
+
+
     // Follow the same behavior as the existing code. We can improve this in phase 2.
     LifecycleResumeEffect(Unit) {
         mediaCameraUploadViewModel.resetCUButtonAndProgress()
         mediaCameraUploadViewModel.checkCameraUploadsPermissions()
         onPauseOrDispose {}
     }
+
+    NodeActionEventHandler(
+        nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+        nameCollisionLauncher = nameCollisionLauncher,
+        onTransfer = onTransfer,
+        onShowSnackBar = {
+            scope.launch {
+                snackBarEventQueue.queueMessage(it)
+            }
+        },
+        onActionFinished = {
+            if (videosTabUiState is VideosTabUiState.Data) {
+                val state = videosTabUiState as VideosTabUiState.Data
+                if (state.selectedTypedNodes.isNotEmpty()) {
+                    videosTabViewModel.clearSelection()
+                }
+            }
+        },
+        onAddVideoToPlaylistResult = { result ->
+            scope.launch {
+                nodeOptionsActionViewModel.dismiss()
+                if (result.isRetry) {
+                    val attribute = SnackbarAttributes(
+                        message = result.message,
+                        action = context.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
+                        actionClick = {
+                            videoToPlaylistLauncher.launch(result.videoHandle)
+                        }
+                    )
+                    snackBarEventQueue.queueMessage(attribute)
+                } else {
+                    snackBarEventQueue.queueMessage(result.message)
+                }
+            }
+        }
+    )
 
     EventEffect(
         event = nodeActionState.dismissEvent,
@@ -238,7 +317,6 @@ fun MediaMainRoute(
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
         nodeActionHandle = nodeActionHandler,
         navigateToLegacyPhotosSearch = navigationHandler::navigate,
-        onTransfer = onTransfer,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
@@ -258,7 +336,6 @@ fun MediaMainScreen(
     selectedTimePeriod: PhotoModificationTimePeriod,
     nodeActionHandle: NodeActionHandler,
     navigationHandler: NavigationHandler,
-    onTransfer: (TransferTriggerEvent) -> Unit,
     timelineFilterUiState: TimelineFilterUiState,
     actionHandler: (MenuAction, List<TypedNode>) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -837,6 +914,77 @@ private fun MediaScreen.MediaContent(
     }
 }
 
+@Composable
+private fun NodeActionEventHandler(
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    nameCollisionLauncher: ManagedActivityResultLauncher<ArrayList<NameCollision>, String?>,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+    onShowSnackBar: (message: String) -> Unit,
+    onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit,
+    onActionFinished: () -> Unit = {},
+    onNavigateToRenameNav: (NavKey) -> Unit = {},
+) {
+    val context = LocalContext.current
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    EventEffect(
+        event = nodeActionState.downloadEvent,
+        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        action = { event ->
+            onTransfer(event)
+            onActionFinished()
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.infoToShowEvent,
+        onConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
+        action = { info ->
+            onShowSnackBar(info.get(context))
+            onActionFinished()
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.nodeNameCollisionsResult,
+        onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
+        action = {
+            if (it.conflictNodes.isNotEmpty()) {
+                nameCollisionLauncher.launch(it.conflictNodes.values.toCollection(ArrayList()))
+            }
+            if (it.noConflictNodes.isNotEmpty()) {
+                when (it.type) {
+                    NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(it.noConflictNodes)
+                    NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(it.noConflictNodes)
+                    else -> Timber.d("Not implemented")
+                }
+            }
+            onActionFinished()
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.renameNodeRequestEvent,
+        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        action = { nodeId ->
+            onNavigateToRenameNav(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
+            onActionFinished()
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss,
+        action = onActionFinished
+    )
+
+    EventEffect(
+        event = nodeActionState.addVideoToPlaylistResultEvent,
+        onConsumed = nodeOptionsActionViewModel::resetAddVideoToPlaylistResultEvent,
+        action = onAddVideoToPlaylistResult
+    )
+}
+
 @CombinedThemePreviews
 @Composable
 fun PhotosMainScreenPreview() {
@@ -868,7 +1016,6 @@ fun PhotosMainScreenPreview() {
             onDismissEnableCameraUploadsBanner = {},
             nodeActionHandle = rememberNodeActionHandler(),
             navigateToLegacyPhotosSearch = {},
-            onTransfer = {},
             navigationHandler = object : NavigationHandler {
                 override fun back() {}
                 override fun remove(navKey: NavKey) {}

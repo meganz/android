@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -40,6 +41,8 @@ sealed class NodeOptionsBottomSheetResult() {
             val restoredNodeHandle: Long,
         )
     }
+
+    data class AddToPlaylist(val result: AddVideoToPlaylistResult) : NodeOptionsBottomSheetResult()
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +89,12 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                 returnResult(
                     NodeOptionsBottomSheetNavKey.RESULT,
                     NodeOptionsBottomSheetResult.RestoreSuccess(data)
+                )
+            },
+            onAddVideoToPlaylistResult = { result ->
+                returnResult(
+                    NodeOptionsBottomSheetNavKey.RESULT,
+                    NodeOptionsBottomSheetResult.AddToPlaylist(result)
                 )
             }
         )

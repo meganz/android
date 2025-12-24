@@ -116,6 +116,11 @@ fun HandleNodeOptionsActionResult(
                 }
             }
 
+            is NodeOptionsBottomSheetResult.AddToPlaylist -> {
+                val result = result.result
+                nodeOptionsActionViewModel.triggerAddVideoToPlaylistResultEvent(result)
+            }
+
             else -> return@LaunchedEffect
         }
 

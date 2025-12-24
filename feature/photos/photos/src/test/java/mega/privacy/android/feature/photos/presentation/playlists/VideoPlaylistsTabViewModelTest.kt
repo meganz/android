@@ -159,6 +159,13 @@ class VideoPlaylistsTabViewModelTest {
             val testFileNode = mock<FileNode> {
                 on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
             }
+            monitorVideoPlaylistSetsUpdateUseCase.stub {
+                on { invoke() }.thenReturn(
+                    flow {
+                        awaitCancellation()
+                    }
+                )
+            }
             monitorNodeUpdatesUseCase.stub {
                 on { invoke() }.thenReturn(
                     flow {
@@ -167,10 +174,11 @@ class VideoPlaylistsTabViewModelTest {
                     }
                 )
             }
+            initUnderTest()
 
             underTest.uiState.test {
                 assertThat(awaitItem()).isInstanceOf(VideoPlaylistsTabUiState.Loading::class.java)
-                cancelAndIgnoreRemainingEvents()
+                expectNoEvents()
             }
         }
 }

@@ -114,8 +114,10 @@ internal fun rememberSingleNodeActionHandler(
 
     val videoToPlaylistLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.videoToPlaylistActivityContract
-    ) {
-        // TODO: Will be implemented in another ticket
+    ) { result ->
+        result?.let {
+            nodeOptionsActionViewModel.triggerAddVideoToPlaylistResultEvent(it)
+        }
     }
 
     return remember(

@@ -42,6 +42,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -63,6 +64,7 @@ internal fun NodeOptionsBottomSheetRoute(
     onRename: (NodeId) -> Unit = {},
     onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
     onRestoreSuccess: (RestoreSuccess.RestoreData) -> Unit = {},
+    onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     actionHandler: NodeActionHandler = rememberNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -156,6 +158,12 @@ internal fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.restoreSuccessEvent,
         onConsumed = nodeOptionsActionViewModel::resetRestoreSuccessEvent,
         action = onRestoreSuccess
+    )
+
+    EventEffect(
+        event = nodeOptionActionState.addVideoToPlaylistResultEvent,
+        onConsumed = nodeOptionsActionViewModel::resetAddVideoToPlaylistResultEvent,
+        action = onAddVideoToPlaylistResult
     )
 
     NodeOptionsBottomSheetContent(

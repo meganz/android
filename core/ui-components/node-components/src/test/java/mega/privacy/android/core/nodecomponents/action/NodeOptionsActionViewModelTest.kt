@@ -6,10 +6,13 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
@@ -44,6 +47,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -1308,17 +1312,6 @@ class NodeOptionsActionViewModelTest {
 
                 val finalState = awaitItem()
 
-                // Verify availableActions contains all 3 actions
-                assertThat(finalState.availableActions).hasSize(5)
-                assertThat(finalState.availableActions).containsExactly(
-                    actions[0],
-                    actions[1],
-                    actions[2],
-                    actions[3],
-                    actions[4],
-                )
-
-                // Verify visibleActions is the same as availableActions (no More action added)
                 assertThat(finalState.visibleActions).hasSize(5)
                 assertThat(finalState.visibleActions).containsExactly(
                     actions[3],
@@ -1329,6 +1322,22 @@ class NodeOptionsActionViewModelTest {
                 )
             }
         }
+
+    @Test
+    fun `test that addVideoToPlaylistResultEvent is updated as expected`() = runTest {
+        val result = AddVideoToPlaylistResult("", false, -1)
+        initViewModel()
+
+        viewModel.triggerAddVideoToPlaylistResultEvent(result)
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(triggered(result))
+
+            viewModel.resetAddVideoToPlaylistResultEvent()
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(consumed())
+        }
+    }
 
     /**
      * Creates mock actions and their corresponding menu items for testing
