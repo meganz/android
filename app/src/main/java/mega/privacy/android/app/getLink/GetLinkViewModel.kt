@@ -31,6 +31,8 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.DoesHaveLinksUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
@@ -67,6 +69,8 @@ class GetLinkViewModel @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
+    private val doesHaveLinksUseCase: DoesHaveLinksUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -236,8 +240,11 @@ class GetLinkViewModel @Inject constructor(
      *
      * @return True if should show it, false otherwise.
      */
-    fun shouldShowCopyright(): Boolean =
-        dbH.shouldShowCopyright && megaApi.publicLinks.isNullOrEmpty()
+    suspend fun shouldShowCopyright(): Boolean = runCatching {
+        shouldShowCopyrightUseCase() && !doesHaveLinksUseCase()
+    }.onFailure {
+        Timber.e(it)
+    }.getOrDefault(false)
 
     /**
      * Updates the flag to show or not [CopyrightFragment] in DB.

@@ -5,8 +5,10 @@ import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.databinding.GetLinkActivityLayoutBinding
@@ -167,8 +169,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             }
         }
 
-        if (viewModelNode.shouldShowCopyright()) {
-            navController.navigate(R.id.show_copyright)
+        lifecycleScope.launch {
+            if (viewModelNode.shouldShowCopyright()) {
+                navController.navigate(R.id.show_copyright)
+            }
         }
     }
 
