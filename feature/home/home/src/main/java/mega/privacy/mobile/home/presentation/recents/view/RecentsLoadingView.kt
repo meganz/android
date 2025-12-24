@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -31,21 +29,7 @@ internal fun RecentsLoadingView(
     Column(
         modifier = modifier.testTag(RECENTS_LOADING_TEST_TAG)
     ) {
-        Box(
-            modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        ) {
-            MegaText(
-                "",
-                style = AppTheme.typography.labelMedium,
-            )
-
-            Spacer(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(16.dp)
-                    .shimmerEffect()
-            )
-        }
+        RecentsDateHeaderSkeleton()
 
         RecentsListItemViewSkeleton()
         RecentsListItemViewSkeleton()

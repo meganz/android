@@ -7,17 +7,21 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -34,6 +38,10 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_MEDIA_GRID_LOADING_TEST_TAG
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketListLoadingView
+import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketMediaGridLoadingView
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsMediaGridView
 import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
 
@@ -115,10 +123,32 @@ internal fun RecentsBucketScreenContent(
     onLongClick: (NodeUiItem<TypedNode>) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Show loading skeleton only if loading takes more than 200ms
+    var shouldShowSkeleton by remember { mutableStateOf(false) }
+    LaunchedEffect(uiState.isLoading) {
+        if (uiState.isLoading) {
+            delay(200L)
+            if (this.isActive) {
+                shouldShowSkeleton = true
+            }
+        } else {
+            shouldShowSkeleton = false
+        }
+    }
+
     when {
         uiState.isLoading -> {
             Box(modifier = modifier) {
-                // TODO: Add loading view
+                if (shouldShowSkeleton)
+                    if (uiState.isMediaBucket) {
+                        RecentsBucketMediaGridLoadingView(
+                            modifier = Modifier.testTag(RECENTS_MEDIA_GRID_LOADING_TEST_TAG)
+                        )
+                    } else {
+                        RecentsBucketListLoadingView(
+                            modifier = Modifier.testTag(RECENTS_LIST_LOADING_TEST_TAG)
+                        )
+                    }
             }
         }
 
