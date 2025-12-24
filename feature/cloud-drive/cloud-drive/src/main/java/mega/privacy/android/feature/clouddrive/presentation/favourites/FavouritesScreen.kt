@@ -76,7 +76,7 @@ fun FavouritesScreen(
                 MegaTopAppBar(
                     title = "Favourites",
                     navigationType = AppBarNavigationType.Back(navigationHandler::back),
-                    trailingIcons = { TransfersToolbarWidget(navigationHandler) },
+                    trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
                     actions = buildList {
                         if (!uiState.isEmpty) {
                             add(

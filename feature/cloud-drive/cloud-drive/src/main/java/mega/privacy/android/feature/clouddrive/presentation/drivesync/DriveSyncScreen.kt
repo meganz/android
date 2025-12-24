@@ -114,7 +114,7 @@ internal fun DriveSyncScreen(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedR.string.general_drive),
                     trailingIcons = {
-                        TransfersToolbarWidget(navigationHandler)
+                        TransfersToolbarWidget(navigationHandler::navigate)
                     },
                     actions = buildList {
                         when {

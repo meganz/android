@@ -78,7 +78,7 @@ fun CloudDriveScreen(
                 MegaTopAppBar(
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
-                    trailingIcons = { TransfersToolbarWidget(navigationHandler) },
+                    trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(

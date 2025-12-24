@@ -4,6 +4,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -36,5 +37,33 @@ data class RecentsBucketUiState(
     /**
      * True if there are no visible items and not loading
      */
-    val isEmpty = fileCount == 0 && !isLoading
+    val isEmpty = items.isEmpty() && !isLoading
+
+
+    /**
+     * Count of visible selected items
+     */
+    val selectedItemsCount: Int = items.count { it.isSelected }
+
+    /**
+     * True if any item is selected
+     */
+    val isInSelectionMode = selectedItemsCount > 0
+
+    /**
+     * True if all items are selected
+     */
+    val isAllSelected = selectedItemsCount == items.size
+
+    /**
+     * Returns a list of selected nodes.
+     */
+    val selectedNodes: List<TypedNode>
+        get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
+     * Returns a list of selected node ids.
+     */
+    val selectedNodeIds: List<NodeId>
+        get() = selectedNodes.map { it.id }
 }

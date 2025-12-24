@@ -582,11 +582,368 @@ class RecentsBucketViewModelTest {
         }
     }
 
+    @Test
+    fun `test that onItemLongClicked toggles item selection`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isFalse()
+            assertThat(initialState.items[1].isSelected).isFalse()
+
+            underTest.onItemLongClicked(nodeUiItem1)
+            val stateAfterLongClick = awaitItem()
+            assertThat(stateAfterLongClick.items[0].isSelected).isTrue()
+            assertThat(stateAfterLongClick.items[1].isSelected).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that toggleItemSelection toggles the correct item`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2, node3),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+        val nodeUiItem3 = createMockNodeUiItem(node3)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2, nodeUiItem3))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isFalse()
+            assertThat(initialState.items[1].isSelected).isFalse()
+            assertThat(initialState.items[2].isSelected).isFalse()
+
+            underTest.toggleItemSelection(nodeUiItem2)
+            val stateAfterToggle1 = awaitItem()
+            assertThat(stateAfterToggle1.items[0].isSelected).isFalse()
+            assertThat(stateAfterToggle1.items[1].isSelected).isTrue()
+            assertThat(stateAfterToggle1.items[2].isSelected).isFalse()
+
+            underTest.toggleItemSelection(nodeUiItem2)
+            val stateAfterToggle2 = awaitItem()
+            assertThat(stateAfterToggle2.items[0].isSelected).isFalse()
+            assertThat(stateAfterToggle2.items[1].isSelected).isFalse()
+            assertThat(stateAfterToggle2.items[2].isSelected).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that toggleItemSelection only toggles the matching item`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isFalse()
+            assertThat(initialState.items[1].isSelected).isFalse()
+
+            underTest.toggleItemSelection(initialState.items[0])
+            val stateAfterToggle = awaitItem()
+            assertThat(stateAfterToggle.items[0].isSelected).isTrue()
+            assertThat(stateAfterToggle.items[1].isSelected).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that deselectAllItems deselects all items`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2, node3),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1, isSelected = true)
+        val nodeUiItem2 = createMockNodeUiItem(node2, isSelected = true)
+        val nodeUiItem3 = createMockNodeUiItem(node3, isSelected = true)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2, nodeUiItem3))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isTrue()
+            assertThat(initialState.items[1].isSelected).isTrue()
+            assertThat(initialState.items[2].isSelected).isTrue()
+
+            underTest.deselectAllItems()
+            val stateAfterDeselect = awaitItem()
+            assertThat(stateAfterDeselect.items[0].isSelected).isFalse()
+            assertThat(stateAfterDeselect.items[1].isSelected).isFalse()
+            assertThat(stateAfterDeselect.items[2].isSelected).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that deselectAllItems works when no items are selected`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isFalse()
+            assertThat(initialState.items[1].isSelected).isFalse()
+
+            underTest.selectAllItems()
+            val stateAfterSelect = awaitItem()
+            assertThat(stateAfterSelect.items[0].isSelected).isTrue()
+            assertThat(stateAfterSelect.items[1].isSelected).isTrue()
+
+            underTest.deselectAllItems()
+            val stateAfterDeselect = awaitItem()
+            assertThat(stateAfterDeselect.items[0].isSelected).isFalse()
+            assertThat(stateAfterDeselect.items[1].isSelected).isFalse()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAllItems selects all items`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2, node3),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+        val nodeUiItem3 = createMockNodeUiItem(node3)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2, nodeUiItem3))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isFalse()
+            assertThat(initialState.items[1].isSelected).isFalse()
+            assertThat(initialState.items[2].isSelected).isFalse()
+
+            underTest.selectAllItems()
+            val stateAfterSelect = awaitItem()
+            assertThat(stateAfterSelect.items[0].isSelected).isTrue()
+            assertThat(stateAfterSelect.items[1].isSelected).isTrue()
+            assertThat(stateAfterSelect.items[2].isSelected).isTrue()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAllItems works when some items are already selected`() = runTest {
+        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
+        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
+        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
+        val bucket = createMockRecentActionBucket(
+            identifier = testIdentifier,
+            nodes = listOf(node1, node2, node3),
+        )
+
+        val nodeUiItem1 = createMockNodeUiItem(node1, isSelected = true)
+        val nodeUiItem2 = createMockNodeUiItem(node2)
+        val nodeUiItem3 = createMockNodeUiItem(node3)
+
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(bucket)
+        whenever(recentsParentFolderNameMapper(any())).thenReturn(LocalizedText.Literal("Test"))
+        whenever(
+            nodeUiItemMapper(
+                nodeList = any(),
+                existingItems = anyOrNull(),
+                nodeSourceType = any(),
+                isPublicNodes = any(),
+                showPublicLinkCreationTime = any(),
+                highlightedNodeId = anyOrNull(),
+                highlightedNames = anyOrNull(),
+                isContactVerificationOn = any(),
+            )
+        ).thenReturn(listOf(nodeUiItem1, nodeUiItem2, nodeUiItem3))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items[0].isSelected).isTrue()
+            assertThat(initialState.items[1].isSelected).isFalse()
+            assertThat(initialState.items[2].isSelected).isFalse()
+
+            underTest.selectAllItems()
+            val stateAfterSelect = awaitItem()
+            assertThat(stateAfterSelect.items[0].isSelected).isTrue()
+            assertThat(stateAfterSelect.items[1].isSelected).isTrue()
+            assertThat(stateAfterSelect.items[2].isSelected).isTrue()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAllItems works with empty list`() = runTest {
+        whenever(getRecentActionBucketByIdUseCase(any(), any())).thenReturn(null)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val initialState = awaitItem()
+            assertThat(initialState.items).isEmpty()
+
+            underTest.selectAllItems()
+            advanceUntilIdle()
+
+            val currentState = underTest.uiState.value
+            assertThat(currentState.items).isEmpty()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun createMockFileNode(
         name: String = "testFile.txt",
+        id: Long = 1L,
     ): TypedFileNode = mock {
         on { it.name }.thenReturn(name)
-        on { it.id }.thenReturn(NodeId(1L))
+        on { it.id }.thenReturn(NodeId(id))
         val fileTypeInfo = TextFileTypeInfo("text/plain", "txt")
         on { it.type }.thenReturn(fileTypeInfo)
     }
@@ -611,8 +968,9 @@ class RecentsBucketViewModelTest {
 
     private fun createMockNodeUiItem(
         node: TypedFileNode,
+        isSelected: Boolean = false,
     ): NodeUiItem<TypedNode> = NodeUiItem(
         node = node,
-        isSelected = false,
+        isSelected = isSelected,
     )
 }

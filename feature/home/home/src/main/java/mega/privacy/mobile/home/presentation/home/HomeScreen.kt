@@ -139,7 +139,7 @@ internal fun HomeScreen(
             MegaTopAppBar(
                 title = stringResource(sharedR.string.general_section_home),
                 navigationType = AppBarNavigationType.None,
-                trailingIcons = { TransfersToolbarWidget(navigationHandler) },
+                trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
                 actions = listOf(
                     MenuActionWithClick(CommonAppBarAction.Search) {
                         navigationHandler.navigate(

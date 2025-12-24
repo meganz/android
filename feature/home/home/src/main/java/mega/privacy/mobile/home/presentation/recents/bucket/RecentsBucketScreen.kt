@@ -29,10 +29,14 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.R as NodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeListView
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -49,6 +53,7 @@ import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
 @Composable
 fun RecentsBucketScreen(
     viewModel: RecentsBucketViewModel,
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     onNavigate: (NavKey) -> Unit,
     transferHandler: TransferHandler,
     nodeActionHandler: NodeActionHandler,
@@ -56,21 +61,43 @@ fun RecentsBucketScreen(
     nodeSourceType: NodeSourceType,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
     val listState = rememberLazyListState()
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            MegaTopAppBar(
-                title = pluralStringResource(
-                    NodeComponentsR.plurals.num_files_with_parameter,
-                    uiState.fileCount,
-                    uiState.fileCount
-                ),
-                subtitle = "Added to ${uiState.parentFolderName.text}", // TODO localize,
-                navigationType = AppBarNavigationType.Back(onBack),
-                actions = emptyList(),
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedItemsCount,
+                    isAllSelected = uiState.isAllSelected,
+                    isSelecting = false,
+                    onSelectAllClicked = { viewModel.selectAllItems() },
+                    onCancelSelectionClicked = { viewModel.deselectAllItems() }
+                )
+            } else {
+                MegaTopAppBar(
+                    title = pluralStringResource(
+                        NodeComponentsR.plurals.num_files_with_parameter,
+                        uiState.fileCount,
+                        uiState.fileCount
+                    ),
+                    subtitle = "Added to ${uiState.parentFolderName.text}", // TODO localize,
+                    navigationType = AppBarNavigationType.Back(onBack),
+                    actions = emptyList(),
+                    trailingIcons = { TransfersToolbarWidget(onNavigate) }
+                )
+            }
+        },
+        bottomBar = {
+            NodeSelectionModeBottomBar(
+                availableActions = nodeOptionsActionUiState.availableActions,
+                visibleActions = nodeOptionsActionUiState.visibleActions,
+                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
+                nodeActionHandler = nodeActionHandler,
+                selectedNodes = uiState.selectedNodes,
+                isSelecting = false
             )
         },
     ) { paddingValues ->
@@ -78,8 +105,15 @@ fun RecentsBucketScreen(
             uiState = uiState,
             modifier = Modifier.padding(paddingValues),
             listState = listState,
-            onFileClicked = { node ->
-                openedFileNode = node to nodeSourceType
+            onItemClicked = { item ->
+                if (uiState.isInSelectionMode) {
+                    viewModel.toggleItemSelection(item)
+                } else {
+                    val node = item.node
+                    if (node is TypedFileNode) {
+                        openedFileNode = node to nodeSourceType
+                    }
+                }
             },
             onMenuClick = {
                 onNavigate(
@@ -89,8 +123,32 @@ fun RecentsBucketScreen(
                     )
                 )
             },
-            onLongClick = { }, // TODO handle selection mode
+            onLongClick = {
+                viewModel.onItemLongClicked(it)
+            },
         )
+
+        LaunchedEffect(uiState.selectedItemsCount) {
+            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                uiState.selectedNodes.toSet(),
+                nodeSourceType = uiState.nodeSourceType
+            )
+        }
+
+        EventEffect(
+            event = nodeOptionsActionUiState.actionTriggeredEvent,
+            onConsumed = nodeOptionsActionViewModel::resetActionTriggered
+        ) {
+            viewModel.deselectAllItems()
+        }
+
+
+        EventEffect(
+            event = nodeOptionsActionUiState.dismissEvent,
+            onConsumed = nodeOptionsActionViewModel::resetDismiss
+        ) {
+            viewModel.deselectAllItems()
+        }
 
         // TODO handle for recents, with list of node ids
         openedFileNode?.let { (node, source) ->
@@ -118,7 +176,7 @@ fun RecentsBucketScreen(
 internal fun RecentsBucketScreenContent(
     uiState: RecentsBucketUiState,
     listState: LazyListState,
-    onFileClicked: (TypedFileNode) -> Unit,
+    onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
     onMenuClick: (NodeUiItem<TypedNode>) -> Unit,
     onLongClick: (NodeUiItem<TypedNode>) -> Unit,
     modifier: Modifier = Modifier,
@@ -171,10 +229,7 @@ internal fun RecentsBucketScreenContent(
                     RecentsMediaGridView(
                         nodeUiItems = uiState.items,
                         onItemClicked = { item ->
-                            val node = item.node
-                            if (node is TypedFileNode) {
-                                onFileClicked(node)
-                            }
+                            onItemClicked(item)
                         },
                         onLongClick = onLongClick,
                     )
@@ -183,10 +238,7 @@ internal fun RecentsBucketScreenContent(
                         nodeUiItemList = uiState.items,
                         onMenuClick = onMenuClick,
                         onItemClicked = { item ->
-                            val node = item.node
-                            if (node is TypedFileNode) {
-                                onFileClicked(node)
-                            }
+                            onItemClicked(item)
                         },
                         onLongClick = onLongClick,
                         onEnterMediaDiscoveryClick = { /** No-op */ },

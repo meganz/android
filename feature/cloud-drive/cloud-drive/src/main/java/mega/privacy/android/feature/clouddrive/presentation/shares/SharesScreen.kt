@@ -178,7 +178,7 @@ internal fun SharesScreen(
                     },
                     title = stringResource(R.string.title_shared_items),
                     trailingIcons = {
-                        TransfersToolbarWidget(navigationHandler)
+                        TransfersToolbarWidget(navigationHandler::navigate)
                     },
                     actions = buildList {
                         add(

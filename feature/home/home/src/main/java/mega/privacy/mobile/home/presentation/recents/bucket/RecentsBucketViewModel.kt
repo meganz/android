@@ -18,9 +18,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
@@ -140,6 +142,52 @@ class RecentsBucketViewModel @AssistedInject constructor(
                 }
         }
     }
+
+
+    /**
+     * Handle item long click - toggle selection state
+     */
+    fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        toggleItemSelection(nodeUiItem)
+    }
+
+    fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
+        val updatedItems = uiState.value.items.map { item ->
+            if (item.node.id == nodeUiItem.node.id) {
+                item.copy(isSelected = !item.isSelected)
+            } else {
+                item
+            }
+        }
+        _uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+    }
+
+    /**
+     * Deselect all items and reset selection state
+     */
+    fun deselectAllItems() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+            )
+        }
+    }
+
+    /**
+     * Select all items
+     */
+    fun selectAllItems() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+            )
+        }
+    }
+
 
     /**
      * Consume navigate back event

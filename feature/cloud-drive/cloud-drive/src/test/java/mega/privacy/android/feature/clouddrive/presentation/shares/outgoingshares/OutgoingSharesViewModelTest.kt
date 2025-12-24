@@ -151,7 +151,6 @@ class OutgoingSharesViewModelTest {
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
-            assertThat(initialState.isSelecting).isFalse()
         }
     }
 
@@ -331,7 +330,6 @@ class OutgoingSharesViewModelTest {
 
         val updatedState = underTest.uiState.value
         assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
         assertThat(updatedState.items[0].isSelected).isFalse()
         assertThat(updatedState.items[1].isSelected).isFalse()
     }
@@ -377,7 +375,6 @@ class OutgoingSharesViewModelTest {
         testScheduler.advanceUntilIdle()
 
         val stateAfterSelectAll = underTest.uiState.value
-        assertThat(stateAfterSelectAll.isSelecting).isFalse()
         assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
         assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
         assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()

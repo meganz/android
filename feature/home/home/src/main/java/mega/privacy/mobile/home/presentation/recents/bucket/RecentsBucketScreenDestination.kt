@@ -39,6 +39,7 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
 
         RecentsBucketScreen(
             viewModel = viewModel,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             transferHandler = transferHandler,
             nodeActionHandler = nodeActionHandler,

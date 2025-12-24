@@ -176,7 +176,6 @@ class IncomingSharesViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 items = updatedItems,
-                isSelecting = false
             )
         }
     }
@@ -189,7 +188,6 @@ class IncomingSharesViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 items = updatedItems,
-                isSelecting = false
             )
         }
     }

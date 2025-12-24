@@ -22,7 +22,6 @@ data class LinksUiState(
     val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
     val navigateBack: StateEvent = consumed,
     val openedFileNode: TypedFileNode? = null,
-    val isSelecting: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {

@@ -177,10 +177,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private fun deselectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = updatedItems)
         }
     }
 
@@ -190,10 +187,7 @@ class OutgoingSharesViewModel @Inject constructor(
     private fun selectAllItems() {
         val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
         _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
+            state.copy(items = updatedItems)
         }
     }
 

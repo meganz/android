@@ -132,7 +132,6 @@ class LinksViewModelTest {
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.currentViewType).isEqualTo(ViewType.LIST)
-            assertThat(initialState.isSelecting).isFalse()
             assertThat(initialState.openedFileNode).isNull()
         }
     }
@@ -290,7 +289,6 @@ class LinksViewModelTest {
 
         val updatedState = underTest.uiState.value
         assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
         assertThat(updatedState.items[0].isSelected).isFalse()
         assertThat(updatedState.items[1].isSelected).isFalse()
     }
@@ -339,8 +337,6 @@ class LinksViewModelTest {
         testScheduler.advanceUntilIdle()
 
         val stateAfterSelectAll = underTest.uiState.value
-        // Verify that isSelecting is false and all items are selected
-        assertThat(stateAfterSelectAll.isSelecting).isFalse()
         assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
         assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
         assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
