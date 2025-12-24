@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
@@ -585,4 +586,16 @@ class NodeActionsViewModel @Inject constructor(
      * return the file type of the given file
      */
     fun getTypeInfo(file: File) = fileTypeInfoMapper(file.name)
+
+    fun triggerAddVideoToPlaylistResultEvent(result: AddVideoToPlaylistResult) {
+        _state.update {
+            it.copy(addVideoToPlaylistResultEvent = triggered(result))
+        }
+    }
+
+    fun resetAddVideoToPlaylistResultEvent() {
+        _state.update {
+            it.copy(addVideoToPlaylistResultEvent = consumed())
+        }
+    }
 }

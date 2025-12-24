@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property selectAll Select All event
  * @property clearAll clear All Event
  * @property infoToShowEvent Info to show event
+ * @property addVideoToPlaylistResultEvent Add video to playlist result event
  */
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
@@ -40,4 +42,5 @@ data class NodeActionState(
     val selectAll: StateEvent = consumed,
     val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
+    val addVideoToPlaylistResultEvent: StateEventWithContent<AddVideoToPlaylistResult> = consumed(),
 )

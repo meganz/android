@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_SECTION_MODE
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.model.menuaction.DownloadMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.HideDropdownMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.SendToChatMenuAction
@@ -258,11 +259,11 @@ internal fun VideoSectionScreen(
         modifier = modifier,
         viewModel = videoSectionViewModel,
         onSortOrderClick = onSortOrderClick,
-        onMenuClick = { item ->
+        onMenuClick = { item, type ->
             keyboardController?.hide()
             navHostController.navigate(
                 route = nodeBottomSheetRoute.plus("/${item.id.longValue}")
-                    .plus("/${NodeSourceType.CLOUD_DRIVE.name}")
+                    .plus("/${type.name}")
             ) {
                 popUpTo(nodeBottomSheetRoute) { inclusive = true }
                 launchSingleTop = true
@@ -284,7 +285,7 @@ internal fun VideoSectionScreen(
 @Composable
 internal fun VideoSectionNavHost(
     onSortOrderClick: () -> Unit,
-    onMenuClick: (VideoUIEntity) -> Unit,
+    onMenuClick: (VideoUIEntity, NodeSourceType) -> Unit,
     modifier: Modifier,
     onMenuAction: (VideoSectionMenuAction?) -> Unit,
     retryActionCallback: () -> Unit,
@@ -351,7 +352,9 @@ internal fun VideoSectionNavHost(
                     videoSectionViewModel = viewModel,
                     onClick = viewModel::onItemClicked,
                     onSortOrderClick = onSortOrderClick,
-                    onMenuClick = onMenuClick,
+                    onMenuClick = { item ->
+                        onMenuClick(item, NodeSourceType.VIDEOS)
+                    },
                     onLongClick = viewModel::onItemLongClicked,
                     onPlaylistItemClick = { playlist, index ->
                         if (state.isInSelection) {
@@ -404,7 +407,9 @@ internal fun VideoSectionNavHost(
                             viewModel.onVideoItemOfPlaylistClicked(item, index)
                         }
                     },
-                    onMenuClick = onMenuClick,
+                    onMenuClick = { item ->
+                        onMenuClick(item, NodeSourceType.CLOUD_DRIVE)
+                    },
                     onLongClick = viewModel::onVideoItemOfPlaylistLongClicked,
                     onDeleteVideosDialogPositiveButtonClicked = onDeleteVideosDialogPositiveButtonClicked,
                     onPlayAllClicked = viewModel::playAllButtonClicked,
@@ -474,7 +479,9 @@ internal fun VideoSectionNavHost(
                             viewModel.clearRecentlyWatchedVideos()
                         }
                     },
-                    onMenuClick = onMenuClick,
+                    onMenuClick = { item ->
+                        onMenuClick(item, NodeSourceType.CLOUD_DRIVE)
+                    },
                     clearRecentlyWatchedVideosMessageShown = viewModel::resetClearRecentlyWatchedVideosSuccess,
                     removedRecentlyWatchedItemMessageShown = viewModel::resetRemoveRecentlyWatchedItemSuccess,
                     scaffoldState = scaffoldState,

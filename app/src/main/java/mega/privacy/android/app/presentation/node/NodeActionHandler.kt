@@ -11,6 +11,8 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
+import mega.privacy.android.app.presentation.node.model.menuaction.AddToPlaylistMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.CopyMenuAction
@@ -124,6 +126,15 @@ class NodeActionHandler(
             nodeActionsViewModel.handleHiddenNodesOnboardingResult(result, true)
         }
 
+    private val addToPlaylistLauncher =
+        (activity as? AppCompatActivity)?.registerForActivityResult(
+            VideoToPlaylistActivityContract()
+        ) { result ->
+            result?.let {
+                nodeActionsViewModel.triggerAddVideoToPlaylistResultEvent(it)
+            }
+        }
+
     /**
      * handles actions from bottom sheet
      *
@@ -162,6 +173,8 @@ class NodeActionHandler(
                 isOnboarded = true,
                 isHidden = false
             )
+
+            is AddToPlaylistMenuAction -> addToPlaylistLauncher?.launch(node.id.longValue)
 
             else -> throw NotImplementedError("Action $action does not have a handler.")
         }

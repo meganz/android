@@ -5,10 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
@@ -30,6 +33,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -608,6 +612,21 @@ class NodeActionsViewModelTest {
 
         assertThat(result).isEqualTo(expected)
         verify(isHiddenNodesOnboardedUseCase).invoke()
+    }
+
+    @Test
+    fun `test that addVideoToPlaylistResultEvent updated as expected`() = runTest {
+        val result = AddVideoToPlaylistResult("", false, -1)
+
+        viewModel.triggerAddVideoToPlaylistResultEvent(result)
+        advanceUntilIdle()
+
+        viewModel.state.test {
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(triggered(result))
+
+            viewModel.resetAddVideoToPlaylistResultEvent()
+            assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(consumed())
+        }
     }
 }
 

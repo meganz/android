@@ -328,3 +328,12 @@ data class SaveScannedDocumentsNavKey(
 data class InviteContactNavKey(
     val isFromAchievement: Boolean = false,
 ) : NavKey
+
+@Serializable
+data class LegacyVideoToPlaylistNavKey(
+    val nodeHandle: Long,
+) : NavKey {
+    companion object {
+        const val ADD_VIDEO_TO_PLAYLIST_RESULT = "ADD_VIDEO_TO_PLAYLIST_RESULT"
+    }
+}

@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInSha
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetOutShareByNodeIdUseCase
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.domain.qualifier.features.Videos
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -69,6 +70,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     @OutgoingShares private val outgoingSharesBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @Links private val linksBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
     @Backups private val backupsBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Videos private val videosBottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NodeBottomSheetState())
@@ -220,6 +222,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             NodeSourceType.LINKS -> linksBottomSheetOptions
             NodeSourceType.RUBBISH_BIN -> rubbishBinBottomSheetOptions
             NodeSourceType.BACKUPS -> backupsBottomSheetOptions
+            NodeSourceType.VIDEOS -> videosBottomSheetOptions
             else -> cloudDriveBottomSheetOptions
         }.get()
 

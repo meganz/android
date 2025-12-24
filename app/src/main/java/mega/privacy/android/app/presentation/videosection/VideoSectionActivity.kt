@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -364,6 +366,28 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                             }
                         } ?: findActivity()?.finish()
                     }
+
+                    EventEffect(
+                        event = nodeActionState.addVideoToPlaylistResultEvent,
+                        onConsumed = nodeActionsViewModel::resetAddVideoToPlaylistResultEvent,
+                        action = { result ->
+                            if (result.isRetry) {
+                                val action =
+                                    scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                        message = result.message,
+                                        actionLabel = getString(R.string.message_option_retry)
+                                    )
+                                if (action == SnackbarResult.ActionPerformed) {
+                                    videoSectionViewModel.launchVideoToPlaylistActivity(result.videoHandle)
+                                }
+
+                            } else {
+                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                    message = result.message
+                                )
+                            }
+                        }
+                    )
                 }
             }
         }
