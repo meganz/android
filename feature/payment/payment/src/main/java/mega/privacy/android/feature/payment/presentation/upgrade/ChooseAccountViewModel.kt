@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -45,6 +46,7 @@ class ChooseAccountViewModel @Inject constructor(
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val ageSignalUseCase: AgeSignalUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -107,10 +109,26 @@ class ChooseAccountViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                        isExternalCheckoutDefault = isExternalCheckoutDefault
+                        isExternalCheckoutDefault = isExternalCheckoutDefault,
                     )
                 }
             }.onFailure(Timber.Forest::e)
+        }
+        viewModelScope.launch {
+            runCatching {
+                val ageSignalsCheckEnabled =
+                    getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)
+                if (ageSignalsCheckEnabled) {
+                    val userAgeComplianceStatus = ageSignalUseCase()
+                    _state.update {
+                        it.copy(
+                            userAgeComplianceStatus = userAgeComplianceStatus
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
         }
         if (isUpgradeAccountFlow) {
             loadCurrentSubscriptionPlan()

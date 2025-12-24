@@ -138,6 +138,7 @@ fun ChooseAccountRoute(
         },
         isExternalCheckoutEnabled = uiState.isExternalCheckoutEnabled,
         isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
+        userAgeComplianceStatus = uiState.userAgeComplianceStatus,
         clearExternalPurchaseError = billingViewModel::clearExternalPurchaseError,
         onBack = onBack
     )

@@ -17,11 +17,13 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -38,7 +40,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -64,6 +68,7 @@ class ChooseAccountViewModelTest {
         mock<GetRecommendedSubscriptionUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val ageSignalUseCase = mock<AgeSignalUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -76,6 +81,7 @@ class ChooseAccountViewModelTest {
             getPricing,
             monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase,
+            ageSignalUseCase,
         )
     }
 
@@ -87,6 +93,7 @@ class ChooseAccountViewModelTest {
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            ageSignalUseCase = ageSignalUseCase,
             savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
         )
     }
@@ -113,6 +120,7 @@ class ChooseAccountViewModelTest {
             )
         )
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
@@ -136,6 +144,7 @@ class ChooseAccountViewModelTest {
             )
         )
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -163,6 +172,7 @@ class ChooseAccountViewModelTest {
                 )
             )
             wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
             initViewModel()
 
             underTest.state.test {
@@ -185,6 +195,7 @@ class ChooseAccountViewModelTest {
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
@@ -206,6 +217,7 @@ class ChooseAccountViewModelTest {
             .thenReturn(false)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
@@ -227,6 +239,7 @@ class ChooseAccountViewModelTest {
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
@@ -248,6 +261,7 @@ class ChooseAccountViewModelTest {
             .thenReturn(true)
         whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
@@ -269,6 +283,7 @@ class ChooseAccountViewModelTest {
             .thenReturn(true)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
@@ -277,6 +292,109 @@ class ChooseAccountViewModelTest {
             Truth.assertThat(state.isExternalCheckoutEnabled).isTrue()
             Truth.assertThat(state.isExternalCheckoutDefault).isTrue()
         }
+    }
+
+    @Test
+    fun `test that userAgeComplianceStatus is AdultVerified when feature flag is disabled`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
+                .thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(UserAgeComplianceStatus.AdultVerified)
+            }
+        }
+
+    @Test
+    fun `test that userAgeComplianceStatus is set to AdultVerified when feature flag is enabled and user is adult`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(true)
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
+                .thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            wheneverBlocking { ageSignalUseCase() }.thenReturn(UserAgeComplianceStatus.AdultVerified)
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(UserAgeComplianceStatus.AdultVerified)
+            }
+        }
+
+    @Test
+    fun `test that userAgeComplianceStatus is set to RequiresMinorRestriction when feature flag is enabled and user is under age`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+                .thenReturn(true)
+            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
+                .thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            wheneverBlocking { ageSignalUseCase() }.thenReturn(
+                UserAgeComplianceStatus.RequiresMinorRestriction
+            )
+
+            initViewModel()
+
+            underTest.state.map { it.userAgeComplianceStatus }.test {
+                Truth.assertThat(awaitItem()).isEqualTo(
+                    UserAgeComplianceStatus.RequiresMinorRestriction
+                )
+            }
+        }
+
+    @Test
+    fun `test that age signal check is not called when feature flag is disabled`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
+            .thenReturn(false)
+        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
+            .thenReturn(false)
+        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+
+        initViewModel()
+
+        underTest.state.test {
+            awaitItem()
+        }
+
+        verify(ageSignalUseCase, never()).invoke()
     }
 
     private val subscriptionProIMonthly = Subscription(

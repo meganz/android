@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
+import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
@@ -89,6 +90,7 @@ fun NewChooseAccountScreen(
     billingUIState: BillingUIState = BillingUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
+    userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
     isExternalCheckoutEnabled: Boolean = false,
     isExternalCheckoutDefault: Boolean = false,
     onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
@@ -210,6 +212,7 @@ fun NewChooseAccountScreen(
                     accountType = accountType,
                     isExternalCheckoutEnabled = isExternalCheckoutEnabled,
                     isExternalCheckoutDefault = isExternalCheckoutDefault,
+                    userAgeComplianceStatus = userAgeComplianceStatus,
                     selectedSubscription = selectedSubscription,
                     isMonthly = isMonthly,
                     onInAppCheckoutClick = onInAppCheckoutClick,
@@ -501,6 +504,7 @@ private fun BuyPlanBottomBar(
     accountType: AccountType,
     isExternalCheckoutEnabled: Boolean,
     isExternalCheckoutDefault: Boolean,
+    userAgeComplianceStatus: UserAgeComplianceStatus,
     selectedSubscription: LocalisedSubscription?,
     isMonthly: Boolean,
     onInAppCheckoutClick: (Subscription) -> Unit,
@@ -512,7 +516,7 @@ private fun BuyPlanBottomBar(
         15.0f
     )
 
-    if (isExternalCheckoutEnabled) {
+    if (isExternalCheckoutEnabled && userAgeComplianceStatus == UserAgeComplianceStatus.AdultVerified) {
         BuyPlanBottomBar(
             modifier = Modifier,
             isExternalCheckoutDefault = isExternalCheckoutDefault,

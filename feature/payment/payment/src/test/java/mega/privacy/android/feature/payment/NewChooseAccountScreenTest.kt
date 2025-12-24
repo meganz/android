@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_ON_WEBSITE_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
@@ -456,6 +457,70 @@ class NewChooseAccountScreenTest {
         }
     }
 
+    @Test
+    fun `test that external checkout button is shown when external checkout is enabled and user is adult`() {
+        setContent(
+            isUpgradeAccount = true,
+            isExternalCheckoutEnabled = true,
+            isExternalCheckoutDefault = false,
+            userAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified
+        )
+
+        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
+        // Select a plan first
+        composeRule.onNodeWithTag(testTag).performClick()
+
+        // Verify both buttons exist and are displayed
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that external checkout button is not shown when user is under age`() {
+        setContent(
+            isUpgradeAccount = true,
+            isExternalCheckoutEnabled = true,
+            isExternalCheckoutDefault = false,
+            userAgeComplianceStatus = UserAgeComplianceStatus.RequiresMinorRestriction
+        )
+
+        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
+        // Select a plan first
+        composeRule.onNodeWithTag(testTag).performClick()
+
+        // Verify only in-app checkout button is displayed
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
+            .assertIsDisplayed()
+        // Verify external checkout button is not displayed
+        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that external checkout button is shown when userAgeComplianceStatus defaults to AdultVerified`() {
+        setContent(
+            isUpgradeAccount = true,
+            isExternalCheckoutEnabled = true,
+            isExternalCheckoutDefault = false
+            // userAgeComplianceStatus defaults to AdultVerified
+        )
+
+        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
+        // Select a plan first
+        composeRule.onNodeWithTag(testTag).performClick()
+
+        // Verify both buttons exist and are displayed (default behavior)
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
+            .assertIsDisplayed()
+    }
+
     private fun setContent(
         isUpgradeAccount: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
@@ -466,6 +531,7 @@ class NewChooseAccountScreenTest {
         onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
         billingUIState: BillingUIState = BillingUIState(),
         clearExternalPurchaseError: () -> Unit = {},
+        userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
         uiState: ChooseAccountState = ChooseAccountState(
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
@@ -484,6 +550,7 @@ class NewChooseAccountScreenTest {
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
             isExternalCheckoutDefault = isExternalCheckoutDefault,
             onExternalCheckoutClick = onExternalCheckoutClick,
+            userAgeComplianceStatus = userAgeComplianceStatus,
         )
     }
 }

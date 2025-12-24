@@ -78,7 +78,23 @@ enum class ApiFeatures(
         experimentName = "aome2",
         description = "Enable Android 16+ orientation migration for large screen devices",
         defaultValue = false
-    );
+    ),
+
+    /**
+     * Age Signal Check feature flag
+     *
+     * Controls whether the app checks the user's age signal to hide Stripe payment method
+     * if the user is under the allowed age. When enabled, Stripe as a payment option
+     * is not shown to users under age according to Google's Age Signals API.
+     *
+     * Default: false
+     */
+    AgeSignalsCheckEnabled(
+        experimentName = "ages1",
+        description = "Do not show Stripe payment method if it is under age",
+        defaultValue = false
+    ),
+    ;
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

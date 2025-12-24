@@ -3,6 +3,7 @@ package mega.privacy.android.feature.payment.model
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 
 /**
  * Upgrade Account state
@@ -20,6 +21,7 @@ data class ChooseAccountState(
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,
     val currentSubscriptionPlan: AccountType? = null,
     val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+    val userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
     val isExternalCheckoutEnabled: Boolean = false,
     val isExternalCheckoutDefault: Boolean = false,
     val isSingleActivityEnabled: Boolean = false,
