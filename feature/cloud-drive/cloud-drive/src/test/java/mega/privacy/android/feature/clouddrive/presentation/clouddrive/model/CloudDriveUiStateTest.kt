@@ -210,42 +210,6 @@ class CloudDriveUiStateTest {
     }
 
     @Test
-    fun `test that selectedNodeIds returns correct node ids for selected items`() {
-        val items = createTestItems(
-            selected = listOf(true, false, true),
-            sensitive = listOf(false, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(3L)))
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns empty list when no items are selected`() {
-        val items = createTestItems(
-            selected = listOf(false, false, false),
-            sensitive = listOf(false, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEmpty()
-    }
-
-    @Test
-    fun `test that selectedNodeIds includes sensitive items when they are selected`() {
-        val items = createTestItems(
-            selected = listOf(true, true, false),
-            sensitive = listOf(true, false, false)
-        )
-
-        val state = CloudDriveUiState(items = items)
-
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(2L)))
-    }
-
-    @Test
     fun `test that complex scenario with mixed states works correctly`() {
         val items = createTestItems(
             selected = listOf(true, false, true, false, true),
@@ -266,7 +230,6 @@ class CloudDriveUiStateTest {
         assertThat(state.selectedItemsCount).isEqualTo(3)
         assertThat(state.isInSelectionMode).isTrue()
         assertThat(state.isEmpty).isFalse()
-        assertThat(state.selectedNodeIds).isEqualTo(listOf(NodeId(1L), NodeId(3L), NodeId(5L)))
     }
 
     @Test
@@ -283,7 +246,6 @@ class CloudDriveUiStateTest {
         assertThat(state.selectedItemsCount).isEqualTo(0)
         assertThat(state.isInSelectionMode).isFalse()
         assertThat(state.isEmpty).isTrue()
-        assertThat(state.selectedNodeIds).isEmpty()
     }
 
     @Test

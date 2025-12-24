@@ -305,66 +305,6 @@ class RecentsBucketUiStateTest {
     }
 
     @Test
-    fun `test that selectedNodeIds returns only selected node ids`() {
-        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
-        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
-        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
-
-        val item1 = createMockNodeUiItem(node1, isSelected = true)
-        val item2 = createMockNodeUiItem(node2, isSelected = false)
-        val item3 = createMockNodeUiItem(node3, isSelected = true)
-
-        val state = RecentsBucketUiState(
-            items = listOf(item1, item2, item3),
-            nodeSourceType = testNodeSourceType
-        )
-        assertThat(state.selectedNodeIds).hasSize(2)
-        assertThat(state.selectedNodeIds).containsExactly(node1.id, node3.id)
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns empty list when no items selected`() {
-        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
-        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
-
-        val item1 = createMockNodeUiItem(node1, isSelected = false)
-        val item2 = createMockNodeUiItem(node2, isSelected = false)
-
-        val state = RecentsBucketUiState(
-            items = listOf(item1, item2),
-            nodeSourceType = testNodeSourceType
-        )
-        assertThat(state.selectedNodeIds).isEmpty()
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns empty list when items list is empty`() {
-        val state = RecentsBucketUiState(
-            items = emptyList(),
-            nodeSourceType = testNodeSourceType
-        )
-        assertThat(state.selectedNodeIds).isEmpty()
-    }
-
-    @Test
-    fun `test that selectedNodeIds returns all node ids when all items selected`() {
-        val node1 = createMockFileNode(name = "file1.txt", id = 1L)
-        val node2 = createMockFileNode(name = "file2.txt", id = 2L)
-        val node3 = createMockFileNode(name = "file3.txt", id = 3L)
-
-        val item1 = createMockNodeUiItem(node1, isSelected = true)
-        val item2 = createMockNodeUiItem(node2, isSelected = true)
-        val item3 = createMockNodeUiItem(node3, isSelected = true)
-
-        val state = RecentsBucketUiState(
-            items = listOf(item1, item2, item3),
-            nodeSourceType = testNodeSourceType
-        )
-        assertThat(state.selectedNodeIds).hasSize(3)
-        assertThat(state.selectedNodeIds).containsExactly(node1.id, node2.id, node3.id)
-    }
-
-    @Test
     fun `test that default values are set correctly`() {
         val state = RecentsBucketUiState(
             nodeSourceType = testNodeSourceType

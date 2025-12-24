@@ -59,10 +59,4 @@ data class IncomingSharesUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
-
-    /**
-     * Returns a list of selected node ids.
-     */
-    val selectedNodeIds: List<NodeId>
-        get() = selectedNodes.map { it.id }
 }

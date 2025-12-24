@@ -4,7 +4,6 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -60,10 +59,4 @@ data class RecentsBucketUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
-
-    /**
-     * Returns a list of selected node ids.
-     */
-    val selectedNodeIds: List<NodeId>
-        get() = selectedNodes.map { it.id }
 }

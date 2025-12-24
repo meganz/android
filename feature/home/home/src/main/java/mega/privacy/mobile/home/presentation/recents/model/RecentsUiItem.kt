@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * @property icon The icon to be displayed
  * @property shareIcon The icon to be displayed for sharing
  * @property parentFolderName Localized parent folder name
- * @property timestampText RecentActionTimestampText for formatting date/time in Composable
  * @property isMediaBucket Whether the item is a media bucket
  * @property isUpdate Whether this is an update action
  * @property updatedByText Localized text indicating who updated/created the item
@@ -54,4 +53,15 @@ data class RecentsUiItem(
         } else {
             NodeSourceType.CLOUD_DRIVE
         }
+
+    /**
+     * Unique key for the item in a list
+     * Adjust for duplicate node node buckets
+     */
+    val key = buildString {
+        append(bucket.identifier)
+        if (isSingleNode) {
+            append("|N:${firstNode?.id?.longValue}")
+        }
+    }
 }

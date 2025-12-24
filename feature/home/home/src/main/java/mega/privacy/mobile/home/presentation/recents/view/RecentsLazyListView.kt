@@ -42,7 +42,7 @@ fun RecentsLazyListView(
 
             items(
                 items = itemsForDate,
-                key = { it.bucket.identifier }
+                key = { it.key }
             ) { item ->
                 RecentsListItemView(
                     item = item,

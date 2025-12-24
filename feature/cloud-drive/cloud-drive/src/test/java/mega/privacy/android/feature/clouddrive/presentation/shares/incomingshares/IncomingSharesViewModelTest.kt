@@ -733,33 +733,6 @@ class IncomingSharesViewModelTest {
         }
     }
 
-    @Test
-    fun `test that selectedNodeIds returns correct node ids`() = runTest {
-        val node1 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<ShareFileNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            assertThat(loadedState.selectedNodeIds).isEmpty()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(IncomingSharesAction.ItemLongClicked(nodeUiItem1))
-            val stateAfterSelection = awaitItem()
-
-            assertThat(stateAfterSelection.selectedNodeIds).hasSize(1)
-            assertThat(stateAfterSelection.selectedNodeIds[0]).isEqualTo(NodeId(1L))
-        }
-    }
-
     // Contact Verification Tests
 
     @Test
