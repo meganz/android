@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -113,6 +114,7 @@ internal class PhotosSearchViewModelTest {
             albumsProvider = albumsProvider,
             albumUiStateMapper = albumUiStateMapper,
             monitorTimelinePhotosUseCase = lazyMonitorTimelinePhotosUseCase,
+            context = mock(),
         )
     }
 
@@ -295,7 +297,7 @@ internal class PhotosSearchViewModelTest {
             val mediaAlbum = mock<MediaAlbum.System>()
             val expectedAlbumUiState = AlbumUiState(
                 mediaAlbum = mediaAlbum,
-                title = "Favourites",
+                title = LocalizedText.Literal("Favourites"),
                 isExported = false,
                 cover = null,
             )

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.mapper
 
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import javax.inject.Inject
@@ -21,8 +22,8 @@ class AlbumUiStateMapper @Inject constructor(
      */
     operator fun invoke(album: MediaAlbum): AlbumUiState {
         val title = when (album) {
-            is MediaAlbum.System -> album.id.albumName
-            is MediaAlbum.User -> album.title
+            is MediaAlbum.System -> LocalizedText.StringRes(album.id.albumNameResId)
+            is MediaAlbum.User -> LocalizedText.Literal(album.title)
         }
         val isExported = when (album) {
             is MediaAlbum.User -> album.isExported

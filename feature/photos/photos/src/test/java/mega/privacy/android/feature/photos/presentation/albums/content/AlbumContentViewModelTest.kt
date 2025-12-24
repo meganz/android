@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import android.content.Context
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
@@ -14,6 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -128,6 +130,7 @@ class AlbumContentViewModelTest {
     private val legacyPhotosSortMapper: LegacyPhotosSortMapper = mock()
     private val themeModeFlow = MutableStateFlow(ThemeMode.System)
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val context: Context = mock()
 
     @BeforeAll
     fun setup() {
@@ -227,6 +230,7 @@ class AlbumContentViewModelTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             legacyPhotosSortMapper = legacyPhotosSortMapper,
             defaultDispatcher = testDispatcher,
+            context = context,
             navKey = navKey,
         )
     }
@@ -250,7 +254,7 @@ class AlbumContentViewModelTest {
     @Test
     fun `test that deleteAlbum queues snackbar message on success`() = runTest {
         val albumId = AlbumId(123L)
-        val albumTitle = "My Album"
+        val albumTitle = LocalizedText.Literal("My Album")
         whenever(savedStateHandle.get<Long>("id")).thenReturn(albumId.id)
         whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
         createViewModel()
@@ -387,7 +391,7 @@ class AlbumContentViewModelTest {
         }
         val mockAlbumUiState = mock<AlbumUiState> {
             on { mediaAlbum }.thenReturn(mockUserAlbum)
-            on { title }.thenReturn("Album")
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
             on { cover }.thenReturn(null)
         }
         whenever(disableExportAlbumsUseCase(listOf(albumId))).thenReturn(1)
@@ -539,7 +543,7 @@ class AlbumContentViewModelTest {
         }
         val mockAlbumUiState = mock<AlbumUiState> {
             on { mediaAlbum }.thenReturn(mockUserAlbum)
-            on { title }.thenReturn("Album")
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
             on { cover }.thenReturn(null)
         }
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
@@ -567,7 +571,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             val expectedMessage = "expectedMessage"
@@ -630,7 +634,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
@@ -670,7 +674,7 @@ class AlbumContentViewModelTest {
         }
         val mockAlbumUiState = mock<AlbumUiState> {
             on { mediaAlbum }.thenReturn(mockUserAlbum)
-            on { title }.thenReturn("Album")
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
             on { cover }.thenReturn(null)
         }
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
@@ -727,7 +731,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             val legacyPhoto = mock<Photo.Image> {
@@ -762,7 +766,7 @@ class AlbumContentViewModelTest {
         }
         val mockAlbumUiState = mock<AlbumUiState> {
             on { mediaAlbum }.thenReturn(mockUserAlbum)
-            on { title }.thenReturn("Album")
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
             on { cover }.thenReturn(null)
         }
         whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
@@ -820,7 +824,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             val baseTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0)
@@ -973,7 +977,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             val baseTime = LocalDateTime.of(2024, 1, 1, 12, 0, 0)
@@ -1127,7 +1131,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             val legacyPhoto = mock<Photo.Image> {
@@ -1238,7 +1242,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockUserAlbum)
-                on { title }.thenReturn("Album")
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
                 on { cover }.thenReturn(null)
             }
             whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
@@ -1268,7 +1272,7 @@ class AlbumContentViewModelTest {
             }
             val mockAlbumUiState = mock<AlbumUiState> {
                 on { mediaAlbum }.thenReturn(mockSystemAlbum)
-                on { title }.thenReturn("Favourites")
+                on { title }.thenReturn(LocalizedText.Literal("Favourites"))
                 on { cover }.thenReturn(null)
             }
             val mockPhotoPredicate: PhotoPredicate = { true }

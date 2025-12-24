@@ -9,7 +9,7 @@ interface SystemAlbum {
     /**
      * Name of the album
      */
-    val albumName: String
+    val albumNameResId: Int
 
     /**
      * Function to determine if a photo belongs to this album type

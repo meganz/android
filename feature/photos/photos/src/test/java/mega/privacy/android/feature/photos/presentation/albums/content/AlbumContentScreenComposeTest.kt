@@ -13,6 +13,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
@@ -685,7 +686,7 @@ class AlbumContentScreenComposeTest {
         )
         return AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = title,
+            title = LocalizedText.Literal(title),
             isExported = false,
             cover = null
         )

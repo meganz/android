@@ -392,9 +392,10 @@ private fun AlbumItem(
 ) {
     val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
     val placeholderPainter = painterResource(placeholder)
+    val context = LocalContext.current
     val title = remember(album.title, query) {
         HighlightedText(
-            full = album.title,
+            full = album.title.get(context = context),
             highlighted = query,
         )
     }

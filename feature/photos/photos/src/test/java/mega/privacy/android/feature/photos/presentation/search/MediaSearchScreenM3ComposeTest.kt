@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
@@ -367,7 +368,7 @@ class MediaSearchScreenM3ComposeTest {
         )
         return AlbumUiState(
             mediaAlbum = album,
-            title = title,
+            title = LocalizedText.Literal(title),
             isExported = false,
             cover = null,
         )

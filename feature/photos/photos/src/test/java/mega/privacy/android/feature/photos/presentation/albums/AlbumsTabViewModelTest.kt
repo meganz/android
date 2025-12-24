@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
@@ -75,9 +76,17 @@ internal class AlbumsTabViewModelTest {
     fun `test that albums are loaded successfully`() = runTest {
         val mockAlbums = createMockAlbums()
         val expectedAlbumUiState1 =
-            AlbumUiState(mediaAlbum = mockAlbums[0], title = "Album 1", isExported = false)
+            AlbumUiState(
+                mediaAlbum = mockAlbums[0],
+                title = LocalizedText.Literal("Album 1"),
+                isExported = false
+            )
         val expectedAlbumUiState2 =
-            AlbumUiState(mediaAlbum = mockAlbums[1], title = "Album 2", isExported = false)
+            AlbumUiState(
+                mediaAlbum = mockAlbums[1],
+                title = LocalizedText.Literal("Album 2"),
+                isExported = false
+            )
 
         whenever(mockAlbumsDataProvider.order).thenReturn(1)
         whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(mockAlbums))
@@ -103,9 +112,17 @@ internal class AlbumsTabViewModelTest {
         val albums1 = listOf(createMockUserAlbum(1L, "Album 1"))
         val albums2 = listOf(createMockUserAlbum(2L, "Album 2"))
         val expectedAlbumUiState1 =
-            AlbumUiState(mediaAlbum = albums1[0], title = "Album 1", isExported = false)
+            AlbumUiState(
+                mediaAlbum = albums1[0],
+                title = LocalizedText.Literal("Album 1"),
+                isExported = false
+            )
         val expectedAlbumUiState2 =
-            AlbumUiState(mediaAlbum = albums2[0], title = "Album 2", isExported = false)
+            AlbumUiState(
+                mediaAlbum = albums2[0],
+                title = LocalizedText.Literal("Album 2"),
+                isExported = false
+            )
 
         whenever(mockProvider1.order).thenReturn(1)
         whenever(mockProvider1.monitorAlbums()).thenReturn(flowOf(albums1))

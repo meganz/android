@@ -368,7 +368,7 @@ internal fun AlbumContentScreen(
                     modifier = Modifier
                         .testTag(ALBUM_CONTENT_SCREEN_DEFAULT_TOOLBAR),
                     navigationType = AppBarNavigationType.Back(onBack),
-                    title = uiState.uiAlbum?.title.orEmpty(),
+                    title = uiState.uiAlbum?.title?.text.orEmpty(),
                     actions = buildList {
                         if (isUserAlbum) {
                             add(
@@ -564,7 +564,7 @@ internal fun AlbumContentScreen(
                 onConfirm = renameAlbum,
                 resetErrorMessage = resetUpdateAlbumNameErrorMessage,
                 errorText = (uiState.updateAlbumNameErrorMessage as? StateEventWithContentTriggered)?.content,
-                name = uiState.uiAlbum?.title.orEmpty()
+                name = uiState.uiAlbum?.title?.text.orEmpty()
             )
         }
 
@@ -689,7 +689,7 @@ internal fun AlbumOptionsBottomSheet(
                     .wrapContentHeight()
             ) {
                 SheetActionHeader(
-                    title = albumUiState?.title.orEmpty(),
+                    title = albumUiState?.title?.text,
                     leadingElement = {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)

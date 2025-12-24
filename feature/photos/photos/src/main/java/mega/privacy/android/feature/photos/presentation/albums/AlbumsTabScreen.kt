@@ -112,7 +112,7 @@ fun AlbumsTabScreen(
                     is DownloadPhotoResult.Success -> result.thumbnailFilePath
                     else -> null
                 },
-                title = HighlightedText(album.title),
+                title = HighlightedText(album.title.text),
                 placeholder = placeholder,
                 errorPlaceholder = placeholder,
                 isExported = album.isExported

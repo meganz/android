@@ -1,9 +1,11 @@
 package mega.privacy.android.feature.photos.presentation.search
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.Lazy
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,6 +52,7 @@ class PhotosSearchViewModel @Inject constructor(
     private val albumsProvider: Lazy<Set<@JvmSuppressWildcards AlbumsDataProvider>>,
     private val albumUiStateMapper: AlbumUiStateMapper,
     private val monitorTimelinePhotosUseCase: Lazy<MonitorTimelinePhotosUseCase>,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
     private val _state: MutableStateFlow<PhotosSearchState> = MutableStateFlow(PhotosSearchState())
 
@@ -187,7 +190,7 @@ class PhotosSearchViewModel @Inject constructor(
                         listOf()
                     } else {
                         _state.value.albumSource.filter {
-                            it.title.contains(query, ignoreCase = true)
+                            it.title.get(context).contains(query, ignoreCase = true)
                         }
                     }
 

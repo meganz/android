@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.ImmutableList
@@ -120,6 +122,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val legacyPhotosSortMapper: LegacyPhotosSortMapper,
+    @ApplicationContext private val context: Context,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentUiState())
@@ -145,6 +148,9 @@ class AlbumContentViewModel @AssistedInject constructor(
         "raw" to { fetchSystemPhotos(systemAlbum = RawAlbum) },
         "custom" to { fetchAlbumPhotos() },
     )
+
+    private val albumTitle
+        get() = state.value.uiAlbum?.title?.get(context).orEmpty()
 
     init {
         monitorThemeMode()
@@ -447,7 +453,7 @@ class AlbumContentViewModel @AssistedInject constructor(
             }.onSuccess {
                 snackbarEventQueue.queueMessage(
                     sharedResR.string.delete_singular_album_confirmation_message,
-                    state.value.uiAlbum?.title.orEmpty()
+                    albumTitle
                 )
                 _state.update {
                     it.copy(deleteAlbumSuccessEvent = triggered)
@@ -543,7 +549,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                 photoId = photo.id,
                 albumType = albumType.orEmpty(),
                 sortType = legacyPhotosSortMapper(_state.value.albumSortConfiguration.sortDirection).name,
-                title = _state.value.uiAlbum?.title.orEmpty()
+                title = albumTitle
             )
 
             _state.update { it.copy(previewAlbumContentEvent = triggered(args)) }

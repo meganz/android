@@ -1,11 +1,8 @@
 package mega.privacy.android.feature.photos.mapper
 
-import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
-import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
-import mega.privacy.android.feature.photos.presentation.albums.model.GifSystemAlbum
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject

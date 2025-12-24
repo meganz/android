@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -37,8 +38,8 @@ class AlbumUiStateMapperTest {
 
     @Test
     fun `test that system album is mapped correctly without cover`() {
-        val albumName = "Favourites"
-        val systemAlbum = createMockSystemAlbum(albumName) { true }
+        val albumNameResId = 12345
+        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
         val mediaAlbum = MediaAlbum.System(
             id = systemAlbum,
             cover = null
@@ -48,7 +49,7 @@ class AlbumUiStateMapperTest {
 
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = albumName,
+            title = LocalizedText.StringRes(albumNameResId),
             isExported = false,
             cover = null
         )
@@ -57,8 +58,8 @@ class AlbumUiStateMapperTest {
 
     @Test
     fun `test that system album is mapped correctly with cover`() {
-        val albumName = "GIFs"
-        val systemAlbum = createMockSystemAlbum(albumName) { true }
+        val albumNameResId = 67890
+        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
         val coverPhoto = newImage(id = 100L, name = "cover.jpg")
         val photoUiState = PhotoUiState.Image(
             id = 100L,
@@ -89,7 +90,7 @@ class AlbumUiStateMapperTest {
 
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = albumName,
+            title = LocalizedText.StringRes(albumNameResId),
             isExported = false,
             cover = photoUiState
         )
@@ -114,7 +115,7 @@ class AlbumUiStateMapperTest {
 
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = title,
+            title = LocalizedText.Literal(title),
             isExported = false,
             cover = null
         )
@@ -159,7 +160,7 @@ class AlbumUiStateMapperTest {
 
         val expected = AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = title,
+            title = LocalizedText.Literal(title),
             isExported = true,
             cover = photoUiState
         )
@@ -169,8 +170,8 @@ class AlbumUiStateMapperTest {
 
     @Test
     fun `test that system album id is hashcode of album name`() {
-        val albumName = "RAW"
-        val systemAlbum = createMockSystemAlbum(albumName) { true }
+        val albumNameResId = 11111
+        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
         val mediaAlbum = MediaAlbum.System(
             id = systemAlbum,
             cover = null
@@ -179,7 +180,7 @@ class AlbumUiStateMapperTest {
         val actual = underTest(mediaAlbum)
 
         assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
-        assertThat(actual.title).isEqualTo(albumName)
+        assertThat(actual.title).isEqualTo(LocalizedText.StringRes(albumNameResId))
     }
 
     @Test
@@ -198,12 +199,12 @@ class AlbumUiStateMapperTest {
         val actual = underTest(mediaAlbum)
 
         assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
-        assertThat(actual.title).isEqualTo(title)
+        assertThat(actual.title).isEqualTo(LocalizedText.Literal(title))
     }
 
-    private fun createMockSystemAlbum(name: String, filter: (Photo) -> Boolean): SystemAlbum {
+    private fun createMockSystemAlbum(albumNameResId: Int, filter: (Photo) -> Boolean): SystemAlbum {
         return object : SystemAlbum {
-            override val albumName: String = name
+            override val albumNameResId = albumNameResId
             override suspend fun filter(photo: Photo): Boolean = filter(photo)
         }
     }

@@ -11,6 +11,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
@@ -75,7 +76,7 @@ class AlbumsTabScreenComposeTest {
                 .assertIsDisplayed()
 
             composeTestRule
-                .onNodeWithText(album.title)
+                .onNodeWithText(album.title.get(context))
                 .assertIsDisplayed()
         }
     }
@@ -124,7 +125,7 @@ class AlbumsTabScreenComposeTest {
         )
         return AlbumUiState(
             mediaAlbum = mediaAlbum,
-            title = title,
+            title = LocalizedText.Literal(title),
             isExported = false,
             cover = null
         )
