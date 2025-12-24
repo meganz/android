@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToAlbumActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToPlaylistActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
@@ -88,7 +89,8 @@ object NodeActionHandlerModule {
         removeFavouriteAction: RemoveFavouriteActionClickHandler,
         syncAction: SyncActionClickHandler,
         addToActionClickHandler: AddToActionClickHandler,
-        addToAlbumActionClickHandler: AddToAlbumActionClickHandler
+        addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
+        addToPlaylistAction: AddToPlaylistActionClickHandler,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -122,7 +124,8 @@ object NodeActionHandlerModule {
             removeFavouriteAction,
             syncAction,
             addToActionClickHandler,
-            addToAlbumActionClickHandler
+            addToAlbumActionClickHandler,
+            addToPlaylistAction
         )
     }
 
@@ -157,7 +160,7 @@ object NodeActionHandlerModule {
         shareAction: ShareActionClickHandler,
         unhideAction: UnhideActionClickHandler,
         addToActionClickHandler: AddToActionClickHandler,
-        addToAlbumActionClickHandler: AddToAlbumActionClickHandler
+        addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,

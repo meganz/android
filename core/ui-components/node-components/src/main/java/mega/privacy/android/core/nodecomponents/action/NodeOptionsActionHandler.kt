@@ -112,6 +112,12 @@ internal fun rememberSingleNodeActionHandler(
             }
         }
 
+    val videoToPlaylistLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.videoToPlaylistActivityContract
+    ) {
+        // TODO: Will be implemented in another ticket
+    }
+
     return remember(
         nodeOptionsActionViewModel,
         versionsLauncher,
@@ -122,6 +128,7 @@ internal fun rememberSingleNodeActionHandler(
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
         addToAlbumLauncher,
+        videoToPlaylistLauncher,
         coroutineScope,
         navigationHandler,
         megaNavigator
@@ -143,7 +150,8 @@ internal fun rememberSingleNodeActionHandler(
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
                 hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
-                addToAlbumLauncher = addToAlbumLauncher
+                addToAlbumLauncher = addToAlbumLauncher,
+                videoToPlaylistLauncher = videoToPlaylistLauncher
             )
 
             nodeOptionsActionViewModel.handleSingleNodeAction(action) { handler ->

@@ -11,6 +11,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToAlbumActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.AddToPlaylistActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.AvailableOfflineActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.CopyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.DeletePermanentActionClickHandler
@@ -45,6 +48,9 @@ import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDel
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToPlaylistMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DeletePermanentlyMenuAction
@@ -111,6 +117,7 @@ import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -165,6 +172,7 @@ class NodeActionClickHandlerTest {
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
     private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase>()
     private val mockAddToAlbumLauncher = mock<ActivityResultLauncher<Pair<Array<Long>, Int>>>()
+    private val mockVideoToPlaylistLauncher = mock<ActivityResultLauncher<Long>>()
 
     private val mockSingleNodeActionProvider = SingleNodeActionProvider(
         viewModel = mockViewModel,
@@ -180,7 +188,8 @@ class NodeActionClickHandlerTest {
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
         versionsLauncher = mockVersionsLauncher,
-        addToAlbumLauncher = mockAddToAlbumLauncher
+        addToAlbumLauncher = mockAddToAlbumLauncher,
+        videoToPlaylistLauncher = mockVideoToPlaylistLauncher
     )
 
     private val mockMultipleNodesActionProvider = MultipleNodesActionProvider(
@@ -1451,5 +1460,68 @@ class NodeActionClickHandlerTest {
                 isFromManagerActivity = true
             )
         )
+    }
+
+    @Test
+    fun `test AddToMenuAction single node calls launch function invoked`() {
+        val action = AddToActionClickHandler()
+        val menuAction = mock<AddToMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 1
+            }
+        )
+    }
+
+    @Test
+    fun `test AddToMenuAction multiple node calls launch function invoked`() {
+        val action = AddToActionClickHandler()
+        val menuAction = mock<AddToMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 1
+            }
+        )
+        verify(mockMultipleNodesActionProvider.viewModel).dismiss()
+    }
+
+    @Test
+    fun `test AddToAlbumMenuAction single node calls launch function invoked`() {
+        val action = AddToAlbumActionClickHandler()
+        val menuAction = mock<AddToAlbumMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 0
+            }
+        )
+    }
+
+    @Test
+    fun `test AddToAlbumMenuAction multiple node calls launch function invoked`() {
+        val action = AddToAlbumActionClickHandler()
+        val menuAction = mock<AddToAlbumMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+        verify(mockSingleNodeActionProvider.addToAlbumLauncher).launch(
+            argThat { pair: Pair<Array<Long>, Int> ->
+                pair.first.contentEquals(arrayOf(123L)) && pair.second == 0
+            }
+        )
+        verify(mockMultipleNodesActionProvider.viewModel).dismiss()
+    }
+
+    @Test
+    fun `test AddToPlaylistMenuAction single node calls launch function invoked`() {
+        val action = AddToPlaylistActionClickHandler()
+        val menuAction = mock<AddToPlaylistMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+        verify(mockSingleNodeActionProvider.videoToPlaylistLauncher).launch(123L)
     }
 }

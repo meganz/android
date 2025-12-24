@@ -24,6 +24,7 @@ data class SingleNodeActionProvider(
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    override val videoToPlaylistLauncher: ActivityResultLauncher<Long>,
     val versionsLauncher: ActivityResultLauncher<Long>,
 ) : NodeActionProvider(
     viewModel = viewModel,
@@ -38,7 +39,8 @@ data class SingleNodeActionProvider(
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
-    addToAlbumLauncher = addToAlbumLauncher
+    addToAlbumLauncher = addToAlbumLauncher,
+    videoToPlaylistLauncher = videoToPlaylistLauncher,
 )
 
 /**
@@ -57,7 +59,8 @@ data class MultipleNodesActionProvider(
     override val restoreLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     override val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     override val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
-    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>
+    override val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    override val videoToPlaylistLauncher: ActivityResultLauncher<Long>? = null,
 ) : NodeActionProvider(
     viewModel = viewModel,
     context = context,
@@ -71,7 +74,8 @@ data class MultipleNodesActionProvider(
     restoreLauncher = restoreLauncher,
     sendToChatLauncher = sendToChatLauncher,
     hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
-    addToAlbumLauncher = addToAlbumLauncher
+    addToAlbumLauncher = addToAlbumLauncher,
+    videoToPlaylistLauncher = null,
 )
 
 open class NodeActionProvider(
@@ -88,4 +92,5 @@ open class NodeActionProvider(
     open val sendToChatLauncher: ActivityResultLauncher<LongArray>,
     open val hiddenNodesOnboardingLauncher: ActivityResultLauncher<Boolean>,
     open val addToAlbumLauncher: ActivityResultLauncher<Pair<Array<Long>, Int>>,
+    open val videoToPlaylistLauncher: ActivityResultLauncher<Long>?,
 )

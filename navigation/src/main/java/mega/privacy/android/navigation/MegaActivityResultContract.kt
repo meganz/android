@@ -2,6 +2,7 @@ package mega.privacy.android.navigation
 
 import android.net.Uri
 import androidx.activity.result.contract.ActivityResultContract
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.chat.SendToChatResult
 import mega.privacy.android.navigation.camera.CameraArg
@@ -86,4 +87,9 @@ interface MegaActivityResultContract {
      * Contract for add to in file operations.
      */
     val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
+
+    /**
+     * Contract for adding a video to a playlist.
+     */
+    val videoToPlaylistActivityContract: ActivityResultContract<Long, AddVideoToPlaylistResult?>
 }

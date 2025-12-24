@@ -208,7 +208,7 @@ internal fun VideosTabScreen(
                                     navigationHandler.navigate(
                                         NodeOptionsBottomSheetNavKey(
                                             nodeHandle = videoItem.id.longValue,
-                                            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                            nodeSourceType = NodeSourceType.VIDEOS
                                         )
                                     )
                                 },

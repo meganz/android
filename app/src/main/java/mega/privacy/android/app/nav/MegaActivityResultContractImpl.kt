@@ -10,6 +10,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityCo
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
 import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
+import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.nav.contract.OpenMultipleDocumentsPersistable
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -52,4 +53,7 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
 
     override val addToAlbumResultContract: ActivityResultContract<Pair<Array<Long>, Int>, String?>
         get() = AddToAlbumActivityContract()
+
+    override val videoToPlaylistActivityContract: VideoToPlaylistActivityContract =
+        VideoToPlaylistActivityContract()
 }

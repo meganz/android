@@ -5,11 +5,10 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -28,9 +27,16 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property outgoingShares Outgoing shares
  * @property contactsData Contacts data
  * @property downloadEvent Download event
- * @property selectAll Select All event
- * @property clearAll clear All Event
  * @property infoToShowEvent Info to show event
+ * @property renameNodeRequestEvent Rename node request event
+ * @property shareFolderDialogEvent Share folder dialog event
+ * @property shareFolderEvent Share folder event
+ * @property visibleActions Visible actions
+ * @property availableActions Available actions
+ * @property navigationEvent Navigation event
+ * @property restoreSuccessEvent Restore success event
+ * @property dismissEvent Dismiss event
+ * @property addVideoToPlaylistResultEvent Add video to playlist result event
  */
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
@@ -52,5 +58,6 @@ data class NodeActionState(
     val navigationEvent: StateEventWithContent<NavKey> = consumed(),
     val restoreSuccessEvent: StateEventWithContent<RestoreSuccess.RestoreData> = consumed(),
     val dismissEvent: StateEvent = consumed,
+    val addVideoToPlaylistResultEvent: StateEventWithContent<AddVideoToPlaylistResult> = consumed(),
     val actionTriggeredEvent: StateEvent = consumed,
 )
