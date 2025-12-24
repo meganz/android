@@ -286,6 +286,12 @@ class PendingBackStackNavigationHandler(
 
     fun peekBackStack(): List<NavKey> = backstack.toList()
 
+    fun dropLast(count: Int) {
+        repeat(count) {
+            backstack.removeLastOrNull()
+        }
+    }
+
     private fun logBackStack(callingFunction: String) {
         val line = "\n*******************\n"
         Timber.d(

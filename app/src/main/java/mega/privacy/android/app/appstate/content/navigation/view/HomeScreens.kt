@@ -4,12 +4,9 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,13 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -34,19 +25,17 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewModel
 import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
-import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 
@@ -55,7 +44,7 @@ import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 fun HomeScreens(
     transferHandler: TransferHandler,
     outerNavigationHandler: NavigationHandler,
-    initialDestination: Pair<MainNavItemNavKey, List<NavKey>?>?,
+    key: HomeScreensNavKey,
     modifier: Modifier = Modifier,
 ) {
     val viewModel = hiltViewModel<MainNavigationStateViewModel>()
@@ -83,25 +72,15 @@ fun HomeScreens(
 
     when (val currentState = state) {
         MainNavState.Loading -> {
-            Box(modifier = modifier.fillMaxSize()) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_splash_logo),
-                    contentDescription = stringResource(id = R.string.login_to_mega),
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(288.dp)
-                        .testTag(MEGA_LOGO_TEST_TAG),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
+            // add shimmer effect later
         }
 
         is MainNavState.Data -> {
             val homeScreenStacks = rememberTopLevelBackStack(currentState.initialDestination)
-            LaunchedEffect(initialDestination) {
-                initialDestination?.let {
-                    homeScreenStacks.switchTopLevel(it.first)
-                    it.second?.let { destinations -> homeScreenStacks.addAll(destinations) }
+            LaunchedEffect(key) {
+                key.root?.let {
+                    homeScreenStacks.switchTopLevel(it)
+                    key.destinations?.let { destinations -> homeScreenStacks.addAll(destinations) }
                 }
             }
 
@@ -123,7 +102,7 @@ fun HomeScreens(
                         homeScreenStacks.switchTopLevel(destination)
                     },
                     isSelected = { destination ->
-                        homeScreenStacks.topLevelKey == destination
+                        homeScreenStacks.topLevelKey::class == destination::class
                     },
                     navContent = { navigationUiController ->
                         Column(Modifier.fillMaxSize()) {

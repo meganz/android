@@ -22,10 +22,17 @@ data class RecentsBucketScreenNavKey(
     val fileCount: Int,
 ) : NavKey
 
+/**
+ * A NavKey to represent the home screens navigation state, including the root main nav item and
+ * the stack of destinations within that main nav item.
+ *
+ * @param timestamp force recomposition when the same root and destinations are provided again
+ */
 @Serializable
 data class HomeScreensNavKey(
     private val serialisedRoot: String?,
     private val serialisedDestinations: String?,
+    private val timestamp: Long = 0,
 ) : NavKey {
 
     constructor() : this(
@@ -33,9 +40,10 @@ data class HomeScreensNavKey(
         serialisedDestinations = null,
     )
 
-    constructor(root: MainNavItemNavKey, destinations: List<NavKey>?) : this(
+    constructor(root: MainNavItemNavKey, destinations: List<NavKey>?, timestamp: Long = 0) : this(
         serialisedRoot = serialiseMainNavItemNavKey(root),
         serialisedDestinations = destinations?.let { serialiseNavKeyList(it) },
+        timestamp = timestamp
     )
 
     constructor(root: MainNavItemNavKey) : this(

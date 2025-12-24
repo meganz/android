@@ -162,7 +162,11 @@ class TrackInfoViewModelTest {
         advanceUntilIdle()
 
         underTest.state.map { it.nodeDestination }.test {
-            assertThat(awaitItem()).isEqualTo(expected)
+            val item = awaitItem()
+            assertThat(item).isNotEmpty()
+            val navKey = item?.first()
+            assertThat(navKey).isInstanceOf(HomeScreensNavKey::class.java)
+            assertThat((navKey as HomeScreensNavKey).root).isInstanceOf(DriveSyncNavKey::class.java)
         }
     }
 

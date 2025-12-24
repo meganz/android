@@ -23,7 +23,7 @@ fun EntryProviderScope<NavKey>.homeScreens(
         HomeScreens(
             transferHandler = transferHandler,
             outerNavigationHandler = navigationHandler,
-            initialDestination = key.root?.let { it to key.destinations },
+            key = key,
         )
     }
 }

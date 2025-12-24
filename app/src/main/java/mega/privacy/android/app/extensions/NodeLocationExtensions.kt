@@ -27,8 +27,9 @@ fun NodeLocation.getDestination() = buildList {
         //cloud drive under HomeScreensNavKey to show bottom navigation
         add(
             HomeScreensNavKey(
-                DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue),
-                childDestinations.takeIf { it.isNotEmpty() }
+                root = DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue),
+                destinations = childDestinations.takeIf { it.isNotEmpty() },
+                timestamp = System.currentTimeMillis()
             )
         )
     } else {
