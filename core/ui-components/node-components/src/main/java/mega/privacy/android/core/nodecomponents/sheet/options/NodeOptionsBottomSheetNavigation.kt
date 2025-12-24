@@ -55,7 +55,7 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
 
         NodeOptionsBottomSheetRoute(
             navigationHandler = navigationHandler,
-            onDismiss = navigationHandler::back,
+            onDismiss = { navigationHandler.remove(it)},
             nodeId = it.nodeHandle,
             nodeSourceType = it.nodeSourceType,
             onTransfer = { event ->
