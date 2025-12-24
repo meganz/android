@@ -30,22 +30,15 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
-import mega.privacy.android.app.utils.Constants.ACTION_OPEN_FOLDER
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FRAGMENT_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_LOCATION_FILE_INFO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_FROM
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_ADAPTER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_HANDLE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH_NAVIGATION
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
@@ -1068,43 +1061,6 @@ object MegaNodeUtil {
                 fragmentHandle = fragmentHandle
             )
         }
-    }
-
-    /**
-     * Handle click event of the location text.
-     *
-     * @param activity current activity
-     * @param adapterType node source adapter type
-     * @param location location info
-     */
-    @JvmStatic
-    @Deprecated(
-        message = "Use GetNodeLocationUseCase or GetNodeLocationByIdUseCase " +
-                "and NodeLocation.getDestination extension fun instead"
-    )
-    fun handleLocationClick(activity: Activity, adapterType: Int, location: LocationInfo) {
-        val intent = Intent(activity, ManagerActivity::class.java)
-
-        intent.action = ACTION_OPEN_FOLDER
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        intent.putExtra(INTENT_EXTRA_KEY_LOCATION_FILE_INFO, true)
-
-        if (adapterType == OFFLINE_ADAPTER) {
-            intent.putExtra(INTENT_EXTRA_KEY_OFFLINE_ADAPTER, true)
-
-            if (location.offlineParentPath != null) {
-                intent.putExtra(INTENT_EXTRA_KEY_PATH_NAVIGATION, location.offlineParentPath)
-            }
-        } else {
-            intent.putExtra(INTENT_EXTRA_KEY_FRAGMENT_HANDLE, location.fragmentHandle)
-
-            if (location.parentHandle != INVALID_HANDLE) {
-                intent.putExtra(INTENT_EXTRA_KEY_PARENT_HANDLE, location.parentHandle)
-            }
-        }
-
-        activity.startActivity(intent)
-        activity.finish()
     }
 
     private fun getTranslatedNameForParentNode(

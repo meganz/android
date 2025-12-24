@@ -915,6 +915,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         data: Uri?,
         action: String?,
         bundle: Bundle?,
+        flags: Int?,
     ) {
         applicationScope.launch {
             runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
@@ -922,11 +923,11 @@ internal class MegaNavigatorImpl @Inject constructor(
                     if (it) {
                         throw IllegalStateException("Navigating to ManagerActivity is not allowed when the SingleActivity flag is enabled")
                     } else {
-                        navigateToManagerActivity(context, action, data, bundle)
+                        navigateToManagerActivity(context, action, data, bundle, flags)
                     }
                 }
                 .onFailure {
-                    navigateToManagerActivity(context, action, data, bundle)
+                    navigateToManagerActivity(context, action, data, bundle, flags)
                 }
         }
     }

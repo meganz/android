@@ -551,6 +551,7 @@ interface AppNavigator {
         data: Uri? = null,
         action: String? = null,
         bundle: Bundle? = null,
+        flags: Int? = null,
     )
 
     /**

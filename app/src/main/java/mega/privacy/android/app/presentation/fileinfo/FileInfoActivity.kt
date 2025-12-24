@@ -33,6 +33,7 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
+import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.controllers.NodeController
@@ -62,7 +63,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
@@ -408,9 +408,11 @@ class FileInfoActivity : BaseActivity() {
                 navigationQueue.emit(nodeDestination, NavPriority.Default, true)
                 megaNavigator.launchMegaActivityIfNeeded(this@FileInfoActivity)
             }
-        } ?: locationInfo?.let {
-            handleLocationClick(this, adapterType, locationInfo)
-        }
+        } ?: locationInfo?.handleLocationClick(
+            activity = this@FileInfoActivity,
+            adapterType = adapterType,
+            megaNavigator = megaNavigator
+        )
     }
 
     private fun navigateToVersions() {

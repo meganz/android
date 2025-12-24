@@ -18,13 +18,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.snackbar.LegacySnackBarWrapper
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -82,9 +82,11 @@ class TrackInfoFragment : Fragment() {
                                     navigationQueue.emit(it, NavPriority.Default, true)
                                     megaNavigator.launchMegaActivityIfNeeded(context)
                                 }
-                            } ?: uiState.location?.let {
-                                handleLocationClick(requireActivity(), args.adapterType, it)
-                            }
+                            } ?: uiState.location?.handleLocationClick(
+                                activity = requireActivity(),
+                                adapterType = args.adapterType,
+                                megaNavigator = megaNavigator
+                            )
                         },
                         onCheckedChange = {
                             if (viewModel.getStorageState() == StorageState.PayWall) {
