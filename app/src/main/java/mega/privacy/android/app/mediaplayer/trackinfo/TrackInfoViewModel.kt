@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.extensions.getDestination
+import mega.privacy.android.app.nav.NodeDestinationMapper
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
@@ -42,6 +42,7 @@ class TrackInfoViewModel @Inject constructor(
     private val getNodeLocationInfoUseCase: GetNodeLocationInfo,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
+    private val nodeDestinationMapper: NodeDestinationMapper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TrackInfoState())
     internal val state = _state.asStateFlow()
@@ -77,7 +78,7 @@ class TrackInfoViewModel @Inject constructor(
             runCatching {
                 getNodeLocationUseCase(node)
             }.onSuccess { nodeLocation ->
-                val nodeDestination = nodeLocation.getDestination()
+                val nodeDestination = nodeDestinationMapper(nodeLocation)
                 _state.update { state -> state.copy(nodeDestination = nodeDestination) }
             }.onFailure {
                 Timber.e("Failed to get node location: $it")

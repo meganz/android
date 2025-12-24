@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoViewModel
+import mega.privacy.android.app.nav.NodeDestinationMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -60,6 +61,7 @@ class TrackInfoViewModelTest {
     private val getNodeLocationInfoUseCase = mock<GetNodeLocationInfo>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -77,6 +79,7 @@ class TrackInfoViewModelTest {
             getNodeLocationInfoUseCase = getNodeLocationInfoUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
         )
     }
 
@@ -93,6 +96,7 @@ class TrackInfoViewModelTest {
             getNodeLocationInfoUseCase,
             getFeatureFlagValueUseCase,
             getNodeLocationUseCase,
+            nodeDestinationMapper,
         )
 
         wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) } doReturn false
@@ -156,6 +160,7 @@ class TrackInfoViewModelTest {
         whenever(getAudioNodeByHandleUseCase(handle, false)) doReturn node
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) doReturn true
         whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
+        whenever(nodeDestinationMapper(nodeLocation)) doReturn expected
 
         initUnderTest()
         underTest.getNodeDestination(node)

@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.nav.NodeDestinationMapper
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -164,6 +165,7 @@ internal class FileInfoViewModelTest {
     private val previewFile: File = mock()
     private val getImageNodeByIdUseCase = mock<GetImageNodeByIdUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -217,7 +219,8 @@ internal class FileInfoViewModelTest {
             isBusinessAccountActiveUseCase,
             monitorAccountDetailsUseCase,
             getNodeLocationByIdUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            nodeDestinationMapper,
         )
     }
 
@@ -266,8 +269,8 @@ internal class FileInfoViewModelTest {
             isBusinessAccountActiveUseCase = isBusinessAccountActiveUseCase,
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             iODispatcher = UnconfinedTestDispatcher(),
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
-
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
         )
     }
 

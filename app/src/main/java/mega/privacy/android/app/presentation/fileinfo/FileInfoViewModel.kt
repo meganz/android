@@ -21,7 +21,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.extensions.getDestination
+import mega.privacy.android.app.nav.NodeDestinationMapper
 import mega.privacy.android.app.presentation.account.model.AccountDeactivatedStatus
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoExtraAction
@@ -155,6 +155,7 @@ class FileInfoViewModel @Inject constructor(
     private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
+    private val nodeDestinationMapper: NodeDestinationMapper,
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -932,7 +933,7 @@ class FileInfoViewModel @Inject constructor(
                 runCatching {
                     getNodeLocationByIdUseCase(typedNode.id)
                 }.onSuccess { nodeLocation ->
-                    val nodeDestination = nodeLocation?.getDestination()
+                    val nodeDestination = nodeLocation?.let { nodeDestinationMapper(nodeLocation) }
                     _uiState.update { state -> state.copy(nodeDestination = nodeDestination) }
                 }.onFailure {
                     Timber.e("Failed to get node location: $it")
