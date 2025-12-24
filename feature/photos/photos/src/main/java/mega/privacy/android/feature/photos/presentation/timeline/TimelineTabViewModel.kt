@@ -1,5 +1,8 @@
 package mega.privacy.android.feature.photos.presentation.timeline
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,6 +43,7 @@ import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature_flags.AppFeatures
@@ -64,6 +68,15 @@ class TimelineTabViewModel @Inject constructor(
     private var isHiddenNodesEnabled: Boolean = false
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
+
+    /**
+     * We need to hoist the state here in the ViewModel class because we want to preserve
+     * the selection even after a navigation occurs.
+     *
+     * We don't need to put this in [TimelineTabUiState] because there is no need to
+     * rebuild the uiState when this property changes.
+     */
+    internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
     private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
     private var allPhotosInTypedNode: Map<Long, TypedNode> = emptyMap()
     private val photoNodeUiStateCache = mutableMapOf<Long, PhotoNodeUiState>()
@@ -439,5 +452,9 @@ class TimelineTabViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    internal fun onPhotoTimePeriodSelected(value: PhotoModificationTimePeriod) {
+        selectedTimePeriod = value
     }
 }

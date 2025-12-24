@@ -196,6 +196,7 @@ fun MediaMainRoute(
         timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
+        selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         selectedPhotosInTypedNode = timelineViewModel.selectedPhotosInTypedNode,
         actionHandler = nodeActionHandler::invoke,
         navigateToAlbumContent = navigateToAlbumContent,
@@ -242,7 +243,8 @@ fun MediaMainRoute(
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
         updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown,
-        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount
+        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+        onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected
     )
 }
 
@@ -253,6 +255,7 @@ fun MediaMainScreen(
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     selectedPhotosInTypedNode: List<TypedNode>,
+    selectedTimePeriod: PhotoModificationTimePeriod,
     nodeActionHandle: NodeActionHandler,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
@@ -280,6 +283,7 @@ fun MediaMainScreen(
     setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
+    onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     viewModel: MediaMainViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -297,7 +301,6 @@ fun MediaMainScreen(
         derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
     }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
-    var selectedTimePeriod by rememberSaveable { mutableStateOf(PhotoModificationTimePeriod.All) }
     val shouldShowTimelineActions by remember(
         selectedTimePeriod,
         mediaCameraUploadUiState.enableCameraUploadPageShowing
@@ -659,7 +662,7 @@ fun MediaMainScreen(
                                     updateIsWarningBannerShown = updateIsWarningBannerShown,
                                     onTabsVisibilityChange = { shouldHideTabs = it },
                                     onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                    onPhotoTimePeriodSelected = { selectedTimePeriod = it }
+                                    onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
                                 )
                             }
                         )
@@ -843,6 +846,7 @@ fun PhotosMainScreenPreview() {
             timelineTabActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
+            selectedTimePeriod = PhotoModificationTimePeriod.All,
             selectedPhotosInTypedNode = emptyList(),
             actionHandler = { _, _ -> },
             navigateToAlbumContent = {},
@@ -887,6 +891,7 @@ fun PhotosMainScreenPreview() {
             setCameraUploadsMessage = {},
             updateIsWarningBannerShown = {},
             onNavigateToUpgradeAccount = {},
+            onPhotoTimePeriodSelected = {}
         )
     }
 }

@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.photos.navigation
 
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +18,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -78,7 +81,11 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             }
         }
 
+
+        val activity = LocalActivity.current as ComponentActivity
+        val timelineViewModel: TimelineTabViewModel = hiltViewModel(activity)
         MediaMainRoute(
+            timelineViewModel = timelineViewModel,
             navigationHandler = navigationHandler,
             navigateToAlbumContent = navigationHandler::navigate,
             navigateToLegacyPhotoSelection = navigationHandler::navigate,

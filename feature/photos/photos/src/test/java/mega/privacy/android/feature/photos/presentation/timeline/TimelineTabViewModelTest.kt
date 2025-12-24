@@ -39,6 +39,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature_flags.AppFeatures
@@ -1873,5 +1874,23 @@ class TimelineTabViewModelTest {
                     TimelineSelectionMenuAction.AddToAlbum
                 )
             }
+        }
+
+    @Test
+    fun `test that time period All is selected by default`() = runTest {
+        val actual = underTest.selectedTimePeriod
+
+        assertThat(actual).isEqualTo(PhotoModificationTimePeriod.All)
+    }
+
+    @ParameterizedTest
+    @EnumSource(PhotoModificationTimePeriod::class)
+    fun `test that the selected time period is successfully updated`(timePeriod: PhotoModificationTimePeriod) =
+        runTest {
+            underTest.onPhotoTimePeriodSelected(value = timePeriod)
+
+            val actual = underTest.selectedTimePeriod
+
+            assertThat(actual).isEqualTo(timePeriod)
         }
 }
