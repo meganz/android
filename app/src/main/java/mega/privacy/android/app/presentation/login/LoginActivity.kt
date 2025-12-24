@@ -34,6 +34,8 @@ import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -110,6 +112,13 @@ class LoginActivity : BaseActivity() {
             startActivity(Intent(this, ManagerActivity::class.java))
             finish()
             return
+        }
+
+        collectFlow(viewModel.state) { uiState ->
+            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled) {
+                startActivity(Intent(this@LoginActivity, MegaActivity::class.java))
+                finish()
+            }
         }
 
         enableEdgeToEdge()

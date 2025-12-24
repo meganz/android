@@ -1,6 +1,5 @@
 package mega.privacy.android.app.getLink
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
@@ -16,6 +15,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.HANDLE_LIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
@@ -63,7 +63,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
         setContentView(binding.root)
         consumeInsetsWithToolbar(customToolbar = binding.toolbarGetLink)
 
-        if (intent == null || shouldRefreshSessionDueToSDK()) {
+        if (intent == null || shouldRefreshSessionDueToSDK(true)) {
             return
         }
 

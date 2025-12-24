@@ -368,6 +368,14 @@ class LoginViewModel @Inject constructor(
                             state.copy(shouldShowNotificationPermission = shouldShowNotificationPermission)
                         }
                     },
+                flow {
+                    emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity))
+                }.catch { Timber.e(it) }
+                    .map { isSingleActivityEnabled ->
+                        { state: LoginState ->
+                            state.copy(isSingleActivityEnabled = isSingleActivityEnabled)
+                        }
+                    }
             ).collect {
                 _state.update(it)
             }
@@ -893,7 +901,8 @@ class LoginViewModel @Inject constructor(
             val isSingleActivityEnabled = runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
             }.getOrDefault(false)
-            if (!isSingleActivityEnabled) {
+            // allow fast login to fetch nodes even if single activity is enabled
+            if (isFastLogin || !isSingleActivityEnabled) {
                 fetchNodes()
             }
             sendAnalyticsEventIfFirstTimeLogin(email)

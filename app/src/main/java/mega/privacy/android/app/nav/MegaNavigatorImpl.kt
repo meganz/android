@@ -309,8 +309,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openInviteContactActivity(context: Context, isFromAchievement: Boolean) {
-        navigateForSingleActivity(
-            context = context,
+        navigateIfInSingleActivity(
             singleActivityDestination = InviteContactNavKey(isFromAchievement = isFromAchievement)
         ) {
             val intent = Intent(context, InviteContactActivity::class.java).apply {

@@ -125,7 +125,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface,
         super.onCreate(savedInstanceState)
         binding = ActivityVersionsFileBinding.inflate(layoutInflater)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
         megaApi.addGlobalListener(this)

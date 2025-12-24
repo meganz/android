@@ -169,7 +169,7 @@ internal class NodeAttachmentHistoryActivity : PasscodeActivity(), MegaChatReque
         super.onCreate(savedInstanceState)
 
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 

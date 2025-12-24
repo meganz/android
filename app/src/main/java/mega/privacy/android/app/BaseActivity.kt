@@ -985,6 +985,8 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
     /**
      * Refresh session.
+     * We still keep navigating to LoginActivity for single activity architecture, to keep the backstack
+     * because MegaActivity is launched always as singleTask.
      */
     protected fun refreshSession(keepCurrentActivity: Boolean = false) {
         navigateToLogin(keepCurrentActivity = keepCurrentActivity)

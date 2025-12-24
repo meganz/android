@@ -974,7 +974,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         enableEdgeToEdgeAndConsumeInsets()
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 
