@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuitem.AddToAlbumBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.AddToBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.AddToPlaylistBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.AvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.CopyBottomSheetMenuItem
@@ -101,7 +103,9 @@ abstract class NodeActionsBottomSheetModule {
             verifyMenuAction: VerifyBottomSheetMenuItem,
             versionsMenuAction: VersionsBottomSheetMenuItem,
             viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
-            syncBottomSheetMenuItem: SyncBottomSheetMenuItem
+            syncBottomSheetMenuItem: SyncBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
+            addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
@@ -136,7 +140,9 @@ abstract class NodeActionsBottomSheetModule {
                 verifyMenuAction,
                 versionsMenuAction,
                 viewInFolderMenuAction,
-                syncBottomSheetMenuItem
+                syncBottomSheetMenuItem,
+                addToBottomSheetMenuItem,
+                addToAlbumBottomSheetMenuItem
             )
         }
 
@@ -178,6 +184,8 @@ abstract class NodeActionsBottomSheetModule {
             verifyMenuAction: VerifyBottomSheetMenuItem,
             versionsMenuAction: VersionsBottomSheetMenuItem,
             viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
+            addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
@@ -209,6 +217,8 @@ abstract class NodeActionsBottomSheetModule {
                 verifyMenuAction,
                 versionsMenuAction,
                 viewInFolderMenuAction,
+                addToAlbumBottomSheetMenuItem,
+                addToBottomSheetMenuItem,
             )
         }
 
@@ -322,6 +332,8 @@ abstract class NodeActionsBottomSheetModule {
             verifyMenuAction: VerifyBottomSheetMenuItem,
             versionsMenuAction: VersionsBottomSheetMenuItem,
             viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
+            addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
                 availableOfflineMenuAction,
@@ -353,6 +365,8 @@ abstract class NodeActionsBottomSheetModule {
                 verifyMenuAction,
                 versionsMenuAction,
                 viewInFolderMenuAction,
+                addToAlbumBottomSheetMenuItem,
+                addToBottomSheetMenuItem,
             )
         }
 
