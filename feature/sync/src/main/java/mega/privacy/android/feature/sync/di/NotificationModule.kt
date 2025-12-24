@@ -32,5 +32,16 @@ internal interface NotificationModule {
                 .setShowBadge(false)
                 .setSound(null, null)
                 .build()
+
+        @Provides
+        @IntoSet
+        fun provideSyncProgressNotificationChannel(): NotificationChannelCompat =
+            NotificationChannelCompat.Builder(
+                SyncNotificationManager.SYNC_PROGRESS_CHANNEL_ID,
+                NotificationManager.IMPORTANCE_LOW
+            ).setName(SyncNotificationManager.SYNC_PROGRESS_CHANNEL_NAME)
+                .setShowBadge(false)
+                .setSound(null, null)
+                .build()
     }
 }

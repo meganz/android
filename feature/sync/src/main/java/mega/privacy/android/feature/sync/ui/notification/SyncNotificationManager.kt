@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sync.ui.notification
 
 import android.Manifest
+import android.app.Notification
 import android.content.Context
 import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationManagerCompat
@@ -53,6 +54,13 @@ class SyncNotificationManager @Inject constructor(
         return false
     }
 
+    /**
+     * Creates a notification for the foreground service
+     */
+    fun createForegroundNotification(context: Context): Notification {
+        return syncNotificationMapper.createForegroundNotification(context)
+    }
+
     companion object {
         /**
          * Notification channel ID
@@ -63,5 +71,15 @@ class SyncNotificationManager @Inject constructor(
          * Notification channel name as displayed in Settings -> Apps -> App info -> App notifications
          */
         const val CHANNEL_NAME = "Sync errors / stalled issues"
+
+        /**
+         * Notification channel ID for sync progress
+         */
+        const val SYNC_PROGRESS_CHANNEL_ID = "sync_progress_notification"
+
+        /**
+         * Notification channel name for sync progress
+         */
+        const val SYNC_PROGRESS_CHANNEL_NAME = "Sync Progress"
     }
 }
