@@ -15,7 +15,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
@@ -54,7 +54,7 @@ fun CloudDriveScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     val megaNavigator = rememberMegaNavigator()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator,
@@ -117,9 +117,10 @@ fun CloudDriveScreen(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
-                nodeActionHandler = nodeActionHandler,
+                multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = uiState.selectedNodes,
-                isSelecting = uiState.isSelecting
+                isSelecting = uiState.isSelecting,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
         floatingActionButton = {

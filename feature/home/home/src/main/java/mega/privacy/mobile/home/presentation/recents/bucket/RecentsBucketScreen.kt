@@ -28,7 +28,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.nodecomponents.R as NodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
@@ -56,9 +56,9 @@ fun RecentsBucketScreen(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
     onNavigate: (NavKey) -> Unit,
     transferHandler: TransferHandler,
-    nodeActionHandler: NodeActionHandler,
     onBack: () -> Unit,
     nodeSourceType: NodeSourceType,
+    selectionModeActionHandler: MultiNodeActionHandler,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
@@ -95,7 +95,7 @@ fun RecentsBucketScreen(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
-                nodeActionHandler = nodeActionHandler,
+                multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = uiState.selectedNodes,
                 isSelecting = false
             )

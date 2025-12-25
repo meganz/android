@@ -32,9 +32,9 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
@@ -66,7 +66,7 @@ internal fun NodeOptionsBottomSheetRoute(
     onRestoreSuccess: (RestoreSuccess.RestoreData) -> Unit = {},
     onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
-    actionHandler: NodeActionHandler = rememberNodeActionHandler(
+    actionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel
     ),
@@ -204,7 +204,7 @@ internal fun NodeOptionsBottomSheetRoute(
 internal fun NodeOptionsBottomSheetContent(
     uiState: NodeBottomSheetState,
     navigationHandler: NavigationHandler,
-    actionHandler: NodeActionHandler,
+    actionHandler: SingleNodeActionHandler,
     nodeSourceType: NodeSourceType,
     onDismiss: () -> Unit,
     showSnackbar: suspend (SnackbarAttributes) -> Unit,

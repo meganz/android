@@ -57,7 +57,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
@@ -110,7 +110,7 @@ fun AlbumContentScreen(
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val actionState by actionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = actionViewModel,
         navigationHandler = navigationHandler
     )
@@ -118,7 +118,7 @@ fun AlbumContentScreen(
     AlbumContentScreen(
         uiState = uiState,
         actionState = actionState,
-        actionHandler = nodeActionHandler::invoke,
+        actionHandler = selectionModeActionHandler::invoke,
         onBack = navigationHandler::back,
         togglePhotoSelection = viewModel::togglePhotoSelection,
         selectAll = viewModel::selectAllPhotos,

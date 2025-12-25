@@ -30,31 +30,29 @@ import org.mockito.kotlin.whenever
 class NodeActionHandlerTest {
 
     @Test
-    fun `test NodeActionHandler single node invoke calls singleNodeHandler`() {
-        val mockSingleNodeHandler = mock<(MenuAction, TypedNode) -> Unit>()
-        val mockMultipleNodesHandler = mock<(MenuAction, List<TypedNode>) -> Unit>()
+    fun `test BottomSheetActionHandler invoke calls handler`() {
+        val mockHandler = mock<(MenuAction, TypedNode) -> Unit>()
         val mockAction = mock<VersionsMenuAction>()
         val mockNode = mock<TypedNode>()
 
-        val nodeActionHandler = NodeActionHandler(mockSingleNodeHandler, mockMultipleNodesHandler)
+        val singleNodeActionHandler = SingleNodeActionHandler(mockHandler)
 
-        nodeActionHandler(mockAction, mockNode)
+        singleNodeActionHandler(mockAction, mockNode)
 
-        verify(mockSingleNodeHandler).invoke(mockAction, mockNode)
+        verify(mockHandler).invoke(mockAction, mockNode)
     }
 
     @Test
-    fun `test NodeActionHandler multiple nodes invoke calls multipleNodesHandler`() {
-        val mockSingleNodeHandler = mock<(MenuAction, TypedNode) -> Unit>()
-        val mockMultipleNodesHandler = mock<(MenuAction, List<TypedNode>) -> Unit>()
+    fun `test SelectionModeActionHandler invoke calls handler`() {
+        val mockHandler = mock<(MenuAction, List<TypedNode>) -> Unit>()
         val mockAction = mock<MoveMenuAction>()
         val mockNodes = listOf(mock<TypedNode>(), mock<TypedNode>())
 
-        val nodeActionHandler = NodeActionHandler(mockSingleNodeHandler, mockMultipleNodesHandler)
+        val multiNodeActionHandler = MultiNodeActionHandler(mockHandler)
 
-        nodeActionHandler(mockAction, mockNodes)
+        multiNodeActionHandler(mockAction, mockNodes)
 
-        verify(mockMultipleNodesHandler).invoke(mockAction, mockNodes)
+        verify(mockHandler).invoke(mockAction, mockNodes)
     }
 
     @Test

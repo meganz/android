@@ -31,9 +31,9 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodesView
@@ -79,7 +79,7 @@ internal fun RubbishBinScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
-    val actionHandler: NodeActionHandler = rememberNodeActionHandler(
+    val multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
     )
@@ -187,9 +187,10 @@ internal fun RubbishBinScreen(
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
-                nodeActionHandler = actionHandler,
+                multiNodeActionHandler = multiNodeActionHandler,
                 isSelecting = uiState.isSelecting,
                 selectedNodes = uiState.selectedNodes,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
     ) { innerPadding ->

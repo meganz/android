@@ -47,9 +47,9 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
@@ -137,7 +137,7 @@ fun MediaMainRoute(
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler,
         megaNavigator = megaNavigator
@@ -277,7 +277,7 @@ fun MediaMainRoute(
         timelineFilterUiState = timelineFilterUiState,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         selectedPhotosInTypedNode = timelineViewModel.selectedPhotosInTypedNode,
-        actionHandler = nodeActionHandler::invoke,
+        actionHandler = selectionModeActionHandler::invoke,
         navigateToAlbumContent = navigateToAlbumContent,
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
@@ -315,7 +315,7 @@ fun MediaMainRoute(
         },
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
-        nodeActionHandle = nodeActionHandler,
+        multiNodeActionHandler = selectionModeActionHandler,
         navigateToLegacyPhotosSearch = navigationHandler::navigate,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
@@ -334,7 +334,7 @@ fun MediaMainScreen(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     selectedPhotosInTypedNode: List<TypedNode>,
     selectedTimePeriod: PhotoModificationTimePeriod,
-    nodeActionHandle: NodeActionHandler,
+    multiNodeActionHandler: MultiNodeActionHandler,
     navigationHandler: NavigationHandler,
     timelineFilterUiState: TimelineFilterUiState,
     actionHandler: (MenuAction, List<TypedNode>) -> Unit,
@@ -662,11 +662,10 @@ fun MediaMainScreen(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && isVideosSelectionMode,
-                nodeActionHandler = nodeActionHandle,
+                multiNodeActionHandler = multiNodeActionHandler,
                 selectedNodes = selectedVideoNodes,
                 isSelecting = false,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                onNavigate = navigationHandler::navigate
             )
         }
     ) { paddingValues ->
@@ -1014,7 +1013,7 @@ fun PhotosMainScreenPreview() {
             clearCameraUploadsCompletedMessage = {},
             onNavigateToCameraUploadsSettings = {},
             onDismissEnableCameraUploadsBanner = {},
-            nodeActionHandle = rememberNodeActionHandler(),
+            multiNodeActionHandler = rememberMultiNodeActionHandler(),
             navigateToLegacyPhotosSearch = {},
             navigationHandler = object : NavigationHandler {
                 override fun back() {}

@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -15,7 +15,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
  * Bottom sheet click handler
  */
 data class BottomSheetClickHandler(
-    val actionHandler: NodeActionHandler,
+    val actionHandler: SingleNodeActionHandler,
     val navigationHandler: NavigationHandler,
     val coroutineScope: CoroutineScope,
     val context: Context,

@@ -16,7 +16,7 @@ import kotlinx.coroutines.delay
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.R
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
@@ -44,7 +44,7 @@ class NodeOptionsBottomSheetComposeTest {
     @OptIn(ExperimentalMaterial3Api::class)
     private fun setContent(
         uiState: NodeBottomSheetState = NodeBottomSheetState(),
-        actionHandler: NodeActionHandler = mock(),
+        actionHandler: SingleNodeActionHandler = mock(),
         navigationHandler: NavigationHandler = mock(),
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         onDismiss: () -> Unit = {},

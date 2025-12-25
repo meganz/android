@@ -4,7 +4,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -31,7 +31,7 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
                 )
             }
         val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
-        val nodeActionHandler = rememberNodeActionHandler(
+        val selectionModeActionHandler = rememberMultiNodeActionHandler(
             navigationHandler = navigationHandler,
             viewModel = nodeOptionsActionViewModel,
             megaNavigator = rememberMegaNavigator(),
@@ -42,9 +42,9 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             transferHandler = transferHandler,
-            nodeActionHandler = nodeActionHandler,
             onBack = navigationHandler::back,
             nodeSourceType = navKey.nodeSourceType,
+            selectionModeActionHandler = selectionModeActionHandler
         )
 
         HandleNodeOptionsActionResult(

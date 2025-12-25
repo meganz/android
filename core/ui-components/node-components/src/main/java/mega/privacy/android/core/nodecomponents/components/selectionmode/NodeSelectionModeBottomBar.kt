@@ -20,20 +20,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,14 +39,12 @@ fun NodeSelectionModeBottomBar(
     availableActions: List<MenuActionWithIcon>,
     visibleActions: List<MenuActionWithIcon>,
     visible: Boolean,
-    nodeActionHandler: NodeActionHandler,
+    multiNodeActionHandler: MultiNodeActionHandler,
     selectedNodes: List<TypedNode>,
     isSelecting: Boolean,
     modifier: Modifier = Modifier,
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel? = null, // pass the ViewModel if the component needs to handle shares events
-    onNavigate: (NavKey) -> Unit = {},
-    onTransfer: (TransferTriggerEvent) -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -85,20 +80,6 @@ fun NodeSelectionModeBottomBar(
                     shareFolderLauncher.launch(handles.toLongArray())
                 }
             )
-
-            EventEffect(
-                event = nodeActionState.contactsData,
-                onConsumed = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
-                action = { (contactData, isFromBackups, nodeHandles) ->
-                    onNavigate(
-                        ShareFolderAccessDialogNavKey(
-                            nodes = nodeHandles,
-                            contacts = contactData.joinToString(separator = ","),
-                            isFromBackups = isFromBackups,
-                        )
-                    )
-                },
-            )
         }
 
         if (shareNodeHandles.isNotEmpty()) {
@@ -128,7 +109,7 @@ fun NodeSelectionModeBottomBar(
                 return@SelectionModeBottomBar
             }
 
-            nodeActionHandler(action, selectedNodes)
+            multiNodeActionHandler(action, selectedNodes)
         }
     )
 
@@ -141,7 +122,7 @@ fun NodeSelectionModeBottomBar(
             },
             onActionPressed = { action ->
                 onActionPressed(action)
-                nodeActionHandler(action, selectedNodes)
+                multiNodeActionHandler(action, selectedNodes)
                 showMoreBottomSheet = false
             }
         )

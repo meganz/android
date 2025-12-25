@@ -53,11 +53,16 @@ fun HandleNodeOptionsActionResult(
         onCopyNodes = nodeOptionsActionViewModel::copyNodes,
         onMoveNodes = nodeOptionsActionViewModel::moveNodes,
         onTransfer = onTransfer,
+        onNavigate = onNavigate,
         consumeNameCollisionResult = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         consumeInfoToShow = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
         consumeForeignNodeDialog = nodeOptionsActionViewModel::markForeignNodeDialogShown,
         consumeQuotaDialog = nodeOptionsActionViewModel::markQuotaDialogShown,
         consumeDownloadEvent = nodeOptionsActionViewModel::markDownloadEventConsumed,
+        consumeRenameNodeRequest = nodeOptionsActionViewModel::resetRenameNodeRequest,
+        consumeNavigationEvent = nodeOptionsActionViewModel::resetNavigationEvent,
+        consumeDismissEvent = nodeOptionsActionViewModel::resetDismiss,
+        consumeAccessDialogShown = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
         onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
     )
 

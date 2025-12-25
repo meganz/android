@@ -31,7 +31,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
@@ -83,7 +83,7 @@ internal fun DriveSyncScreen(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator
@@ -142,9 +142,10 @@ internal fun DriveSyncScreen(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && cloudDriveUiState.isInSelectionMode,
-                nodeActionHandler = nodeActionHandler,
+                multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = cloudDriveUiState.selectedNodes,
-                isSelecting = cloudDriveUiState.isSelecting
+                isSelecting = cloudDriveUiState.isSelecting,
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
         floatingActionButton = {

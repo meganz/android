@@ -10,10 +10,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogViewM3
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.StorageState
@@ -39,16 +42,21 @@ import timber.log.Timber
  * @param consumeQuotaDialog Callback to consume the quota dialog event.
  */
 @Composable
-fun HandleNodeOptionsActionEvent(
+internal fun HandleNodeOptionsActionEvent(
     nodeActionState: NodeActionState,
     onCopyNodes: (nodes: Map<Long, Long>) -> Unit,
     onMoveNodes: (nodes: Map<Long, Long>) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
+    onNavigate: (NavKey) -> Unit,
     consumeNameCollisionResult: () -> Unit,
     consumeInfoToShow: () -> Unit,
     consumeForeignNodeDialog: () -> Unit,
     consumeQuotaDialog: () -> Unit,
     consumeDownloadEvent: () -> Unit,
+    consumeRenameNodeRequest: () -> Unit,
+    consumeNavigationEvent: () -> Unit,
+    consumeDismissEvent: () -> Unit,
+    consumeAccessDialogShown: () -> Unit,
     onActionTriggered: () -> Unit = {},
 ) {
     val snackbarQueue = rememberSnackBarQueue()
@@ -122,6 +130,41 @@ fun HandleNodeOptionsActionEvent(
             onActionTriggered()
             onTransfer(it)
         }
+    )
+
+    EventEffect(
+        event = nodeActionState.renameNodeRequestEvent,
+        onConsumed = consumeRenameNodeRequest
+    ) { nodeId ->
+        onActionTriggered()
+        onNavigate(RenameNodeDialogNavKey(nodeId.longValue))
+    }
+
+    EventEffect(
+        event = nodeActionState.navigationEvent,
+        onConsumed = consumeNavigationEvent,
+        action = onNavigate
+    )
+
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = consumeDismissEvent,
+        action = onActionTriggered
+    )
+
+    EventEffect(
+        event = nodeActionState.contactsData,
+        onConsumed = consumeAccessDialogShown,
+        action = { (contactData, isFromBackups, nodeHandles) ->
+            onActionTriggered()
+            onNavigate(
+                ShareFolderAccessDialogNavKey(
+                    nodes = nodeHandles,
+                    contacts = contactData.joinToString(separator = ","),
+                    isFromBackups = isFromBackups,
+                )
+            )
+        },
     )
 
     if (isShowForeignDialog) {

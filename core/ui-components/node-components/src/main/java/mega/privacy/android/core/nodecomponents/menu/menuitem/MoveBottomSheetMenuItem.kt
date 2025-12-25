@@ -7,7 +7,6 @@ import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
-import mega.privacy.android.core.nodecomponents.action.NodeActionHandler
 
 /**
  * Move bottom sheet menu item

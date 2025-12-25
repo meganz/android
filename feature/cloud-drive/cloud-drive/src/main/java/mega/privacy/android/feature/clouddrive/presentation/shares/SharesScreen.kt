@@ -35,7 +35,7 @@ import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.action.rememberNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -83,7 +83,7 @@ internal fun SharesScreen(
     val snackbarHostState = LocalSnackBarHostState.current
     var selectedTab by rememberSaveable { mutableStateOf(SharesTab.IncomingShares) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val nodeActionHandler = rememberNodeActionHandler(
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator
@@ -200,12 +200,10 @@ internal fun SharesScreen(
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
-                nodeActionHandler = nodeActionHandler,
+                multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = getSelectedNodes(),
                 isSelecting = false,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-                onNavigate = navigationHandler::navigate,
-                onTransfer = onTransfer
+                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
     ) { paddingValues ->
