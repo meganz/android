@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.login.createaccount.AccountInvitati
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.photos.albums.navigation.AlbumsDeepLinkHandler
+import mega.privacy.android.app.presentation.storage.OverQuotaDialogDestinations
 import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyDeepLinkHandler
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
@@ -188,6 +189,7 @@ internal class AppModule {
             ContactLinkDialogDestinations,
             MeetingHasEndedDialogDestinations,
             DeepLinksDialogDestinations,
+            OverQuotaDialogDestinations,
         )
 
     @Provides
