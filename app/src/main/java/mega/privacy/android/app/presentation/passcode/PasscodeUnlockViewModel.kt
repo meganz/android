@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
@@ -30,10 +32,11 @@ internal class PasscodeUnlockViewModel @Inject constructor(
     private val unlockPasscodeUseCase: UnlockPasscodeUseCase,
     private val monitorPasscodeTypeUseCase: MonitorPasscodeTypeUseCase,
     private val passcodeTypeMapper: PasscodeTypeMapper,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<PasscodeUnlockState> = MutableStateFlow(
-        PasscodeUnlockState.Loading
+        PasscodeUnlockState.Loading(ThemeMode.System)
     )
 
     /**
@@ -50,20 +53,26 @@ internal class PasscodeUnlockViewModel @Inject constructor(
                             passcodeTypeMapper(it)
                         }
                     },
-                    monitorPasscodeAttemptsUseCase()
-                ) { type, attempts ->
+                    monitorPasscodeAttemptsUseCase(),
+                    monitorThemeModeUseCase().catch {
+                        Timber.e(it, "Error monitoring theme mode")
+                        emit(ThemeMode.System)
+                    }
+                ) { type, attempts, themeMode ->
                     { state: PasscodeUnlockState ->
                         if (state is PasscodeUnlockState.Data) {
                             state.copy(
                                 passcodeType = type,
                                 failedAttempts = attempts,
-                                logoutWarning = attempts >= 5
+                                logoutWarning = attempts >= 5,
+                                themeMode = themeMode
                             )
                         } else {
                             PasscodeUnlockState.Data(
                                 passcodeType = type,
                                 failedAttempts = attempts,
-                                logoutWarning = attempts >= 5
+                                logoutWarning = attempts >= 5,
+                                themeMode = themeMode
                             )
                         }
                     }

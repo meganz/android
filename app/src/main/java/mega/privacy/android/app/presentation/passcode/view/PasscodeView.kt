@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
@@ -100,63 +101,65 @@ internal fun PasscodeView(
         activity?.finishAffinity()
     }
 
-    Surface(
-        modifier = Modifier
-            .background(MaterialTheme.colors.background)
-            .fillMaxSize()
-            .systemBarsPadding()
-            .imePadding()
-    ) {
-        when (val currentState = uiState) {
-            PasscodeUnlockState.Loading -> {}
-            is PasscodeUnlockState.Data -> {
-                val context = LocalContext.current
-                var showBiometricPrompt: Boolean by remember {
-                    mutableStateOf(
-                        biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
-                            context
-                        )
-                    )
-                }
-
-                if (showBiometricPrompt) {
-                    Timber.d("Show biometrics UI composed")
-                    val title = stringResource(id = R.string.title_unlock_fingerprint)
-                    val negativeButton = stringResource(R.string.action_use_passcode)
-                    val promptInfo = remember {
-                        BiometricPrompt.PromptInfo.Builder()
-                            .setTitle(title)
-                            .setNegativeButtonText(negativeButton)
-                            .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
-                            .build()
-                    }
-
-                    LaunchedEffect(key1 = Unit) {
-                        Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
-                        showBiometricAuth(
-                            passcodeUnlockViewModel::unlockWithBiometrics,
-                            { showBiometricPrompt = false },
-                            passcodeUnlockViewModel::onBiometricAuthFailed,
-                            context,
-                            promptInfo,
-                            cryptObjectFactory()
+    OriginalTheme(isDark = uiState.themeMode.isDarkMode()) {
+        Surface(
+            modifier = Modifier
+                .background(MaterialTheme.colors.background)
+                .fillMaxSize()
+                .systemBarsPadding()
+                .imePadding()
+        ) {
+            when (val currentState = uiState) {
+                is PasscodeUnlockState.Loading -> {}
+                is PasscodeUnlockState.Data -> {
+                    val context = LocalContext.current
+                    var showBiometricPrompt: Boolean by remember {
+                        mutableStateOf(
+                            biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
+                                context
+                            )
                         )
                     }
 
-                } else {
-                    LaunchedEffect(key1 = showBiometricPrompt) {
-                        Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+                    if (showBiometricPrompt) {
+                        Timber.d("Show biometrics UI composed")
+                        val title = stringResource(id = R.string.title_unlock_fingerprint)
+                        val negativeButton = stringResource(R.string.action_use_passcode)
+                        val promptInfo = remember {
+                            BiometricPrompt.PromptInfo.Builder()
+                                .setTitle(title)
+                                .setNegativeButtonText(negativeButton)
+                                .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+                                .build()
+                        }
+
+                        LaunchedEffect(key1 = Unit) {
+                            Analytics.tracker.trackEvent(PasscodeBiometricUnlockDialogEvent)
+                            showBiometricAuth(
+                                passcodeUnlockViewModel::unlockWithBiometrics,
+                                { showBiometricPrompt = false },
+                                passcodeUnlockViewModel::onBiometricAuthFailed,
+                                context,
+                                promptInfo,
+                                cryptObjectFactory()
+                            )
+                        }
+
+                    } else {
+                        LaunchedEffect(key1 = showBiometricPrompt) {
+                            Analytics.tracker.trackEvent(PasscodeUnlockDialogEvent)
+                        }
+                        PasscodeContent(
+                            onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
+                            onPasscodeEntered = { passcode ->
+                                Analytics.tracker.trackEvent(PasscodeEnteredEvent)
+                                passcodeUnlockViewModel.unlockWithPasscode(passcode)
+                            },
+                            failedAttemptCount = currentState.failedAttempts,
+                            showLogoutWarning = currentState.logoutWarning,
+                            passcodeType = currentState.passcodeType,
+                        )
                     }
-                    PasscodeContent(
-                        onPasswordEntered = passcodeUnlockViewModel::unlockWithPassword,
-                        onPasscodeEntered = { passcode ->
-                            Analytics.tracker.trackEvent(PasscodeEnteredEvent)
-                            passcodeUnlockViewModel.unlockWithPasscode(passcode)
-                        },
-                        failedAttemptCount = currentState.failedAttempts,
-                        showLogoutWarning = currentState.logoutWarning,
-                        passcodeType = currentState.passcodeType,
-                    )
                 }
             }
         }

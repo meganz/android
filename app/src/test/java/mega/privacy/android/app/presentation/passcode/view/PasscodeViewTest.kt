@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.app.presentation.passcode.view.FAILED_ATTEMPTS_TAG
 import mega.privacy.android.app.presentation.passcode.view.FORGOT_PASSCODE_BUTTON_TAG
 import mega.privacy.android.app.presentation.passcode.view.LOGOUT_BUTTON_TAG
@@ -74,7 +75,8 @@ internal class PasscodeViewTest {
         val uiState = PasscodeUnlockState.Data(
             passcodeType = PasscodeUIType.Pin(false, 4),
             failedAttempts = 0,
-            logoutWarning = false
+            logoutWarning = false,
+            themeMode = ThemeMode.System
         )
 
         displayPasscodeViewWithState(uiState)
@@ -89,7 +91,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -103,7 +106,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 0,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -117,7 +121,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -131,7 +136,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -145,7 +151,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -165,7 +172,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -185,7 +193,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -214,7 +223,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -228,7 +238,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -256,7 +267,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(true),
                 failedAttempts = 0,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -272,7 +284,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(true, 4),
                 failedAttempts = 0,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -296,7 +309,8 @@ internal class PasscodeViewTest {
         val uiState = PasscodeUnlockState.Data(
             passcodeType = PasscodeUIType.Pin(false, 4),
             failedAttempts = 0,
-            logoutWarning = false
+            logoutWarning = false,
+            themeMode = ThemeMode.System
         )
 
         displayPasscodeViewWithState(uiState)
@@ -315,7 +329,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(true),
                 failedAttempts = 0,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -331,7 +346,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -352,7 +368,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Alphanumeric(false),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -378,7 +395,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 
@@ -394,7 +412,8 @@ internal class PasscodeViewTest {
             PasscodeUnlockState.Data(
                 passcodeType = PasscodeUIType.Pin(false, 4),
                 failedAttempts = 1,
-                logoutWarning = false
+                logoutWarning = false,
+                themeMode = ThemeMode.System
             )
         )
 

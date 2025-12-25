@@ -3,17 +3,22 @@ package mega.privacy.android.app.presentation.passcode
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
+import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.passcode.mapper.PasscodeTypeMapper
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.passcode.PasscodeType
 import mega.privacy.android.domain.entity.passcode.UnlockPasscodeRequest
 import mega.privacy.android.domain.exception.security.NoPasscodeTypeSetException
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeAttemptsUseCase
 import mega.privacy.android.domain.usecase.passcode.MonitorPasscodeTypeUseCase
 import mega.privacy.android.domain.usecase.passcode.UnlockPasscodeUseCase
@@ -26,8 +31,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.extensions.withCoroutineExceptions
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -37,6 +40,7 @@ internal class PasscodeUnlockViewModelTest {
     private val monitorPasscodeAttemptsUseCase = mock<MonitorPasscodeAttemptsUseCase>()
     private val monitorPasscodeTypeUseCase = mock<MonitorPasscodeTypeUseCase>()
     private val passcodeTypeMapper = mock<PasscodeTypeMapper>()
+    private val monitorThemeModeUseCase = mock<MonitorThemeModeUseCase>()
 
     @AfterEach
     internal fun cleanup() {
@@ -45,6 +49,7 @@ internal class PasscodeUnlockViewModelTest {
             monitorPasscodeAttemptsUseCase,
             monitorPasscodeTypeUseCase,
             passcodeTypeMapper,
+            monitorThemeModeUseCase,
         )
     }
 
@@ -60,6 +65,7 @@ internal class PasscodeUnlockViewModelTest {
             underTest.state.test {
                 val actual = awaitItem()
                 assertThat(actual).isInstanceOf(PasscodeUnlockState.Loading::class.java)
+                assertThat((actual as PasscodeUnlockState.Loading).themeMode).isEqualTo(ThemeMode.System)
             }
         }
 
@@ -75,7 +81,9 @@ internal class PasscodeUnlockViewModelTest {
             )
 
             underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
-                assertThat(awaitItem().failedAttempts).isEqualTo(expected)
+                val state = awaitItem()
+                assertThat(state.failedAttempts).isEqualTo(expected)
+                assertThat(state.themeMode).isEqualTo(ThemeMode.System)
             }
         }
 
@@ -88,7 +96,9 @@ internal class PasscodeUnlockViewModelTest {
         )
 
         underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
-            assertThat(awaitItem().logoutWarning).isEqualTo(true)
+            val state = awaitItem()
+            assertThat(state.logoutWarning).isEqualTo(true)
+            assertThat(state.themeMode).isEqualTo(ThemeMode.System)
         }
     }
 
@@ -151,7 +161,9 @@ internal class PasscodeUnlockViewModelTest {
         )
 
         underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
-            assertThat(awaitItem().passcodeType).isEqualTo(expected)
+            val state = awaitItem()
+            assertThat(state.passcodeType).isEqualTo(expected)
+            assertThat(state.themeMode).isEqualTo(ThemeMode.System)
         }
     }
 
@@ -166,7 +178,9 @@ internal class PasscodeUnlockViewModelTest {
                 )
 
                 underTest.state.test {
-                    assertThat(awaitItem()).isEqualTo(PasscodeUnlockState.Loading)
+                    val state = awaitItem()
+                    assertThat(state).isInstanceOf(PasscodeUnlockState.Loading::class.java)
+                    assertThat((state as PasscodeUnlockState.Loading).themeMode).isEqualTo(ThemeMode.System)
                 }
             }
         }
@@ -182,6 +196,47 @@ internal class PasscodeUnlockViewModelTest {
             verify(unlockPasscodeUseCase).invoke(UnlockPasscodeRequest.BiometricRequest)
         }
 
+    @Test
+    internal fun `test that theme mode changes are reflected in state`() = runTest {
+        val initialThemeMode = ThemeMode.Light
+        val newThemeMode = ThemeMode.Dark
+
+        val themeModeFlow = MutableStateFlow(initialThemeMode)
+        initViewModel(
+            monitorThemeModeUseCaseStub = monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(themeModeFlow)
+            }
+        )
+
+        underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
+            val initialState = awaitItem()
+            assertThat(initialState.themeMode).isEqualTo(initialThemeMode)
+
+            // Change theme mode
+            themeModeFlow.emit(newThemeMode)
+
+            val updatedState = awaitItem()
+            assertThat(updatedState.themeMode).isEqualTo(newThemeMode)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    internal fun `test that system theme mode is returned if monitor fails`() = runTest {
+        initViewModel(
+            monitorThemeModeUseCaseStub = monitorThemeModeUseCase.stub {
+                on { invoke() }.thenAnswer { throw Exception("Monitor theme mode failed") }
+            }
+        )
+
+        underTest.state.filterIsInstance<PasscodeUnlockState.Data>().test {
+            val state = awaitItem()
+            // Should default to System theme mode on error
+            assertThat(state.themeMode).isEqualTo(ThemeMode.System)
+        }
+    }
+
     private fun initViewModel(
         monitorPasscodeAttemptsUseCaseStub: MonitorPasscodeAttemptsUseCase =
             monitorPasscodeAttemptsUseCase.stub {
@@ -195,12 +250,17 @@ internal class PasscodeUnlockViewModelTest {
         passcodeTypeMapperStub: PasscodeTypeMapper = passcodeTypeMapper.stub {
             on { invoke(any()) }.thenReturn(PasscodeUIType.Alphanumeric(false))
         },
+        monitorThemeModeUseCaseStub: MonitorThemeModeUseCase =
+            monitorThemeModeUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(ThemeMode.System))
+            },
     ) {
         underTest = PasscodeUnlockViewModel(
             monitorPasscodeAttemptsUseCase = monitorPasscodeAttemptsUseCaseStub,
             unlockPasscodeUseCase = unlockPasscodeUseCaseStub,
             monitorPasscodeTypeUseCase = monitorPasscodeTypeUseCaseStub,
             passcodeTypeMapper = passcodeTypeMapperStub,
+            monitorThemeModeUseCase = monitorThemeModeUseCaseStub,
         )
     }
 }
