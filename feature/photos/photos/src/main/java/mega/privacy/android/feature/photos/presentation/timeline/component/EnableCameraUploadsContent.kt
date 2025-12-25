@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -89,10 +90,14 @@ internal fun EnableCameraUploadsContent(
             PrimaryFilledButton(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 24.dp),
+                    .padding(top = 24.dp)
+                    .testTag(ENABLE_CAMERA_UPLOADS_CONTENT_ENABLE_BUTTON_TAG),
                 text = stringResource(sharedR.string.camera_backup_permission_enable_button_text),
                 onClick = onEnable
             )
         },
     )
 }
+
+internal const val ENABLE_CAMERA_UPLOADS_CONTENT_ENABLE_BUTTON_TAG =
+    "enable_camera_uploads_content:button_enable"

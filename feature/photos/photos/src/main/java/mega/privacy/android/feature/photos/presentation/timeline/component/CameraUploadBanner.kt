@@ -189,7 +189,9 @@ private fun NetworkRequirementNotMetPausedBanner(
     modifier: Modifier = Modifier,
 ) {
     BasicCameraUploadsBanner(
-        modifier = modifier,
+        modifier = modifier.testTag(
+            TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_PAUSED_BANNER_TEST_TAG
+        ),
         statusIcon = R.drawable.ic_cu_status_warning,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_uploads_notification_content_no_wifi_connection),
@@ -227,7 +229,9 @@ private fun FullStorageBanner(
     }
 
     InlineErrorBanner(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag(TIMELINE_CAMERA_UPLOADS_FULL_STORAGE_BANNER_TEST_TAG),
         title = stringResource(id = sharedR.string.account_storage_over_quota_inline_error_banner_title),
         body = stringResource(id = sharedR.string.account_storage_over_quota_inline_error_banner_message),
         actionButtonText = stringResource(id = sharedR.string.account_storage_over_quota_inline_error_banner_upgrade_link),
@@ -277,7 +281,8 @@ private fun EnableCameraUploadsBanner(
             MegaIcon(
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable(onClick = onDismissRequest),
+                    .clickable(onClick = onDismissRequest)
+                    .testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_DISMISS_ICON_TEST_TAG),
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                 contentDescription = "Camera uploads banner end icon",
                 tint = IconColor.Primary,
@@ -443,13 +448,19 @@ const val TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG =
     "timeline_enable_camera_uploads_banner_test_tag"
 
 /**
- * Test tag for camera uploads checking uploads banner
+ * Test tag for enable camera uploads banner dismiss icon
  */
-const val TIMELINE_CAMERA_UPLOADS_CHECKING_UPLOADS_BANNER_TEST_TAG =
-    "timeline_camera_uploads_checking_uploads_banner_test_tag"
+const val TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_DISMISS_ICON_TEST_TAG =
+    "timeline_enable_camera_uploads_dismiss_icon_test_tag"
 
 /**
- * Test tag for camera uploads pending count banner
+ * Test tag for camera uploads allow mobile data banner
  */
-const val TIMELINE_CAMERA_UPLOADS_PENDING_COUNT_BANNER_TEST_TAG =
-    "timeline_camera_uploads_pending_count_banner_test_tag"
+const val TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_PAUSED_BANNER_TEST_TAG =
+    "timeline_camera_uploads_network_requirement_not_met_paused_banner_test_tag"
+
+/**
+ * Test tag for camera uploads full storage banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_FULL_STORAGE_BANNER_TEST_TAG =
+    "timeline_camera_uploads_full_storage_banner_test_tag"

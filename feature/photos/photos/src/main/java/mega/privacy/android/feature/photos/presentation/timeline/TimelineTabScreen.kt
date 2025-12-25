@@ -296,7 +296,9 @@ internal fun TimelineTabScreen(
     when {
         showEnableCUPage -> {
             EnableCameraUploadsContent(
-                modifier = modifier.padding(horizontal = 16.dp),
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+                    .testTag(TIMELINE_TAB_SCREEN_ENABLE_CU_CONTENT_TAG),
                 onEnable = {
                     onNavigateToCameraUploadsSettings(
                         LegacySettingsCameraUploadsActivityNavKey()
@@ -306,11 +308,14 @@ internal fun TimelineTabScreen(
         }
 
         uiState.isLoading -> {
-            PhotosSkeletonView()
+            PhotosSkeletonView(
+                modifier = Modifier.testTag(TIMELINE_TAB_SCREEN_LOADING_SKELETON_VIEW_TAG)
+            )
         }
 
         uiState.displayedPhotos.isEmpty() -> {
             EmptyBody(
+                modifier = Modifier.testTag(TIMELINE_TAB_SCREEN_EMPTY_BODY_TAG),
                 enableCameraUploadButtonShowing = mediaCameraUploadUiState.enableCameraUploadButtonShowing,
                 mediaSource = timelineFilterUiState.mediaSource,
                 setEnableCUPage = setEnableCUPage,
@@ -371,12 +376,13 @@ private fun EmptyBody(
     mediaSource: FilterMediaSource,
     enableCameraUploadButtonShowing: Boolean,
     setEnableCUPage: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     if (enableCameraUploadButtonShowing && mediaSource != FilterMediaSource.CloudDrive) {
         setEnableCUPage(true)
     } else {
         EmptyBodyContent(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .conditional(LocalConfiguration.current.orientation == ORIENTATION_LANDSCAPE) {
                     verticalScroll(rememberScrollState())
@@ -446,7 +452,9 @@ private fun TimelineTabContent(
         when (selectedTimePeriod) {
             PhotoModificationTimePeriod.All -> {
                 PhotosNodeGridView(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(TIMELINE_TAB_CONTENT_GRID_VIEW_TAG),
                     lazyGridState = lazyGridState,
                     contentPadding = contentPadding,
                     items = uiState.displayedPhotos,
@@ -480,7 +488,9 @@ private fun TimelineTabContent(
                     else -> uiState.daysCardPhotos
                 }
                 PhotosNodeListCardListView(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(TIMELINE_TAB_CONTENT_LIST_VIEW_TAG),
                     state = lazyListState,
                     contentPadding = PaddingValues(bottom = 50.dp),
                     photos = items,
@@ -509,7 +519,8 @@ private fun TimelineTabContent(
             PhotoModificationTimePeriodSelector(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+                    .align(Alignment.BottomCenter)
+                    .testTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG),
                 isVisible = shouldShowTimePeriodSelector,
                 selectedTimePeriod = selectedTimePeriod,
                 onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
@@ -547,7 +558,11 @@ private fun PhotoModificationTimePeriodSelector(
                 )
 
                 if (index != PhotoModificationTimePeriod.entries.lastIndex) {
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(
+                        modifier = Modifier
+                            .width(8.dp)
+                            .testTag(PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_SPACER_TAG)
+                    )
                 }
             }
         }
@@ -772,3 +787,17 @@ private fun TimelineTabScreenPreview() {
 }
 
 internal const val TIMELINE_TAB_SCREEN_SORT_DIALOG_TAG = "timeline_tab_screen:dialog_sort"
+internal const val TIMELINE_TAB_SCREEN_ENABLE_CU_CONTENT_TAG =
+    "timeline_tab_screen:enable_cu_content"
+internal const val TIMELINE_TAB_SCREEN_LOADING_SKELETON_VIEW_TAG =
+    "timeline_tab_screen:view_loading_skeleton"
+internal const val TIMELINE_TAB_SCREEN_EMPTY_BODY_TAG =
+    "timeline_tab_screen:empty_body"
+internal const val TIMELINE_TAB_CONTENT_GRID_VIEW_TAG =
+    "timeline_tab_content:grid_view"
+internal const val TIMELINE_TAB_CONTENT_LIST_VIEW_TAG =
+    "timeline_tab_content:list_view"
+internal const val TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG =
+    "timeline_tab_content:selector_photo_modification_time_period"
+internal const val PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_SPACER_TAG =
+    "photo_modification_time_period_selector:spacer"
