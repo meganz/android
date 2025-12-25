@@ -47,7 +47,7 @@ class AchievementsFeatureActivity : PasscodeActivity() {
         Timber.d("onCreate")
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
         setContent {

@@ -34,7 +34,6 @@ import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.getValue
 
 
 private const val CHAT_EXPLORER_FRAGMENT = "chatExplorerFragment"
@@ -72,7 +71,7 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 

@@ -160,7 +160,7 @@ internal class MyAccountActivity : PasscodeActivity(),
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        if (shouldRefreshSessionDueToSDK()) {
+        if (shouldRefreshSessionDueToSDK(true)) {
             return
         }
 

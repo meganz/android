@@ -281,7 +281,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
         initFileBackupManager()
 
-        if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
             return
         }
 

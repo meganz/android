@@ -44,7 +44,6 @@ class MonitorPsaUseCaseTest {
         }
 
         verify(fetchPsaUseCase).invoke(currentTime, true)
-        verify(fetchPsaUseCase).invoke(currentTime, false)
     }
 
     @Test
@@ -62,7 +61,7 @@ class MonitorPsaUseCaseTest {
         underTest.invoke { testScheduler.currentTime - initial }.test {
             testScheduler.advanceTimeBy(50.seconds)
             val events: List<Event<Psa>> = cancelAndConsumeRemainingEvents()
-            assertThat(events.filterIsInstance<Event.Item<Psa>>().size).isEqualTo(6)
+            assertThat(events.filterIsInstance<Event.Item<Psa>>().size).isEqualTo(5)
         }
     }
 

@@ -51,12 +51,11 @@ class MonitorPsaUseCase(
                         forceRefresh = true
                     )?.let { emit(it) }
                     while (true) {
+                        delay(psaCheckFrequency)
                         fetchPsaUseCase(
                             currentTime = currentMilliSecondTimeProvider(),
                             forceRefresh = false
-                        )
-                            ?.let { emit(it) }
-                        delay(psaCheckFrequency)
+                        )?.let { emit(it) }
                     }
                 }
             }

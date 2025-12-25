@@ -83,7 +83,7 @@ private fun navigateToLogin(
     isSingleActivityEnabled: Boolean,
 ) {
     context.findActivity()?.let { activity ->
-        val targetActivity = if (isSingleActivityEnabled) {
+        val targetActivity = if (isSingleActivityEnabled && activity is MegaActivity) {
             MegaActivity::class.java
         } else {
             LoginActivity::class.java
