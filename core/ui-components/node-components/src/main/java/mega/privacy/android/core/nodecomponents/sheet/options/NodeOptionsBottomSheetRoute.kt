@@ -10,11 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,13 +29,15 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
@@ -71,11 +70,11 @@ internal fun NodeOptionsBottomSheetRoute(
         viewModel = nodeOptionsActionViewModel
     ),
     viewModel: NodeOptionsBottomSheetViewModel = hiltViewModel(),
+    shareFolderDialogResult: ShareFolderDialogResult? = null,
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    var shareNodeHandles by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
     val context = LocalContext.current
     val megaActivityResultContract = remember { context.megaActivityResultContract }
     val shareFolderLauncher = rememberLauncherForActivityResult(
@@ -88,10 +87,18 @@ internal fun NodeOptionsBottomSheetRoute(
             )
         }
     }
+    val nodeHandlesToJsonMapper = remember { NodeHandlesToJsonMapper() }
 
     LaunchedEffect(Unit) {
         keyboardController?.hide()
         viewModel.getBottomSheetOptions(nodeId, nodeSourceType)
+    }
+
+    LaunchedEffect(shareFolderDialogResult) {
+        if (shareFolderDialogResult != null) {
+            val handles = shareFolderDialogResult.nodes.map { it.id.longValue }.toLongArray()
+            shareFolderLauncher.launch(handles)
+        }
     }
 
     EventEffect(
@@ -104,7 +111,8 @@ internal fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.shareFolderDialogEvent,
         onConsumed = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
         action = { handles ->
-            shareNodeHandles = handles
+            val nodes = nodeHandlesToJsonMapper(handles)
+            onNavigate(ShareFolderDialogNavKey(nodes))
         }
     )
 
@@ -175,23 +183,6 @@ internal fun NodeOptionsBottomSheetRoute(
         showSnackbar = viewModel::showSnackbar,
         onConsumeErrorState = viewModel::onConsumeErrorState,
     )
-
-    if (shareNodeHandles.isNotEmpty()) {
-        // We cannot provide navigation to this dialog, because it requires injecting shareFolderLauncher
-        // to the menu item. Instead the menu item will call the view model to trigger StateEvent
-        // to show this dialog, and the onConfirm callback will use the launcher to start the activity for result
-        ShareFolderDialogM3(
-            nodeIds = shareNodeHandles.map { NodeId(it) },
-            onDismiss = {
-                shareNodeHandles = emptyList()
-                //onDismiss()
-            },
-            onConfirm = { nodes ->
-                val handles = nodes.map { it.id.longValue }.toLongArray()
-                shareFolderLauncher.launch(handles)
-            }
-        )
-    }
 }
 
 /**

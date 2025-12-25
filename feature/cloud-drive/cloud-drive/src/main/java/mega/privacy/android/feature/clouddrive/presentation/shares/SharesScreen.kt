@@ -203,7 +203,6 @@ internal fun SharesScreen(
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = getSelectedNodes(),
                 isSelecting = false,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
     ) { paddingValues ->

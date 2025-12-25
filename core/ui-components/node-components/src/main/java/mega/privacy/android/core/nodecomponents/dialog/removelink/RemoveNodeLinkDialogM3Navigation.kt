@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.removelink
 
+import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -20,7 +21,7 @@ fun EntryProviderScope<NavKey>.removeNodeLinkDialogM3(
             )
         )
     ) { key ->
-        val mapper = NodeHandlesToJsonMapper()
+        val mapper = remember { NodeHandlesToJsonMapper() }
 
         RemoveNodeLinkDialogM3(
             nodes = mapper(key.nodes),

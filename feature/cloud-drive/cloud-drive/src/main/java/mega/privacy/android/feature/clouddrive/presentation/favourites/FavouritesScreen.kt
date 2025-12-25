@@ -101,7 +101,6 @@ fun FavouritesScreen(
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = uiState.selectedNodes,
                 isSelecting = false,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
         content = { innerPadding ->

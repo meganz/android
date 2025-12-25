@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -17,7 +18,9 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogViewM3
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
@@ -48,6 +51,7 @@ internal fun HandleNodeOptionsActionEvent(
     onMoveNodes: (nodes: Map<Long, Long>) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigate: (NavKey) -> Unit,
+    onShareContactSelected: (List<String>, List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
     consumeInfoToShow: () -> Unit,
     consumeForeignNodeDialog: () -> Unit,
@@ -57,6 +61,8 @@ internal fun HandleNodeOptionsActionEvent(
     consumeNavigationEvent: () -> Unit,
     consumeDismissEvent: () -> Unit,
     consumeAccessDialogShown: () -> Unit,
+    consumeShareFolderEvent: () -> Unit,
+    consumeShareFolderDialogEvent: () -> Unit,
     onActionTriggered: () -> Unit = {},
 ) {
     val snackbarQueue = rememberSnackBarQueue()
@@ -75,6 +81,14 @@ internal fun HandleNodeOptionsActionEvent(
             }
         }
     }
+    val shareFolderLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.shareFolderActivityResultContract
+    ) { result ->
+        result?.let { (contactIds, nodeHandles) ->
+            onShareContactSelected(contactIds, nodeHandles)
+        }
+    }
+    val nodeHandlesToJsonMapper = remember { NodeHandlesToJsonMapper() }
 
     EventEffect(
         event = nodeActionState.nodeNameCollisionsResult,
@@ -143,7 +157,10 @@ internal fun HandleNodeOptionsActionEvent(
     EventEffect(
         event = nodeActionState.navigationEvent,
         onConsumed = consumeNavigationEvent,
-        action = onNavigate
+        action = {
+            onActionTriggered()
+            onNavigate(it)
+        }
     )
 
     EventEffect(
@@ -165,6 +182,24 @@ internal fun HandleNodeOptionsActionEvent(
                 )
             )
         },
+    )
+
+    EventEffect(
+        event = nodeActionState.shareFolderDialogEvent,
+        onConsumed = consumeShareFolderDialogEvent,
+        action = { handles ->
+            val nodes = nodeHandlesToJsonMapper(handles)
+            onNavigate(ShareFolderDialogNavKey(nodes))
+        }
+    )
+
+    EventEffect(
+        event = nodeActionState.shareFolderEvent,
+        onConsumed = consumeShareFolderEvent,
+        action = { handles ->
+            onActionTriggered()
+            shareFolderLauncher.launch(handles.toLongArray())
+        }
     )
 
     if (isShowForeignDialog) {

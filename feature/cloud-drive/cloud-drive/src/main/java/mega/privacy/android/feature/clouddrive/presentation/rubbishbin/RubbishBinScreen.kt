@@ -190,7 +190,6 @@ internal fun RubbishBinScreen(
                 multiNodeActionHandler = multiNodeActionHandler,
                 isSelecting = uiState.isSelecting,
                 selectedNodes = uiState.selectedNodes,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
     ) { innerPadding ->

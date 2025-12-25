@@ -9,6 +9,7 @@ import mega.privacy.android.core.nodecomponents.dialog.removelink.removeNodeLink
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.removeShareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.rename.renameNodeDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.shareFolderAccessDialogM3
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.shareFolderDialogM3
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.changeLabelBottomSheetNavigation
 import mega.privacy.android.core.nodecomponents.sheet.home.homeFabOptionsBottomSheetNavigation
 import mega.privacy.android.core.nodecomponents.sheet.options.nodeOptionsBottomSheet
@@ -26,8 +27,13 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             cannotVerifyContactDialogM3(navigationHandler::back)
             leaveShareDialogM3(navigationHandler::back)
             shareFolderAccessDialogM3(navigationHandler::back)
+            shareFolderDialogM3(
+                onDismiss = navigationHandler::back,
+                returnResult = navigationHandler::returnResult
+            )
             nodeOptionsBottomSheet(
                 navigationHandler = navigationHandler,
+                shareFolderDialogResult = navigationHandler::monitorResult,
                 returnResult = navigationHandler::returnResult
             )
             changeLabelBottomSheetNavigation(navigationHandler::back)

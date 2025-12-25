@@ -4,10 +4,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
@@ -15,6 +17,9 @@ import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.core.nodecomponents.action.HandleNodeOptionsActionEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
+import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -29,6 +34,7 @@ fun HandleNodeOptionsActionResult(
     onNavigate: (NavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
+    shareFolderDialogResultFlow: (String) -> Flow<ShareFolderDialogResult?>,
     clearResultFlow: (String) -> Unit,
 ) {
     val context = LocalContext.current
@@ -54,6 +60,7 @@ fun HandleNodeOptionsActionResult(
         onMoveNodes = nodeOptionsActionViewModel::moveNodes,
         onTransfer = onTransfer,
         onNavigate = onNavigate,
+        onShareContactSelected = nodeOptionsActionViewModel::contactSelectedForShareFolder,
         consumeNameCollisionResult = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         consumeInfoToShow = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
         consumeForeignNodeDialog = nodeOptionsActionViewModel::markForeignNodeDialogShown,
@@ -63,6 +70,8 @@ fun HandleNodeOptionsActionResult(
         consumeNavigationEvent = nodeOptionsActionViewModel::resetNavigationEvent,
         consumeDismissEvent = nodeOptionsActionViewModel::resetDismiss,
         consumeAccessDialogShown = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
+        consumeShareFolderEvent = nodeOptionsActionViewModel::resetShareFolderEvent,
+        consumeShareFolderDialogEvent = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
         onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
     )
 

@@ -665,7 +665,6 @@ fun MediaMainScreen(
                 multiNodeActionHandler = multiNodeActionHandler,
                 selectedNodes = selectedVideoNodes,
                 isSelecting = false,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             )
         }
     ) { paddingValues ->

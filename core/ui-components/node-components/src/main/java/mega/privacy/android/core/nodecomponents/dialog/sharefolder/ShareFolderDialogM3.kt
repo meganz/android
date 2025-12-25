@@ -26,7 +26,7 @@ internal data class ShareFolderUiAttr(
  * @param nodeIds List of [NodeId]
  * @param shareFolderDialogViewModel [ShareFolderDialogViewModel]
  * @param onDismiss
- * @param onOkClicked
+ * @param onConfirm
  */
 @Composable
 fun ShareFolderDialogM3(

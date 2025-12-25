@@ -120,7 +120,6 @@ fun CloudDriveScreen(
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = uiState.selectedNodes,
                 isSelecting = uiState.isSelecting,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
         floatingActionButton = {

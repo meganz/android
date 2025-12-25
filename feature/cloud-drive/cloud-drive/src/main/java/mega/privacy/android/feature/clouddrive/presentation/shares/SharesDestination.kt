@@ -21,6 +21,7 @@ fun EntryProviderScope<NavKey>.shares(
             onNavigate = navigationHandler::navigate,
             onTransfer = transferHandler::setTransferEvent,
             nodeResultFlow = navigationHandler::monitorResult,
+            shareFolderDialogResultFlow = navigationHandler::monitorResult,
             clearResultFlow = navigationHandler::clearResult,
         )
 

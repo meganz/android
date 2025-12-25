@@ -145,7 +145,6 @@ internal fun DriveSyncScreen(
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = cloudDriveUiState.selectedNodes,
                 isSelecting = cloudDriveUiState.isSelecting,
-                nodeOptionsActionViewModel = nodeOptionsActionViewModel
             )
         },
         floatingActionButton = {

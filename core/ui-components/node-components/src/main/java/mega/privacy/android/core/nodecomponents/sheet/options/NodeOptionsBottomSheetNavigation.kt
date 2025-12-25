@@ -1,9 +1,14 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
+import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -48,6 +53,7 @@ sealed class NodeOptionsBottomSheetResult() {
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
     navigationHandler: NavigationHandler,
+    shareFolderDialogResult: (String) -> Flow<ShareFolderDialogResult?>,
     returnResult: (String, NodeOptionsBottomSheetResult) -> Unit,
 ) {
     entry<NodeOptionsBottomSheetNavKey>(metadata = bottomSheetMetadata(skipPartiallyExpanded = false)) {
@@ -56,9 +62,12 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
             return@entry
         }
 
+        val shareFolderResult by shareFolderDialogResult(ShareFolderDialogNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
+
         NodeOptionsBottomSheetRoute(
             navigationHandler = navigationHandler,
-            onDismiss = { navigationHandler.remove(it)},
+            onDismiss = { navigationHandler.remove(it) },
             nodeId = it.nodeHandle,
             nodeSourceType = it.nodeSourceType,
             onTransfer = { event ->
@@ -96,7 +105,8 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                     NodeOptionsBottomSheetNavKey.RESULT,
                     NodeOptionsBottomSheetResult.AddToPlaylist(result)
                 )
-            }
+            },
+            shareFolderDialogResult = shareFolderResult
         )
     }
 }

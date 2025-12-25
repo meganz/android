@@ -1,6 +1,5 @@
 package mega.privacy.android.core.nodecomponents.components.selectionmode
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -19,20 +18,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogM3
-import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 
+/**
+ * A bottom bar component for node selection mode that displays action buttons
+ * and handles multi-node operations.
+ *
+ * This composable wraps [SelectionModeBottomBar] and adds support for showing
+ * a "More" options bottom sheet when additional actions are available.
+ *
+ * @param availableActions All available actions for the selected nodes (shown in "More" bottom sheet)
+ * @param visibleActions Actions to display directly in the bottom bar
+ * @param visible Whether the bottom bar should be visible
+ * @param multiNodeActionHandler Handler for executing actions on multiple nodes
+ * @param selectedNodes The list of currently selected nodes
+ * @param isSelecting Whether a selection operation is in progress (disables actions when true)
+ * @param modifier Modifier to be applied to the bottom bar
+ * @param onActionPressed Optional callback invoked when any action is pressed (before handling)
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NodeSelectionModeBottomBar(
@@ -44,57 +52,8 @@ fun NodeSelectionModeBottomBar(
     isSelecting: Boolean,
     modifier: Modifier = Modifier,
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel? = null, // pass the ViewModel if the component needs to handle shares events
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
-
-    nodeOptionsActionViewModel?.let { viewModel ->
-        val nodeActionState: NodeActionState by viewModel.uiState.collectAsStateWithLifecycle()
-        var shareNodeHandles by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
-
-        val megaResultContract = rememberMegaResultContract()
-        val shareFolderLauncher = rememberLauncherForActivityResult(
-            contract = megaResultContract.shareFolderActivityResultContract
-        ) { result ->
-            result?.let { (contactIds, nodeHandles) ->
-                viewModel.contactSelectedForShareFolder(
-                    contactIds,
-                    nodeHandles
-                )
-            }
-        }
-
-        if (visible) {
-            EventEffect(
-                event = nodeActionState.shareFolderDialogEvent,
-                onConsumed = viewModel::resetShareFolderDialogEvent,
-                action = { handles ->
-                    shareNodeHandles = handles
-                }
-            )
-
-            EventEffect(
-                event = nodeActionState.shareFolderEvent,
-                onConsumed = viewModel::resetShareFolderEvent,
-                action = { handles ->
-                    shareFolderLauncher.launch(handles.toLongArray())
-                }
-            )
-        }
-
-        if (shareNodeHandles.isNotEmpty()) {
-            ShareFolderDialogM3(
-                nodeIds = shareNodeHandles.map { NodeId(it) },
-                onDismiss = {
-                    shareNodeHandles = emptyList()
-                },
-                onConfirm = { nodes ->
-                    val handles = nodes.map { it.id.longValue }.toLongArray()
-                    shareFolderLauncher.launch(handles)
-                }
-            )
-        }
-    }
 
     SelectionModeBottomBar(
         visible = visible,
@@ -129,6 +88,19 @@ fun NodeSelectionModeBottomBar(
     }
 }
 
+/**
+ * A floating toolbar bottom bar for selection mode that animates in/out.
+ *
+ * This is a lower-level composable that displays a [MegaFloatingToolbar] with
+ * slide-in animation from the bottom. It does not handle action execution -
+ * use [NodeSelectionModeBottomBar] for complete node selection handling.
+ *
+ * @param visible Whether the bottom bar should be visible (controls animation)
+ * @param actions List of actions to display in the toolbar
+ * @param modifier Modifier to be applied to the container
+ * @param actionsEnabled Whether the action buttons are enabled
+ * @param onActionPressed Callback invoked when an action is pressed
+ */
 @Composable
 fun SelectionModeBottomBar(
     visible: Boolean,

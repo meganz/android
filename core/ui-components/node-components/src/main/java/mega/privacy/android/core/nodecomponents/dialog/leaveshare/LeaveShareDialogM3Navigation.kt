@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.dialog.leaveshare
 
+import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -20,8 +21,8 @@ fun EntryProviderScope<NavKey>.leaveShareDialogM3(
             )
         )
     ) { key ->
-        val mapper = NodeHandlesToJsonMapper()
-        val handles = mapper(key.handles)
+        val mapper = remember { NodeHandlesToJsonMapper() }
+        val handles = remember(key.handles) { mapper(key.handles) }
 
         LeaveShareDialogM3(handles = handles, onDismiss = onBack)
     }
