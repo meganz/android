@@ -792,7 +792,7 @@ class TimelineViewModel @Inject constructor(
             is DateCard.YearsCard -> {
                 val monthsCardList = _state.value.monthsCardPhotos
                 val photo = monthsCardList.find {
-                    it.photo.modificationTime == dateCard.photo.modificationTime
+                    it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                 }
                 updateSelectedTimeBarState(TimeBarTab.Months, monthsCardList.indexOf(photo))
             }
@@ -800,7 +800,7 @@ class TimelineViewModel @Inject constructor(
             is DateCard.MonthsCard -> {
                 val daysCardList = _state.value.daysCardPhotos
                 val photo = daysCardList.find {
-                    it.photo.modificationTime == dateCard.photo.modificationTime
+                    it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
                 }
                 updateSelectedTimeBarState(TimeBarTab.Days, daysCardList.indexOf(photo))
             }

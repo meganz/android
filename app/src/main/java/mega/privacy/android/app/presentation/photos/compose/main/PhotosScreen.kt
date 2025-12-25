@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.model.PhotosTab
+import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.view.CameraUploadsBanners
 import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
@@ -144,10 +145,24 @@ fun PhotosScreen(
         timelineViewState.scrollStartOffset,
         timelineViewState.selectedTimeBarTab,
     ) {
-        timelineLazyGridState.scrollToItem(
-            timelineViewState.scrollStartIndex,
-            timelineViewState.scrollStartOffset
-        )
+        if (timelineViewState.scrollStartIndex > 0) {
+            //startIndex should include the appropriate header count depending on the different cases.
+            val startIndex = when {
+                timelineViewState.selectedTimeBarTab == TimeBarTab.All &&
+                        bannerType != CameraUploadsBannerType.NONE ->
+                    timelineViewState.scrollStartIndex + 1
+
+                timelineViewState.selectedTimeBarTab == TimeBarTab.All ->
+                    timelineViewState.scrollStartIndex
+
+                else ->
+                    timelineViewState.scrollStartIndex + 2
+            }
+            timelineLazyGridState.scrollToItem(
+                startIndex,
+                timelineViewState.scrollStartOffset
+            )
+        }
     }
 
     LaunchedEffect(
