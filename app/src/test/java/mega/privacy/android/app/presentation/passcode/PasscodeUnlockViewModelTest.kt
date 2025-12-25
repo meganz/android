@@ -226,7 +226,11 @@ internal class PasscodeUnlockViewModelTest {
     internal fun `test that system theme mode is returned if monitor fails`() = runTest {
         initViewModel(
             monitorThemeModeUseCaseStub = monitorThemeModeUseCase.stub {
-                on { invoke() }.thenAnswer { throw Exception("Monitor theme mode failed") }
+                on { invoke() }.thenReturn(
+                    flow {
+                        throw Exception("Monitor theme mode failed")
+                    }
+                )
             }
         )
 
