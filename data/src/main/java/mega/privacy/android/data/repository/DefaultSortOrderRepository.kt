@@ -42,7 +42,7 @@ internal class DefaultSortOrderRepository @Inject constructor(
             .asStateFlow()
             .onStart {
                 if (sortOrderFlow.value == null) {
-                    getCloudSortOrder()
+                    emit(getCloudSortOrder())
                 }
             }
             .flowOn(ioDispatcher)

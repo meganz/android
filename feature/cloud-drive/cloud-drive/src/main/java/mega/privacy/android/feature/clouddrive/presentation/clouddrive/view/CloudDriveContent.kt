@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -28,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -210,8 +211,10 @@ internal fun CloudDriveContent(
 
             uiState.isEmpty -> {
                 CloudDriveEmptyView(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
                     isRootCloudDrive = uiState.isCloudDriveRoot,
-                    modifier = Modifier.fillMaxSize(),
                     onAddItemsClicked = { onToggleShowUploadOptionsBottomSheet(true) }
                 )
             }

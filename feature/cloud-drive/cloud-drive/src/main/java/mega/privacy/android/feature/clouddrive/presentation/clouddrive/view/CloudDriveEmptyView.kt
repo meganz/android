@@ -1,15 +1,33 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.view
 
+import android.content.res.Configuration
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.PrimaryFilledButton
-import mega.android.core.ui.components.state.EmptyStateView
-import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.spacing.LocalSpacing
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -18,7 +36,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun CloudDriveEmptyView(
     modifier: Modifier = Modifier,
     isRootCloudDrive: Boolean = false,
-    onAddItemsClicked: () -> Unit
+    onAddItemsClicked: () -> Unit,
 ) {
     val imageDrawable = if (isRootCloudDrive) {
         iconPackR.drawable.ic_usp_2
@@ -32,25 +50,100 @@ fun CloudDriveEmptyView(
         sharedR.string.context_empty_folder_title
     }
 
-    EmptyStateView(
-        modifier = modifier,
-        illustration = imageDrawable,
-        title = stringResource(titleId),
-        description = SpannableText(
-            text = stringResource(sharedR.string.context_empty_cloud_drive_description)
-        ),
-        actions = {
-            PrimaryFilledButton(
-                modifier = Modifier.wrapContentSize(),
-                text = stringResource(sharedR.string.album_content_action_add_items),
-                leadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-                onClick = onAddItemsClicked
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        Row(
+            modifier = modifier.padding(LocalSpacing.current.x16),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            EmptyImage(imageDrawable = imageDrawable, modifier = Modifier.weight(1f))
+
+            Spacer(modifier = Modifier.width(24.dp))
+
+            EmptyContent(
+                modifier = Modifier.weight(1f),
+                titleId = titleId,
+                onAddItemsClicked = onAddItemsClicked
             )
         }
+    } else {
+        Column(
+            modifier = modifier.padding(LocalSpacing.current.x16),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            EmptyImage(imageDrawable = imageDrawable)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            EmptyContent(
+                titleId = titleId,
+                onAddItemsClicked = onAddItemsClicked
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyImage(
+    imageDrawable: Int,
+    modifier: Modifier = Modifier,
+) {
+    Image(
+        modifier = modifier.size(120.dp),
+        painter = painterResource(id = imageDrawable),
+        contentDescription = "Empty icon"
     )
 }
 
+@Composable
+private fun EmptyContent(
+    titleId: Int,
+    onAddItemsClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        MegaText(
+            text = stringResource(titleId),
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.titleLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        MegaText(
+            text = stringResource(sharedR.string.context_empty_cloud_drive_description),
+            textColor = TextColor.Secondary,
+            style = AppTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        PrimaryFilledButton(
+            modifier = Modifier.wrapContentSize(),
+            text = stringResource(sharedR.string.album_content_action_add_items),
+            leadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+            onClick = onAddItemsClicked
+        )
+    }
+}
+
+
 @CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
 @Composable
 private fun CloudDriveEmptyViewPreview() {
     AndroidThemeForPreviews {
@@ -62,6 +155,11 @@ private fun CloudDriveEmptyViewPreview() {
 }
 
 @CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
 @Composable
 private fun FolderEmptyViewPreview() {
     AndroidThemeForPreviews {
