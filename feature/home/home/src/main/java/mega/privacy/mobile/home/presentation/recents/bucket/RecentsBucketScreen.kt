@@ -42,6 +42,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_MEDIA_GRID_LOADING_TEST_TAG
@@ -66,6 +67,7 @@ fun RecentsBucketScreen(
     val coroutineScope = rememberCoroutineScope()
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val listState = rememberLazyListState()
+    val snackbarQueue = rememberSnackBarQueue()
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
@@ -128,6 +130,13 @@ fun RecentsBucketScreen(
                 viewModel.onItemLongClicked(it)
             },
         )
+
+        LaunchedEffect(uiState.isEmpty) {
+            if (uiState.isEmpty) {
+                onBack()
+                snackbarQueue.queueMessage("These file are no longer available") // TODO localize
+            }
+        }
 
         LaunchedEffect(uiState.selectedItemsCount) {
             nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -213,9 +222,7 @@ internal fun RecentsBucketScreenContent(
         }
 
         uiState.isEmpty -> {
-            Box(modifier = modifier) {
-                // TODO: Add empty view
-            }
+            Box(modifier = modifier)
         }
 
         else -> {

@@ -88,20 +88,22 @@ class RecentsBucketViewModel @AssistedInject constructor(
                         )
                     }
                 } else {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                        )
-                    }
+                    setEmptyUiState()
                 }
             }.onFailure { throwable ->
                 Timber.e(throwable, "Failed to load recent action bucket")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                    )
-                }
+                setEmptyUiState()
             }
+        }
+    }
+
+    private fun setEmptyUiState() {
+        _uiState.update {
+            it.copy(
+                items = emptyList(),
+                fileCount = 0,
+                isLoading = false,
+            )
         }
     }
 
