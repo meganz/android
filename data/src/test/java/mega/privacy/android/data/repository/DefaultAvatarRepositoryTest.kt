@@ -18,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -62,6 +63,7 @@ internal class DefaultAvatarRepositoryTest {
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
     private val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
+    private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
 
     @Before
     fun setUp() {
@@ -74,6 +76,7 @@ internal class DefaultAvatarRepositoryTest {
             cacheGateway = cacheGateway,
             sharingScope = TestScope(),
             ioDispatcher = UnconfinedTestDispatcher(),
+            credentialsPreferencesGateway = { credentialsPreferencesGateway },
         )
     }
 

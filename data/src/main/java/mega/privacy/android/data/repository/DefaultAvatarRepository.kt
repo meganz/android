@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import android.graphics.BitmapFactory
 import androidx.core.graphics.toColorInt
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -21,6 +23,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -52,6 +55,7 @@ internal class DefaultAvatarRepository @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
+    private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {
@@ -126,7 +130,8 @@ internal class DefaultAvatarRepository @Inject constructor(
                     return@withContext loadAvatarFile(it)
                 }
             }
-            return@withContext cacheGateway.buildAvatarFile(megaApiGateway.accountEmail.orEmpty() + FileConstant.JPG_EXTENSION)
+            val email = megaApiGateway.accountEmail ?: credentialsPreferencesGateway.get().monitorCredentials().first()?.email
+            return@withContext cacheGateway.buildAvatarFile(email.orEmpty() + FileConstant.JPG_EXTENSION)
                 ?.takeIf { it.exists() }
         }
 
