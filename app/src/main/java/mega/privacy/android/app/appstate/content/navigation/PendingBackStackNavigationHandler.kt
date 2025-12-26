@@ -265,6 +265,9 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun showPasscodeScreen() {
+        if (backstack.isNotEmpty() && backstack.last() == passcodeDestination) {
+            return
+        }
         backstack.pending = backstack + backstack.pending
         backstack.clear()
         navigate(passcodeDestination)
