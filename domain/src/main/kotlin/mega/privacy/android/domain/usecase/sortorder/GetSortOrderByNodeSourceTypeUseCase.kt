@@ -24,7 +24,10 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
      * @param nodeSource The source of the node.
      * @return The sort order for the specified node source.
      */
-    suspend operator fun invoke(nodeSource: NodeSourceType, isSingleActivityEnabled :Boolean): SortOrder =
+    suspend operator fun invoke(
+        nodeSource: NodeSourceType,
+        isSingleActivityEnabled: Boolean,
+    ): SortOrder =
         when (nodeSource) {
             NodeSourceType.LINKS -> getLinksSortOrderUseCase(isSingleActivityEnabled)
             NodeSourceType.INCOMING_SHARES -> getOthersSortOrder()
@@ -39,6 +42,7 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.OTHER,
             NodeSourceType.VIDEOS,
             NodeSourceType.SEARCH,
+            NodeSourceType.RECENTS_BUCKET,
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()

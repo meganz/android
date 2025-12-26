@@ -56,7 +56,7 @@ data class RecentsUiItem(
 
     /**
      * Unique key for the item in a list
-     * Adjust for duplicate node node buckets
+     * Adjust for duplicate single node buckets edge case
      */
     val key = buildString {
         append(bucket.identifier)

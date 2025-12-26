@@ -74,6 +74,11 @@ enum class NodeSourceType {
      * When node source is Search results
      */
     SEARCH,
+
+    /**
+     * When node source is Recents Bucket
+     */
+    RECENTS_BUCKET,
 }
 
 /**

@@ -538,6 +538,8 @@ class VideosTabViewModelTest {
                 anyOrNull(),
                 anyOrNull(),
                 anyOrNull(),
+                anyOrNull(),
+                anyOrNull(),
             )
         ).thenReturn(mockNavKey)
 

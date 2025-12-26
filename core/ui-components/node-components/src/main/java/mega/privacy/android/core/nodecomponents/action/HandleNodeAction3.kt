@@ -28,6 +28,8 @@ fun HandleNodeAction3(
     nodeSourceType: NodeSourceType,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
+    nodeIds: List<Long>? = null,
+    isInShare: Boolean = false,
 ) {
     val fileNodeContentToNavKeyMapper = remember {
         FileNodeContentToNavKeyMapper(NodeSourceTypeToViewTypeMapper())
@@ -45,7 +47,9 @@ fun HandleNodeAction3(
                 content = content,
                 fileNode = typedFileNode,
                 nodeSourceType = nodeSourceType,
-                sortOrder = sortOrder
+                sortOrder = sortOrder,
+                nodeIds = nodeIds,
+                isInShare = isInShare
             )?.let { navKey ->
                 onNavigate(navKey)
             }

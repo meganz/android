@@ -28,6 +28,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      * @param nodeSourceType The NodeSourceType
      * @param sortOrder The sort order for media player (default: ORDER_NONE)
      * @param textEditorMode The text editor mode (default: View)
+     * @param searchedItems The searched items for media player (default: null)
+     * @param nodeIds The list of node ids of current screen, e.g. from recents bucket (default: null)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
@@ -37,6 +39,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
+        nodeIds: List<Long>? = null,
+        isInShare: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
         return when (content) {
@@ -50,7 +54,9 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
             is FileNodeContent.ImageForNode -> LegacyImageViewerNavKey(
                 nodeHandle = fileNode.id.longValue,
                 parentNodeHandle = fileNode.parentId.longValue,
-                nodeSourceType = viewType
+                nodeSourceType = viewType,
+                nodeIds = nodeIds,
+                isInShare = isInShare
             )
 
             is FileNodeContent.TextContent -> LegacyTextEditorNavKey(
@@ -69,7 +75,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 parentHandle = fileNode.parentId.longValue,
                 fileHandle = fileNode.id.longValue,
                 fileTypeInfo = fileNode.type,
-                searchedItems = searchedItems
+                searchedItems = searchedItems,
+                nodeHandles = nodeIds
             )
 
             is FileNodeContent.LocalZipFile -> LegacyZipBrowserNavKey(

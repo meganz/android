@@ -615,4 +615,5 @@ class DefaultMediaPlayerRepositoryTest {
         assertThat(actual).isEqualTo(expectedPlaybackInfo)
         verify(megaLocalRoomGateway).getMediaPlaybackInfo(expectedHandle)
     }
+
 }

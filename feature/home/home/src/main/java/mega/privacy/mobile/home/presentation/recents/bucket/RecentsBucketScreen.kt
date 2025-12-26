@@ -40,6 +40,7 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
@@ -63,7 +64,7 @@ fun RecentsBucketScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-    var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
+    var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val listState = rememberLazyListState()
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -111,7 +112,7 @@ fun RecentsBucketScreen(
                 } else {
                     val node = item.node
                     if (node is TypedFileNode) {
-                        openedFileNode = node to nodeSourceType
+                        openedFileNode = node
                     }
                 }
             },
@@ -150,16 +151,17 @@ fun RecentsBucketScreen(
             viewModel.deselectAllItems()
         }
 
-        // TODO handle for recents, with list of node ids
-        openedFileNode?.let { (node, source) ->
+        openedFileNode?.let { node ->
             HandleNodeAction3(
                 typedFileNode = node,
                 snackBarHostState = LocalSnackBarHostState.current,
                 coroutineScope = coroutineScope,
                 onActionHandled = { openedFileNode = null },
-                nodeSourceType = source,
+                nodeSourceType = NodeSourceType.RECENTS_BUCKET,
                 onDownloadEvent = transferHandler::setTransferEvent,
                 onNavigate = onNavigate,
+                nodeIds = uiState.nodeIds,
+                isInShare = uiState.nodeSourceType.isSharedSource()
             )
         }
     }

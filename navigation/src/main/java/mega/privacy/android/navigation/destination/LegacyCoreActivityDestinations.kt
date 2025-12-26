@@ -242,6 +242,8 @@ data class LegacyImageViewerNavKey(
     val nodeHandle: Long,
     val parentNodeHandle: Long,
     val nodeSourceType: Int? = null,
+    val nodeIds: List<Long>? = null,
+    val isInShare: Boolean = false,
 ) : NoSessionNavKey.Optional
 
 @Serializable
@@ -264,6 +266,7 @@ data class LegacyMediaPlayerNavKey(
     val fileHandle: Long,
     val fileTypeInfo: FileTypeInfo,
     val searchedItems: List<Long>? = null,
+    val nodeHandles: List<Long>? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

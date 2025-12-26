@@ -59,4 +59,10 @@ data class RecentsBucketUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
+     * Returns a list of current node ids in the bucket.
+     */
+    val nodeIds: List<Long>
+        get() = items.map { it.node.id.longValue }
 }
