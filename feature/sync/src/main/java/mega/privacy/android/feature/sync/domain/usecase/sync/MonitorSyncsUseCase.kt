@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
@@ -21,6 +22,7 @@ class MonitorSyncsUseCaseImpl @Inject constructor(
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val canReadUriUseCase: CanReadUriUseCase,
+    private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
 ) : MonitorSyncsUseCase {
 
 
@@ -48,14 +50,23 @@ class MonitorSyncsUseCaseImpl @Inject constructor(
                         send(validSyncs + pausedSyncs)
                         val notResumedSyncs = handleInvalidSyncs(invalidSyncs)
                         val totalSyncs =
-                            validSyncs + pausedSyncs.minus(notResumedSyncs) + notResumedSyncs
+                            validSyncs + pausedSyncs.minus(notResumedSyncs.toSet()) + notResumedSyncs
                         send(totalSyncs)
                     } else {
                         send(validSyncs)
                     }
                 }
         }
+    }.onEach {
+        if (isSyncingCompleted(it)) {
+            // this will ensure that when sync worker is not running when app is opened,
+            // if the cancelled sync worker's syncs are completed then set the foreground preference to false
+            setSyncWorkerForegroundPreferenceUseCase(false)
+        }
     }
+
+    private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
+        syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
 
     private suspend fun handleInvalidSyncs(invalidSyncs: List<FolderPair>): List<FolderPair> {
         return invalidSyncs.mapNotNull { folderPair ->

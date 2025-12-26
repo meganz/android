@@ -19,6 +19,7 @@ import mega.privacy.android.feature.sync.domain.repository.SyncRepository
 import mega.privacy.android.feature.sync.domain.usecase.sync.ChangeSyncLocalRootUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -40,11 +41,15 @@ internal class MonitorSyncsUseCaseTest {
     private val resumeSyncUseCase: ResumeSyncUseCase = mock()
     private val canReadUriUseCase: CanReadUriUseCase = mock()
 
+    private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase =
+        mock()
+
     private val underTest = MonitorSyncsUseCaseImpl(
         syncRepository = syncRepository,
         changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
         resumeSyncUseCase = resumeSyncUseCase,
         canReadUriUseCase = canReadUriUseCase,
+        setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase
     )
 
     private val validFolderPairs = listOf(
@@ -92,7 +97,13 @@ internal class MonitorSyncsUseCaseTest {
 
     @AfterEach
     fun resetMocks() {
-        reset(syncRepository, changeSyncLocalRootUseCase, resumeSyncUseCase, canReadUriUseCase)
+        reset(
+            syncRepository,
+            changeSyncLocalRootUseCase,
+            resumeSyncUseCase,
+            canReadUriUseCase,
+            setSyncWorkerForegroundPreferenceUseCase
+        )
     }
 
     @Test
@@ -220,4 +231,110 @@ internal class MonitorSyncsUseCaseTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that only syncs with MISMATCH_OF_ROOT_FSID error are processed as invalid`() =
+        runTest {
+            val syncWithDifferentError = FolderPair(
+                id = 5L,
+                syncType = SyncType.TYPE_TWOWAY,
+                pairName = "DifferentErrorSync",
+                localFolderPath = "SomePath",
+                remoteFolder = RemoteFolder(id = NodeId(999L), name = "test"),
+                syncStatus = SyncStatus.SYNCING,
+                syncError = SyncError.ACTIVE_SYNC_SAME_PATH // Different error
+            )
+
+            val mixedSyncs = validFolderPairs + invalidFolderPairs + listOf(syncWithDifferentError)
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(mixedSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            invalidFolderPairs.forEach {
+                whenever(canReadUriUseCase(it.localFolderPath)).thenReturn(false)
+            }
+
+            underTest().test {
+                val result = awaitItem()
+
+                // Only MISMATCH_OF_ROOT_FSID syncs should be converted to paused
+                val expectedResult = validFolderPairs +
+                        listOf(syncWithDifferentError) + // This should remain unchanged
+                        invalidFolderPairs.map {
+                            it.copy(
+                                syncStatus = SyncStatus.PAUSED,
+                                syncError = SyncError.NO_SYNC_ERROR
+                            )
+                        }
+
+                Truth.assertThat(result).containsExactlyElementsIn(expectedResult)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is called when all syncs are completed`() =
+        runTest {
+            val completedSyncs = listOf(
+                validFolderPairs[0].copy(syncStatus = SyncStatus.SYNCED),
+                validFolderPairs[1].copy(syncStatus = SyncStatus.PAUSED)
+            )
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(completedSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                awaitItem()
+                verify(setSyncWorkerForegroundPreferenceUseCase).invoke(false)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is not called when syncs are still running`() =
+        runTest {
+            val runningSyncs = listOf(
+                validFolderPairs[0].copy(syncStatus = SyncStatus.SYNCING),
+                validFolderPairs[1].copy(syncStatus = SyncStatus.SYNCED)
+            )
+
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(runningSyncs)
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                awaitItem()
+                verify(setSyncWorkerForegroundPreferenceUseCase, never()).invoke(any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setSyncWorkerForegroundPreference is not called when sync list is empty`() =
+        runTest {
+            whenever(syncRepository.monitorFolderPairChanges()).thenReturn(
+                flow {
+                    emit(emptyList())
+                    awaitCancellation()
+                }
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                Truth.assertThat(result).isEmpty()
+                verify(setSyncWorkerForegroundPreferenceUseCase, never()).invoke(any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }
