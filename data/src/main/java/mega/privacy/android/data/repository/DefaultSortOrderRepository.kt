@@ -48,7 +48,9 @@ internal class DefaultSortOrderRepository @Inject constructor(
             .flowOn(ioDispatcher)
 
     override suspend fun getCloudSortOrder(): SortOrder? = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder())
+        sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder()).also {
+            sortOrderFlow.emit(it)
+        }
     }
 
     override suspend fun getLinksSortOrder(isSingleActivityEnabled: Boolean): SortOrder? =

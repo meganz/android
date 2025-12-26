@@ -35,7 +35,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -78,7 +77,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
-    private val getCloudSortOrderUseCase: GetCloudSortOrder,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -172,14 +170,6 @@ class CloudDriveViewModel @AssistedInject constructor(
                         showHiddenNodes = showHiddenItems
                     )
                 }
-            }
-        }
-        viewModelScope.launch {
-            runCatching {
-                val sortOrder = getCloudSortOrderUseCase()
-                updateSortOrder(sortOrder)
-            }.onFailure {
-                Timber.e(it, "Failed to get cloud sort order")
             }
         }
     }

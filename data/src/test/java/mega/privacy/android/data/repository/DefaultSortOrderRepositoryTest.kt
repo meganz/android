@@ -1,5 +1,6 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -31,6 +32,10 @@ internal class DefaultSortOrderRepositoryTest {
 
     @BeforeAll
     fun setUp() {
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = DefaultSortOrderRepository(
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
@@ -247,5 +252,27 @@ internal class DefaultSortOrderRepositoryTest {
         whenever(sortOrderIntMapper.invoke(order)).thenReturn(expected)
         underTest.setOthersSortOrder(order)
         verify(sortOrderIntMapper).invoke(order)
+    }
+
+    @Test
+    fun `test that monitorCloudSortOrder is emit as expected`() = runTest {
+        val order = SortOrder.ORDER_DEFAULT_ASC
+        val expected = MegaApiJava.ORDER_DEFAULT_ASC
+        whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(expected)
+        whenever(sortOrderMapper(expected)).thenReturn(order)
+
+        initUnderTest()
+
+        val flow = underTest.monitorCloudSortOrder()
+
+        flow.test {
+            val result = awaitItem()
+
+            assertThat(result).isEqualTo(order)
+            cancelAndIgnoreRemainingEvents()
+
+            verify(sortOrderMapper).invoke(expected)
+            verify(megaLocalStorageGateway).getCloudSortOrder()
+        }
     }
 }
