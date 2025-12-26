@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -87,6 +88,7 @@ class CloudDriveViewModelTest {
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
         mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val getCloudSortOrderUseCase: GetCloudSortOrder = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -119,7 +121,8 @@ class CloudDriveViewModelTest {
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase,
-            monitorSortCloudOrderUseCase
+            monitorSortCloudOrderUseCase,
+            getCloudSortOrderUseCase
         )
     }
 
@@ -146,6 +149,7 @@ class CloudDriveViewModelTest {
         getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
+        getCloudSortOrderUseCase = getCloudSortOrderUseCase
     )
 
     private suspend fun setupTestData(
