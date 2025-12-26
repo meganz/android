@@ -288,6 +288,8 @@ internal class TimelineViewModelTest {
                 .isTrue()
             assertWithMessage("enableSortOption value is incorrect").that(initialState.enableSortOption)
                 .isTrue()
+            assertWithMessage("enableFilterOption value is incorrect").that(initialState.enableFilterOption)
+                .isTrue()
             assertWithMessage("enableCameraUploadButtonShowing value is incorrect").that(
                 initialState.enableCameraUploadButtonShowing
             ).isTrue()

@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.feature.photos.provider.PhotosCache.updatePhotos
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
@@ -76,6 +75,7 @@ import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.feature.photos.provider.PhotosCache.updatePhotos
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -589,6 +589,7 @@ class TimelineViewModel @Inject constructor(
         _state.update {
             it.copy(
                 photos = sourcePhotos,
+                enableFilterOption = sourcePhotos.isNotEmpty(),
                 loadPhotosDone = true,
                 currentShowingPhotos = sortedPhotos,
                 enableCameraUploadPageShowing = sortedPhotos.isEmpty() && !isCameraUploadsEnabled,

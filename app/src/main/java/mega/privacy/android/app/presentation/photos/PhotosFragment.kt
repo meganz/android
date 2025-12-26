@@ -60,7 +60,6 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActi
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
-import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.app.presentation.photos.compose.navigation.CameraUploadsTransferScreen
 import mega.privacy.android.app.presentation.photos.compose.navigation.PhotosNavigationGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavigationGraph
@@ -97,6 +96,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
@@ -604,45 +604,35 @@ class PhotosFragment : Fragment() {
                 it.title = s
             }
         }
-
+        menu.findItem(R.id.action_photos_filter_secondary)?.let {
+            it.isEnabled = timelineViewModel.state.value.enableFilterOption
+            setDisabledMenuItemTextColorToGray(it, timelineViewModel.state.value.enableFilterOption)
+        }
         menu.findItem(R.id.action_zoom_in)?.let {
             it.isEnabled = zoomInValid
-            it.title = SpannableString(it.title.toString()).apply {
-                if (zoomInValid) return@apply
-
-                val color = if (Util.isDarkMode(requireContext())) {
-                    Color.argb(38, 255, 255, 255)
-                } else {
-                    Color.argb(38, 0, 0, 0)
-                }
-
-                setSpan(
-                    ForegroundColorSpan(color),
-                    0,
-                    it.title?.length ?: 0,
-                    0,
-                )
-            }
+            setDisabledMenuItemTextColorToGray(it, zoomInValid)
         }
 
         menu.findItem(R.id.action_zoom_out)?.let {
             it.isEnabled = zoomOutValid
-            it.title = SpannableString(it.title.toString()).apply {
-                if (zoomOutValid) return@apply
+            setDisabledMenuItemTextColorToGray(it, zoomOutValid)
+        }
+    }
 
-                val color = if (Util.isDarkMode(requireContext())) {
-                    Color.argb(38, 255, 255, 255)
-                } else {
-                    Color.argb(38, 0, 0, 0)
-                }
-
-                setSpan(
-                    ForegroundColorSpan(color),
-                    0,
-                    it.title?.length ?: 0,
-                    0,
-                )
+    private fun setDisabledMenuItemTextColorToGray(menuItem: MenuItem, isEnabled: Boolean) {
+        menuItem.title = SpannableString(menuItem.title.toString()).apply {
+            if (isEnabled) return@apply
+            val color = if (Util.isDarkMode(requireContext())) {
+                Color.argb(38, 255, 255, 255)
+            } else {
+                Color.argb(38, 0, 0, 0)
             }
+            setSpan(
+                ForegroundColorSpan(color),
+                0,
+                menuItem.title?.length ?: 0,
+                0,
+            )
         }
     }
 

@@ -39,6 +39,7 @@ import mega.privacy.android.feature.photos.model.ZoomLevel
  * @property enableZoomIn                               True if the Zoom In button is enabled
  * @property enableZoomOut                              True is the Zoom Out button is enabled
  * @property enableSortOption                           True is the Sort option menu is enabled
+ * @property enableFilterOption                         True is the Filter option menu is enabled
  * @property enableCameraUploadButtonShowing            True if we should show the Enable Camera Upload button
  * @property progressBarShowing                         True if we should show progress bar
  * @property progress                                   The current Camera Uploads progress
@@ -94,6 +95,7 @@ data class TimelineViewState(
     val enableZoomIn: Boolean = true,
     val enableZoomOut: Boolean = true,
     val enableSortOption: Boolean = true,
+    val enableFilterOption: Boolean = true,
     val enableCameraUploadButtonShowing: Boolean = true,
     val progressBarShowing: Boolean = false,
     val progress: Float = 0f,
