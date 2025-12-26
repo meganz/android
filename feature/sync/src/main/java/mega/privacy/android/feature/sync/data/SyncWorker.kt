@@ -1,8 +1,12 @@
 package mega.privacy.android.feature.sync.data
 
+import android.app.ForegroundServiceStartNotAllowedException
 import android.content.Context
+import android.content.pm.ServiceInfo
+import android.os.Build
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -19,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -27,12 +32,15 @@ import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.MonitorSyncNotificationsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.notifcation.SetSyncNotificationShownUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
 import timber.log.Timber
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,6 +62,9 @@ internal class SyncWorker @AssistedInject constructor(
     private val pauseResumeSyncsBasedOnBatteryAndWiFiUseCase: PauseResumeSyncsBasedOnBatteryAndWiFiUseCase,
     private val isRootNodeExistsUseCase: RootNodeExistsUseCase,
     private val syncPermissionManager: SyncPermissionsManager,
+    private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
+    private val getSyncWorkerForegroundPreferenceUseCase: GetSyncWorkerForegroundPreferenceUseCase,
+    private val foregroundSetter: ForegroundSetter? = null,
 ) : CoroutineWorker(context, workerParams) {
 
     private var monitorNotificationsJob: Job? = null
@@ -61,22 +72,60 @@ internal class SyncWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = coroutineScope {
         Timber.d("SyncWorker started")
-        if (isLoginSuccessful()) {
-            monitorNotificationsJob = monitorNotifications()
-            val result = withTimeoutOrNull(MAX_DURATION.minutes) {
-                checkSyncStatus()
-            } ?: Result.retry()
-            Timber.d("withTimeoutOrNull returned $result")
+        runCatching {
+            val isForeground = tryPromoteToForeground()
+            if (isLoginSuccessful()) {
+                val timeoutDuration = if (isForeground) {
+                    MAX_FOREGROUND_DURATION_IN_HOURS.hours
+                } else {
+                    MAX_BACKGROUND_DURATION_IN_MINUTES.minutes
+                }
+
+                monitorNotificationsJob = monitorNotifications()
+                val result = withTimeoutOrNull(timeoutDuration) {
+                    checkSyncStatus()
+                }
+
+                return@coroutineScope if (result == null) {
+                    // Timeout occurred
+                    Timber.d("SyncWorker timeout")
+                    setSyncWorkerForegroundPreferenceUseCase(true)
+                    cancelNotificationJob()
+                    Result.retry()
+                } else {
+                    Timber.d("withTimeoutOrNull returned $result")
+                    setSyncWorkerForegroundPreferenceUseCase(false)
+                    cancelNotificationJob()
+                    Timber.d("SyncWorker finished, result: $result")
+                    result
+                }
+            } else {
+                // login failed after few attempts
+                Timber.d("Login failed")
+                cancelNotificationJob()
+                Timber.d("SyncWorker finished")
+                return@coroutineScope Result.retry()
+            }
+        }.getOrElse {
+            Timber.e(it)
             cancelNotificationJob()
-            Timber.d("SyncWorker finished, result: $result")
-            return@coroutineScope result
-        } else {
-            // login failed after few attempts
-            Timber.d("Login failed")
-            cancelNotificationJob()
-            Timber.d("SyncWorker finished")
             return@coroutineScope Result.retry()
         }
+    }
+
+    private suspend fun tryPromoteToForeground(): Boolean {
+        val canAttemptForeground = syncPermissionManager.isNotificationsPermissionGranted()
+                && getSyncWorkerForegroundPreferenceUseCase()
+
+        if (!canAttemptForeground) {
+            return false
+        }
+
+        val promoted = promoteToForeground()
+        if (promoted) {
+            Timber.d("SyncWorker running in Foreground")
+        }
+        return promoted
     }
 
     private suspend fun CoroutineScope.checkSyncStatus(): Result {
@@ -91,7 +140,7 @@ internal class SyncWorker @AssistedInject constructor(
         // add initial delay before checking the sync status
         delay(1.minutes)
         while (syncs.isEmpty() || isSyncingCompleted(syncs).not()) {
-            delay(SYNC_WORKER_RECHECK_DELAY)
+            delay(SYNC_WORKER_RECHECK_DELAY_IN_SECONDS.seconds)
             Timber.d("checking sync status...")
         }
         Timber.d("all syncs completed")
@@ -107,6 +156,41 @@ internal class SyncWorker @AssistedInject constructor(
 
     private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
         syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }
+
+    private suspend fun promoteToForeground(): Boolean {
+        val foregroundInfo = createForegroundInfo()
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                foregroundSetter?.setForeground(foregroundInfo) ?: setForeground(foregroundInfo)
+                true
+            } catch (e: ForegroundServiceStartNotAllowedException) {
+                Timber.w(e, "Failed to promote SyncWorker to foreground")
+                false
+            } catch (e: IllegalStateException) {
+                Timber.w(e, "The worker is subject to foreground service restrictions")
+                false
+            }
+        } else {
+            foregroundSetter?.setForeground(foregroundInfo) ?: setForeground(foregroundInfo)
+            true
+        }
+    }
+
+    private fun createForegroundInfo(): ForegroundInfo {
+        val notification = syncNotificationManager.createForegroundNotification(context)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                SYNC_FOREGROUND_NOTIFICATION_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(
+                SYNC_FOREGROUND_NOTIFICATION_ID,
+                notification
+            )
+        }
+    }
 
     /**
      * When the user is not logged in, perform a Complete Fast Login procedure
@@ -190,13 +274,20 @@ internal class SyncWorker @AssistedInject constructor(
         const val SYNC_WORKER_TAG = "SYNC_WORKER_TAG"
 
         /**
-         * Delay for to check whether the syncs are finished
+         * Delay in seconds to check whether the syncs are finished
          */
-        const val SYNC_WORKER_RECHECK_DELAY = 6000L
+        const val SYNC_WORKER_RECHECK_DELAY_IN_SECONDS = 30
 
         /**
          * Max Duration for the sync worker to run
          */
-        const val MAX_DURATION = 9 // 9 minutes in milliseconds
+        const val MAX_BACKGROUND_DURATION_IN_MINUTES = 9 // 9 minutes
+
+        const val MAX_FOREGROUND_DURATION_IN_HOURS = 1 // 1 hour
+
+        /**
+         * Notification ID for the foreground service
+         */
+        const val SYNC_FOREGROUND_NOTIFICATION_ID = 123456
     }
 }
