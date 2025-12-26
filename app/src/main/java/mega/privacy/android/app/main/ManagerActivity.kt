@@ -1897,6 +1897,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             )
         }
         isInFilterPage = savedInstanceState.getBoolean(STATE_KEY_IS_IN_PHOTOS_FILTER, false)
+        if (isInFilterPage) {
+            photosFilterFragment = supportFragmentManager.getFragment(
+                savedInstanceState,
+                FragmentTag.PHOTOS_FILTER.tag
+            ) as? PhotosFilterFragment
+        }
 
         //upload from device, progress dialog should show when screen orientation changes.
         if (savedInstanceState.getBoolean(PROCESS_FILE_DIALOG_SHOWN, false)) {
@@ -3479,6 +3485,25 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
+    /**
+     * Sets up the common UI state for the Photos drawer item.
+     *
+     * @param hideBottomNav Whether to hide the bottom navigation bar
+     * @param hideFab Whether to hide the floating action button
+     */
+    private fun setupPhotosDrawerItem(hideBottomNav: Boolean, hideFab: Boolean) {
+        setAppBarVisibility(true)
+        setToolbarTitle()
+        supportInvalidateOptionsMenu()
+        if (hideFab) hideFabButton() else showFabButton()
+        showHideBottomNavigationView(hideBottomNav)
+        if (!comesFromNotifications) {
+            bottomNavigationCurrentItem = PHOTOS_BNV
+        }
+        setBottomNavigationMenuItemChecked(PHOTOS_BNV)
+        changeAppBarElevation(false)
+    }
+
     private fun selectDrawerItemNotifications() {
         Timber.d("selectDrawerItemNotifications")
         setAppBarVisibility(true)
@@ -3829,26 +3854,32 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             DrawerItem.PHOTOS -> {
-                if ((isInAlbumContent || isInFilterPage) && photosFragment?.isCameraUploadsTransferScreen() == true) {
-                    showHideBottomNavigationView(true)
-                } else {
-                    setAppBarVisibility(true)
-                    if (getPhotosFragment() == null) {
-                        photosFragment =
-                            PhotosFragment.newInstance(viewModel.state().isFirstLogin)
-                    } else {
-                        refreshFragment(FragmentTag.PHOTOS.tag)
+                when {
+                    (isInAlbumContent || isInFilterPage) && photosFragment?.isCameraUploadsTransferScreen() == true -> {
+                        showHideBottomNavigationView(true)
                     }
-                    photosFragment?.let { replaceFragment(it, FragmentTag.PHOTOS.tag) }
-                    setToolbarTitle()
-                    supportInvalidateOptionsMenu()
-                    showFabButton()
-                    showHideBottomNavigationView(false)
-                    if (!comesFromNotifications) {
-                        bottomNavigationCurrentItem = PHOTOS_BNV
+
+                    isInAlbumContent && albumContentFragment != null -> {
+                        // Restore album content state after configuration change
+                        hideAdsView()
+                        setupPhotosDrawerItem(hideBottomNav = true, hideFab = true)
                     }
-                    setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-                    changeAppBarElevation(false)
+
+                    isInFilterPage && photosFilterFragment != null -> {
+                        // Restore filter page state after configuration change
+                        setupPhotosDrawerItem(hideBottomNav = true, hideFab = true)
+                    }
+
+                    else -> {
+                        if (getPhotosFragment() == null) {
+                            photosFragment =
+                                PhotosFragment.newInstance(viewModel.state().isFirstLogin)
+                        } else {
+                            refreshFragment(FragmentTag.PHOTOS.tag)
+                        }
+                        photosFragment?.let { replaceFragment(it, FragmentTag.PHOTOS.tag) }
+                        setupPhotosDrawerItem(hideBottomNav = false, hideFab = false)
+                    }
                 }
             }
 

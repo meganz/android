@@ -37,11 +37,9 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumType
-import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Util
@@ -57,6 +55,8 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
 import mega.privacy.mobile.analytics.event.AlbumContentScreenEvent
@@ -189,6 +189,7 @@ class AlbumContentFragment : Fragment() {
                     }
 
                     if (state.uiAlbum != null && !isContextMenuInitialized) {
+                        managerActivity.setToolbarTitle(getCurrentAlbumTitle())
                         managerActivity.invalidateOptionsMenu()
                         isContextMenuInitialized = true
                     }
@@ -396,6 +397,7 @@ class AlbumContentFragment : Fragment() {
      * Get current page title
      */
     fun getCurrentAlbumTitle(): String {
+        if (isDetached) return ""
         val currentUIAlbum = albumContentViewModel.state.value.uiAlbum
         return if (context != null && currentUIAlbum != null) {
             currentUIAlbum.title.getTitleString(requireContext())
