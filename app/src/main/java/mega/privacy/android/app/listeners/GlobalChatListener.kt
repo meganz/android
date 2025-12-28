@@ -1,8 +1,10 @@
 package mega.privacy.android.app.listeners
 
 import android.app.Application
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
@@ -10,6 +12,8 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.BroadcastChatSignalPresenceUseCase
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
@@ -26,7 +30,9 @@ class GlobalChatListener @Inject constructor(
     private val chatManagement: ChatManagement,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val broadcastChatSignalPresenceUseCase: BroadcastChatSignalPresenceUseCase
+    private val broadcastChatSignalPresenceUseCase: BroadcastChatSignalPresenceUseCase,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : MegaChatListenerInterface {
     override fun onChatListItemUpdate(api: MegaChatApiJava?, item: MegaChatListItem?) {
         if (item != null) {
@@ -37,10 +43,16 @@ class GlobalChatListener @Inject constructor(
     override fun onChatInitStateUpdate(api: MegaChatApiJava?, newState: Int) {
         if (newState == INIT_ONLINE_SESSION) {
             api?.let {
-                val list = it.chatListItems
-                if (!list.isNullOrEmpty()) {
-                    for (i in 0 until list.size) {
-                        MegaApplication.getChatManagement().addCurrentGroupChat(list[i].chatId)
+                applicationScope.launch {
+                    val list = withContext(ioDispatcher) {
+                        it.chatListItems
+                    }
+                    if (!list.isNullOrEmpty()) {
+                        withContext(mainDispatcher) {
+                            for (i in 0 until list.size) {
+                                MegaApplication.getChatManagement().addCurrentGroupChat(list[i].chatId)
+                            }
+                        }
                     }
                 }
             }
