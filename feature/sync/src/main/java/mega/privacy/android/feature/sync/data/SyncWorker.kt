@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
@@ -39,6 +40,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegr
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.ui.notification.SyncNotificationManager
 import mega.privacy.android.feature.sync.ui.permissions.SyncPermissionsManager
+import mega.privacy.mobile.analytics.event.SyncWorkerForegroundExecutionStartedEvent
 import timber.log.Timber
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -162,6 +164,7 @@ internal class SyncWorker @AssistedInject constructor(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             try {
                 foregroundSetter?.setForeground(foregroundInfo) ?: setForeground(foregroundInfo)
+                Analytics.tracker.trackEvent(SyncWorkerForegroundExecutionStartedEvent)
                 true
             } catch (e: ForegroundServiceStartNotAllowedException) {
                 Timber.w(e, "Failed to promote SyncWorker to foreground")
@@ -172,6 +175,7 @@ internal class SyncWorker @AssistedInject constructor(
             }
         } else {
             foregroundSetter?.setForeground(foregroundInfo) ?: setForeground(foregroundInfo)
+            Analytics.tracker.trackEvent(SyncWorkerForegroundExecutionStartedEvent)
             true
         }
     }
