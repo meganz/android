@@ -73,6 +73,12 @@ enum class NodeSortOption(
                 Size
             )
 
+            NodeSourceType.VIDEO_PLAYLISTS -> listOf(
+                Name,
+                Created,
+                Modified
+            )
+
             else -> listOf(
                 Name,
                 Favourite,

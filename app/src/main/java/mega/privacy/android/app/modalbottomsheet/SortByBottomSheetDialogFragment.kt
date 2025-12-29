@@ -71,6 +71,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.AUDIO,
                     NodeSourceType.VIDEOS,
                     NodeSourceType.SEARCH,
+                    NodeSourceType.VIDEO_PLAYLISTS,
                     NodeSourceType.RECENTS_BUCKET,
                         -> ORDER_CLOUD
 

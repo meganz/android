@@ -141,6 +141,7 @@ class VideosTabScreenTest {
         VIDEO_TAB_VIDEOS_DURATION_FILTER_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
     }
 
+    @Test
     fun `test that SortBottomSheet is displayed correctly`() {
         val video = createVideoUiEntity(1L)
         val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()

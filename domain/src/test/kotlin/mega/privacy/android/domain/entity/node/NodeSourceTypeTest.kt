@@ -46,6 +46,9 @@ class NodeSourceTypeTest {
             Arguments.of(NodeSourceType.AUDIO),
             Arguments.of(NodeSourceType.OTHER),
             Arguments.of(NodeSourceType.OFFLINE),
+            Arguments.of(NodeSourceType.VIDEO_PLAYLISTS),
+            Arguments.of(NodeSourceType.VIDEOS),
+            Arguments.of(NodeSourceType.SEARCH),
         )
     }
 }

@@ -1250,6 +1250,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.AUDIO,
         NodeSourceType.VIDEOS,
         NodeSourceType.SEARCH,
+        NodeSourceType.VIDEO_PLAYLISTS,
         NodeSourceType.RECENTS_BUCKET,
             -> MegaApiJava.INVALID_HANDLE
 

@@ -5,7 +5,10 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import org.junit.Rule
@@ -22,11 +25,13 @@ class VideoPlaylistsScreenTest {
 
     private fun setComposeContent(
         uiState: VideoPlaylistsTabUiState = VideoPlaylistsTabUiState.Data(),
+        onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
                 uiState = uiState,
+                onSortNodes = onSortNodes,
                 modifier = modifier
             )
         }
@@ -79,6 +84,27 @@ class VideoPlaylistsScreenTest {
         ).assertIsNotDisplayedWithTag()
     }
 
+    @Test
+    fun `test that SortBottomSheet is displayed correctly`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        val onSortNodes = mock<(NodeSortConfiguration) -> Unit>()
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            onSortNodes = onSortNodes
+        )
+
+        VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+
+        with(SORT_ORDER_TAG.getNodeWithTag()) {
+            assertIsDisplayed()
+            performClick()
+        }
+
+        VIDEO_PLAYLISTS_TAB_SORT_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
     private fun String.assertIsDisplayedWithTag() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
 
@@ -90,6 +116,9 @@ class VideoPlaylistsScreenTest {
 
     private fun String.assertIsNotDisplayedWithTag() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsNotDisplayed()
+
+    private fun String.getNodeWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
 
     private fun createVideoPlaylistUiEntity(
         handle: Long,

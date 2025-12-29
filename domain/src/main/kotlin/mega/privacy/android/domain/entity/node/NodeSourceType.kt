@@ -76,6 +76,11 @@ enum class NodeSourceType {
     SEARCH,
 
     /**
+     * When node source is Video Playlists
+     */
+    VIDEO_PLAYLISTS,
+
+    /**
      * When node source is Recents Bucket
      */
     RECENTS_BUCKET,
