@@ -17,6 +17,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.Constants
@@ -49,25 +50,39 @@ internal fun ChatSessionContainer(
     val context = LocalContext.current
 
     LaunchedEffect(state) {
-        if (state is ChatSessionState.Invalid) {
+        if (state.sessionState is ChatSessionState.Invalid) {
             Timber.d("Chat session not valid. Navigating to login")
-            navigateToLogin(context)
+            navigateToLogin(context, state.isSingleActivityEnabled)
         }
     }
 
-    if (state is ChatSessionState.Valid) {
+    if (state.sessionState is ChatSessionState.Valid) {
         Timber.d("Chat session is valid. Displaying content")
         content()
-    } else if (state is ChatSessionState.Pending) {
+    } else if (state.sessionState is ChatSessionState.Pending) {
         loadingView()
     }
 }
 
-private fun navigateToLogin(context: Context) {
+private fun navigateToLogin(
+    context: Context,
+    isSingleActivityEnabled: Boolean,
+) {
     context.findActivity()?.let { activity ->
-        val intent = Intent(context, LoginActivity::class.java).apply {
+        val targetActivity = if (isSingleActivityEnabled && activity is MegaActivity) {
+            MegaActivity::class.java
+        } else {
+            LoginActivity::class.java
+        }
+        val intent = Intent(context, targetActivity).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            putExtra(Constants.LAUNCH_INTENT, activity.intent)
+            putExtra(
+                Constants.LAUNCH_INTENT,
+                activity.intent.apply {
+                    // remove flags that may cause issues when navigate from notification
+                    flags = 0
+                }
+            )
         }
         context.startActivity(intent)
         activity.finish()

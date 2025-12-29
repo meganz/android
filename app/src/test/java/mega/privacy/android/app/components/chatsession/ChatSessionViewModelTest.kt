@@ -9,7 +9,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.CheckChatSessionUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -28,11 +31,15 @@ internal class ChatSessionViewModelTest {
     private lateinit var underTest: ChatSessionViewModel
 
     private val checkChatSessionUseCase: CheckChatSessionUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock {
+        onBlocking { invoke(any()) }.thenReturn(false)
+    }
 
     @BeforeAll
     fun setUp() {
         underTest = ChatSessionViewModel(
             checkChatSessionUseCase = checkChatSessionUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -40,6 +47,7 @@ internal class ChatSessionViewModelTest {
     fun resetMocks() {
         reset(
             checkChatSessionUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -53,15 +61,15 @@ internal class ChatSessionViewModelTest {
 
 
     @Test
-    fun `test that successful checkChatSession updates isChatSessionValid to true`() = runTest {
+    fun `test that successful checkChatSession updates sessionState to Valid`() = runTest {
         underTest.checkChatSession()
         underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Valid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Valid)
         }
     }
 
     @Test
-    fun `test that failed checkChatSession updates isChatSessionValid to false`() = runTest {
+    fun `test that failed checkChatSession updates sessionState to Invalid`() = runTest {
         whenever(checkChatSessionUseCase()).thenAnswer {
             throw Exception("Call failed")
         }
@@ -69,7 +77,7 @@ internal class ChatSessionViewModelTest {
         underTest.checkChatSession()
 
         underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Invalid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Invalid)
         }
     }
 
@@ -86,19 +94,38 @@ internal class ChatSessionViewModelTest {
             throw Exception("Call failed")
         }
 
-        assertThat(underTest.state.value).isEqualTo(ChatSessionState.Pending)
+        assertThat(underTest.state.value.sessionState).isEqualTo(ChatSessionState.Pending)
         underTest.checkChatSession(optimistic)
 
         underTest.state.test {
             if (optimistic) {
-                assertThat(awaitItem()).isEqualTo(ChatSessionState.Valid)
+                assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Valid)
             } else {
-                assertThat(awaitItem()).isEqualTo(ChatSessionState.Pending)
+                assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Pending)
             }
-            assertThat(awaitItem()).isEqualTo(ChatSessionState.Invalid)
+            assertThat(awaitItem().sessionState).isEqualTo(ChatSessionState.Invalid)
         }
 
         Dispatchers.setMain(UnconfinedTestDispatcher())
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that init block fetches single activity feature flag and updates state correctly`(
+        isEnabled: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(isEnabled)
+
+        val viewModel = ChatSessionViewModel(
+            checkChatSessionUseCase = checkChatSessionUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
+        )
+
+        viewModel.state.test {
+            assertThat(awaitItem().isSingleActivityEnabled).isEqualTo(isEnabled)
+        }
+
+        verify(getFeatureFlagValueUseCase).invoke(AppFeatures.SingleActivity)
     }
 
 }
