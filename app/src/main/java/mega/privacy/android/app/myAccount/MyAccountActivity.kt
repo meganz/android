@@ -166,6 +166,11 @@ internal class MyAccountActivity : PasscodeActivity(),
         consumeInsetsWithToolbar(customToolbar = binding.toolbar)
         setContentView(binding.root)
         onBackPressedDispatcher.addCallback(this, onBackPressCallback)
+
+        navController =
+            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
+                .navController
+        setupNavigationGraph(savedInstanceState)
         setupView()
         setupObservers()
         manageIntentExtras()
@@ -268,30 +273,8 @@ internal class MyAccountActivity : PasscodeActivity(),
             }
 
             ACTION_OPEN_USAGE_METER_FROM_MENU -> {
-                lifecycleScope.launch {
-                    runCatching {
-                        val navGraph = navController.navInflater.inflate(R.navigation.my_account)
-
-                        val myAccountUsageFragmentComposeUI =
-                            runCatching { getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI) }.getOrDefault(
-                                false
-                            )
-
-                        val startDestination =
-                            if (myAccountUsageFragmentComposeUI) {
-                                R.id.my_account_usage_compose
-                            } else {
-                                R.id.my_account_usage
-                            }
-
-                        navGraph.setStartDestination(startDestination)
-                        navController.setGraph(navGraph, intent.extras)
-                        supportActionBar?.apply {
-                            title = resources.getString(R.string.storage_space)
-                        }
-                    }
-                    intent.action = null
-                }
+                // Graph is already set in onCreate, just clear the action
+                intent.action = null
             }
         }
     }
@@ -433,6 +416,48 @@ internal class MyAccountActivity : PasscodeActivity(),
         }
     }
 
+    /**
+     * Sets up the navigation graph based on the intent action.
+     * Only sets the graph when savedInstanceState == null.
+     */
+    private fun setupNavigationGraph(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) {
+            return
+        }
+
+        lifecycleScope.launch {
+            runCatching {
+                val navGraph = navController.navInflater.inflate(R.navigation.my_account)
+
+                val startDestination = when (intent.action) {
+                    ACTION_OPEN_USAGE_METER_FROM_MENU -> {
+                        val myAccountUsageFragmentComposeUI =
+                            runCatching {
+                                getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)
+                            }.getOrDefault(false)
+
+                        if (myAccountUsageFragmentComposeUI) {
+                            R.id.my_account_usage_compose
+                        } else {
+                            R.id.my_account_usage
+                        }
+                    }
+
+                    else -> R.id.my_account
+                }
+
+                navGraph.setStartDestination(startDestination)
+                navController.setGraph(navGraph, intent.extras)
+
+                if (intent.action == ACTION_OPEN_USAGE_METER_FROM_MENU) {
+                    supportActionBar?.apply {
+                        title = resources.getString(R.string.storage_space)
+                    }
+                }
+            }
+        }
+    }
+
     private fun setupView() {
         updateInfo()
         setSupportActionBar(binding.toolbar)
@@ -442,10 +467,6 @@ internal class MyAccountActivity : PasscodeActivity(),
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
-
-        navController =
-            (supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment)
-                .navController
 
         navController.addOnDestinationChangedListener { _, _, _ ->
             refreshMenuOptionsVisibility()

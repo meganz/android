@@ -18,7 +18,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/my_account"
         android:layout_below="@+id/toolbar"/>
 
     <androidx.compose.ui.platform.ComposeView
