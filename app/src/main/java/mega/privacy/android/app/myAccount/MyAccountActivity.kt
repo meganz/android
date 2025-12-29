@@ -139,8 +139,6 @@ internal class MyAccountActivity : PasscodeActivity(),
 
     private var menu: Menu? = null
 
-    private var navigateToStorageFromMenu: Boolean = false
-
     private var killSessionsConfirmationDialog: AlertDialog? = null
     private var cancelSubscriptionsDialog: AlertDialog? = null
     private var cancelSubscriptionsConfirmationDialog: AlertDialog? = null
@@ -150,7 +148,7 @@ internal class MyAccountActivity : PasscodeActivity(),
     private var cancelSubscriptionsFeedback: String? = null
     private val onBackPressCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            if (!navController.navigateUp() || navigateToStorageFromMenu) {
+            if (!navController.navigateUp()) {
                 finish()
             }
         }
@@ -271,14 +269,26 @@ internal class MyAccountActivity : PasscodeActivity(),
 
             ACTION_OPEN_USAGE_METER_FROM_MENU -> {
                 lifecycleScope.launch {
-                    navigateToStorageFromMenu = true
-                    if (getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)) {
-                        navController.navigate(R.id.action_my_account_to_my_account_usage_compose)
-                    } else {
-                        navController.navigate(R.id.action_my_account_to_my_account_usage)
-                    }
-                    supportActionBar?.apply {
-                        title = resources.getString(R.string.storage_space)
+                    runCatching {
+                        val navGraph = navController.navInflater.inflate(R.navigation.my_account)
+
+                        val myAccountUsageFragmentComposeUI =
+                            runCatching { getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI) }.getOrDefault(
+                                false
+                            )
+
+                        val startDestination =
+                            if (myAccountUsageFragmentComposeUI) {
+                                R.id.my_account_usage_compose
+                            } else {
+                                R.id.my_account_usage
+                            }
+
+                        navGraph.setStartDestination(startDestination)
+                        navController.setGraph(navGraph, intent.extras)
+                        supportActionBar?.apply {
+                            title = resources.getString(R.string.storage_space)
+                        }
                     }
                     intent.action = null
                 }
