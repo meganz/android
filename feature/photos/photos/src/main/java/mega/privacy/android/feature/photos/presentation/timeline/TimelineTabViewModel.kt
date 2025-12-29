@@ -29,7 +29,6 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
@@ -46,14 +45,12 @@ import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNo
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class TimelineTabViewModel @Inject constructor(
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorTimelinePhotosUseCase: MonitorTimelinePhotosUseCase,
     private val photoUiStateMapper: PhotoUiStateMapper,
     private val fileTypeIconMapper: FileTypeIconMapper,
@@ -112,7 +109,7 @@ class TimelineTabViewModel @Inject constructor(
 
     internal val uiState: StateFlow<TimelineTabUiState> by lazy {
         combine(
-            timelineTabUiState(),
+            monitorPhotos(),
             monitorHiddenNodesEnabledUseCase().catch {
                 Timber.e(it, "Unable to monitor hidden nodes enabled")
             }
@@ -126,23 +123,15 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun timelineTabUiState() =
-        flow { emit(isPaginationEnabled()) }
-            .map { isPaginationEnabled ->
-                TimelinePhotosRequest(
-                    isPaginationEnabled = isPaginationEnabled,
-                    selectedFilterFlow = selectedFilterFlow
-                )
-            }
-            .flatMapLatest(::monitorPhotos)
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorPhotos(request: TimelinePhotosRequest) = combine(
-        flow = monitorTimelinePhotosUseCase(request = request),
+    private fun monitorPhotos() = combine(
+        flow = monitorTimelinePhotosUseCase(
+            request = TimelinePhotosRequest(
+                selectedFilterFlow = selectedFilterFlow
+            )
+        ),
         flow2 = sortOptionsFlow
     ) { photosResult, sortOptions ->
         val sortResult = monitorTimelinePhotosUseCase.sortPhotos(
-            isPaginationEnabled = request.isPaginationEnabled,
             photos = photosResult.nonSensitivePhotos,
             sortOrder = sortOptions.sortOrder
         )
@@ -153,7 +142,6 @@ class TimelineTabViewModel @Inject constructor(
         updateAllPhotosInTypedNodeValue(allPhotos = allPhotos)
     }.flatMapLatest { (allPhotos, sortResult) ->
         buildUiState(
-            isPaginationEnabled = request.isPaginationEnabled,
             allPhotos = allPhotos,
             sortResult = sortResult
         )
@@ -182,7 +170,6 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     private fun buildUiState(
-        isPaginationEnabled: Boolean,
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
     ) = combine(
@@ -195,7 +182,6 @@ class TimelineTabViewModel @Inject constructor(
             sortResult = sortResult,
             gridSize = gridSize,
             selectedPhotoIds = selectedPhotoIds,
-            isPaginationEnabled = isPaginationEnabled
         )
     }
 
@@ -204,7 +190,6 @@ class TimelineTabViewModel @Inject constructor(
         sortResult: TimelineSortedPhotosResult,
         gridSize: TimelineGridSize,
         selectedPhotoIds: Set<Long>,
-        isPaginationEnabled: Boolean,
     ): TimelineTabUiState {
         val displayedPhotos = buildList {
             sortResult.sortedPhotos.forEachIndexed { index, photoResult ->
@@ -241,7 +226,6 @@ class TimelineTabViewModel @Inject constructor(
             gridSize = gridSize,
             selectedPhotoCount = selectedPhotoIds.size,
             currentSort = sortOptionsFlow.value,
-            isPaginationEnabled = isPaginationEnabled,
         )
     }
 
@@ -273,24 +257,6 @@ class TimelineTabViewModel @Inject constructor(
     internal fun onSortOptionsChange(value: TimelineTabSortOptions) {
         sortOptionsFlow.value = value
     }
-
-    internal fun loadNextPage() {
-        if (!uiState.value.isPaginationEnabled) return
-
-        viewModelScope.launch {
-            runCatching {
-                monitorTimelinePhotosUseCase.loadNextPage()
-            }.onFailure {
-                Timber.e(it, "Error loading next page of photos")
-            }.onSuccess {
-                Timber.d("Next page of photos loaded successfully")
-            }
-        }
-    }
-
-    private suspend fun isPaginationEnabled(): Boolean = runCatching {
-        getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
-    }.getOrElse { false }
 
     internal fun onGridSizeChange(
         size: TimelineGridSize,

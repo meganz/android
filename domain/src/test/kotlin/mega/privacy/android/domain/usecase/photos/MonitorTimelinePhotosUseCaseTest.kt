@@ -36,10 +36,7 @@ class MonitorTimelinePhotosUseCaseTest {
 
     private lateinit var underTest: MonitorTimelinePhotosUseCase
 
-    private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase =
-        mock()
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase = mock()
-    private val loadNextPageOfPhotosUseCase: LoadNextPageOfPhotosUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
@@ -59,9 +56,7 @@ class MonitorTimelinePhotosUseCaseTest {
         underTest = MonitorTimelinePhotosUseCase(
             defaultDispatcher = dispatcher,
             ioDispatcher = dispatcher,
-            monitorPaginatedTimelinePhotosUseCase = monitorPaginatedTimelinePhotosUseCase,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
-            loadNextPageOfPhotosUseCase = loadNextPageOfPhotosUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
@@ -73,9 +68,7 @@ class MonitorTimelinePhotosUseCaseTest {
     @AfterEach
     fun tearDown() {
         reset(
-            monitorPaginatedTimelinePhotosUseCase,
             getTimelinePhotosUseCase,
-            loadNextPageOfPhotosUseCase,
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
             getTimelineFilterPreferencesUseCase,
@@ -85,48 +78,8 @@ class MonitorTimelinePhotosUseCaseTest {
     }
 
     @Test
-    fun `test that pagination source is returned when pagination is enabled`() =
-        runTest(dispatcher) {
-            val request = TimelinePhotosRequest(isPaginationEnabled = true)
-            val now = LocalDateTime.now()
-            val photo1 = mock<Photo.Image> {
-                on { id } doReturn 1
-                on { modificationTime } doReturn now.minusDays(1)
-                on { isSensitive } doReturn false
-                on { isSensitiveInherited } doReturn false
-            }
-            val photo2 = mock<Photo.Image> {
-                on { id } doReturn 2
-                on { modificationTime } doReturn now.minusDays(2)
-                on { isSensitive } doReturn true
-                on { isSensitiveInherited } doReturn false
-            }
-            val photo3 = mock<Photo.Video> {
-                on { id } doReturn 3
-                on { modificationTime } doReturn now.minusDays(3)
-                on { isSensitive } doReturn false
-                on { isSensitiveInherited } doReturn true
-            }
-            val allPhotosList = listOf(photo1, photo2, photo3)
-
-            whenever(monitorPaginatedTimelinePhotosUseCase()) doReturn flowOf(allPhotosList)
-            whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf(true)
-            whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf(true)
-
-            underTest(request = request).test {
-                assertThat(expectMostRecentItem().allPhotos.size).isEqualTo(3)
-            }
-
-            verify(monitorPaginatedTimelinePhotosUseCase, times(1)).invoke()
-            verify(loadNextPageOfPhotosUseCase, times(1)).invoke()
-            verify(getTimelinePhotosUseCase, times(0)).invoke()
-        }
-
-    @Test
-    fun `test that non-pagination source is returned when pagination is not enabled`() = runTest(
-        dispatcher
-    ) {
-        val request = TimelinePhotosRequest(isPaginationEnabled = false)
+    fun `test that timeline photos are successfully retrieved`() = runTest(dispatcher) {
+        val request = TimelinePhotosRequest()
         val now = LocalDateTime.now()
         val photo1 = mock<Photo.Image> {
             on { id } doReturn 1
@@ -156,13 +109,12 @@ class MonitorTimelinePhotosUseCaseTest {
         }
 
         verify(getTimelinePhotosUseCase, times(1)).invoke()
-        verify(monitorPaginatedTimelinePhotosUseCase, times(0)).invoke()
     }
 
     @Test
     fun `test that the photo is not marked as sensitive when hidden nodes flag is not active`() =
         runTest(dispatcher) {
-            val request = TimelinePhotosRequest(isPaginationEnabled = false)
+            val request = TimelinePhotosRequest()
             val now = LocalDateTime.now()
             val photo1 = mock<Photo.Image> {
                 on { id } doReturn 1
@@ -185,7 +137,7 @@ class MonitorTimelinePhotosUseCaseTest {
     @Test
     fun `test that sensitive photos are successfully filtered when hidden nodes flag is active`() =
         runTest(dispatcher) {
-            val request = TimelinePhotosRequest(isPaginationEnabled = false)
+            val request = TimelinePhotosRequest()
             val now = LocalDateTime.now()
             val photo1Id = 1L
             val photo1 = mock<Photo.Image> {
@@ -226,7 +178,7 @@ class MonitorTimelinePhotosUseCaseTest {
     @Test
     fun `test that sensitive photos are included as non-sensitive photos when should show hidden items`() =
         runTest(dispatcher) {
-            val request = TimelinePhotosRequest(isPaginationEnabled = false)
+            val request = TimelinePhotosRequest()
             val now = LocalDateTime.now()
             val photo1Id = 1L
             val photo1 = mock<Photo.Image> {
@@ -261,45 +213,6 @@ class MonitorTimelinePhotosUseCaseTest {
         }
 
     @Test
-    fun `test that the original photos order is returned when pagination is enabled`() = runTest {
-        val now = LocalDateTime.now()
-        val photo1Id = 1L
-        val photo1 = mock<Photo.Image> {
-            on { id } doReturn photo1Id
-            on { modificationTime } doReturn now.minusDays(1)
-            on { isSensitive } doReturn false
-            on { isSensitiveInherited } doReturn false
-        }
-        val photo2Id = 2L
-        val photo2 = mock<Photo.Image> {
-            on { id } doReturn photo2Id
-            on { modificationTime } doReturn now.minusDays(2)
-            on { isSensitive } doReturn true
-            on { isSensitiveInherited } doReturn false
-        }
-        val unsortedPhotos = listOf(
-            PhotoResult(
-                photo = photo2,
-                isMarkedSensitive = false
-            ),
-            PhotoResult(
-                photo = photo1,
-                isMarkedSensitive = false
-            )
-        )
-        val isPaginationEnabled = true
-
-        val actual = underTest.sortPhotos(
-            isPaginationEnabled = isPaginationEnabled,
-            photos = unsortedPhotos,
-            sortOrder = SortOrder.ORDER_MODIFICATION_DESC
-        )
-
-        assertThat(actual.sortedPhotos[0].photo.id).isEqualTo(photo2Id)
-        assertThat(actual.sortedPhotos[1].photo.id).isEqualTo(photo1Id)
-    }
-
-    @Test
     fun `test that the list of photos is successfully sorted by the modification time in descending`() =
         runTest {
             val now = LocalDateTime.now()
@@ -327,10 +240,8 @@ class MonitorTimelinePhotosUseCaseTest {
                     isMarkedSensitive = false
                 )
             )
-            val isPaginationEnabled = false
 
             val actual = underTest.sortPhotos(
-                isPaginationEnabled = isPaginationEnabled,
                 photos = unsortedPhotos,
                 sortOrder = SortOrder.ORDER_MODIFICATION_DESC
             )
@@ -367,10 +278,8 @@ class MonitorTimelinePhotosUseCaseTest {
                     isMarkedSensitive = false
                 )
             )
-            val isPaginationEnabled = false
 
             val actual = underTest.sortPhotos(
-                isPaginationEnabled = isPaginationEnabled,
                 photos = unsortedPhotos,
                 sortOrder = SortOrder.ORDER_MODIFICATION_ASC
             )
@@ -415,7 +324,6 @@ class MonitorTimelinePhotosUseCaseTest {
         val photos = listOf(photoTodayResult, photoLastMonthResult, photoLastYearResult)
 
         val actual = underTest.sortPhotos(
-            isPaginationEnabled = false,
             photos = photos,
             sortOrder = SortOrder.ORDER_MODIFICATION_DESC
         )
@@ -445,7 +353,6 @@ class MonitorTimelinePhotosUseCaseTest {
                 TimelinePreferencesJSON.JSON_KEY_LOCATION.value to mediaSource,
             )
             val request = TimelinePhotosRequest(
-                isPaginationEnabled = false,
                 selectedFilterFlow = flowOf(newFilter)
             )
             val now = LocalDateTime.now()

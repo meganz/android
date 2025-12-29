@@ -139,7 +139,7 @@ class PhotosSearchViewModel @Inject constructor(
     private fun createSingleActivityPhotosFlow() =
         monitorTimelinePhotosUseCase
             .get()
-            .invoke(TimelinePhotosRequest(isPaginationEnabled = false))
+            .invoke(TimelinePhotosRequest())
             .map { result -> result.allPhotos.map { it.photo } }
 
     private fun updateAlbums(albums: List<UIAlbum>) {

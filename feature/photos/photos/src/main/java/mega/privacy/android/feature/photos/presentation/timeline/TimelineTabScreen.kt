@@ -41,7 +41,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -91,7 +90,6 @@ internal fun TimelineTabRoute(
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
-    loadNextPage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
@@ -118,7 +116,6 @@ internal fun TimelineTabRoute(
         selectedTimePeriod = selectedTimePeriod,
         clearCameraUploadsMessage = clearCameraUploadsMessage,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-        loadNextPage = loadNextPage,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
         onGridSizeChange = onGridSizeChange,
@@ -144,7 +141,6 @@ internal fun TimelineTabScreen(
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
-    loadNextPage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
@@ -172,8 +168,10 @@ internal fun TimelineTabScreen(
     val isListScrollingDown by lazyListState.isScrollingDown()
     val isListScrolledToEnd by lazyListState.isScrolledToEnd()
     val isListScrolledToTop by lazyListState.isScrolledToTop()
-    val shouldShowTimePeriodSelector by remember(selectedTimePeriod) {
+    val shouldShowTimePeriodSelector by remember(selectedTimePeriod, uiState.isLoading) {
         derivedStateOf {
+            if (uiState.isLoading) return@derivedStateOf false
+
             if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
                 !lazyGridState.isScrollInProgress || (!isGridScrollingDown && !isGridScrolledToEnd) || isGridScrolledToTop
             } else !lazyListState.isScrollInProgress || (!isListScrollingDown && !isListScrolledToEnd) || isListScrolledToTop
@@ -182,7 +180,10 @@ internal fun TimelineTabScreen(
     var shouldScrollToIndex by remember { mutableIntStateOf(0) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
-    var cuBannerType by remember {
+    val cuBannerType by remember(
+        uiState.selectedPhotoCount,
+        mediaCameraUploadUiState
+    ) {
         mutableStateOf(
             value = getCameraUploadsBannerType(
                 timelineTabUiState = uiState,
@@ -196,24 +197,40 @@ internal fun TimelineTabScreen(
         }
     var isWarningBannerStateValid by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(
-        mediaCameraUploadUiState.enableCameraUploadButtonShowing,
-        uiState.selectedPhotoCount,
-        mediaCameraUploadUiState.showCameraUploadsWarning,
-        mediaCameraUploadUiState.cameraUploadsStatus,
-        mediaCameraUploadUiState.cameraUploadsFinishedReason,
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled
-    ) {
-        cuBannerType = getCameraUploadsBannerType(
-            timelineTabUiState = uiState,
-            mediaCameraUploadUiState = mediaCameraUploadUiState
-        )
-    }
+    if (uiState.isLoading.not()) {
+        LaunchedEffect(shouldScrollToIndex) {
+            if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+                lazyGridState.scrollToItem(shouldScrollToIndex)
+            } else lazyListState.animateScrollToItem(shouldScrollToIndex)
+        }
 
-    LaunchedEffect(shouldScrollToIndex) {
-        if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-            lazyGridState.scrollToItem(shouldScrollToIndex)
-        } else lazyListState.animateScrollToItem(shouldScrollToIndex)
+        LaunchedEffect(
+            mediaCameraUploadUiState.showCameraUploadsWarning,
+            mediaCameraUploadUiState.isCameraUploadsLimitedAccess,
+            mediaCameraUploadUiState.cameraUploadsFinishedReason,
+            mediaCameraUploadUiState.isWarningBannerShown,
+            mediaCameraUploadUiState.isCUPausedWarningBannerEnabled
+        ) {
+            isWarningBannerStateValid = mediaCameraUploadUiState.isWarningBannerShown &&
+                    isCUBannerTypeValidForWarningBanner(
+                        bannerType = cuBannerType,
+                        mediaCameraUploadUiState = mediaCameraUploadUiState
+                    )
+        }
+
+        LaunchedEffect(
+            isGridScrollingDown,
+            isGridScrolledToEnd,
+            isGridScrolledToTop,
+            isListScrollingDown,
+            isListScrolledToEnd,
+            isListScrolledToTop
+        ) {
+            val shouldShowTabs = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+                isGridScrolledToTop || (!isGridScrollingDown && !isGridScrolledToEnd)
+            } else isListScrolledToTop || (!isListScrollingDown && !isListScrolledToEnd)
+            onTabsVisibilityChange(!shouldShowTabs)
+        }
     }
 
     LaunchedEffect(mediaCameraUploadUiState.cameraUploadsMessage) {
@@ -236,52 +253,6 @@ internal fun TimelineTabScreen(
             )
         }
         clearCameraUploadsCompletedMessage()
-    }
-
-    LaunchedEffect(lazyGridState) {
-        snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleItemIndex ->
-                if (lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == lazyGridState.layoutInfo.totalItemsCount - 1) {
-                    loadNextPage()
-                }
-            }
-    }
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleItemIndex ->
-                if (lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == lazyListState.layoutInfo.totalItemsCount - 1) {
-                    loadNextPage()
-                }
-            }
-    }
-
-    LaunchedEffect(
-        mediaCameraUploadUiState.showCameraUploadsWarning,
-        mediaCameraUploadUiState.isCameraUploadsLimitedAccess,
-        mediaCameraUploadUiState.cameraUploadsFinishedReason,
-        mediaCameraUploadUiState.isWarningBannerShown,
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled
-    ) {
-        isWarningBannerStateValid = mediaCameraUploadUiState.isWarningBannerShown &&
-                isCUBannerTypeValidForWarningBanner(
-                    bannerType = cuBannerType,
-                    mediaCameraUploadUiState = mediaCameraUploadUiState
-                )
-    }
-
-    LaunchedEffect(
-        isGridScrollingDown,
-        isGridScrolledToEnd,
-        isGridScrolledToTop,
-        isListScrollingDown,
-        isListScrolledToEnd,
-        isListScrolledToTop
-    ) {
-        val shouldShowTabs = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-            isGridScrolledToTop || (!isGridScrollingDown && !isGridScrolledToEnd)
-        } else isListScrolledToTop || (!isListScrollingDown && !isListScrolledToEnd)
-        onTabsVisibilityChange(!shouldShowTabs)
     }
 
     if (showTimelineSortDialog) {
@@ -768,7 +739,6 @@ private fun TimelineTabScreenPreview() {
             selectedTimePeriod = PhotoModificationTimePeriod.All,
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
-            loadNextPage = {},
             setEnableCUPage = {},
             onNavigateToCameraUploadsSettings = {},
             onGridSizeChange = {},

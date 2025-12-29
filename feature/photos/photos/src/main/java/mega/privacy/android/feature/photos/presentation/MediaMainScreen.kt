@@ -47,8 +47,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -298,7 +298,6 @@ fun MediaMainRoute(
             )
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
-        loadTimelineNextPage = timelineViewModel::loadNextPage,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         setNavigationItemVisibility = setNavigationItemVisibility,
         navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
@@ -341,7 +340,6 @@ fun MediaMainScreen(
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    loadTimelineNextPage: () -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     setNavigationItemVisibility: (Boolean) -> Unit,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
@@ -712,7 +710,6 @@ fun MediaMainScreen(
                                         onTimelineSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
-                                    loadTimelineNextPage = loadTimelineNextPage,
                                     onTimelinePhotoClick = {
                                         if (isTimelineInSelectionMode) {
                                             onTimelinePhotoSelected(it)
@@ -850,7 +847,6 @@ private fun MediaScreen.MediaContent(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortDialogDismissed: () -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
-    loadTimelineNextPage: () -> Unit,
     onTimelinePhotoClick: (node: PhotoNodeUiState) -> Unit,
     onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit,
     clearCameraUploadsMessage: () -> Unit,
@@ -880,7 +876,6 @@ private fun MediaScreen.MediaContent(
                 selectedTimePeriod = selectedTimePeriod,
                 clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                loadNextPage = loadTimelineNextPage,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
                 onGridSizeChange = onTimelineGridSizeChange,
@@ -999,7 +994,6 @@ fun PhotosMainScreenPreview() {
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},
-            loadTimelineNextPage = {},
             onTimelineApplyFilterClick = {},
             setNavigationItemVisibility = {},
             navigateToLegacyPhotoSelection = {},

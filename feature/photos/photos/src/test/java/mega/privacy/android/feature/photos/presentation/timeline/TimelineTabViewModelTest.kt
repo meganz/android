@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
@@ -42,7 +41,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNo
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -55,7 +53,6 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -68,7 +65,6 @@ class TimelineTabViewModelTest {
 
     private lateinit var underTest: TimelineTabViewModel
 
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorTimelinePhotosUseCase: MonitorTimelinePhotosUseCase = mock()
     private val photoUiStateMapper: PhotoUiStateMapper = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
@@ -86,7 +82,6 @@ class TimelineTabViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
         whenever(getNodeListByIdsUseCase(nodeIds = any())) doReturn emptyList()
         underTest = TimelineTabViewModel(
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
             photoUiStateMapper = photoUiStateMapper,
             fileTypeIconMapper = fileTypeIconMapper,
@@ -102,7 +97,6 @@ class TimelineTabViewModelTest {
     @AfterEach
     fun tearDown() {
         reset(
-            getFeatureFlagValueUseCase,
             monitorTimelinePhotosUseCase,
             photoUiStateMapper,
             fileTypeIconMapper,
@@ -116,10 +110,7 @@ class TimelineTabViewModelTest {
     }
 
     @Test
-    fun `test that feature flags and photos are fetched successfully`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
-        ) doReturn true
+    fun `test that photos are fetched successfully`() = runTest {
         val now = LocalDateTime.now()
         val mockFileTypeInfo = mock<VideoFileTypeInfo>()
         val photo1 = mock<Photo.Image> {
@@ -153,7 +144,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = true,
                 photos = photosResult.nonSensitivePhotos,
                 sortOrder = SortOrder.ORDER_MODIFICATION_DESC
             )
@@ -170,87 +160,17 @@ class TimelineTabViewModelTest {
         ) doReturn persistentListOf()
 
         underTest.uiState.test {
-            val item = expectMostRecentItem()
-            assertThat(item.allPhotos.size).isEqualTo(2)
-            assertThat(item.isPaginationEnabled).isTrue()
+            assertThat(expectMostRecentItem().allPhotos.size).isEqualTo(2)
         }
         verify(monitorTimelinePhotosUseCase).invoke(isA<TimelinePhotosRequest>())
         verify(monitorTimelinePhotosUseCase).sortPhotos(
-            isPaginationEnabled = true,
             photos = photosResult.nonSensitivePhotos,
             sortOrder = SortOrder.ORDER_MODIFICATION_DESC
         )
     }
 
     @Test
-    fun `test that the next page is not loaded when pagination is disabled`() = runTest {
-        val isPaginationEnabled = false
-        whenever(
-            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
-        ) doReturn isPaginationEnabled
-        val photosResult = mock<TimelinePhotosResult> {
-            on { allPhotos } doReturn emptyList()
-            on { nonSensitivePhotos } doReturn emptyList()
-        }
-        whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn emptyList()
-        }
-        whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = isPaginationEnabled,
-                photos = emptyList(),
-                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
-            )
-        ) doReturn sortResult
-        whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
-
-        underTest.uiState.test {
-            assertThat(expectMostRecentItem().isPaginationEnabled).isFalse()
-            underTest.loadNextPage()
-        }
-        verify(monitorTimelinePhotosUseCase, never()).loadNextPage()
-    }
-
-    @Test
-    fun `test that the next page is loaded when pagination is enabled`() = runTest {
-        val isPaginationEnabled = true
-        whenever(
-            getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)
-        ) doReturn isPaginationEnabled
-        val photosResult = mock<TimelinePhotosResult> {
-            on { allPhotos } doReturn emptyList()
-            on { nonSensitivePhotos } doReturn emptyList()
-        }
-        whenever(monitorTimelinePhotosUseCase(request = any())) doReturn flowOf(photosResult)
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn emptyList()
-        }
-        whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = isPaginationEnabled,
-                photos = emptyList(),
-                sortOrder = SortOrder.ORDER_MODIFICATION_DESC
-            )
-        ) doReturn sortResult
-        whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
-
-        underTest.uiState.test {
-            assertThat(expectMostRecentItem().isPaginationEnabled).isTrue()
-            underTest.loadNextPage()
-        }
-        verify(monitorTimelinePhotosUseCase).loadNextPage()
-    }
-
-    @Test
     fun `test that all photos are resorted when the sort order changes`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(any())
-        ) doReturn false
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -261,7 +181,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = eq(false),
                 photos = eq(emptyList()),
                 sortOrder = any()
             )
@@ -278,7 +197,6 @@ class TimelineTabViewModelTest {
             ).isEqualTo(TimelineTabSortOptions.Oldest)
         }
         verify(monitorTimelinePhotosUseCase).sortPhotos(
-            isPaginationEnabled = any(),
             photos = any(),
             sortOrder = eq(SortOrder.ORDER_MODIFICATION_ASC)
         )
@@ -288,9 +206,6 @@ class TimelineTabViewModelTest {
     @EnumSource(TimelineGridSize::class)
     fun `test that the correct grid size is set`(gridSize: TimelineGridSize) =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn false
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -301,7 +216,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(false),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -323,9 +237,6 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that the first displayed header item shows the grid size settings`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(any())
-        ) doReturn true
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -367,7 +278,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = eq(true),
                 photos = eq(emptyList()),
                 sortOrder = any()
             )
@@ -396,9 +306,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when grid size is changed and the camera upload page is displayed and the media source is not cloud drive`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -440,7 +347,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -478,9 +384,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when grid size is changed and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -522,7 +425,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -546,9 +448,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is enabled and the media source is not cloud drive`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -590,7 +489,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -613,9 +511,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is disabled and the media source is cloud drive`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -657,7 +552,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -680,9 +574,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is disabled when CU page is disabled and no photos to display`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn false
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -693,7 +584,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(false),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -716,9 +606,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the sort toolbar action is enabled when CU page is disabled and the camera upload page is not displayed and the media source is cloud drive`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -760,7 +647,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -826,9 +712,6 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that a photo is successfully selected`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(any())
-        ) doReturn true
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -876,7 +759,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = eq(true),
                 photos = eq(emptyList()),
                 sortOrder = any()
             )
@@ -900,9 +782,6 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that a photo is successfully unselected`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(any())
-        ) doReturn true
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -950,7 +829,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = eq(true),
                 photos = eq(emptyList()),
                 sortOrder = any()
             )
@@ -975,9 +853,6 @@ class TimelineTabViewModelTest {
 
     @Test
     fun `test that all photos are successfully selected`() = runTest {
-        whenever(
-            getFeatureFlagValueUseCase(any())
-        ) doReturn true
         val photosResult = mock<TimelinePhotosResult> {
             on { allPhotos } doReturn emptyList()
             on { nonSensitivePhotos } doReturn emptyList()
@@ -1025,7 +900,6 @@ class TimelineTabViewModelTest {
         }
         whenever(
             monitorTimelinePhotosUseCase.sortPhotos(
-                isPaginationEnabled = eq(true),
                 photos = eq(emptyList()),
                 sortOrder = any()
             )
@@ -1049,9 +923,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that nothing happens when selecting all photos if all photos are already selected`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -1099,7 +970,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1121,9 +991,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that all photos are successfully deselected`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -1171,7 +1038,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1198,10 +1064,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that nothing happens when deselecting all photos if all photos are already deselected`() =
         runTest {
-
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val photosResult = mock<TimelinePhotosResult> {
                 on { allPhotos } doReturn emptyList()
                 on { nonSensitivePhotos } doReturn emptyList()
@@ -1249,7 +1111,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1294,9 +1155,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the remove link action menu is available when a single exported node is selected`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1337,7 +1195,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1363,9 +1220,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the remove link action menu is not available when multiple nodes are selected`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photo1Id = 1L
@@ -1431,7 +1285,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1455,9 +1308,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the unhide menu action is available when node is hidden`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1489,7 +1339,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1528,9 +1377,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the hide menu action is available when node is not hidden`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1572,7 +1418,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1601,9 +1446,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the move menu action is always available`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1635,7 +1477,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1671,9 +1512,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the copy menu action is always available`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1705,7 +1543,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1741,9 +1578,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the add to album menu action is available when the selected node is an image node`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<SvgFileTypeInfo>()
             val photoId = 1L
@@ -1775,7 +1609,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )
@@ -1810,9 +1643,6 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that the add to album menu action is available when the selected node is a video node`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(any())
-            ) doReturn true
             val now = LocalDateTime.now()
             val mockFileTypeInfo = mock<VideoFileTypeInfo>()
             val photoId = 1L
@@ -1844,7 +1674,6 @@ class TimelineTabViewModelTest {
             }
             whenever(
                 monitorTimelinePhotosUseCase.sortPhotos(
-                    isPaginationEnabled = eq(true),
                     photos = eq(emptyList()),
                     sortOrder = any()
                 )

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
@@ -34,9 +33,7 @@ import javax.inject.Inject
 class MonitorTimelinePhotosUseCase @Inject constructor(
     @DefaultDispatcher val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
-    private val monitorPaginatedTimelinePhotosUseCase: MonitorPaginatedTimelinePhotosUseCase,
     private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
-    private val loadNextPageOfPhotosUseCase: LoadNextPageOfPhotosUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
@@ -59,10 +56,8 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     )
 
     operator fun invoke(request: TimelinePhotosRequest): Flow<TimelinePhotosResult> {
-        val timelinePhotoSource =
-            getTimelinePhotoSource(isPaginationEnabled = request.isPaginationEnabled)
         return combine(
-            flow = timelinePhotoSource,
+            flow = getTimelinePhotosUseCase().distinctUntilChanged(),
             flow2 = monitorShowHiddenItemsUseCase().distinctUntilChanged(),
             flow3 = monitorHiddenNodesEnabledUseCase().distinctUntilChanged(),
             flow4 = request.selectedFilterFlow.distinctUntilChanged()
@@ -74,14 +69,6 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
                 shouldApplyFilterFromPreference = newFilter != null
             )
         }.flowOn(defaultDispatcher)
-    }
-
-    private fun getTimelinePhotoSource(isPaginationEnabled: Boolean): Flow<List<Photo>> {
-        return if (isPaginationEnabled) {
-            monitorPaginatedTimelinePhotosUseCase().onStart { loadNextPage() }
-        } else {
-            getTimelinePhotosUseCase()
-        }
     }
 
     private suspend fun processTimelinePhotos(
@@ -173,25 +160,20 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
     }
 
     suspend fun sortPhotos(
-        isPaginationEnabled: Boolean,
         photos: List<PhotoResult>,
         sortOrder: SortOrder,
     ): TimelineSortedPhotosResult =
         withContext(defaultDispatcher) {
-            val sortedPhotos = if (isPaginationEnabled) {
-                photos
-            } else {
-                when (sortOrder) {
-                    SortOrder.ORDER_MODIFICATION_DESC -> {
-                        photos.sortedWith(compareByDescending<PhotoResult> { it.photo.modificationTime }.thenByDescending { it.photo.id })
-                    }
-
-                    SortOrder.ORDER_MODIFICATION_ASC -> {
-                        photos.sortedWith(compareBy<PhotoResult> { it.photo.modificationTime }.thenByDescending { it.photo.id })
-                    }
-
-                    else -> photos
+            val sortedPhotos = when (sortOrder) {
+                SortOrder.ORDER_MODIFICATION_DESC -> {
+                    photos.sortedWith(compareByDescending<PhotoResult> { it.photo.modificationTime }.thenByDescending { it.photo.id })
                 }
+
+                SortOrder.ORDER_MODIFICATION_ASC -> {
+                    photos.sortedWith(compareBy<PhotoResult> { it.photo.modificationTime }.thenByDescending { it.photo.id })
+                }
+
+                else -> photos
             }
             val nowYear = Year.now()
             val dayPhotos = groupPhotosByDay(sortedPhotos = sortedPhotos)
@@ -290,11 +272,6 @@ class MonitorTimelinePhotosUseCase @Inject constructor(
             photo = photo,
             photosCount = photosCount
         )
-    }
-
-
-    suspend fun loadNextPage() {
-        loadNextPageOfPhotosUseCase()
     }
 
     companion object Companion {

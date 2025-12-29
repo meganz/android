@@ -22,7 +22,6 @@ data class TimelineTabUiState(
     val gridSize: TimelineGridSize = TimelineGridSize.Default,
     val selectedPhotoCount: Int = 0,
     val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
-    val isPaginationEnabled: Boolean = false,
 )
 
 data class TimelineTabActionUiState(
