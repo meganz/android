@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
@@ -67,6 +68,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun providePurchaseResultInitialiser(initialiser: PurchaseResultInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideBusinessAccountExpiredInitialiser(initialiser: BusinessAccountExpiredInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides
