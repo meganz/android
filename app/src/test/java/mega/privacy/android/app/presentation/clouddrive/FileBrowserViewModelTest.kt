@@ -16,7 +16,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.features.CloudDriveFeature
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
@@ -1366,7 +1366,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn false
 
@@ -1416,7 +1416,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn true
 
@@ -1461,7 +1461,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn true
 
@@ -1506,7 +1506,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn true
 
@@ -1558,7 +1558,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn true
 
@@ -1602,7 +1602,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.LABEL_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn true
 
@@ -1646,7 +1646,7 @@ class FileBrowserViewModelTest {
             ) doReturn AccessPermission.UNKNOWN
             whenever(
                 getFeatureFlagValueUseCase(
-                    CloudDriveFeature.LABEL_MULTIPLE_SELECTION
+                    ApiFeatures.AllowMultipleSelectionsEnabled
                 )
             ) doReturn false
 

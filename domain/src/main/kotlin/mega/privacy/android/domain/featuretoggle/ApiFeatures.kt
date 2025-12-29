@@ -94,6 +94,18 @@ enum class ApiFeatures(
         description = "Do not show Stripe payment method if it is under age",
         defaultValue = false
     ),
+
+    /**
+     * Flag to allow multiple selection for favorite/label in Cloud Drive.
+     * When enabled, users can select multiple favorites or labels at once.
+     *
+     * Default: false
+     */
+    AllowMultipleSelectionsEnabled(
+        experimentName = "mult1",
+        description = "Allow multiple selection for favorite/label in Cloud Drive",
+        defaultValue = false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

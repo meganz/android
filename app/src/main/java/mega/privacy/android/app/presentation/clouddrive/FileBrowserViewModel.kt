@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.extensions.updateItemAt
-import mega.privacy.android.app.features.CloudDriveFeature
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.HandleOptionClickMapper
@@ -947,9 +947,9 @@ class FileBrowserViewModel @Inject constructor(
 
     private suspend fun getFavouritesActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsFavouritesActionModifierItem {
         // Check if the bugfix for allowing favorite in multiple selection is enabled
-        val isFavoriteMultipleSelectionEnabled = isFavoriteMultipleSelectionEnabled()
+        val isMultipleSelectionEnabled = isMultipleSelectionEnabled()
         // Only show favorite options when the feature is enabled
-        if (!isFavoriteMultipleSelectionEnabled) {
+        if (!isMultipleSelectionEnabled) {
             return CloudDriveSyncsFavouritesActionModifierItem(
                 canBeAdded = false,
                 canBeRemoved = false
@@ -965,24 +965,20 @@ class FileBrowserViewModel @Inject constructor(
         )
     }
 
-    private suspend fun isFavoriteMultipleSelectionEnabled() = runCatching {
-        getFeatureFlagValueUseCase(CloudDriveFeature.FAVORITE_MULTIPLE_SELECTION)
-    }.getOrElse { false }
-
     private suspend fun getAddLabelActionModifierItem(): CloudDriveSyncsAddLabelActionModifierItem {
         // Check if the feature for allowing label in multiple selection is enabled
-        val isLabelMultipleSelectionEnabled = isLabelMultipleSelectionEnabled()
+        val isMultipleSelectionEnabled = isMultipleSelectionEnabled()
         // Always show "Add label" when multiple selection is enabled and nodes are selected
         // The label dialog will handle both adding and removing labels
         return CloudDriveSyncsAddLabelActionModifierItem(
-            canBeAdded = isLabelMultipleSelectionEnabled
+            canBeAdded = isMultipleSelectionEnabled
         )
     }
 
-    private suspend fun isLabelMultipleSelectionEnabled() = runCatching {
-        getFeatureFlagValueUseCase(CloudDriveFeature.LABEL_MULTIPLE_SELECTION)
+    private suspend fun isMultipleSelectionEnabled() = runCatching {
+        getFeatureFlagValueUseCase(ApiFeatures.AllowMultipleSelectionsEnabled)
     }.onFailure {
-        Timber.w(it, "Label multi-select flag check failed")
+        Timber.w(it, "Multiple selection flag check failed")
     }.getOrElse { false }
 
     private fun getAddToActionModifierItem(selectedNodes: List<NodeUIItem<TypedNode>>): CloudDriveSyncsAddToActionModifierItem {
