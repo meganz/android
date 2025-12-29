@@ -1,5 +1,6 @@
 package mega.privacy.mobile.navigation.snowflake
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -74,10 +76,13 @@ fun MainNavigationScaffold(
     navContent: @Composable (NavigationUiController) -> Unit,
     availableSlots: Int = 5,
 ) {
-
-    val navSuiteType =
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val navSuiteType = if (isLandscape) {
+        NavigationSuiteType.NavigationRail
+    } else {
         NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(currentWindowAdaptiveInfo())
-
+    }
 
     // Order items based on preferredSlot
     val orderedItems = orderNavigationItems(items = mainNavItems, availableSlots = availableSlots)
@@ -118,6 +123,7 @@ private fun MegaNavigationSuite(
     val itemColors = NavigationScaffoldColors.itemColors()
     val borderColor = DSTokens.colors.border.subtle
     NavigationSuite(
+        layoutType = navSuiteType,
         colors = scaffoldColors,
         modifier = Modifier
             .drawBehind {
