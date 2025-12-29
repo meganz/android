@@ -21,7 +21,7 @@ class ManageShareFolderMenuAction @Inject constructor() : MenuActionWithIcon {
         IconPack.Medium.Thin.Outline.GearSix
     )
 
-    override val orderInCategory = 190
+    override val orderInCategory = 200
 
     override val testTag: String = "menu_action:share_folder"
 }

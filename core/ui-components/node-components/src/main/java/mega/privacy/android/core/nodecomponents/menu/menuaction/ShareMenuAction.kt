@@ -20,7 +20,7 @@ class ShareMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getIconPainter() =
         rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
 
-    override val orderInCategory = 200
+    override val orderInCategory = 190
 
     override val testTag: String = "menu_action:share"
 }

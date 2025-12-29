@@ -17,9 +17,10 @@ class SendToChatMenuAction @Inject constructor() : MenuActionWithIcon {
     override fun getDescription() = stringResource(id = SharedResR.string.context_send_file_to_chat)
 
     @Composable
-    override fun getIconPainter() = rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp)
+    override fun getIconPainter() =
+        rememberVectorPainter(IconPack.Medium.Thin.Outline.MessageArrowUp)
 
-    override val orderInCategory = 180
+    override val orderInCategory = 220
 
     override val testTag: String = "menu_action:send_to_chat"
 }
