@@ -76,7 +76,6 @@ class TimelineTabViewModel @Inject constructor(
     internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
     private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
     private var allPhotosInTypedNode: Map<Long, TypedNode> = emptyMap()
-    private val photoNodeUiStateCache = mutableMapOf<Long, PhotoNodeUiState>()
     internal val selectedPhotosInTypedNode: List<TypedNode>
         get() {
             if (selectedPhotoIdsFlow.value.isEmpty()) return emptyList()
@@ -208,8 +207,11 @@ class TimelineTabViewModel @Inject constructor(
                 }
                 add(
                     PhotosNodeContentType.PhotoNodeItem(
-                        node = getCachedPhotoNodeUiState(photoResult = photoResult).copy(
-                            isSelected = photoResult.photo.id in selectedPhotoIds
+                        node = PhotoNodeUiState(
+                            photo = photoUiStateMapper(photoResult.photo),
+                            isSensitive = photoResult.isMarkedSensitive,
+                            isSelected = photoResult.photo.id in selectedPhotoIds,
+                            defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
                         )
                     )
                 )
@@ -242,17 +244,6 @@ class TimelineTabViewModel @Inject constructor(
             currentDate.month != previousDate.month
         }
     }
-
-    private fun getCachedPhotoNodeUiState(photoResult: PhotoResult): PhotoNodeUiState =
-        photoNodeUiStateCache.getOrPut(photoResult.photo.id) {
-            PhotoNodeUiState(
-                photo = photoUiStateMapper(photoResult.photo),
-                isSensitive = photoResult.isMarkedSensitive,
-                isSelected = false,
-                defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
-            )
-        }
-
 
     internal fun onSortOptionsChange(value: TimelineTabSortOptions) {
         sortOptionsFlow.value = value
