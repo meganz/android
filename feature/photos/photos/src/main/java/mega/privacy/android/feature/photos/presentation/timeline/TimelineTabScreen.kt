@@ -199,9 +199,12 @@ internal fun TimelineTabScreen(
 
     if (uiState.isLoading.not()) {
         LaunchedEffect(shouldScrollToIndex) {
-            if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-                lazyGridState.scrollToItem(shouldScrollToIndex)
-            } else lazyListState.animateScrollToItem(shouldScrollToIndex)
+            if (shouldScrollToIndex > -1) {
+                if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+                    lazyGridState.scrollToItem(shouldScrollToIndex)
+                } else lazyListState.scrollToItem(shouldScrollToIndex)
+                shouldScrollToIndex = -1
+            }
         }
 
         LaunchedEffect(
