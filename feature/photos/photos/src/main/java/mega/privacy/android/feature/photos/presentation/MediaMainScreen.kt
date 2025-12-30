@@ -4,7 +4,6 @@ package mega.privacy.android.feature.photos.presentation
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
@@ -54,7 +53,6 @@ import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
@@ -66,8 +64,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
-import mega.privacy.android.domain.entity.node.NameCollision
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -112,7 +108,6 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
-import timber.log.Timber
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -200,13 +195,6 @@ fun MediaMainRoute(
 
     NodeActionEventHandler(
         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
-        nameCollisionLauncher = nameCollisionLauncher,
-        onTransfer = onTransfer,
-        onShowSnackBar = {
-            scope.launch {
-                snackBarEventQueue.queueMessage(it)
-            }
-        },
         onActionFinished = {
             if (videosTabUiState is VideosTabUiState.Data) {
                 val state = videosTabUiState as VideosTabUiState.Data
@@ -910,59 +898,15 @@ private fun MediaScreen.MediaContent(
 @Composable
 private fun NodeActionEventHandler(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel,
-    nameCollisionLauncher: ManagedActivityResultLauncher<ArrayList<NameCollision>, String?>,
-    onTransfer: (TransferTriggerEvent) -> Unit,
-    onShowSnackBar: (message: String) -> Unit,
     onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit,
     onActionFinished: () -> Unit = {},
-    onNavigateToRenameNav: (NavKey) -> Unit = {},
 ) {
-    val context = LocalContext.current
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     EventEffect(
-        event = nodeActionState.downloadEvent,
-        onConsumed = nodeOptionsActionViewModel::markDownloadEventConsumed,
-        action = { event ->
-            onTransfer(event)
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.infoToShowEvent,
-        onConsumed = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
-        action = { info ->
-            onShowSnackBar(info.get(context))
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.nodeNameCollisionsResult,
-        onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
-        action = {
-            if (it.conflictNodes.isNotEmpty()) {
-                nameCollisionLauncher.launch(it.conflictNodes.values.toCollection(ArrayList()))
-            }
-            if (it.noConflictNodes.isNotEmpty()) {
-                when (it.type) {
-                    NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(it.noConflictNodes)
-                    NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(it.noConflictNodes)
-                    else -> Timber.d("Not implemented")
-                }
-            }
-            onActionFinished()
-        }
-    )
-
-    EventEffect(
-        event = nodeActionState.renameNodeRequestEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRenameNodeRequest,
-        action = { nodeId ->
-            onNavigateToRenameNav(RenameNodeDialogNavKey(nodeId = nodeId.longValue))
-            onActionFinished()
-        }
+        event = nodeActionState.actionTriggeredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetActionTriggered,
+        action = { onActionFinished() }
     )
 
     EventEffect(

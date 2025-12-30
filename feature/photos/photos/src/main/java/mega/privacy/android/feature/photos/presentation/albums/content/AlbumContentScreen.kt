@@ -564,7 +564,8 @@ internal fun AlbumContentScreen(
                 onConfirm = renameAlbum,
                 resetErrorMessage = resetUpdateAlbumNameErrorMessage,
                 errorText = (uiState.updateAlbumNameErrorMessage as? StateEventWithContentTriggered)?.content,
-                name = uiState.uiAlbum?.title?.text.orEmpty()
+                name = uiState.uiAlbum?.title?.text.orEmpty(),
+                positiveButtonText = stringResource(sharedR.string.context_rename)
             )
         }
 

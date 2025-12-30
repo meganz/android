@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +30,7 @@ import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumCo
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun AlbumsTabRoute(
@@ -127,6 +129,7 @@ fun AlbumsTabScreen(
             onConfirm = addNewAlbum,
             resetErrorMessage = resetErrorMessage,
             errorText = (uiState.addNewAlbumErrorMessage as? StateEventWithContentTriggered)?.content,
+            positiveButtonText = stringResource(sharedR.string.media_add_new_album_dialog_positive_button)
         )
     }
 }
