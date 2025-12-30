@@ -16,14 +16,18 @@ import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -1749,4 +1753,44 @@ internal class CameraUploadsWorkerTest {
                 .invoke(eq(HeartbeatStatus.UP_TO_DATE), any())
             assertThat(result).isEqualTo(ListenableWorker.Result.success())
         }
+
+    @Test
+    fun `test that cleanup operations are not executed even when worker is cancelled`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+
+            // Setup upload scenario with a blocking flow to allow cancellation
+            val record = mock<CameraUploadsRecord> {
+                on { filePath }.thenReturn("test/path")
+                on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
+                on { tempFilePath }.thenReturn("temp/path")
+                on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(1024L)
+                on { mediaId }.thenReturn(1L)
+            }
+            val list = listOf(record)
+            setupDefaultProcessingFilesConditionMocks(list)
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            val uploadFlow = flow<CameraUploadsTransferProgress> {
+                emit(
+                    CameraUploadsTransferProgress.ToUpload(
+                        record,
+                        TransferEvent.TransferStartEvent(mock())
+                    )
+                )
+                awaitCancellation()
+            }
+            whenever(uploadCameraUploadsRecordsUseCase.invoke(any(), any(), any(), any()))
+                .thenReturn(uploadFlow)
+            val workerJob = launch {
+                underTest.doWork()
+            }
+            advanceTimeBy(500)
+            workerJob.cancelAndJoin()
+            verifyNoInteractions(
+                deleteCameraUploadsTemporaryRootDirectoryUseCase,
+                scheduleCameraUploadUseCase
+            )
+        }
+
 }

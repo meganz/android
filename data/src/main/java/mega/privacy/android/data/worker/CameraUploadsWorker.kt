@@ -392,12 +392,29 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         }
+        finalizeWork()
+    }
 
-        return@withContext withContext(NonCancellable) {
+    private suspend fun finalizeWork(): Result {
+        return runCatching {
             cleanResources()
             sendFinishedStatus(finishedReason ?: CameraUploadsFinishedReason.COMPLETED)
             endWork(finishedReason ?: CameraUploadsFinishedReason.COMPLETED, restartMode).also {
                 crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Finished")
+            }
+        }.getOrElse {
+            Timber.e(it)
+            return when {
+                // Fail only if the app explicitly cancelled the work on Android S or newer.
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && stopReason == STOP_REASON_CANCELLED_BY_APP -> {
+                    Timber.d("Camera UploadsWorker failed")
+                    Result.failure()
+                }
+                // For all other cases, including older OS versions or different stop reasons, retry.
+                else -> {
+                    Timber.d("Camera UploadsWorker retried")
+                    Result.retry()
+                }
             }
         }
     }
