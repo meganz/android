@@ -4,11 +4,8 @@ import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +35,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -97,9 +95,7 @@ internal fun DriveSyncScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.systemBars.only(
-            WindowInsetsSides.Top + WindowInsetsSides.Horizontal
-        ),
+        contentWindowInsets = WindowInsets.systemBarsIgnoringBottom,
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

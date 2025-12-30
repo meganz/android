@@ -2,7 +2,9 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +24,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -30,6 +33,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 
 /**
@@ -64,7 +68,13 @@ fun CloudDriveScreen(
         viewModel.processAction(DeselectAllItems)
     }
 
+    val isBottomNavigationVisible = LocalBottomNavigationVisible.current
     MegaScaffoldWithTopAppBarScrollBehavior(
+        contentWindowInsets = if (isBottomNavigationVisible) {
+            WindowInsets.systemBarsIgnoringBottom
+        } else {
+            ScaffoldDefaults.contentWindowInsets
+        },
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

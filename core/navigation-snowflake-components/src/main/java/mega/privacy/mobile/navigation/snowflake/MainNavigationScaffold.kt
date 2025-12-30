@@ -12,6 +12,7 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +47,7 @@ import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
@@ -106,7 +108,9 @@ fun MainNavigationScaffold(
         isNavigationVisible = isNavigationVisible,
         animationConfig = animationConfig,
         content = {
-            navContent(navUiController)
+            CompositionLocalProvider(LocalBottomNavigationVisible provides isNavigationVisible) {
+                navContent(navUiController)
+            }
         }
     )
 }
