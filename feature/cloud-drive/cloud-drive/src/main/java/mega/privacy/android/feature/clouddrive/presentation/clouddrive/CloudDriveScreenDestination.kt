@@ -19,11 +19,20 @@ import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
+/**
+ * Entry for Cloud Drive Screen
+ * @param navigationHandler Navigation handler to handle navigation actions
+ * @param onBack Callback to be invoked when the back button is pressed
+ * @param onTransfer Callback to handle transfer events
+ * @param openSearch Callback to open search with parent handle and node source type
+ * @param setNavigationBarVisibility Optional callback to set the visibility of the bottom navigation bar, used in HomeScreens
+ */
 fun EntryProviderScope<NavKey>.cloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
+    setNavigationBarVisibility: (Boolean) -> Unit = { },
 ) {
     entry<CloudDriveNavKey> { key ->
         val viewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
@@ -57,6 +66,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
             onBack = onBack,
             onTransfer = onTransfer,
             openSearch = openSearch,
+            setNavigationBarVisibility = setNavigationBarVisibility,
             nodeOptionsActionViewModel = nodeOptionsActionViewModel
         )
     }

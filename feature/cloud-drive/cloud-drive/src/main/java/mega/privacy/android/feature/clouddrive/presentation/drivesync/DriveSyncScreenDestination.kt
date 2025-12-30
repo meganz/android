@@ -40,7 +40,7 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
             navigationHandler = navigationHandler,
             viewModel = viewModel,
             cloudDriveViewModel = cloudDriveViewModel,
-            setNavigationItemVisibility = setNavigationVisibility,
+            setNavigationBarVisibility = setNavigationVisibility,
             onTransfer = onTransfer,
             openSearch = openSearch,
             initialTabIndex = key.initialTabIndex,

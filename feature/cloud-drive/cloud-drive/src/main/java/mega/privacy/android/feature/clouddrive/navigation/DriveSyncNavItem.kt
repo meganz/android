@@ -50,7 +50,8 @@ class DriveSyncNavItem : MainNavItem {
                             parentHandle = parentHandle
                         )
                     )
-                }
+                },
+                setNavigationBarVisibility = navigationController::showNavigation,
             )
         }
 

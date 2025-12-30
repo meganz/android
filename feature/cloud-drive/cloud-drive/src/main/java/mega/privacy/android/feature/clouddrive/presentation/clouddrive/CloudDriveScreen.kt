@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ fun CloudDriveScreen(
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
+    setNavigationBarVisibility: (Boolean) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
@@ -68,9 +70,8 @@ fun CloudDriveScreen(
         viewModel.processAction(DeselectAllItems)
     }
 
-    val isBottomNavigationVisible = LocalBottomNavigationVisible.current
     MegaScaffoldWithTopAppBarScrollBehavior(
-        contentWindowInsets = if (isBottomNavigationVisible) {
+        contentWindowInsets = if (LocalBottomNavigationVisible.current) {
             WindowInsets.systemBarsIgnoringBottom
         } else {
             ScaffoldDefaults.contentWindowInsets
@@ -155,6 +156,10 @@ fun CloudDriveScreen(
             )
         }
     )
+
+    LaunchedEffect(uiState.isInSelectionMode) {
+        setNavigationBarVisibility(!uiState.isInSelectionMode)
+    }
 
     @SuppressLint("ComposeViewModelForwarding")
     ScanDocumentHandler(

@@ -59,14 +59,14 @@ import mega.privacy.android.shared.resources.R as sharedR
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
  *
- * @param setNavigationItemVisibility Callback to set the visibility of the navigation item
+ * @param setNavigationBarVisibility Callback to set the visibility of the navigation bar
  * @param viewModel ViewModel for managing the state of the Drive Sync screen
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DriveSyncScreen(
     navigationHandler: NavigationHandler,
-    setNavigationItemVisibility: (Boolean) -> Unit,
+    setNavigationBarVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openSearch: (Long, NodeSourceType) -> Unit,
     cloudDriveViewModel: CloudDriveViewModel,
@@ -235,7 +235,7 @@ internal fun DriveSyncScreen(
     }
 
     LaunchedEffect(cloudDriveUiState.isInSelectionMode) {
-        setNavigationItemVisibility(!cloudDriveUiState.isInSelectionMode)
+        setNavigationBarVisibility(!cloudDriveUiState.isInSelectionMode)
     }
 
     @SuppressLint("ComposeViewModelForwarding")
