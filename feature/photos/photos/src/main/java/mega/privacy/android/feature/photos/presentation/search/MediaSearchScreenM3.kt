@@ -3,7 +3,10 @@ package mega.privacy.android.feature.photos.presentation.search
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +27,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
@@ -50,6 +54,9 @@ import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.model.HighlightedText
+import mega.android.core.ui.modifiers.shimmerEffect
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
@@ -177,8 +184,7 @@ private fun MediaSearchContent(
     modifier: Modifier = Modifier,
 ) {
     when (state.contentState) {
-        MediaContentState.Initializing -> {}
-
+        MediaContentState.Loading -> MediaSearchLoading()
         MediaContentState.WelcomeEmpty -> {
             MediaSearchEmptyState(
                 modifier = modifier
@@ -494,6 +500,82 @@ private fun PhotoCard(
             onClick(photo)
         }
     )
+}
+
+@Composable
+private fun MediaSearchLoading() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 16.dp, horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .height(16.dp)
+                .width(50.dp)
+                .shimmerEffect()
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            repeat(3) {
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .size(104.dp)
+                            .shimmerEffect()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .width(50.dp)
+                            .height(16.dp)
+                            .align(Alignment.CenterHorizontally)
+                            .shimmerEffect()
+                    )
+                }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .height(16.dp)
+                .width(50.dp)
+                .shimmerEffect()
+        )
+
+        repeat(5) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .shimmerEffect()
+                )
+
+                Box(
+                    modifier = Modifier
+                        .height(16.dp)
+                        .fillMaxWidth()
+                        .align(Alignment.CenterVertically)
+                        .shimmerEffect()
+                )
+            }
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MediaSearchLoadingPreview() {
+    AndroidThemeForPreviews {
+        MediaSearchLoading()
+    }
 }
 
 internal const val MEDIA_SEARCH_SCREEN_WELCOME_EMPTY = "media_search_screen:welcome_empty"

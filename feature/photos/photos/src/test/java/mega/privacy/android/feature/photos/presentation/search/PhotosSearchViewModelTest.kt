@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
@@ -123,8 +122,6 @@ internal class PhotosSearchViewModelTest {
         // given
         whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(listOf())
         initViewModel()
-        advanceUntilIdle()
-
         val query = "sample"
 
         // when
@@ -145,8 +142,6 @@ internal class PhotosSearchViewModelTest {
 
         // when
         initViewModel()
-        advanceUntilIdle()
-
         // then - PhotosCache is used instead, so lazy dependencies should not be accessed
         // The fact that we didn't set up mocks for albumsDataProvider.monitorAlbums()
         // or monitorTimelinePhotosUseCase() proves they weren't called
@@ -183,8 +178,6 @@ internal class PhotosSearchViewModelTest {
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
 
         initViewModel()
-        advanceUntilIdle()
-
         photosSearchViewModel.state.test {
             val state = awaitItem()
             assertThat(state.isSingleActivityEnabled).isFalse()
@@ -221,10 +214,7 @@ internal class PhotosSearchViewModelTest {
         whenever(albumTitleStringMapper(AlbumTitle.StringTitle("GIFs"))).thenReturn("GIFs")
 
         initViewModel()
-        advanceUntilIdle()
         photosSearchViewModel.search("Fav")
-        advanceUntilIdle()
-
         photosSearchViewModel.state.test {
             val state = awaitItem()
             assertThat(state.isSingleActivityEnabled).isFalse()
@@ -279,10 +269,7 @@ internal class PhotosSearchViewModelTest {
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
 
         initViewModel()
-        advanceUntilIdle()
         photosSearchViewModel.search("vacation")
-        advanceUntilIdle()
-
         photosSearchViewModel.state.test {
             val state = awaitItem()
             assertThat(state.isSingleActivityEnabled).isFalse()
@@ -310,8 +297,6 @@ internal class PhotosSearchViewModelTest {
             whenever(monitorTimelinePhotosUseCase(any())).thenReturn(flowOf())
 
             initViewModel()
-            advanceUntilIdle()
-
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.isSingleActivityEnabled).isTrue()
@@ -358,8 +343,6 @@ internal class PhotosSearchViewModelTest {
             whenever(monitorTimelinePhotosUseCase(any())).thenReturn(flowOf(timelinePhotosResult))
 
             initViewModel()
-            advanceUntilIdle()
-
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.isSingleActivityEnabled).isTrue()
@@ -374,11 +357,11 @@ internal class PhotosSearchViewModelTest {
             whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(emptyList())
 
             initViewModel()
-
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.query).isEmpty()
                 assertThat(state.recentQueries).isEmpty()
+                assertThat(state.isInitializing).isFalse()
                 assertThat(state.contentState).isEqualTo(MediaContentState.WelcomeEmpty)
             }
         }
@@ -390,12 +373,11 @@ internal class PhotosSearchViewModelTest {
             whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(recentQueries)
 
             initViewModel()
-            photosSearchViewModel.updateQuery("")
-
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.query).isEmpty()
                 assertThat(state.recentQueries).isEqualTo(recentQueries)
+                assertThat(state.isInitializing).isFalse()
                 assertThat(state.contentState).isEqualTo(MediaContentState.RecentQueries)
             }
         }
@@ -407,8 +389,6 @@ internal class PhotosSearchViewModelTest {
 
             initViewModel()
             photosSearchViewModel.search("nonexistent")
-            photosSearchViewModel.updateQuery("nonexistent")
-
             photosSearchViewModel.state.test {
                 val state = awaitItem()
                 assertThat(state.query).isEqualTo("nonexistent")
@@ -421,7 +401,7 @@ internal class PhotosSearchViewModelTest {
         }
 
     @Test
-    fun `test that contentState is SearchResults when search returns albums`() = runTest {
+    fun `test that contentState is Loading when search is in progress`() = runTest {
         whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(emptyList())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
         whenever(albumsDataProvider.order).thenReturn(0)
@@ -430,11 +410,11 @@ internal class PhotosSearchViewModelTest {
         whenever(albumTitleStringMapper(any())).thenReturn("Test Album")
 
         initViewModel()
-        photosSearchViewModel.search("Test")
-
+        // Verify initial state is not Loading after initialization
         photosSearchViewModel.state.test {
             val state = awaitItem()
-            assertThat(state.query).isEqualTo("Test")
+            assertThat(state.isInitializing).isFalse()
+            assertThat(state.contentState).isNotEqualTo(MediaContentState.Loading)
         }
     }
 
@@ -476,7 +456,6 @@ internal class PhotosSearchViewModelTest {
 
         initViewModel()
         photosSearchViewModel.search("vacation")
-
         photosSearchViewModel.state.test {
             val state = awaitItem()
             assertThat(state.query).isEqualTo("vacation")
@@ -494,7 +473,6 @@ internal class PhotosSearchViewModelTest {
             initViewModel()
             photosSearchViewModel.updateQuery("some_query")
             photosSearchViewModel.updateQuery("")
-            photosSearchViewModel.updateQuery("")
 
             photosSearchViewModel.state.test {
                 val state = awaitItem()
@@ -509,19 +487,24 @@ internal class PhotosSearchViewModelTest {
         whenever(retrievePhotosRecentQueriesUseCase()).thenReturn(emptyList())
 
         initViewModel()
-
         photosSearchViewModel.state.test {
             val initialState = awaitItem()
             assertThat(initialState.contentState).isEqualTo(MediaContentState.WelcomeEmpty)
         }
 
         photosSearchViewModel.updateRecentQueries("new_query")
-        photosSearchViewModel.updateQuery("")
-
         photosSearchViewModel.state.test {
             val state = awaitItem()
             assertThat(state.recentQueries).contains("new_query")
             assertThat(state.contentState).isEqualTo(MediaContentState.RecentQueries)
         }
+    }
+
+    @Test
+    fun `test that default PhotosSearchState has Loading contentState`() = runTest {
+        // Verify the default state has Loading as contentState
+        val defaultState = PhotosSearchState()
+        assertThat(defaultState.isInitializing).isTrue()
+        assertThat(defaultState.contentState).isEqualTo(MediaContentState.Loading)
     }
 }

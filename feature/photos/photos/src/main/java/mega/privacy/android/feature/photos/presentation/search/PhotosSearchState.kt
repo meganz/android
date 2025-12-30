@@ -9,7 +9,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
  * Represents the content state of the media search screen.
  */
 enum class MediaContentState {
-    Initializing,
+    Loading,
     WelcomeEmpty,
     RecentQueries,
     NoResults,
@@ -18,7 +18,7 @@ enum class MediaContentState {
 
 data class PhotosSearchState(
     val isInitializing: Boolean = true,
-    val contentState: MediaContentState = MediaContentState.Initializing,
+    val contentState: MediaContentState = MediaContentState.Loading,
     val query: String = "",
     val recentQueries: List<String> = listOf(),
     val selectedQuery: String? = null,

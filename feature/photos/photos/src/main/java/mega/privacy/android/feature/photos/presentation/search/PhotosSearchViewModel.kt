@@ -8,12 +8,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -56,7 +57,9 @@ class PhotosSearchViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state: MutableStateFlow<PhotosSearchState> = MutableStateFlow(PhotosSearchState())
 
-    val state: StateFlow<PhotosSearchState> = _state.asStateFlow()
+    val state: StateFlow<PhotosSearchState> = _state
+        .map { it.copy(contentState = computeContentState(it)) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, PhotosSearchState())
 
     private var showHiddenItems: Boolean = false
 
@@ -158,10 +161,7 @@ class PhotosSearchViewModel @Inject constructor(
 
     fun updateQuery(query: String) {
         _state.update {
-            it.copy(
-                query = query,
-                contentState = updateContentState()
-            )
+            it.copy(query = query)
         }
     }
 
@@ -174,7 +174,6 @@ class PhotosSearchViewModel @Inject constructor(
                 legacyAlbums = it.legacyAlbums.takeIf { query.isNotBlank() }.orEmpty(),
                 albums = it.albums.takeIf { query.isNotBlank() }.orEmpty(),
                 isSearchingAlbums = true,
-                contentState = updateContentState()
             )
         }
 
@@ -198,7 +197,6 @@ class PhotosSearchViewModel @Inject constructor(
                         it.copy(
                             albums = albums,
                             isSearchingAlbums = false,
-                            contentState = updateContentState()
                         )
                     }
                 }
@@ -226,7 +224,6 @@ class PhotosSearchViewModel @Inject constructor(
                 it.copy(
                     legacyAlbums = albums,
                     isSearchingAlbums = false,
-                    contentState = updateContentState()
                 )
             }
         }
@@ -256,7 +253,6 @@ class PhotosSearchViewModel @Inject constructor(
             it.copy(
                 photos = photos,
                 isSearchingPhotos = false,
-                contentState = updateContentState()
             )
         }
     }
@@ -266,10 +262,7 @@ class PhotosSearchViewModel @Inject constructor(
 
         val recentQueries = (listOf(query) + _state.value.recentQueries).toSet().take(6)
         _state.update {
-            it.copy(
-                recentQueries = recentQueries,
-                contentState = updateContentState()
-            )
+            it.copy(recentQueries = recentQueries)
         }
     }
 
@@ -303,15 +296,11 @@ class PhotosSearchViewModel @Inject constructor(
                 it.copy(
                     isInitializing = false,
                     recentQueries = queries,
-                    contentState = updateContentState()
                 )
             }
         }.onFailure { throwable ->
             _state.update {
-                it.copy(
-                    isInitializing = false,
-                    contentState = updateContentState()
-                )
+                it.copy(isInitializing = false)
             }
             Timber.e(throwable)
         }
@@ -327,27 +316,27 @@ class PhotosSearchViewModel @Inject constructor(
     }
 
     /**
-     * Updates the content state based on the current state properties.
+     * Computes the content state based on the given state properties.
+     * This mirrors the logic in PhotosSearchScreen for consistency.
      */
-    private fun updateContentState(): MediaContentState {
-        val state = this.state.value
-
-        return when {
-            state.query.isBlank() && state.recentQueries.isEmpty() -> MediaContentState.WelcomeEmpty
-            state.query.isBlank() -> MediaContentState.RecentQueries
-
-            isAlbumEmpty()
-                    && !state.isSearchingAlbums
-                    && state.photos.isEmpty()
-                    && !state.isSearchingPhotos -> MediaContentState.NoResults
-
-            else -> MediaContentState.SearchResults
+    private fun computeContentState(state: PhotosSearchState): MediaContentState = when {
+        state.isInitializing || state.isSearchingAlbums || state.isSearchingPhotos -> MediaContentState.Loading
+        state.query.isBlank() -> {
+            if (state.recentQueries.isEmpty()) {
+                MediaContentState.WelcomeEmpty
+            } else {
+                MediaContentState.RecentQueries
+            }
         }
+
+        state.photos.isEmpty() && isAlbumEmpty(state) -> MediaContentState.NoResults
+        else -> MediaContentState.SearchResults
     }
 
-    private fun isAlbumEmpty(): Boolean = when (state.value.isSingleActivityEnabled) {
-        true -> state.value.albums.isEmpty()
-        false -> state.value.legacyAlbums.isEmpty()
-        else -> true
-    }
+    private fun isAlbumEmpty(state: PhotosSearchState): Boolean =
+        when (state.isSingleActivityEnabled) {
+            true -> state.albums.isEmpty()
+            false -> state.legacyAlbums.isEmpty()
+            else -> true
+        }
 }

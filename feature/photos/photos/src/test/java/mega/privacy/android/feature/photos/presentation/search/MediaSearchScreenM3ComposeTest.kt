@@ -12,13 +12,10 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
-import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
-import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
@@ -259,7 +256,7 @@ class MediaSearchScreenM3ComposeTest {
     @Test
     fun `test that nothing is displayed when initializing`() {
         val state = PhotosSearchState(
-            contentState = MediaContentState.Initializing,
+            contentState = MediaContentState.Loading,
         )
 
         setComposeContent(state)
