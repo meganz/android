@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.extensions
+package mega.privacy.android.core.sharedcomponents.extension
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable

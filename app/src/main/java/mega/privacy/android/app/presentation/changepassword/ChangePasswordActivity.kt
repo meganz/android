@@ -21,7 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity

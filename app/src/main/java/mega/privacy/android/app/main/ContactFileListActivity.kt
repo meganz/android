@@ -52,7 +52,6 @@ import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DocumentScanningErrorDialog
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.extensions.uploadFolderManually
 import mega.privacy.android.app.presentation.node.dialogs.leaveshare.LeaveShareDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
@@ -81,6 +80,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.document.DocumentEntity

@@ -8,8 +8,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startMeetingActivity
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.shared.original.core.ui.controls.chat.ReturnToCallBanner
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews

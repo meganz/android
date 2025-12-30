@@ -6,7 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.MegaPsaContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer

@@ -66,7 +66,6 @@ import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginNavKey
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
@@ -81,6 +80,7 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy

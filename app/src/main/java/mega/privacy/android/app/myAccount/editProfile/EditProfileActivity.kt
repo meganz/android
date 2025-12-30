@@ -50,7 +50,6 @@ import mega.privacy.android.app.myAccount.MyAccountViewModel
 import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_2FA
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
@@ -75,6 +74,7 @@ import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase

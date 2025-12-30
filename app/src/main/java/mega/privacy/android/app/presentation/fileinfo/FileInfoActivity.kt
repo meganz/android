@@ -38,7 +38,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent

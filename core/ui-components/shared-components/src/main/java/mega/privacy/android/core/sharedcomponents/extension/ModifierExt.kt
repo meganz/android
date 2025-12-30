@@ -1,12 +1,10 @@
 package mega.privacy.android.core.sharedcomponents.extension
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLayoutDirection
-import mega.privacy.android.domain.entity.ThemeMode
 
 /**
  * Extension function to exclude bottom padding from PaddingValues
@@ -19,14 +17,4 @@ fun PaddingValues.excludingBottomPadding(): PaddingValues {
         start = calculateStartPadding(layoutDirection),
         end = calculateEndPadding(layoutDirection)
     )
-}
-
-/**
- * Is current theme mode a dark theme
- */
-@Composable
-fun ThemeMode.isDarkMode() = when (this) {
-    ThemeMode.Light -> false
-    ThemeMode.Dark -> true
-    ThemeMode.System -> isSystemInDarkTheme()
 }

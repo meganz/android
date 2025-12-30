@@ -46,9 +46,9 @@ import mega.privacy.android.app.contacts.requests.adapter.ContactRequestListAdap
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem
 import mega.privacy.android.app.contacts.requests.data.ContactRequestsState
 import mega.privacy.android.app.databinding.PageContactRequestsBinding
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactRequestAction
 import mega.privacy.android.domain.entity.user.ContactAvatar

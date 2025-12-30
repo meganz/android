@@ -37,7 +37,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity.Companion.INTENT_KEY_FROM_FOLDER_LINK

@@ -25,7 +25,7 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion

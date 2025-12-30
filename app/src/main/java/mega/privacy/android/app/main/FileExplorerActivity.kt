@@ -80,7 +80,6 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
@@ -104,6 +103,7 @@ import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialo
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode

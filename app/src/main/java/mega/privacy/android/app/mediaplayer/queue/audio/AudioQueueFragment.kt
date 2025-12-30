@@ -46,9 +46,9 @@ import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemUiEntity
 import mega.privacy.android.app.mediaplayer.queue.view.AudioQueueView
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme

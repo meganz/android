@@ -46,7 +46,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
@@ -69,6 +68,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature_flags.AppFeatures

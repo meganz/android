@@ -47,7 +47,7 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ScheduledMeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkBottomSheet
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG

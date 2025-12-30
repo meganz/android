@@ -15,7 +15,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.videosection.view.videoselected.VideoSelectedScreen
 import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper

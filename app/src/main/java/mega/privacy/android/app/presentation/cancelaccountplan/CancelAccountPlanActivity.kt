@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.cancelaccountplan.model.Cancellatio
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelAccountPlanView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.CancelSubscriptionSurveyView
 import mega.privacy.android.app.presentation.cancelaccountplan.view.instructionscreens.CancellationInstructionsView
-import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.utils.MANAGE_PLAY_STORE_SUBSCRIPTION_URL
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.ThemeMode
