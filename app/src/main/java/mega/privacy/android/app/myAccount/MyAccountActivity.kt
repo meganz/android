@@ -273,7 +273,9 @@ internal class MyAccountActivity : PasscodeActivity(),
             }
 
             ACTION_OPEN_USAGE_METER_FROM_MENU -> {
-                // Graph is already set in onCreate, just clear the action
+                supportActionBar?.apply {
+                    title = resources.getString(R.string.storage_space)
+                }
                 intent.action = null
             }
         }
@@ -448,12 +450,6 @@ internal class MyAccountActivity : PasscodeActivity(),
 
                 navGraph.setStartDestination(startDestination)
                 navController.setGraph(navGraph, intent.extras)
-
-                if (intent.action == ACTION_OPEN_USAGE_METER_FROM_MENU) {
-                    supportActionBar?.apply {
-                        title = resources.getString(R.string.storage_space)
-                    }
-                }
             }
         }
     }
