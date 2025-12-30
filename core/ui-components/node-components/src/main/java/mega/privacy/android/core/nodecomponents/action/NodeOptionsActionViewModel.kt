@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -182,8 +183,8 @@ class NodeOptionsActionViewModel @Inject constructor(
                     nodes.associateWith { targetNode },
                     type
                 )
-            }.onSuccess { result ->
-                uiState.update { it.copy(nodeNameCollisionsResult = triggered(result)) }
+            }.onSuccess {
+                triggerCollisionsResult(it)
             }.onFailure {
                 Timber.e(it)
             }
@@ -764,7 +765,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     }
 
     private fun List<NodeSelectionModeMenuItem>.orderAction(
-        nodeSourceType: NodeSourceType, isMultipleSelected: Boolean
+        nodeSourceType: NodeSourceType, isMultipleSelected: Boolean,
     ): List<NodeSelectionModeMenuItem> {
         val baseList = sortedBy { it.action.orderInCategory }
 
@@ -874,6 +875,12 @@ class NodeOptionsActionViewModel @Inject constructor(
     fun resetActionTriggered() {
         uiState.update {
             it.copy(actionTriggeredEvent = consumed)
+        }
+    }
+
+    fun triggerCollisionsResult(result: NodeNameCollisionsResult) {
+        uiState.update {
+            it.copy(nodeNameCollisionsResult = triggered(result))
         }
     }
 }

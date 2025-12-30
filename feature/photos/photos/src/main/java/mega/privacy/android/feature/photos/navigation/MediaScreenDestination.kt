@@ -51,7 +51,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             onNavigate = navigationHandler::navigate,
             onTransfer = onTransfer,
             nodeResultFlow = navigationHandler::monitorResult,
-            shareFolderDialogResultFlow = navigationHandler::monitorResult,
             clearResultFlow = navigationHandler::clearResult,
         )
 

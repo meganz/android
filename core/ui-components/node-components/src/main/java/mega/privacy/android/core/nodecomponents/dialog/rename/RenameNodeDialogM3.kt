@@ -170,7 +170,7 @@ private fun RenameNodeDialogBody(
     LaunchedEffect(nodeName) {
         val dotIndex = nodeName.lastIndexOf('.')
         val cursorIndex = if (dotIndex != -1) dotIndex else nodeName.length
-        inputValue = TextFieldValue(nodeName, TextRange(cursorIndex))
+        inputValue = TextFieldValue(text = nodeName, selection = TextRange(0, cursorIndex))
     }
 
     BasicInputDialog(

@@ -28,7 +28,7 @@ fun EntryProviderScope<NavKey>.favouritesScreen(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onNavigate = navigationHandler::navigate,
             onTransfer = onTransfer,
-            nodeResultFlow = navigationHandler::monitorResult,shareFolderDialogResultFlow = navigationHandler::monitorResult,
+            nodeResultFlow = navigationHandler::monitorResult,
             clearResultFlow = navigationHandler::clearResult,
         )
     }

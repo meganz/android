@@ -1,32 +1,22 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
-import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
 import mega.privacy.android.core.nodecomponents.action.HandleNodeOptionsActionEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
-import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
-import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
-import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
-import timber.log.Timber
 
 @Composable
 fun HandleNodeOptionsActionResult(
@@ -34,24 +24,13 @@ fun HandleNodeOptionsActionResult(
     onNavigate: (NavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
-    shareFolderDialogResultFlow: (String) -> Flow<ShareFolderDialogResult?>,
     clearResultFlow: (String) -> Unit,
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val megaResultContract = rememberMegaResultContract()
     val snackbarQueue = rememberSnackBarQueue()
     val nodeBottomSheetResult =
         nodeResultFlow(NodeOptionsBottomSheetNavKey.RESULT).collectAsStateWithLifecycle(null)
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            coroutineScope.launch {
-                snackbarQueue.queueMessage(message)
-            }
-        }
-    }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     HandleNodeOptionsActionEvent(
@@ -87,23 +66,10 @@ fun HandleNodeOptionsActionResult(
 
             is NodeOptionsBottomSheetResult.Rename -> {
                 nodeOptionsActionViewModel.handleRenameNodeRequest(result.nodeId)
-                onNavigate(RenameNodeDialogNavKey(result.nodeId.longValue))
             }
 
             is NodeOptionsBottomSheetResult.NodeNameCollision -> {
-                val result = result.result
-                if (result.conflictNodes.isNotEmpty()) {
-                    nameCollisionLauncher
-                        .launch(result.conflictNodes.values.toCollection(ArrayList()))
-                }
-                if (result.noConflictNodes.isNotEmpty()) {
-                    val nodes = result.noConflictNodes
-                    when (result.type) {
-                        NodeNameCollisionType.MOVE -> nodeOptionsActionViewModel.moveNodes(nodes)
-                        NodeNameCollisionType.COPY -> nodeOptionsActionViewModel.copyNodes(nodes)
-                        else -> Timber.d("Not implemented")
-                    }
-                }
+                nodeOptionsActionViewModel.triggerCollisionsResult(result.result)
             }
 
             is NodeOptionsBottomSheetResult.RestoreSuccess -> {
@@ -131,8 +97,7 @@ fun HandleNodeOptionsActionResult(
             }
 
             is NodeOptionsBottomSheetResult.AddToPlaylist -> {
-                val result = result.result
-                nodeOptionsActionViewModel.triggerAddVideoToPlaylistResultEvent(result)
+                nodeOptionsActionViewModel.triggerAddVideoToPlaylistResultEvent(result.result)
             }
 
             else -> return@LaunchedEffect

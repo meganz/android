@@ -28,7 +28,6 @@ fun EntryProviderScope<NavKey>.rubbishBin(
             onNavigate = navigationHandler::navigate,
             onTransfer = transferHandler::setTransferEvent,
             nodeResultFlow = navigationHandler::monitorResult,
-            shareFolderDialogResultFlow = navigationHandler::monitorResult,
             clearResultFlow = navigationHandler::clearResult,
         )
 
