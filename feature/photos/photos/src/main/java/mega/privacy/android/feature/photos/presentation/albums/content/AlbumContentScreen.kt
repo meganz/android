@@ -430,7 +430,10 @@ internal fun AlbumContentScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                visible = uiState.uiAlbum?.mediaAlbum is MediaAlbum.User && uiState.photos.isNotEmpty(),
+                modifier = Modifier.testTag(ALBUM_CONTENT_SCREEN_ADD_CONTENT_FAB),
+                visible = uiState.selectedPhotos.isEmpty()
+                        && uiState.uiAlbum?.mediaAlbum is MediaAlbum.User
+                        && uiState.photos.isNotEmpty(),
                 onClick = {
                     Analytics.tracker.trackEvent(AlbumAddPhotosFABEvent)
                     handleAction(AlbumContentSelectionAction.AddItems)
@@ -801,3 +804,5 @@ internal const val ALBUM_CONTENT_SCREEN_SKELETON =
     "album_content_screen:skeleton"
 internal const val ALBUM_CONTENT_SCREEN_EMPTY_PHOTOS_LAYOUT =
     "album_content_screen:empty_photos_layout"
+internal const val ALBUM_CONTENT_SCREEN_ADD_CONTENT_FAB =
+    "album_content_screen:add_content_fab"

@@ -27,6 +27,7 @@ import mega.privacy.android.icon.pack.IconPack
 fun AddContentFab(
     visible: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var readyToShow by remember { mutableStateOf(true) }
 
@@ -34,7 +35,7 @@ fun AddContentFab(
         MegaFab(
             onClick = onClick,
             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-            modifier = Modifier.windowInsetsPadding(
+            modifier = modifier.windowInsetsPadding(
                 WindowInsets.systemBars.only(
                     WindowInsetsSides.Horizontal
                 )

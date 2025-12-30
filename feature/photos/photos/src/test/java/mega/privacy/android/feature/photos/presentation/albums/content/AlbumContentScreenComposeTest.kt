@@ -612,6 +612,24 @@ class AlbumContentScreenComposeTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that fab should be hidden on selection mode`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(createMockPhoto(id = 1L)),
+            isLoading = false
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_ADD_CONTENT_FAB)
+            .assertDoesNotExist()
+    }
+
     private fun createMockPhoto(id: Long): PhotoUiState.Image {
         return PhotoUiState.Image(
             id = id,
