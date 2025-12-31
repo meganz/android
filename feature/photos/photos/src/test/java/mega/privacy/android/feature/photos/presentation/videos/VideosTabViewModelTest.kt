@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -25,7 +26,6 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -52,6 +52,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -65,7 +66,6 @@ class VideosTabViewModelTest {
 
     private val getAllVideosUseCase = mock<GetAllVideosUseCase>()
     private val videoUiEntityMapper = mock<VideoUiEntityMapper>()
-    private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getSyncUploadsFolderIdsUseCase = mock<GetSyncUploadsFolderIdsUseCase>()
@@ -102,12 +102,10 @@ class VideosTabViewModelTest {
             )
             whenever(monitorSortCloudOrderUseCase()).thenReturn(
                 flow {
-                    emit(null)
+                    emit(SortOrder.ORDER_MODIFICATION_DESC)
                     awaitCancellation()
                 }
             )
-
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_MODIFICATION_DESC)
             whenever(
                 getAllVideosUseCase(
                     searchQuery = anyOrNull(),
@@ -139,7 +137,6 @@ class VideosTabViewModelTest {
         underTest = VideosTabViewModel(
             getAllVideosUseCase = getAllVideosUseCase,
             videoUiEntityMapper = videoUiEntityMapper,
-            getCloudSortOrder = getCloudSortOrder,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase,
             getSyncUploadsFolderIdsUseCase = getSyncUploadsFolderIdsUseCase,
@@ -158,7 +155,6 @@ class VideosTabViewModelTest {
         reset(
             getAllVideosUseCase,
             videoUiEntityMapper,
-            getCloudSortOrder,
             monitorNodeUpdatesUseCase,
             monitorOfflineNodeUpdatesUseCase,
             getSyncUploadsFolderIdsUseCase,
@@ -231,19 +227,33 @@ class VideosTabViewModelTest {
             val testFileNode = mock<FileNode> {
                 on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
             }
-            monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-                        awaitCancellation()
-                    }
-                )
-            }
 
-            underTest.uiState.test {
-                assertThat(awaitItem()).isInstanceOf(VideosTabUiState.Loading::class.java)
-                cancelAndIgnoreRemainingEvents()
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
+            monitorNodeUpdatesUseCase.stub {
+                on { invoke() }.thenReturn(nodeUpdatesFlow)
             }
+            initUnderTest()
+
+            underTest.uiState
+                .filterIsInstance<VideosTabUiState.Data>()
+                .first()
+
+            advanceUntilIdle()
+
+            resetMocks()
+            whenever(
+                getAllVideosUseCase(
+                    searchQuery = anyOrNull(),
+                    tag = anyOrNull(),
+                    description = anyOrNull()
+                )
+            ).thenReturn(listOf(mock(), mock()))
+
+            nodeUpdatesFlow.emit(NodeUpdate(mapOf(testFileNode to emptyList())))
+            advanceUntilIdle()
+
+            // Verify that getAllVideosUseCase was NOT called because the update was filtered out
+            verifyNoMoreInteractions(getAllVideosUseCase)
         }
 
     @Test
@@ -587,7 +597,7 @@ class VideosTabViewModelTest {
 
         val actual = underTest.uiState
             .filterIsInstance<VideosTabUiState.Data>()
-            .first { it.allVideoEntities.isNotEmpty() }
+            .first { it.allVideoEntities.isNotEmpty() && it.showHiddenItems == showHiddenItems }
 
 
         assertThat(actual.allVideoEntities).isNotEmpty()
@@ -629,7 +639,7 @@ class VideosTabViewModelTest {
 
         val actual = underTest.uiState
             .filterIsInstance<VideosTabUiState.Data>()
-            .first { it.allVideoEntities.isNotEmpty() }
+            .first { it.allVideoEntities.isNotEmpty() && it.showHiddenItems == !hiddenNodeEnabled }
 
         assertThat(actual.allVideoEntities).isNotEmpty()
         assertThat(actual.showHiddenItems).isEqualTo(!hiddenNodeEnabled)

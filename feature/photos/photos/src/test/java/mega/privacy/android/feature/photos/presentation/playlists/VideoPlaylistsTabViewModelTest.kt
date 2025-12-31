@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -38,6 +39,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -190,27 +192,26 @@ class VideoPlaylistsTabViewModelTest {
             val testFileNode = mock<FileNode> {
                 on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
             }
-            monitorVideoPlaylistSetsUpdateUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        awaitCancellation()
-                    }
-                )
-            }
+
+            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
             monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-                        awaitCancellation()
-                    }
-                )
+                on { invoke() }.thenReturn(nodeUpdatesFlow)
             }
             initUnderTest()
 
-            underTest.uiState.test {
-                assertThat(awaitItem()).isInstanceOf(VideoPlaylistsTabUiState.Loading::class.java)
-                expectNoEvents()
-            }
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first()
+            advanceUntilIdle()
+
+            resetMocks()
+            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
+
+            nodeUpdatesFlow.emit(NodeUpdate(mapOf(testFileNode to emptyList())))
+            advanceUntilIdle()
+
+            // Verify that getVideoPlaylistsUseCase was NOT called because the update was filtered out
+            verifyNoMoreInteractions(getVideoPlaylistsUseCase)
         }
 
     @Test

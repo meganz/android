@@ -10,7 +10,6 @@ import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -18,20 +17,19 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedVideoNode
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -53,7 +51,6 @@ import timber.log.Timber
 class VideosTabViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
     private val videoUiEntityMapper: VideoUiEntityMapper,
-    private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
@@ -70,11 +67,6 @@ class VideosTabViewModel @Inject constructor(
     private val locationFilterOptionFlow = MutableStateFlow(LocationFilterOption.AllLocations)
     private val durationFilterOptionFlow = MutableStateFlow(DurationFilterOption.AllDurations)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
-    private val showHiddenItemsFlow = observeShowHiddenItemsState().stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        false
-    )
 
     private val navigateToVideoPlayerFlow =
         MutableStateFlow<StateEventWithContent<NavKey>>(consumed())
@@ -88,28 +80,30 @@ class VideosTabViewModel @Inject constructor(
             flow {
                 emit(VideosTabUiState.Loading)
                 emitAll(
-                    merge(
-                        monitorNodeUpdatesUseCase().filter {
-                            it.changes.keys.any { node ->
-                                node is FileNode && node.type is VideoFileTypeInfo
-                            }
-                        },
-                        monitorOfflineNodeUpdatesUseCase(),
+                    combine(
+                        merge(
+                            monitorNodeUpdatesUseCase().filter {
+                                it.changes.keys.any { node ->
+                                    node is FileNode && node.type is VideoFileTypeInfo
+                                }
+                            },
+                            monitorOfflineNodeUpdatesUseCase(),
+                            selectedVideoIdsFlow,
+                        ).onStart { emit(Unit) },
                         monitorSortCloudOrderUseCase(),
-                        selectedVideoIdsFlow,
-                        showHiddenItemsFlow,
-                    ).mapLatest {
+                        observeShowHiddenItemsState(),
+                    ) { _, sortOrder, showHiddenItems ->
                         val videoNodes = getVideoNodeList()
                             .filterVideosByDuration()
                             .filterVideosByLocation()
-                            .filterNonSensitiveItems(showHiddenItemsFlow.value)
+                            .filterNonSensitiveItems(showHiddenItems)
                         val uiEntities = videoNodes.map {
                             videoUiEntityMapper(it).copy(
                                 isSelected = it.id.longValue in selectedVideoIdsFlow.value
                             )
                         }
-                        val sortOrder = getCloudSortOrder()
-                        val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+                        val order = sortOrder ?: SortOrder.ORDER_DEFAULT_ASC
+                        val sortOrderPair = nodeSortConfigurationUiMapper(order)
                         val selectedNodes = videoNodes.filter {
                             it.id.longValue in selectedVideoIdsFlow.value
                         }
@@ -117,13 +111,13 @@ class VideosTabViewModel @Inject constructor(
                         VideosTabUiState.Data(
                             allVideoEntities = uiEntities,
                             allVideoNodes = videoNodes,
-                            sortOrder = sortOrder,
+                            sortOrder = order,
                             query = queryFlow.value,
                             selectedSortConfiguration = sortOrderPair,
                             locationSelectedFilterOption = locationFilterOptionFlow.value,
                             durationSelectedFilterOption = durationFilterOptionFlow.value,
                             selectedTypedNodes = selectedNodes,
-                            showHiddenItems = showHiddenItemsFlow.value
+                            showHiddenItems = showHiddenItems
                         )
                     }.catch {
                         Timber.e(it)
@@ -218,6 +212,8 @@ class VideosTabViewModel @Inject constructor(
                 .catch { Timber.e(it) },
         ) { isHiddenNodesEnabled, showHiddenItems ->
             showHiddenItems || !isHiddenNodesEnabled
+        }.onStart {
+            emit(false)
         }
 
     internal fun onItemClicked(item: VideoUiEntity) {
