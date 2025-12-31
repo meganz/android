@@ -222,7 +222,7 @@ internal fun NodeOptionsBottomSheetContent(
     if (uiState.node != null) {
         NodeListViewItem(
             modifier = Modifier.semantics { testTagsAsResourceId = true },
-            title = uiState.node.name,
+            title = uiState.node.title.text,
             titleColor = if (uiState.node.isTakenDown) TextColor.Error else TextColor.Primary,
             titleTextStyle = AppTheme.typography.titleMedium,
             titleMaxLines = 1,
