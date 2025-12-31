@@ -320,7 +320,9 @@ class CameraUploadsWorker @AssistedInject constructor(
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         runCatching {
             Timber.d("Start CU Worker")
-            crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started")
+            // Determine if this is a periodic or one-time worker based on tags
+            val isPeriodic = tags.contains("CAMERA_UPLOAD_TAG")
+            crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Started with isPeriodic: $isPeriodic")
             // Signal to not kill the worker if the app is killed
             runCatching { setForeground(getForegroundInfo()) }.onFailure {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && it is ForegroundServiceStartNotAllowedException) {
