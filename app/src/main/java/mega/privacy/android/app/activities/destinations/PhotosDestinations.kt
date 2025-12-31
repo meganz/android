@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.model.AlbumFlow
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
@@ -90,7 +90,9 @@ fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
 fun EntryProviderScope<NavKey>.legacyAlbumGetLink(
     removeDestination: () -> Unit,
 ) {
-    entry<AlbumGetLinkNavKey> { args ->
+    entry<AlbumGetLinkNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {
@@ -111,7 +113,9 @@ fun EntryProviderScope<NavKey>.legacyAlbumGetLink(
 fun EntryProviderScope<NavKey>.legacyAlbumImport(
     removeDestination: () -> Unit,
 ) {
-    entry<LegacyAlbumImportNavKey> { key ->
+    entry<LegacyAlbumImportNavKey>(
+        metadata = transparentMetadata()
+    ) { key ->
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {
@@ -133,7 +137,9 @@ fun EntryProviderScope<NavKey>.legacyAlbumImport(
 fun EntryProviderScope<NavKey>.legacyAlbumContentPreview(
     removeDestination: () -> Unit,
 ) {
-    entry<AlbumContentPreviewNavKey> { args ->
+    entry<AlbumContentPreviewNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {
@@ -168,7 +174,9 @@ fun EntryProviderScope<NavKey>.legacyAlbumContentPreview(
 }
 
 fun EntryProviderScope<NavKey>.legacyMediaTimelinePhotoPreview(removeDestination: () -> Unit) {
-    entry<MediaTimelinePhotoPreviewNavKey> { args ->
+    entry<MediaTimelinePhotoPreviewNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
 
         LaunchedEffect(Unit) {
@@ -193,7 +201,9 @@ fun EntryProviderScope<NavKey>.legacyMediaTimelinePhotoPreview(removeDestination
 }
 
 fun EntryProviderScope<NavKey>.legacyAddToAlbumActivityNavKey(returnResult: (String, String?) -> Unit) {
-    entry<LegacyAddToAlbumActivityNavKey> { args ->
+    entry<LegacyAddToAlbumActivityNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
@@ -216,7 +226,9 @@ fun EntryProviderScope<NavKey>.legacyAddToAlbumActivityNavKey(returnResult: (Str
 }
 
 fun EntryProviderScope<NavKey>.legacySettingsCameraUploadsActivityNavKey(removeDestination: () -> Unit) {
-    entry<LegacySettingsCameraUploadsActivityNavKey> { args ->
+    entry<LegacySettingsCameraUploadsActivityNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(context, SettingsCameraUploadsActivity::class.java).apply {
