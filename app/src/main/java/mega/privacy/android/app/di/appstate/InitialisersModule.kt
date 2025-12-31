@@ -9,6 +9,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
@@ -61,6 +62,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideSslErrorMonitorAppStartInitialiser(initialiser: SSLErrorMonitorInitialiser): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun providePurchaseResultInitialiser(initialiser: PurchaseResultInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides
