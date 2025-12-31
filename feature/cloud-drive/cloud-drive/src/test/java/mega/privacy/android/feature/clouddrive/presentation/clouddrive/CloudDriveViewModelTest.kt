@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -86,6 +88,7 @@ class CloudDriveViewModelTest {
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
         mock()
+    private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
@@ -119,6 +122,7 @@ class CloudDriveViewModelTest {
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase,
+            getNodeAccessPermission,
             monitorSortCloudOrderUseCase,
         )
     }
@@ -144,6 +148,7 @@ class CloudDriveViewModelTest {
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
         getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
+        getNodeAccessPermission = getNodeAccessPermission,
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
     )
@@ -270,6 +275,9 @@ class CloudDriveViewModelTest {
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
         whenever(areCredentialsVerifiedUseCase(any())).thenReturn(false)
         whenever(getIncomingShareParentUserEmailUseCase(any())).thenReturn(null)
+
+        // Setup permission check mock
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.OWNER)
     }
 
     @Test
@@ -1819,4 +1827,88 @@ class CloudDriveViewModelTest {
                 assertThat(initialState.showContactNotVerifiedBanner).isFalse()
             }
         }
-} 
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for OWNER permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(AccessPermission.OWNER)
+
+            val underTest = createViewModel()
+            testScheduler.advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for READWRITE permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(AccessPermission.READWRITE)
+
+            val underTest = createViewModel()
+            testScheduler.advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for FULL permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(AccessPermission.FULL)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for READ permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(AccessPermission.READ)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for UNKNOWN permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(AccessPermission.UNKNOWN)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for null permission`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenReturn(null)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false when exception is thrown`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getNodeAccessPermission.invoke(folderNodeId)).thenThrow(RuntimeException("Test exception"))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.hasWritePermission).isFalse()
+        }
+}

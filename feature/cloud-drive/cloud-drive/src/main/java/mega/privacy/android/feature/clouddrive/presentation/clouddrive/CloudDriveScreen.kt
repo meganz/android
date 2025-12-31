@@ -135,7 +135,7 @@ fun CloudDriveScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                visible = !uiState.isInSelectionMode && !uiState.isEmpty,
+                visible = uiState.hasWritePermission && !uiState.isInSelectionMode && !uiState.isEmpty,
                 onClick = { showUploadOptionsBottomSheet = true }
             )
         },

@@ -215,7 +215,8 @@ internal fun CloudDriveContent(
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                     isRootCloudDrive = uiState.isCloudDriveRoot,
-                    onAddItemsClicked = { onToggleShowUploadOptionsBottomSheet(true) }
+                    onAddItemsClicked = { onToggleShowUploadOptionsBottomSheet(true) },
+                    showAddItems = uiState.hasWritePermission
                 )
             }
 

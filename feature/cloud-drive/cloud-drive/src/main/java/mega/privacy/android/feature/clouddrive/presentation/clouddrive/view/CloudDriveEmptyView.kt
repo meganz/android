@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,9 +35,10 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun CloudDriveEmptyView(
+    onAddItemsClicked: () -> Unit,
     modifier: Modifier = Modifier,
     isRootCloudDrive: Boolean = false,
-    onAddItemsClicked: () -> Unit,
+    showAddItems: Boolean = true,
 ) {
     val imageDrawable = if (isRootCloudDrive) {
         iconPackR.drawable.ic_usp_2
@@ -66,7 +68,8 @@ fun CloudDriveEmptyView(
             EmptyContent(
                 modifier = Modifier.weight(1f),
                 titleId = titleId,
-                onAddItemsClicked = onAddItemsClicked
+                onAddItemsClicked = onAddItemsClicked,
+                showAddItems = showAddItems
             )
         }
     } else {
@@ -81,7 +84,8 @@ fun CloudDriveEmptyView(
 
             EmptyContent(
                 titleId = titleId,
-                onAddItemsClicked = onAddItemsClicked
+                onAddItemsClicked = onAddItemsClicked,
+                showAddItems = showAddItems
             )
         }
     }
@@ -93,7 +97,9 @@ private fun EmptyImage(
     modifier: Modifier = Modifier,
 ) {
     Image(
-        modifier = modifier.size(120.dp),
+        modifier = modifier
+            .size(120.dp)
+            .testTag(EMPTY_IMAGE_TAG),
         painter = painterResource(id = imageDrawable),
         contentDescription = "Empty icon"
     )
@@ -104,6 +110,7 @@ private fun EmptyContent(
     titleId: Int,
     onAddItemsClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    showAddItems: Boolean = true,
 ) {
     Column(
         modifier = modifier,
@@ -111,29 +118,35 @@ private fun EmptyContent(
         verticalArrangement = Arrangement.Center
     ) {
         MegaText(
+            modifier = Modifier.testTag(EMPTY_TITLE_TAG),
             text = stringResource(titleId),
             textColor = TextColor.Primary,
             style = AppTheme.typography.titleLarge,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        if (showAddItems) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-        MegaText(
-            text = stringResource(sharedR.string.context_empty_cloud_drive_description),
-            textColor = TextColor.Secondary,
-            style = AppTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
+            MegaText(
+                modifier = Modifier.testTag(EMPTY_DESCRIPTION_TAG),
+                text = stringResource(sharedR.string.context_empty_cloud_drive_description),
+                textColor = TextColor.Secondary,
+                style = AppTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-        PrimaryFilledButton(
-            modifier = Modifier.wrapContentSize(),
-            text = stringResource(sharedR.string.album_content_action_add_items),
-            leadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-            onClick = onAddItemsClicked
-        )
+            PrimaryFilledButton(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .testTag(ADD_ITEMS_BUTTON_TAG),
+                text = stringResource(sharedR.string.album_content_action_add_items),
+                leadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                onClick = onAddItemsClicked
+            )
+        }
     }
 }
 
@@ -169,3 +182,26 @@ private fun FolderEmptyViewPreview() {
         )
     }
 }
+
+@CombinedThemePreviews
+@Preview(
+    name = "Landscape",
+    showBackground = true,
+    device = "spec:parent=pixel_5,orientation=landscape"
+)
+@Composable
+private fun FolderEmptyNoWritePermissionViewPreview() {
+    AndroidThemeForPreviews {
+        CloudDriveEmptyView(
+            isRootCloudDrive = false,
+            showAddItems = false,
+            onAddItemsClicked = { }
+        )
+    }
+}
+
+internal const val EMPTY_IMAGE_TAG = "cloud_drive_empty_view:image"
+internal const val EMPTY_TITLE_TAG = "cloud_drive_empty_view:title"
+internal const val EMPTY_DESCRIPTION_TAG = "cloud_drive_empty_view:description"
+internal const val ADD_ITEMS_BUTTON_TAG = "cloud_drive_empty_view:add_items_button"
+

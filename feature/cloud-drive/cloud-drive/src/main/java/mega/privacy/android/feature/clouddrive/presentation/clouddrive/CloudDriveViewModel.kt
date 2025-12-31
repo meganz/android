@@ -35,6 +35,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -48,6 +49,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingShareParentUserEmailUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -74,6 +76,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
@@ -102,6 +105,7 @@ class CloudDriveViewModel @AssistedInject constructor(
         monitorCloudSortOrder()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
+        checkWritePermission()
     }
 
     /**
@@ -247,6 +251,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                         // If nodes are currently loading, ignore updates
                         if (uiState.value.nodesLoadingState == NodesLoadingState.FullyLoaded) {
                             refreshNodes()
+                            checkWritePermission()
                         }
                     }
                 }
@@ -500,6 +505,25 @@ class CloudDriveViewModel @AssistedInject constructor(
                 }
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    private fun checkWritePermission() {
+        viewModelScope.launch {
+            runCatching {
+                val accessPermission = getNodeAccessPermission(uiState.value.currentFolderId)
+                val hasWritePermission = accessPermission == AccessPermission.OWNER ||
+                        accessPermission == AccessPermission.READWRITE ||
+                        accessPermission == AccessPermission.FULL
+                _uiState.update { state ->
+                    state.copy(hasWritePermission = hasWritePermission)
+                }
+            }.onFailure {
+                Timber.e(it, "Failed to check write permission")
+                _uiState.update { state ->
+                    state.copy(hasWritePermission = false)
+                }
             }
         }
     }
