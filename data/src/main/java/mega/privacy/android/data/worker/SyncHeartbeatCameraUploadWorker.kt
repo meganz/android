@@ -62,7 +62,7 @@ class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
             Result.success()
         } catch (throwable: Throwable) {
             Timber.e(throwable, "SyncHeartbeatCameraUploadWorker: doWork() fail")
-            Result.failure()
+            Result.retry()
         }
     }
 }
