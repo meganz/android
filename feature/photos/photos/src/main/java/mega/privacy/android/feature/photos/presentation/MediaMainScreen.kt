@@ -63,6 +63,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -657,7 +658,7 @@ fun MediaMainScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(paddingValues.excludingBottomPadding()),
             beyondViewportPageCount = 1,
             hideTabs = isTimelineInSelectionMode || isVideosSelectionMode || shouldHideTabs,
             pagerScrollEnabled = true,
