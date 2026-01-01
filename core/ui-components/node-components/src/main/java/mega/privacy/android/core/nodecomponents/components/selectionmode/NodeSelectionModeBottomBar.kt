@@ -45,12 +45,12 @@ import mega.privacy.android.domain.entity.node.TypedNode
 @Composable
 fun NodeSelectionModeBottomBar(
     availableActions: List<MenuActionWithIcon>,
-    visibleActions: List<MenuActionWithIcon>,
     visible: Boolean,
     multiNodeActionHandler: MultiNodeActionHandler,
     selectedNodes: List<TypedNode>,
     isSelecting: Boolean,
     modifier: Modifier = Modifier,
+    visibleActions: List<MenuActionWithIcon> = availableActions,
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }

@@ -1,12 +1,15 @@
 package mega.privacy.android.feature.photos.presentation.albums.dialog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
 
 @Composable
 internal fun RemoveAlbumConfirmationDialog(
@@ -16,6 +19,10 @@ internal fun RemoveAlbumConfirmationDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LaunchedEffect(Unit) {
+        Analytics.tracker.trackEvent(DeleteAlbumsConfirmationDialogEvent)
+    }
+
     BasicDialog(
         modifier = modifier,
         title = if (size == 1) {

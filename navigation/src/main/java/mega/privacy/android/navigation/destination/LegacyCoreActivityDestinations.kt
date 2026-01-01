@@ -227,6 +227,12 @@ data class AlbumGetLinkNavKey(
 ) : NavKey
 
 @Serializable
+data class AlbumGetMultipleLinksNavKey(
+    val albumIds: Set<Long>,
+    val hasSensitiveContent: Boolean,
+) : NavKey
+
+@Serializable
 data class LegacyAlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
 
 @Serializable

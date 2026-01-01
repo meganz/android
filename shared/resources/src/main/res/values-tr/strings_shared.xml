@@ -1919,4 +1919,6 @@
     <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
     <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
     <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
+    <!-- Multiple album deletion success message -->
+    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
 </resources>

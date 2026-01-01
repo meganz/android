@@ -77,6 +77,8 @@ import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
+import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
+import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
@@ -349,20 +351,31 @@ fun MediaMainScreen(
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     viewModel: MediaMainViewModel = hiltViewModel(),
+    albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
+    val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
     var showTimelineFilter by rememberSaveable { mutableStateOf(false) }
     val isTimelineInSelectionMode by remember(timelineTabUiState.selectedPhotoCount) {
         derivedStateOf { timelineTabUiState.selectedPhotoCount > 0 }
     }
+    val isAlbumInSelectionMode by remember(albumsTabUiState.selectedUserAlbums) {
+        derivedStateOf { albumsTabUiState.selectedUserAlbums.isNotEmpty() }
+    }
     val areAllTimelinePhotosSelected by remember(
         timelineTabUiState.selectedPhotoCount,
         timelineTabUiState.displayedPhotos
     ) {
         derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
+    }
+    val areAllAlbumsSelected by remember(
+        albumsTabUiState.selectedUserAlbums,
+        albumsTabUiState.albums
+    ) {
+        derivedStateOf { albumsTabViewModel.areAllAlbumsSelected() }
     }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
     val shouldShowTimelineActions by remember(
@@ -460,13 +473,25 @@ fun MediaMainScreen(
         },
         topBar = {
             when {
-                isTimelineInSelectionMode -> NodeSelectionModeAppBar(
-                    count = timelineTabUiState.selectedPhotoCount,
-                    isAllSelected = areAllTimelinePhotosSelected,
-                    isSelecting = false,
-                    onSelectAllClicked = onAllTimelinePhotosSelected,
-                    onCancelSelectionClicked = onClearTimelinePhotosSelection
-                )
+                isTimelineInSelectionMode -> {
+                    NodeSelectionModeAppBar(
+                        count = timelineTabUiState.selectedPhotoCount,
+                        isAllSelected = areAllTimelinePhotosSelected,
+                        isSelecting = false,
+                        onSelectAllClicked = onAllTimelinePhotosSelected,
+                        onCancelSelectionClicked = onClearTimelinePhotosSelection
+                    )
+                }
+
+                isAlbumInSelectionMode -> {
+                    NodeSelectionModeAppBar(
+                        count = albumsTabUiState.selectedUserAlbumsCount,
+                        isAllSelected = areAllAlbumsSelected,
+                        isSelecting = false,
+                        onSelectAllClicked = albumsTabViewModel::selectAllAlbums,
+                        onCancelSelectionClicked = albumsTabViewModel::clearAlbumsSelection
+                    )
+                }
 
                 isVideosTabSearchBarVisible || isVideosSelectionMode ->
                     VideosTabToolbar(
@@ -653,6 +678,16 @@ fun MediaMainScreen(
                 selectedNodes = selectedVideoNodes,
                 isSelecting = false,
             )
+
+            SelectionModeBottomBar(
+                actions = listOf(
+                    AlbumSelectionAction.ManageLink,
+                    AlbumSelectionAction.Delete
+                ),
+                visible = albumsTabUiState.selectedUserAlbums.isNotEmpty(),
+                actionsEnabled = true,
+                onActionPressed = albumsTabViewModel::handleSelectionAction
+            )
         }
     ) { paddingValues ->
         MegaScrollableTabRow(
@@ -683,6 +718,7 @@ fun MediaMainScreen(
                                         }
                                     ),
                                     mainViewModel = viewModel,
+                                    albumsTabViewModel = albumsTabViewModel,
                                     timelineTabUiState = timelineTabUiState,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
@@ -825,6 +861,7 @@ private fun MediaScreen.getTabItem() = when (this) {
 @Composable
 private fun MediaScreen.MediaContent(
     mainViewModel: MediaMainViewModel,
+    albumsTabViewModel: AlbumsTabViewModel,
     timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
@@ -886,8 +923,8 @@ private fun MediaScreen.MediaContent(
                 modifier = Modifier.fillMaxSize(),
                 showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
-                navigateToAlbumContent = navigateToAlbumContent,
-                navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection
+                onNavigate = navigationHandler::navigate,
+                viewModel = albumsTabViewModel
             )
         }
 

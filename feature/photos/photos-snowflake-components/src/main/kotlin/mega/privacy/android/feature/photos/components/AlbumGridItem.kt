@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.photos.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +26,18 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.model.HighlightedText
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
 
 @Composable
@@ -42,7 +48,10 @@ fun AlbumGridItem(
     placeholder: Painter? = null,
     errorPlaceholder: Painter? = null,
     isExported: Boolean = false,
+    isSelected: Boolean = false,
 ) {
+    val albumItemShape = RoundedCornerShape(4.dp)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -53,12 +62,21 @@ fun AlbumGridItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .conditional(isSelected) {
+                    border(
+                        border = BorderStroke(
+                            width = 2.dp,
+                            color = DSTokens.colors.border.strongSelected
+                        ),
+                        shape = albumItemShape
+                    )
+                }
         ) {
             AsyncImage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(shape = RoundedCornerShape(4.dp)),
+                    .clip(shape = albumItemShape),
                 model = ImageRequest
                     .Builder(LocalContext.current)
                     .data(coverImage)
@@ -88,6 +106,16 @@ fun AlbumGridItem(
                     )
                 }
             }
+
+            if (isSelected) {
+                Checkbox(
+                    modifier = Modifier.padding(top = 1.dp, start = 1.dp),
+                    checked = true,
+                    onCheckStateChanged = {},
+                    tapTargetArea = false,
+                    clickable = false,
+                )
+            }
         }
 
         MegaText(
@@ -112,7 +140,8 @@ private fun AlbumGridItemPreview() {
             coverImage = null,
             isExported = true,
             errorPlaceholder = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_add_to_album),
-            placeholder = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_add_to_album)
+            placeholder = painterResource(mega.privacy.android.icon.pack.R.drawable.ic_add_to_album),
+            isSelected = true
         )
     }
 }
