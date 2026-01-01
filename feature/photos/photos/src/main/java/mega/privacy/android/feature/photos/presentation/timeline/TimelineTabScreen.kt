@@ -180,13 +180,9 @@ internal fun TimelineTabScreen(
     var shouldScrollToIndex by remember { mutableIntStateOf(0) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
-    val cuBannerType by remember(
-        uiState.selectedPhotoCount,
-        mediaCameraUploadUiState
-    ) {
+    val cuBannerType by remember(mediaCameraUploadUiState) {
         mutableStateOf(
             value = getCameraUploadsBannerType(
-                timelineTabUiState = uiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState
             )
         )
@@ -211,8 +207,7 @@ internal fun TimelineTabScreen(
             mediaCameraUploadUiState.showCameraUploadsWarning,
             mediaCameraUploadUiState.isCameraUploadsLimitedAccess,
             mediaCameraUploadUiState.cameraUploadsFinishedReason,
-            mediaCameraUploadUiState.isWarningBannerShown,
-            mediaCameraUploadUiState.isCUPausedWarningBannerEnabled
+            mediaCameraUploadUiState.isWarningBannerShown
         ) {
             isWarningBannerStateValid = mediaCameraUploadUiState.isWarningBannerShown &&
                     isCUBannerTypeValidForWarningBanner(
@@ -638,27 +633,22 @@ private fun calculateScrollIndex(
 }
 
 private fun getCameraUploadsBannerType(
-    timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
 ): CameraUploadsBannerType {
     return when {
-        mediaCameraUploadUiState.enableCameraUploadButtonShowing && timelineTabUiState.selectedPhotoCount == 0 ->
+        mediaCameraUploadUiState.enableCameraUploadButtonShowing ->
             CameraUploadsBannerType.EnableCameraUploads
 
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
-                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
+        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
             -> CameraUploadsBannerType.FullStorage
 
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
-                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
+        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
             -> CameraUploadsBannerType.NetworkRequirementNotMet
 
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
-                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
+        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
             -> CameraUploadsBannerType.LowBattery
 
-        mediaCameraUploadUiState.isCUPausedWarningBannerEnabled &&
-                mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
             -> CameraUploadsBannerType.DeviceChargingNotMet
 
         mediaCameraUploadUiState.isCameraUploadsLimitedAccess -> CameraUploadsBannerType.NoFullAccess

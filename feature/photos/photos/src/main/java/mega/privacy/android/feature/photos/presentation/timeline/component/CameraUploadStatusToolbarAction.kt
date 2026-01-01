@@ -13,9 +13,7 @@ import mega.privacy.android.shared.resources.R as SharedR
 internal fun CameraUploadStatusToolbarAction(
     isCuWarningStatusVisible: Boolean,
     isCuDefaultStatusVisible: Boolean,
-    isCuPausedStatusVisible: Boolean,
     isCuCompleteStatusVisible: Boolean,
-    isCUPausedWarningBannerEnabled: Boolean,
     cameraUploadsStatus: CameraUploadsStatus,
     cameraUploadsProgress: Float,
     setCameraUploadsMessage: (message: String) -> Unit,
@@ -38,21 +36,6 @@ internal fun CameraUploadStatusToolbarAction(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_DEFAULT_TAG),
                 type = CameraUploadsStatusType.Default,
                 onClick = onNavigateToCameraUploadsSettings
-            )
-        }
-
-        isCuPausedStatusVisible -> {
-            CameraUploadsStatusIcon(
-                modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_PAUSED_TAG),
-                type = CameraUploadsStatusType.Pause,
-                onClick = {
-                    setCameraUploadsMessage(
-                        context.getString(SharedR.string.camera_uploads_phone_not_charging_message),
-                    )
-                    if (isCUPausedWarningBannerEnabled) {
-                        updateIsWarningBannerShown(true)
-                    }
-                }
             )
         }
 
@@ -91,8 +74,6 @@ internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG =
     "camera_upload_status_toolbar_action:icon_warning"
 internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_DEFAULT_TAG =
     "camera_upload_status_toolbar_action:icon_default"
-internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_PAUSED_TAG =
-    "camera_upload_status_toolbar_action:icon_paused"
 internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG =
     "camera_upload_status_toolbar_action:icon_complete"
 internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG =

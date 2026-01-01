@@ -80,9 +80,9 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
-import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTabAppBar
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTabAppBar
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
@@ -410,8 +410,6 @@ fun MediaMainScreen(
     val isCuWarningStatusVisible = mediaCameraUploadUiState.showCameraUploadsWarning
     val isCuDefaultStatusVisible =
         mediaCameraUploadUiState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
-    val isCuPausedStatusVisible =
-        mediaCameraUploadUiState.showCameraUploadsPaused && !isCuDefaultStatusVisible
     val isCuCompleteStatusVisible =
         mediaCameraUploadUiState.showCameraUploadsComplete && !isCuDefaultStatusVisible
 
@@ -565,10 +563,6 @@ fun MediaMainScreen(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedResR.string.media_feature_title),
                     subtitle = when {
-                        isCuPausedStatusVisible -> {
-                            stringResource(id = sharedResR.string.camera_uploads_notification_title_paused_warning)
-                        }
-
                         isCuCompleteStatusVisible -> {
                             stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
                         }
@@ -609,9 +603,7 @@ fun MediaMainScreen(
                                 modifier = Modifier.padding(end = 14.dp),
                                 isCuWarningStatusVisible = isCuWarningStatusVisible,
                                 isCuDefaultStatusVisible = isCuDefaultStatusVisible,
-                                isCuPausedStatusVisible = isCuPausedStatusVisible,
                                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
-                                isCUPausedWarningBannerEnabled = mediaCameraUploadUiState.isCUPausedWarningBannerEnabled,
                                 cameraUploadsStatus = mediaCameraUploadUiState.cameraUploadsStatus,
                                 cameraUploadsProgress = mediaCameraUploadUiState.cameraUploadsProgress,
                                 setCameraUploadsMessage = setCameraUploadsMessage,

@@ -75,60 +75,11 @@ class CameraUploadStatusToolbarActionTest {
     }
 
     @Test
-    fun `test that the paused icon is displayed`() {
-        composeRuleScope {
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = true
-            )
-
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_PAUSED_TAG).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that the camera upload message is displayed when the paused icon is clicked`() {
-        composeRuleScope {
-            val setCameraUploadsMessage = mock<(message: String) -> Unit>()
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = true,
-                setCameraUploadsMessage = setCameraUploadsMessage
-            )
-
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_PAUSED_TAG).performClick()
-
-            verify(setCameraUploadsMessage).invoke(any())
-        }
-    }
-
-    @Test
-    fun `test that the warning banner is shown when the paused icon is clicked and the paused warning banner is enabled`() {
-        composeRuleScope {
-            val updateIsWarningBannerShown = mock<(value: Boolean) -> Unit>()
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = true,
-                isCUPausedWarningBannerEnabled = true,
-                updateIsWarningBannerShown = updateIsWarningBannerShown
-            )
-
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_PAUSED_TAG).performClick()
-
-            verify(updateIsWarningBannerShown).invoke(true)
-        }
-    }
-
-    @Test
     fun `test that the complete icon is displayed`() {
         composeRuleScope {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = false,
                 isCuCompleteStatusVisible = true
             )
 
@@ -143,7 +94,6 @@ class CameraUploadStatusToolbarActionTest {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = false,
                 isCuCompleteStatusVisible = true,
                 setCameraUploadsMessage = setCameraUploadsMessage
             )
@@ -160,7 +110,6 @@ class CameraUploadStatusToolbarActionTest {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = false,
                 isCuCompleteStatusVisible = false,
                 cameraUploadsStatus = CameraUploadsStatus.Sync
             )
@@ -175,7 +124,6 @@ class CameraUploadStatusToolbarActionTest {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
-                isCuPausedStatusVisible = false,
                 isCuCompleteStatusVisible = false,
                 cameraUploadsStatus = CameraUploadsStatus.Uploading
             )
@@ -193,9 +141,7 @@ class CameraUploadStatusToolbarActionTest {
     private fun ComposeContentTestRule.setAction(
         isCuWarningStatusVisible: Boolean = false,
         isCuDefaultStatusVisible: Boolean = false,
-        isCuPausedStatusVisible: Boolean = false,
         isCuCompleteStatusVisible: Boolean = false,
-        isCUPausedWarningBannerEnabled: Boolean = false,
         cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.None,
         cameraUploadsProgress: Float = 0F,
         setCameraUploadsMessage: (message: String) -> Unit = {},
@@ -206,9 +152,7 @@ class CameraUploadStatusToolbarActionTest {
             CameraUploadStatusToolbarAction(
                 isCuWarningStatusVisible = isCuWarningStatusVisible,
                 isCuDefaultStatusVisible = isCuDefaultStatusVisible,
-                isCuPausedStatusVisible = isCuPausedStatusVisible,
                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
-                isCUPausedWarningBannerEnabled = isCUPausedWarningBannerEnabled,
                 cameraUploadsStatus = cameraUploadsStatus,
                 cameraUploadsProgress = cameraUploadsProgress,
                 setCameraUploadsMessage = setCameraUploadsMessage,

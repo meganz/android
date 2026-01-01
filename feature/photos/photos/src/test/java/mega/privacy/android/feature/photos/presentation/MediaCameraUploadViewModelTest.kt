@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.permisison.HasCameraUploadsPermissionUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
@@ -26,13 +25,11 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -48,7 +45,6 @@ class MediaCameraUploadViewModelTest {
 
     private val monitorCameraUploadsStatusInfoUseCase: MonitorCameraUploadsStatusInfoUseCase =
         mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val startCameraUploadUseCase: StartCameraUploadUseCase = mock()
     private val hasMediaPermissionUseCase: HasMediaPermissionUseCase = mock()
     private val setInitialCUPreferences: SetInitialCUPreferences = mock()
@@ -78,7 +74,6 @@ class MediaCameraUploadViewModelTest {
         whenever(
             monitorCameraUploadShownUseCase.cameraUploadShownFlow
         ) doReturn cameraUploadShownFlow
-        whenever(getFeatureFlagValueUseCase(any())) doReturn true
         whenever(hasMediaPermissionUseCase()) doReturn true
         whenever(isCameraUploadsEnabledUseCase()) doReturn true
         enableCameraUploadBannerVisibilityFlow = MutableStateFlow(false)
@@ -90,7 +85,6 @@ class MediaCameraUploadViewModelTest {
 
         underTest = MediaCameraUploadViewModel(
             monitorCameraUploadsStatusInfoUseCase = monitorCameraUploadsStatusInfoUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
             hasMediaPermissionUseCase = hasMediaPermissionUseCase,
             setInitialCUPreferences = setInitialCUPreferences,
@@ -109,7 +103,6 @@ class MediaCameraUploadViewModelTest {
     fun tearDown() {
         reset(
             monitorCameraUploadsStatusInfoUseCase,
-            getFeatureFlagValueUseCase,
             startCameraUploadUseCase,
             hasMediaPermissionUseCase,
             setInitialCUPreferences,
@@ -131,8 +124,6 @@ class MediaCameraUploadViewModelTest {
             verify(monitorCameraUploadsStatusInfoUseCase).invoke()
             verify(monitorCameraUploadShownUseCase).cameraUploadShownFlow
             verify(startCameraUploadUseCase).invoke()
-            verify(getFeatureFlagValueUseCase).invoke(AppFeatures.CameraUploadsTransferScreen)
-            verify(getFeatureFlagValueUseCase).invoke(AppFeatures.CameraUploadsPausedWarningBanner)
         }
 
     @Test
@@ -152,7 +143,6 @@ class MediaCameraUploadViewModelTest {
             underTest.uiState.test {
                 val item = expectMostRecentItem()
                 assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Sync)
-                assertThat(item.showCameraUploadsPaused).isFalse()
                 assertThat(item.showCameraUploadsComplete).isFalse()
                 assertThat(item.showCameraUploadsWarning).isFalse()
             }
@@ -213,12 +203,6 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that the warning banner is shown when status is Finished with network requirement`() =
         runTest {
-            whenever(
-                getFeatureFlagValueUseCase(
-                    AppFeatures.CameraUploadsPausedWarningBanner
-                )
-            ) doReturn true
-
             cameraUploadsStatusFlow.value =
                 CameraUploadsStatusInfo.Finished(CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET)
 
@@ -396,11 +380,6 @@ class MediaCameraUploadViewModelTest {
                     reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
                 )
             )
-            whenever(
-                getFeatureFlagValueUseCase(
-                    AppFeatures.CameraUploadsPausedWarningBanner
-                )
-            ) doReturn false
 
             underTest.uiState.test {
                 underTest.checkCameraUploadsPermissions()
@@ -418,11 +397,6 @@ class MediaCameraUploadViewModelTest {
                     reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
                 )
             )
-            whenever(
-                getFeatureFlagValueUseCase(
-                    AppFeatures.CameraUploadsPausedWarningBanner
-                )
-            ) doReturn true
 
             underTest.checkCameraUploadsPermissions()
 
@@ -440,11 +414,6 @@ class MediaCameraUploadViewModelTest {
                     reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
                 )
             )
-            whenever(
-                getFeatureFlagValueUseCase(
-                    AppFeatures.CameraUploadsPausedWarningBanner
-                )
-            ) doReturn false
 
             underTest.uiState.test {
                 underTest.checkCameraUploadsPermissions()
@@ -462,11 +431,6 @@ class MediaCameraUploadViewModelTest {
                     reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
                 )
             )
-            whenever(
-                getFeatureFlagValueUseCase(
-                    AppFeatures.CameraUploadsPausedWarningBanner
-                )
-            ) doReturn true
 
             underTest.checkCameraUploadsPermissions()
 
