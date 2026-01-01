@@ -266,7 +266,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
 
         collectFlow(monitorChatSignalPresenceUseCase(), Lifecycle.State.CREATED) {
             Timber.d("BROADCAST TO SEND SIGNAL PRESENCE")
-            if (delaySignalPresence && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
+            if (delaySignalPresence) {
                 delaySignalPresence = false
                 retryConnectionsAndSignalPresence()
             }

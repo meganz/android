@@ -16,8 +16,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment
 import mega.privacy.android.app.utils.Constants
-import timber.log.Timber
 import mega.privacy.android.shared.resources.R as sharedR
+import timber.log.Timber
 
 /**
  * ChatPreferencesActivity
@@ -47,7 +47,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
                     viewModel.onConsumePushNotificationSettingsUpdateEvent()
                 }
                 if (signalPresenceUpdate) {
-                    if (sttChat != null && megaChatApi.presenceConfig != null && !megaChatApi.presenceConfig.isPending) {
+                    if (sttChat != null) {
                         sttChat?.updatePresenceConfigChat(false)
                     }
                     viewModel.onSignalPresenceUpdateConsumed()
