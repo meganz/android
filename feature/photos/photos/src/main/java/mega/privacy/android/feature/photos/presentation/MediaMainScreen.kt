@@ -80,6 +80,9 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTabAppBar
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
@@ -354,6 +357,7 @@ fun MediaMainScreen(
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -398,6 +402,11 @@ fun MediaMainScreen(
     var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
     var shouldHideTabs by remember { mutableStateOf(false) }
 
+    val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
+    var selectedPlaylistCount by rememberSaveable { mutableIntStateOf(0) }
+    var areAllPlaylistsSelected by rememberSaveable { mutableStateOf(false) }
+    var isPlaylistsSelectionMode by rememberSaveable { mutableStateOf(false) }
+
     val isCuWarningStatusVisible = mediaCameraUploadUiState.showCameraUploadsWarning
     val isCuDefaultStatusVisible =
         mediaCameraUploadUiState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
@@ -405,6 +414,8 @@ fun MediaMainScreen(
         mediaCameraUploadUiState.showCameraUploadsPaused && !isCuDefaultStatusVisible
     val isCuCompleteStatusVisible =
         mediaCameraUploadUiState.showCameraUploadsComplete && !isCuDefaultStatusVisible
+
+    var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -463,6 +474,24 @@ fun MediaMainScreen(
         }
     }
 
+    BackHandler(isPlaylistsSelectionMode) {
+        if (isPlaylistsSelectionMode) {
+            videoPlaylistsTabViewModel.clearSelection()
+        }
+    }
+
+    LaunchedEffect(playlistsTabUiState) {
+        if (playlistsTabUiState is VideoPlaylistsTabUiState.Data) {
+            val state = playlistsTabUiState as VideoPlaylistsTabUiState.Data
+
+            if (selectedPlaylistCount != state.selectedPlaylists.size) {
+                selectedPlaylistCount = state.selectedPlaylists.size
+                areAllPlaylistsSelected = selectedPlaylistCount == state.videoPlaylistEntities.size
+                isPlaylistsSelectionMode = state.selectedPlaylists.isNotEmpty()
+            }
+        }
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -509,6 +538,18 @@ fun MediaMainScreen(
                             }
                         }
                     )
+
+                isPlaylistsSelectionMode -> {
+                    VideoPlaylistsTabAppBar(
+                        count = selectedPlaylistCount,
+                        isAllSelected = areAllPlaylistsSelected,
+                        onSelectAllClicked = videoPlaylistsTabViewModel::selectAllVideos,
+                        onCancelSelectionClicked = videoPlaylistsTabViewModel::clearSelection,
+                        removePlaylist = {
+                            showVideoPlaylistRemovedDialog = true
+                        },
+                    )
+                }
 
                 else -> MegaTopAppBar(
                     navigationType = AppBarNavigationType.None,
@@ -759,7 +800,11 @@ fun MediaMainScreen(
                                     updateIsWarningBannerShown = updateIsWarningBannerShown,
                                     onTabsVisibilityChange = { shouldHideTabs = it },
                                     onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                    onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+                                    onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
+                                    showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+                                    dismissVideoPlaylistRemovedDialog = {
+                                        showVideoPlaylistRemovedDialog = false
+                                    }
                                 )
                             }
                         )
@@ -885,6 +930,8 @@ private fun MediaScreen.MediaContent(
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    showVideoPlaylistRemovedDialog: Boolean,
+    dismissVideoPlaylistRemovedDialog: () -> Unit,
     modifier: Modifier = Modifier,
     timelineContentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -929,7 +976,11 @@ private fun MediaScreen.MediaContent(
         }
 
         MediaScreen.Videos -> VideosTabRoute(navigationHandler)
-        MediaScreen.Playlists -> VideoPlaylistsTabRoute(modifier)
+        MediaScreen.Playlists -> VideoPlaylistsTabRoute(
+            showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+            dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
+            modifier = modifier
+        )
     }
 }
 

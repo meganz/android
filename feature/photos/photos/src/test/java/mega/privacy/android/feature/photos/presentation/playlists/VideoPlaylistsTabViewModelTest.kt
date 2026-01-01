@@ -2,6 +2,8 @@ package mega.privacy.android.feature.photos.presentation.playlists
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,11 +23,13 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import org.junit.jupiter.api.AfterEach
@@ -56,6 +60,7 @@ class VideoPlaylistsTabViewModelTest {
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
+    private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
 
     private val expectedId = NodeId(1L)
     private val expectedPlaylist = mock<VideoPlaylistUiEntity> {
@@ -103,6 +108,7 @@ class VideoPlaylistsTabViewModelTest {
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
         )
     }
 
@@ -116,6 +122,7 @@ class VideoPlaylistsTabViewModelTest {
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
             monitorSortCloudOrderUseCase,
+            removeVideoPlaylistsUseCase,
         )
     }
 
@@ -154,7 +161,7 @@ class VideoPlaylistsTabViewModelTest {
                     }
                 )
             }
-
+            initUnderTest()
             val actual = underTest.uiState
                 .filterIsInstance<VideoPlaylistsTabUiState.Data>()
                 .first { it.videoPlaylistEntities.isNotEmpty() }
@@ -265,4 +272,161 @@ class VideoPlaylistsTabViewModelTest {
             assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
             assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
         }
+
+    @Test
+    fun `test that selectedTypedNodes are updated correctly`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            initVideoPlaylists(listOf(playlist1, playlist2))
+            underTest.onItemLongClicked(playlist1)
+
+            var actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.selectedPlaylists.size == 1 }
+
+            assertThat(actual.selectedPlaylists).hasSize(1)
+            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
+
+            underTest.onItemClicked(playlist2)
+
+            actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.selectedPlaylists.size == 2 }
+
+            assertThat(actual.selectedPlaylists).hasSize(2)
+            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
+                playlist1.id,
+                playlist2.id
+            )
+        }
+
+    @Test
+    fun `test that selectedTypedNodes are updated correctly after selectAllVideos is invoked`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            initVideoPlaylists(listOf(playlist1, playlist2))
+
+            var actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.videoPlaylistEntities.isNotEmpty() }
+            assertThat(actual.videoPlaylistEntities).isNotEmpty()
+            assertThat(actual.selectedPlaylists).isEmpty()
+
+            underTest.selectAllVideos()
+
+            actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.selectedPlaylists.isNotEmpty() }
+
+            assertThat(actual.selectedPlaylists).hasSize(2)
+            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
+                playlist1.id,
+                playlist2.id
+            )
+        }
+
+    @Test
+    fun `test that selectedTypedNodes are updated correctly after clearSelection is invoked`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            initVideoPlaylists(listOf(playlist1, playlist2))
+
+            underTest.onItemLongClicked(playlist1)
+
+            var actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.selectedPlaylists.size == 1 }
+
+            assertThat(actual.selectedPlaylists).hasSize(1)
+            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
+
+            underTest.clearSelection()
+
+            actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.selectedPlaylists.isEmpty() }
+
+            assertThat(actual.selectedPlaylists).isEmpty()
+        }
+
+    @Test
+    fun `test that playlistsRemovedEvent is updated correctly`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L, name = "Playlist 1")
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L, name = "Playlist 2")
+
+            initVideoPlaylists(listOf(playlist1, playlist2))
+
+            whenever(
+                removeVideoPlaylistsUseCase(any())
+            ).thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
+
+            underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+            advanceUntilIdle()
+
+            var actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.playlistsRemovedEvent != consumed() }
+
+            assertThat(actual.playlistsRemovedEvent).isEqualTo(
+                triggered(
+                    listOf(playlist1.title, playlist2.title)
+                )
+            )
+
+            underTest.resetPlaylistsRemovedEvent()
+
+            actual = underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .first { it.playlistsRemovedEvent == consumed() }
+
+            assertThat(actual.playlistsRemovedEvent).isEqualTo(consumed())
+        }
+
+    private fun createVideoPlaylistUiEntity(
+        handle: Long,
+        name: String = "video name $handle",
+        isSelected: Boolean = false,
+        isSystemVideoPlayer: Boolean = false,
+    ) = VideoPlaylistUiEntity(
+        id = NodeId(handle),
+        title = name,
+        cover = null,
+        creationTime = 1L,
+        modificationTime = 1L,
+        thumbnailList = emptyList(),
+        numberOfVideos = 0,
+        totalDuration = "",
+        videos = emptyList(),
+        isSelected = isSelected,
+        isSystemVideoPlayer = isSystemVideoPlayer
+    )
+
+    private fun createVideoPlaylist(handle: Long) =
+        mock<UserVideoPlaylist> {
+            on { id }.thenReturn(NodeId(handle))
+            on { title }.thenReturn("Playlist $handle")
+        }
+
+    private suspend fun initVideoPlaylists(
+        playlists: List<VideoPlaylistUiEntity>,
+    ) {
+        val userPlaylists = playlists.map {
+            createVideoPlaylist(it.id.longValue)
+        }
+        whenever(getVideoPlaylistsUseCase()).thenReturn(userPlaylists)
+
+        userPlaylists.map { playlist ->
+            playlists.firstOrNull { it.id.longValue == playlist.id.longValue }
+                ?.let { playlistEntity ->
+                    whenever(videoPlaylistUiEntityMapper(playlist)).thenReturn(playlistEntity)
+                }
+        }
+    }
 }

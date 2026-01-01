@@ -11,6 +11,7 @@ import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,14 +26,28 @@ class VideoPlaylistsScreenTest {
 
     private fun setComposeContent(
         uiState: VideoPlaylistsTabUiState = VideoPlaylistsTabUiState.Data(),
+        showRemoveDialog: Boolean = false,
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
-        modifier: Modifier = Modifier
+        modifier: Modifier = Modifier,
+        onClick: (VideoPlaylistUiEntity) -> Unit = {},
+        onLongClick: (VideoPlaylistUiEntity) -> Unit = {},
+        onConsumedPlaylistRemovedEvent: () -> Unit = {},
+        onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+        onRemovedDialogDismiss: () -> Unit = {},
+        snackBarQueue: SnackbarEventQueue = mock()
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
                 uiState = uiState,
+                showRemoveDialog = showRemoveDialog,
                 onSortNodes = onSortNodes,
-                modifier = modifier
+                modifier = modifier,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                onConsumedPlaylistRemovedEvent = onConsumedPlaylistRemovedEvent,
+                onDeleteButtonClicked = onDeleteButtonClicked,
+                onRemovedDialogDismiss = onRemovedDialogDismiss,
+                snackBarQueue = snackBarQueue
             )
         }
     }
@@ -103,6 +118,19 @@ class VideoPlaylistsScreenTest {
         }
 
         VIDEO_PLAYLISTS_TAB_SORT_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RemovePlaylistDialog is displayed when showRemoveDialog is true`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            showRemoveDialog = true
+        )
+
+        VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
     }
 
     private fun String.assertIsDisplayedWithTag() =

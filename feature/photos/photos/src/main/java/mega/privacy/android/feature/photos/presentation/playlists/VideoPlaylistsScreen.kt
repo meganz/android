@@ -11,12 +11,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -28,19 +32,32 @@ import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoPlaylistItemView
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.resources.R
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun VideoPlaylistsTabRoute(
+    showVideoPlaylistRemovedDialog: Boolean,
+    dismissVideoPlaylistRemovedDialog: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     VideoPlaylistsTabScreen(
         uiState = uiState,
+        showRemoveDialog = showVideoPlaylistRemovedDialog,
         modifier = modifier,
-        onSortNodes = viewModel::setCloudSortOrder
+        onSortNodes = viewModel::setCloudSortOrder,
+        onClick = viewModel::onItemClicked,
+        onLongClick = viewModel::onItemLongClicked,
+        onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
+        onDeleteButtonClicked = viewModel::removeVideoPlaylists,
+        onRemovedDialogDismiss = dismissVideoPlaylistRemovedDialog
     )
 }
 
@@ -48,10 +65,19 @@ fun VideoPlaylistsTabRoute(
 @Composable
 internal fun VideoPlaylistsTabScreen(
     uiState: VideoPlaylistsTabUiState,
+    showRemoveDialog: Boolean,
     onSortNodes: (NodeSortConfiguration) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (VideoPlaylistUiEntity) -> Unit = {},
+    onLongClick: (VideoPlaylistUiEntity) -> Unit = {},
+    onConsumedPlaylistRemovedEvent: () -> Unit = {},
+    onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+    onRemovedDialogDismiss: () -> Unit = {},
+    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue()
 ) {
     val lazyListState = rememberLazyListState()
+    val context = LocalContext.current
+    val resources = LocalResources.current
 
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -64,6 +90,27 @@ internal fun VideoPlaylistsTabScreen(
         )
 
         is VideoPlaylistsTabUiState.Data -> {
+            EventEffect(
+                event = uiState.playlistsRemovedEvent,
+                onConsumed = onConsumedPlaylistRemovedEvent,
+                action = { deletedVideoPlaylistTitles ->
+                    if (deletedVideoPlaylistTitles.isNotEmpty()) {
+                        val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                            context.getString(
+                                sharedR.string.video_section_playlists_delete_playlists_message_singular,
+                                deletedVideoPlaylistTitles[0]
+                            )
+                        } else {
+                            resources.getQuantityString(
+                                sharedR.plurals.video_section_playlists_delete_playlists_message,
+                                deletedVideoPlaylistTitles.size,
+                                deletedVideoPlaylistTitles.size
+                            )
+                        }
+                        snackBarQueue.queueMessage(deletedMessage)
+                    }
+                }
+            )
             if (uiState.videoPlaylistEntities.isEmpty()) {
                 MegaEmptyView(
                     modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG),
@@ -75,7 +122,7 @@ internal fun VideoPlaylistsTabScreen(
                 FastScrollLazyColumn(
                     state = lazyListState,
                     totalItems = items.size,
-                    modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG)
+                    modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG),
                 ) {
                     item(key = "header") {
                         NodeHeaderItem(
@@ -105,9 +152,9 @@ internal fun VideoPlaylistsTabScreen(
                             totalDuration = videoPlaylistItem.totalDuration,
                             isSelected = videoPlaylistItem.isSelected,
                             isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
-                            onClick = {},
+                            onClick = { onClick(videoPlaylistItem) },
                             onMenuClick = {},
-                            onLongClick = {}
+                            onLongClick = { onLongClick(videoPlaylistItem) }
                         )
                     }
                 }
@@ -137,6 +184,24 @@ internal fun VideoPlaylistsTabScreen(
                         }
                     )
                 }
+
+                if (showRemoveDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        title = stringResource(id = R.string.video_section_playlists_delete_playlist_dialog_title),
+                        description = null,
+                        positiveButtonText = stringResource(R.string.video_section_playlists_delete_playlist_dialog_delete_button),
+                        negativeButtonText = stringResource(R.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            onDeleteButtonClicked(uiState.selectedPlaylists)
+                            onRemovedDialogDismiss()
+                        },
+                        onNegativeButtonClicked = onRemovedDialogDismiss,
+                        onDismiss = onRemovedDialogDismiss
+                    )
+                }
             }
         }
     }
@@ -161,3 +226,9 @@ const val VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG = "video_playlists_tab
  * Test tag for the video playlist tab sort bottom sheet
  */
 const val VIDEO_PLAYLISTS_TAB_SORT_BOTTOM_SHEET_TEST_TAG = "video_playlists_tab:sort_bottom_sheet"
+
+/**
+ * Test tag for DeleteVideoPlaylistDialog
+ */
+const val VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlists_tab:dialog_delete_video_playlist"
