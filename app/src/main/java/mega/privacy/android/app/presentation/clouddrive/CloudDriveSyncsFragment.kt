@@ -44,7 +44,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,6 +55,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
@@ -74,7 +78,6 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetD
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.mapper.OptionsItemInfo
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
@@ -91,6 +94,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -646,12 +650,20 @@ class CloudDriveSyncsFragment : Fragment() {
             fileBrowserViewModel.onCloudDriveSortOrderChanged()
         }
 
-        viewLifecycleOwner.collectFlow(
-            fileBrowserViewModel.state
-                .map { it.toolbarActionsModifierItem }
-                .distinctUntilChanged()
-        ) {
-            actionMode?.invalidate()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                fileBrowserViewModel.state
+                    .map { it.toolbarActionsModifierItem }
+                    .collectLatest { toolbarActionsModifierItem ->
+                        if (actionMode != null && toolbarActionsModifierItem != null) {
+                            runCatching {
+                                actionMode?.invalidate()
+                            }.onFailure {
+                                Timber.e(it, "Failed to invalidate action mode")
+                            }
+                        }
+                    }
+            }
         }
     }
 
@@ -697,10 +709,8 @@ class CloudDriveSyncsFragment : Fragment() {
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            val actionModeState = fileBrowserViewModel.state.value.toolbarActionsModifierItem
-            if (actionModeState == null) {
-                return false
-            }
+            val actionModeState =
+                fileBrowserViewModel.state.value.toolbarActionsModifierItem ?: return false
 
             menu.findItem(R.id.cab_menu_share_link).title = resources.getQuantityString(
                 sharedR.plurals.label_share_links,
