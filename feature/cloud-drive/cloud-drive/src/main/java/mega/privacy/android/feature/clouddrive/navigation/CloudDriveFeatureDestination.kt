@@ -63,7 +63,6 @@ class CloudDriveFeatureDestination : FeatureDestination {
 
             searchScreen(
                 navigationHandler = navigationHandler,
-                onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
             )
 

@@ -80,7 +80,7 @@ import kotlin.coroutines.cancellation.CancellationException
  * @property monitorOfflineNodeUpdatesUseCase [MonitorOfflineNodeUpdatesUseCase]
  */
 @HiltViewModel
-class SearchViewModel @Inject constructor(
+class LegacySearchViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val searchUseCase: SearchUseCase,

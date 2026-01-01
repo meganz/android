@@ -32,7 +32,7 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
 @OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun SearchNavHostController(
-    viewModel: SearchViewModel,
+    viewModel: LegacySearchViewModel,
     navigateToLink: (String) -> Unit,
     showSortOrderBottomSheet: () -> Unit,
     onBackPressed: () -> Unit,

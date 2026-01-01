@@ -11,7 +11,6 @@ import mega.privacy.android.navigation.destination.SearchNavKey
 
 fun EntryProviderScope<NavKey>.searchScreen(
     navigationHandler: NavigationHandler,
-    onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<SearchNavKey> { key ->
@@ -24,7 +23,6 @@ fun EntryProviderScope<NavKey>.searchScreen(
 
         SearchScreen(
             navigationHandler = navigationHandler,
-            onBack = onBack,
             onTransfer = onTransfer,
             viewModel = viewModel,
             nodeOptionsActionViewModel = nodeOptionsActionViewModel

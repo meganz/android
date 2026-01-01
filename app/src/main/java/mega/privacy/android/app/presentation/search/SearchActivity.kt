@@ -101,7 +101,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalComposeUiApi::class)
 @AndroidEntryPoint
 class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
-    private val viewModel: SearchViewModel by viewModels()
+    private val viewModel: LegacySearchViewModel by viewModels()
     private val nodeActionsViewModel: NodeActionsViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.search
 
-import androidx.compose.material.SnackbarHostState
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -44,7 +43,7 @@ internal fun NavGraphBuilder.searchNavGraph(
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
     nodeActionHandler: NodeActionHandler,
-    searchViewModel: SearchViewModel,
+    searchViewModel: LegacySearchViewModel,
     onBackPressed: () -> Unit,
     nodeActionsViewModel: NodeActionsViewModel,
     handleClick: (TypedNode?) -> Unit,

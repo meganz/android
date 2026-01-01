@@ -38,7 +38,7 @@ fun SearchScreen(
     navigateToLink: (String) -> Unit,
     navHostController: NavHostController,
     onBackPressed: () -> Unit,
-    searchViewModel: SearchViewModel,
+    searchViewModel: LegacySearchViewModel,
     nodeActionHandler: NodeActionHandler,
     handleClick: (TypedNode?) -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,

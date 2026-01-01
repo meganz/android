@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.SearchActivity
-import mega.privacy.android.app.presentation.search.SearchViewModel
+import mega.privacy.android.app.presentation.search.LegacySearchViewModel
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
@@ -65,7 +65,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SearchViewModelTest {
-    private lateinit var underTest: SearchViewModel
+    private lateinit var underTest: LegacySearchViewModel
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
@@ -103,7 +103,7 @@ class SearchViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = SearchViewModel(
+        underTest = LegacySearchViewModel(
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             setViewType = setViewType,
