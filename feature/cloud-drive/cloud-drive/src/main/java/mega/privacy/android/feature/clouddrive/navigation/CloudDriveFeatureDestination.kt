@@ -7,6 +7,7 @@ import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncS
 import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
+import mega.privacy.android.feature.clouddrive.presentation.search.searchScreen
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.openPasswordLinkDialog
 import mega.privacy.android.feature.clouddrive.presentation.shares.shares
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -16,7 +17,6 @@ import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -25,14 +25,6 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                },
             )
 
             rubbishBin(
@@ -62,18 +54,16 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = { /* No-op for FeatureDestination */ },
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                },
             )
 
             favouritesScreen(
                 navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+            )
+
+            searchScreen(
+                navigationHandler = navigationHandler,
+                onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
             )
 

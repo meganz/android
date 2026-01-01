@@ -103,7 +103,7 @@ import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -844,7 +844,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         parentHandle: Long,
     ) {
         navigateForSingleActivity(
-            context = context, singleActivityDestination = SearchNodeNavKey(
+            context = context, singleActivityDestination = LegacySearchNavKey(
                 nodeSourceType = nodeSourceType, parentHandle = parentHandle
             )
         ) {

@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import org.junit.After
 import org.junit.Before
@@ -90,6 +92,7 @@ class CloudDriveViewModelTest {
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -124,6 +127,7 @@ class CloudDriveViewModelTest {
             getIncomingShareParentUserEmailUseCase,
             getNodeAccessPermission,
             monitorSortCloudOrderUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -150,6 +154,7 @@ class CloudDriveViewModelTest {
         getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
         getNodeAccessPermission = getNodeAccessPermission,
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
     )
 
@@ -1911,4 +1916,18 @@ class CloudDriveViewModelTest {
 
             assertThat(underTest.uiState.value.hasWritePermission).isFalse()
         }
+
+    @Test
+    fun `test that isSearchRevampEnabled is updated when feature flag is enabled`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp)).thenReturn(true)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isSearchRevampEnabled).isTrue()
+        }
+    }
 }

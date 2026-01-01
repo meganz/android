@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -56,6 +57,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import timber.log.Timber
 
@@ -80,6 +82,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -106,6 +109,7 @@ class CloudDriveViewModel @AssistedInject constructor(
         monitorStorageOverQuota()
         monitorTransferOverQuota()
         checkWritePermission()
+        checkSearchRevampEnabled()
     }
 
     /**
@@ -525,6 +529,15 @@ class CloudDriveViewModel @AssistedInject constructor(
                     state.copy(hasWritePermission = false)
                 }
             }
+        }
+    }
+
+    private fun checkSearchRevampEnabled() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
+                .onSuccess { isEnabled ->
+                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
+                }
         }
     }
 

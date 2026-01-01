@@ -6,12 +6,12 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 
 fun EntryProviderScope<NavKey>.searchLegacyDestination(
     removeDestination: () -> Unit,
 ) {
-    entry<SearchNodeNavKey>(
+    entry<LegacySearchNavKey>(
         metadata = transparentMetadata()
     ) { key ->
         val context = LocalContext.current

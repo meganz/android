@@ -38,13 +38,13 @@ import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPaddi
 import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
@@ -68,7 +68,6 @@ internal fun DriveSyncScreen(
     navigationHandler: NavigationHandler,
     setNavigationBarVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Long, NodeSourceType) -> Unit,
     cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -116,18 +115,15 @@ internal fun DriveSyncScreen(
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
-                                    openSearch(
-                                        cloudDriveUiState.currentFolderId.longValue,
-                                        cloudDriveViewModel.nodeSourceType
-                                    )
-                                })
+                                    navigationHandler.navigate(cloudDriveUiState.searchNavKey)
+                                }
+                            )
 
                             selectedTabIndex == 1 -> add(
-                                MenuActionWithClick(
-                                    CommonAppBarAction.More
-                                ) {
+                                MenuActionWithClick(CommonAppBarAction.More) {
                                     showSyncSettings = true
-                                })
+                                }
+                            )
                         }
                     }
                 )

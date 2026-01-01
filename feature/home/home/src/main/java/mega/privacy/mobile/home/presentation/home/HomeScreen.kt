@@ -52,7 +52,7 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -141,7 +141,7 @@ internal fun HomeScreen(
                 actions = listOf(
                     MenuActionWithClick(CommonAppBarAction.Search) {
                         navigationHandler.navigate(
-                            SearchNodeNavKey(
+                            LegacySearchNavKey(
                                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                                 parentHandle = -1L
                             )

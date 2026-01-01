@@ -16,7 +16,6 @@ import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import mega.privacy.mobile.analytics.event.CloudDriveBottomNavigationItemEvent
@@ -29,28 +28,12 @@ class DriveSyncNavItem : MainNavItem {
                 navigationHandler = navigationHandler,
                 setNavigationVisibility = navigationController::showNavigation,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                }
             )
 
             cloudDriveScreen(
                 navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onTransfer = transferHandler::setTransferEvent,
-                openSearch = { parentHandle, nodeSourceType ->
-                    navigationHandler.navigate(
-                        SearchNodeNavKey(
-                            nodeSourceType = nodeSourceType,
-                            parentHandle = parentHandle
-                        )
-                    )
-                },
                 setNavigationBarVisibility = navigationController::showNavigation,
             )
         }

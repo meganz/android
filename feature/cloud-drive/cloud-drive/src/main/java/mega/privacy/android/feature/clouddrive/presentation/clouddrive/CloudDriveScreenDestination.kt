@@ -13,7 +13,6 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -24,14 +23,12 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
  * @param navigationHandler Navigation handler to handle navigation actions
  * @param onBack Callback to be invoked when the back button is pressed
  * @param onTransfer Callback to handle transfer events
- * @param openSearch Callback to open search with parent handle and node source type
  * @param setNavigationBarVisibility Optional callback to set the visibility of the bottom navigation bar, used in HomeScreens
  */
 fun EntryProviderScope<NavKey>.cloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Long, NodeSourceType) -> Unit,
     setNavigationBarVisibility: (Boolean) -> Unit = { },
 ) {
     entry<CloudDriveNavKey> { key ->
@@ -65,7 +62,6 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
             viewModel = viewModel,
             onBack = onBack,
             onTransfer = onTransfer,
-            openSearch = openSearch,
             setNavigationBarVisibility = setNavigationBarVisibility,
             nodeOptionsActionViewModel = nodeOptionsActionViewModel
         )

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 
 fun EntryProviderScope<NavKey>.rubbishBin(
     navigationHandler: NavigationHandler,
@@ -40,7 +40,7 @@ fun EntryProviderScope<NavKey>.rubbishBin(
             },
             openSearch = { parentHandle ->
                 navigationHandler.navigate(
-                    SearchNodeNavKey(
+                    LegacySearchNavKey(
                         nodeSourceType = NodeSourceType.RUBBISH_BIN,
                         parentHandle = parentHandle
                     )

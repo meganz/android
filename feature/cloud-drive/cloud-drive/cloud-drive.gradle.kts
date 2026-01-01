@@ -27,6 +27,7 @@ dependencies {
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":core:transfers"))
     implementation(project(":core:formatter"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":shared:resources"))
     implementation(project(":icon-pack"))

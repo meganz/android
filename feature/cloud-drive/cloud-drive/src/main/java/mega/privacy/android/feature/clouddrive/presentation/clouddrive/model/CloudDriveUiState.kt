@@ -52,6 +52,7 @@ data class CloudDriveUiState(
     val showContactNotVerifiedBanner: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val hasWritePermission: Boolean = false,
+    val isSearchRevampEnabled: Boolean = false,
 ) {
 
     /**

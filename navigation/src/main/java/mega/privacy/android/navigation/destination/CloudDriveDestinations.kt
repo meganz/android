@@ -58,6 +58,15 @@ data class DriveSyncNavKey(
 data object FavouritesNavKey : NavKey
 
 /**
+ * Search route args
+ */
+@Serializable
+data class SearchNavKey(
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val parentHandle: Long,
+) : NavKey
+
+/**
  * @isOverQuota whether the user is over quota (red) or near quota (orange)
  * @overQuotaAlert whether to show the over quota alert dialog or just reminder dialog
  */

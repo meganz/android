@@ -23,7 +23,7 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.model.Fav
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction.SelectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.favourites.view.FavouritesContent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 
 /**
@@ -82,7 +82,7 @@ fun FavouritesScreen(
                             add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
                                     navigationHandler.navigate(
-                                        SearchNodeNavKey(
+                                        LegacySearchNavKey(
                                             nodeSourceType = NodeSourceType.FAVOURITES,
                                             parentHandle = -1L
                                         )

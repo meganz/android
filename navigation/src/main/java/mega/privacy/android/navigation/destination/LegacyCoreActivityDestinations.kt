@@ -117,7 +117,7 @@ data class FileContactInfoNavKey(
 ) : NavKey
 
 @Serializable
-data class SearchNodeNavKey(
+data class LegacySearchNavKey(
     val nodeSourceType: NodeSourceType,
     val parentHandle: Long,
 ) : NavKey

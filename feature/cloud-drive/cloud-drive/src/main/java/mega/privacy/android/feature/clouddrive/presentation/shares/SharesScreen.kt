@@ -57,7 +57,7 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.SearchNodeNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -180,7 +180,7 @@ internal fun SharesScreen(
                         add(
                             MenuActionWithClick(CommonAppBarAction.Search) {
                                 navigationHandler.navigate(
-                                    SearchNodeNavKey(
+                                    LegacySearchNavKey(
                                         nodeSourceType = selectedTab.toNodeSourceType(),
                                         parentHandle = -1L
                                     )

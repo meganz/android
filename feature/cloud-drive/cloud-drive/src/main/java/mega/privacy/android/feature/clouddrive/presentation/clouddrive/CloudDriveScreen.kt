@@ -28,10 +28,10 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
@@ -50,7 +50,6 @@ fun CloudDriveScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    openSearch: (Long, NodeSourceType) -> Unit,
     setNavigationBarVisibility: (Boolean) -> Unit,
     viewModel: CloudDriveViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -94,10 +93,7 @@ fun CloudDriveScreen(
                         if (uiState.items.isNotEmpty()) {
                             add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
-                                    openSearch(
-                                        uiState.currentFolderId.longValue,
-                                        viewModel.nodeSourceType
-                                    )
+                                    navigationHandler.navigate(uiState.searchNavKey)
                                 }
                             )
                         }
