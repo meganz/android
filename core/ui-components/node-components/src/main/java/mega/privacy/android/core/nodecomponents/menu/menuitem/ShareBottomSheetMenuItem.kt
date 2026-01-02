@@ -26,7 +26,7 @@ class ShareBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override fun getOnClickFunction(
         node: TypedNode,

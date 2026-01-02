@@ -25,7 +25,7 @@ class ManageLinkBottomSheetMenuItem @Inject constructor(
             && node.exportedData?.publicLink != null
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 7
 }

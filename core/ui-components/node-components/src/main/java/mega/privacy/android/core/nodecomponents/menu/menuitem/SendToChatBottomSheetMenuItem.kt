@@ -35,7 +35,7 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
     ) = isConnected
             && node is TypedFileNode
             && node.isTakenDown.not()
-            && isNodeInRubbish.not()
+            && isNodeInRubbish.not() && node.isNodeKeyDecrypted
 
     override val groupId = 7
 }

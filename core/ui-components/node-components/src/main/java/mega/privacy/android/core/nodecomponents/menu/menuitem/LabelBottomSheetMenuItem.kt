@@ -64,7 +64,7 @@ class LabelBottomSheetMenuItem @Inject constructor(
     ) = node.isTakenDown.not()
             && isNodeInRubbish.not()
             && accessPermission in setOf(AccessPermission.FULL, AccessPermission.OWNER)
-            && isInBackups.not()
+            && isInBackups.not() && node.isNodeKeyDecrypted
 
     override val groupId: Int
         get() = 3

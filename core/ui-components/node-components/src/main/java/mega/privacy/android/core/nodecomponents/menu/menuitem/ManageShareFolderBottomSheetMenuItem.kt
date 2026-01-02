@@ -28,7 +28,7 @@ class ManageShareFolderBottomSheetMenuItem @Inject constructor(
             && accessPermission == AccessPermission.OWNER
             && isNodeInRubbish.not()
             && isOutShareUseCase(node)
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 7
 

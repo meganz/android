@@ -25,7 +25,7 @@ class RenameBottomSheetMenuItem @Inject constructor(
         AccessPermission.OWNER,
         AccessPermission.FULL
     ) && isInBackups.not()
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 8
 }

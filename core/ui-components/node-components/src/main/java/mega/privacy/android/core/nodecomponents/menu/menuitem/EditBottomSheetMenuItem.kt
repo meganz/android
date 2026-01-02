@@ -38,7 +38,7 @@ class EditBottomSheetMenuItem @Inject constructor(
                 && isInBackups.not()
                 && node.isTakenDown.not()
                 && getFileTypeInfoUseCase(file) is TextFileTypeInfo
-                && accessPermission in listOf(OWNER, READWRITE, FULL)
+                && accessPermission in listOf(OWNER, READWRITE, FULL) && node.isNodeKeyDecrypted
     }
 
     override val groupId = 1

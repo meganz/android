@@ -51,7 +51,7 @@ class VersionsBottomSheetMenuItem @Inject constructor(
         isConnected: Boolean,
     ) = node is TypedFileNode
             && node.hasVersion
-            && node.isTakenDown.not()
+            && node.isTakenDown.not() && node.isNodeKeyDecrypted
 
     override val groupId = 3
 }

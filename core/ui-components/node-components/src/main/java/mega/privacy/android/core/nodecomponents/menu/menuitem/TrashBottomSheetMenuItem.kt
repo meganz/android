@@ -34,7 +34,7 @@ class TrashBottomSheetMenuItem @Inject constructor(
         AccessPermission.OWNER,
         AccessPermission.FULL,
     ) && isInBackups.not()
-            && node.isNotS4Container()
+            && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val isDestructiveAction: Boolean
         get() = true
