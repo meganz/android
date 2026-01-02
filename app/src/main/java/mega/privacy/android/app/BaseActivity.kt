@@ -63,16 +63,13 @@ import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
-import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LAUNCH_INTENT
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.TextUtil
@@ -466,7 +463,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type   There are three possible values to this param:
      *                - SNACKBAR_TYPE: creates a simple snackbar
      *                - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      * @param view   Layout where the snackbar is going to show.
      * @param s      Text to shown in the snackbar
      * @param idChat Chat ID. If this param has a valid value the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat.
@@ -488,9 +484,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type   There are three possible values to this param:
      *                  - SNACKBAR_TYPE: creates a simple snackbar
      *                  - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                  - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                  - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                  - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view   Layout where the snackbar is going to show.
      * @param anchor Sets the view the Snackbar should be anchored above, null as default
      * @param s      Text to shown in the snackbar
@@ -521,9 +515,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type      There are three possible values to this param:
      *                  - SNACKBAR_TYPE: creates a simple snackbar
      *                  - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                  - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                  - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                  - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view      Layout where the snackbar is going to show.
      * @param anchor    Sets the view the Snackbar should be anchored above, null as default
      * @param s         Text to shown in the snackbar
@@ -548,9 +540,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * @param type          There are three possible values to this param:
      *                      - SNACKBAR_TYPE: creates a simple snackbar
      *                      - MESSAGE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Chat section
-     *                      - NOT_SPACE_SNACKBAR_TYPE: creates an action snackbar which function is to go to Storage-Settings section
      *                      - MUTE_NOTIFICATIONS_SNACKBAR_TYPE: creates an action snackbar which function is unmute chats notifications
-     *                      - INVITE_CONTACT_TYPE: creates an action snackbar which function is to send a contact invitation
      * @param view          Layout where the snackbar is going to show.
      * @param anchor        Sets the view the Snackbar should be anchored above, null as default
      * @param s             Text to shown in the snackbar
@@ -577,12 +567,6 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     view,
                     (if (s?.isNotEmpty() == true) s else getString(R.string.sent_as_message))
                         ?: return,
-                    Snackbar.LENGTH_LONG
-                )
-
-                NOT_SPACE_SNACKBAR_TYPE -> Snackbar.make(
-                    view,
-                    R.string.error_not_enough_free_space,
                     Snackbar.LENGTH_LONG
                 )
 
@@ -639,18 +623,23 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 MESSAGE_SNACKBAR_TYPE -> {
                     setAction(
                         R.string.action_see,
-                        SnackbarNavigateOption(context = view.context, idChat = idChat)
+                        SnackbarNavigateOption(
+                            context = view.context,
+                            idChat = idChat,
+                            megaNavigator = megaNavigator,
+                        )
                     )
                     show()
                 }
 
-                NOT_SPACE_SNACKBAR_TYPE -> {
-                    setAction(R.string.action_settings, SnackbarNavigateOption(view.context))
-                    show()
-                }
-
                 MUTE_NOTIFICATIONS_SNACKBAR_TYPE -> {
-                    setAction(R.string.general_unmute, SnackbarNavigateOption(view.context, type))
+                    setAction(
+                        R.string.general_unmute, SnackbarNavigateOption(
+                            context = view.context,
+                            type = type,
+                            megaNavigator = megaNavigator,
+                        )
+                    )
                     show()
                 }
 
@@ -662,35 +651,23 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                     show()
                 }
 
-                INVITE_CONTACT_TYPE -> {
-                    setAction(
-                        R.string.contact_invite,
-                        SnackbarNavigateOption(view.context, type, userEmail)
-                    )
-                    show()
-                }
-
                 DISMISS_ACTION_SNACKBAR -> {
                     val snackbarTextView =
                         snackbarLayout.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarTextView.maxLines = 5
                     setAction(
                         sharedResR.string.general_ok,
-                        SnackbarNavigateOption(view.context, type)
+                        SnackbarNavigateOption(
+                            context = view.context,
+                            type = type,
+                            megaNavigator = megaNavigator,
+                        )
                     )
                     show()
                 }
 
                 OPEN_FILE_SNACKBAR_TYPE -> {
                     setAction(getString(R.string.general_confirmation_open)) { action() }
-                    show()
-                }
-
-                SENT_REQUESTS_TYPE -> {
-                    setAction(
-                        R.string.tab_sent_requests,
-                        SnackbarNavigateOption(view.context, type, userEmail)
-                    )
                     show()
                 }
 

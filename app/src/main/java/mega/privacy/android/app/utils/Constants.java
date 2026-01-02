@@ -133,7 +133,6 @@ public class Constants {
     public static final String ACTION_OPEN_FILE_LINK_ROOTNODES_NULL = "ACTION_OPEN_FILE_LINK_ROOTNODES_NULL";
     public static final String ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL = "ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL";
     public static final String ACTION_SHOW_SETTINGS = "ACTION_SHOW_SETTINGS";
-    public static final String ACTION_SHOW_SETTINGS_STORAGE = "ACTION_SHOW_SETTINGS_STORAGE";
     public static final String ACTION_PRE_OVERQUOTA_STORAGE = "PRE_OVERQUOTA_STORAGE";
     public static final String ACTION_LOG_IN = "ACTION_LOG_IN";
     public static final String ACTION_OPEN_DEVICE_CENTER = "ACTION_OPEN_DEVICE_CENTER";
@@ -342,12 +341,9 @@ public class Constants {
     public static final int SNACKBAR_TYPE = 0;
     public static final int MESSAGE_SNACKBAR_TYPE = 1;
     public static final int MUTE_NOTIFICATIONS_SNACKBAR_TYPE = 2;
-    public static final int NOT_SPACE_SNACKBAR_TYPE = 3;
     public static final int PERMISSIONS_TYPE = 4;
-    public static final int INVITE_CONTACT_TYPE = 5;
     public static final int DISMISS_ACTION_SNACKBAR = 6;
     public static final int OPEN_FILE_SNACKBAR_TYPE = 7;
-    public static final int SENT_REQUESTS_TYPE = 8;
 
     public static final int NOT_CALL_PERMISSIONS_SNACKBAR_TYPE = 10;
 

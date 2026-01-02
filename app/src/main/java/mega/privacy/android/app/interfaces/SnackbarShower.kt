@@ -1,7 +1,6 @@
 package mega.privacy.android.app.interfaces
 
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
@@ -36,11 +35,4 @@ fun SnackbarShower.showSnackbar(content: String) {
  */
 fun SnackbarShower.showSnackbarWithChat(content: String?, chatId: Long) {
     showSnackbar(MESSAGE_SNACKBAR_TYPE, content, chatId)
-}
-
-/**
- * Shows a snackbar with a message indicating there is not enough space.
- */
-fun SnackbarShower.showNotEnoughSpaceSnackbar() {
-    showSnackbar(NOT_SPACE_SNACKBAR_TYPE, null, MEGACHAT_INVALID_HANDLE)
 }

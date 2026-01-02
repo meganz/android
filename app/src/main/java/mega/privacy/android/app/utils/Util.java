@@ -697,7 +697,7 @@ public class Util {
      *
      * @param context      Class where the Snackbar has to be shown
      * @param snackbarType specifies the type of the Snackbar.
-     *                     It can be SNACKBAR_TYPE, MESSAGE_SNACKBAR_TYPE or NOT_SPACE_SNACKBAR_TYPE
+     *                     It can be SNACKBAR_TYPE or MESSAGE_SNACKBAR_TYPE
      * @param message      Text to shown in the snackbar
      * @param idChat       Chat ID. If this param has a valid value, different to -1, the function of MESSAGE_SNACKBAR_TYPE ends in the specified chat
      */

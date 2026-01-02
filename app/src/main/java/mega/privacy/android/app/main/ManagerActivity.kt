@@ -212,7 +212,6 @@ import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinViewMode
 import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.startScreenTargetPreference
-import mega.privacy.android.app.presentation.settings.model.storageTargetPreference
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CHAT_BNV
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.Companion.CLOUD_DRIVE_BNV
@@ -1671,12 +1670,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         Timber.d("Chat notification: SHOW_SETTINGS")
                         selectDrawerItemPending = false
                         moveToSettingsSection()
-                        intent.action = null
-                        intent = null
-                    } else if (intent.action == Constants.ACTION_SHOW_SETTINGS_STORAGE) {
-                        Timber.d("ACTION_SHOW_SETTINGS_STORAGE")
-                        selectDrawerItemPending = false
-                        moveToSettingsSectionStorage()
                         intent.action = null
                         intent = null
                     } else if (intent.action == Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION) {
@@ -4184,13 +4177,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     private fun moveToSettingsSection() {
         navigateToSettingsActivity(null)
-    }
-
-    /**
-     * Opens the settings section and scrolls to storage category.
-     */
-    fun moveToSettingsSectionStorage() {
-        navigateToSettingsActivity(storageTargetPreference)
     }
 
     /**
