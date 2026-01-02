@@ -75,12 +75,16 @@ fun NodeSubtitleText.text(): String {
             val format = DecimalFormat("#.##")
             val formattedFileSize = format.format(fileSizeValue)
             val fileSizeText = stringResource(fileSizeResId, formattedFileSize)
-            val formattedDate = formatModifiedDate(locale, time)
-            stringResource(
-                R.string.file_subtitle_format,
-                fileSizeText,
-                formattedDate
-            )
+            if (time != 0L) {
+                val formattedDate = formatModifiedDate(locale, time)
+                stringResource(
+                    R.string.file_subtitle_format,
+                    fileSizeText,
+                    formattedDate
+                )
+            } else {
+                fileSizeText
+            }
         }
 
         is NodeSubtitleText.FolderSubtitle -> {
