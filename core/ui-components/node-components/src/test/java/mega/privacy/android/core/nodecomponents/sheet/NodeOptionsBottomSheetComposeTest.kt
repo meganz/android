@@ -47,6 +47,7 @@ class NodeOptionsBottomSheetComposeTest {
         actionHandler: SingleNodeActionHandler = mock(),
         navigationHandler: NavigationHandler = mock(),
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        partiallyExpand: Boolean = false,
         onDismiss: () -> Unit = {},
         onConsumeErrorState: () -> Unit = {},
         showSnackbar: suspend (SnackbarAttributes) -> Unit = { _ -> },
@@ -67,11 +68,41 @@ class NodeOptionsBottomSheetComposeTest {
                 actionHandler = actionHandler,
                 navigationHandler = navigationHandler,
                 nodeSourceType = nodeSourceType,
+                partiallyExpand = partiallyExpand,
                 onDismiss = onDismiss,
                 onConsumeErrorState = onConsumeErrorState,
                 showSnackbar = showSnackbar
             )
         }
+    }
+
+    /**
+     * Wait for the sheet content to be ready (after SHEET_READY_DELAY_MS).
+     */
+    private fun waitForSheetReady() {
+        composeTestRule.waitForIdle()
+        composeTestRule.mainClock.advanceTimeBy(400) // Slightly more than 350ms delay
+        composeTestRule.waitForIdle()
+    }
+
+    /**
+     * Creates a mock NodeUiItem for testing.
+     */
+    private fun createMockNodeUiItem(name: String = "test_file.txt"): NodeUiItem<TypedNode> {
+        val mockNode = mock<TypedFileNode>()
+        whenever(mockNode.name).thenReturn(name)
+        whenever(mockNode.id).thenReturn(NodeId(123L))
+        whenever(mockNode.isTakenDown).thenReturn(false)
+        whenever(mockNode.hasVersion).thenReturn(false)
+        whenever(mockNode.tags).thenReturn(emptyList())
+
+        return NodeUiItem(
+            node = mockNode,
+            isSelected = false,
+            title = LocalizedText.Literal(name),
+            iconRes = R.drawable.ic_send_horizontal,
+            thumbnailData = null
+        )
     }
 
     @Test
@@ -97,6 +128,8 @@ class NodeOptionsBottomSheetComposeTest {
 
         setContent(uiState = uiState)
 
+        waitForSheetReady()
+
         composeTestRule.onNodeWithText("test_file.txt")
             .assertExists("Node title should be displayed")
             .assertIsDisplayed()
@@ -116,11 +149,13 @@ class NodeOptionsBottomSheetComposeTest {
         }
 
         val uiState = NodeBottomSheetState(
-            node = null,
+            node = createMockNodeUiItem(),
             actions = listOf(listOf(mockAction)),
         )
 
         setContent(uiState = uiState)
+
+        waitForSheetReady()
 
         // Verify that the action is rendered (the NodeActionListTile should be present)
         // Since we can't easily test the exact content without more complex setup,
@@ -219,8 +254,7 @@ class NodeOptionsBottomSheetComposeTest {
 
         setContent(uiState = uiState)
 
-        // Wait for the content to be displayed
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
 
         // Initially, when the list is not scrolled, the divider should not be shown
         composeTestRule.onNodeWithTag(NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG)
@@ -269,8 +303,7 @@ class NodeOptionsBottomSheetComposeTest {
 
         setContent(uiState = uiState)
 
-        // Wait for the content to be displayed
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
 
         // The divider should not be shown when the list is not scrolled
         composeTestRule.onNodeWithTag(NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG)
@@ -290,13 +323,13 @@ class NodeOptionsBottomSheetComposeTest {
         }
 
         val uiState = NodeBottomSheetState(
-            node = null,
+            node = createMockNodeUiItem(),
             actions = listOf(listOf(mockAction)),
         )
 
         setContent(uiState = uiState)
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
 
         // No divider should be shown when there's only one group
         composeTestRule.onNodeWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
@@ -325,7 +358,7 @@ class NodeOptionsBottomSheetComposeTest {
         }
 
         val uiState = NodeBottomSheetState(
-            node = null,
+            node = createMockNodeUiItem(),
             actions = listOf(
                 listOf(mockAction1),
                 listOf(mockAction2)
@@ -334,7 +367,7 @@ class NodeOptionsBottomSheetComposeTest {
 
         setContent(uiState = uiState)
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
 
         // One divider should be shown between two groups
         composeTestRule.onAllNodesWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
@@ -356,7 +389,7 @@ class NodeOptionsBottomSheetComposeTest {
         }
 
         val uiState = NodeBottomSheetState(
-            node = null,
+            node = createMockNodeUiItem(),
             actions = listOf(
                 listOf(mockActions[0]),
                 listOf(mockActions[1]),
@@ -366,7 +399,7 @@ class NodeOptionsBottomSheetComposeTest {
 
         setContent(uiState = uiState)
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
 
         // Two dividers should be shown between three groups (dividers between group 1-2 and 2-3)
         composeTestRule.onAllNodesWithTag(NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG)
@@ -402,7 +435,7 @@ class NodeOptionsBottomSheetComposeTest {
             nodeSourceType = NodeSourceType.INCOMING_SHARES
         )
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
         // Verify the component renders correctly for shared items.
         // The isSharedItem() check in NodeOptionsBottomSheetContent ensures that
         // blur/sensitive flags are disabled for shared items (isSensitive=false, showBlurEffect=false
@@ -445,7 +478,7 @@ class NodeOptionsBottomSheetComposeTest {
             nodeSourceType = NodeSourceType.OUTGOING_SHARES
         )
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
         // Verify the component renders correctly for shared items.
         // See test above for explanation on why we cannot directly test alpha/blur effects.
         composeTestRule.onNodeWithText("shared_file.txt")
@@ -482,7 +515,7 @@ class NodeOptionsBottomSheetComposeTest {
             nodeSourceType = NodeSourceType.LINKS
         )
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
         // Verify the component renders correctly for shared items.
         // See test above for explanation on why we cannot directly test alpha/blur effects.
         composeTestRule.onNodeWithText("shared_file.txt")
@@ -519,7 +552,7 @@ class NodeOptionsBottomSheetComposeTest {
             nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
         // Verify the component renders correctly for non-shared items.
         // The isSharedItem() check in NodeOptionsBottomSheetContent ensures that
         // blur/sensitive flags are enabled for non-shared items (isSensitive=true, showBlurEffect=true
@@ -560,7 +593,7 @@ class NodeOptionsBottomSheetComposeTest {
             nodeSourceType = NodeSourceType.HOME
         )
 
-        composeTestRule.waitForIdle()
+        waitForSheetReady()
         // Verify the component renders correctly for non-shared items.
         // See test above for explanation on why we cannot directly test alpha/blur effects.
         composeTestRule.onNodeWithText("home_file.txt")

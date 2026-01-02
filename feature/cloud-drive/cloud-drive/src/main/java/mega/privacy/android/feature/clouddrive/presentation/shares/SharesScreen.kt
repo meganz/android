@@ -222,7 +222,8 @@ internal fun SharesScreen(
                             navigationHandler.navigate(
                                 NodeOptionsBottomSheetNavKey(
                                     nodeHandle = nodeId.longValue,
-                                    nodeSourceType = NodeSourceType.INCOMING_SHARES
+                                    nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                                    partiallyExpand = false
                                 )
                             )
                         },

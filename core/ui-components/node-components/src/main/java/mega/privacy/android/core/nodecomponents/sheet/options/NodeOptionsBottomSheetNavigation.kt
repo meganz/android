@@ -22,6 +22,7 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val partiallyExpand: Boolean = true
 ) : NoSessionNavKey.Optional {
 
     companion object {
@@ -70,6 +71,7 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
             onDismiss = { navigationHandler.remove(it) },
             nodeId = it.nodeHandle,
             nodeSourceType = it.nodeSourceType,
+            partiallyExpand = it.partiallyExpand,
             onTransfer = { event ->
                 returnResult(
                     NodeOptionsBottomSheetNavKey.RESULT,

@@ -171,7 +171,8 @@ internal fun RubbishBinScreen(
                                         navigationHandler.navigate(
                                             NodeOptionsBottomSheetNavKey(
                                                 nodeHandle = uiState.currentFolderId.longValue,
-                                                nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                                                partiallyExpand = false
                                             )
                                         )
                                     },
@@ -233,7 +234,8 @@ internal fun RubbishBinScreen(
                         navigationHandler.navigate(
                             NodeOptionsBottomSheetNavKey(
                                 nodeHandle = nodeUiItem.node.id.longValue,
-                                nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                                partiallyExpand = false
                             )
                         )
                     },
