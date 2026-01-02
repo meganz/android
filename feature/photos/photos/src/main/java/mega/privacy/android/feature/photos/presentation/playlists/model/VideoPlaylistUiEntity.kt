@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.playlists.model
 
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 
 /**
@@ -30,4 +31,10 @@ data class VideoPlaylistUiEntity(
     val videos: List<VideoUiEntity>? = null,
     val isSelected: Boolean = false,
     val isSystemVideoPlayer: Boolean = false
-)
+) {
+    val type: PlaylistType = if (isSystemVideoPlayer) {
+        PlaylistType.Favourite
+    } else {
+        PlaylistType.User
+    }
+}

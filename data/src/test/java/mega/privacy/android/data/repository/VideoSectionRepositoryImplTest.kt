@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -199,7 +198,9 @@ class VideoSectionRepositoryImplTest {
             assertThat(actual[0] is FavouritesVideoPlaylist).isTrue()
         }
 
-    private suspend fun initEmptyFavouritesVideoPlaylist() {
+    private suspend fun initEmptyFavouritesVideoPlaylist(
+        favouritePlaylist: FavouritesVideoPlaylist = mock()
+    ) {
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
         whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(token)
@@ -212,7 +213,7 @@ class VideoSectionRepositoryImplTest {
         whenever(
             megaApiGateway.searchWithFilter(filter, sortOrderIntMapper(SortOrder.ORDER_NONE), token)
         ).thenReturn(emptyList())
-        whenever(favouritesVideoPlaylistMapper(anyOrNull())).thenReturn(mock())
+        whenever(favouritesVideoPlaylistMapper(anyOrNull())).thenReturn(favouritePlaylist)
     }
 
     @Test
@@ -956,4 +957,37 @@ class VideoSectionRepositoryImplTest {
             underTest.removeRecentlyWatchedItem(testHandle)
             verify(megaLocalRoomGateway).removeRecentlyWatchedVideo(testHandle)
         }
+
+    @Test
+    fun `test that getVideoPlaylistById returns correct UserVideoPlaylist`() = runTest {
+        val testId = NodeId(12345L)
+        val testUserSet = createMegaSet(testId.longValue)
+        val megaSetElementList = mock<MegaSetElementList> {
+            on { size() }.thenReturn(0L)
+        }
+        val megaNode = mock<MegaNode> {
+            on { duration }.thenReturn(100)
+            on { isOutShare }.thenReturn(false)
+        }
+        val testPlaylist = mock<UserVideoPlaylist> {
+            on { id }.thenReturn(testId)
+            on { title }.thenReturn("video playlist title")
+        }
+        whenever(megaApiGateway.getSet(testId.longValue)).thenReturn(testUserSet)
+        whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
+        whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
+        whenever(userVideoPlaylistMapper(any(), any())).thenReturn(testPlaylist)
+        initUnderTest()
+        val result = underTest.getVideoPlaylistById(testId)
+        assertThat(result).isEqualTo(testPlaylist)
+    }
+
+    @Test
+    fun `test that getFavouritesVideoPlaylist returns correct FavouritesVideoPlaylist`() = runTest {
+        val testFavouritePlaylist = mock<FavouritesVideoPlaylist>()
+        initEmptyFavouritesVideoPlaylist(testFavouritePlaylist)
+        initUnderTest()
+        val result = underTest.getFavouritePlaylist(SortOrder.ORDER_NONE)
+        assertThat(result).isEqualTo(testFavouritePlaylist)
+    }
 }

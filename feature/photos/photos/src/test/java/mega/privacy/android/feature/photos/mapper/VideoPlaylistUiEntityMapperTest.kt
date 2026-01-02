@@ -7,6 +7,7 @@ import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.entity.videosection.SystemVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
@@ -188,7 +189,8 @@ class VideoPlaylistUiEntityMapperTest {
                     )
                 },
                 { assertThat(it.videos?.size).isEqualTo(expectedVideos?.size) },
-                { assertThat(it.isSystemVideoPlayer).isFalse() }
+                { assertThat(it.isSystemVideoPlayer).isFalse() },
+                { assertThat(it.type).isEqualTo(PlaylistType.User) }
             )
         }
     }
@@ -225,7 +227,8 @@ class VideoPlaylistUiEntityMapperTest {
                     )
                 },
                 { assertThat(it.videos?.size).isEqualTo(expectedVideos?.size) },
-                { assertThat(it.isSystemVideoPlayer).isTrue() }
+                { assertThat(it.isSystemVideoPlayer).isTrue() },
+                { assertThat(it.type).isEqualTo(PlaylistType.Favourite) }
             )
         }
     }

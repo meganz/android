@@ -2,11 +2,11 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.VideoSectionRepository
@@ -334,28 +335,32 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorSetsUpdates(): Flow<List<Long>> = merge(megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
-        .mapNotNull { it.sets }
-        .map { sets ->
-            sets.filter {
-                it.type() == MegaSet.SET_TYPE_PLAYLIST
-            }.map {
-                it.id()
-            }
-        },
+    override fun monitorSetsUpdates(): Flow<List<Long>> =
         megaApiGateway.globalUpdates
-            .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
-            .mapNotNull { it.elements }
-            .map { elements ->
-                val updatedIds = elements.map { it.setId() }
-                if (updatedIds.any { it in videoPlaylistsMap.keys }) {
-                    updatedIds
-                } else {
-                    emptyList()
+            .filter { it is GlobalUpdate.OnSetsUpdate || it is GlobalUpdate.OnSetElementsUpdate }
+            .mapNotNull { update ->
+                when (update) {
+                    is GlobalUpdate.OnSetsUpdate -> {
+                        update.sets?.filter {
+                            it.type() == MegaSet.SET_TYPE_PLAYLIST
+                        }?.map {
+                            it.id()
+                        } ?: emptyList()
+                    }
+
+                    is GlobalUpdate.OnSetElementsUpdate -> {
+                        val updatedIds = update.elements?.map { it.setId() } ?: emptyList()
+                        if (updatedIds.any { it in videoPlaylistsMap.keys }) {
+                            updatedIds
+                        } else {
+                            emptyList()
+                        }
+                    }
+
+                    else -> null
                 }
             }
-    )
+            .flowOn(ioDispatcher)
 
     override fun getVideoSetsMap() = videoSetsMap
 
@@ -449,6 +454,20 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
 
     override suspend fun removeRecentlyWatchedItem(handle: Long) =
         megaLocalRoomGateway.removeRecentlyWatchedVideo(handle)
+
+    override suspend fun getVideoPlaylistById(playlistId: NodeId): UserVideoPlaylist? =
+        withContext(ioDispatcher) {
+            val offlineItems = getAllOfflineNodeHandle()
+            megaApiGateway.getSet(playlistId.longValue)
+                ?.toUserSet()
+                ?.toVideoPlaylist(offlineItems) as? UserVideoPlaylist
+        }
+
+    override suspend fun getFavouritePlaylist(order: SortOrder): FavouritesVideoPlaylist =
+        withContext(ioDispatcher) {
+            val offlineItems = getAllOfflineNodeHandle()
+            getFavouritesVideoPlaylist(order, offlineItems)
+        }
 
     companion object {
         private const val PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS =

@@ -5,6 +5,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.entity.videosection.FavouritesVideoPlaylist
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 
 /**
@@ -150,4 +152,20 @@ interface VideoSectionRepository {
      * @param handle removed item handle
      */
     suspend fun removeRecentlyWatchedItem(handle: Long)
+
+    /**
+     * Get video playlist by id
+     *
+     * @param playlistId playlist id
+     * @return video playlist
+     */
+    suspend fun getVideoPlaylistById(playlistId: NodeId): UserVideoPlaylist?
+
+    /**
+     * Get favourite playlist
+     *
+     * @param order the list order
+     * @return favourites video playlist
+     */
+    suspend fun getFavouritePlaylist(order: SortOrder): FavouritesVideoPlaylist
 }
