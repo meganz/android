@@ -1477,9 +1477,34 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    /**
+     * Recursively clear large data from Bundle and its nested Bundles
+     */
+    private fun clearLargeDataFromBundle(bundle: Bundle) {
+        // Clear large data from current Bundle
+        bundle.remove(Intent.EXTRA_STREAM)
+        bundle.remove(Intent.EXTRA_TEXT)
+
+        // Recursively process all nested Bundles
+        bundle.keySet().forEach { key ->
+            bundle.getBundle(key)?.let { nestedBundle ->
+                clearLargeDataFromBundle(nestedBundle)
+            }
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
+
+        // Clear large data from all ViewModels' SavedStateHandle
+        // This is the key to solving TransactionTooLargeException，e.g., share 200+ files from File
+        runCatching {
+            clearLargeDataFromBundle(outState)
+            Timber.d("Cleared large data from all ViewModels")
+        }.onFailure {
+            Timber.e(it, "Failed to clear large data from ViewModels")
+        }
 
         with(outState) {
             putBoolean("folderSelected", folderSelected)
