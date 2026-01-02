@@ -17,6 +17,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore.Companion.REQUEST_PHONE_NUMBER_FILE
+import mega.privacy.android.data.preferences.qaAccountCacheDataStoreName
 import mega.privacy.android.data.preferences.base.createEncrypted
 import mega.privacy.android.data.preferences.cameraUploadsSettingsPreferenceDataStoreName
 import mega.privacy.android.data.preferences.credentialDataStoreName
@@ -141,6 +142,25 @@ internal object DataStoreModule {
             masterKey = masterKey,
             context = context,
             fileName = credentialDataStoreName
+        )
+    }
+
+    @Singleton
+    @Provides
+    @Named(qaAccountCacheDataStoreName)
+    fun provideQAAccountCacheDataStore(
+        @ApplicationContext context: Context,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        masterKey: MasterKey?,
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.createEncrypted(
+            corruptionHandler = ReplaceFileCorruptionHandler(
+                produceNewData = { emptyPreferences() }
+            ),
+            scope = CoroutineScope(ioDispatcher),
+            masterKey = masterKey,
+            context = context,
+            fileName = qaAccountCacheDataStoreName
         )
     }
 

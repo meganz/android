@@ -33,6 +33,7 @@ import mega.privacy.android.data.facade.chat.ChatStorageFacade
 import mega.privacy.android.data.gateway.AgeSignalsGateway
 import mega.privacy.android.data.gateway.AgeSignalsGatewayImpl
 import mega.privacy.android.data.gateway.AdsGateway
+import mega.privacy.android.data.gateway.QAAccountCacheGateway
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AssetsGateway
@@ -86,6 +87,7 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
+import mega.privacy.android.data.preferences.QAAccountCacheDataStore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
 import mega.privacy.android.data.preferences.CallsPreferencesDataStore
 import mega.privacy.android.data.preferences.CameraUploadsSettingsPreferenceDataStore
@@ -173,6 +175,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindAccountPreferencesGateway(implementation: AccountPreferencesDataStore): AccountPreferencesGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindAccountCacheGateway(implementation: QAAccountCacheDataStore): QAAccountCacheGateway
 
     @Binds
     @Singleton

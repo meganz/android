@@ -10,4 +10,16 @@
     <string name="settings_qa_feature_flags_summary">Enable or disable features locally</string>
     <string name="settings_qa_feature_flag_quick_settings_title">Select feature flag for quick settings tile</string>
     <string name="settings_qa_filter">Filter features by name or description</string>
-</resources>
+    <string name="settings_qa_save_current_account">Save Current Account</string>
+    <string name="settings_qa_save_current_account_summary">Save current account credentials for quick switching</string>
+    <string name="settings_qa_cached_accounts">Cached Accounts</string>
+    <string name="settings_qa_no_cached_accounts">No cached accounts</string>
+    <string name="settings_qa_switch_to_account">Switch to this account</string>
+    <string name="settings_qa_remove_account">Remove from cache</string>
+    <string name="settings_qa_switching_account">Switching account...</string>
+    <string name="settings_qa_open_login">Open Login Screen</string>
+    <string name="settings_qa_open_login_summary">Open login screen without logging out</string>
+    <string name="settings_qa_current_account">Current</string>
+    <string name="settings_qa_add_remark">Add Remark</string>
+    <string name="settings_qa_remark_hint">Enter remark</string>
+</resources>                                                               
