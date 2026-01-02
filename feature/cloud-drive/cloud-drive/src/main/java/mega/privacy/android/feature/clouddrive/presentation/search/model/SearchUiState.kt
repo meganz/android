@@ -4,6 +4,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.search.DateFilterOption
+import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 
 /**
@@ -24,6 +26,9 @@ data class SearchUiState(
     val isSelecting: Boolean = false,
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
+    val typeFilterOption: TypeFilterOption? = null,
+    val dateModifiedFilterOption: DateFilterOption? = null,
+    val dateAddedFilterOption: DateFilterOption? = null,
 ) {
     /**
      * True if nodes or hidden node settings are loading
@@ -88,4 +93,10 @@ data class SearchUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
+     * True if search filters can be applied in the current node source type
+     */
+    val isFilterAllowed =
+        nodeSourceType == NodeSourceType.CLOUD_DRIVE || nodeSourceType == NodeSourceType.HOME
 }

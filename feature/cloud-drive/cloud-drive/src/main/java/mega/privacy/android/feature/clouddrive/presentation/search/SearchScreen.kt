@@ -9,33 +9,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.toolbar.AppBarNavigationType
-import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.feature.clouddrive.presentation.search.view.FilterType
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +50,7 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
         topBar = {
@@ -61,124 +63,204 @@ fun SearchScreen(
             )
         }
     ) { contentPadding ->
-        val topPadding = 12.dp // TODO adjust if there is a header
-
-        Column(
-            modifier = Modifier
-                .padding(contentPadding.excludingBottomPadding())
-        ) {
-            when {
-                uiState.isLoading -> {
-                    NodesViewSkeleton(
-                        isListView = isListView,
-                        spanCount = spanCount,
-                        contentPadding = PaddingValues(top = topPadding),
+        SearchContent(
+            uiState = uiState,
+            contentPadding = contentPadding,
+            isListView = isListView,
+            spanCount = spanCount,
+            onFilterClicked = { filterType ->
+                // TODO: Navigate to filter bottom sheet
+            },
+            onMenuClicked = { nodeUiItem ->
+                navigationHandler.navigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = nodeUiItem.id.longValue,
+                        nodeSourceType = uiState.nodeSourceType
                     )
-                }
-
-                uiState.isPreSearch -> {
-                    // TODO show recent searches
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        MegaText(
-                            "Search for files and folders",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-
-                uiState.isEmpty -> {
-                    // TODO update empty UI
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        MegaText(
-                            "No results found",
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth(),
-                        )
-                    }
-                }
-
-                else -> NodesView(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    listContentPadding = PaddingValues(
-                        top = topPadding,
-                        bottom = contentPadding.calculateBottomPadding() + 100.dp,
-                    ),
-                    spanCount = spanCount,
-                    items = uiState.items,
-                    highlightText = uiState.searchedQuery,
-                    isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                    showHiddenNodes = uiState.showHiddenNodes,
-                    onMenuClicked = {
-                        navigationHandler.navigate(
-                            NodeOptionsBottomSheetNavKey(
-                                nodeHandle = it.id.longValue,
-                                nodeSourceType = uiState.nodeSourceType
-                            )
-                        )
-                    },
-                    onItemClicked = {
-                        // TODO handle file opening
-                    },
-                    onLongClicked = {
-                        // TODO handle selection mode
-                    },
-                    sortConfiguration = NodeSortConfiguration.default, // TODO handle sort
-                    isListView = isListView,
-                    onSortOrderClick = {
-                        // TODO handle sort order change
-                    },
-                    onChangeViewTypeClicked = {
-                        // TODO handle view type change
-                    },
-                    showMediaDiscoveryButton = false,
-                    onEnterMediaDiscoveryClick = {
-                        // TODO in phase 2
-                    },
-                    inSelectionMode = uiState.isInSelectionMode, // TODO handle selection mode
-                    isContactVerificationOn = uiState.isContactVerificationOn
                 )
-            }
-        }
+            },
+            onItemClicked = { nodeUiItem ->
+                // TODO handle file opening
+            },
+            onLongClicked = { nodeUiItem ->
+                // TODO handle selection mode
+            },
+            onSortOrderClick = {
+                // TODO handle sort order change
+            },
+            onChangeViewTypeClicked = {
+                // TODO handle view type change
+            },
+            onEnterMediaDiscoveryClick = {
+                // TODO in phase 2
+            },
+        )
     }
 }
 
 @Composable
-private fun SearchTopAppBar(
-    searchText: String,
-    onSearchTextChanged: (String) -> Unit,
-    onBack: () -> Unit,
+fun SearchContent(
+    uiState: SearchUiState,
+    contentPadding: PaddingValues,
+    isListView: Boolean,
+    spanCount: Int,
+    onFilterClicked: (FilterType) -> Unit,
+    onMenuClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onLongClicked: (NodeUiItem<TypedNode>) -> Unit,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
+    onEnterMediaDiscoveryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isExiting by remember { mutableStateOf(false) }
-    val localKeyboardController = LocalSoftwareKeyboardController.current
+    val topPadding = 12.dp
 
-    MegaSearchTopAppBar(
-        modifier = modifier,
-        query = searchText,
-        title = "",
-        navigationType = AppBarNavigationType.Back(onBack),
-        searchPlaceholder = stringResource(sharedR.string.search_bar_placeholder_text),
-        onQueryChanged = {
-            if (!isExiting) {
-                onSearchTextChanged(it)
-            }
-        },
-        onSearchAction = {
-            localKeyboardController?.hide()
-        },
-        isSearchingMode = true,
-        onSearchingModeChanged = { isSearching ->
-            if (!isSearching) {
-                isExiting = true
-                onBack()
-            }
+    Column(
+        modifier = modifier.padding(contentPadding.excludingBottomPadding())
+    ) {
+        if (uiState.isFilterAllowed) {
+            SearchFilterChips(
+                typeFilterOption = uiState.typeFilterOption,
+                dateModifiedFilterOption = uiState.dateModifiedFilterOption,
+                dateAddedFilterOption = uiState.dateAddedFilterOption,
+                onFilterClicked = onFilterClicked,
+            )
         }
-    )
+
+        when {
+            uiState.isLoading -> {
+                NodesViewSkeleton(
+                    isListView = isListView,
+                    spanCount = spanCount,
+                    contentPadding = PaddingValues(top = topPadding),
+                )
+            }
+
+            uiState.isPreSearch -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
+                ) {
+                    MegaText(
+                        "Search for files and folders",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            uiState.isEmpty -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(SEARCH_CONTENT_EMPTY_TAG),
+                ) {
+                    MegaText(
+                        "No results found",
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
+            else -> NodesView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(SEARCH_CONTENT_RESULTS_TAG),
+                listContentPadding = PaddingValues(
+                    top = topPadding,
+                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                ),
+                spanCount = spanCount,
+                items = uiState.items,
+                highlightText = uiState.searchedQuery,
+                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                showHiddenNodes = uiState.showHiddenNodes,
+                onMenuClicked = onMenuClicked,
+                onItemClicked = onItemClicked,
+                onLongClicked = onLongClicked,
+                sortConfiguration = NodeSortConfiguration.default,
+                isListView = isListView,
+                onSortOrderClick = onSortOrderClick,
+                onChangeViewTypeClicked = onChangeViewTypeClicked,
+                showMediaDiscoveryButton = false,
+                onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                inSelectionMode = uiState.isInSelectionMode,
+                isContactVerificationOn = uiState.isContactVerificationOn
+            )
+        }
+    }
 }
+
+@CombinedThemePreviews
+@Composable
+private fun SearchContentPreSearchPreview() {
+    AndroidThemeForPreviews {
+        SearchContent(
+            uiState = SearchUiState(),
+            contentPadding = PaddingValues(0.dp),
+            isListView = true,
+            spanCount = 2,
+            onFilterClicked = {},
+            onMenuClicked = {},
+            onItemClicked = {},
+            onLongClicked = {},
+            onSortOrderClick = {},
+            onChangeViewTypeClicked = {},
+            onEnterMediaDiscoveryClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SearchContentEmptyPreview() {
+    AndroidThemeForPreviews {
+        SearchContent(
+            uiState = SearchUiState(
+                searchText = "test",
+                searchedQuery = "test",
+                nodesLoadingState = NodesLoadingState.FullyLoaded,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            isListView = true,
+            spanCount = 2,
+            onFilterClicked = {},
+            onMenuClicked = {},
+            onItemClicked = {},
+            onLongClicked = {},
+            onSortOrderClick = {},
+            onChangeViewTypeClicked = {},
+            onEnterMediaDiscoveryClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SearchContentLoadingPreview() {
+    AndroidThemeForPreviews {
+        SearchContent(
+            uiState = SearchUiState(
+                searchText = "test",
+                nodesLoadingState = NodesLoadingState.Loading,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            isListView = true,
+            spanCount = 2,
+            onFilterClicked = {},
+            onMenuClicked = {},
+            onItemClicked = {},
+            onLongClicked = {},
+            onSortOrderClick = {},
+            onChangeViewTypeClicked = {},
+            onEnterMediaDiscoveryClick = {},
+        )
+    }
+}
+
+internal const val SEARCH_CONTENT_PRE_SEARCH_TAG = "search_content:pre_search"
+internal const val SEARCH_CONTENT_EMPTY_TAG = "search_content:empty"
+internal const val SEARCH_CONTENT_RESULTS_TAG = "search_content:results"
