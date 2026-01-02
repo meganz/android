@@ -25,6 +25,9 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.pdf.CheckIfShouldDeleteLastPageViewedInPdfUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.SharesNavKey
+import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -35,12 +38,15 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val checkIfShouldDeleteLastPageViewedInPdfUseCase: CheckIfShouldDeleteLastPageViewedInPdfUseCase,
     @MegaApi private val megaApi: MegaApiAndroid,
+    private val megaNavigator: MegaNavigator,
 ) {
     operator fun invoke(nodeList: ArrayList<MegaNode>?) {
         nodeList?.toList()?.forEach { node ->
             when {
                 node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE.toLong()) -> {
-                    showSharedFolderNotification(node)
+                    applicationScope.launch {
+                        showSharedFolderNotification(node)
+                    }
                 }
 
                 node.hasChanged(MegaNode.CHANGE_TYPE_PUBLIC_LINK.toLong()) && node.publicLink != null -> {
@@ -63,7 +69,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
         }
     }
 
-    private fun showSharedFolderNotification(n: MegaNode) {
+    private suspend fun showSharedFolderNotification(n: MegaNode) {
         Timber.d("showSharedFolderNotification")
         try {
             val sharesIncoming = megaApi.inSharesList ?: return
@@ -88,13 +94,22 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                         Util.toCDATA(userName)
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
-            val intent: Intent = Intent(appContext, ManagerActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                .setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)
-            val pendingIntent = PendingIntent.getActivity(
-                appContext, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-            )
+            val pendingIntent = megaNavigator
+                .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, SharesNavKey>(
+                    context = appContext,
+                    createPendingIntent = { intent ->
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        intent.action = Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION
+
+                        PendingIntent.getActivity(
+                            appContext,
+                            0,
+                            intent,
+                            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+                        )
+                    },
+                    singleActivityDestination = { SharesNavKey }
+                )
             val notificationManager =
                 appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             val channel = NotificationChannel(

@@ -32,7 +32,8 @@ data class CloudDriveNavKey(
  * Shares route args
  */
 @Serializable
-data object SharesNavKey : NavKey
+@Parcelize
+data object SharesNavKey : NavKey, Parcelable
 
 /**
  * Offline route args

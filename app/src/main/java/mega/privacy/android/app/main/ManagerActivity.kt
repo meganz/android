@@ -1681,7 +1681,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         intent = null
                     } else if (intent.action == Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION) {
                         Timber.d("ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION")
-                        markNotificationsSeen(true)
                         drawerItem = DrawerItem.SHARED_ITEMS
                         viewModel.setSharesTab(SharesTab.INCOMING_TAB)
                         selectDrawerItem(drawerItem)
@@ -2786,7 +2785,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION -> {
                     Timber.d("ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION")
-                    markNotificationsSeen(true)
                     drawerItem = DrawerItem.SHARED_ITEMS
                     viewModel.setSharesTab(SharesTab.INCOMING_TAB)
                     selectDrawerItem(drawerItem)
