@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.fingerprintauth
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -30,6 +29,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.body2
 import mega.privacy.android.shared.original.core.ui.theme.jade_300
 import mega.privacy.android.shared.original.core.ui.theme.subtitle1
@@ -42,13 +44,14 @@ import mega.privacy.android.shared.resources.R as sharedResR
  * @param onCloseClick : Close icon click listener
  */
 @Composable
-fun SecurityUpgradeDialogView(
+fun LegacySecurityUpgradeDialogView(
     onOkClick: () -> Unit,
     onCloseClick: () -> Unit,
 ) {
-    Surface(modifier = Modifier
-        .padding(10.dp)
-        .fillMaxSize(),
+    Surface(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         color = if (MaterialTheme.colors.isLight) {
             Color.White
@@ -56,13 +59,12 @@ fun SecurityUpgradeDialogView(
             Color.Transparent
         },
         content = {
-
             Row(
                 horizontalArrangement = Arrangement.End,
             ) {
                 IconButton(
                     content = {
-                        Icon(
+                        MegaIcon(
                             modifier = Modifier
                                 .padding(top = 10.dp),
                             painter = if (MaterialTheme.colors.isLight) {
@@ -76,7 +78,8 @@ fun SecurityUpgradeDialogView(
                 )
             }
 
-            Column(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
+            Column(
+                modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 content = {
                     Image(
@@ -130,6 +133,19 @@ fun SecurityUpgradeDialogView(
                     )
 
                     Spacer(Modifier.height(10.dp))
-                })
-        })
+                },
+            )
+        },
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun SecurityUpgradeDialogViewPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        LegacySecurityUpgradeDialogView(
+            onOkClick = {},
+            onCloseClick = {},
+        )
+    }
 }
