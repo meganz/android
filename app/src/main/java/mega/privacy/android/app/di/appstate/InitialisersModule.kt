@@ -12,6 +12,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Onboard
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
@@ -73,6 +74,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideBusinessAccountExpiredInitialiser(initialiser: BusinessAccountExpiredInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideSecurityUpgradeInitialiser(initialiser: SecurityUpgradeInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides
