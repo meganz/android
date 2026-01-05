@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.widget
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -74,7 +75,7 @@ class MyAccountWidgetViewModel @Inject constructor(
                 storageQuotaLevel = quotaLevelMapper(usedPercentage, storageState),
                 accountTypeNameResource = accountTypeNameMapper(accountDetail.levelDetail?.accountType),
                 avatarFile = avatarFile,
-                avatarColor = avatarColor,
+                avatarColor = avatarColor?.let { color -> Color(color) } ?: Color.Unspecified,
                 isLoading = false
             )
         }.catch { Timber.e(it) }

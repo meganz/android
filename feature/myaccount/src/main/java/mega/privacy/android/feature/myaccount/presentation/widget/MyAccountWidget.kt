@@ -169,7 +169,8 @@ internal fun MyAccountWidget(
                 MediumProfilePicture(
                     imageFile = state.avatarFile,
                     contentDescription = state.name,
-                    name = state.name ?: ""
+                    name = state.name ?: "",
+                    avatarColor = state.avatarColor
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))
