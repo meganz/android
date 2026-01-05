@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -267,12 +268,12 @@ class CloudDriveViewModel @AssistedInject constructor(
             getNodeInfoByIdUseCase(uiState.value.currentFolderId)
         }.onSuccess { nodeInfo ->
             val title = if (nodeInfo?.isNodeKeyDecrypted == false) {
-                LocalizedText.StringRes(resId = mega.privacy.android.core.nodecomponents.R.string.shared_items_verify_credentials_undecrypted_folder)
+                LocalizedText.StringRes(resId = R.string.shared_items_verify_credentials_undecrypted_folder)
             } else {
                 LocalizedText.Literal(nodeInfo?.name ?: "")
             }
             // Only update state if fetched title is different
-            if (uiState.value.title != title) {
+            if (uiState.value.title != title) {-
                 _uiState.update { state ->
                     state.copy(title = title)
                 }
