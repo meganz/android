@@ -31,7 +31,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
@@ -72,7 +74,6 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_NO_WIFI_CONNECTION
         private const val NO_NETWORK_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_NETWORK_CONNECTION
-        private const val ACTION_SHOW_SETTINGS = Constants.ACTION_SHOW_SETTINGS
         private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVERQUOTA_STORAGE
     }
 
@@ -184,14 +185,34 @@ class CameraUploadsNotificationManager @Inject constructor(
         return builder.build()
     }
 
-    private fun getDefaultPendingIntent() = PendingIntent.getActivity(
-        context,
-        0,
-        Intent(context, ManagerActivity::class.java).apply {
-            action = ACTION_SHOW_CU_PROGRESS_VIEW
-        },
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-    )
+    private suspend fun getDefaultPendingIntent() = megaNavigator
+        .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, MediaMainNavKey>(
+            context = context,
+            createPendingIntent = { intent ->
+                intent.action = ACTION_SHOW_CU_PROGRESS_VIEW
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            },
+            singleActivityDestination = { MediaMainNavKey }
+        )
+
+    private suspend fun getCUSettingsPendingIntent() = megaNavigator
+        .getPendingIntentConsideringSingleActivityWithDestination<SettingsCameraUploadsActivity, SettingsCameraUploadsNavKey>(
+            context = context,
+            createPendingIntent = { intent ->
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+            },
+            singleActivityDestination = { SettingsCameraUploadsNavKey }
+        )
 
     /**
      * Display a notification for upload progress
@@ -206,7 +227,7 @@ class CameraUploadsNotificationManager @Inject constructor(
         progress: Int,
         areUploadsPaused: Boolean,
     ) {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val content = context.getString(
                 if (areUploadsPaused)
                     R.string.upload_service_notification_paused
@@ -257,12 +278,12 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      *  @progress an Int between 0 and 100
      */
-    private fun showVideoCompressionProgressNotification(
+    private suspend fun showVideoCompressionProgressNotification(
         progress: Int,
         currentFileIndex: Int,
         totalCount: Int,
     ) {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val content = context.getString(
                 R.string.title_compress_video,
                 currentFileIndex,
@@ -284,8 +305,8 @@ class CameraUploadsNotificationManager @Inject constructor(
     /**
      *  Display a notification for checking files to upload
      */
-    private fun showCheckUploadsNotification() {
-        getDefaultPendingIntent()?.let { defaultPendingIntent ->
+    private suspend fun showCheckUploadsNotification() {
+        getDefaultPendingIntent().let { defaultPendingIntent ->
             val notification = createNotification(
                 title = context.getString(R.string.section_photo_sync),
                 content = context.getString(R.string.settings_camera_notif_checking_title),
@@ -331,12 +352,6 @@ class CameraUploadsNotificationManager @Inject constructor(
         val notification = createNotification(
             title = context.getString(R.string.title_out_of_space),
             content = context.getString(R.string.message_out_of_space),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
-            ),
         )
         notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
     }
@@ -349,12 +364,6 @@ class CameraUploadsNotificationManager @Inject constructor(
         val notification = createNotification(
             title = context.getString(R.string.title_out_of_space),
             content = context.getString(R.string.error_not_enough_free_space),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java),
-                PendingIntent.FLAG_IMMUTABLE
-            ),
         )
         notificationManager.notify(NOT_ENOUGH_STORAGE_NOTIFICATION_ID, notification)
     }
@@ -372,14 +381,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                     getVideoCompressionSizeLimitUseCase().toString()
                 )
             ),
-            intent = PendingIntent.getActivity(
-                context,
-                0,
-                Intent(context, ManagerActivity::class.java).apply {
-                    action = ACTION_SHOW_SETTINGS
-                },
-                PendingIntent.FLAG_IMMUTABLE
-            ),
+            intent = getCUSettingsPendingIntent(),
         )
         notificationManager.notify(COMPRESSION_ERROR_NOTIFICATION_ID, notification)
     }
@@ -390,7 +392,7 @@ class CameraUploadsNotificationManager @Inject constructor(
      *
      * @param cameraUploadsFolderType
      */
-    private fun showFolderUnavailableNotification(cameraUploadsFolderType: CameraUploadFolderType) {
+    private suspend fun showFolderUnavailableNotification(cameraUploadsFolderType: CameraUploadFolderType) {
         val (resId, notificationId) = when (cameraUploadsFolderType) {
             CameraUploadFolderType.Primary ->
                 Pair(
@@ -410,14 +412,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             val notification = createNotification(
                 title = context.getString(R.string.section_photo_sync),
                 content = context.getString(resId),
-                intent = PendingIntent.getActivity(
-                    context,
-                    0,
-                    Intent(context, ManagerActivity::class.java).apply {
-                        action = ACTION_SHOW_SETTINGS
-                    },
-                    PendingIntent.FLAG_IMMUTABLE
-                ),
+                intent = getCUSettingsPendingIntent(),
             )
             notificationManager.notify(notificationId, notification)
         }
