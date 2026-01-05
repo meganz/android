@@ -1,7 +1,11 @@
 package mega.privacy.android.core.nodecomponents.sheet.sort
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -93,7 +97,7 @@ fun <T : SortOptionItem> SortBottomSheet(
     MegaModalBottomSheet(
         bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
         sheetState = sheetState,
-        modifier = modifier,
+        modifier = modifier.statusBarsPadding(),
         onDismissRequest = onDismissRequest
     ) {
         SecondaryHeaderListItem(
@@ -104,39 +108,44 @@ fun <T : SortOptionItem> SortBottomSheet(
             enableClick = false
         )
 
-        options.forEach { option ->
-            val isSelected = currentSort?.sortOptionItem == option
-            FlexibleLineListItem(
-                modifier = Modifier
-                    .testTag(option.testTag),
-                title = stringResource(option.displayName),
-                trailingElement = {
-                    if (isSelected) {
-                        MegaIcon(
-                            modifier = Modifier.size(24.dp),
-                            painter = rememberVectorPainter(
-                                if (currentSort?.sortDirection == SortDirection.Ascending) {
-                                    IconPack.Small.Thin.Outline.ArrowUp
-                                } else {
-                                    IconPack.Small.Thin.Outline.ArrowDown
-                                }
-                            ),
-                            contentDescription = currentSort?.sortDirection?.name,
-                            tint = IconColor.Secondary,
-                        )
-                    }
-                },
-                onClickListener = {
-                    val result = if (isSelected) {
-                        selectedSort?.toggleOrder()
-                    } else {
-                        option.toSortResult()
-                    }
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+        ) {
+            options.forEach { option ->
+                val isSelected = currentSort?.sortOptionItem == option
+                FlexibleLineListItem(
+                    modifier = Modifier
+                        .testTag(option.testTag),
+                    title = stringResource(option.displayName),
+                    trailingElement = {
+                        if (isSelected) {
+                            MegaIcon(
+                                modifier = Modifier.size(24.dp),
+                                painter = rememberVectorPainter(
+                                    if (currentSort?.sortDirection == SortDirection.Ascending) {
+                                        IconPack.Small.Thin.Outline.ArrowUp
+                                    } else {
+                                        IconPack.Small.Thin.Outline.ArrowDown
+                                    }
+                                ),
+                                contentDescription = currentSort?.sortDirection?.name,
+                                tint = IconColor.Secondary,
+                            )
+                        }
+                    },
+                    onClickListener = {
+                        val result = if (isSelected) {
+                            selectedSort?.toggleOrder()
+                        } else {
+                            option.toSortResult()
+                        }
 
-                    internalSort = result
-                    onSortOptionSelected(result)
-                }
-            )
+                        internalSort = result
+                        onSortOptionSelected(result)
+                    }
+                )
+            }
         }
     }
 }

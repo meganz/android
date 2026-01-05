@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.sheet.upload
 
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -43,7 +43,7 @@ fun UploadOptionsBottomSheet(
     bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
     onDismissRequest = onDismissSheet,
     modifier = modifier
-        .fillMaxWidth()
+        .statusBarsPadding()
         .semantics { testTagsAsResourceId = true }
         .testTag(TEST_TAG_UPLOAD_OPTIONS_SHEET),
     sheetState = sheetState,
