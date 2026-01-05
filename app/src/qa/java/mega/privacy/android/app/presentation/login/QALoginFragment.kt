@@ -13,11 +13,11 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -31,6 +31,9 @@ class QALoginFragment : DialogFragment() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
+
     private val qaLoginViewModel by viewModels<QALoginViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +44,7 @@ class QALoginFragment : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
@@ -76,17 +79,19 @@ class QALoginFragment : DialogFragment() {
     }
 
     private fun navigateToMainActivity() {
-        try {
-            val intent = Intent(requireContext(), ManagerActivity::class.java).apply {
-                action = Constants.ACTION_REFRESH
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching {
+            context?.let {
+                megaNavigator.openManagerActivity(
+                    context = it,
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
+                    singleActivityDestination = HomeScreensNavKey(),
+                )
+
+                activity?.finish()
+                dismiss()
             }
-            startActivity(intent)
-            activity?.finish()
-            dismiss()
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to navigate to ManagerActivity")
+        }.onFailure {
+            Timber.e(it, "Failed to navigate to ManagerActivity")
         }
     }
 }

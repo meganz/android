@@ -16,29 +16,34 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.account.model.QAAccountSwitchEvent
-import mega.privacy.android.core.sharedcomponents.canBeHandled
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.account.QAAccountViewModel
+import mega.privacy.android.app.presentation.account.model.QAAccountSwitchEvent
 import mega.privacy.android.app.presentation.featureflag.FeatureFlagActivity
 import mega.privacy.android.app.presentation.login.QALoginFragment
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.canBeHandled
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import timber.log.Timber
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import mega.privacy.android.app.arch.extensions.collectFlow
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class QASettingsFragment : PreferenceFragmentCompat() {
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
     private val settingViewModel by viewModels<QASettingViewModel>()
     private val accountViewModel by viewModels<QAAccountViewModel>()
 
@@ -153,7 +158,7 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     private fun formatAccountSummary(
         timestamp: Long?,
         remark: String?,
-        isCurrentAccount: Boolean
+        isCurrentAccount: Boolean,
     ): String {
         val loginTimeText = if (timestamp != null) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -308,16 +313,18 @@ class QASettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun navigateToMainActivity() {
-        try {
-            val intent = Intent(requireContext(), ManagerActivity::class.java).apply {
-                action = Constants.ACTION_REFRESH
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching {
+            context?.let {
+                megaNavigator.openManagerActivity(
+                    context = it,
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
+                    singleActivityDestination = HomeScreensNavKey(),
+                )
+
+                activity?.finish()
             }
-            startActivity(intent)
-            activity?.finish()
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to navigate to ManagerActivity")
+        }.onFailure {
+            Timber.e(it, "Failed to navigate to ManagerActivity")
         }
     }
 
