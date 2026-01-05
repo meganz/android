@@ -273,7 +273,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                 LocalizedText.Literal(nodeInfo?.name ?: "")
             }
             // Only update state if fetched title is different
-            if (uiState.value.title != title) {
+            if (uiState.value.title != title) {-
                 _uiState.update { state ->
                     state.copy(title = title)
                 }

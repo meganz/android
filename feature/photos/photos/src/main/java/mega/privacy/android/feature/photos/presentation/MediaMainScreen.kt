@@ -436,6 +436,16 @@ fun MediaMainScreen(
         setNavigationItemVisibility(!isTimelineInSelectionMode)
     }
 
+    BackHandler(isAlbumInSelectionMode) {
+        if (isAlbumInSelectionMode) {
+            albumsTabViewModel.clearAlbumsSelection()
+        }
+    }
+
+    LaunchedEffect(isAlbumInSelectionMode) {
+        setNavigationItemVisibility(!isAlbumInSelectionMode)
+    }
+
     BackHandler(isVideosTabSearchBarVisible) {
         if (isVideosTabSearchBarVisible) {
             isVideosTabSearchBarVisible = false
@@ -496,7 +506,7 @@ fun MediaMainScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             AddContentFab(
-                visible = currentTabIndex == MediaScreen.Albums.ordinal,
+                visible = currentTabIndex == MediaScreen.Albums.ordinal && !isAlbumInSelectionMode,
                 onClick = viewModel::showNewAlbumDialog
             )
         },
@@ -736,7 +746,7 @@ fun MediaMainScreen(
                 .fillMaxSize()
                 .padding(paddingValues.excludingBottomPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = isTimelineInSelectionMode || isVideosSelectionMode || shouldHideTabs,
+            hideTabs = isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode || shouldHideTabs,
             pagerScrollEnabled = true,
             initialSelectedIndex = currentTabIndex,
             onTabSelected = { index ->
@@ -752,7 +762,7 @@ fun MediaMainScreen(
                                 MediaContent(
                                     modifier = modifier.fillMaxSize(),
                                     timelineContentPadding = PaddingValues(
-                                        bottom = if (isTimelineInSelectionMode || isVideosSelectionMode) {
+                                        bottom = if (isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode) {
                                             paddingValues.calculateBottomPadding()
                                         } else {
                                             50.dp
