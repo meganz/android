@@ -4,10 +4,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.MultipleNodesRestoreResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +24,7 @@ internal class RestoreNodesUseCaseTest {
 
     private val moveNodeUseCase: MoveNodeUseCase = mock()
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase = mock()
-    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase = mock()
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase = mock()
     private val accountRepository: AccountRepository = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
 
@@ -32,7 +33,7 @@ internal class RestoreNodesUseCaseTest {
         underTest = RestoreNodesUseCase(
             moveNodeUseCase = moveNodeUseCase,
             isNodeInRubbishOrDeletedUseCase = isNodeInRubbishOrDeletedUseCase,
-            getNodeNameByIdUseCase = getNodeNameByIdUseCase,
+            getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
             accountRepository = accountRepository,
             getRootNodeIdUseCase = getRootNodeIdUseCase
         )
@@ -42,11 +43,14 @@ internal class RestoreNodesUseCaseTest {
     fun `test that moves to root when destination is in rubbish bin or deleted`() = runTest {
         val moveFirstNode = 1L to 2L
         val rootNodeId = NodeId(999L)
-        val rootNodeName = "Cloud Drive"
+        val rootNodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Cloud Drive")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
 
         whenever(isNodeInRubbishOrDeletedUseCase(moveFirstNode.second)).thenReturn(true)
         whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
-        whenever(getNodeNameByIdUseCase(rootNodeId)).thenReturn(rootNodeName)
+        whenever(getNodeInfoByIdUseCase(rootNodeId)).thenReturn(rootNodeInfo)
         whenever(moveNodeUseCase(NodeId(moveFirstNode.first), rootNodeId))
             .thenReturn(NodeId(moveFirstNode.first))
 
@@ -54,12 +58,12 @@ internal class RestoreNodesUseCaseTest {
 
         verify(moveNodeUseCase).invoke(NodeId(moveFirstNode.first), rootNodeId)
         verify(getRootNodeIdUseCase).invoke()
-        verify(getNodeNameByIdUseCase).invoke(rootNodeId)
+        verify(getNodeInfoByIdUseCase).invoke(rootNodeId)
         verify(accountRepository).resetAccountDetailsTimeStamp()
         assertThat(result).isInstanceOf(SingleNodeRestoreResult::class.java)
         val singleResult = result as SingleNodeRestoreResult
         assertThat(singleResult.successCount).isEqualTo(1)
-        assertThat(singleResult.destinationFolderName).isEqualTo(rootNodeName)
+        assertThat(singleResult.destinationFolderName).isEqualTo(rootNodeInfo.name)
         assertThat(singleResult.destinationHandle).isEqualTo(rootNodeId.longValue)
     }
 
@@ -67,20 +71,29 @@ internal class RestoreNodesUseCaseTest {
     fun `test that uses original destination when not in rubbish bin and not deleted`() = runTest {
         val moveFirstNode = 1L to 100L
         val destinationNodeId = NodeId(moveFirstNode.second)
-        val destinationNodeName = "Destination Folder"
+        val destinationNodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Destination Folder")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
 
         whenever(isNodeInRubbishOrDeletedUseCase(moveFirstNode.second)).thenReturn(false)
-        whenever(getNodeNameByIdUseCase(destinationNodeId)).thenReturn(destinationNodeName)
+        whenever(getNodeInfoByIdUseCase(destinationNodeId)).thenReturn(destinationNodeInfo)
         whenever(moveNodeUseCase(NodeId(moveFirstNode.first), destinationNodeId))
             .thenReturn(NodeId(moveFirstNode.first))
 
         val result = underTest(mapOf(moveFirstNode))
 
         verify(moveNodeUseCase).invoke(NodeId(moveFirstNode.first), destinationNodeId)
-        verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
+        verify(getNodeInfoByIdUseCase).invoke(destinationNodeId)
         verifyNoInteractions(getRootNodeIdUseCase)
         verify(accountRepository).resetAccountDetailsTimeStamp()
-        assertThat(result).isEqualTo(SingleNodeRestoreResult(1, destinationNodeName, moveFirstNode.second))
+        assertThat(result).isEqualTo(
+            SingleNodeRestoreResult(
+                1,
+                destinationNodeInfo.name,
+                moveFirstNode.second
+            )
+        )
     }
 
     @Test
@@ -116,15 +129,24 @@ internal class RestoreNodesUseCaseTest {
         runTest {
             val moveFirstNode = 1L to 100L
             val destinationNodeId = NodeId(moveFirstNode.second)
-            val nodeName = "name"
+            val nodeInfo = mock<NodeInfo> {
+                on { name }.thenReturn("name")
+                on { isNodeKeyDecrypted }.thenReturn(true)
+            }
             whenever(isNodeInRubbishOrDeletedUseCase(moveFirstNode.second)).thenReturn(false)
-            whenever(getNodeNameByIdUseCase(destinationNodeId)).thenReturn(nodeName)
+            whenever(getNodeInfoByIdUseCase(destinationNodeId)).thenReturn(nodeInfo)
             whenever(moveNodeUseCase(NodeId(moveFirstNode.first), destinationNodeId))
                 .thenReturn(NodeId(moveFirstNode.first))
             val result = underTest(mapOf(moveFirstNode))
-        verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
-        verify(accountRepository).resetAccountDetailsTimeStamp()
-        assertThat(result).isEqualTo(SingleNodeRestoreResult(1, nodeName, moveFirstNode.second))
+            verify(getNodeInfoByIdUseCase).invoke(destinationNodeId)
+            verify(accountRepository).resetAccountDetailsTimeStamp()
+            assertThat(result).isEqualTo(
+                SingleNodeRestoreResult(
+                    1,
+                    nodeInfo.name,
+                    moveFirstNode.second
+                )
+            )
         }
 
     @Test
@@ -143,11 +165,14 @@ internal class RestoreNodesUseCaseTest {
     fun `test that uses original destination when root node ID is null`() = runTest {
         val moveFirstNode = 1L to 2L
         val destinationNodeId = NodeId(moveFirstNode.second)
-        val destinationNodeName = "Original Destination"
+        val destinationNodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Original Destination")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
 
         whenever(isNodeInRubbishOrDeletedUseCase(moveFirstNode.second)).thenReturn(true)
         whenever(getRootNodeIdUseCase()).thenReturn(null)
-        whenever(getNodeNameByIdUseCase(destinationNodeId)).thenReturn(destinationNodeName)
+        whenever(getNodeInfoByIdUseCase(destinationNodeId)).thenReturn(destinationNodeInfo)
         whenever(moveNodeUseCase(NodeId(moveFirstNode.first), destinationNodeId))
             .thenReturn(NodeId(moveFirstNode.first))
 
@@ -155,12 +180,12 @@ internal class RestoreNodesUseCaseTest {
 
         verify(getRootNodeIdUseCase).invoke()
         verify(moveNodeUseCase).invoke(NodeId(moveFirstNode.first), destinationNodeId)
-        verify(getNodeNameByIdUseCase).invoke(destinationNodeId)
+        verify(getNodeInfoByIdUseCase).invoke(destinationNodeId)
         verify(accountRepository).resetAccountDetailsTimeStamp()
         assertThat(result).isInstanceOf(SingleNodeRestoreResult::class.java)
         val singleResult = result as SingleNodeRestoreResult
         assertThat(singleResult.successCount).isEqualTo(1)
-        assertThat(singleResult.destinationFolderName).isEqualTo(destinationNodeName)
+        assertThat(singleResult.destinationFolderName).isEqualTo(destinationNodeInfo.name)
         assertThat(singleResult.destinationHandle).isEqualTo(moveFirstNode.second)
     }
 }

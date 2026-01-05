@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.repository.AccountRepository
-import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class RestoreNodesUseCase @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val isNodeInRubbishOrDeletedUseCase: IsNodeInRubbishOrDeletedUseCase,
-    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase,
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
     private val accountRepository: AccountRepository,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
 ) {
@@ -60,7 +60,7 @@ class RestoreNodesUseCase @Inject constructor(
                 destinationFolderName = takeIf { successCount > 0 }
                     ?.let {
                         val actualDestinationHandle = results.first().second
-                        getNodeNameByIdUseCase(NodeId(actualDestinationHandle))
+                        getNodeInfoByIdUseCase(NodeId(actualDestinationHandle))?.name
                     },
                 destinationHandle = takeIf { successCount > 0 }
                     ?.let { results.first().second }

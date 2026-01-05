@@ -36,7 +36,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -63,7 +63,7 @@ import timber.log.Timber
 
 @HiltViewModel(assistedFactory = CloudDriveViewModel.Factory::class)
 class CloudDriveViewModel @AssistedInject constructor(
-    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase,
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
@@ -264,9 +264,13 @@ class CloudDriveViewModel @AssistedInject constructor(
 
     private suspend fun updateTitle() {
         runCatching {
-            getNodeNameByIdUseCase(uiState.value.currentFolderId)
-        }.onSuccess { nodeName ->
-            val title = LocalizedText.Literal(nodeName ?: "")
+            getNodeInfoByIdUseCase(uiState.value.currentFolderId)
+        }.onSuccess { nodeInfo ->
+            val title = if (nodeInfo?.isNodeKeyDecrypted == false) {
+                LocalizedText.StringRes(resId = mega.privacy.android.core.nodecomponents.R.string.shared_items_verify_credentials_undecrypted_folder)
+            } else {
+                LocalizedText.Literal(nodeInfo?.name ?: "")
+            }
             // Only update state if fetched title is different
             if (uiState.value.title != title) {
                 _uiState.update { state ->

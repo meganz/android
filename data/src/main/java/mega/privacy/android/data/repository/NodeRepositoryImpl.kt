@@ -59,6 +59,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -1274,9 +1275,12 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.getRootNode()?.let { NodeId(it.handle) }
     }
 
-    override suspend fun getNodeNameById(nodeId: NodeId): String? = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.name
-    }
+    override suspend fun getNodeInfoByIdUseCase(nodeId: NodeId): NodeInfo? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+                NodeInfo(node.name, node.isNodeKeyDecrypted)
+            }
+        }
 
     override suspend fun getTypedNodesById(
         nodeId: NodeId,

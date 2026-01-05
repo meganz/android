@@ -26,13 +26,14 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
-import mega.privacy.android.domain.usecase.GetNodeNameByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -72,7 +73,7 @@ import org.robolectric.annotation.Config
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
 class CloudDriveViewModelTest {
-    private val getNodeNameByIdUseCase: GetNodeNameByIdUseCase = mock()
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase = mock()
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase = mock()
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
@@ -108,7 +109,7 @@ class CloudDriveViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
         reset(
-            getNodeNameByIdUseCase,
+            getNodeInfoByIdUseCase,
             getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase,
             setViewTypeUseCase,
@@ -135,7 +136,7 @@ class CloudDriveViewModelTest {
         nodeHandle: Long = folderNodeHandle,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     ) = CloudDriveViewModel(
-        getNodeNameByIdUseCase = getNodeNameByIdUseCase,
+        getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
         getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
@@ -166,7 +167,11 @@ class CloudDriveViewModelTest {
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
-        whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
+        val nodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Test folder")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        whenever(getNodeInfoByIdUseCase(eq(folderNodeId))).thenReturn(nodeInfo)
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
         // Setup the new chunked use case to return a flow with the items and hasMore flag
@@ -229,7 +234,11 @@ class CloudDriveViewModelTest {
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
-        whenever(getNodeNameByIdUseCase(eq(folderNodeId))).thenReturn("Test folder")
+        val nodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Test folder")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        whenever(getNodeInfoByIdUseCase(eq(folderNodeId))).thenReturn(nodeInfo)
         whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
 
         // Setup the new chunked use case to return a flow with the items and hasMore = true (partial load)
@@ -306,14 +315,35 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that title is updated correctly`() = runTest {
-        whenever(getNodeNameByIdUseCase(any())).thenReturn("Test Folder2")
+    fun `test that title is updated correctly when node key is decrypted`() = runTest {
+        val nodeName = "Test Folder2"
+        val nodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn(nodeName)
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
+        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
         setupTestData(emptyList())
         val underTest = createViewModel()
         advanceUntilIdle()
         underTest.uiState.test {
             val updatedState = awaitItem()
-            assertThat(updatedState.title).isEqualTo(LocalizedText.Literal("Test Folder2"))
+            assertThat(updatedState.title).isEqualTo(LocalizedText.Literal(nodeName))
+        }
+    }
+
+    @Test
+    fun `test that title is updated correctly when node key is not decrypted`() = runTest {
+        val nodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn("Test Folder2")
+            on { isNodeKeyDecrypted }.thenReturn(false)
+        }
+        whenever(getNodeInfoByIdUseCase(any())).thenReturn(nodeInfo)
+        setupTestData(emptyList())
+        val underTest = createViewModel()
+        advanceUntilIdle()
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.title).isEqualTo(LocalizedText.StringRes(resId = mega.privacy.android.core.nodecomponents.R.string.shared_items_verify_credentials_undecrypted_folder))
         }
     }
 
