@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -33,13 +34,18 @@ class AdsViewModelTest {
     private val monitorGoogleConsentLoadedUseCase: MonitorGoogleConsentLoadedUseCase = mock {
         on { invoke() }.thenReturn(flowOf())
     }
+    private val monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase = mock {
+        on { invoke() }.thenReturn(flowOf())
+    }
 
     @BeforeEach
     fun resetMocks() {
         reset(
             getFeatureFlagValueUseCase,
             consentInformation,
+            monitorUpdateUserDataUseCase,
         )
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
     }
 
     private fun initTestClass() {
@@ -47,12 +53,14 @@ class AdsViewModelTest {
             getFeatureFlagValueUseCase,
             consentInformation,
             monitorGoogleConsentLoadedUseCase,
+            monitorUpdateUserDataUseCase,
         )
     }
 
     @Test
     fun `test initial state should have null request`() {
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         assertThat(underTest.uiState.value.request).isNull()
@@ -65,6 +73,7 @@ class AdsViewModelTest {
             whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
             whenever(consentInformation.canRequestAds()).thenReturn(true)
             whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+            whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
             initTestClass()
 
             underTest.scheduleRefreshAds()
@@ -82,6 +91,7 @@ class AdsViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(false)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -97,6 +107,7 @@ class AdsViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(false)
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -114,6 +125,7 @@ class AdsViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -132,6 +144,7 @@ class AdsViewModelTest {
         whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
         whenever(consentInformation.canRequestAds()).thenReturn(true)
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -148,6 +161,7 @@ class AdsViewModelTest {
         whenever(getFeatureFlagValueUseCase(any())).doThrow(RuntimeException("Feature flag error"))
         whenever(consentInformation.canRequestAds()).thenReturn(true)
         whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(false))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf())
         initTestClass()
 
         underTest.scheduleRefreshAds()
@@ -156,6 +170,23 @@ class AdsViewModelTest {
 
         assertThat(underTest.uiState.value.request).isNull()
         assertThat(underTest.uiState.value.isAdsFeatureEnabled).isFalse()
+    }
+
+    @Test
+    fun `test when user data updates should reset feature flag and reschedule ads`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag)).thenReturn(true)
+        whenever(consentInformation.canRequestAds()).thenReturn(true)
+        whenever(monitorGoogleConsentLoadedUseCase()).thenReturn(flowOf(true))
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(flowOf(Unit, Unit))
+        initTestClass()
+
+        delay(1000L)
+
+        // After user data updates, feature flag should be reset and ads rescheduled
+        // The first emission is dropped, so we need at least 2 emissions
+        assertThat(underTest.uiState.value.isAdsFeatureEnabled).isNotNull()
+        
+        underTest.cancelRefreshAds()
     }
 
     companion object {

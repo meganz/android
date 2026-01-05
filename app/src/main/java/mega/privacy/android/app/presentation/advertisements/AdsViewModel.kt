@@ -9,12 +9,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.advertisements.MonitorGoogleConsentLoadedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import timber.log.Timber
@@ -28,6 +31,7 @@ class AdsViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val consentInformation: ConsentInformation,
     private val monitorGoogleConsentLoadedUseCase: MonitorGoogleConsentLoadedUseCase,
+    private val monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AdsUiState())
 
@@ -49,6 +53,16 @@ class AdsViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            monitorUpdateUserDataUseCase()
+                .drop(1) // drop the initial value when app starts
+                .collectLatest {
+                    Timber.d("Account updated, resetting ads feature flag")
+                    _uiState.update { it.copy(isAdsFeatureEnabled = null) }
+                    cancelRefreshAds()
+                    scheduleRefreshAds()
+                }
+        }
     }
 
     /**
@@ -65,6 +79,8 @@ class AdsViewModel @Inject constructor(
                     Timber.d("Refreshing AdRequest")
                     createNewAdRequestIfNeeded()
                 }
+            } else {
+                _uiState.update { it.copy(request = null) }
             }
         }
     }
@@ -98,11 +114,11 @@ class AdsViewModel @Inject constructor(
                 it.copy(isAdsFeatureEnabled = getFeatureFlagValueUseCase(ApiFeatures.GoogleAdsFeatureFlag))
             }
             Timber.d("Ads feature enabled: ${_uiState.value.isAdsFeatureEnabled}")
-        }.onFailure {
+        }.onFailure { e ->
             _uiState.update {
                 it.copy(isAdsFeatureEnabled = false)
             }
-            Timber.e(it, "Error getting feature flag value")
+            Timber.e(e, "Error getting feature flag value")
         }
     }
 
