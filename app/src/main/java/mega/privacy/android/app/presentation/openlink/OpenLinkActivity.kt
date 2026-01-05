@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_MAIN
 import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
@@ -245,14 +246,23 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                     viewModel.onResetPasswordLinkResultConsumed()
                 }
                 if (navigateToSingleActivity) {
+                    val isFromHistory =
+                        (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0
                     MegaActivity.getIntent(
                         this@OpenLinkActivity,
-                        action = ACTION_DEEP_LINKS,
-                    ).also { intent ->
-                        intent.data = this@OpenLinkActivity.intent.data
-                        startActivity(intent)
-                        finish()
+                        action = if (isFromHistory) ACTION_MAIN else ACTION_DEEP_LINKS,
+                    ).also { megaActivityIntent ->
+                        if (!isFromHistory) {
+                            megaActivityIntent.data = intent.data
+                        }
+                        startActivity(megaActivityIntent)
                     }
+                    intent = Intent(intent).apply {
+                        action = ACTION_VIEW
+                        data = null
+                        replaceExtras(Bundle())
+                    }
+                    finish()
                 }
 
                 urlToOpen?.let { url -> openWebLink(url) }
