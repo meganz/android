@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.widget
 
+import androidx.compose.ui.graphics.Color
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -81,7 +82,7 @@ class MyAccountWidgetViewModelTest {
         assertThat(initialState.isLoading).isTrue() // isLoading is set to false after account data loads
         assertThat(initialState.name).isNull() // Name is loaded in init
         assertThat(initialState.avatarFile).isNull()
-        assertThat(initialState.avatarColor).isNull() // Color is loaded
+        assertThat(initialState.avatarColor).isEqualTo(Color.Unspecified)
         assertThat(initialState.usedStorage).isEqualTo(0L)
         assertThat(initialState.totalStorage).isEqualTo(0L)
         assertThat(initialState.usedStoragePercentage).isEqualTo(0)
@@ -266,7 +267,7 @@ class MyAccountWidgetViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.avatarFile).isEqualTo(avatarFile)
-            assertThat(state.avatarColor).isEqualTo(avatarColor)
+            assertThat(state.avatarColor).isEqualTo(Color(avatarColor))
             // Note: getMyAvatarFileUseCase is called 3 times total:
             // 1. onStart with isForceRefresh=false
             // 2. onStart with isForceRefresh=true  
@@ -312,7 +313,7 @@ class MyAccountWidgetViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.avatarFile).isEqualTo(avatarFile)
-            assertThat(state.avatarColor).isNull() // Color should be null on error
+            assertThat(state.avatarColor).isEqualTo(Color.Unspecified) // Color should be default on error
             cancelAndIgnoreRemainingEvents()
         }
     }
