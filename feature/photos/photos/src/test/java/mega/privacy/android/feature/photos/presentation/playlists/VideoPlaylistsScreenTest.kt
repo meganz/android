@@ -26,7 +26,7 @@ class VideoPlaylistsScreenTest {
 
     private fun setComposeContent(
         uiState: VideoPlaylistsTabUiState = VideoPlaylistsTabUiState.Data(),
-        showRemoveDialog: Boolean = false,
+        showVideoPlaylistRemovedDialog: Boolean = false,
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
         onClick: (VideoPlaylistUiEntity) -> Unit = {},
@@ -39,7 +39,7 @@ class VideoPlaylistsScreenTest {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
                 uiState = uiState,
-                showRemoveDialog = showRemoveDialog,
+                showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
                 onSortNodes = onSortNodes,
                 modifier = modifier,
                 onClick = onClick,
@@ -127,7 +127,7 @@ class VideoPlaylistsScreenTest {
             uiState = VideoPlaylistsTabUiState.Data(
                 videoPlaylistEntities = listOf(video)
             ),
-            showRemoveDialog = true
+            showVideoPlaylistRemovedDialog = true
         )
 
         VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()

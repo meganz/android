@@ -8,6 +8,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -33,6 +34,9 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoPlaylistItemView
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
@@ -50,7 +54,7 @@ fun VideoPlaylistsTabRoute(
 
     VideoPlaylistsTabScreen(
         uiState = uiState,
-        showRemoveDialog = showVideoPlaylistRemovedDialog,
+        showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
         modifier = modifier,
         onSortNodes = viewModel::setCloudSortOrder,
         onClick = viewModel::onItemClicked,
@@ -65,7 +69,7 @@ fun VideoPlaylistsTabRoute(
 @Composable
 internal fun VideoPlaylistsTabScreen(
     uiState: VideoPlaylistsTabUiState,
-    showRemoveDialog: Boolean,
+    showVideoPlaylistRemovedDialog: Boolean,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
     onClick: (VideoPlaylistUiEntity) -> Unit = {},
@@ -73,7 +77,7 @@ internal fun VideoPlaylistsTabScreen(
     onConsumedPlaylistRemovedEvent: () -> Unit = {},
     onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
     onRemovedDialogDismiss: () -> Unit = {},
-    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue()
+    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
@@ -81,6 +85,19 @@ internal fun VideoPlaylistsTabScreen(
 
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var selectedVideoPlaylist by remember { mutableStateOf<VideoPlaylistUiEntity?>(null) }
+
+    var showRemovedDialog by rememberSaveable(showVideoPlaylistRemovedDialog) {
+        mutableStateOf(showVideoPlaylistRemovedDialog)
+    }
+
+    val dismissDialog: () -> Unit = {
+        onRemovedDialogDismiss()
+        showRemovedDialog = false
+    }
 
     when (uiState) {
         is VideoPlaylistsTabUiState.Loading -> NodesViewSkeleton(
@@ -153,7 +170,10 @@ internal fun VideoPlaylistsTabScreen(
                             isSelected = videoPlaylistItem.isSelected,
                             isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
                             onClick = { onClick(videoPlaylistItem) },
-                            onMenuClick = {},
+                            onMenuClick = {
+                                showPlaylistBottomSheet = true
+                                selectedVideoPlaylist = videoPlaylistItem
+                            },
                             onLongClick = { onLongClick(videoPlaylistItem) }
                         )
                     }
@@ -185,7 +205,7 @@ internal fun VideoPlaylistsTabScreen(
                     )
                 }
 
-                if (showRemoveDialog) {
+                if (showRemovedDialog) {
                     BasicDialog(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
@@ -195,11 +215,44 @@ internal fun VideoPlaylistsTabScreen(
                         positiveButtonText = stringResource(R.string.video_section_playlists_delete_playlist_dialog_delete_button),
                         negativeButtonText = stringResource(R.string.general_dialog_cancel_button),
                         onPositiveButtonClicked = {
-                            onDeleteButtonClicked(uiState.selectedPlaylists)
-                            onRemovedDialogDismiss()
+                            val playlists = uiState.selectedPlaylists.ifEmpty {
+                                selectedVideoPlaylist?.let(::setOf).orEmpty()
+                            }
+                            onDeleteButtonClicked(playlists)
+                            if (selectedVideoPlaylist != null) {
+                                selectedVideoPlaylist = null
+                            }
+                            dismissDialog()
                         },
-                        onNegativeButtonClicked = onRemovedDialogDismiss,
-                        onDismiss = onRemovedDialogDismiss
+                        onNegativeButtonClicked = dismissDialog,
+                        onDismiss = dismissDialog
+                    )
+                }
+
+                if (showPlaylistBottomSheet) {
+                    VideoPlaylistBottomSheet(
+                        actions = listOf(
+                            VideoPlaylistRenameMenuAction(),
+                            VideoPlaylistsTrashMenuAction()
+                        ),
+                        sheetState = playlistBottomSheetState,
+                        onActionClicked = { action ->
+                            when (action) {
+                                is VideoPlaylistRenameMenuAction -> {
+                                    //TODO rename functionality will be finished in another ticket
+                                }
+
+                                is VideoPlaylistsTrashMenuAction -> {
+                                    showRemovedDialog = true
+                                    showPlaylistBottomSheet = false
+                                }
+                            }
+                        },
+                        onDismissRequest = {
+                            showPlaylistBottomSheet = false
+                            selectedVideoPlaylist = null
+                        },
+                        modifier = Modifier
                     )
                 }
             }
