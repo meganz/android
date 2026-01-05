@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -343,7 +344,7 @@ class CloudDriveViewModelTest {
         advanceUntilIdle()
         underTest.uiState.test {
             val updatedState = awaitItem()
-            assertThat(updatedState.title).isEqualTo(LocalizedText.StringRes(resId = mega.privacy.android.core.nodecomponents.R.string.shared_items_verify_credentials_undecrypted_folder))
+            assertThat(updatedState.title).isEqualTo(LocalizedText.StringRes(resId = R.string.shared_items_verify_credentials_undecrypted_folder))
         }
     }
 
