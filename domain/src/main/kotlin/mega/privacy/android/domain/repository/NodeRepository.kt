@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -905,12 +906,12 @@ interface NodeRepository {
     suspend fun getRootNodeId(): NodeId?
 
     /**
-     * Get node name by id
+     * Get node info by id
      *
      * @param nodeId
-     * @return The node name if found else null
+     * @return The NodeInfo if found else null
      */
-    suspend fun getNodeNameById(nodeId: NodeId): String?
+    suspend fun getNodeInfoByIdUseCase(nodeId: NodeId): NodeInfo?
 
     /**
      * Get full node path by id.

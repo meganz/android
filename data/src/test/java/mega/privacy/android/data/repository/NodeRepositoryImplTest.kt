@@ -49,6 +49,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
@@ -1661,25 +1662,31 @@ internal class NodeRepositoryImplTest {
     }
 
     @Test
-    fun `test that getNodeNameById returns node name when node exists`() = runTest {
+    fun `test that getNodeInfoById returns node info when node exists`() = runTest {
         val nodeId = NodeId(123L)
         val expectedName = "TestNode.txt"
+        val expectedNodeInfo = mock<NodeInfo> {
+            on { name }.thenReturn(expectedName)
+            on { isNodeKeyDecrypted }.thenReturn(true)
+        }
         val megaNode = mock<MegaNode> {
             on { name }.thenReturn(expectedName)
+            on { isNodeKeyDecrypted }.thenReturn(true)
         }
         whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
 
-        val actual = underTest.getNodeNameById(nodeId)
+        val actual = underTest.getNodeInfoByIdUseCase(nodeId)
 
-        assertThat(actual).isEqualTo(expectedName)
+        assertThat(actual?.name).isEqualTo(expectedNodeInfo.name)
+        assertThat(actual?.isNodeKeyDecrypted).isEqualTo(expectedNodeInfo.isNodeKeyDecrypted)
     }
 
     @Test
-    fun `test that getNodeNameById returns null when node does not exist`() = runTest {
+    fun `test that getNodeInfoById returns null when node does not exist`() = runTest {
         val nodeId = NodeId(123L)
         whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(null)
 
-        val actual = underTest.getNodeNameById(nodeId)
+        val actual = underTest.getNodeInfoByIdUseCase(nodeId)
 
         assertThat(actual).isNull()
     }
