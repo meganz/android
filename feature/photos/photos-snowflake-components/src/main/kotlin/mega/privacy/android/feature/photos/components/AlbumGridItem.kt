@@ -16,6 +16,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
@@ -49,6 +51,7 @@ fun AlbumGridItem(
     errorPlaceholder: Painter? = null,
     isExported: Boolean = false,
     isSelected: Boolean = false,
+    isSensitive: Boolean = false
 ) {
     val albumItemShape = RoundedCornerShape(4.dp)
 
@@ -76,7 +79,9 @@ fun AlbumGridItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(shape = albumItemShape),
+                    .clip(shape = albumItemShape)
+                    .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
+                    .blur(0.dp.takeIf { !isSensitive } ?: 16.dp),
                 model = ImageRequest
                     .Builder(LocalContext.current)
                     .data(coverImage)

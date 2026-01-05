@@ -124,6 +124,8 @@ internal fun AlbumsTabScreen(
                 val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
                 val userAlbum = album.mediaAlbum as? MediaAlbum.User
                 val isSelected = userAlbum?.let { uiState.selectedUserAlbums.contains(it) } ?: false
+                val isSensitive =
+                    album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true
 
                 AlbumGridItem(
                     modifier = Modifier
@@ -148,7 +150,8 @@ internal fun AlbumsTabScreen(
                     placeholder = placeholder,
                     errorPlaceholder = placeholder,
                     isExported = album.isExported,
-                    isSelected = isSelected
+                    isSelected = isSelected,
+                    isSensitive = isSensitive
                 )
             }
         }

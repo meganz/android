@@ -405,6 +405,8 @@ private fun AlbumItem(
             highlighted = query,
         )
     }
+    val isSensitive =
+        album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true
 
     AlbumGridItem(
         modifier = modifier
@@ -417,7 +419,8 @@ private fun AlbumItem(
         title = title,
         placeholder = placeholderPainter,
         errorPlaceholder = placeholderPainter,
-        isExported = album.isExported
+        isExported = album.isExported,
+        isSensitive = isSensitive
     )
 }
 

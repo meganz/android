@@ -52,15 +52,12 @@ class MonitorMediaSystemAlbumsUseCase @Inject constructor(
         monitorAccountDetailUseCase()
     ) { photos, showHiddenItems, accountDetail ->
         val isPaid = accountDetail.levelDetail?.accountType?.isPaid ?: false
+        val isHiddenEnabled = (showHiddenItems && isPaid)
 
         systemAlbums.map { albumType ->
             val cover = photos
                 .filter { photo ->
-                    if (showHiddenItems || !isPaid) {
-                        !photo.isSensitive && !photo.isSensitiveInherited
-                    } else {
-                        true
-                    }
+                    isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited)
                 }
                 .firstOrNull { photo ->
                     albumType.filter(photo)
