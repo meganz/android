@@ -1,9 +1,5 @@
 package mega.privacy.android.app.appstate.content.navigation.view
 
-import androidx.compose.animation.ContentTransform
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,6 +31,7 @@ import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.extension.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
@@ -131,12 +128,7 @@ fun HomeScreens(
                                         )
                                     }
                                 },
-                                predictivePopTransitionSpec = {
-                                    ContentTransform(
-                                        fadeIn(animationSpec = tween(700)),
-                                        fadeOut(animationSpec = tween(700)),
-                                    )
-                                }
+                                predictivePopTransitionSpec = { fadeTransition }
                             )
                             MiniAudioPlayerView(
                                 modifier = Modifier

@@ -11,9 +11,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.SnackbarHostState
@@ -80,6 +77,8 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.contract.extension.slideForwardTransition
+import mega.privacy.android.navigation.contract.extension.slideBackwardTransition
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
@@ -341,30 +340,9 @@ class MegaActivity : ComponentActivity() {
 
                                             passcodeView(passcodeCryptObjectFactory)
                                         },
-                                        transitionSpec = {
-                                            // Slide in from right when navigating forward
-                                            slideInHorizontally(
-                                                initialOffsetX = { it },
-                                            ) togetherWith slideOutHorizontally(
-                                                targetOffsetX = { -it },
-                                            )
-                                        },
-                                        popTransitionSpec = {
-                                            // Slide in from left when navigating back
-                                            slideInHorizontally(
-                                                initialOffsetX = { -it },
-                                            ) togetherWith slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                            )
-                                        },
-                                        predictivePopTransitionSpec = {
-                                            // Slide in from left when navigating back
-                                            slideInHorizontally(
-                                                initialOffsetX = { -it },
-                                            ) togetherWith slideOutHorizontally(
-                                                targetOffsetX = { it },
-                                            )
-                                        }
+                                        transitionSpec = { slideForwardTransition },
+                                        popTransitionSpec = { slideBackwardTransition },
+                                        predictivePopTransitionSpec = { slideBackwardTransition }
                                     )
 
                                     StartTransferComponent(
