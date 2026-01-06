@@ -41,7 +41,9 @@ import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavK
 fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
     returnResult: (String, String?) -> Unit,
 ) {
-    entry<LegacyAlbumCoverSelectionNavKey> { contract ->
+    entry<LegacyAlbumCoverSelectionNavKey>(
+        metadata = transparentMetadata()
+    ) { contract ->
         val launcher = rememberLauncherForActivityResult(
             SelectAlbumCoverContract()
         ) { result ->
@@ -58,7 +60,9 @@ fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
     removeDestination: () -> Unit,
     returnResult: (String, Long?) -> Unit,
 ) {
-    entry<LegacyPhotoSelectionNavKey> { contract ->
+    entry<LegacyPhotoSelectionNavKey>(
+        metadata = transparentMetadata()
+    ) { contract ->
         val context = LocalContext.current
         val launcher = rememberLauncherForActivityResult(
             SelectAlbumPhotosContract()
@@ -272,7 +276,9 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
     removeDestination: () -> Unit,
     returnResult: (String, Pair<Long?, String>?) -> Unit,
 ) {
-    entry<LegacyPhotosSearchNavKey> {
+    entry<LegacyPhotosSearchNavKey>(
+        metadata = transparentMetadata()
+    ) {
         val context = LocalContext.current
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
