@@ -1,8 +1,8 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 /**
@@ -11,7 +11,7 @@ import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 class TopLevelBackStackNavigationHandler(
     private val backStack: TopLevelBackStack<NavKey, MainNavItemNavKey>,
     private val navigationResultManager: NavigationResultManager,
-) : NavigationHandler {
+) : NavigationHandler, NavigationResultsHandler by navigationResultManager {
 
     override fun back() {
         backStack.removeLast()
@@ -46,31 +46,10 @@ class TopLevelBackStackNavigationHandler(
 
     override fun <T> returnResult(key: String, value: T) {
         // Store the result in the NavigationResultManager
-        navigationResultManager.setResult(key, value)
+        navigationResultManager.returnResult(key, value)
 
         // Navigate back after setting the result
         backStack.removeLast()
-    }
-
-    override fun <T> monitorResult(key: String): Flow<T?> {
-        return navigationResultManager.monitorResult(key)
-    }
-
-    /**
-     * Clears the result for a specific key after it has been consumed.
-     * This helps prevent memory leaks and ensures results are only consumed once.
-     *
-     * @param key The key to clear the result for
-     */
-    override fun clearResult(key: String) {
-        navigationResultManager.clearResult(key)
-    }
-
-    /**
-     * Clears all stored results. Useful for cleanup or when starting fresh.
-     */
-    fun clearAllResults() {
-        navigationResultManager.clearAllResults()
     }
 
     /**

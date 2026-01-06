@@ -50,19 +50,34 @@ class PendingBackStackNavigationHandlerTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = PendingBackStackNavigationHandler(
+        underTest = initHandler(
+            backStack = backStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+            hasRoot = true,
+            isPasscodeLocked = false
+        )
+    }
+
+    private fun initHandler(
+        backStack: PendingBackStack<NavKey>,
+        authStatus: PendingBackStackNavigationHandler.AuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
+            initialSession
+        ),
+        hasRoot: Boolean = true,
+        isPasscodeLocked: Boolean = false,
+    ) =
+        PendingBackStackNavigationHandler(
             backstack = backStack,
-            currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
-            hasRootNode = true,
+            currentAuthStatus = authStatus,
+            hasRootNode = hasRoot,
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
             initialLoginDestination = InitialLoginDestination,
             fetchRootNodeDestination = getFetchNodeDestinationFunction,
-            isPasscodeLocked = false,
+            isPasscodeLocked = isPasscodeLocked,
             passcodeDestination = PasscodeDestination,
             navigationResultManager = navigationResultManager,
         )
-    }
 
     @AfterEach
     fun tearDown() {
@@ -222,19 +237,10 @@ class PendingBackStackNavigationHandlerTest {
                     NoSessionDestination1, NoSessionDestination2, Destination1, Destination2
                 )
             )
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
-                hasRootNode = true,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
-                isPasscodeLocked = false,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
             )
-
             assertThat(tempBackStack).containsExactly(NoSessionDestination1, NoSessionDestination2)
             assertThat(tempBackStack.pending).containsExactly(Destination1, Destination2)
         }
@@ -242,17 +248,9 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that existing destination is replaced if initialised without a session`() = runTest {
         val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
-        PendingBackStackNavigationHandler(
-            backstack = tempBackStack,
-            currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
-            hasRootNode = true,
-            defaultLandingScreen = DefaultLandingScreen,
-            defaultLoginDestination = DefaultLoginDestination,
-            initialLoginDestination = InitialLoginDestination,
-            fetchRootNodeDestination = getFetchNodeDestinationFunction,
-            isPasscodeLocked = false,
-            passcodeDestination = PasscodeDestination,
-            navigationResultManager = navigationResultManager,
+        initHandler(
+            backStack = tempBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
         )
 
         assertThat(tempBackStack).containsExactly(InitialLoginDestination)
@@ -264,17 +262,9 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             val tempBackStack =
                 PendingBackStack(NavBackStack(Destination1, Destination3, Destination2))
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
-                hasRootNode = true,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
-                isPasscodeLocked = false,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
             )
 
             assertThat(tempBackStack).containsExactly(InitialLoginDestination)
@@ -340,19 +330,9 @@ class PendingBackStackNavigationHandlerTest {
                     NoNodeDestination1, NoNodeDestination2, Destination1, Destination2
                 )
             )
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
-                    initialSession
-                ),
-                hasRootNode = false,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
-                isPasscodeLocked = false,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
             )
 
             assertThat(tempBackStack).containsExactly(
@@ -365,19 +345,9 @@ class PendingBackStackNavigationHandlerTest {
     fun `test that existing destination is replaced if initialised without a root node`() =
         runTest {
             val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
-                    initialSession
-                ),
-                hasRootNode = false,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
-                isPasscodeLocked = false,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
             )
 
             assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
@@ -389,19 +359,9 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             val tempBackStack =
                 PendingBackStack(NavBackStack(Destination1, Destination3, Destination2))
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
-                    initialSession
-                ),
-                hasRootNode = false,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
-                isPasscodeLocked = false,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
+            initHandler(
+                backStack = tempBackStack,
+                hasRoot = false
             )
 
             assertThat(tempBackStack).containsExactly(FetchingContentNavKey(initialSession, false))
@@ -487,17 +447,10 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that passcode is only added after login and fetch nodes is completed`() = runTest {
         val tempBackStack = PendingBackStack<NavKey>(NavBackStack(Destination1))
-        val tempHandler = PendingBackStackNavigationHandler(
-            backstack = tempBackStack,
-            currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
-            hasRootNode = false,
-            defaultLandingScreen = DefaultLandingScreen,
-            defaultLoginDestination = DefaultLoginDestination,
-            initialLoginDestination = InitialLoginDestination,
-            fetchRootNodeDestination = getFetchNodeDestinationFunction,
-            isPasscodeLocked = false,
-            passcodeDestination = PasscodeDestination,
-            navigationResultManager = navigationResultManager,
+        val tempHandler = initHandler(
+            backStack = tempBackStack,
+            authStatus = PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn,
+            hasRoot = false
         )
         val session = "newSession"
 
@@ -514,20 +467,10 @@ class PendingBackStackNavigationHandlerTest {
     fun `test that if initial passcode lock is enabled passcode is the only destination on the stack`() =
         runTest {
             val navTree = listOf(Destination1, Destination2)
-            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(*navTree.toTypedArray()))
-            PendingBackStackNavigationHandler(
-                backstack = tempBackStack,
-                currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
-                    initialSession
-                ),
-                hasRootNode = true,
-                defaultLandingScreen = DefaultLandingScreen,
-                defaultLoginDestination = DefaultLoginDestination,
-                initialLoginDestination = InitialLoginDestination,
-                fetchRootNodeDestination = getFetchNodeDestinationFunction,
+            val tempBackStack = PendingBackStack(NavBackStack(*navTree.toTypedArray()))
+            initHandler(
+                backStack = tempBackStack,
                 isPasscodeLocked = true,
-                passcodeDestination = PasscodeDestination,
-                navigationResultManager = navigationResultManager,
             )
             assertThat(tempBackStack).containsExactly(PasscodeDestination)
             assertThat(tempBackStack.pending).containsExactlyElementsIn(navTree)
@@ -541,20 +484,12 @@ class PendingBackStackNavigationHandlerTest {
     @Test
     fun `test that logging out removes fetch nodes destination`() = runTest {
         val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
-        val tempHandler = PendingBackStackNavigationHandler(
-            backstack = tempBackStack,
-            currentAuthStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(
-                initialSession
-            ),
-            hasRootNode = false,
-            defaultLandingScreen = DefaultLandingScreen,
-            defaultLoginDestination = DefaultLoginDestination,
-            initialLoginDestination = InitialLoginDestination,
-            fetchRootNodeDestination = getFetchNodeDestinationFunction,
+        val tempHandler = initHandler(
+            backStack = tempBackStack,
+            hasRoot = false,
             isPasscodeLocked = true,
-            passcodeDestination = PasscodeDestination,
-            navigationResultManager = navigationResultManager,
         )
+
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
 
         assertThat(tempBackStack).containsExactly(DefaultLoginDestination)

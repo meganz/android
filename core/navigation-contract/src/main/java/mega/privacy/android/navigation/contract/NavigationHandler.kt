@@ -1,13 +1,12 @@
 package mega.privacy.android.navigation.contract
 
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
 
 /**
  * Interface providing comprehensive navigation capabilities for feature destinations.
  * This replaces the previous function-based navigation approach with a more structured interface.
  */
-interface NavigationHandler {
+interface NavigationHandler : NavigationResultsHandler {
     /**
      * Navigate back to the previous screen in the back stack.
      */
@@ -55,29 +54,4 @@ interface NavigationHandler {
      * @param inclusive Whether to include the new parent in the pop operation
      */
     fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean = false)
-
-    /**
-     * Set result and pop
-     *
-     * @param T type of the result
-     * @param key type of the result
-     * @param value
-     */
-    fun <T> returnResult(key: String, value: T)
-
-    /**
-     * Clear result for a given key
-     *
-     * @param key
-     */
-    fun clearResult(key: String)
-
-    /**
-     * Monitor result
-     *
-     * @param T
-     * @param key
-     * @return flow that emits when value is returned
-     */
-    fun <T> monitorResult(key: String): Flow<T?>
 } 

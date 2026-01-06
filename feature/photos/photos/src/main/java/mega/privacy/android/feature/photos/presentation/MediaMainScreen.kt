@@ -1057,6 +1057,7 @@ fun PhotosMainScreenPreview() {
                 override fun <T> returnResult(key: String, value: T) {}
                 override fun clearResult(key: String) {}
                 override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)
+                override fun clearAllResults() {}
             },
             handleCameraUploadsPermissionsResult = {},
             setCameraUploadsMessage = {},

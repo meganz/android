@@ -1,10 +1,10 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
-import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import timber.log.Timber
@@ -23,7 +23,7 @@ class PendingBackStackNavigationHandler(
     initialLoginDestination: NoSessionNavKey,
     private val fetchRootNodeDestination: (session: String, fromLogin: Boolean, RefreshEvent?) -> NavKey,
     private val navigationResultManager: NavigationResultManager,
-) : NavigationHandler {
+) : NavigationHandler, NavigationResultsHandler by navigationResultManager {
     private var fromLogin = false
 
     init {
@@ -40,37 +40,6 @@ class PendingBackStackNavigationHandler(
         onPasscodeStateChanged(isPasscodeLocked)
 
         logBackStack("init isLoggedIn: ${currentAuthStatus.isLoggedIn} hasRootNode: $hasRootNode")
-    }
-
-    private fun replaceAuthRequiredDestinations(newDestination: NoSessionNavKey): List<NavKey> {
-        Timber.d("PendingBackStackNavigationHandler::removeAuthRequiredDestinations")
-        val authRequiredDestinations = backstack.takeLastWhile { it !is NoSessionNavKey }
-
-        repeat(authRequiredDestinations.size) {
-            backstack.removeLastOrNull()
-        }
-        if (backstack.isEmpty()) backstack.add(newDestination)
-        // show non-required destinations immediately
-        backstack.addAll(backstack.pending.filter { it is NoSessionNavKey })
-        backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }
-        logBackStack("removeAuthRequiredDestinations")
-        return authRequiredDestinations
-    }
-
-    private fun removeRootNodeRequiredDestinations(event: RefreshEvent? = null): List<NavKey> {
-        Timber.d("PendingBackStackNavigationHandler::removeRootNodeRequiredDestinations")
-        val rootNodeRequiredDestinations = backstack.takeLastWhile { it !is NoNodeNavKey }
-
-        repeat(rootNodeRequiredDestinations.size) {
-            backstack.removeLastOrNull()
-        }
-
-        (currentAuthStatus as? AuthStatus.LoggedIn)?.session?.let {
-            val fetchDestination = fetchRootNodeDestination(it, fromLogin, event)
-            if (backstack.lastOrNull() != fetchDestination) backstack.add(fetchDestination)
-        }
-        logBackStack("removeRootNodeRequiredDestinations")
-        return rootNodeRequiredDestinations
     }
 
     override fun back() {
@@ -101,18 +70,19 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destinations: List<NavKey>) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        val topDestination = destinations.last()
         when {
-            destinations.last() is NoSessionNavKey.Mandatory && currentAuthStatus.isLoggedIn -> {
+            topDestination is NoSessionNavKey.Mandatory && isLoggedOut().not() -> {
                 backstack.pending += destinations
                 if (backstack.isEmpty()) navigate(defaultLandingScreen)
             }
 
-            currentAuthStatus.isLoggedIn.not() && destinations.last() !is NoSessionNavKey -> {
+            isLoggedOut() && topDestination !is NoSessionNavKey -> {
                 backstack.pending += destinations
                 if (backstack.isEmpty()) backstack.add(defaultLoginDestination)
             }
 
-            currentAuthStatus is AuthStatus.LoggedIn && destinations.last() !is NoNodeNavKey && hasRootNode.not() -> {
+            isLoggedInNoRoot() && topDestination !is NoNodeNavKey -> {
                 backstack.pending += destinations
                 val fetchNodesDestinationOrLogin =
                     currentFetchNodesDestinationOrNull(currentAuthStatus) ?: defaultLoginDestination
@@ -121,13 +91,8 @@ class PendingBackStackNavigationHandler(
                 )
             }
 
-            currentAuthStatus is AuthStatus.LoggedIn && destinations.last() is NoSessionNavKey.Mandatory -> {
-                navigate(defaultLandingScreen)
-            }
-
-            currentAuthStatus is AuthStatus.LoggedIn
-                    && hasRootNode
-                    && destinations.last() == currentFetchNodesDestinationOrNull(
+            isLoggedInWithRoot()
+                    && topDestination == currentFetchNodesDestinationOrNull(
                 currentAuthStatus
             ) -> {
                 navigate(defaultLandingScreen)
@@ -139,15 +104,6 @@ class PendingBackStackNavigationHandler(
         }
         logBackStack("navigate : $destinations")
     }
-
-    private fun currentFetchNodesDestinationOrNull(currentAuthStatus: AuthStatus) =
-        (currentAuthStatus as? AuthStatus.LoggedIn)?.session?.let {
-            fetchRootNodeDestination(
-                it,
-                fromLogin,
-                null
-            )
-        }
 
     override fun backTo(destination: NavKey, inclusive: Boolean) {
         removeFromBackStackTo(destination, inclusive)
@@ -165,48 +121,10 @@ class PendingBackStackNavigationHandler(
 
     override fun <T> returnResult(key: String, value: T) {
         // Store the result in the NavigationResultManager
-        navigationResultManager.setResult(key, value)
+        navigationResultManager.returnResult(key, value)
 
         // Navigate back after setting the result
         backstack.removeLastOrNull()
-    }
-
-    override fun <T> monitorResult(key: String): Flow<T?> {
-        return navigationResultManager.monitorResult(key)
-    }
-
-    /**
-     * Clears the result for a specific key after it has been consumed.
-     * This helps prevent memory leaks and ensures results are only consumed once.
-     *
-     * @param key The key to clear the result for
-     */
-    override fun clearResult(key: String) {
-        navigationResultManager.clearResult(key)
-    }
-
-    /**
-     * Clears all stored results. Useful for cleanup or when starting fresh.
-     */
-    fun clearAllResults() {
-        navigationResultManager.clearAllResults()
-    }
-
-    /**
-     * Removes elements from the back stack up to the specified destination.
-     *
-     * @param destination The destination to navigate back to
-     * @param inclusive Whether to include the destination in the removal operation
-     */
-    private fun removeFromBackStackTo(destination: NavKey, inclusive: Boolean) {
-        val index = backstack.indexOfLast { it == destination }
-        if (index == -1) return
-        val removeCount = backstack.size - index - if (inclusive) 0 else 1
-        if (removeCount <= 0) return
-
-        repeat(removeCount) {
-            backstack.removeLastOrNull()
-        }
     }
 
     fun onLoginChange(authStatus: AuthStatus) {
@@ -253,7 +171,7 @@ class PendingBackStackNavigationHandler(
         isPasscodeLocked = isLocked
 
         if (isPasscodeLocked) {
-            if (currentAuthStatus.isLoggedIn && hasRootNode) {
+            if (isLoggedInWithRoot()) {
                 showPasscodeScreen()
             }
         } else {
@@ -262,21 +180,6 @@ class PendingBackStackNavigationHandler(
                 navigateToPendingScreens()
             }
         }
-    }
-
-    private fun showPasscodeScreen() {
-        if (backstack.isNotEmpty() && backstack.last() == passcodeDestination) {
-            return
-        }
-        backstack.pending = backstack + backstack.pending
-        backstack.clear()
-        navigate(passcodeDestination)
-    }
-
-    private fun navigateToPendingScreens() {
-        val pending = listOf(defaultLandingScreen).union(backstack.pending)
-        backstack.pending = emptyList()
-        navigate(pending.toList())
     }
 
     fun displayDialog(dialogDestination: NavKey) {
@@ -293,6 +196,89 @@ class PendingBackStackNavigationHandler(
         repeat(count) {
             backstack.removeLastOrNull()
         }
+    }
+
+    private fun replaceAuthRequiredDestinations(newDestination: NoSessionNavKey): List<NavKey> {
+        Timber.d("PendingBackStackNavigationHandler::removeAuthRequiredDestinations")
+        val authRequiredDestinations = backstack.takeLastWhile { it !is NoSessionNavKey }
+
+        repeat(authRequiredDestinations.size) {
+            backstack.removeLastOrNull()
+        }
+        if (backstack.isEmpty()) backstack.add(newDestination)
+        // show non-required destinations immediately
+        backstack.addAll(backstack.pending.filter { it is NoSessionNavKey })
+        backstack.pending = backstack.pending.filterNot { it is NoSessionNavKey }
+        logBackStack("removeAuthRequiredDestinations")
+        return authRequiredDestinations
+    }
+
+    private fun removeRootNodeRequiredDestinations(event: RefreshEvent? = null): List<NavKey> {
+        Timber.d("PendingBackStackNavigationHandler::removeRootNodeRequiredDestinations")
+        val rootNodeRequiredDestinations = backstack.takeLastWhile { it !is NoNodeNavKey }
+
+        repeat(rootNodeRequiredDestinations.size) {
+            backstack.removeLastOrNull()
+        }
+
+        currentFetchNodesDestinationOrNull(
+            currentAuthStatus = currentAuthStatus,
+            refreshEvent = event
+        )?.let { fetchDestination ->
+            if (backstack.lastOrNull() != fetchDestination) backstack.add(fetchDestination)
+        }
+        logBackStack("removeRootNodeRequiredDestinations")
+        return rootNodeRequiredDestinations
+    }
+
+    private fun isLoggedOut() = currentAuthStatus.isLoggedIn.not()
+    private fun isLoggedInWithRoot() = currentAuthStatus.isLoggedIn && hasRootNode
+    private fun isLoggedInNoRoot() = currentAuthStatus.isLoggedIn && hasRootNode.not()
+
+    private fun currentFetchNodesDestinationOrNull(
+        currentAuthStatus: AuthStatus,
+        refreshEvent: RefreshEvent? = null,
+    ) = currentAuthStatus.sessionOrNull()?.let {
+        fetchRootNodeDestination(
+            it,
+            fromLogin,
+            refreshEvent
+        )
+    }
+
+    private fun AuthStatus?.sessionOrNull(): String? =
+        (this as? AuthStatus.LoggedIn)?.session
+
+    /**
+     * Removes elements from the back stack up to the specified destination.
+     *
+     * @param destination The destination to navigate back to
+     * @param inclusive Whether to include the destination in the removal operation
+     */
+    private fun removeFromBackStackTo(destination: NavKey, inclusive: Boolean) {
+        val index = backstack.indexOfLast { it == destination }
+        if (index == -1) return
+        val removeCount = backstack.size - index - if (inclusive) 0 else 1
+        if (removeCount <= 0) return
+
+        repeat(removeCount) {
+            backstack.removeLastOrNull()
+        }
+    }
+
+    private fun showPasscodeScreen() {
+        if (backstack.isNotEmpty() && backstack.last() == passcodeDestination) {
+            return
+        }
+        backstack.pending = backstack + backstack.pending
+        backstack.clear()
+        navigate(passcodeDestination)
+    }
+
+    private fun navigateToPendingScreens() {
+        val pending = listOf(defaultLandingScreen).union(backstack.pending)
+        backstack.pending = emptyList()
+        navigate(pending.toList())
     }
 
     private fun logBackStack(callingFunction: String) {
