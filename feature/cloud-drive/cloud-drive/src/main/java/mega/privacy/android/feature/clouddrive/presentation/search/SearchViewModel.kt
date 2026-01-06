@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.navigation.destination.SearchNavKey
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -50,6 +51,7 @@ class SearchViewModel @AssistedInject constructor(
     fun processAction(action: SearchUiAction) {
         when (action) {
             is SearchUiAction.UpdateSearchText -> updateSearchText(action.text)
+            is SearchUiAction.SelectFilter -> updateFilter(action.result)
             is SearchUiAction.ItemClicked -> {} // TODO
             is SearchUiAction.ItemLongClicked -> {} // TODO
             is SearchUiAction.ChangeViewTypeClicked -> {} // TODO
@@ -60,6 +62,17 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.NavigateBackEventConsumed -> {} // TODO
             is SearchUiAction.OverQuotaConsumptionWarning -> {} // TODO
         }
+    }
+
+    private fun updateFilter(result: SearchFilterResult) {
+        _uiState.update { state ->
+            when (result) {
+                is SearchFilterResult.Type -> state.copy(typeFilterOption = result.option)
+                is SearchFilterResult.DateModified -> state.copy(dateModifiedFilterOption = result.option)
+                is SearchFilterResult.DateAdded -> state.copy(dateAddedFilterOption = result.option)
+            }
+        }
+        viewModelScope.launch { performSearch(_uiState.value.searchText) }
     }
 
     private fun updateSearchText(text: String) {

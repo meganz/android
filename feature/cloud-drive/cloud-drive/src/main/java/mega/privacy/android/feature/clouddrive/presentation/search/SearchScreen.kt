@@ -6,17 +6,27 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -31,9 +41,10 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
-import mega.privacy.android.feature.clouddrive.presentation.search.view.FilterType
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterBottomSheetContent
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -50,6 +61,11 @@ fun SearchScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+
+    var selectedFilterType by rememberSaveable { mutableStateOf<SearchFilterType?>(null) }
+    val filterBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    val localKeyboardController = LocalSoftwareKeyboardController.current
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
@@ -69,7 +85,8 @@ fun SearchScreen(
             isListView = isListView,
             spanCount = spanCount,
             onFilterClicked = { filterType ->
-                // TODO: Navigate to filter bottom sheet
+                localKeyboardController?.hide()
+                selectedFilterType = filterType
             },
             onMenuClicked = { nodeUiItem ->
                 navigationHandler.navigate(
@@ -96,6 +113,30 @@ fun SearchScreen(
             },
         )
     }
+
+    selectedFilterType?.let { filterType ->
+        MegaModalBottomSheet(
+            modifier = modifier.statusBarsPadding(),
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+            sheetState = filterBottomSheetState,
+            onDismissRequest = { selectedFilterType = null },
+        ) {
+            SearchFilterBottomSheetContent(
+                filterType = filterType,
+                selectedTypeFilter = uiState.typeFilterOption,
+                selectedDateModifiedFilter = uiState.dateModifiedFilterOption,
+                selectedDateAddedFilter = uiState.dateAddedFilterOption,
+                onFilterSelected = { result ->
+                    viewModel.processAction(SearchUiAction.SelectFilter(result))
+                    coroutineScope.launch {
+                        filterBottomSheetState.hide()
+                    }.invokeOnCompletion {
+                        selectedFilterType = null
+                    }
+                },
+            )
+        }
+    }
 }
 
 @Composable
@@ -104,7 +145,7 @@ fun SearchContent(
     contentPadding: PaddingValues,
     isListView: Boolean,
     spanCount: Int,
-    onFilterClicked: (FilterType) -> Unit,
+    onFilterClicked: (SearchFilterType) -> Unit,
     onMenuClicked: (NodeUiItem<TypedNode>) -> Unit,
     onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
     onLongClicked: (NodeUiItem<TypedNode>) -> Unit,
@@ -140,6 +181,7 @@ fun SearchContent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(top = 100.dp)
                         .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
                 ) {
                     MegaText(
@@ -154,6 +196,7 @@ fun SearchContent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(top = 100.dp)
                         .testTag(SEARCH_CONTENT_EMPTY_TAG),
                 ) {
                     MegaText(

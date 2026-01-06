@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.view
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -18,8 +19,10 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.labelResId
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.titleResId
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.SearchDateAddedDropdownChipPressedEvent
 import mega.privacy.mobile.analytics.event.SearchFileTypeDropdownChipPressedEvent
 import mega.privacy.mobile.analytics.event.SearchLastModifiedDropdownChipPressedEvent
@@ -29,7 +32,7 @@ fun SearchFilterChips(
     typeFilterOption: TypeFilterOption?,
     dateModifiedFilterOption: DateFilterOption?,
     dateAddedFilterOption: DateFilterOption?,
-    onFilterClicked: (FilterType) -> Unit,
+    onFilterClicked: (SearchFilterType) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
@@ -42,39 +45,48 @@ fun SearchFilterChips(
         Spacer(Modifier.size(8.dp))
 
         MegaChip(
-            modifier = Modifier.testTag(TYPE_FILTER_CHIP_TAG),
-            content = typeFilterOption?.toDisplayString()
-                ?: stringResource(sharedR.string.search_dropdown_chip_filter_type_file_type),
+            modifier = Modifier
+                .animateContentSize()
+                .testTag(TYPE_FILTER_CHIP_TAG),
+            content = stringResource(
+                typeFilterOption?.labelResId ?: SearchFilterType.TYPE.titleResId
+            ),
             selected = typeFilterOption != null,
             trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
             onClick = {
-                onFilterClicked(FilterType.TYPE)
+                onFilterClicked(SearchFilterType.TYPE)
                 Analytics.tracker.trackEvent(SearchFileTypeDropdownChipPressedEvent)
             },
             enabled = enabled
         )
 
         MegaChip(
-            modifier = Modifier.testTag(DATE_MODIFIED_FILTER_CHIP_TAG),
-            content = dateModifiedFilterOption?.toDisplayString()
-                ?: stringResource(sharedR.string.search_dropdown_chip_filter_type_last_modified),
+            modifier = Modifier
+                .animateContentSize()
+                .testTag(DATE_MODIFIED_FILTER_CHIP_TAG),
+            content = stringResource(
+                dateModifiedFilterOption?.labelResId ?: SearchFilterType.LAST_MODIFIED.titleResId
+            ),
             selected = dateModifiedFilterOption != null,
             trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
             onClick = {
-                onFilterClicked(FilterType.LAST_MODIFIED)
+                onFilterClicked(SearchFilterType.LAST_MODIFIED)
                 Analytics.tracker.trackEvent(SearchLastModifiedDropdownChipPressedEvent)
             },
             enabled = enabled
         )
 
         MegaChip(
-            modifier = Modifier.testTag(DATE_ADDED_FILTER_CHIP_TAG),
-            content = dateAddedFilterOption?.toDisplayString()
-                ?: stringResource(sharedR.string.search_dropdown_chip_filter_type_date_added),
+            modifier = Modifier
+                .animateContentSize()
+                .testTag(DATE_ADDED_FILTER_CHIP_TAG),
+            content = stringResource(
+                dateAddedFilterOption?.labelResId ?: SearchFilterType.DATE_ADDED.titleResId
+            ),
             selected = dateAddedFilterOption != null,
             trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
             onClick = {
-                onFilterClicked(FilterType.DATE_ADDED)
+                onFilterClicked(SearchFilterType.DATE_ADDED)
                 Analytics.tracker.trackEvent(SearchDateAddedDropdownChipPressedEvent)
             },
             enabled = enabled
@@ -84,38 +96,6 @@ fun SearchFilterChips(
     }
 }
 
-@Composable
-private fun TypeFilterOption.toDisplayString(): String = stringResource(
-    when (this) {
-        TypeFilterOption.Audio -> sharedR.string.search_dropdown_chip_filter_type_file_type_audio
-        TypeFilterOption.Video -> sharedR.string.search_dropdown_chip_filter_type_file_type_video
-        TypeFilterOption.Images -> sharedR.string.search_dropdown_chip_filter_type_file_type_images
-        TypeFilterOption.Documents -> sharedR.string.search_dropdown_chip_filter_type_file_type_documents
-        TypeFilterOption.Folder -> sharedR.string.search_dropdown_chip_filter_type_file_type_folders
-        TypeFilterOption.Pdf -> sharedR.string.search_dropdown_chip_filter_type_file_type_pdf
-        TypeFilterOption.Presentation -> sharedR.string.search_dropdown_chip_filter_type_file_type_presentations
-        TypeFilterOption.Spreadsheet -> sharedR.string.search_dropdown_chip_filter_type_file_type_spreadsheets
-        TypeFilterOption.Other -> sharedR.string.search_dropdown_chip_filter_type_file_type_others
-    }
-)
-
-@Composable
-private fun DateFilterOption.toDisplayString(): String = stringResource(
-    when (this) {
-        DateFilterOption.Today -> sharedR.string.search_dropdown_chip_filter_type_date_today
-        DateFilterOption.Last7Days -> sharedR.string.search_dropdown_chip_filter_type_date_last_seven_days
-        DateFilterOption.Last30Days -> sharedR.string.search_dropdown_chip_filter_type_date_last_thirty_days
-        DateFilterOption.ThisYear -> sharedR.string.search_dropdown_chip_filter_type_date_this_year
-        DateFilterOption.LastYear -> sharedR.string.search_dropdown_chip_filter_type_date_last_year
-        DateFilterOption.Older -> sharedR.string.search_dropdown_chip_filter_type_date_older
-    }
-)
-
-enum class FilterType {
-    TYPE,
-    LAST_MODIFIED,
-    DATE_ADDED,
-}
 
 @CombinedThemePreviews
 @Composable

@@ -12,6 +12,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,32 +46,32 @@ class SearchFilterChipsTest {
 
     @Test
     fun `test that onFilterClicked is called with TYPE when type chip is clicked`() {
-        val onFilterClicked = mock<(FilterType) -> Unit>()
+        val onFilterClicked = mock<(SearchFilterType) -> Unit>()
         setupComposeContent(onFilterClicked = onFilterClicked)
 
         composeRule.onNodeWithTag(TYPE_FILTER_CHIP_TAG).performClick()
 
-        verify(onFilterClicked).invoke(FilterType.TYPE)
+        verify(onFilterClicked).invoke(SearchFilterType.TYPE)
     }
 
     @Test
     fun `test that onFilterClicked is called with LAST_MODIFIED when date modified chip is clicked`() {
-        val onFilterClicked = mock<(FilterType) -> Unit>()
+        val onFilterClicked = mock<(SearchFilterType) -> Unit>()
         setupComposeContent(onFilterClicked = onFilterClicked)
 
         composeRule.onNodeWithTag(DATE_MODIFIED_FILTER_CHIP_TAG).performClick()
 
-        verify(onFilterClicked).invoke(FilterType.LAST_MODIFIED)
+        verify(onFilterClicked).invoke(SearchFilterType.LAST_MODIFIED)
     }
 
     @Test
     fun `test that onFilterClicked is called with DATE_ADDED when date added chip is clicked`() {
-        val onFilterClicked = mock<(FilterType) -> Unit>()
+        val onFilterClicked = mock<(SearchFilterType) -> Unit>()
         setupComposeContent(onFilterClicked = onFilterClicked)
 
         composeRule.onNodeWithTag(DATE_ADDED_FILTER_CHIP_TAG).performClick()
 
-        verify(onFilterClicked).invoke(FilterType.DATE_ADDED)
+        verify(onFilterClicked).invoke(SearchFilterType.DATE_ADDED)
     }
 
 
@@ -79,7 +80,7 @@ class SearchFilterChipsTest {
         dateModifiedFilterOption: DateFilterOption? = null,
         dateAddedFilterOption: DateFilterOption? = null,
         enabled: Boolean = true,
-        onFilterClicked: (FilterType) -> Unit = {},
+        onFilterClicked: (SearchFilterType) -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
