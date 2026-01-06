@@ -20,7 +20,7 @@ import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
 import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
-import mega.privacy.android.app.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -64,7 +64,7 @@ import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class SearchViewModelTest {
+class LegacySearchViewModelTest {
     private lateinit var underTest: LegacySearchViewModel
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val monitorNodeUpdatesFakeFlow = MutableSharedFlow<NodeUpdate>()

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.search.mapper
+package mega.privacy.android.feature.clouddrive.presentation.search.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeSourceType

@@ -16,23 +16,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
-import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
-import mega.privacy.android.navigation.destination.SearchNavKey
 import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = SearchViewModel.Factory::class)
 class SearchViewModel @AssistedInject constructor(
-    @Assisted private val navKey: SearchNavKey,
+    @Assisted private val args: Args,
     private val searchUseCase: SearchUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val typeFilterToSearchMapper: TypeFilterToSearchMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -107,16 +109,22 @@ class SearchViewModel @AssistedInject constructor(
         runCatching {
             cancelCancelTokenUseCase()
             val nodes = searchUseCase(
-                parentHandle = NodeId(navKey.parentHandle),
-                nodeSourceType = navKey.nodeSourceType,
+                parentHandle = NodeId(args.parentHandle),
+                nodeSourceType = args.nodeSourceType,
                 searchParameters = SearchParameters(
-                    query = query
+                    query = query,
+                    searchCategory = typeFilterToSearchMapper(
+                        typeFilterOption = uiState.value.typeFilterOption,
+                        nodeSourceType = args.nodeSourceType
+                    ),
+                    modificationDate = uiState.value.dateModifiedFilterOption,
+                    creationDate = uiState.value.dateAddedFilterOption,
                 ),
                 isSingleActivityEnabled = true
             )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
-                nodeSourceType = navKey.nodeSourceType,
+                nodeSourceType = args.nodeSourceType,
                 existingItems = _uiState.value.items,
             )
             _uiState.update { state ->
@@ -141,8 +149,13 @@ class SearchViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(navKey: SearchNavKey): SearchViewModel
+        fun create(args: Args): SearchViewModel
     }
+
+    data class Args(
+        val parentHandle: Long,
+        val nodeSourceType: NodeSourceType,
+    )
 
     companion object {
         const val SEARCH_DEBOUNCE_MS = 300L

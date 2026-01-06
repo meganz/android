@@ -14,11 +14,14 @@ fun EntryProviderScope<NavKey>.searchScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<SearchNavKey> { key ->
-        val viewModel = hiltViewModel<SearchViewModel, SearchViewModel.Factory>(
-            creationCallback = { factory ->
-                factory.create(key)
-            }
-        )
+        val viewModel = hiltViewModel<SearchViewModel, SearchViewModel.Factory> { factory ->
+            factory.create(
+                SearchViewModel.Args(
+                    parentHandle = key.parentHandle,
+                    nodeSourceType = key.nodeSourceType,
+                )
+            )
+        }
         val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
 
         SearchScreen(

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.list.HeaderTextStyle
-import mega.android.core.ui.components.list.SecondaryHeaderListItem
+import mega.android.core.ui.components.list.PrimaryHeaderListItem
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -100,7 +100,7 @@ fun <T : SortOptionItem> SortBottomSheet(
         modifier = modifier.statusBarsPadding(),
         onDismissRequest = onDismissRequest
     ) {
-        SecondaryHeaderListItem(
+        PrimaryHeaderListItem(
             modifier = Modifier
                 .testTag(SORT_BOTTOM_SHEET_TITLE_TAG),
             text = title,

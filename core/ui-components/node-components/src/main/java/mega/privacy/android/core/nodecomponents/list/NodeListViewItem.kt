@@ -34,6 +34,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.components.util.normalize
+import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -212,15 +213,15 @@ fun NodeListViewItem(
                     )
                 }
                 if (highlightText.isNotBlank()) {
-                    HighlightedText(
-                        text = title,
-                        highlightText = highlightText,
+                    MegaText(
+                        text = HighlightedText(
+                            full = title,
+                            highlighted = highlightText,
+                        ),
                         textColor = if (isTakenDown) TextColor.Error else titleColor,
-                        style = titleTextStyle,
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .testTag(TITLE_TAG),
-                        maxLines = titleMaxLines
                     )
                 } else {
                     MegaText(

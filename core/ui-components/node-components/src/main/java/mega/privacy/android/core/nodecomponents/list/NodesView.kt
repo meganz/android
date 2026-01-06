@@ -144,6 +144,7 @@ fun <T : TypedNode> NodesView(
             onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
             spanCount = spanCount,
             sortConfiguration = sortConfiguration,
+            highlightText = highlightText,
             onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = onChangeViewTypeClicked,
             showSortOrder = showSortOrder,

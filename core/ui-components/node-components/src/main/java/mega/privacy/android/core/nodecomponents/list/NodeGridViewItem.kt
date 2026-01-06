@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.components.text.HighlightedText
+import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -281,9 +281,11 @@ fun NodeGridViewItem(
             }
 
             if (highlightText.isNotBlank()) {
-                HighlightedText(
-                    text = name,
-                    highlightText = highlightText,
+                MegaText(
+                    text = HighlightedText(
+                        full = name,
+                        highlighted = highlightText,
+                    ),
                     textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
                     style = AppTheme.typography.bodySmall,
                     modifier = Modifier

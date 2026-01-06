@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.HeaderTextStyle
 import mega.android.core.ui.components.list.OneLineListItem
-import mega.android.core.ui.components.list.SecondaryHeaderListItem
+import mega.android.core.ui.components.list.PrimaryHeaderListItem
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -43,7 +43,7 @@ fun SearchFilterBottomSheetContent(
             BoxSurface(
                 surfaceColor = SurfaceColor.Surface1
             ) {
-                SecondaryHeaderListItem(
+                PrimaryHeaderListItem(
                     modifier = Modifier.testTag(SEARCH_FILTER_BOTTOM_SHEET_TITLE_TAG),
                     text = stringResource(filterType.titleResId),
                     headerTextStyle = HeaderTextStyle.Medium,
