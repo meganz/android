@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.global.event
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import timber.log.Timber
 import java.util.Queue
 
 class QueuePollingChannel<T, R>(
@@ -17,7 +18,11 @@ class QueuePollingChannel<T, R>(
 
         mutex.withLock {
             sendEvent = queue.isEmpty()
-            queue.add(item)
+            if (queue.contains(item).not()) {
+                queue.add(item)
+            } else {
+                Timber.d("Item already in queue: $item")
+            }
         }
 
         if (sendEvent) {

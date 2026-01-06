@@ -66,4 +66,19 @@ class QueuePollingChannelTest {
             }
         }
 
+    @Test
+    fun `test that duplicates are ignored`() = runTest {
+        val expected = listOf(1, 2, 3)
+        underTest.events.consumeAsFlow().test {
+            expected.forEach {
+                underTest.add(it)
+            }
+            underTest.add(3)
+            expected.forEach {
+                assertThat(awaitItem()()).isEqualTo(it)
+            }
+            assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
+        }
+    }
+
 }

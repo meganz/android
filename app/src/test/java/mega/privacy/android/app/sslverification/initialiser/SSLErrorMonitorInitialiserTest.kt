@@ -8,6 +8,8 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -32,7 +34,8 @@ class SSLErrorMonitorInitialiserTest {
         underTest()
 
         verify(appDialogsEventQueue).emit(
-            AppDialogEvent(SSLErrorDialog)
+            argThat<AppDialogEvent> { event -> event.dialogDestination == SSLErrorDialog },
+            any()
         )
     }
 }

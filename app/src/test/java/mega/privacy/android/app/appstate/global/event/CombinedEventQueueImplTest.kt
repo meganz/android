@@ -59,8 +59,10 @@ class CombinedEventQueueImplTest {
         val expected = NavigationQueueEvent(listOf(key))
         underTest.emit(key)
 
-        val actual = underTest.events.tryReceive().getOrNull()
-        assertThat(actual?.invoke()).isEqualTo(expected)
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(expected.keys)
+        assertThat(actual?.isSingleTop).isEqualTo(expected.isSingleTop)
     }
 
     @Test
@@ -70,8 +72,10 @@ class CombinedEventQueueImplTest {
         val expected = NavigationQueueEvent(keys)
         underTest.emit(keys)
 
-        val actual = underTest.events.tryReceive().getOrNull()
-        assertThat(actual?.invoke()).isEqualTo(expected)
+        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
+        assertThat(actual).isNotNull()
+        assertThat(actual?.keys).isEqualTo(expected.keys)
+        assertThat(actual?.isSingleTop).isEqualTo(expected.isSingleTop)
     }
 
     @Test
@@ -158,8 +162,13 @@ class CombinedEventQueueImplTest {
         underTest.emit(keys, NavPriority.Default)
 
         underTest.events.receiveAsFlow().map { it.invoke() }.test {
-            assertThat(awaitItem()).isEqualTo(expectedFirst)
-            assertThat(awaitItem()).isEqualTo(expectedSecond)
+            val firstItem = awaitItem() as? NavigationQueueEvent
+            assertThat(firstItem).isNotNull()
+            assertThat(firstItem?.keys).isEqualTo(expectedFirst.keys)
+            assertThat(firstItem?.isSingleTop).isEqualTo(expectedFirst.isSingleTop)
+            val secondItem = awaitItem() as? AppDialogEvent
+            assertThat(secondItem).isNotNull()
+            assertThat(secondItem?.dialogDestination).isEqualTo(expectedSecond.dialogDestination)
         }
 
     }
@@ -187,9 +196,19 @@ class CombinedEventQueueImplTest {
         underTest.emit(input)
 
         underTest.events.receiveAsFlow().map { it.invoke() }.test {
-            assertThat(awaitItem()).isEqualTo(NavigationQueueEvent(initialKeys))
-            assertThat(awaitItem()).isEqualTo(NavigationQueueEvent(finalKeys))
-            assertThat(awaitItem()).isEqualTo(AppDialogEvent(dialogKey))
+            val firstItem = awaitItem() as? NavigationQueueEvent
+            assertThat(firstItem).isNotNull()
+            assertThat(firstItem?.keys).isEqualTo(initialKeys)
+            assertThat(firstItem?.isSingleTop).isFalse()
+
+            val secondItem = awaitItem() as? NavigationQueueEvent
+            assertThat(secondItem).isNotNull()
+            assertThat(secondItem?.keys).isEqualTo(finalKeys)
+            assertThat(secondItem?.isSingleTop).isFalse()
+
+            val thirdItem = awaitItem() as? AppDialogEvent
+            assertThat(thirdItem).isNotNull()
+            assertThat(thirdItem?.dialogDestination).isEqualTo(dialogKey)
         }
     }
 
