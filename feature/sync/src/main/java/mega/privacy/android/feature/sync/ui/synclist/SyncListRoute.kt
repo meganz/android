@@ -63,6 +63,7 @@ fun SyncListRoute(
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
     applyRevampStyles: Boolean = false,
+    isSingleActivity: Boolean = false,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
     val viewModelStoreOwner =
@@ -86,6 +87,7 @@ fun SyncListRoute(
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onFabExpanded = onFabExpanded,
         applyRevampStyles = applyRevampStyles,
+        isSingleActivity = isSingleActivity,
     )
 }
 
@@ -108,6 +110,7 @@ internal fun SyncListRoute(
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
     applyRevampStyles: Boolean = false,
+    isSingleActivity: Boolean = false,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val syncSettingsState by settingsSyncViewModel.uiState.collectAsStateWithLifecycle()
@@ -187,7 +190,8 @@ internal fun SyncListRoute(
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
         selectedChip = selectedChip,
         onFabExpanded = onFabExpanded,
-        applyRevampStyles = applyRevampStyles
+        applyRevampStyles = applyRevampStyles,
+        isSingleActivity = isSingleActivity,
     )
 
     val context = LocalContext.current

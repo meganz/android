@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -54,6 +55,7 @@ internal fun MegaPickerScreen(
     isSelectEnabled: Boolean,
     onCreateNewFolderDialogSuccess: (String) -> Unit = {},
     isStopBackupMegaPicker: Boolean = false,
+    isSingleActivity: Boolean = false,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -67,6 +69,13 @@ internal fun MegaPickerScreen(
                 currentFolder.parentId != NodeId(MegaApiJava.INVALID_HANDLE)
 
     var showCreateNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    val appBarWindowInsets = if (isSingleActivity) {
+        // In Nav3 context (MegaActivity), use status bar insets for proper top padding
+        WindowInsets.statusBars
+    } else {
+        // In Fragment context, FragmentActivity handles window insets, so use 0.dp
+        WindowInsets(0.dp)
+    }
 
     MegaScaffold(
         topBar = {
@@ -75,7 +84,7 @@ internal fun MegaPickerScreen(
                 title = currentFolder?.name?.takeIf { showCurrentFolderName }
                     ?: stringResource(sharedR.string.general_section_cloud_drive),
                 subtitle = stringResource(sharedR.string.general_select_create_folder).takeIf { isStopBackupMegaPicker },
-                windowInsets = WindowInsets(0.dp),
+                windowInsets = appBarWindowInsets,
                 elevation = 0.dp,
                 onNavigationPressed = {
                     onBackPressedDispatcher?.onBackPressed()

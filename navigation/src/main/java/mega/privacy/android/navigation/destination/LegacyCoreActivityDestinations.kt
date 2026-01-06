@@ -160,6 +160,12 @@ data class SyncSelectStopBackupDestinationNavKey(
 ) : NavKey
 
 @Serializable
+data object SyncMegaPickerNavKey : NavKey
+
+@Serializable
+data object SyncEmptyRouteNavKey : NavKey
+
+@Serializable
 @Parcelize
 data class UpgradeAccountNavKey(
     val isUpgrade: Boolean = true,

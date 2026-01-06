@@ -5,6 +5,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
@@ -31,6 +32,7 @@ internal fun MegaPickerRoute(
     backClicked: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
     isStopBackupMegaPicker: Boolean = false,
+    isSingleActivity: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -60,6 +62,7 @@ internal fun MegaPickerRoute(
         isLoading = state.value.isLoading,
         isSelectEnabled = state.value.isSelectEnabled,
         isStopBackupMegaPicker = isStopBackupMegaPicker,
+        isSingleActivity = isSingleActivity
     )
 
     val onBack = {
@@ -71,7 +74,9 @@ internal fun MegaPickerRoute(
     }
 
     if (state.value.showAllFilesAccessDialog) {
-        Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDisplayedEvent)
+        LaunchedEffect(Unit) {
+            Analytics.tracker.trackEvent(AndroidSyncAllFilesAccessDialogDisplayedEvent)
+        }
         AllFilesAccessDialog(
             onConfirm = {
                 viewModel.handleAction(MegaPickerAction.AllFilesAccessPermissionDialogShown)

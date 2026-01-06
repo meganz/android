@@ -2,6 +2,7 @@ package mega.privacy.android.app.activities.destinations
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.activities.navigation.fileInfoScreen
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -15,14 +16,13 @@ import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDesti
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
-import mega.privacy.android.app.activities.navigation.fileInfoScreen
-import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
+import mega.privacy.android.app.presentation.documentscanner.navigation.saveScannedDocumentsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
-import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
-import mega.privacy.android.app.presentation.documentscanner.navigation.saveScannedDocumentsLegacyDestination
+import mega.privacy.android.app.presentation.meeting.managechathistory.navigation.manageChatHistoryLegacyDestination
 import mega.privacy.android.app.presentation.pdfviewer.legacyPdfViewerScreen
+import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.mediaDiscoveryLegacyDestination
 import mega.privacy.android.app.presentation.search.navigation.searchLegacyDestination
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
@@ -61,9 +61,6 @@ class LegacyCoreActivityFeatureGraph(
             chatLegacyDestination(navigationHandler::back)
             manageChatHistoryLegacyDestination(navigationHandler::back)
             testPasswordLegacyDestination(navigationHandler::back)
-            syncListDestination(navigationHandler::back)
-            syncNewFolderDestination(navigationHandler::back)
-            syncSelectStopBackupDestinationDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
             legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)

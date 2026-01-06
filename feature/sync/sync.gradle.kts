@@ -23,6 +23,7 @@ android {
 
 dependencies {
     implementation(project(":navigation"))
+    implementation(project(":core:navigation-contract"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:feature-flags"))
     testImplementation(project(":core-test"))
@@ -63,6 +64,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(google.guava)
     implementation(androidx.material3)
+    implementation(androidx.navigation3.runtime)
 
     testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(testlib.bundles.ui.test)

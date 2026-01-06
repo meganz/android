@@ -20,6 +20,7 @@ internal fun SyncNewFolderScreenRoute(
     openUpgradeAccount: () -> Unit,
     onBackClicked: () -> Unit,
     onSelectFolder: () -> Unit = {},
+    isSingleActivity: Boolean = false,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -45,6 +46,7 @@ internal fun SyncNewFolderScreenRoute(
         onDismissStorageOverQuota = { viewModel.handleAction(SyncNewFolderAction.StorageOverquotaShown) },
         onOpenUpgradeAccount = { openUpgradeAccount() },
         viewModel = viewModel,
+        isSingleActivity = isSingleActivity,
     )
 
     EventEffect(event = state.value.openSyncListScreen, onConsumed = {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetValue
@@ -104,6 +105,7 @@ internal fun SyncListScreen(
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
     applyRevampStyles: Boolean = false,
+    isSingleActivity: Boolean = false,
 ) {
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -193,6 +195,14 @@ internal fun SyncListScreen(
             onDispose { }
         }
 
+        val appBarWindowInsets = if (isSingleActivity) {
+            // In Nav3 context (MegaActivity), use status bar insets for proper top padding
+            WindowInsets.statusBars
+        } else {
+            // In Fragment context, FragmentActivity handles window insets, so use 0.dp
+            WindowInsets(0.dp)
+        }
+
         MegaScaffold(
             scaffoldState = scaffoldState,
             contentWindowInsets = if (isInCloudDrive) WindowInsets(0.dp) else ScaffoldDefaults.contentWindowInsets,
@@ -207,7 +217,7 @@ internal fun SyncListScreen(
                         actions = actions,
                         onActionPressed = onActionPressed,
                         elevation = if (isWarningBannerDisplayed || syncFoldersState.isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
-                        windowInsets = WindowInsets(0.dp),
+                        windowInsets = appBarWindowInsets,
                     )
                 }
             },
