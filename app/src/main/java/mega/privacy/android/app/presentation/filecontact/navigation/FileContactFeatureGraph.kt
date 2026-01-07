@@ -14,7 +14,8 @@ class FileContactFeatureDestination : FeatureDestination {
             fileContacts(
                 onNavigateBack = navigationHandler::back,
                 onNavigate = navigationHandler::navigate,
-                resultFlow = navigationHandler::monitorResult
+                resultFlow = navigationHandler::monitorResult,
+                clearResults = navigationHandler::clearResult
             )
             addContactLegacyDestination(
                 returnResult = navigationHandler::returnResult,

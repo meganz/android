@@ -22,6 +22,7 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     resultFlow: (String) -> Flow<List<String>?>,
+    clearResults: (String) -> Unit,
 ) {
     entry<FileContactInfoNavKey> { key ->
         val viewModel = hiltViewModel<ShareRecipientsViewModel, ShareRecipientsViewModel.Factory>(
@@ -55,7 +56,10 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
         FileContactHomeScreen(
             state = state,
             newShareRecipients = newShareRecipients,
-            clearNewShareRecipients = { newShareRecipients = null },
+            clearNewShareRecipients = {
+                newShareRecipients = null
+                clearResults(AddContactToShareNavKey.KEY)
+            },
             onBackPressed = onNavigateBack,
             removeContacts = viewModel::removeShare,
             shareFolder = viewModel::shareFolder,
