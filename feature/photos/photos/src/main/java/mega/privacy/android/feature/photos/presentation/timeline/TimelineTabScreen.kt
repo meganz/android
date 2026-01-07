@@ -62,11 +62,11 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.feature.photos.R
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGridView
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
@@ -653,10 +653,10 @@ private fun getCameraUploadsBannerType(
 
         mediaCameraUploadUiState.isCameraUploadsLimitedAccess -> CameraUploadsBannerType.NoFullAccess
 
-        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Sync ->
+        mediaCameraUploadUiState.status is CUStatusUiState.Sync ->
             CameraUploadsBannerType.CheckingUploads
 
-        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Uploading ->
+        mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress || mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete ->
             CameraUploadsBannerType.PendingCount
 
         else -> CameraUploadsBannerType.NONE

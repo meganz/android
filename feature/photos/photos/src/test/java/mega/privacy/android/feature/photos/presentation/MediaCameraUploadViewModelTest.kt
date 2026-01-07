@@ -23,7 +23,6 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -142,7 +141,7 @@ class MediaCameraUploadViewModelTest {
             cameraUploadsStatusFlow.value = CameraUploadsStatusInfo.CheckFilesForUpload
             underTest.uiState.test {
                 val item = expectMostRecentItem()
-                assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Sync)
+                assertThat(item.status).isEqualTo(CUStatusUiState.Sync)
                 assertThat(item.showCameraUploadsComplete).isFalse()
                 assertThat(item.showCameraUploadsWarning).isFalse()
             }
@@ -151,12 +150,15 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that the UI state shows Uploading FAB with progress when status is UploadProgress`() =
         runTest {
+            val totalToUpload = 100
+            val totalUploaded = 25
+            val progress = Progress(0.25F)
             val progressInfo = CameraUploadsStatusInfo.UploadProgress(
-                totalToUpload = 100,
-                totalUploaded = 25,
+                totalToUpload = totalToUpload,
+                totalUploaded = totalUploaded,
                 totalUploadedBytes = 0L,
                 totalUploadBytes = 0L,
-                progress = Progress(0.25F),
+                progress = progress,
                 areUploadsPaused = false
             )
 
@@ -164,15 +166,18 @@ class MediaCameraUploadViewModelTest {
 
             underTest.uiState.test {
                 val item = expectMostRecentItem()
-                assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Uploading)
-                assertThat(item.cameraUploadsProgress).isEqualTo(0.25f)
-                assertThat(item.pending).isEqualTo(75)
-                assertThat(item.cameraUploadsTotalUploaded).isEqualTo(100)
+                assertThat(item.status).isEqualTo(
+                    CUStatusUiState.UploadInProgress(
+                        progress = progress.floatValue,
+                        pending = totalToUpload - totalUploaded,
+                    )
+                )
+                assertThat(item.cameraUploadsTotalUploaded).isEqualTo(totalToUpload)
             }
         }
 
     @Test
-    fun `test that UI shows complete fab then menu when status is Finished with COMPLETED`() =
+    fun `test that the status is set to upload complete when the finish reason is completed`() =
         runTest {
             cameraUploadsStatusFlow.value = CameraUploadsStatusInfo.UploadProgress(
                 totalUploaded = 10,
@@ -192,10 +197,10 @@ class MediaCameraUploadViewModelTest {
                 )
 
                 val completeFabState = awaitItem()
-                assertThat(completeFabState.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.Complete)
+                assertThat(completeFabState.status).isEqualTo(CUStatusUiState.UploadComplete)
                 assertThat(completeFabState.showCameraUploadsCompletedMessage).isTrue()
                 val completeMenuState = awaitItem()
-                assertThat(completeMenuState.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+                assertThat(completeMenuState.status).isEqualTo(CUStatusUiState.UpToDate)
                 assertThat(completeMenuState.showCameraUploadsCompletedMessage).isTrue()
             }
         }
@@ -210,7 +215,7 @@ class MediaCameraUploadViewModelTest {
                 val item = expectMostRecentItem()
                 assertThat(item.isWarningBannerShown).isTrue()
                 assertThat(item.showCameraUploadsWarning).isTrue()
-                assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+                assertThat(item.status).isEqualTo(CUStatusUiState.None)
             }
         }
 
@@ -236,11 +241,9 @@ class MediaCameraUploadViewModelTest {
     }
 
     @Test
-    fun `test that the enable button is hidden when CU is enabled and resetCUButtonAndProgress called`() =
+    fun `test that the enable button is hidden when CU is enabled`() =
         runTest {
-            whenever(isCameraUploadsEnabledUseCase()) doReturn true
-
-            underTest.resetCUButtonAndProgress()
+            isCameraUploadsEnabledFlow.value = true
 
             underTest.uiState.test {
                 val item = expectMostRecentItem()
@@ -250,16 +253,14 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that the enable button is shown when CU is disabled and resetCUButtonAndProgress called`() =
+    fun `test that the enable button is shown when CU is disabled`() =
         runTest {
-            whenever(isCameraUploadsEnabledUseCase()) doReturn false
-
-            underTest.resetCUButtonAndProgress()
+            isCameraUploadsEnabledFlow.value = false
 
             underTest.uiState.test {
                 val item = expectMostRecentItem()
                 assertThat(item.enableCameraUploadButtonShowing).isTrue()
-                assertThat(item.cameraUploadsStatus).isEqualTo(CameraUploadsStatus.None)
+                assertThat(item.status).isEqualTo(CUStatusUiState.None)
             }
         }
 

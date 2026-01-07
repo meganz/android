@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import mega.privacy.android.feature.photos.components.CameraUploadsStatusIcon
 import mega.privacy.android.feature.photos.components.CameraUploadsStatusType
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
@@ -14,8 +14,7 @@ internal fun CameraUploadStatusToolbarAction(
     isCuWarningStatusVisible: Boolean,
     isCuDefaultStatusVisible: Boolean,
     isCuCompleteStatusVisible: Boolean,
-    cameraUploadsStatus: CameraUploadsStatus,
-    cameraUploadsProgress: Float,
+    cameraUploadsStatus: CUStatusUiState,
     setCameraUploadsMessage: (message: String) -> Unit,
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
@@ -42,7 +41,7 @@ internal fun CameraUploadStatusToolbarAction(
         isCuCompleteStatusVisible -> {
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG),
-                type = CameraUploadsStatusType.Complete,
+                type = CameraUploadsStatusType.UpToDate,
                 onClick = {
                     setCameraUploadsMessage(
                         context.getString(SharedR.string.media_main_screen_camera_uploads_updated),
@@ -51,7 +50,7 @@ internal fun CameraUploadStatusToolbarAction(
             )
         }
 
-        cameraUploadsStatus == CameraUploadsStatus.Sync -> {
+        cameraUploadsStatus is CUStatusUiState.Sync -> {
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG),
                 type = CameraUploadsStatusType.Sync,
@@ -59,11 +58,22 @@ internal fun CameraUploadStatusToolbarAction(
             )
         }
 
-        cameraUploadsStatus == CameraUploadsStatus.Uploading -> {
+        cameraUploadsStatus is CUStatusUiState.UploadInProgress -> {
             CameraUploadsStatusIcon(
-                modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOADING_TAG),
-                type = CameraUploadsStatusType.Uploading,
-                progress = { cameraUploadsProgress },
+                modifier = modifier.testTag(
+                    CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_IN_PROGRESS_TAG
+                ),
+                type = CameraUploadsStatusType.UploadInProgress,
+                progress = { cameraUploadsStatus.progress },
+                onClick = {}
+            )
+        }
+
+        cameraUploadsStatus is CUStatusUiState.UploadComplete -> {
+            CameraUploadsStatusIcon(
+                modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG),
+                type = CameraUploadsStatusType.UploadComplete,
+                progress = { 1F },
                 onClick = {}
             )
         }
@@ -78,5 +88,7 @@ internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG =
     "camera_upload_status_toolbar_action:icon_complete"
 internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG =
     "camera_upload_status_toolbar_action:icon_sync"
-internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOADING_TAG =
-    "camera_upload_status_toolbar_action:icon_uploading"
+internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_IN_PROGRESS_TAG =
+    "camera_upload_status_toolbar_action:icon_upload_in_progress"
+internal const val CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG =
+    "camera_upload_status_toolbar_action:icon_upload_complete"

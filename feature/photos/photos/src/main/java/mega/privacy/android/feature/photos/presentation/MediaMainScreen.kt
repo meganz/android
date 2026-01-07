@@ -68,7 +68,6 @@ import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -194,7 +193,6 @@ fun MediaMainRoute(
 
     // Follow the same behavior as the existing code. We can improve this in phase 2.
     LifecycleResumeEffect(Unit) {
-        mediaCameraUploadViewModel.resetCUButtonAndProgress()
         mediaCameraUploadViewModel.checkCameraUploadsPermissions()
         onPauseOrDispose {}
     }
@@ -270,7 +268,7 @@ fun MediaMainRoute(
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
-        selectedPhotosInTypedNode = timelineViewModel.selectedPhotosInTypedNode,
+        selectedPhotosInTypedNode = { timelineViewModel.selectedPhotosInTypedNode },
         actionHandler = selectionModeActionHandler::invoke,
         navigateToAlbumContent = navigateToAlbumContent,
         setEnableCUPage = { shouldShow ->
@@ -325,7 +323,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
-    selectedPhotosInTypedNode: List<TypedNode>,
+    selectedPhotosInTypedNode: () -> List<TypedNode>,
     selectedTimePeriod: PhotoModificationTimePeriod,
     multiNodeActionHandler: MultiNodeActionHandler,
     navigationHandler: NavigationHandler,
@@ -567,20 +565,20 @@ fun MediaMainScreen(
                             stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
                         }
 
-                        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Sync -> {
+                        mediaCameraUploadUiState.status is CUStatusUiState.Sync -> {
                             stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
                         }
 
-                        mediaCameraUploadUiState.cameraUploadsStatus == CameraUploadsStatus.Uploading -> {
-                            if (mediaCameraUploadUiState.cameraUploadsProgress == 1F) {
-                                stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
-                            } else {
-                                pluralStringResource(
-                                    id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
-                                    count = mediaCameraUploadUiState.pending,
-                                    mediaCameraUploadUiState.pending,
-                                )
-                            }
+                        mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress -> {
+                            pluralStringResource(
+                                id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
+                                count = mediaCameraUploadUiState.status.pending,
+                                mediaCameraUploadUiState.status.pending,
+                            )
+                        }
+
+                        mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete -> {
+                            stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
                         }
 
                         else -> null
@@ -604,8 +602,7 @@ fun MediaMainScreen(
                                 isCuWarningStatusVisible = isCuWarningStatusVisible,
                                 isCuDefaultStatusVisible = isCuDefaultStatusVisible,
                                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
-                                cameraUploadsStatus = mediaCameraUploadUiState.cameraUploadsStatus,
-                                cameraUploadsProgress = mediaCameraUploadUiState.cameraUploadsProgress,
+                                cameraUploadsStatus = mediaCameraUploadUiState.status,
                                 setCameraUploadsMessage = setCameraUploadsMessage,
                                 updateIsWarningBannerShown = updateIsWarningBannerShown,
                                 onNavigateToCameraUploadsSettings = {
@@ -669,7 +666,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.Download -> {
                             actionHandler(
                                 DownloadMenuAction(),
-                                selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode()
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -677,7 +674,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.ShareLink -> {
                             actionHandler(
                                 GetLinkMenuAction(),
-                                selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode()
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -685,7 +682,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.SendToChat -> {
                             actionHandler(
                                 SendToChatMenuAction(),
-                                selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode()
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -693,7 +690,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.Share -> {
                             actionHandler(
                                 ShareMenuAction(),
-                                selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode()
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -701,7 +698,7 @@ fun MediaMainScreen(
                         TimelineSelectionMenuAction.MoveToRubbishBin -> {
                             actionHandler(
                                 TrashMenuAction(),
-                                selectedPhotosInTypedNode
+                                selectedPhotosInTypedNode()
                             )
                             onClearTimelinePhotosSelection()
                         }
@@ -842,7 +839,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.RemoveLink -> {
                         actionHandler(
                             RemoveLinkMenuAction(),
-                            selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode()
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -851,7 +848,7 @@ fun MediaMainScreen(
                         Analytics.tracker.trackEvent(TimelineHideNodeMenuItemEvent)
                         actionHandler(
                             HideMenuAction(),
-                            selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode()
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -859,7 +856,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Unhide -> {
                         actionHandler(
                             UnhideMenuAction(),
-                            selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode()
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -867,7 +864,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Move -> {
                         actionHandler(
                             MoveMenuAction(),
-                            selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode()
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -875,7 +872,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.Copy -> {
                         actionHandler(
                             CopyMenuAction(),
-                            selectedPhotosInTypedNode
+                            selectedPhotosInTypedNode()
                         )
                         onClearTimelinePhotosSelection()
                     }
@@ -883,7 +880,7 @@ fun MediaMainScreen(
                     TimelineSelectionMenuAction.AddToAlbum -> {
                         onNavigateToAddToAlbum(
                             LegacyAddToAlbumActivityNavKey(
-                                photoIds = selectedPhotosInTypedNode.map { it.id.longValue },
+                                photoIds = selectedPhotosInTypedNode().map { it.id.longValue },
                                 viewType = 0
                             )
                         )
@@ -1023,7 +1020,7 @@ fun PhotosMainScreenPreview() {
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             selectedTimePeriod = PhotoModificationTimePeriod.All,
-            selectedPhotosInTypedNode = emptyList(),
+            selectedPhotosInTypedNode = { emptyList() },
             actionHandler = { _, _ -> },
             navigateToAlbumContent = {},
             setEnableCUPage = {},

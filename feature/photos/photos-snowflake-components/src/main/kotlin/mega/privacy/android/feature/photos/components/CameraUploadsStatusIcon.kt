@@ -57,12 +57,8 @@ private fun CameraUploadsIcon(
     ) {
         progress?.let {
             val color = when (type) {
-                CameraUploadsStatusType.Uploading -> {
-                    if (it() == 1F) {
-                        DSTokens.colors.support.success
-                    } else DSTokens.colors.support.info
-                }
-
+                CameraUploadsStatusType.UploadInProgress -> DSTokens.colors.support.info
+                CameraUploadsStatusType.UploadComplete -> DSTokens.colors.support.success
                 else -> Color.Transparent
             }
             CircularProgressIndicator(
@@ -82,7 +78,9 @@ private fun CameraUploadsIcon(
         }
         MegaIcon(
             modifier = Modifier.size(
-                size = if (type == CameraUploadsStatusType.Uploading) 22.dp else 24.dp
+                size = if (type == CameraUploadsStatusType.UploadInProgress || type == CameraUploadsStatusType.UploadComplete) {
+                    22.dp
+                } else 24.dp
             ),
             imageVector = ImageVector.vectorResource(iconResId),
             tint = IconColor.Primary,
@@ -98,24 +96,16 @@ private fun StatusIcon(
 ) {
     if (type != CameraUploadsStatusType.Default) {
         val color = when (type) {
-            CameraUploadsStatusType.Uploading -> {
-                if (progress?.invoke() == 1F) {
-                    DSTokens.colors.support.success
-                } else DSTokens.colors.support.info
-            }
-
+            CameraUploadsStatusType.UploadInProgress -> DSTokens.colors.support.info
+            CameraUploadsStatusType.UploadComplete -> DSTokens.colors.support.success
             CameraUploadsStatusType.Warning -> DSTokens.colors.support.warning
             else -> DSTokens.colors.icon.secondary
         }
         val iconResId = when (type) {
             CameraUploadsStatusType.Sync -> IconPackR.drawable.ic_cu_status_sync_medium_thin_solid
-            CameraUploadsStatusType.Uploading -> {
-                if (progress?.invoke() == 1F) {
-                    IconPackR.drawable.ic_cu_status_check_medium_thin_solid
-                } else IconPackR.drawable.ic_cu_status_arrow_up_medium_thin_solid
-            }
-
-            CameraUploadsStatusType.Complete -> IconPackR.drawable.ic_cu_status_check_medium_thin_solid
+            CameraUploadsStatusType.UploadInProgress -> IconPackR.drawable.ic_cu_status_arrow_up_medium_thin_solid
+            CameraUploadsStatusType.UploadComplete -> IconPackR.drawable.ic_cu_status_check_medium_thin_solid
+            CameraUploadsStatusType.UpToDate -> IconPackR.drawable.ic_cu_status_check_medium_thin_solid
             CameraUploadsStatusType.Pause -> IconPackR.drawable.ic_cu_status_pause_medium_thin_solid
             else -> IconPackR.drawable.ic_cu_status_warning_medium_thin_solid
         }
@@ -137,9 +127,10 @@ private fun StatusIcon(
 enum class CameraUploadsStatusType {
     Default,
     Sync,
-    Uploading,
+    UploadInProgress,
+    UploadComplete,
     Pause,
-    Complete,
+    UpToDate,
     Warning
 }
 
@@ -152,8 +143,10 @@ private fun CameraUploadsStatusIconPreview(
         CameraUploadsStatusIcon(
             type = type,
             onClick = {},
-            progress = if (type == CameraUploadsStatusType.Uploading) {
+            progress = if (type == CameraUploadsStatusType.UploadInProgress) {
                 { 0.5F }
+            } else if (type == CameraUploadsStatusType.UploadComplete) {
+                { 1F }
             } else null
         )
     }
@@ -162,16 +155,4 @@ private fun CameraUploadsStatusIconPreview(
 private class CameraUploadsStatusTypePreviewParameterProvider :
     PreviewParameterProvider<CameraUploadsStatusType> {
     override val values = CameraUploadsStatusType.entries.asSequence()
-}
-
-@CombinedThemePreviews
-@Composable
-private fun CameraUploadsStatusIcon100Preview() {
-    AndroidThemeForPreviews {
-        CameraUploadsStatusIcon(
-            type = CameraUploadsStatusType.Uploading,
-            onClick = {},
-            progress = { 1F }
-        )
-    }
 }

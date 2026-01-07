@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -111,7 +111,7 @@ class CameraUploadStatusToolbarActionTest {
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
                 isCuCompleteStatusVisible = false,
-                cameraUploadsStatus = CameraUploadsStatus.Sync
+                cameraUploadsStatus = CUStatusUiState.Sync
             )
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG).assertIsDisplayed()
@@ -119,16 +119,30 @@ class CameraUploadStatusToolbarActionTest {
     }
 
     @Test
-    fun `test that the uploading icon is displayed`() {
+    fun `test that the upload in-progress icon is displayed`() {
         composeRuleScope {
             setAction(
                 isCuWarningStatusVisible = false,
                 isCuDefaultStatusVisible = false,
                 isCuCompleteStatusVisible = false,
-                cameraUploadsStatus = CameraUploadsStatus.Uploading
+                cameraUploadsStatus = CUStatusUiState.UploadInProgress(1F, 1)
             )
 
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOADING_TAG).assertIsDisplayed()
+            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_IN_PROGRESS_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that the upload complete icon is displayed`() {
+        composeRuleScope {
+            setAction(
+                isCuWarningStatusVisible = false,
+                isCuDefaultStatusVisible = false,
+                isCuCompleteStatusVisible = false,
+                cameraUploadsStatus = CUStatusUiState.UploadComplete
+            )
+
+            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG).assertIsDisplayed()
         }
     }
 
@@ -142,8 +156,7 @@ class CameraUploadStatusToolbarActionTest {
         isCuWarningStatusVisible: Boolean = false,
         isCuDefaultStatusVisible: Boolean = false,
         isCuCompleteStatusVisible: Boolean = false,
-        cameraUploadsStatus: CameraUploadsStatus = CameraUploadsStatus.None,
-        cameraUploadsProgress: Float = 0F,
+        cameraUploadsStatus: CUStatusUiState = CUStatusUiState.None,
         setCameraUploadsMessage: (message: String) -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
@@ -154,7 +167,6 @@ class CameraUploadStatusToolbarActionTest {
                 isCuDefaultStatusVisible = isCuDefaultStatusVisible,
                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
                 cameraUploadsStatus = cameraUploadsStatus,
-                cameraUploadsProgress = cameraUploadsProgress,
                 setCameraUploadsMessage = setCameraUploadsMessage,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings

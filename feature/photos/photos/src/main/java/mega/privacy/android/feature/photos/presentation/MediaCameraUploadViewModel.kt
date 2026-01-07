@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature.photos.model.CameraUploadsStatus
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -71,6 +70,7 @@ class MediaCameraUploadViewModel @Inject constructor(
         monitorCameraUploadsStatus()
         monitorEnableCUBannerVisibility()
         syncCameraUploadsStatus()
+        monitorCameraUploadsEnable()
     }
 
     private fun monitorCameraUploadShownStatus() {
@@ -117,19 +117,13 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     private fun handleCameraUploadsCheckStatus() {
-        setCameraUploadsSyncFab(isVisible = true)
+        setCameraUploadsSyncState()
         setCameraUploadsCompleteMenu(isVisible = false)
         setCameraUploadsWarningMenu(false)
     }
 
-    private fun setCameraUploadsSyncFab(isVisible: Boolean) {
-        _uiState.update {
-            it.copy(
-                cameraUploadsStatus = CameraUploadsStatus.Sync.takeIf {
-                    isVisible
-                } ?: CameraUploadsStatus.None,
-            )
-        }
+    private fun setCameraUploadsSyncState() {
+        _uiState.update { it.copy(status = CUStatusUiState.Sync) }
     }
 
     private fun setCameraUploadsCompleteMenu(isVisible: Boolean) {
@@ -137,38 +131,19 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
-        updateCameraUploadProgressIfNeeded(pending = info.totalToUpload - info.totalUploaded)
-        setCameraUploadsUploadingFab(
-            isVisible = true,
-            progress = info.progress.floatValue,
-        )
-        setCameraUploadsTotalUploaded(info.totalToUpload)
-
+        _uiState.update {
+            it.copy(
+                status = CUStatusUiState.UploadInProgress(
+                    progress = info.progress.floatValue,
+                    pending = info.totalToUpload - info.totalUploaded,
+                ),
+                cameraUploadsTotalUploaded = info.totalToUpload,
+            )
+        }
         isCameraUploadsUploading = true
     }
 
-    private fun updateCameraUploadProgressIfNeeded(pending: Int) {
-        _uiState.update { it.copy(pending = pending) }
-        Timber.d("CU Upload Progress: Pending: $pending")
-    }
-
-    private fun setCameraUploadsUploadingFab(isVisible: Boolean, progress: Float) {
-        _uiState.update {
-            it.copy(
-                cameraUploadsStatus = CameraUploadsStatus.Uploading.takeIf {
-                    isVisible
-                } ?: CameraUploadsStatus.None,
-                cameraUploadsProgress = progress,
-            )
-        }
-    }
-
-    private fun setCameraUploadsTotalUploaded(totalUploaded: Int) {
-        _uiState.update { state -> state.copy(cameraUploadsTotalUploaded = totalUploaded) }
-    }
-
     private suspend fun handleCameraUploadsFinishedStatus(info: CameraUploadsStatusInfo.Finished) {
-        updateCameraUploadProgressIfNeeded(pending = 0)
         val cameraUploadsFinishedReason = info.reason
 
         if (cameraUploadsFinishedReason == CameraUploadsFinishedReason.UNKNOWN) return
@@ -178,15 +153,21 @@ class MediaCameraUploadViewModel @Inject constructor(
         when (cameraUploadsFinishedReason) {
             CameraUploadsFinishedReason.COMPLETED -> {
                 if (isCameraUploadsUploading) {
-                    setCameraUploadsCompleteFab(isVisible = true)
-                    setCameraUploadsCompletedMessage(show = true)
+                    _uiState.update {
+                        it.copy(
+                            status = CUStatusUiState.UploadComplete,
+                            showCameraUploadsCompletedMessage = true
+                        )
+                    }
 
                     isCameraUploadsUploading = false
                     delay(4.seconds)
                 }
 
+                _uiState.update { uiState ->
+                    uiState.copy(status = CUStatusUiState.UpToDate)
+                }
                 setCameraUploadsCompleteMenu(isVisible = true)
-                setCameraUploadsCompleteFab(isVisible = false)
             }
 
             CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
@@ -203,7 +184,7 @@ class MediaCameraUploadViewModel @Inject constructor(
                 } else {
                     _uiState.update {
                         it.copy(
-                            cameraUploadsStatus = CameraUploadsStatus.Warning,
+                            status = CUStatusUiState.Warning,
                             cameraUploadsProgress = 0.5f,
                         )
                     }
@@ -218,22 +199,12 @@ class MediaCameraUploadViewModel @Inject constructor(
         _uiState.update { it.copy(cameraUploadsFinishedReason = reason) }
     }
 
-    private fun setCameraUploadsCompleteFab(isVisible: Boolean) {
-        _uiState.update {
-            it.copy(
-                cameraUploadsStatus = CameraUploadsStatus.Complete.takeIf {
-                    isVisible
-                } ?: CameraUploadsStatus.None,
-            )
-        }
-    }
-
     internal fun setCameraUploadsCompletedMessage(show: Boolean) {
         _uiState.update { it.copy(showCameraUploadsCompletedMessage = show) }
     }
 
     private fun hideCameraUploadsFab() {
-        _uiState.update { it.copy(cameraUploadsStatus = CameraUploadsStatus.None) }
+        _uiState.update { it.copy(status = CUStatusUiState.None) }
     }
 
     internal fun shouldShowWarningBanner(): Boolean {
@@ -266,6 +237,25 @@ class MediaCameraUploadViewModel @Inject constructor(
         }
     }
 
+    private fun monitorCameraUploadsEnable() {
+        viewModelScope.launch {
+            isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled
+                .catch { Timber.e(it, "Unable to monitor camera uploads enabled") }
+                .collectLatest { isEnabled ->
+                    if (isEnabled) {
+                        _uiState.update {
+                            it.copy(
+                                enableCameraUploadButtonShowing = false,
+                                enableCameraUploadPageShowing = false,
+                            )
+                        }
+                    } else {
+                        _uiState.update { it.copy(enableCameraUploadButtonShowing = true) }
+                    }
+                }
+        }
+    }
+
     internal fun handleCameraUploadsPermissionsResult() {
         val hasPermissions = hasMediaPermissionUseCase()
 
@@ -290,22 +280,6 @@ class MediaCameraUploadViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { setInitialCUPreferences() }
                 .onFailure { Timber.e(it, "Unable to set the initial CU preferences") }
-        }
-    }
-
-    internal fun resetCUButtonAndProgress() {
-        viewModelScope.launch {
-            if (isCameraUploadsEnabledUseCase()) {
-                _uiState.update {
-                    it.copy(
-                        enableCameraUploadButtonShowing = false,
-                        enableCameraUploadPageShowing = false,
-                    )
-                }
-            } else {
-                _uiState.update { it.copy(enableCameraUploadButtonShowing = true) }
-                hideCameraUploadsFab()
-            }
         }
     }
 
