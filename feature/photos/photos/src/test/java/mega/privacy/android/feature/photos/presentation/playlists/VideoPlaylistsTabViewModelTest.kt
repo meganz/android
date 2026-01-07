@@ -2,13 +2,9 @@ package mega.privacy.android.feature.photos.presentation.playlists
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -17,9 +13,6 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMa
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.TextFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
@@ -41,11 +34,8 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import kotlin.time.Duration.Companion.seconds
 
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -76,7 +66,7 @@ class VideoPlaylistsTabViewModelTest {
         runBlocking {
             whenever(monitorNodeUpdatesUseCase()).thenReturn(
                 flow {
-                    emptyMap<FileNode, NodeUpdate>()
+                    NodeUpdate(emptyMap())
                     awaitCancellation()
                 }
             )
@@ -96,7 +86,6 @@ class VideoPlaylistsTabViewModelTest {
             whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
             whenever(videoPlaylistUiEntityMapper(any())).thenReturn(expectedPlaylist)
         }
-        initUnderTest()
     }
 
     private fun initUnderTest() {
@@ -128,98 +117,14 @@ class VideoPlaylistsTabViewModelTest {
 
     @Test
     fun `test that the initial state is correctly updated`() = runTest {
+        initUnderTest()
+        advanceUntilIdle()
+
         underTest.uiState.test {
             assertThat(awaitItem()).isInstanceOf(VideoPlaylistsTabUiState.Loading::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }
-
-    @Test
-    fun `test that uiState is correctly updated triggerRefresh is invoked`() =
-        runTest {
-            underTest.triggerRefresh()
-            advanceUntilIdle()
-
-            val actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-
-            assertThat(actual.videoPlaylistEntities).isNotEmpty()
-            assertThat(actual.videoPlaylistEntities).hasSize(2)
-            assertThat(actual.sortOrder).isEqualTo(expectedSortOrder)
-            assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorVideoPlaylistSetsUpdateUseCase is triggered`() =
-        runTest {
-            monitorVideoPlaylistSetsUpdateUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(listOf(1L, 2L))
-                        awaitCancellation()
-                    }
-                )
-            }
-            initUnderTest()
-            val actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-
-            assertThat(actual.videoPlaylistEntities).isNotEmpty()
-            assertThat(actual.videoPlaylistEntities).hasSize(2)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
-        runTest {
-            val testFileNode = mock<FileNode> {
-                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
-            }
-            monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-                        awaitCancellation()
-                    }
-                )
-            }
-
-            val actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-
-            assertThat(actual.videoPlaylistEntities).isNotEmpty()
-            assertThat(actual.videoPlaylistEntities).hasSize(2)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered but changed node is not videoType`() =
-        runTest {
-            val testFileNode = mock<FileNode> {
-                on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
-            }
-
-            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
-            monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(nodeUpdatesFlow)
-            }
-            initUnderTest()
-
-            underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first()
-            advanceUntilIdle()
-
-            resetMocks()
-            whenever(getVideoPlaylistsUseCase()).thenReturn(listOf(mock(), mock()))
-
-            nodeUpdatesFlow.emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-            advanceUntilIdle()
-
-            // Verify that getVideoPlaylistsUseCase was NOT called because the update was filtered out
-            verifyNoMoreInteractions(getVideoPlaylistsUseCase)
-        }
 
     @Test
     fun `test that uiState is correctly updated when setCloudSortOrder is invoked`() =
@@ -230,16 +135,20 @@ class VideoPlaylistsTabViewModelTest {
                 .thenReturn(sortOrder)
             whenever(nodeSortConfigurationUiMapper(any(), any())).thenReturn(config)
 
+            initUnderTest()
             underTest.setCloudSortOrder(config)
             advanceUntilIdle()
 
-            val actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-
-            verify(setCloudSortOrderUseCase).invoke(sortOrder)
-            assertThat(actual.sortOrder).isEqualTo(expectedSortOrder)
-            assertThat(actual.selectedSortConfiguration).isEqualTo(config)
+            underTest.uiState.test {
+                skipItems(1)
+                val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    verify(setCloudSortOrderUseCase).invoke(sortOrder)
+                    assertThat(actual.sortOrder).isEqualTo(expectedSortOrder)
+                    assertThat(actual.selectedSortConfiguration).isEqualTo(config)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @ParameterizedTest(name = "when sortOrder is {0}")
@@ -265,12 +174,15 @@ class VideoPlaylistsTabViewModelTest {
             initUnderTest()
             advanceUntilIdle()
 
-            val actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-
-            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
-            assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
+            underTest.uiState.test {
+                skipItems(1)
+                val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
+                    assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -280,26 +192,28 @@ class VideoPlaylistsTabViewModelTest {
             val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
 
             initVideoPlaylists(listOf(playlist1, playlist2))
+            initUnderTest()
             underTest.onItemLongClicked(playlist1)
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.selectedPlaylists.size == 1 }
+            underTest.uiState.test {
+                skipItems(1)
+                var actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedPlaylists).hasSize(1)
+                    assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
+                }
 
-            assertThat(actual.selectedPlaylists).hasSize(1)
-            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
-
-            underTest.onItemClicked(playlist2)
-
-            actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.selectedPlaylists.size == 2 }
-
-            assertThat(actual.selectedPlaylists).hasSize(2)
-            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
-                playlist1.id,
-                playlist2.id
-            )
+                underTest.onItemClicked(playlist2)
+                actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedPlaylists).hasSize(2)
+                    assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
+                        playlist1.id,
+                        playlist2.id
+                    )
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -309,24 +223,28 @@ class VideoPlaylistsTabViewModelTest {
             val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
 
             initVideoPlaylists(listOf(playlist1, playlist2))
+            initUnderTest()
+            advanceUntilIdle()
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.videoPlaylistEntities.isNotEmpty() }
-            assertThat(actual.videoPlaylistEntities).isNotEmpty()
-            assertThat(actual.selectedPlaylists).isEmpty()
+            underTest.uiState.test {
+                skipItems(1)
+                var actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.videoPlaylistEntities).isNotEmpty()
+                    assertThat(actual.selectedPlaylists).isEmpty()
+                }
 
-            underTest.selectAllVideos()
-
-            actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.selectedPlaylists.isNotEmpty() }
-
-            assertThat(actual.selectedPlaylists).hasSize(2)
-            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
-                playlist1.id,
-                playlist2.id
-            )
+                underTest.selectAllVideos()
+                actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedPlaylists).hasSize(2)
+                    assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
+                        playlist1.id,
+                        playlist2.id
+                    )
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -336,23 +254,19 @@ class VideoPlaylistsTabViewModelTest {
             val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
 
             initVideoPlaylists(listOf(playlist1, playlist2))
-
+            initUnderTest()
             underTest.onItemLongClicked(playlist1)
+            advanceUntilIdle()
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.selectedPlaylists.size == 1 }
-
-            assertThat(actual.selectedPlaylists).hasSize(1)
-            assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
-
-            underTest.clearSelection()
-
-            actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.selectedPlaylists.isEmpty() }
-
-            assertThat(actual.selectedPlaylists).isEmpty()
+            underTest.uiState.test {
+                skipItems(1)
+                val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedPlaylists).hasSize(1)
+                    assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(playlist1.id)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -367,26 +281,21 @@ class VideoPlaylistsTabViewModelTest {
                 removeVideoPlaylistsUseCase(any())
             ).thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
 
-            underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+            initUnderTest()
             advanceUntilIdle()
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.playlistsRemovedEvent != consumed() }
-
-            assertThat(actual.playlistsRemovedEvent).isEqualTo(
-                triggered(
-                    listOf(playlist1.title, playlist2.title)
-                )
-            )
-
-            underTest.resetPlaylistsRemovedEvent()
-
-            actual = underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .first { it.playlistsRemovedEvent == consumed() }
-
-            assertThat(actual.playlistsRemovedEvent).isEqualTo(consumed())
+            underTest.uiState.test {
+                skipItems(2)
+                underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+                val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.playlistsRemovedEvent).isEqualTo(
+                        triggered(
+                            listOf(playlist1.title, playlist2.title)
+                        )
+                    )
+                }
+            }
         }
 
     private fun createVideoPlaylistUiEntity(

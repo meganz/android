@@ -9,6 +9,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import jakarta.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -51,16 +52,16 @@ import timber.log.Timber
 class VideosTabViewModel @Inject constructor(
     private val getAllVideosUseCase: GetAllVideosUseCase,
     private val videoUiEntityMapper: VideoUiEntityMapper,
-    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
     private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
-    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
 ) : ViewModel() {
     private val triggerFlow = MutableStateFlow(false)
     private val queryFlow = MutableStateFlow<String?>(null)
@@ -75,49 +76,60 @@ class VideosTabViewModel @Inject constructor(
                 navigateToVideoPlayerFlow
             }
 
+    private val dataUpdatedFlow: Flow<VideosTabUiState.Data> =
+        combine(
+            merge(
+                monitorNodeUpdatesUseCase().filter {
+                    it.changes.keys.any { node ->
+                        node is FileNode && node.type is VideoFileTypeInfo
+                    }
+                }.catch { Timber.e(it) },
+                monitorOfflineNodeUpdatesUseCase().catch { Timber.e(it) }
+            ).onStart { emit(Unit) },
+            monitorSortCloudOrderUseCase().catch { Timber.e(it) },
+            monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
+            monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
+        ) { _, sortOrder, isHiddenNodesEnabled, isShowHiddenItems ->
+            val showHiddenItems = isShowHiddenItems || !isHiddenNodesEnabled
+            val videoNodes = getVideoNodeList()
+                .filterVideosByDuration()
+                .filterVideosByLocation()
+                .filterNonSensitiveItems(showHiddenItems)
+            val uiEntities = videoNodes.map { videoUiEntityMapper(it) }
+            val order = sortOrder ?: SortOrder.ORDER_DEFAULT_ASC
+            val sortOrderPair = nodeSortConfigurationUiMapper(order)
+
+            VideosTabUiState.Data(
+                allVideoEntities = uiEntities,
+                allVideoNodes = videoNodes,
+                sortOrder = order,
+                query = queryFlow.value,
+                selectedSortConfiguration = sortOrderPair,
+                locationSelectedFilterOption = locationFilterOptionFlow.value,
+                durationSelectedFilterOption = durationFilterOptionFlow.value,
+                showHiddenItems = showHiddenItems
+            )
+        }
+
     internal val uiState: StateFlow<VideosTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
         triggerFlow.flatMapLatest {
             flow {
                 emit(VideosTabUiState.Loading)
                 emitAll(
                     combine(
-                        merge(
-                            monitorNodeUpdatesUseCase().filter {
-                                it.changes.keys.any { node ->
-                                    node is FileNode && node.type is VideoFileTypeInfo
-                                }
-                            },
-                            monitorOfflineNodeUpdatesUseCase(),
-                            selectedVideoIdsFlow,
-                        ).onStart { emit(Unit) },
-                        monitorSortCloudOrderUseCase(),
-                        observeShowHiddenItemsState(),
-                    ) { _, sortOrder, showHiddenItems ->
-                        val videoNodes = getVideoNodeList()
-                            .filterVideosByDuration()
-                            .filterVideosByLocation()
-                            .filterNonSensitiveItems(showHiddenItems)
-                        val uiEntities = videoNodes.map {
-                            videoUiEntityMapper(it).copy(
-                                isSelected = it.id.longValue in selectedVideoIdsFlow.value
-                            )
+                        dataUpdatedFlow,
+                        selectedVideoIdsFlow
+                    ) { uiState, selectedVideoIds ->
+                        val uiEntities = uiState.allVideoEntities.map {
+                            it.copy(isSelected = it.id.longValue in selectedVideoIds)
                         }
-                        val order = sortOrder ?: SortOrder.ORDER_DEFAULT_ASC
-                        val sortOrderPair = nodeSortConfigurationUiMapper(order)
-                        val selectedNodes = videoNodes.filter {
-                            it.id.longValue in selectedVideoIdsFlow.value
+                        val selectedNodes = uiState.allVideoNodes.filter {
+                            it.id.longValue in selectedVideoIds
                         }
 
-                        VideosTabUiState.Data(
+                        uiState.copy(
                             allVideoEntities = uiEntities,
-                            allVideoNodes = videoNodes,
-                            sortOrder = order,
-                            query = queryFlow.value,
-                            selectedSortConfiguration = sortOrderPair,
-                            locationSelectedFilterOption = locationFilterOptionFlow.value,
-                            durationSelectedFilterOption = durationFilterOptionFlow.value,
-                            selectedTypedNodes = selectedNodes,
-                            showHiddenItems = showHiddenItems
+                            selectedTypedNodes = selectedNodes
                         )
                     }.catch {
                         Timber.e(it)
@@ -134,13 +146,14 @@ class VideosTabViewModel @Inject constructor(
         triggerFlow.update { !it }
     }
 
-
-    private suspend fun getVideoNodeList() =
-        getAllVideosUseCase(
-            searchQuery = getCurrentSearchQuery(),
-            tag = getCurrentSearchQuery().removePrefix("#"),
-            description = getCurrentSearchQuery()
+    private suspend fun getVideoNodeList(): List<TypedVideoNode> {
+        val query = getCurrentSearchQuery()
+        return getAllVideosUseCase(
+            searchQuery = query,
+            tag = query.removePrefix("#"),
+            description = query
         )
+    }
 
     private suspend fun List<TypedVideoNode>.filterVideosByLocation(): List<TypedVideoNode> {
         val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
@@ -204,18 +217,6 @@ class VideosTabViewModel @Inject constructor(
         }
     }
 
-    private fun observeShowHiddenItemsState() =
-        combine(
-            monitorHiddenNodesEnabledUseCase()
-                .catch { Timber.e(it) },
-            monitorShowHiddenItemsUseCase()
-                .catch { Timber.e(it) },
-        ) { isHiddenNodesEnabled, showHiddenItems ->
-            showHiddenItems || !isHiddenNodesEnabled
-        }.onStart {
-            emit(false)
-        }
-
     internal fun onItemClicked(item: VideoUiEntity) {
         if (selectedVideoIdsFlow.value.isNotEmpty()) {
             toggleItemSelection(item)
@@ -270,11 +271,9 @@ class VideosTabViewModel @Inject constructor(
     }
 
     internal fun selectAllVideos() {
-        if (uiState.value is VideosTabUiState.Data) {
-            val allIds =
-                (uiState.value as VideosTabUiState.Data).allVideoEntities.map { it.id.longValue }
-            selectedVideoIdsFlow.update { allIds }
-        }
+        val state = uiState.value as? VideosTabUiState.Data ?: return
+        val allIds = state.allVideoEntities.map { it.id.longValue }
+        selectedVideoIdsFlow.update { allIds }
     }
 
     internal fun clearSelection() {

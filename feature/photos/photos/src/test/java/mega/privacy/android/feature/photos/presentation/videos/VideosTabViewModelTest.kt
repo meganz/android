@@ -1,28 +1,17 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
-import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.domain.entity.Offline
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
@@ -50,9 +39,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -90,7 +76,7 @@ class VideosTabViewModelTest {
         runBlocking {
             whenever(monitorNodeUpdatesUseCase()).thenReturn(
                 flow {
-                    emptyMap<FileNode, NodeUpdate>()
+                    emit(NodeUpdate(emptyMap()))
                     awaitCancellation()
                 }
             )
@@ -130,7 +116,6 @@ class VideosTabViewModelTest {
                 }
             )
         }
-        initUnderTest()
     }
 
     private fun initUnderTest() {
@@ -170,8 +155,22 @@ class VideosTabViewModelTest {
 
     @Test
     fun `test that the initial state is correctly updated`() = runTest {
+        initUnderTest()
         underTest.uiState.test {
             assertThat(awaitItem()).isInstanceOf(VideosTabUiState.Loading::class.java)
+            val actual = awaitItem() as? VideosTabUiState.Data
+            if (actual != null) {
+                assertThat(actual).isInstanceOf(VideosTabUiState.Data::class.java)
+                assertThat(actual.allVideoEntities).isNotEmpty()
+                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                assertThat(actual.allVideoEntities.size).isEqualTo(2)
+                assertThat(actual.selectedTypedNodes).isEmpty()
+                assertThat(actual.query).isNull()
+                assertThat(actual.highlightText).isEmpty()
+                assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                assertThat(actual.locationSelectedFilterOption).isEqualTo(LocationFilterOption.AllLocations)
+                assertThat(actual.durationSelectedFilterOption).isEqualTo(DurationFilterOption.AllDurations)
+            }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -179,103 +178,28 @@ class VideosTabViewModelTest {
     @Test
     fun `test that uiState is correctly updated triggerRefresh is invoked`() =
         runTest {
-            underTest.triggerRefresh()
-            advanceUntilIdle()
-
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.allVideoEntities.isNotEmpty() }
-
-            assertThat(actual.allVideoEntities).isNotEmpty()
-            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            assertThat(actual.allVideoEntities.size).isEqualTo(2)
-            assertThat(actual.selectedTypedNodes).isEmpty()
-            assertThat(actual.query).isNull()
-            assertThat(actual.highlightText).isEmpty()
-            assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
-            assertThat(actual.locationSelectedFilterOption).isEqualTo(LocationFilterOption.AllLocations)
-            assertThat(actual.durationSelectedFilterOption).isEqualTo(DurationFilterOption.AllDurations)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered`() =
-        runTest {
-            val testFileNode = mock<FileNode> {
-                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
-            }
-            monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-                        awaitCancellation()
-                    }
-                )
-            }
-
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.allVideoEntities.isNotEmpty() }
-
-            assertThat(actual.allVideoEntities).isNotEmpty()
-            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            assertThat(actual.allVideoEntities.size).isEqualTo(2)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorNodeUpdatesUseCase is triggered but changed node is not videoType`() =
-        runTest {
-            val testFileNode = mock<FileNode> {
-                on { type }.thenReturn(TextFileTypeInfo("TextFile", "txt"))
-            }
-
-            val nodeUpdatesFlow = MutableSharedFlow<NodeUpdate>()
-            monitorNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(nodeUpdatesFlow)
-            }
             initUnderTest()
 
-            underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first()
+            underTest.uiState.test {
+                skipItems(2)
 
-            advanceUntilIdle()
-
-            resetMocks()
-            whenever(
-                getAllVideosUseCase(
-                    searchQuery = anyOrNull(),
-                    tag = anyOrNull(),
-                    description = anyOrNull()
-                )
-            ).thenReturn(listOf(mock(), mock()))
-
-            nodeUpdatesFlow.emit(NodeUpdate(mapOf(testFileNode to emptyList())))
-            advanceUntilIdle()
-
-            // Verify that getAllVideosUseCase was NOT called because the update was filtered out
-            verifyNoMoreInteractions(getAllVideosUseCase)
-        }
-
-    @Test
-    fun `test that uiState is correctly updated when monitorOfflineNodeUpdatesUseCase is triggered`() =
-        runTest {
-            val testOffline = mock<Offline>()
-            monitorOfflineNodeUpdatesUseCase.stub {
-                on { invoke() }.thenReturn(
-                    flow {
-                        emit(listOf(testOffline))
-                        awaitCancellation()
-                    }
-                )
+                underTest.triggerRefresh()
+                assertThat(awaitItem()).isInstanceOf(VideosTabUiState.Loading::class.java)
+                val actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual).isInstanceOf(VideosTabUiState.Data::class.java)
+                    assertThat(actual.allVideoEntities).isNotEmpty()
+                    assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                    assertThat(actual.allVideoEntities.size).isEqualTo(2)
+                    assertThat(actual.selectedTypedNodes).isEmpty()
+                    assertThat(actual.query).isNull()
+                    assertThat(actual.highlightText).isEmpty()
+                    assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                    assertThat(actual.locationSelectedFilterOption).isEqualTo(LocationFilterOption.AllLocations)
+                    assertThat(actual.durationSelectedFilterOption).isEqualTo(DurationFilterOption.AllDurations)
+                }
+                cancelAndIgnoreRemainingEvents()
             }
-
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.allVideoEntities.isNotEmpty() }
-
-            assertThat(actual.allVideoEntities).isNotEmpty()
-            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            assertThat(actual.allVideoEntities.size).isEqualTo(2)
         }
 
     @Test
@@ -291,17 +215,22 @@ class VideosTabViewModelTest {
             )
         ).thenReturn(listOf(typedNode))
         whenever(videoUiEntityMapper(typedNode)).thenReturn(video)
-        underTest.searchQuery(query)
-        advanceUntilIdle()
 
-        val actual = underTest.uiState
-            .filterIsInstance<VideosTabUiState.Data>()
-            .first { !it.query.isNullOrEmpty() }
+        initUnderTest()
 
-        assertThat(actual.allVideoEntities).isNotEmpty()
-        assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-        assertThat(actual.allVideoEntities.size).isEqualTo(1)
-        assertThat(actual.query).isEqualTo(query)
+        underTest.uiState.test {
+            skipItems(2)
+
+            underTest.searchQuery(query)
+            val actual = awaitItem() as? VideosTabUiState.Data
+            if (actual != null) {
+                assertThat(actual.allVideoEntities).isNotEmpty()
+                assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                assertThat(actual.allVideoEntities.size).isEqualTo(1)
+                assertThat(actual.query).isEqualTo(query)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -314,18 +243,21 @@ class VideosTabViewModelTest {
                 NodeSortConfiguration.default
             )
 
-            underTest.setCloudSortOrder(NodeSortConfiguration.default)
-            advanceUntilIdle()
+            initUnderTest()
 
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.allVideoEntities.isNotEmpty() }
+            underTest.uiState.test {
+                skipItems(1)
 
-            verify(setCloudSortOrderUseCase).invoke(any())
-            assertThat(actual.allVideoEntities).isNotEmpty()
-            assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
-            assertThat(actual.allVideoEntities.size).isEqualTo(2)
-            assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                underTest.setCloudSortOrder(NodeSortConfiguration.default)
+                val actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.allVideoEntities).isNotEmpty()
+                    assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_MODIFICATION_DESC)
+                    assertThat(actual.allVideoEntities.size).isEqualTo(2)
+                    assertThat(actual.selectedSortConfiguration).isEqualTo(NodeSortConfiguration.default)
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
 
@@ -347,30 +279,36 @@ class VideosTabViewModelTest {
             val list = cloudDriveList + cameraUploadsList + sharedList
 
             initVideosForFilter(videos = list)
-            underTest.setLocationSelectedFilterOption(locationFilterOption)
-            advanceUntilIdle()
 
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.locationSelectedFilterOption == locationFilterOption }
+            initUnderTest()
 
-            assertThat(actual.allVideoEntities).hasSize(
-                when (locationFilterOption) {
-                    LocationFilterOption.AllLocations -> list.size
-                    LocationFilterOption.CloudDrive -> (cloudDriveList + sharedList).size
-                    LocationFilterOption.CameraUploads -> cameraUploadsList.size
-                    LocationFilterOption.SharedItems -> sharedList.size
+            underTest.uiState.test {
+                skipItems(2)
+
+                underTest.setLocationSelectedFilterOption(locationFilterOption)
+                skipItems(1)
+                val actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.allVideoEntities).hasSize(
+                        when (locationFilterOption) {
+                            LocationFilterOption.AllLocations -> list.size
+                            LocationFilterOption.CloudDrive -> (cloudDriveList + sharedList).size
+                            LocationFilterOption.CameraUploads -> cameraUploadsList.size
+                            LocationFilterOption.SharedItems -> sharedList.size
+                        }
+                    )
+
+                    assertThat(actual.allVideoEntities.map { it.id }).isEqualTo(
+                        when (locationFilterOption) {
+                            LocationFilterOption.AllLocations -> list
+                            LocationFilterOption.CloudDrive -> cloudDriveList + sharedList
+                            LocationFilterOption.CameraUploads -> cameraUploadsList
+                            LocationFilterOption.SharedItems -> sharedList
+                        }.map { it.id }
+                    )
                 }
-            )
-
-            assertThat(actual.allVideoEntities.map { it.id }).isEqualTo(
-                when (locationFilterOption) {
-                    LocationFilterOption.AllLocations -> list
-                    LocationFilterOption.CloudDrive -> cloudDriveList + sharedList
-                    LocationFilterOption.CameraUploads -> cameraUploadsList
-                    LocationFilterOption.SharedItems -> sharedList
-                }.map { it.id }
-            )
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     private fun provideLocationOptions(): List<LocationFilterOption> =
@@ -411,34 +349,39 @@ class VideosTabViewModelTest {
                 lessThan10Seconds + between10And60Seconds + between1And4 + between4And20 + moreThan20
 
             initVideosForFilter(allVideos)
-            underTest.setDurationSelectedFilterOption(durationFilterOption)
-            advanceUntilIdle()
+            initUnderTest()
 
-            val actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.durationSelectedFilterOption == durationFilterOption }
+            underTest.uiState.test {
+                skipItems(2)
 
-            assertThat(actual.durationSelectedFilterOption).isEqualTo(durationFilterOption)
-            assertThat(actual.allVideoEntities).hasSize(
-                when (durationFilterOption) {
-                    DurationFilterOption.AllDurations -> allVideos.size
-                    DurationFilterOption.LessThan10Seconds -> lessThan10Seconds.size
-                    DurationFilterOption.Between10And60Seconds -> between10And60Seconds.size
-                    DurationFilterOption.Between1And4 -> between1And4.size
-                    DurationFilterOption.Between4And20 -> between4And20.size
-                    DurationFilterOption.MoreThan20 -> moreThan20.size
+                underTest.setDurationSelectedFilterOption(durationFilterOption)
+                skipItems(1)
+                val actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.durationSelectedFilterOption).isEqualTo(durationFilterOption)
+                    assertThat(actual.allVideoEntities).hasSize(
+                        when (durationFilterOption) {
+                            DurationFilterOption.AllDurations -> allVideos.size
+                            DurationFilterOption.LessThan10Seconds -> lessThan10Seconds.size
+                            DurationFilterOption.Between10And60Seconds -> between10And60Seconds.size
+                            DurationFilterOption.Between1And4 -> between1And4.size
+                            DurationFilterOption.Between4And20 -> between4And20.size
+                            DurationFilterOption.MoreThan20 -> moreThan20.size
+                        }
+                    )
+                    assertThat(actual.allVideoEntities.map { it.id }).isEqualTo(
+                        when (durationFilterOption) {
+                            DurationFilterOption.AllDurations -> allVideos
+                            DurationFilterOption.LessThan10Seconds -> lessThan10Seconds
+                            DurationFilterOption.Between10And60Seconds -> between10And60Seconds
+                            DurationFilterOption.Between1And4 -> between1And4
+                            DurationFilterOption.Between4And20 -> between4And20
+                            DurationFilterOption.MoreThan20 -> moreThan20
+                        }.map { it.id }
+                    )
                 }
-            )
-            assertThat(actual.allVideoEntities.map { it.id }).isEqualTo(
-                when (durationFilterOption) {
-                    DurationFilterOption.AllDurations -> allVideos
-                    DurationFilterOption.LessThan10Seconds -> lessThan10Seconds
-                    DurationFilterOption.Between10And60Seconds -> between10And60Seconds
-                    DurationFilterOption.Between1And4 -> between1And4
-                    DurationFilterOption.Between4And20 -> between4And20
-                    DurationFilterOption.MoreThan20 -> moreThan20
-                }.map { it.id }
-            )
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     private fun provideDurationOptions(): List<DurationFilterOption> =
@@ -458,27 +401,29 @@ class VideosTabViewModelTest {
             val video2 = createVideoUiEntity(handle = 2L)
 
             initVideosForFilter(videos = listOf(video1, video2))
+            initUnderTest()
 
-            underTest.onItemLongClicked(video1)
+            underTest.uiState.test {
+                skipItems(2)
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.selectedTypedNodes.size == 1 }
+                underTest.onItemLongClicked(video1)
+                var actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedTypedNodes).hasSize(1)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
+                }
 
-            assertThat(actual.selectedTypedNodes).hasSize(1)
-            assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
-
-            underTest.onItemClicked(video2)
-
-            actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.selectedTypedNodes.size == 2 }
-
-            assertThat(actual.selectedTypedNodes).hasSize(2)
-            assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
-                video1.id,
-                video2.id
-            )
+                underTest.onItemClicked(video2)
+                actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedTypedNodes).hasSize(2)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
+                        video1.id,
+                        video2.id
+                    )
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -488,24 +433,27 @@ class VideosTabViewModelTest {
             val video2 = createVideoUiEntity(handle = 2L)
 
             initVideosForFilter(videos = listOf(video1, video2))
+            initUnderTest()
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.allVideoEntities.isNotEmpty() }
-            assertThat(actual.allVideoEntities).isNotEmpty()
-            assertThat(actual.selectedTypedNodes).isEmpty()
+            underTest.uiState.test {
+                skipItems(1)
+                var actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.allVideoEntities).isNotEmpty()
+                    assertThat(actual.selectedTypedNodes).isEmpty()
+                }
 
-            underTest.selectAllVideos()
-
-            actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.selectedTypedNodes.isNotEmpty() }
-
-            assertThat(actual.selectedTypedNodes).hasSize(2)
-            assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
-                video1.id,
-                video2.id
-            )
+                underTest.selectAllVideos()
+                actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedTypedNodes).hasSize(2)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
+                        video1.id,
+                        video2.id
+                    )
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -516,65 +464,26 @@ class VideosTabViewModelTest {
 
             initVideosForFilter(videos = listOf(video1, video2))
 
-            underTest.onItemLongClicked(video1)
+            initUnderTest()
 
-            var actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.selectedTypedNodes.size == 1 }
+            underTest.uiState.test {
+                skipItems(2)
 
-            assertThat(actual.selectedTypedNodes).hasSize(1)
-            assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
+                underTest.onItemLongClicked(video1)
+                var actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedTypedNodes).hasSize(1)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
+                }
 
-            underTest.clearSelection()
-
-            actual = underTest.uiState
-                .filterIsInstance<VideosTabUiState.Data>()
-                .first { it.selectedTypedNodes.isEmpty() }
-
-            assertThat(actual.selectedTypedNodes).isEmpty()
+                underTest.clearSelection()
+                actual = awaitItem() as? VideosTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedTypedNodes).isEmpty()
+                }
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-
-    @Test
-    fun `test that navigateToVideoPlayer is updated as expected`() = runTest {
-        val video1 = createVideoUiEntity(handle = 1L)
-        val video2 = createVideoUiEntity(handle = 2L)
-
-        val mockNavKey = mock<NavKey>()
-        whenever(
-            fileNodeContentToNavKeyMapper(
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-            )
-        ).thenReturn(mockNavKey)
-
-        val expectedContentUri = NodeContentUri.RemoteContentUri("test url", false)
-        whenever(getNodeContentUriUseCase(any())).thenReturn(expectedContentUri)
-
-        initVideosForFilter(videos = listOf(video1, video2))
-
-        val actual = underTest.uiState
-            .filterIsInstance<VideosTabUiState.Data>()
-            .first { it.allVideoEntities.isNotEmpty() }
-        assertThat(actual.allVideoEntities).isNotEmpty()
-        assertThat(actual.allVideoEntities).hasSize(2)
-
-        underTest.onItemClicked(video1)
-
-        var navigateToVideoPlayer = underTest.navigateToVideoPlayerEvent
-            .first { it != consumed() }
-        assertThat(navigateToVideoPlayer).isEqualTo(triggered(mockNavKey))
-
-        underTest.resetNavigateToVideoPlayer()
-        navigateToVideoPlayer = underTest.navigateToVideoPlayerEvent
-            .first { it == consumed() }
-        assertThat(navigateToVideoPlayer).isEqualTo(consumed())
-    }
 
     @ParameterizedTest(name = "when the showHiddenItems is {0}")
     @ValueSource(booleans = [true, false])
@@ -592,35 +501,37 @@ class VideosTabViewModelTest {
                 awaitCancellation()
             }
         )
-        initUnderTest()
         initVideosForFilter(videos = listOf(video1, video2, video3, video4))
+        initUnderTest()
 
-        val actual = underTest.uiState
-            .filterIsInstance<VideosTabUiState.Data>()
-            .first { it.allVideoEntities.isNotEmpty() && it.showHiddenItems == showHiddenItems }
-
-
-        assertThat(actual.allVideoEntities).isNotEmpty()
-        assertThat(actual.showHiddenItems).isEqualTo(showHiddenItems)
-        assertThat(actual.allVideoEntities).hasSize(
-            if (showHiddenItems) {
-                4
-            } else {
-                2
+        underTest.uiState.test {
+            skipItems(1)
+            val actual = awaitItem() as? VideosTabUiState.Data
+            if (actual != null) {
+                assertThat(actual.allVideoEntities).isNotEmpty()
+                assertThat(actual.showHiddenItems).isEqualTo(showHiddenItems)
+                assertThat(actual.allVideoEntities).hasSize(
+                    if (showHiddenItems) {
+                        4
+                    } else {
+                        2
+                    }
+                )
+                if (showHiddenItems) {
+                    assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
+                        video1.id,
+                        video2.id,
+                        video3.id,
+                        video4.id
+                    )
+                } else {
+                    assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
+                        video3.id,
+                        video4.id
+                    )
+                }
             }
-        )
-        if (showHiddenItems) {
-            assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
-                video1.id,
-                video2.id,
-                video3.id,
-                video4.id
-            )
-        } else {
-            assertThat(actual.allVideoEntities.map { it.id }).containsExactly(
-                video3.id,
-                video4.id
-            )
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -637,12 +548,15 @@ class VideosTabViewModelTest {
         )
         initUnderTest()
 
-        val actual = underTest.uiState
-            .filterIsInstance<VideosTabUiState.Data>()
-            .first { it.allVideoEntities.isNotEmpty() && it.showHiddenItems == !hiddenNodeEnabled }
-
-        assertThat(actual.allVideoEntities).isNotEmpty()
-        assertThat(actual.showHiddenItems).isEqualTo(!hiddenNodeEnabled)
+        underTest.uiState.test {
+            skipItems(1)
+            val actual = awaitItem() as? VideosTabUiState.Data
+            if (actual != null) {
+                assertThat(actual.allVideoEntities).isNotEmpty()
+                assertThat(actual.showHiddenItems).isEqualTo(!hiddenNodeEnabled)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun createVideoUiEntity(

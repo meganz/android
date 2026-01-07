@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -46,52 +45,57 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
 ) : ViewModel() {
-    private val triggerFlow = MutableStateFlow(false)
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val playlistsRemovedFlow =
         MutableStateFlow<StateEventWithContent<List<String>>>(consumed())
 
-    internal val uiState: StateFlow<VideoPlaylistsTabUiState> by lazy {
-        triggerFlow.flatMapLatest {
-            combine(
-                merge(
-                    monitorVideoPlaylistSetsUpdateUseCase(),
-                    monitorNodeUpdatesUseCase().filter {
-                        it.changes.keys.any { node ->
-                            node is FileNode && node.type is VideoFileTypeInfo
-                        }
-                    },
-                    selectedVideoPlaylistsFlow,
-                    playlistsRemovedFlow,
-                ).onStart { emit(Unit) },
-                monitorSortCloudOrderUseCase(),
-            ) { _, sortOrder ->
-                val videoPlaylists = getVideoPlaylistsUseCase()
-                val selectedPlaylists = selectedVideoPlaylistsFlow.value
-                val selectedIds = selectedPlaylists.map { playlist -> playlist.id }
-                val videoPlaylistEntities = videoPlaylists.map {
-                    val entity = videoPlaylistUiEntityMapper(it)
-                    entity.copy(
-                        isSelected = entity.id in selectedIds
-                    )
-                }
-
-                val convertedSortOrder =
-                    sortOrder?.convertPlaylistSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
-                val sortOrderPair = nodeSortConfigurationUiMapper(convertedSortOrder)
-
-                VideoPlaylistsTabUiState.Data(
-                    videoPlaylists = videoPlaylists,
-                    videoPlaylistEntities = videoPlaylistEntities,
-                    sortOrder = convertedSortOrder,
-                    selectedSortConfiguration = sortOrderPair,
-                    selectedPlaylists = selectedPlaylists,
-                    playlistsRemovedEvent = playlistsRemovedFlow.value
-                )
-            }.catch {
-                Timber.e(it)
+    private val dataUpdateFlow =
+        combine(
+            merge(
+                monitorVideoPlaylistSetsUpdateUseCase().catch { Timber.e(it) },
+                monitorNodeUpdatesUseCase().filter {
+                    it.changes.keys.any { node ->
+                        node is FileNode && node.type is VideoFileTypeInfo
+                    }
+                }.catch { Timber.e(it) }
+            ).onStart { emit(Unit) },
+            monitorSortCloudOrderUseCase().catch { Timber.e(it) },
+            playlistsRemovedFlow
+        ) { _, sortOrder, playlistsRemoved ->
+            val videoPlaylists = getVideoPlaylistsUseCase()
+            val videoPlaylistEntities = videoPlaylists.map {
+                videoPlaylistUiEntityMapper(it)
             }
+            val convertedSortOrder =
+                sortOrder?.convertPlaylistSortOrder() ?: SortOrder.ORDER_DEFAULT_ASC
+            val sortOrderPair = nodeSortConfigurationUiMapper(convertedSortOrder)
+
+            VideoPlaylistsTabUiState.Data(
+                videoPlaylists = videoPlaylists,
+                videoPlaylistEntities = videoPlaylistEntities,
+                sortOrder = convertedSortOrder,
+                selectedSortConfiguration = sortOrderPair,
+                playlistsRemovedEvent = playlistsRemoved,
+            )
+        }
+
+    internal val uiState: StateFlow<VideoPlaylistsTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            dataUpdateFlow,
+            selectedVideoPlaylistsFlow,
+        ) { uiState, selectedVideoPlaylists ->
+            val selectedIds = selectedVideoPlaylists.map { playlist -> playlist.id }
+            val videoPlaylistEntities = uiState.videoPlaylistEntities.map {
+                it.copy(isSelected = it.id in selectedIds)
+            }
+
+            uiState.copy(
+                videoPlaylistEntities = videoPlaylistEntities,
+                selectedPlaylists = selectedVideoPlaylists,
+            )
+        }.catch {
+            Timber.e(it)
         }.asUiStateFlow(
             viewModelScope,
             VideoPlaylistsTabUiState.Loading
@@ -107,10 +111,6 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             SortOrder.ORDER_MODIFICATION_DESC -> SortOrder.ORDER_MODIFICATION_DESC
             else -> SortOrder.ORDER_DEFAULT_ASC
         }
-
-    fun triggerRefresh() {
-        triggerFlow.update { !it }
-    }
 
     internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
         viewModelScope.launch {
@@ -148,11 +148,9 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     }
 
     internal fun selectAllVideos() {
-        if (uiState.value is VideoPlaylistsTabUiState.Data) {
-            val allPlaylists =
-                (uiState.value as VideoPlaylistsTabUiState.Data).videoPlaylistEntities.toSet()
-            selectedVideoPlaylistsFlow.update { allPlaylists }
-        }
+        val state = uiState.value as? VideoPlaylistsTabUiState.Data ?: return
+        val allPlaylists = state.videoPlaylistEntities.toSet()
+        selectedVideoPlaylistsFlow.update { allPlaylists }
     }
 
     internal fun clearSelection() {
