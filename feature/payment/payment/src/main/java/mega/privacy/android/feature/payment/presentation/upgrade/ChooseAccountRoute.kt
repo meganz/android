@@ -21,6 +21,7 @@ import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
+import mega.privacy.android.navigation.payment.toSource
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
@@ -123,7 +124,8 @@ fun ChooseAccountRoute(
             activity?.let {
                 billingViewModel.startPurchase(
                     activity = activity,
-                    subscription = subscription
+                    subscription = subscription,
+                    source = openFromSource.toSource()
                 )
             }
         },
@@ -223,10 +225,12 @@ private fun onPurchasesUpdated(
 ) {
     if (isUpgradeAccount) {
         if (openFromSource == UpgradeAccountSource.MY_ACCOUNT_SCREEN) {
-            megaNavigator.openMyAccountActivity(
-                context = activity,
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            )
+            if (!isSingleActivityEnabled) {
+                megaNavigator.openMyAccountActivity(
+                    context = activity,
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                )
+            }
             activity.finish()
         }
         // other cases stay in the same activity

@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.Subscription
-import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
@@ -37,19 +37,6 @@ class BillingViewModel @Inject constructor(
     private val generatePurchaseUrlUseCase: GeneratePurchaseUrlUseCase,
     monitorBillingEventUseCase: MonitorBillingEventUseCase,
 ) : ViewModel() {
-    private val _skus = MutableStateFlow<List<MegaSku>>(emptyList())
-
-    /**
-     * Skus state, all skus from billing system
-     */
-    val skus = _skus.asStateFlow()
-
-    private val _purchases = MutableStateFlow<List<MegaPurchase>>(emptyList())
-
-    /**
-     * All purchases from billing system
-     */
-    val purchases = _purchases.asStateFlow()
 
     /**
      * Billing update event
@@ -87,7 +74,7 @@ class BillingViewModel @Inject constructor(
      */
     fun loadPurchases() {
         viewModelScope.launch {
-            _purchases.value = runCatching { queryPurchase() }
+            runCatching { queryPurchase() }
                 .onFailure {
                     Timber.Forest.e(it, "Failed to query purchase")
                 }
@@ -102,10 +89,16 @@ class BillingViewModel @Inject constructor(
     fun startPurchase(
         activity: Activity,
         subscription: Subscription,
+        source: UpgradeSource,
     ) {
         viewModelScope.launch {
             runCatching {
-                launchPurchaseFlowUseCase(activity, subscription.sku, subscription.offerId)
+                launchPurchaseFlowUseCase(
+                    activity = activity,
+                    source = source,
+                    productId = subscription.sku,
+                    offerId = subscription.offerId
+                )
             }.onFailure {
                 Timber.Forest.e(it, "Failed to launch purchase flow")
             }

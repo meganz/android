@@ -230,8 +230,6 @@ internal class MyAccountActivity : PasscodeActivity(),
                 source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
             )
 
-            viewModel.setOpenUpgradeFrom()
-
             intent.removeExtra(ExtraConstant.EXTRA_ACCOUNT_TYPE)
         }
 
@@ -354,7 +352,6 @@ internal class MyAccountActivity : PasscodeActivity(),
                     context = this,
                     source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
                 )
-                viewModel.setOpenUpgradeFrom()
             }
 
             R.id.action_cancel_subscriptions -> {

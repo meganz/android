@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.util.concurrent.TimeUnit
@@ -84,6 +85,10 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     fun provideBannersCache(): Cache<List<Banner>> = PermanentCache()
+
+    @Provides
+    @Singleton
+    fun provideUpgradeSourceCache(): Cache<UpgradeSource> = PermanentCache()
 
     @Provides
     @Singleton

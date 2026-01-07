@@ -5856,7 +5856,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             drawerLayout.closeDrawer(GravityCompat.START)
         }
         megaNavigator.openUpgradeAccount(this)
-        myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
     }
 
     override fun navigateToContactRequests() {

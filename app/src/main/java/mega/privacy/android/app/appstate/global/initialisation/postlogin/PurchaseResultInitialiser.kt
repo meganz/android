@@ -4,11 +4,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
 import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.MegaPurchaseState
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -20,7 +20,6 @@ import javax.inject.Inject
 class PurchaseResultInitialiser @Inject constructor(
     private val monitorBillingEventUseCase: MonitorBillingEventUseCase,
     private val appDialogsEventQueue: AppDialogsEventQueue,
-    private val myAccountInfo: MyAccountInfo,
 ) : PostLoginInitialiser(
     action = { _, _ ->
         monitorBillingEventUseCase()
@@ -28,7 +27,7 @@ class PurchaseResultInitialiser @Inject constructor(
             .filterIsInstance<BillingEvent.OnPurchaseUpdate>()
             .collectLatest { billingEvent ->
                 handlePurchaseUpdate(
-                    myAccountInfo = myAccountInfo,
+                    source = billingEvent.upgradeSource,
                     appDialogsEventQueue = appDialogsEventQueue,
                     billingEvent = billingEvent
                 )
@@ -37,13 +36,13 @@ class PurchaseResultInitialiser @Inject constructor(
 )
 
 private suspend fun handlePurchaseUpdate(
-    myAccountInfo: MyAccountInfo,
+    source: UpgradeSource,
     appDialogsEventQueue: AppDialogsEventQueue,
     billingEvent: BillingEvent.OnPurchaseUpdate,
 ) {
     val purchaseType = getPurchaseType(billingEvent.purchases)
 
-    if (shouldShowPurchaseResultDialog(myAccountInfo)) {
+    if (source == UpgradeSource.Main) {
         billingEvent.activeSubscription?.sku?.removeSuffix(".test")?.let { activeSubscriptionSku ->
             appDialogsEventQueue.emit(
                 AppDialogEvent(
@@ -70,8 +69,5 @@ private fun getPurchaseType(purchases: List<MegaPurchase>): PurchaseType {
         PurchaseType.DOWNGRADE
     }
 }
-
-private fun shouldShowPurchaseResultDialog(myAccountInfo: MyAccountInfo) =
-    myAccountInfo.isUpgradeFromManager()
 
 

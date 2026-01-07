@@ -11,13 +11,13 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.DialogTwoVerticalButtonsBinding
 import mega.privacy.android.app.fragments.settingsFragments.SettingsFileManagementFragment
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
@@ -133,8 +133,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
         firstButton.text = getFormattedStringOrDefault(R.string.button_plans_almost_full_warning)
         firstButton.setOnClickListener {
             generalDialog?.dismiss()
-            megaNavigator.openUpgradeAccount(context = this)
-            myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.SETTINGS
+            megaNavigator.openUpgradeAccount(context = this, UpgradeAccountSource.SETTINGS_SCREEN)
         }
         val secondButton = binding.findViewById<Button>(R.id.dialog_second_button)
         secondButton.text = getFormattedStringOrDefault(R.string.button_not_now_rich_links)

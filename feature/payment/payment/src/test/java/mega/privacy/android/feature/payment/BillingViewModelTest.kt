@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.payment
 
-import app.cash.turbine.test
 import android.app.Activity
+import app.cash.turbine.test
 import com.android.billingclient.api.Purchase
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
@@ -56,34 +57,14 @@ internal class BillingViewModelTest {
     }
 
     @Test
-    fun `test that purchases empty when loadPurchases return empty`() = runTest {
-        whenever(queryPurchase()).thenReturn(emptyList())
-        underTest.loadPurchases()
-        Truth.assertThat(underTest.purchases.value).isEmpty()
-    }
-
-    @Test
-    fun `test that purchases empty when loadPurchases throw exception`() = runTest {
-        whenever(queryPurchase()).thenThrow(RuntimeException())
-        underTest.loadPurchases()
-        Truth.assertThat(underTest.purchases.value).isEmpty()
-    }
-
-    @Test
-    fun `test that purchases not empty when loadPurchases return not empty`() = runTest {
-        val list = listOf(MegaPurchase(""))
-        whenever(queryPurchase()).thenReturn(list)
-        underTest.loadPurchases()
-        Truth.assertThat(underTest.purchases.value).isNotEmpty()
-    }
-
-    @Test
     fun `test that billingUpdateEvent updated when monitorBillingEvent emit`() = runTest {
         val activeSubscription = MegaPurchase("")
         val event = BillingEvent.OnPurchaseUpdate(
             listOf(
                 activeSubscription
-            ), activeSubscription
+            ),
+            activeSubscription,
+            UpgradeSource.Main
         )
         eventFlow.emit(event)
         Truth.assertThat(underTest.billingUpdateEvent.value).isEqualTo(event)
@@ -106,14 +87,15 @@ internal class BillingViewModelTest {
         runTest {
             val activity = mock<Activity>()
             val expectedSku = Skus.SKU_PRO_I_MONTH
+            val source = UpgradeSource.Main
             val subscription = mock<Subscription> {
                 on { sku }.thenReturn(expectedSku)
                 on { offerId }.thenReturn(null)
             }
 
-            underTest.startPurchase(activity, subscription)
+            underTest.startPurchase(activity, subscription, source)
 
-            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
+            verify(launchPurchaseFlowUseCase).invoke(activity, source, expectedSku, null)
         }
 
     @Test
@@ -121,14 +103,15 @@ internal class BillingViewModelTest {
         runTest {
             val activity = mock<Activity>()
             val expectedSku = Skus.SKU_PRO_II_YEAR
+            val source = UpgradeSource.Main
             val subscription = mock<Subscription> {
                 on { sku }.thenReturn(expectedSku)
                 on { offerId }.thenReturn(null)
             }
 
-            underTest.startPurchase(activity, subscription)
+            underTest.startPurchase(activity, subscription, source)
 
-            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
+            verify(launchPurchaseFlowUseCase).invoke(activity, source, expectedSku, null)
         }
 
     @Test
@@ -136,28 +119,30 @@ internal class BillingViewModelTest {
         runTest {
             val activity = mock<Activity>()
             val expectedSku = Skus.SKU_PRO_III_MONTH
+            val source = UpgradeSource.Main
             val subscription = mock<Subscription> {
                 on { sku }.thenReturn(expectedSku)
                 on { offerId }.thenReturn(null)
             }
 
-            underTest.startPurchase(activity, subscription)
+            underTest.startPurchase(activity, subscription, source)
 
-            verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
+            verify(launchPurchaseFlowUseCase).invoke(activity, source, expectedSku, null)
         }
 
     @Test
     fun `test that startPurchase handles PRO_LITE monthly correctly`() = runTest {
         val activity = mock<Activity>()
         val expectedSku = Skus.SKU_PRO_LITE_MONTH
+        val source = UpgradeSource.Main
         val subscription = mock<Subscription> {
             on { sku }.thenReturn(expectedSku)
             on { offerId }.thenReturn(null)
         }
 
-        underTest.startPurchase(activity, subscription)
+        underTest.startPurchase(activity, subscription, source)
 
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, null)
+        verify(launchPurchaseFlowUseCase).invoke(activity, source, expectedSku, null)
     }
 
     @Test
@@ -165,28 +150,30 @@ internal class BillingViewModelTest {
         val activity = mock<Activity>()
         val expectedSku = Skus.SKU_PRO_I_YEAR
         val offerId = "offerId"
+        val source = UpgradeSource.Main
         val subscription = mock<Subscription> {
             on { sku }.thenReturn(expectedSku)
             on { this.offerId }.thenReturn(offerId)
         }
 
-        underTest.startPurchase(activity, subscription)
+        underTest.startPurchase(activity, subscription, source)
 
-        verify(launchPurchaseFlowUseCase).invoke(activity, expectedSku, offerId)
+        verify(launchPurchaseFlowUseCase).invoke(activity, source, expectedSku, offerId)
     }
 
     @Test
     fun `test that startPurchase does not throw exception when sku is empty`() =
         runTest {
             val activity = mock<Activity>()
+            val source = UpgradeSource.Main
             val subscription = mock<Subscription> {
                 on { sku }.thenReturn("")
                 on { offerId }.thenReturn(null)
             }
 
-            underTest.startPurchase(activity, subscription)
+            underTest.startPurchase(activity, subscription, source)
 
-            verify(launchPurchaseFlowUseCase).invoke(activity, "", null)
+            verify(launchPurchaseFlowUseCase).invoke(activity, source, "", null)
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -224,7 +211,8 @@ internal class BillingViewModelTest {
             val subscription = mock<Subscription> {
                 on { accountType }.thenReturn(AccountType.PRO_II)
             }
-            val expectedUrl = "https://mega.nz/#propay_2/uao=Android app Ver 15.21?m=12&session=test"
+            val expectedUrl =
+                "https://mega.nz/#propay_2/uao=Android app Ver 15.21?m=12&session=test"
 
             whenever(generatePurchaseUrlUseCase(any(), any())).thenReturn(expectedUrl)
 

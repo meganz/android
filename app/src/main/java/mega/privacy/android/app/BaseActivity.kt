@@ -85,6 +85,7 @@ import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -242,6 +243,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                 onPurchasesUpdated(
                     purchases = billingEvent.purchases,
                     activeSubscription = billingEvent.activeSubscription,
+                    source = billingEvent.upgradeSource,
                     singleActivityFlagEnabled = singleActivityFlagEnabled
                 )
                 billingViewModel.markHandleBillingEvent()
@@ -987,6 +989,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     private fun onPurchasesUpdated(
         purchases: List<MegaPurchase>,
         activeSubscription: MegaPurchase?,
+        source: UpgradeSource,
         singleActivityFlagEnabled: Boolean,
     ) {
         val type: PurchaseType = if (purchases.isNotEmpty()) {
@@ -1011,9 +1014,9 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             PurchaseType.DOWNGRADE
         }
         when {
-            this is MyAccountActivity && myAccountInfo.isUpgradeFromAccount()
-                    || this is ManagerActivity && myAccountInfo.isUpgradeFromManager()
-                    || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
+            this is MyAccountActivity && source == UpgradeSource.MyAccount
+                    || this is ManagerActivity && source == UpgradeSource.Main
+                    || this is FileManagementPreferencesActivity && source == UpgradeSource.Settings -> {
                 purchaseType = type
                 // Remove the .test suffix for testing SKUs
                 activeSubscriptionSku = activeSubscription?.sku?.removeSuffix(".test")?.also {

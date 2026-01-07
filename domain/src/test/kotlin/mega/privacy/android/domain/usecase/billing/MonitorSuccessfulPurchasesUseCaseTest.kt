@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.MegaPurchaseState
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -33,7 +34,8 @@ class MonitorSuccessfulPurchasesUseCaseTest {
             }
             val billingEvent = BillingEvent.OnPurchaseUpdate(
                 purchases = listOf(successfulPurchase),
-                activeSubscription = null
+                activeSubscription = null,
+                upgradeSource = UpgradeSource.Main
             )
 
             whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent))
@@ -56,7 +58,8 @@ class MonitorSuccessfulPurchasesUseCaseTest {
             }
             val billingEvent = BillingEvent.OnPurchaseUpdate(
                 purchases = listOf(pendingPurchase, unspecifiedPurchase),
-                activeSubscription = null
+                activeSubscription = null,
+                upgradeSource = UpgradeSource.Main
             )
 
             whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent))
@@ -70,7 +73,8 @@ class MonitorSuccessfulPurchasesUseCaseTest {
     fun `test that purchase events are filtered out when purchases list is empty`() = runTest {
         val billingEvent = BillingEvent.OnPurchaseUpdate(
             purchases = emptyList(),
-            activeSubscription = null
+            activeSubscription = null,
+            upgradeSource = UpgradeSource.Main
         )
 
         whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent))
@@ -91,7 +95,8 @@ class MonitorSuccessfulPurchasesUseCaseTest {
             }
             val billingEvent = BillingEvent.OnPurchaseUpdate(
                 purchases = listOf(pendingPurchase, successfulPurchase),
-                activeSubscription = null
+                activeSubscription = null,
+                upgradeSource = UpgradeSource.Main
             )
 
             whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent))
@@ -112,7 +117,8 @@ class MonitorSuccessfulPurchasesUseCaseTest {
             }
             val billingEvent = BillingEvent.OnPurchaseUpdate(
                 purchases = listOf(successfulPurchase, pendingPurchase),
-                activeSubscription = null
+                activeSubscription = null,
+                upgradeSource = UpgradeSource.Main
             )
 
             whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent))
@@ -134,11 +140,13 @@ class MonitorSuccessfulPurchasesUseCaseTest {
         }
         val billingEvent1 = BillingEvent.OnPurchaseUpdate(
             purchases = listOf(successfulPurchase1),
-            activeSubscription = null
+            activeSubscription = null,
+            upgradeSource = UpgradeSource.Main
         )
         val billingEvent2 = BillingEvent.OnPurchaseUpdate(
             purchases = listOf(successfulPurchase2),
-            activeSubscription = null
+            activeSubscription = null,
+            upgradeSource = UpgradeSource.Main
         )
 
         whenever(monitorBillingEventUseCase()).thenReturn(flowOf(billingEvent1, billingEvent2))
@@ -162,11 +170,13 @@ class MonitorSuccessfulPurchasesUseCaseTest {
         }
         val successfulBillingEvent = BillingEvent.OnPurchaseUpdate(
             purchases = listOf(successfulPurchase),
-            activeSubscription = null
+            activeSubscription = null,
+            upgradeSource = UpgradeSource.Main
         )
         val pendingBillingEvent = BillingEvent.OnPurchaseUpdate(
             purchases = listOf(pendingPurchase),
-            activeSubscription = null
+            activeSubscription = null,
+            upgradeSource = UpgradeSource.Main
         )
 
         whenever(monitorBillingEventUseCase()).thenReturn(

@@ -192,7 +192,6 @@ internal class ManagerDrawerFragment : Fragment() {
         binding.upgradeNavigationView.setOnClickListener {
             drawerManager.closeDrawer()
             megaNavigator.openUpgradeAccount(requireActivity())
-            myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.MANAGER
         }
         binding.contactsSection.setOnClickListener {
             drawerManager.closeDrawer()

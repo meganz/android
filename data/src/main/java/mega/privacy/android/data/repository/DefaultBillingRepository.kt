@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.BillingRepository
 import nz.mega.sdk.MegaError
@@ -44,6 +45,7 @@ internal class DefaultBillingRepository @Inject constructor(
     private val paymentMethodFlagsCache: Cache<PaymentMethodFlags>,
     private val pricingCache: Cache<Pricing>,
     private val skusCache: Cache<List<MegaSku>>,
+    private val sourceCache: Cache<UpgradeSource>,
     private val activeSubscriptionCache: Cache<MegaPurchase>,
     private val numberOfSubscriptionCache: Cache<Long>,
     private val pricingMapper: PricingMapper,
@@ -114,9 +116,13 @@ internal class DefaultBillingRepository @Inject constructor(
 
     override suspend fun launchPurchaseFlow(
         activity: Activity,
+        source: UpgradeSource,
         productId: String,
         offerId: String?,
-    ) = billingGateway.launchPurchaseFlow(activity, productId, offerId)
+    ) {
+        sourceCache.set(source)
+        billingGateway.launchPurchaseFlow(activity, productId, offerId)
+    }
 
     override suspend fun getCurrentPaymentMethod(): PaymentMethod? =
         PaymentMethod.entries.firstOrNull {

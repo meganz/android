@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import android.app.Activity
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 
 /**
  * Android billing repository
@@ -12,5 +13,10 @@ interface AndroidBillingRepository {
     /**
      * Launch a purchase flow.
      */
-    suspend fun launchPurchaseFlow(activity: Activity, productId: String, offerId: String?)
+    suspend fun launchPurchaseFlow(
+        activity: Activity,
+        source: UpgradeSource,
+        productId: String,
+        offerId: String?,
+    )
 }

@@ -90,7 +90,6 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
                 context = requireActivity(),
                 source = UpgradeAccountSource.MY_ACCOUNT_SCREEN
             )
-            viewModel.setOpenUpgradeFrom()
         }
     }
 

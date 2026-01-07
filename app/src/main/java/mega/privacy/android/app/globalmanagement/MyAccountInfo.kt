@@ -30,10 +30,6 @@ class MyAccountInfo @Inject constructor(
         const val HAS_SESSIONS_DETAILS = 0x020
     }
 
-    enum class UpgradeFrom {
-        MANAGER, ACCOUNT, SETTINGS
-    }
-
     var usedPercentage = INVALID_VALUE
     var usedTransferPercentage = INVALID_VALUE
     var usedStorage = INVALID_VALUE.toLong()
@@ -60,8 +56,6 @@ class MyAccountInfo @Inject constructor(
 
     var numVersions = INVALID_VALUE
     var previousVersionsSize = INVALID_VALUE.toLong()
-
-    var upgradeOpenedFrom = UpgradeFrom.MANAGER
 
     // Added the subscriptionMethodId parameter for subscription dialog
     var subscriptionMethodId = -1
@@ -98,8 +92,6 @@ class MyAccountInfo @Inject constructor(
 
         numVersions = INVALID_VALUE
         previousVersionsSize = INVALID_VALUE.toLong()
-
-        upgradeOpenedFrom = UpgradeFrom.MANAGER
     }
 
     fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int, context: Context) {
@@ -194,8 +186,4 @@ class MyAccountInfo @Inject constructor(
     }
 
     fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown
-
-    fun isUpgradeFromAccount(): Boolean = upgradeOpenedFrom == UpgradeFrom.ACCOUNT
-    fun isUpgradeFromManager(): Boolean = upgradeOpenedFrom == UpgradeFrom.MANAGER
-    fun isUpgradeFromSettings(): Boolean = upgradeOpenedFrom == UpgradeFrom.SETTINGS
 }

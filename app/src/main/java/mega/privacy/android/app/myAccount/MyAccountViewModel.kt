@@ -1293,14 +1293,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Set open upgrade from
-     *
-     */
-    fun setOpenUpgradeFrom() {
-        myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
-    }
-
-    /**
      * Refresh account info
      *
      */

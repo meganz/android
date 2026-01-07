@@ -1,6 +1,5 @@
 package mega.privacy.android.data.repository
 
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -21,6 +20,7 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
 import mega.privacy.android.domain.entity.billing.Pricing
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.BillingRepository
 import nz.mega.sdk.MegaChatError
@@ -57,11 +57,17 @@ class DefaultBillingRepositoryTest {
     private val skuString = Skus.SKU_PRO_I_MONTH
     private val megaSkuList = listOf(megaSkuObject2, megaSkuObject1)
     private val localPricing =
-        LocalPricing(CurrencyPoint.LocalCurrencyPoint(9990000), Currency("EUR"), skuString, emptyList())
+        LocalPricing(
+            CurrencyPoint.LocalCurrencyPoint(9990000),
+            Currency("EUR"),
+            skuString,
+            emptyList()
+        )
     private val localPricingMapper = mock<LocalPricingMapper>()
     private val pricingMapper = mock<PricingMapper>()
     private val billingGateway = mock<BillingGateway>()
     private val paymentMethodTypeMapper = ::toPaymentMethodType
+    private val sourceCache = mock<Cache<UpgradeSource>>()
 
     @Before
     fun setUp() {
@@ -77,7 +83,8 @@ class DefaultBillingRepositoryTest {
             billingGateway = billingGateway,
             paymentMethodTypeMapper = paymentMethodTypeMapper,
             skusCache = skusCache,
-            activeSubscriptionCache = activeSubscriptionCache
+            activeSubscriptionCache = activeSubscriptionCache,
+            sourceCache = sourceCache
         )
     }
 

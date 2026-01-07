@@ -43,6 +43,7 @@ import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.ConnectBillingServiceException
 import mega.privacy.android.domain.exception.ProductNotFoundException
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -77,6 +78,7 @@ internal class BillingFacade @Inject constructor(
     private val accountInfoWrapper: AccountInfoWrapper,
     private val productDetailsListCache: Cache<List<ProductDetails>>,
     private val activeSubscription: Cache<MegaPurchase>,
+    private val source: Cache<UpgradeSource>,
     private val accountRepository: AccountRepository,
     private val loginRepository: LoginRepository,
 ) : BillingGateway, PurchasesUpdatedListener, DefaultLifecycleObserver {
@@ -219,8 +221,9 @@ internal class BillingFacade @Inject constructor(
                 val validPurchases = processPurchase(client, purchases)
                 billingEvent.emit(
                     BillingEvent.OnPurchaseUpdate(
-                        validPurchases,
-                        activeSubscription.get()
+                        purchases = validPurchases,
+                        activeSubscription = activeSubscription.get(),
+                        upgradeSource = source.get() ?: UpgradeSource.Main
                     )
                 )
             } else {
