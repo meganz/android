@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -357,6 +358,7 @@ fun MediaMainScreen(
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
+    val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -730,87 +732,99 @@ fun MediaMainScreen(
             )
         }
     ) { paddingValues ->
-        MegaScrollableTabRow(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues.excludingBottomPadding()),
-            beyondViewportPageCount = 1,
-            hideTabs = isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode || shouldHideTabs,
-            pagerScrollEnabled = true,
-            initialSelectedIndex = currentTabIndex,
-            onTabSelected = { index ->
-                currentTabIndex = index
-                true
-            },
-            cells = {
-                MediaScreen.entries.forEach { tab ->
-                    with(tab) {
-                        addTextTabWithScrollableContent(
-                            tabItem = getTabItem(),
-                            content = { _, modifier ->
-                                MediaContent(
-                                    modifier = modifier.fillMaxSize(),
-                                    timelineContentPadding = PaddingValues(
-                                        bottom = if (isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode) {
-                                            paddingValues.calculateBottomPadding()
-                                        } else {
-                                            50.dp
-                                        }
-                                    ),
-                                    mainViewModel = viewModel,
-                                    albumsTabViewModel = albumsTabViewModel,
-                                    timelineTabUiState = timelineTabUiState,
-                                    timelineFilterUiState = timelineFilterUiState,
-                                    mediaCameraUploadUiState = mediaCameraUploadUiState,
-                                    showTimelineSortDialog = showTimelineSortDialog,
-                                    selectedTimePeriod = selectedTimePeriod,
-                                    navigateToAlbumContent = navigateToAlbumContent,
-                                    navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
-                                    setEnableCUPage = setEnableCUPage,
-                                    onTimelineGridSizeChange = onTimelineGridSizeChange,
-                                    onTimelineSortDialogDismissed = {
-                                        showTimelineSortDialog = false
-                                    },
-                                    onTimelineSortOptionChange = {
-                                        onTimelineSortOptionChange(it)
-                                        showTimelineSortDialog = false
-                                    },
-                                    onTimelinePhotoClick = {
-                                        if (isTimelineInSelectionMode) {
-                                            onTimelinePhotoSelected(it)
-                                        } else {
-                                            onNavigateToTimelinePhotoPreview(
-                                                MediaTimelinePhotoPreviewNavKey(
-                                                    id = it.photo.id,
-                                                    sortType = timelineTabUiState.currentSort.toLegacySort().name,
-                                                    filterType = timelineFilterUiState.mediaType.name,
-                                                    mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
-                                                )
-                                            )
-                                        }
-                                    },
-                                    onTimelinePhotoSelected = onTimelinePhotoSelected,
-                                    clearCameraUploadsMessage = clearCameraUploadsMessage,
-                                    clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                                    onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
-                                    navigationHandler = navigationHandler,
-                                    handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                                    updateIsWarningBannerShown = updateIsWarningBannerShown,
-                                    onTabsVisibilityChange = { shouldHideTabs = it },
-                                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                    onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
-                                    showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
-                                    dismissVideoPlaylistRemovedDialog = {
-                                        showVideoPlaylistRemovedDialog = false
-                                    }
-                                )
-                            }
-                        )
-                    }
+        val tabEntries = remember(mediaMainUiState.isMediaRevampPhase2Enabled) {
+            if (mediaMainUiState.isMediaRevampPhase2Enabled) {
+                MediaScreen.entries
+            } else {
+                MediaScreen.entries.filter {
+                    it == MediaScreen.Timeline || it == MediaScreen.Albums
                 }
             }
-        )
+        }
+
+        key(tabEntries.size) {
+            MegaScrollableTabRow(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues.excludingBottomPadding()),
+                beyondViewportPageCount = 1,
+                hideTabs = isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode || shouldHideTabs,
+                pagerScrollEnabled = true,
+                initialSelectedIndex = currentTabIndex,
+                onTabSelected = { index ->
+                    currentTabIndex = index
+                    true
+                },
+                cells = {
+                    tabEntries.forEach { tab ->
+                        with(tab) {
+                            addTextTabWithScrollableContent(
+                                tabItem = getTabItem(),
+                                content = { _, modifier ->
+                                    MediaContent(
+                                        modifier = modifier.fillMaxSize(),
+                                        timelineContentPadding = PaddingValues(
+                                            bottom = if (isTimelineInSelectionMode || isAlbumInSelectionMode || isVideosSelectionMode) {
+                                                paddingValues.calculateBottomPadding()
+                                            } else {
+                                                50.dp
+                                            }
+                                        ),
+                                        mainViewModel = viewModel,
+                                        albumsTabViewModel = albumsTabViewModel,
+                                        timelineTabUiState = timelineTabUiState,
+                                        timelineFilterUiState = timelineFilterUiState,
+                                        mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                        showTimelineSortDialog = showTimelineSortDialog,
+                                        selectedTimePeriod = selectedTimePeriod,
+                                        navigateToAlbumContent = navigateToAlbumContent,
+                                        navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
+                                        setEnableCUPage = setEnableCUPage,
+                                        onTimelineGridSizeChange = onTimelineGridSizeChange,
+                                        onTimelineSortDialogDismissed = {
+                                            showTimelineSortDialog = false
+                                        },
+                                        onTimelineSortOptionChange = {
+                                            onTimelineSortOptionChange(it)
+                                            showTimelineSortDialog = false
+                                        },
+                                        onTimelinePhotoClick = {
+                                            if (isTimelineInSelectionMode) {
+                                                onTimelinePhotoSelected(it)
+                                            } else {
+                                                onNavigateToTimelinePhotoPreview(
+                                                    MediaTimelinePhotoPreviewNavKey(
+                                                        id = it.photo.id,
+                                                        sortType = timelineTabUiState.currentSort.toLegacySort().name,
+                                                        filterType = timelineFilterUiState.mediaType.name,
+                                                        mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
+                                                    )
+                                                )
+                                            }
+                                        },
+                                        onTimelinePhotoSelected = onTimelinePhotoSelected,
+                                        clearCameraUploadsMessage = clearCameraUploadsMessage,
+                                        clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                                        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                                        onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                                        navigationHandler = navigationHandler,
+                                        handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                                        updateIsWarningBannerShown = updateIsWarningBannerShown,
+                                        onTabsVisibilityChange = { shouldHideTabs = it },
+                                        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                                        onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
+                                        showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+                                        dismissVideoPlaylistRemovedDialog = {
+                                            showVideoPlaylistRemovedDialog = false
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
+            )
+        }
     }
 
     if (showTimelineFilter) {

@@ -106,6 +106,15 @@ enum class ApiFeatures(
         description = "Allow multiple selection for favorite/label in Cloud Drive",
         defaultValue = false
     ),
+
+    /**
+     * Media Revamp phase 2 feature flag
+     */
+    MediaRevampPhase2(
+        experimentName = "mrp2",
+        description = "Enable Media Revamp phase 2 features",
+        defaultValue = false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {
