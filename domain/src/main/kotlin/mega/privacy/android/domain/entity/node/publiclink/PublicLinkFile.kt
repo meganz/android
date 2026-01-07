@@ -12,5 +12,4 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 class PublicLinkFile(
     val node: TypedFileNode,
     override val parent: PublicLinkFolder?,
-) : PublicLinkNode, TypedFileNode by node {
-}
+) : PublicLinkNode, TypedFileNode by node

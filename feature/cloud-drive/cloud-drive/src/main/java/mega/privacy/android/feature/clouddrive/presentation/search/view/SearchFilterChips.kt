@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.chip.MegaChip
+import mega.android.core.ui.components.surface.ThemedSurface
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
@@ -36,63 +37,67 @@ fun SearchFilterChips(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    Row(
+    ThemedSurface(
         modifier = modifier
-            .horizontalScroll(state = rememberScrollState())
-            .testTag(FILTER_CHIPS_TAG),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Spacer(Modifier.size(8.dp))
-
-        MegaChip(
+        Row(
             modifier = Modifier
-                .animateContentSize()
-                .testTag(TYPE_FILTER_CHIP_TAG),
-            content = stringResource(
-                typeFilterOption?.labelResId ?: SearchFilterType.TYPE.titleResId
-            ),
-            selected = typeFilterOption != null,
-            trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
-            onClick = {
-                onFilterClicked(SearchFilterType.TYPE)
-                Analytics.tracker.trackEvent(SearchFileTypeDropdownChipPressedEvent)
-            },
-            enabled = enabled
-        )
+                .horizontalScroll(state = rememberScrollState())
+                .testTag(FILTER_CHIPS_TAG),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Spacer(Modifier.size(8.dp))
 
-        MegaChip(
-            modifier = Modifier
-                .animateContentSize()
-                .testTag(DATE_MODIFIED_FILTER_CHIP_TAG),
-            content = stringResource(
-                dateModifiedFilterOption?.labelResId ?: SearchFilterType.LAST_MODIFIED.titleResId
-            ),
-            selected = dateModifiedFilterOption != null,
-            trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
-            onClick = {
-                onFilterClicked(SearchFilterType.LAST_MODIFIED)
-                Analytics.tracker.trackEvent(SearchLastModifiedDropdownChipPressedEvent)
-            },
-            enabled = enabled
-        )
+            MegaChip(
+                modifier = Modifier
+                    .animateContentSize()
+                    .testTag(TYPE_FILTER_CHIP_TAG),
+                content = stringResource(
+                    typeFilterOption?.labelResId ?: SearchFilterType.TYPE.titleResId
+                ),
+                selected = typeFilterOption != null,
+                trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
+                onClick = {
+                    onFilterClicked(SearchFilterType.TYPE)
+                    Analytics.tracker.trackEvent(SearchFileTypeDropdownChipPressedEvent)
+                },
+                enabled = enabled
+            )
 
-        MegaChip(
-            modifier = Modifier
-                .animateContentSize()
-                .testTag(DATE_ADDED_FILTER_CHIP_TAG),
-            content = stringResource(
-                dateAddedFilterOption?.labelResId ?: SearchFilterType.DATE_ADDED.titleResId
-            ),
-            selected = dateAddedFilterOption != null,
-            trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
-            onClick = {
-                onFilterClicked(SearchFilterType.DATE_ADDED)
-                Analytics.tracker.trackEvent(SearchDateAddedDropdownChipPressedEvent)
-            },
-            enabled = enabled
-        )
+            MegaChip(
+                modifier = Modifier
+                    .animateContentSize()
+                    .testTag(DATE_MODIFIED_FILTER_CHIP_TAG),
+                content = stringResource(
+                    dateModifiedFilterOption?.labelResId ?: SearchFilterType.LAST_MODIFIED.titleResId
+                ),
+                selected = dateModifiedFilterOption != null,
+                trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
+                onClick = {
+                    onFilterClicked(SearchFilterType.LAST_MODIFIED)
+                    Analytics.tracker.trackEvent(SearchLastModifiedDropdownChipPressedEvent)
+                },
+                enabled = enabled
+            )
 
-        Spacer(Modifier.size(8.dp))
+            MegaChip(
+                modifier = Modifier
+                    .animateContentSize()
+                    .testTag(DATE_ADDED_FILTER_CHIP_TAG),
+                content = stringResource(
+                    dateAddedFilterOption?.labelResId ?: SearchFilterType.DATE_ADDED.titleResId
+                ),
+                selected = dateAddedFilterOption != null,
+                trailingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ChevronDown),
+                onClick = {
+                    onFilterClicked(SearchFilterType.DATE_ADDED)
+                    Analytics.tracker.trackEvent(SearchDateAddedDropdownChipPressedEvent)
+                },
+                enabled = enabled
+            )
+
+            Spacer(Modifier.size(8.dp))
+        }
     }
 }
 

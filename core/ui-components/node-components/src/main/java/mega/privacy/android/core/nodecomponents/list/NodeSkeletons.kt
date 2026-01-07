@@ -42,7 +42,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
  */
 @Composable
 fun NodesViewSkeleton(
-    contentPadding: PaddingValues,
+    contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
     isListView: Boolean = true,
     spanCount: Int = 2,

@@ -2,6 +2,8 @@ package mega.privacy.android.feature.clouddrive.presentation.search
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
@@ -13,6 +15,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
@@ -624,4 +627,80 @@ class SearchViewModelTest {
         )
     }
 
+    @Test
+    fun `test that ItemClicked action in normal mode triggers file open event`() = runTest {
+        val underTest = createViewModel()
+
+        val fileNode = mock<TypedFileNode>()
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = fileNode,
+            isSelected = false
+        )
+
+        underTest.processAction(SearchUiAction.ItemClicked(nodeUiItem))
+
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.openedFileNode).isEqualTo(fileNode)
+        }
+    }
+
+    @Test
+    fun `test that ItemClicked action in normal mode navigates to folder`() = runTest {
+        val underTest = createViewModel()
+
+        val folderNode = mock<TypedFolderNode>()
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = folderNode,
+            isSelected = false
+        )
+
+        underTest.processAction(SearchUiAction.ItemClicked(nodeUiItem))
+
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.navigateToFolderEvent).isEqualTo(triggered(folderNode))
+        }
+    }
+
+    @Test
+    fun `test that NavigateToFolderEventConsumed action clear event`() = runTest {
+        val underTest = createViewModel()
+
+        val folderNode = mock<TypedFolderNode>()
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = folderNode,
+            isSelected = false
+        )
+
+        underTest.processAction(SearchUiAction.ItemClicked(nodeUiItem))
+        advanceUntilIdle()
+        underTest.processAction(SearchUiAction.NavigateToFolderEventConsumed)
+
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.navigateToFolderEvent).isEqualTo(consumed())
+        }
+    }
+
+
+    @Test
+    fun `test that OpenedFileNodeHandled action clear event`() = runTest {
+        val underTest = createViewModel()
+
+        val fileNode = mock<TypedFileNode>()
+        val nodeUiItem = NodeUiItem<TypedNode>(
+            node = fileNode,
+            isSelected = false
+        )
+
+        underTest.processAction(SearchUiAction.ItemClicked(nodeUiItem))
+        advanceUntilIdle()
+        underTest.processAction(SearchUiAction.OpenedFileNodeHandled)
+
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.openedFileNode).isNull()
+        }
+    }
 }

@@ -6,6 +6,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,8 +17,13 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -54,13 +61,13 @@ class SearchViewModel @AssistedInject constructor(
         when (action) {
             is SearchUiAction.UpdateSearchText -> updateSearchText(action.text)
             is SearchUiAction.SelectFilter -> updateFilter(action.result)
-            is SearchUiAction.ItemClicked -> {} // TODO
+            is SearchUiAction.ItemClicked -> onItemClicked(action.nodeUiItem)
             is SearchUiAction.ItemLongClicked -> {} // TODO
             is SearchUiAction.ChangeViewTypeClicked -> {} // TODO
-            is SearchUiAction.OpenedFileNodeHandled -> {} // TODO
+            is SearchUiAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
             is SearchUiAction.SelectAllItems -> {} // TODO
             is SearchUiAction.DeselectAllItems -> {} // TODO
-            is SearchUiAction.NavigateToFolderEventConsumed -> {} // TODO
+            is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is SearchUiAction.NavigateBackEventConsumed -> {} // TODO
             is SearchUiAction.OverQuotaConsumptionWarning -> {} // TODO
         }
@@ -144,6 +151,57 @@ class SearchViewModel @AssistedInject constructor(
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Handle item click - navigate to folder if it's a folder
+     */
+    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        // TODO handle selection mode
+
+        when (val node = nodeUiItem.node) {
+            is TypedFolderNode -> {
+                _uiState.update { state ->
+                    state.copy(
+                        navigateToFolderEvent = triggered(node)
+                    )
+                }
+            }
+
+            is PublicLinkFile -> {
+                _uiState.update { state ->
+                    state.copy(
+                        openedFileNode = node
+                    )
+                }
+            }
+
+            is TypedFileNode -> {
+                _uiState.update { state ->
+                    state.copy(
+                        openedFileNode = node
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Consume navigation event
+     */
+    private fun onNavigateToFolderEventConsumed() {
+        _uiState.update { state ->
+            state.copy(navigateToFolderEvent = consumed())
+        }
+    }
+
+    /**
+     * Handle the event when a file node is opened
+     */
+    private fun onOpenedFileNodeHandled() {
+        _uiState.update { state ->
+            state.copy(openedFileNode = null)
         }
     }
 

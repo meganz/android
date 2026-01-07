@@ -1,6 +1,5 @@
 package mega.privacy.android.navigation.contract.extension
 
-import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -12,21 +11,32 @@ import androidx.navigation3.ui.NavDisplay
 /**
  * Slide transition for forward navigation (entering screen slides in from right)
  */
-val slideForwardTransition = slideInHorizontally(initialOffsetX = { it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { -it })
+val slideForwardTransition = slideInHorizontally(
+    animationSpec = tween(durationMillis = SLIDE_ANIM_DURATION_MS),
+    initialOffsetX = { it }
+) togetherWith slideOutHorizontally(
+    animationSpec = tween(durationMillis = SLIDE_ANIM_DURATION_MS),
+    targetOffsetX = { -it }
+)
 
 /**
  * Slide transition for backward navigation (entering screen slides in from left)
  */
-val slideBackwardTransition = slideInHorizontally(initialOffsetX = { -it }) togetherWith
-        slideOutHorizontally(targetOffsetX = { it })
+val slideBackwardTransition = slideInHorizontally(
+    animationSpec = tween(durationMillis = SLIDE_ANIM_DURATION_MS),
+    initialOffsetX = { -it }
+) togetherWith slideOutHorizontally(
+    animationSpec = tween(durationMillis = SLIDE_ANIM_DURATION_MS),
+    targetOffsetX = { it }
+)
 
 /**
  * Screen exit transition with fade in animation
  */
-val fadeTransition = ContentTransform(
-    fadeIn(animationSpec = tween(300)),
-    fadeOut(animationSpec = tween(300)),
+val fadeTransition = fadeIn(
+    animationSpec = tween(FADE_ANIM_DURATION_MS)
+) togetherWith fadeOut(
+    animationSpec = tween(FADE_ANIM_DURATION_MS)
 )
 
 /**
@@ -39,3 +49,6 @@ val slideTransitionMetadata = NavDisplay.transitionSpec {
 } + NavDisplay.predictivePopTransitionSpec {
     slideBackwardTransition
 }
+
+private const val SLIDE_ANIM_DURATION_MS = 600
+private const val FADE_ANIM_DURATION_MS = 300

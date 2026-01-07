@@ -1,7 +1,12 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
@@ -29,6 +34,10 @@ data class SearchUiState(
     val typeFilterOption: TypeFilterOption? = null,
     val dateModifiedFilterOption: DateFilterOption? = null,
     val dateAddedFilterOption: DateFilterOption? = null,
+    val navigateToFolderEvent: StateEventWithContent<TypedNode> = consumed(),
+    val openedFileNode: TypedFileNode? = null,
+    val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
+    val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
 ) {
     /**
      * True if nodes or hidden node settings are loading

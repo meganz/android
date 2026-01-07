@@ -440,7 +440,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         }
     }
 
-
     /**
      * Monitor storage over quota state
      */
