@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.model
 
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
 
@@ -16,6 +17,8 @@ sealed interface SearchUiAction {
     data class ItemClicked(val nodeUiItem: NodeUiItem<TypedNode>) : SearchUiAction
 
     data class ItemLongClicked(val nodeUiItem: NodeUiItem<TypedNode>) : SearchUiAction
+
+    data class SetSortOrder(val sortConfiguration: NodeSortConfiguration) : SearchUiAction
 
     data object ChangeViewTypeClicked : SearchUiAction
 

@@ -112,7 +112,6 @@ class SearchContentTest {
                     onLongClicked = {},
                     onSortOrderClick = {},
                     onChangeViewTypeClicked = {},
-                    onEnterMediaDiscoveryClick = {},
                 )
             }
         }

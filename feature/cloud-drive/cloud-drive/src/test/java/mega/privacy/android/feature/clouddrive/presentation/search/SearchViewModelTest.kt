@@ -5,23 +5,34 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
@@ -48,6 +59,11 @@ class SearchViewModelTest {
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
     private val typeFilterToSearchMapper: TypeFilterToSearchMapper = mock()
+    private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val setViewTypeUseCase: SetViewType = mock()
+    private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val parentHandle = 123L
     private val args = SearchViewModel.Args(
@@ -67,10 +83,17 @@ class SearchViewModelTest {
         searchUseCase = searchUseCase,
         cancelCancelTokenUseCase = cancelCancelTokenUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
-        typeFilterToSearchMapper = typeFilterToSearchMapper
+        typeFilterToSearchMapper = typeFilterToSearchMapper,
+        setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+        nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+        monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+        setViewTypeUseCase = setViewTypeUseCase,
+        monitorViewTypeUseCase = monitorViewTypeUseCase,
     )
 
-    private fun stubNodeUiItemMapper(result: List<NodeUiItem<TypedNode>>) {
+    private fun setupTestData(
+        nodeUiItems: List<NodeUiItem<TypedNode>>,
+    ) {
         runBlocking {
             whenever(
                 nodeUiItemMapper(
@@ -83,8 +106,15 @@ class SearchViewModelTest {
                     highlightedNames = anyOrNull(),
                     isContactVerificationOn = any(),
                 )
-            ).thenReturn(result)
+            ).thenReturn(nodeUiItems)
+            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
         }
+
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+            NodeSortConfiguration.default
+        )
     }
 
     @Test
@@ -129,7 +159,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        stubNodeUiItemMapper(listOf(nodeUiItem))
+        setupTestData(listOf(nodeUiItem))
 
         val underTest = createViewModel()
 
@@ -160,7 +190,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        stubNodeUiItemMapper(listOf(nodeUiItem))
+        setupTestData(listOf(nodeUiItem))
 
         val underTest = createViewModel()
         advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
@@ -175,7 +205,7 @@ class SearchViewModelTest {
             )
         ).thenReturn(listOf(typedFileNode))
         whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
-        stubNodeUiItemMapper(listOf(nodeUiItem))
+        setupTestData(listOf(nodeUiItem))
 
         underTest.uiState.test {
             skipItems(1)
@@ -217,7 +247,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        stubNodeUiItemMapper(emptyList())
+        setupTestData(emptyList())
 
         val underTest = createViewModel()
 
@@ -266,7 +296,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        stubNodeUiItemMapper(listOf(nodeUiItem))
+        setupTestData(listOf(nodeUiItem))
 
         val underTest = createViewModel()
 
@@ -297,8 +327,8 @@ class SearchViewModelTest {
             whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(
                 SearchCategory.ALL
             )
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel()
             advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
@@ -329,8 +359,8 @@ class SearchViewModelTest {
             whenever(typeFilterToSearchMapper(typeFilterOption, nodeSourceType)).thenReturn(
                 expectedSearchCategory
             )
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel()
             underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -363,8 +393,8 @@ class SearchViewModelTest {
         whenever(typeFilterToSearchMapper(typeFilterOption, nodeSourceType)).thenReturn(
             expectedSearchCategory
         )
-        whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-        stubNodeUiItemMapper(emptyList())
+
+        setupTestData(emptyList())
 
         val underTest = createViewModel()
         underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -395,8 +425,8 @@ class SearchViewModelTest {
             val dateModifiedFilter = DateFilterOption.Last7Days
 
             whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel()
             underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -425,8 +455,8 @@ class SearchViewModelTest {
             val dateAddedFilter = DateFilterOption.Today
 
             whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel()
             underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -460,8 +490,8 @@ class SearchViewModelTest {
         whenever(typeFilterToSearchMapper(typeFilterOption, nodeSourceType)).thenReturn(
             expectedSearchCategory
         )
-        whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-        stubNodeUiItemMapper(emptyList())
+
+        setupTestData(emptyList())
 
         val underTest = createViewModel()
         underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -501,8 +531,8 @@ class SearchViewModelTest {
             whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(
                 expectedSearchCategory
             )
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel(favouritesArgs)
             underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -537,8 +567,8 @@ class SearchViewModelTest {
             whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(
                 expectedSearchCategory
             )
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-            stubNodeUiItemMapper(emptyList())
+
+            setupTestData(emptyList())
 
             val underTest = createViewModel(documentsArgs)
             underTest.processAction(SearchUiAction.UpdateSearchText(query))
@@ -575,8 +605,8 @@ class SearchViewModelTest {
         whenever(typeFilterToSearchMapper(updatedTypeFilter, nodeSourceType)).thenReturn(
             updatedSearchCategory
         )
-        whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
-        stubNodeUiItemMapper(emptyList())
+
+        setupTestData(emptyList())
 
         val underTest = createViewModel()
         advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
@@ -701,6 +731,60 @@ class SearchViewModelTest {
         underTest.uiState.test {
             val updatedState = awaitItem()
             assertThat(updatedState.openedFileNode).isNull()
+        }
+    }
+
+    @Test
+    fun `test that setCloudSortOrder calls use case and refetches sort order`() = runTest {
+        val sortConfiguration =
+            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+
+        whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.SetSortOrder(sortConfiguration))
+        advanceUntilIdle()
+
+        verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
+    }
+
+    @Test
+    fun `test that ChangeViewTypeClicked action toggles from LIST to GRID`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        val underTest = createViewModel()
+
+        underTest.processAction(SearchUiAction.ChangeViewTypeClicked)
+        advanceUntilIdle()
+
+        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+    }
+
+    @Test
+    fun `test that ChangeViewTypeClicked action toggles from GRID to LIST`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.GRID))
+        val underTest = createViewModel()
+
+        underTest.processAction(SearchUiAction.ChangeViewTypeClicked)
+        advanceUntilIdle()
+
+        verify(setViewTypeUseCase).invoke(ViewType.LIST)
+    }
+
+    @Test
+    fun `test that monitorViewType updates currentViewType in UI state`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            val updatedState = awaitItem() // State after monitorViewType flow emits
+            assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
         }
     }
 }

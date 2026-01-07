@@ -22,6 +22,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,8 +42,11 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -56,6 +60,8 @@ import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFi
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as sharedR
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +78,8 @@ fun SearchScreen(
     val snackbarHostState = LocalSnackBarHostState.current
     var selectedFilterType by rememberSaveable { mutableStateOf<SearchFilterType?>(null) }
     val filterBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val localKeyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
@@ -119,13 +127,10 @@ fun SearchScreen(
                 // TODO handle selection mode
             },
             onSortOrderClick = {
-                // TODO handle sort order change
+                showSortBottomSheet = true
             },
             onChangeViewTypeClicked = {
-                // TODO handle view type change
-            },
-            onEnterMediaDiscoveryClick = {
-                // TODO in phase 2
+                viewModel.processAction(SearchUiAction.ChangeViewTypeClicked)
             },
         )
     }
@@ -179,6 +184,34 @@ fun SearchScreen(
             )
         }
     }
+
+    if (showSortBottomSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType),
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                sortDirection = uiState.selectedSortConfiguration.sortDirection
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    viewModel.processAction(
+                        SearchUiAction.SetSortOrder(
+                            NodeSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection
+                            )
+                        )
+                    )
+                    showSortBottomSheet = false
+                }
+            },
+            onDismissRequest = {
+                showSortBottomSheet = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -193,7 +226,6 @@ fun SearchContent(
     onLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
-    onEnterMediaDiscoveryClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -265,12 +297,12 @@ fun SearchContent(
                 onMenuClicked = onMenuClicked,
                 onItemClicked = onItemClicked,
                 onLongClicked = onLongClicked,
-                sortConfiguration = NodeSortConfiguration.default,
+                sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClicked = onChangeViewTypeClicked,
                 showMediaDiscoveryButton = false,
-                onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+                onEnterMediaDiscoveryClick = { /* No-op */ },
                 inSelectionMode = uiState.isInSelectionMode,
                 isContactVerificationOn = uiState.isContactVerificationOn
             )
@@ -293,7 +325,6 @@ private fun SearchContentPreSearchPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
-            onEnterMediaDiscoveryClick = {},
         )
     }
 }
@@ -317,7 +348,6 @@ private fun SearchContentEmptyPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
-            onEnterMediaDiscoveryClick = {},
         )
     }
 }
@@ -340,7 +370,6 @@ private fun SearchContentLoadingPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
-            onEnterMediaDiscoveryClick = {},
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -22,6 +23,7 @@ fun SearchTopAppBar(
     modifier: Modifier = Modifier,
 ) {
     var isExiting by remember { mutableStateOf(false) }
+    val localFocusManager = LocalFocusManager.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
 
     MegaSearchTopAppBar(
@@ -36,6 +38,7 @@ fun SearchTopAppBar(
             }
         },
         onSearchAction = {
+            localFocusManager.clearFocus()
             localKeyboardController?.hide()
         },
         isSearchingMode = true,
