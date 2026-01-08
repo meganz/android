@@ -252,7 +252,11 @@ internal fun NodeOptionsBottomSheetContent(
     val isContentReady = isSheetReady && uiState.node != null
 
     LaunchedEffect(Unit) {
-        delay(SHEET_READY_DELAY_MS)
+        // Delay should only be applied on first load
+        if (uiState.actions.isEmpty()) {
+            delay(SHEET_READY_DELAY_MS)
+        }
+
         isSheetReady = true
     }
 
