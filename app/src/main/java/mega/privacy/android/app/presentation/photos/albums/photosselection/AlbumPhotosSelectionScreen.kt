@@ -516,16 +516,10 @@ private fun EmptyStateContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(id = featurePhotosR.drawable.ic_no_images),
-            contentDescription = "Empty",
-            colorFilter = ColorFilter.tint(
-                color = if (MaterialTheme.colors.isLight) {
-                    Color(0xFFDADADA)
-                } else {
-                    Color(0xFFEAEFEF)
-                }
-            ),
-            alpha = if (MaterialTheme.colors.isLight) 1F else 0.16F
+            modifier = Modifier
+                .size(120.dp),
+            painter = painterResource(featurePhotosR.drawable.il_glass_image),
+            contentDescription = "No media found",
         )
 
         Row(
@@ -548,10 +542,7 @@ private fun EmptyStateContent(modifier: Modifier = Modifier) {
                     text.indexOf(placeHolderStart),
                     text.indexOf(placeHolderEnd)
                 ).replace("[B]", ""),
-                textColor = TextColor.Primary,
-                style = LocalTextStyle.current.copy(
-                    fontWeight = FontWeight.ExtraBold
-                )
+                textColor = TextColor.Secondary,
             )
 
             MegaText(
