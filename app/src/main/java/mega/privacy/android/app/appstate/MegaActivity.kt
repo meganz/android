@@ -77,8 +77,6 @@ import mega.privacy.android.app.presentation.security.check.PasscodeCheckViewMod
 import mega.privacy.android.app.presentation.security.check.model.PasscodeCheckState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.navigation.contract.extension.slideForwardTransition
-import mega.privacy.android.navigation.contract.extension.slideBackwardTransition
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
@@ -87,6 +85,8 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.transition.slideBackwardTransition
+import mega.privacy.android.navigation.contract.transition.slideForwardTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey

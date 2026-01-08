@@ -16,7 +16,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsA
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.extension.slideTransitionMetadata
+import mega.privacy.android.navigation.contract.transition.orientationAwareSlideTransition
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
 /**
@@ -32,7 +32,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     setNavigationBarVisibility: (Boolean) -> Unit = { },
 ) {
-    entry<CloudDriveNavKey>(metadata = slideTransitionMetadata) { key ->
+    entry<CloudDriveNavKey>(metadata = orientationAwareSlideTransition) { key ->
         val viewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
             creationCallback = { factory ->
                 factory.create(key)
