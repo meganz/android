@@ -352,3 +352,9 @@ data class LegacyVideoToPlaylistNavKey(
         const val ADD_VIDEO_TO_PLAYLIST_RESULT = "ADD_VIDEO_TO_PLAYLIST_RESULT"
     }
 }
+
+@Serializable
+data class LegacyImagePreviewNavKey(
+    val imageIds: Set<Long>,
+    val anchorImageId: Long
+) : NavKey

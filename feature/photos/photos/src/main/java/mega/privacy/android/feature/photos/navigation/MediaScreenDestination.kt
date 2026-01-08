@@ -14,19 +14,26 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
+import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
+import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
+import mega.privacy.android.navigation.destination.MediaSearchNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
@@ -126,6 +133,56 @@ fun EntryProviderScope<NavKey>.albumContentScreen(
             navigationHandler = navigationHandler,
             onTransfer = onTransfer,
             viewModel = viewModel,
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.mediaSearchScreen(
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+) {
+    entry<MediaSearchNavKey> { args ->
+        val photoDownloaderViewModel: PhotoDownloaderViewModel = hiltViewModel()
+        val photosSearchViewModel: PhotosSearchViewModel = hiltViewModel()
+        val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+        val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
+
+        MediaSearchScreenM3(
+            state = state,
+            photoDownloaderViewModel = photoDownloaderViewModel,
+            onOpenAlbum = navigationHandler::navigate,
+            onOpenImagePreviewScreen = { photo ->
+                navigationHandler.navigate(
+                    LegacyImagePreviewNavKey(
+                        imageIds = state.photos.map { it.id }.toSet(),
+                        anchorImageId = photo.id
+                    )
+                )
+            },
+            onShowMoreMenu = { nodeId ->
+                navigationHandler.navigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = nodeId.longValue,
+                        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                        partiallyExpand = true
+                    )
+                )
+            },
+            updateQuery = photosSearchViewModel::updateQuery,
+            updateSelectedQuery = {
+                photosSearchViewModel.updateSelectedQuery(null)
+            },
+            updateRecentQueries = photosSearchViewModel::updateRecentQueries,
+            searchPhotos = photosSearchViewModel::search,
+            onCloseScreen = { navigationHandler.remove(args) },
         )
     }
 }

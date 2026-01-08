@@ -96,5 +96,6 @@ class LegacyCoreActivityFeatureGraph(
                 navigationHandler::back,
                 navigationHandler::returnResult
             )
+            legacyImagePreview(navigationHandler::back)
         }
 }

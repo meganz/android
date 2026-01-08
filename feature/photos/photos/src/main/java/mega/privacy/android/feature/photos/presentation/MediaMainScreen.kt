@@ -108,6 +108,7 @@ import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKe
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
+import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -308,7 +309,7 @@ fun MediaMainRoute(
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
         multiNodeActionHandler = selectionModeActionHandler,
-        navigateToLegacyPhotosSearch = navigationHandler::navigate,
+        navigateToMediaSearch = navigationHandler::navigate,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
@@ -337,7 +338,7 @@ fun MediaMainScreen(
     setNavigationItemVisibility: (Boolean) -> Unit,
     navigateToAlbumContent: (AlbumContentNavKey) -> Unit,
     navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
-    navigateToLegacyPhotosSearch: (LegacyPhotosSearchNavKey) -> Unit,
+    navigateToMediaSearch: (NavKey) -> Unit,
     onTimelinePhotoSelected: (nodes: PhotoNodeUiState) -> Unit,
     onAllTimelinePhotosSelected: () -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
@@ -621,7 +622,11 @@ fun MediaMainScreen(
                                 if (currentTabIndex == MediaScreen.Videos.ordinal) {
                                     isVideosTabSearchBarVisible = true
                                 } else {
-                                    navigateToLegacyPhotosSearch(LegacyPhotosSearchNavKey)
+                                    if (mediaMainUiState.isMediaRevampPhase2Enabled) {
+                                        navigateToMediaSearch(MediaSearchNavKey)
+                                    } else {
+                                        navigateToMediaSearch(LegacyPhotosSearchNavKey)
+                                    }
                                 }
                             }
                         )
@@ -1053,7 +1058,7 @@ fun PhotosMainScreenPreview() {
             onNavigateToCameraUploadsSettings = {},
             onDismissEnableCameraUploadsBanner = {},
             multiNodeActionHandler = rememberMultiNodeActionHandler(),
-            navigateToLegacyPhotosSearch = {},
+            navigateToMediaSearch = {},
             navigationHandler = object : NavigationHandler {
                 override fun back() {}
                 override fun remove(navKey: NavKey) {}

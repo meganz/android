@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
@@ -33,6 +34,7 @@ import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
+import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
@@ -116,7 +118,7 @@ fun EntryProviderScope<NavKey>.legacyAlbumGetLink(
 }
 
 fun EntryProviderScope<NavKey>.legacyAlbumGetMultipleLinks(
-    removeDestination: () -> Unit
+    removeDestination: () -> Unit,
 ) {
     entry<AlbumGetMultipleLinksNavKey>(
         metadata = transparentMetadata()
@@ -300,6 +302,29 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
         LaunchedEffect(Unit) {
             val intent = Intent(context, PhotosSearchActivity::class.java)
             launcher.launch(intent)
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.legacyImagePreview(
+    removeDestination: () -> Unit,
+) {
+    entry<LegacyImagePreviewNavKey>(
+        metadata = transparentMetadata()
+    ) { args ->
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            val intent = ImagePreviewActivity.createIntent(
+                context = context,
+                imageSource = ImagePreviewFetcherSource.DEFAULT,
+                menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                anchorImageNodeId = NodeId(args.anchorImageId),
+                params = mapOf(DefaultImageNodeFetcher.NODE_IDS to args.imageIds.toLongArray()),
+            )
+
+            context.startActivity(intent)
+            removeDestination()
         }
     }
 }
