@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -32,10 +33,10 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.feature.myaccount.R
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
-import mega.privacy.android.feature.myaccount.presentation.util.getSizeString
 import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
 import mega.privacy.android.icon.pack.IconPack
 
@@ -149,6 +150,7 @@ internal fun MyAccountWidget(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     CardSurface(
         modifier = modifier
             .padding(horizontal = 16.dp)
@@ -198,8 +200,8 @@ internal fun MyAccountWidget(
                     MegaText(
                         text = stringResource(
                             R.string.storage_usage_format,
-                            getSizeString(state.usedStorage),
-                            getSizeString(state.totalStorage)
+                            formatFileSize(state.usedStorage, context),
+                            formatFileSize(state.totalStorage, context)
                         ),
                         textColor = TextColor.Secondary,
                         style = AppTheme.typography.bodySmall,

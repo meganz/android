@@ -14,6 +14,7 @@ import static mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PRO
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
+import static mega.privacy.android.core.formatter.FileSizeFormatterKt.formatFileSize;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -368,6 +369,10 @@ public class Util {
 
     /**
      * Gets a size string.
+     * Matches iOS ByteCountFormatter behavior with .memory count style:
+     * - KB values are rounded to whole numbers
+     * - MB values show 1 decimal place
+     * - GB and above show 2 decimal places
      *
      * @param size the size to show in the string
      * @return The size string.
@@ -375,30 +380,7 @@ public class Util {
      */
     @Deprecated
     public static String getSizeString(long size, Context context) {
-        DecimalFormat df = new DecimalFormat("#.##");
-
-        float KB = 1024;
-        float MB = KB * 1024;
-        float GB = MB * 1024;
-        float TB = GB * 1024;
-        float PB = TB * 1024;
-        float EB = PB * 1024;
-
-        if (size < KB) {
-            return context.getString(R.string.label_file_size_byte, Long.toString(size));
-        } else if (size < MB) {
-            return context.getString(R.string.label_file_size_kilo_byte, df.format(size / KB));
-        } else if (size < GB) {
-            return context.getString(R.string.label_file_size_mega_byte, df.format(size / MB));
-        } else if (size < TB) {
-            return context.getString(R.string.label_file_size_giga_byte, df.format(size / GB));
-        } else if (size < PB) {
-            return context.getString(R.string.label_file_size_tera_byte, df.format(size / TB));
-        } else if (size < EB) {
-            return context.getString(R.string.label_file_size_peta_byte, df.format(size / PB));
-        } else {
-            return context.getString(R.string.label_file_size_exa_byte, df.format(size / EB));
-        }
+        return formatFileSize(size, context);
     }
 
     public static String getSizeStringGBBased(long gbSize) {

@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.extensions.transfers
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -76,8 +78,9 @@ internal fun InProgressTransfer.getSpeedString(
 
 @Composable
 internal fun InProgressTransfer.getProgressSizeString(): String {
-    val totalSizeString = getSizeString(this.totalBytes)
-    val transferredString = getSizeString((totalBytes * progress.floatValue).toLong())
+    val context = LocalContext.current
+    val totalSizeString = formatFileSize(this.totalBytes, context)
+    val transferredString = formatFileSize((totalBytes * progress.floatValue).toLong(), context)
     return stringResource(
         sharedR.string.transfers_completed_transfer_size_indicator,
         transferredString,
@@ -86,62 +89,6 @@ internal fun InProgressTransfer.getProgressSizeString(): String {
 }
 
 internal fun InProgressTransfer.getProgressPercentString() = "${progress.intValue}%"
-
-/**
- * Get the size string for a given size as Long.
- */
-@Composable
-internal fun getSizeString(totalBytes: Long): String {
-    val df = DecimalFormat("#.##")
-
-    return when {
-        totalBytes < KB -> {
-            stringResource(R.string.label_file_size_byte, totalBytes.toString())
-        }
-
-        totalBytes < MB -> {
-            stringResource(
-                R.string.label_file_size_kilo_byte,
-                df.format((totalBytes / KB).toDouble())
-            )
-        }
-
-        totalBytes < GB -> {
-            stringResource(
-                R.string.label_file_size_mega_byte,
-                df.format((totalBytes / MB).toDouble())
-            )
-        }
-
-        totalBytes < TB -> {
-            stringResource(
-                R.string.label_file_size_giga_byte,
-                df.format((totalBytes / GB).toDouble())
-            )
-        }
-
-        totalBytes < PB -> {
-            stringResource(
-                R.string.label_file_size_tera_byte,
-                df.format((totalBytes / TB).toDouble())
-            )
-        }
-
-        totalBytes < EB -> {
-            stringResource(
-                R.string.label_file_size_peta_byte,
-                df.format((totalBytes / PB).toDouble())
-            )
-        }
-
-        else -> {
-            stringResource(
-                R.string.label_file_size_exa_byte,
-                df.format((totalBytes / EB).toDouble())
-            )
-        }
-    }
-}
 
 private const val KB = 1024f
 private const val MB = KB * 1024

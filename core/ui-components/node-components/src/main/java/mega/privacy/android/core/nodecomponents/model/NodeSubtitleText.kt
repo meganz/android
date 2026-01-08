@@ -1,13 +1,13 @@
 package mega.privacy.android.core.nodecomponents.model
 
-import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
+import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.R
-import java.text.DecimalFormat
 
 /**
  * Represents different types of node subtitles that can be resolved to localized strings
@@ -16,15 +16,13 @@ import java.text.DecimalFormat
 sealed class NodeSubtitleText {
     /**
      * For file nodes: displays file size and modification time
-     * @param fileSizeResId String resource ID for file size formatting
      * @param fileSizeValue Pre-calculated file size value (raw number)
      * @param modificationTime File modification time in milliseconds
      * @param showPublicLinkCreationTime Whether to show public link creation time instead of modification time
      * @param publicLinkCreationTime Public link creation time in milliseconds (optional)
      */
     data class FileSubtitle(
-        @StringRes val fileSizeResId: Int,
-        val fileSizeValue: Double,
+        val fileSizeValue: Long,
         val modificationTime: Long,
         val showPublicLinkCreationTime: Boolean,
         val publicLinkCreationTime: Long? = null,
@@ -72,9 +70,8 @@ fun NodeSubtitleText.text(): String {
             val time = publicLinkCreationTime.takeIf {
                 showPublicLinkCreationTime
             } ?: modificationTime
-            val format = DecimalFormat("#.##")
-            val formattedFileSize = format.format(fileSizeValue)
-            val fileSizeText = stringResource(fileSizeResId, formattedFileSize)
+            val context = LocalContext.current
+            val fileSizeText = formatFileSize(fileSizeValue, context)
             if (time != 0L) {
                 val formattedDate = formatModifiedDate(locale, time)
                 stringResource(

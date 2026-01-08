@@ -51,8 +51,7 @@ class NodeUiItemMapperTest {
             )
         ).thenReturn(
             NodeSubtitleText.FileSubtitle(
-                fileSizeResId = R.string.label_file_size_kilo_byte,
-                fileSizeValue = 1.0,
+                fileSizeValue = 1,
                 modificationTime = 1234567890L,
                 showPublicLinkCreationTime = false
             )
@@ -648,8 +647,7 @@ class NodeUiItemMapperTest {
         isHighlighted = isHighlighted,
         title = LocalizedText.Literal(node.name),
         subtitle = NodeSubtitleText.FileSubtitle(
-            fileSizeResId = R.string.label_file_size_kilo_byte,
-            fileSizeValue = 1.0,
+            fileSizeValue = 1,
             modificationTime = 1234567890L,
             showPublicLinkCreationTime = false
         ),

@@ -27,6 +27,8 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":core:ui-components:shared-components"))
+    implementation(project(":core:formatter"))
+
 
     implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))

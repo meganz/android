@@ -10,9 +10,7 @@ import javax.inject.Inject
 /**
  * Mapper to create NodeSubtitleText from TypedNode
  */
-class NodeSubtitleMapper @Inject constructor(
-    private val fileSizeMapper: FileSizeMapper,
-) {
+class NodeSubtitleMapper @Inject constructor() {
 
     /**
      * Invoke
@@ -26,10 +24,8 @@ class NodeSubtitleMapper @Inject constructor(
     ): NodeSubtitleText {
         return when (node) {
             is TypedFileNode -> {
-                val (fileSizeResId, fileSizeValue) = fileSizeMapper(node.size)
                 NodeSubtitleText.FileSubtitle(
-                    fileSizeResId = fileSizeResId,
-                    fileSizeValue = fileSizeValue,
+                    fileSizeValue = node.size,
                     modificationTime = node.modificationTime,
                     showPublicLinkCreationTime = showPublicLinkCreationTime,
                     publicLinkCreationTime = node.exportedData?.publicLinkCreationTime
