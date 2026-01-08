@@ -429,7 +429,6 @@ pipeline {
 //                        sh './gradlew --no-daemon readReleaseNotes'
                         RELEASE_NOTES_CONTENT = common.releaseNotes(RELEASE_NOTES_FILE)
                         println("Major release notes: ${RELEASE_NOTES_CONTENT}")
-                        exit 1  //TODO delete me
                     }
 
                     def parameters = parseDeliverAppStoreParameters(env.gitlabTriggerPhrase)
