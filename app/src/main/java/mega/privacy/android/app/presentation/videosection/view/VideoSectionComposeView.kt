@@ -64,6 +64,7 @@ import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEven
 import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
 import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
 import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
+import mega.privacy.mobile.analytics.event.VideosScreenBackNavigationEvent
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -197,8 +198,10 @@ internal fun VideoSectionComposeView(
                             uiState.searchState == SearchWidgetState.EXPANDED ->
                                 videoSectionViewModel.exitSearch()
 
-                            else ->
+                            else -> {
+                                Analytics.tracker.trackEvent(VideosScreenBackNavigationEvent)
                                 onBackPressedDispatcher?.onBackPressed()
+                            }
                         }
                     },
                     menuItems = toolbarState.toolbarMenuItems,

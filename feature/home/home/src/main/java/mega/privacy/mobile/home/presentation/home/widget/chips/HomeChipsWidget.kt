@@ -16,6 +16,7 @@ import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -26,6 +27,9 @@ import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.core.event.type.AnalyticsEvent
+import mega.privacy.mobile.analytics.event.VideosChipButtonPressedEvent
+import timber.log.Timber
 import javax.inject.Inject
 
 class HomeChipsWidget @Inject constructor(
@@ -72,6 +76,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Film),
             onClick = {
+                Analytics.tracker.trackEvent(VideosChipButtonPressedEvent)
                 onNavigate(VideoSectionNavKey)
             },
         )

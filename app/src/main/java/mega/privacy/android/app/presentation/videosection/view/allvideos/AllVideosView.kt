@@ -19,6 +19,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
@@ -36,6 +37,8 @@ import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreview
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.DurationFilterButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LocationFilterButtonPressedEvent
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,8 +116,15 @@ internal fun AllVideosView(
                 isLocationFilterSelected = isAllLocations.not(),
                 isDurationFilterSelected = isAllDurations.not(),
                 modifier = Modifier.testTag(VIDEOS_FILTER_BUTTON_VIEW_TEST_TAG),
-                onDurationFilterClicked = onDurationFilterClicked,
-                onLocationFilterClicked = onLocationFilterClicked,
+                onDurationFilterClicked = {
+                    Analytics.tracker.trackEvent(DurationFilterButtonPressedEvent)
+                    onDurationFilterClicked()
+
+                },
+                onLocationFilterClicked = {
+                    Analytics.tracker.trackEvent(LocationFilterButtonPressedEvent)
+                    onLocationFilterClicked()
+                },
                 locationDefaultText = locationTitle,
                 durationDefaultText = durationTitle,
                 locationFilterSelectText = if (isAllLocations) {

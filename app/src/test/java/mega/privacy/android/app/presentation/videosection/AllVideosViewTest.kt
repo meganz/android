@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import coil.annotation.ExperimentalCoilApi
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.LocationFilterOption
 import mega.privacy.android.app.presentation.videosection.model.VideoUIEntity
@@ -21,6 +22,7 @@ import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEOS_
 import mega.privacy.android.domain.entity.node.NodeId
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
@@ -28,8 +30,13 @@ import org.mockito.kotlin.mock
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class AllVideosViewTest {
-    @get:Rule
+
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private fun setComposeContent(
         items: List<VideoUIEntity> = emptyList(),
