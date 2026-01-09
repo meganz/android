@@ -32,10 +32,13 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.modifiers.conditional
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.sharedcomponents.clipSelected
 import mega.privacy.android.core.sharedcomponents.selectedBorder
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
@@ -67,13 +70,13 @@ internal fun AlbumPhotoItem(
             .crossfade(true)
             .build(),
         contentDescription = null,
-        placeholder = painterResource(id = iconPackR.drawable.ic_image_medium_solid),
         error = painterResource(id = iconPackR.drawable.ic_image_medium_solid),
         contentScale = ContentScale.Crop,
         modifier = modifier
             .width(width)
             .height(height)
             .aspectRatio(1f)
+            .shimmerEffect(visible = downloadedPhoto.isNullOrBlank())
             .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .blur(0.dp.takeIf { !isSensitive } ?: 16.dp)
     )
@@ -91,6 +94,7 @@ internal fun AlbumPhotoContainer(
 ) {
     Box(
         modifier = modifier
+            .clipSelected(isSelected)
             .selectedBorder(isSelected)
             .combinedClickable(
                 onClick = { onClick(photo) },

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,6 +23,16 @@ fun Modifier.selectedBorder(
         ),
         shape = shape
     )
+} else {
+    this
+}
+
+@Composable
+fun Modifier.clipSelected(
+    isSelected: Boolean,
+    shape: Shape = DSTokens.shapes.extraSmall
+): Modifier = if (isSelected) {
+    this.clip(shape)
 } else {
     this
 }
