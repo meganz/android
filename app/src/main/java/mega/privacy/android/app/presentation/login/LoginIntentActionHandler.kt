@@ -18,13 +18,11 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_REFRESH_AND_OPEN_SESSION_LINK
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.app.providers.FileProviderActivity
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
@@ -35,6 +33,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.navigation.ExtraConstant
+import mega.privacy.android.navigation.megaNavigator
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 
@@ -123,29 +122,34 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     when (intentAction) {
                         Constants.ACTION_CHANGE_MAIL -> {
                             Timber.d("Action change mail after fetch nodes")
-                            val changeMailIntent = Intent(activity, ManagerActivity::class.java)
-                            changeMailIntent.action = Constants.ACTION_CHANGE_MAIL
-                            changeMailIntent.data = intentDataString?.toUri()
-                            activity.startActivity(changeMailIntent)
+                            activity.megaNavigator.openManagerActivity(
+                                context = activity,
+                                action = Constants.ACTION_CHANGE_MAIL,
+                                data = intentDataString?.toUri(),
+                                singleActivityDestination = null,
+                            )
                             activity.finish()
                         }
 
                         Constants.ACTION_RESET_PASS -> {
                             Timber.d("Action reset pass after fetch nodes")
-                            val resetPassIntent = Intent(activity, ManagerActivity::class.java)
-                            resetPassIntent.action = Constants.ACTION_RESET_PASS
-                            resetPassIntent.data = intentDataString?.toUri()
-                            activity.startActivity(resetPassIntent)
+                            activity.megaNavigator.openManagerActivity(
+                                context = activity,
+                                action = Constants.ACTION_RESET_PASS,
+                                data = intentDataString?.toUri(),
+                                singleActivityDestination = null,
+                            )
                             activity.finish()
                         }
 
                         Constants.ACTION_CANCEL_ACCOUNT -> {
                             Timber.d("Action cancel Account after fetch nodes")
-                            val cancelAccountIntent =
-                                Intent(activity, ManagerActivity::class.java)
-                            cancelAccountIntent.action = Constants.ACTION_CANCEL_ACCOUNT
-                            cancelAccountIntent.data = intentDataString?.toUri()
-                            activity.startActivity(cancelAccountIntent)
+                            activity.megaNavigator.openManagerActivity(
+                                context = activity,
+                                action = Constants.ACTION_CANCEL_ACCOUNT,
+                                data = intentDataString?.toUri(),
+                                singleActivityDestination = null,
+                            )
                             activity.finish()
                         }
                     }
@@ -158,40 +162,52 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         val intent = Intent()
                         intent.putExtra("PARENT_HANDLE", intentParentHandle)
                         activity.setResult(Activity.RESULT_OK, intent)
-                        activity.finish()
                     } else {
-                        var intent: Intent
-                        val refreshActivityIntent =
-                            activity.intent.parcelable<Intent>(Constants.LAUNCH_INTENT)
+                        var intent: Intent? = null
+                        var action: String? = null
+                        var data: Uri? = null
+                        var flags: Int? = null
+                        var bundle = Bundle()
+
                         if (loginUiState.isAlreadyLoggedIn) {
                             Timber.d("isAlreadyLoggedIn")
-                            intent = Intent(activity, ManagerActivity::class.java)
                             viewModel.setStartScreenTimeStamp()
                             when (intentAction) {
                                 Constants.ACTION_EXPORT_MASTER_KEY -> {
                                     Timber.d("ACTION_EXPORT_MK")
-                                    intent.action = Constants.ACTION_EXPORT_MASTER_KEY
+                                    action = Constants.ACTION_EXPORT_MASTER_KEY
                                 }
 
                                 Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
                                     if (intentDataString != null) {
-                                        intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
-                                        intent.data = intentDataString?.toUri()
+                                        action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
+                                        data = intentDataString?.toUri()
                                     }
                                 }
 
                                 else -> intent =
-                                    refreshActivityIntent ?: handleLinkNavigation(
-                                        activity = activity,
-                                        intentAction = intentAction,
-                                        intentExtras = intentExtras,
-                                        intentData = intentData,
-                                        intentDataString = intentDataString
-                                    )
+                                    activity.intent.parcelable<Intent>(Constants.LAUNCH_INTENT)
+                                        ?: handleLinkNavigation(
+                                            activity = activity,
+                                            intentAction = intentAction,
+                                            intentExtras = intentExtras,
+                                            intentData = intentData,
+                                            intentDataString = intentDataString
+                                        ).let { intentInfo ->
+                                            action = intentInfo.action
+                                            data = intentInfo.data
+                                            intentInfo.bundle?.let { bundle = it }
+
+                                            intentInfo.intent
+                                        }
                             }
+
                             if (loginUiState.isFirstTime) {
                                 Timber.d("First time")
-                                intent.putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                                intent?.putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                                    ?: bundle.apply {
+                                        putBoolean(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                                    }
                             }
                         } else {
                             var initialCam = false
@@ -201,24 +217,24 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         viewModel.setStartScreenTimeStamp()
 
                                         Timber.d("First login")
-                                        startActivity(
-                                            Intent(
-                                                this,
-                                                ManagerActivity::class.java
-                                            ).apply {
-                                                putExtra(
+                                        activity.megaNavigator.openManagerActivity(
+                                            context = activity,
+                                            bundle = Bundle().apply {
+                                                putBoolean(
                                                     ExtraConstant.EXTRA_FIRST_LOGIN,
-                                                    true
+                                                    true,
                                                 )
-                                            })
+                                            },
+                                            singleActivityDestination = null,
+                                        )
 
                                         finish()
                                     }
-                                    initialCam = true
                                 }
                             } else {
-                                intent = Intent(activity, ManagerActivity::class.java)
-                                intent.putExtra(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                                bundle.apply {
+                                    putBoolean(ExtraConstant.EXTRA_FIRST_LOGIN, true)
+                                }
                                 initialCam = true
                                 viewModel.setStartScreenTimeStamp()
                             }
@@ -230,20 +246,25 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                     intentExtras = intentExtras,
                                     intentData = intentData,
                                     intentDataString = intentDataString
-                                )
+                                ).let { intentInfo ->
+                                    action = intentInfo.action
+                                    data = intentInfo.data
+                                    intentInfo.bundle?.let { bundle = it }
+
+                                    intentInfo.intent
+                                }
                             } else {
                                 Timber.d("initialCam YES")
-                                intent = Intent(activity, ManagerActivity::class.java)
                                 Timber.d("The action is: %s", intentAction)
-                                intent.action = intentAction
-                                intentDataString?.let { intent.data = it.toUri() }
+                                action = intentAction
+                                intentDataString?.let { data = it.toUri() }
                             }
-                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                         }
                         if (intentAction == Constants.ACTION_REFRESH_API_SERVER
                             || intentAction == Constants.ACTION_REFRESH_AFTER_BLOCKED
                         ) {
-                            intent.action = intentAction
+                            action = intentAction
                         }
 
                         if (viewModel.getStorageState() === StorageState.PayWall) {
@@ -251,18 +272,31 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             AlertsAndWarnings.showOverDiskQuotaPaywallWarning(activity, true)
                         } else {
                             Timber.d("First launch")
-                            intent.apply {
-                                putExtra(
+                            intent?.let {
+                                it.putExtra(
                                     IntentConstants.EXTRA_FIRST_LAUNCH,
                                     loginUiState.isFirstTimeLaunch
                                 )
                                 if (uiState.shouldShowNotificationPermission) {
                                     Timber.d("LoginFragment::shouldShowNotificationPermission")
-                                    putExtra(
+                                    it.putExtra(
                                         IntentConstants.EXTRA_ASK_PERMISSIONS,
                                         true
                                     )
-                                    putExtra(
+                                    it.putExtra(
+                                        IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
+                                        true
+                                    )
+                                }
+                            } ?: bundle.apply {
+                                putBoolean(
+                                    IntentConstants.EXTRA_FIRST_LAUNCH,
+                                    loginUiState.isFirstTimeLaunch
+                                )
+                                if (uiState.shouldShowNotificationPermission) {
+                                    Timber.d("LoginFragment::shouldShowNotificationPermission")
+                                    putBoolean(IntentConstants.EXTRA_ASK_PERMISSIONS, true)
+                                    putBoolean(
                                         IntentConstants.EXTRA_SHOW_NOTIFICATION_PERMISSION,
                                         true
                                     )
@@ -272,31 +306,42 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             // we show upgrade account for all accounts that are free and logged in for the first time
                             if (loginUiState.shouldShowUpgradeAccount) {
                                 activity.startActivity(
-                                    intent.setClass(
+                                    (intent?.setClass(
                                         activity,
                                         ChooseAccountActivity::class.java
-                                    ).apply {
-                                        putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
-                                        putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
-                                    }
+                                    ) ?: Intent(activity, ChooseAccountActivity::class.java))
+                                        .apply {
+                                            putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
+                                            putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
+                                        }
                                 )
                             } else {
-                                activity.startActivity(intent)
+                                intent?.let { activity.startActivity(intent) }
+                                    ?: activity.megaNavigator.openManagerActivity(
+                                        context = activity,
+                                        action = action,
+                                        data = data,
+                                        bundle = bundle,
+                                        flags = flags,
+                                        singleActivityDestination = null,
+                                    )
                             }
                         }
-                        Timber.d("LoginActivity finish")
-                        activity.finish()
                     }
+                    Timber.d("LoginActivity finish")
+                    activity.finish()
                 }
             } else {
                 Timber.d("Go to ChooseAccountActivity")
                 viewModel.updateIsAccountConfirmed(false)
                 if (MegaApplication.getChatManagement().isPendingJoinLink()) {
                     LoginActivity.isBackFromLoginPage = false
-                    val intent = Intent(activity, ManagerActivity::class.java)
-                    intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
-                    intent.data = MegaApplication.getChatManagement().pendingJoinLink?.toUri()
-                    activity.startActivity(intent)
+                    activity.megaNavigator.openManagerActivity(
+                        context = activity,
+                        action = Constants.ACTION_JOIN_OPEN_CHAT_LINK,
+                        data = MegaApplication.getChatManagement().pendingJoinLink?.toUri(),
+                        singleActivityDestination = null,
+                    )
                     MegaApplication.getChatManagement().pendingJoinLink = null
                     activity.finish()
                 } else if (loginUiState.isAlreadyLoggedIn) {
@@ -313,8 +358,8 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                 if (loginUiState.isAlreadyLoggedIn && !LoginActivity.isBackFromLoginPage) {
                     Timber.d("Credentials NOT null")
 
-                    intentAction?.let { action ->
-                        when (action) {
+                    intentAction?.let {
+                        when (intentAction) {
                             Constants.ACTION_REFRESH -> {
                                 viewModel.fetchNodes(true)
                                 return@apply
@@ -332,8 +377,8 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             }
 
                             else -> {
-                                Timber.d("intent received $action")
-                                when (action) {
+                                Timber.d("intent received $intentAction")
+                                when (intentAction) {
                                     Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
                                         intentExtras = extras
                                     }
@@ -358,12 +403,6 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         intentDataString = dataString
                                     }
 
-                                    Constants.ACTION_FILE_PROVIDER -> {
-                                        intentData = data
-                                        intentExtras = extras
-                                        intentDataString = null
-                                    }
-
                                     Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
                                     Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
                                         -> {
@@ -371,21 +410,12 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                     }
                                 }
 
-                                if (loginUiState.rootNodesExists && action != LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT) {
-                                    var newIntent =
-                                        Intent(activity, ManagerActivity::class.java)
+                                if (loginUiState.rootNodesExists && intentAction != LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT) {
+                                    var newIntent: Intent? = null
+                                    var flags: Int? = null
+                                    val bundle = Bundle()
 
-                                    when (action) {
-                                        Constants.ACTION_FILE_PROVIDER -> {
-                                            newIntent =
-                                                Intent(
-                                                    activity,
-                                                    FileProviderActivity::class.java
-                                                )
-                                            intentExtras?.let { newIntent.putExtras(it) }
-                                            newIntent.data = intentData
-                                        }
-
+                                    when (intentAction) {
                                         Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
                                             newIntent = getFileLinkIntent(activity)
                                             newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -401,30 +431,43 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         }
 
                                         Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                                            newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                             intentAction = Constants.ACTION_OPEN_CONTACTS_SECTION
-                                            if (newIntent.getLongExtra(
-                                                    Constants.CONTACT_HANDLE,
-                                                    -1
-                                                ) != -1L
-                                            ) {
-                                                newIntent.putExtra(
-                                                    Constants.CONTACT_HANDLE,
-                                                    newIntent.getLongExtra(
-                                                        Constants.CONTACT_HANDLE,
-                                                        -1
-                                                    )
-                                                )
+
+                                            getLongExtra(
+                                                Constants.CONTACT_HANDLE,
+                                                -1
+                                            ).takeIf { it != -1L }?.let { contactHandle ->
+                                                bundle.apply {
+                                                    putLong(Constants.CONTACT_HANDLE, contactHandle)
+                                                }
                                             }
                                         }
                                     }
 
-                                    newIntent.action = intentAction
+                                    newIntent?.action = intentAction
 
-                                    intentDataString?.let { newIntent.data = it.toUri() }
-                                    newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                    intentDataString?.let { newIntent?.data = it.toUri() }
+                                    newIntent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                                    flags = if (flags == null) {
+                                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    } else {
+                                        flags or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    }
 
-                                    activity.startActivity(newIntent)
+                                    if (newIntent != null) {
+                                        activity.startActivity(newIntent)
+                                    } else {
+                                        activity.megaNavigator.openManagerActivity(
+                                            context = activity,
+                                            action = intentAction,
+                                            data = intentDataString?.toUri(),
+                                            bundle = bundle,
+                                            flags = flags,
+                                            singleActivityDestination = null,
+                                        )
+                                    }
+
                                     activity.finish()
                                 } else {
                                     viewModel.fastLogin(activity.intent?.action == Constants.ACTION_REFRESH_API_SERVER)
@@ -438,17 +481,12 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     if (loginUiState.rootNodesExists && loginUiState.fetchNodesUpdate == null && !MegaApplication.isIsHeartBeatAlive) {
                         Timber.d("rootNode != null")
 
-                        var newIntent = Intent(activity, ManagerActivity::class.java)
+                        var newIntent: Intent? = null
+                        var flags: Int? = null
+                        val bundle = Bundle()
 
-                        intentAction?.let { action ->
-                            when (action) {
-                                Constants.ACTION_FILE_PROVIDER -> {
-                                    newIntent =
-                                        Intent(activity, FileProviderActivity::class.java)
-                                    intentExtras?.let { newIntent.putExtras(it) }
-                                    newIntent.data = intentData
-                                }
-
+                        intentAction?.let {
+                            when (intentAction) {
                                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
                                     newIntent = getFileLinkIntent(activity)
                                     newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -464,24 +502,43 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                 }
 
                                 Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                                    newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
-                                    if (getLongExtra(Constants.CONTACT_HANDLE, -1) != -1L) {
-                                        newIntent.putExtra(
-                                            Constants.CONTACT_HANDLE,
-                                            getLongExtra(Constants.CONTACT_HANDLE, -1)
-                                        )
+                                    getLongExtra(
+                                        Constants.CONTACT_HANDLE,
+                                        -1
+                                    ).takeIf { it != -1L }?.let { contactHandle ->
+                                        bundle.apply {
+                                            putLong(Constants.CONTACT_HANDLE, contactHandle)
+                                        }
                                     }
                                 }
                             }
 
-                            newIntent.action = action
-                            intentDataString?.let { newIntent.data = it.toUri() }
+                            newIntent?.action = intentAction
+                            intentDataString?.let { newIntent?.data = it.toUri() }
                         }
 
-                        newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        newIntent?.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                        flags = if (flags == null) {
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        } else {
+                            flags or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
 
-                        activity.startActivity(newIntent)
+                        if (newIntent != null) {
+                            activity.startActivity(newIntent)
+                        } else {
+                            activity.megaNavigator.openManagerActivity(
+                                context = activity,
+                                action = intentAction,
+                                data = intentDataString?.toUri(),
+                                bundle = bundle,
+                                flags = flags,
+                                singleActivityDestination = null,
+                            )
+                        }
+
                         activity.finish()
                     } else {
                         Timber.d("rootNode is null or heart beat is alive -> do fast login")
@@ -497,21 +554,9 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
 
                 intentAction?.let { action ->
                     Timber.d("ACTION NOT NULL")
-                    val newIntent: Intent
                     when (action) {
-                        Constants.ACTION_FILE_PROVIDER -> {
-                            newIntent = Intent(activity, FileProviderActivity::class.java)
-                            intentExtras?.let { newIntent.putExtras(it) }
-                            newIntent.data = intentData
-                            newIntent.action = action
-                        }
-
                         Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
                             viewModel.setSnackbarMessageId(R.string.login_before_share)
-                        }
-
-                        Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
-                            intentDataString = dataString
                         }
                     }
                 }
@@ -622,28 +667,18 @@ private fun handleLinkNavigation(
     intentExtras: Bundle?,
     intentData: Uri?,
     intentDataString: String?,
-): Intent {
-    var intent = Intent(activity, ManagerActivity::class.java)
+): IntentInfo {
+    var intent: Intent? = null
+    var bundle = Bundle()
+
     if (intentAction != null) {
         Timber.d("The action is: %s", intentAction)
-        intent.action = intentAction
         when (intentAction) {
-            Constants.ACTION_FILE_PROVIDER -> {
-                intent = Intent(activity, FileProviderActivity::class.java)
-                intentExtras?.let { intent.putExtras(it) }
-                intent.data = intentData
-            }
-
-            Constants.ACTION_LOCATE_DOWNLOADED_FILE -> {
-                intentExtras?.let { intent.putExtras(it) }
-            }
-
-            Constants.ACTION_SHOW_WARNING -> {
-                intentExtras?.let { intent.putExtras(it) }
-            }
-
-            Constants.ACTION_EXPLORE_ZIP -> {
-                intentExtras?.let { intent.putExtras(it) }
+            Constants.ACTION_LOCATE_DOWNLOADED_FILE,
+            Constants.ACTION_SHOW_WARNING,
+            Constants.ACTION_EXPLORE_ZIP,
+                -> {
+                intentExtras?.let { bundle = intentExtras }
             }
 
             Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
@@ -660,19 +695,35 @@ private fun handleLinkNavigation(
             }
 
             Constants.ACTION_OPEN_CONTACTS_SECTION -> {
-                intent.putExtra(
+                bundle.putLong(
                     Constants.CONTACT_HANDLE,
-                    activity.intent?.getLongExtra(Constants.CONTACT_HANDLE, -1),
+                    activity.intent?.getLongExtra(Constants.CONTACT_HANDLE, -1) ?: -1,
                 )
             }
         }
-        intentDataString?.let { intent.data = it.toUri() }
+
+        intent?.action = intentAction
+        intentDataString?.let { intent?.data = it.toUri() }
     } else {
         Timber.w("The intent action is NULL")
     }
-    return intent
+    return if (intent != null) {
+        IntentInfo(intent = intent)
+    } else {
+        IntentInfo(
+            bundle = bundle,
+            action = intentAction,
+            data = intentDataString?.toUri()
+        )
+    }
 }
 
+private data class IntentInfo(
+    val intent: Intent? = null,
+    val bundle: Bundle? = null,
+    val action: String? = null,
+    val data: Uri? = null,
+)
 
 private fun toSharePage(activity: Activity) = with(activity) {
     startActivity(

@@ -37,14 +37,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
-import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,6 +62,9 @@ class LoginActivity : BaseActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private val disabledPasscodeCheck = object : PasscodeCheck {
         override fun disablePasscode() {
@@ -109,7 +112,10 @@ class LoginActivity : BaseActivity() {
         ) {
             // in case offline mode, go to ManagerActivity
             stopShowingSplashScreen()
-            startActivity(Intent(this, ManagerActivity::class.java))
+            megaNavigator.openManagerActivity(
+                context = this,
+                singleActivityDestination = null,
+            )
             finish()
             return
         }

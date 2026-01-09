@@ -107,7 +107,6 @@ public class Constants {
     public static final String ACTION_OPEN_MEGA_FOLDER_LINK = "OPEN_MEGA_FOLDER_LINK";
     public static final String ACTION_IMPORT_LINK_FETCH_NODES = "IMPORT_LINK_FETCH_NODES";
     public static final String ACTION_FILE_EXPLORER_UPLOAD = "FILE_EXPLORER_UPLOAD";
-    public static final String ACTION_FILE_PROVIDER = "ACTION_FILE_PROVIDER";
     public static final String ACTION_EXPLORE_ZIP = "EXPLORE_ZIP";
     public static final String EXTRA_PATH_ZIP = "PATH_ZIP";
     public static final String EXTRA_HANDLE_ZIP = "HANDLE_ZIP";
