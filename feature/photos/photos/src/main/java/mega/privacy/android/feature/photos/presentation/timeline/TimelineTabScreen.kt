@@ -27,13 +27,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -64,7 +61,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
@@ -77,6 +73,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Timel
 import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -160,24 +157,19 @@ internal fun TimelineTabScreen(
     val resource = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
 
-    val lazyGridState = rememberLazyGridState()
-    val isGridScrollingDown by lazyGridState.isScrollingDown()
-    val isGridScrolledToEnd by lazyGridState.isScrolledToEnd()
-    val isGridScrolledToTop by lazyGridState.isScrolledToTop()
-    val lazyListState = rememberLazyListState()
-    val isListScrollingDown by lazyListState.isScrollingDown()
-    val isListScrolledToEnd by lazyListState.isScrolledToEnd()
-    val isListScrolledToTop by lazyListState.isScrolledToTop()
+    val timelineLazyListState =
+        rememberTimelineLazyListState(selectedTimePeriod = selectedTimePeriod)
+    val isScrollingDown by timelineLazyListState.isScrollingDown
+    val isScrolledToEnd by timelineLazyListState.isScrolledToEnd
+    val isScrolledToTop by timelineLazyListState.isScrolledToTop
+
     val shouldShowTimePeriodSelector by remember(selectedTimePeriod, uiState.isLoading) {
         derivedStateOf {
             if (uiState.isLoading) return@derivedStateOf false
-
-            if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-                !lazyGridState.isScrollInProgress || (!isGridScrollingDown && !isGridScrolledToEnd) || isGridScrolledToTop
-            } else !lazyListState.isScrollInProgress || (!isListScrollingDown && !isListScrolledToEnd) || isListScrolledToTop
+            !timelineLazyListState.isScrollInProgress || (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
         }
     }
-    var shouldScrollToIndex by remember { mutableIntStateOf(0) }
+    var shouldScrollToIndex by remember { mutableIntStateOf(-1) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
     val cuBannerType by remember(mediaCameraUploadUiState) {
@@ -194,11 +186,21 @@ internal fun TimelineTabScreen(
     var isWarningBannerStateValid by rememberSaveable { mutableStateOf(false) }
 
     if (uiState.isLoading.not()) {
-        LaunchedEffect(shouldScrollToIndex) {
+        LaunchedEffect(shouldScrollToIndex, selectedTimePeriod) {
             if (shouldScrollToIndex > -1) {
-                if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-                    lazyGridState.scrollToItem(shouldScrollToIndex)
-                } else lazyListState.scrollToItem(shouldScrollToIndex)
+                val isCUBannerVisible = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
+                    timelineLazyListState.totalItemsCount > uiState.displayedPhotos.size
+                } else {
+                    val items = when (selectedTimePeriod) {
+                        PhotoModificationTimePeriod.Years -> uiState.yearsCardPhotos
+                        PhotoModificationTimePeriod.Months -> uiState.monthsCardPhotos
+                        else -> uiState.daysCardPhotos
+                    }
+                    timelineLazyListState.totalItemsCount > items.size
+                }
+                val index =
+                    if (isCUBannerVisible && shouldScrollToIndex > 0) shouldScrollToIndex + 1 else shouldScrollToIndex
+                timelineLazyListState.scrollToItem(index = index)
                 shouldScrollToIndex = -1
             }
         }
@@ -216,16 +218,11 @@ internal fun TimelineTabScreen(
         }
 
         LaunchedEffect(
-            isGridScrollingDown,
-            isGridScrolledToEnd,
-            isGridScrolledToTop,
-            isListScrollingDown,
-            isListScrolledToEnd,
-            isListScrolledToTop
+            isScrollingDown,
+            isScrolledToEnd,
+            isScrolledToTop
         ) {
-            val shouldShowTabs = if (selectedTimePeriod == PhotoModificationTimePeriod.All) {
-                isGridScrolledToTop || (!isGridScrollingDown && !isGridScrolledToEnd)
-            } else isListScrolledToTop || (!isListScrollingDown && !isListScrolledToEnd)
+            val shouldShowTabs = isScrolledToTop || (!isScrollingDown && !isScrolledToEnd)
             onTabsVisibilityChange(!shouldShowTabs)
         }
     }
@@ -297,23 +294,37 @@ internal fun TimelineTabScreen(
                 uiState = uiState,
                 shouldShowEnableCUBanner = mediaCameraUploadUiState.shouldShowEnableCUBanner,
                 shouldShowCUWarningBanner = isWarningBannerStateValid,
-                lazyGridState = lazyGridState,
-                lazyListState = lazyListState,
+                lazyGridState = timelineLazyListState.lazyGridState,
+                lazyListState = timelineLazyListState.lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
                 bannerType = cuBannerType,
-                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
+                onPhotoTimePeriodSelected = {
+                    val scrollIndex =
+                        timelineLazyListState.calculateScrollIndexBasedOnTimePeriodClick(
+                            targetPeriod = it,
+                            displayedPhotos = uiState.displayedPhotos,
+                            daysCardPhotos = uiState.daysCardPhotos,
+                            monthsCardPhotos = uiState.monthsCardPhotos,
+                            yearsCardPhotos = uiState.yearsCardPhotos,
+                        )
+                    if (scrollIndex > -1) {
+                        shouldScrollToIndex = scrollIndex
+                    }
+                    onPhotoTimePeriodSelected(it)
+                },
                 onGridSizeChange = onGridSizeChange,
                 onPhotoClick = onPhotoClick,
                 onPhotoSelected = onPhotoSelected,
                 onPhotosNodeListCardClick = { photo ->
                     onPhotoTimePeriodSelected(PhotoModificationTimePeriod.entries[selectedTimePeriod.ordinal + 1])
-                    shouldScrollToIndex = calculateScrollIndex(
-                        photo = photo,
-                        displayedPhotos = uiState.displayedPhotos,
-                        daysCardPhotos = uiState.daysCardPhotos,
-                        monthsCardPhotos = uiState.monthsCardPhotos,
-                    )
+                    shouldScrollToIndex =
+                        timelineLazyListState.calculateScrollIndexBasedOnItemClick(
+                            photo = photo,
+                            displayedPhotos = uiState.displayedPhotos,
+                            daysCardPhotos = uiState.daysCardPhotos,
+                            monthsCardPhotos = uiState.monthsCardPhotos,
+                        )
                 },
                 onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 onChangeCameraUploadsPermissions = {
@@ -533,100 +544,6 @@ private fun PhotoModificationTimePeriodSelector(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LazyGridState.isScrollingDown(): State<Boolean> {
-    var nextIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
-    var nextScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
-    return remember(this) {
-        derivedStateOf {
-            if (nextIndex != firstVisibleItemIndex) {
-                nextIndex < firstVisibleItemIndex
-            } else {
-                nextScrollOffset <= firstVisibleItemScrollOffset
-            }.also {
-                nextIndex = firstVisibleItemIndex
-                nextScrollOffset = firstVisibleItemScrollOffset
-            }
-        }
-    }
-}
-
-@Composable
-private fun LazyListState.isScrollingDown(): State<Boolean> {
-    var nextIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
-    var nextScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
-    return remember(this) {
-        derivedStateOf {
-            if (nextIndex != firstVisibleItemIndex) {
-                nextIndex < firstVisibleItemIndex
-            } else {
-                nextScrollOffset <= firstVisibleItemScrollOffset
-            }.also {
-                nextIndex = firstVisibleItemIndex
-                nextScrollOffset = firstVisibleItemScrollOffset
-            }
-        }
-    }
-}
-
-@Composable
-private fun LazyGridState.isScrolledToEnd() = remember(this) {
-    derivedStateOf {
-        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-    }
-}
-
-@Composable
-private fun LazyListState.isScrolledToEnd() = remember(this) {
-    derivedStateOf {
-        layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
-    }
-}
-
-@Composable
-private fun LazyGridState.isScrolledToTop() = remember(this) {
-    derivedStateOf {
-        firstVisibleItemIndex <= 1 && firstVisibleItemScrollOffset == 0
-    }
-}
-
-@Composable
-private fun LazyListState.isScrolledToTop() = remember(this) {
-    derivedStateOf {
-        firstVisibleItemIndex <= 1 && firstVisibleItemScrollOffset == 0
-    }
-}
-
-private fun calculateScrollIndex(
-    photo: PhotosNodeListCard,
-    displayedPhotos: List<PhotosNodeContentType>,
-    daysCardPhotos: List<PhotosNodeListCard>,
-    monthsCardPhotos: List<PhotosNodeListCard>,
-): Int {
-    return when (photo) {
-        is PhotosNodeListCard.Years -> {
-            val photo = monthsCardPhotos.find {
-                it as PhotosNodeListCard.Months
-                it.photoItem.photo.modificationTime == photo.photoItem.photo.modificationTime
-            }
-            monthsCardPhotos.indexOf(photo)
-        }
-
-        is PhotosNodeListCard.Months -> {
-            val photo = daysCardPhotos.find {
-                it as PhotosNodeListCard.Days
-                it.photoItem.photo.modificationTime == photo.photoItem.photo.modificationTime
-            }
-            daysCardPhotos.indexOf(photo)
-        }
-
-        is PhotosNodeListCard.Days -> {
-            val photo = displayedPhotos.find { it.key == photo.photoItem.photo.hashCode() }
-            displayedPhotos.indexOf(photo)
         }
     }
 }
