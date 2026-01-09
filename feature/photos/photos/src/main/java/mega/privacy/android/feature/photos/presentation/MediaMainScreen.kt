@@ -415,7 +415,7 @@ fun MediaMainScreen(
     val isCuDefaultStatusVisible =
         mediaCameraUploadUiState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
     val isCuCompleteStatusVisible =
-        mediaCameraUploadUiState.showCameraUploadsComplete && !isCuDefaultStatusVisible
+        mediaCameraUploadUiState.status is CUStatusUiState.UpToDate && !isCuDefaultStatusVisible
 
     var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -567,24 +567,30 @@ fun MediaMainScreen(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedResR.string.media_feature_title),
                     subtitle = when {
-                        isCuCompleteStatusVisible -> {
-                            stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
-                        }
+                        currentTabIndex == MediaScreen.Timeline.ordinal -> {
+                            when {
+                                isCuCompleteStatusVisible -> {
+                                    stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
+                                }
 
-                        mediaCameraUploadUiState.status is CUStatusUiState.Sync -> {
-                            stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
-                        }
+                                mediaCameraUploadUiState.status is CUStatusUiState.Sync -> {
+                                    stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
+                                }
 
-                        mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress -> {
-                            pluralStringResource(
-                                id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
-                                count = mediaCameraUploadUiState.status.pending,
-                                mediaCameraUploadUiState.status.pending,
-                            )
-                        }
+                                mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress -> {
+                                    pluralStringResource(
+                                        id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
+                                        count = mediaCameraUploadUiState.status.pending,
+                                        mediaCameraUploadUiState.status.pending,
+                                    )
+                                }
 
-                        mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete -> {
-                            stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
+                                mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete -> {
+                                    stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
+                                }
+
+                                else -> null
+                            }
                         }
 
                         else -> null

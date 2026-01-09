@@ -142,7 +142,6 @@ class MediaCameraUploadViewModelTest {
             underTest.uiState.test {
                 val item = expectMostRecentItem()
                 assertThat(item.status).isEqualTo(CUStatusUiState.Sync)
-                assertThat(item.showCameraUploadsComplete).isFalse()
                 assertThat(item.showCameraUploadsWarning).isFalse()
             }
         }

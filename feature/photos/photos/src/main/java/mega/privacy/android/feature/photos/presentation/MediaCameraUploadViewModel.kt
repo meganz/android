@@ -118,16 +118,11 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     private fun handleCameraUploadsCheckStatus() {
         setCameraUploadsSyncState()
-        setCameraUploadsCompleteMenu(isVisible = false)
         setCameraUploadsWarningMenu(false)
     }
 
     private fun setCameraUploadsSyncState() {
         _uiState.update { it.copy(status = CUStatusUiState.Sync) }
-    }
-
-    private fun setCameraUploadsCompleteMenu(isVisible: Boolean) {
-        _uiState.update { it.copy(showCameraUploadsComplete = isVisible) }
     }
 
     private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
@@ -167,18 +162,15 @@ class MediaCameraUploadViewModel @Inject constructor(
                 _uiState.update { uiState ->
                     uiState.copy(status = CUStatusUiState.UpToDate)
                 }
-                setCameraUploadsCompleteMenu(isVisible = true)
             }
 
             CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                setCameraUploadsCompleteMenu(isVisible = false)
                 setCameraUploadsWarningMenu(isVisible = true)
                 updateIsWarningBannerShown(true)
                 hideCameraUploadsFab()
             }
 
             else -> {
-                setCameraUploadsCompleteMenu(isVisible = false)
                 if (shouldShowWarningBanner()) {
                     hideCameraUploadsFab()
                 } else {
