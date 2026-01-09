@@ -28,6 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
@@ -64,6 +66,9 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OfflineScreenEvent
+import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 
 /**
  * OfflineScreen - A purely composable screen for displaying offline files
@@ -156,6 +161,11 @@ internal fun OfflineScreen(
     val offlineBottomSheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
 
+    LifecycleResumeEffect(Unit) {
+        Analytics.tracker.trackEvent(OfflineScreenEvent)
+        onPauseOrDispose {}
+    }
+
     EventEffect(
         event = uiState.openFolderInPageEvent,
         onConsumed = consumeOpenFolderEvent
@@ -207,7 +217,10 @@ internal fun OfflineScreen(
                 MegaSearchTopAppBar(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG),
-                    navigationType = AppBarNavigationType.Back(onBack),
+                    navigationType = AppBarNavigationType.Back {
+                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                        onBack()
+                    },
                     title = uiState
                         .title
                         .takeIf { uiState.nodeId != -1 }
@@ -316,7 +329,10 @@ internal fun OfflineScreen(
                             contentPadding = PaddingValues(
                                 bottom = paddingValues.calculateBottomPadding()
                             ),
-                            onChangeViewType = onChangeViewType,
+                            onChangeViewType = {
+                                Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
+                                onChangeViewType()
+                            },
                             onSortClick = {
                                 showSortBottomSheet = true
                             }

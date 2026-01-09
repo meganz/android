@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -14,6 +13,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.core.nodecomponents.list.GRID_VIEW_TOGGLE_TAG
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -22,30 +24,33 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_EMPTY_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_GRID_COLUMN_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LIST_COLUMN_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_LOADING_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_REMOVE_FROM_OFFLINE_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG
-import mega.privacy.android.feature.clouddrive.presentation.offline.OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG
+import mega.privacy.mobile.analytics.event.OfflineScreenEvent
+import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.AfterEach
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
 class OfflineScreenTest {
+    private val analyticsTracker: AnalyticsTracker = mock()
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule(analyticsTracker)
+
+    @AfterEach
+    fun resetMocks() {
+        reset(analyticsTracker)
+    }
 
     @Test
     fun `test that OfflineScreen displays loading state when isLoading is true`() {
@@ -708,6 +713,31 @@ class OfflineScreenTest {
         // Wait for and verify that the sort bottom sheet is now displayed
         composeRule.waitForIdle()
         composeRule.onNodeWithTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that on load should track screen event`() {
+        setupComposeContent(OfflineUiState())
+
+        verify(analyticsTracker).trackEvent(OfflineScreenEvent)
+    }
+
+    @Test
+    fun `test that on view mode changed should track event`() {
+        val offlineNodes = listOf(
+            createOfflineNodeUiItem("test_file.txt", isFolder = false, handle = "1")
+        )
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes
+        )
+        setupComposeContent(uiState = uiState)
+
+        composeRule.onNodeWithTag(GRID_VIEW_TOGGLE_TAG)
+            .assertIsDisplayed()
+            .performClick()
+
+        verify(analyticsTracker).trackEvent(ViewModeButtonPressedEvent)
     }
 
     private fun setupComposeContent(
