@@ -72,6 +72,7 @@ include(":shared:original-core-ui")
 include(":shared:resources")
 include(":shared:sync")
 include(":third-party-lib:pdfiumAndroid")
+include(":third-party-lib:twemoji")
 include(":feature:photos:photos")
 include(":feature:photos:photos-snowflake-components")
 
