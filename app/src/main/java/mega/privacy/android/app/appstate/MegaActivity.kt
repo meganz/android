@@ -83,8 +83,6 @@ import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
-import mega.privacy.android.navigation.contract.extension.slideBackwardTransition
-import mega.privacy.android.navigation.contract.extension.slideForwardTransition
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
