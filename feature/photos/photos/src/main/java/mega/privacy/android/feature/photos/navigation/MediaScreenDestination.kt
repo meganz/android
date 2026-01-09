@@ -5,6 +5,7 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -23,10 +24,12 @@ import mega.privacy.android.feature.photos.presentation.albums.content.AlbumCont
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
+import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
@@ -102,6 +105,9 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             onNavigateToAddToAlbum = navigationHandler::navigate,
             onNavigateToCameraUploadsSettings = navigationHandler::navigate,
             onNavigateToUpgradeAccount = navigationHandler::navigate,
+            onNavigateToCameraUploadsProgressScreen = {
+                navigationHandler.navigate(destination = CameraUploadsProgressNavKey)
+            },
         )
     }
 }
@@ -183,6 +189,18 @@ fun EntryProviderScope<NavKey>.mediaSearchScreen(
             updateRecentQueries = photosSearchViewModel::updateRecentQueries,
             searchPhotos = photosSearchViewModel::search,
             onCloseScreen = { navigationHandler.remove(args) },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.cameraUploadsProgressRoute(
+    onNavigateUp: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    entry<CameraUploadsProgressNavKey> { args ->
+        CameraUploadsProgressRoute(
+            modifier = modifier,
+            onNavigateUp = onNavigateUp
         )
     }
 }

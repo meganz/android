@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.model
+package mega.privacy.android.domain.entity.photos
 
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 

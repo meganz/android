@@ -2052,4 +2052,40 @@
     <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
     <!-- Home Screen - View Offline files button -->
     <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
+    <!-- Label indicating transfer over quota in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
+    <!-- Label indicating storage over quota in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
+    <!-- Label indicating that the transfer is paused in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
+    <!-- Label indicating that the transfer is queued in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
+    <!-- Label indicating that the transfer is completing in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
+    <!-- Label indicating that the transfer is retrying in CU progress screen -->
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
+    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
 </resources>

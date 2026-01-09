@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
+import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.transfers.active.MonitorCameraUploadsInProgressTransfersUseCase
 import javax.inject.Inject

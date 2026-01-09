@@ -146,6 +146,24 @@ class CameraUploadStatusToolbarActionTest {
         }
     }
 
+    @Test
+    fun `test that the user is successfully navigated to camera uploads progress screen`() {
+        composeRuleScope {
+            val onNavigateToCameraUploadsProgressScreen = mock<() -> Unit>()
+            setAction(
+                isCuWarningStatusVisible = false,
+                isCuDefaultStatusVisible = false,
+                isCuCompleteStatusVisible = false,
+                cameraUploadsStatus = CUStatusUiState.UploadInProgress(1F, 1),
+                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
+            )
+
+            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_IN_PROGRESS_TAG).performClick()
+
+            verify(onNavigateToCameraUploadsProgressScreen).invoke()
+        }
+    }
+
     private fun composeRuleScope(block: ComposeContentTestRule.() -> Unit) {
         with(composeRule) {
             block()
@@ -160,6 +178,7 @@ class CameraUploadStatusToolbarActionTest {
         setCameraUploadsMessage: (message: String) -> Unit = {},
         updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
+        onNavigateToCameraUploadsProgressScreen: () -> Unit = {},
     ) {
         setContent {
             CameraUploadStatusToolbarAction(
@@ -169,7 +188,8 @@ class CameraUploadStatusToolbarActionTest {
                 cameraUploadsStatus = cameraUploadsStatus,
                 setCameraUploadsMessage = setCameraUploadsMessage,
                 updateIsWarningBannerShown = updateIsWarningBannerShown,
-                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
             )
         }
     }

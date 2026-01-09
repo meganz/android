@@ -36,17 +36,17 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressPercentString
-import mega.privacy.android.app.presentation.extensions.transfers.getProgressSizeString
-import mega.privacy.android.app.presentation.extensions.transfers.getSpeedString
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowMenuAction
-import mega.privacy.android.app.presentation.photos.model.CameraUploadsTransferType
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.CameraUploadsTransferViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.transfers.extension.getProgressPercentString
+import mega.privacy.android.core.transfers.extension.getProgressSizeString
+import mega.privacy.android.core.transfers.extension.getSpeedString
 import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
@@ -57,6 +57,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollL
 import mega.privacy.android.shared.resources.R as sharedR
 import java.math.BigInteger
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 fun CameraUploadsTransferScreen(
     timelineViewModel: TimelineViewModel,
@@ -104,6 +105,7 @@ fun CameraUploadsTransferScreen(
     }
 }
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 internal fun CameraUploadsTranferView(
     uiState: TimelineViewState,
@@ -177,6 +179,7 @@ internal fun CameraUploadsTranferView(
     }
 }
 
+@Deprecated(message = "Please use CameraUploadsProgressScreen instead")
 @Composable
 internal fun CameraUploadsTransferEmptyView(modifier: Modifier = Modifier) {
     Column(

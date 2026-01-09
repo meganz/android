@@ -28,11 +28,13 @@ dependencies {
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":core:formatter"))
+    implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))
+    implementation(project(":feature:transfers:transfers-snowflake-components"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)

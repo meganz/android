@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.photos.navigation
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -17,6 +19,11 @@ class MediaFeatureDestination : FeatureDestination {
             mediaSearchScreen(
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent
+            )
+
+            cameraUploadsProgressRoute(
+                modifier = Modifier.fillMaxSize(),
+                onNavigateUp = navigationHandler::back
             )
         }
 }

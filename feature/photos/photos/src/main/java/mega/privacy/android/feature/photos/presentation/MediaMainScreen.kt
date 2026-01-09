@@ -128,6 +128,7 @@ fun MediaMainRoute(
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
+    onNavigateToCameraUploadsProgressScreen: () -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
@@ -315,7 +316,8 @@ fun MediaMainRoute(
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
         updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-        onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected
+        onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected,
+        onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
     )
 }
 
@@ -353,6 +355,7 @@ fun MediaMainScreen(
     updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
+    onNavigateToCameraUploadsProgressScreen: () -> Unit,
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
@@ -612,7 +615,8 @@ fun MediaMainScreen(
                                     onNavigateToCameraUploadsSettings(
                                         LegacySettingsCameraUploadsActivityNavKey()
                                     )
-                                }
+                                },
+                                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
                             )
                         }
                     },
@@ -1082,7 +1086,8 @@ fun PhotosMainScreenPreview() {
             setCameraUploadsMessage = {},
             updateIsWarningBannerShown = {},
             onNavigateToUpgradeAccount = {},
-            onPhotoTimePeriodSelected = {}
+            onPhotoTimePeriodSelected = {},
+            onNavigateToCameraUploadsProgressScreen = {},
         )
     }
 }

@@ -9,8 +9,7 @@ import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 @Serializable
-@Parcelize
-data object MediaMainNavKey : MainNavItemNavKey, Parcelable
+data object MediaMainNavKey : MainNavItemNavKey
 
 @Serializable
 data class AlbumContentNavKey(val id: Long?, val type: String?) : NavKey
@@ -20,3 +19,7 @@ data class VideoPlaylistDetailNavKey(val playlistId: NodeId, val type: PlaylistT
 
 @Serializable
 data object MediaSearchNavKey : NavKey
+
+@Serializable
+@Parcelize
+data object CameraUploadsProgressNavKey : NavKey, Parcelable

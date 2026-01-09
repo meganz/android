@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
-import mega.privacy.android.navigation.destination.MediaMainNavKey
+import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivityWithDestination
@@ -186,7 +186,7 @@ class CameraUploadsNotificationManager @Inject constructor(
     }
 
     private suspend fun getDefaultPendingIntent() = megaNavigator
-        .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, MediaMainNavKey>(
+        .getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, CameraUploadsProgressNavKey>(
             context = context,
             createPendingIntent = { intent ->
                 intent.action = ACTION_SHOW_CU_PROGRESS_VIEW
@@ -197,7 +197,7 @@ class CameraUploadsNotificationManager @Inject constructor(
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             },
-            singleActivityDestination = { MediaMainNavKey }
+            singleActivityDestination = { CameraUploadsProgressNavKey }
         )
 
     private suspend fun getCUSettingsPendingIntent() = megaNavigator
