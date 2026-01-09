@@ -204,7 +204,6 @@ internal fun TimelineTabScreen(
         }
 
         LaunchedEffect(
-            mediaCameraUploadUiState.showCameraUploadsWarning,
             mediaCameraUploadUiState.isCameraUploadsLimitedAccess,
             mediaCameraUploadUiState.cameraUploadsFinishedReason,
             mediaCameraUploadUiState.isWarningBannerShown

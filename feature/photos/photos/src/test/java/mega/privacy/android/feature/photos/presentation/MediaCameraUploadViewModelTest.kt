@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -136,13 +138,12 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that the UI state shows Sync FAB when camera upload status is CheckFilesForUpload`() =
+    fun `test that the Cu status is set to sync when the status info is checking files for upload and the CU status shouldn't be updated for warning`() =
         runTest {
             cameraUploadsStatusFlow.value = CameraUploadsStatusInfo.CheckFilesForUpload
             underTest.uiState.test {
                 val item = expectMostRecentItem()
                 assertThat(item.status).isEqualTo(CUStatusUiState.Sync)
-                assertThat(item.showCameraUploadsWarning).isFalse()
             }
         }
 
@@ -213,8 +214,7 @@ class MediaCameraUploadViewModelTest {
             underTest.uiState.test {
                 val item = expectMostRecentItem()
                 assertThat(item.isWarningBannerShown).isTrue()
-                assertThat(item.showCameraUploadsWarning).isTrue()
-                assertThat(item.status).isEqualTo(CUStatusUiState.None)
+                assertThat(item.status).isEqualTo(CUStatusUiState.Warning)
             }
         }
 
@@ -372,7 +372,7 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that camera uploads warning menu is visible when CU permissions are not granted`() =
+    fun `test that camera uploads warning action is visible when CU permissions are not granted`() =
         runTest {
             whenever(hasCameraUploadsPermissionUseCase()) doReturn false
             cameraUploadsStatusFlow.emit(
@@ -384,26 +384,31 @@ class MediaCameraUploadViewModelTest {
             underTest.uiState.test {
                 underTest.checkCameraUploadsPermissions()
 
-                assertThat(expectMostRecentItem().showCameraUploadsWarning).isTrue()
+                assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.Warning)
             }
         }
 
-    @Test
-    fun `test that camera uploads warning menu is visible when should show warning menu`() =
-        runTest {
-            whenever(hasCameraUploadsPermissionUseCase()) doReturn true
-            cameraUploadsStatusFlow.emit(
-                CameraUploadsStatusInfo.Finished(
-                    reason = CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
-                )
+    @ParameterizedTest
+    @EnumSource(
+        value = CameraUploadsFinishedReason::class,
+        names = ["DEVICE_CHARGING_REQUIREMENT_NOT_MET", "BATTERY_LEVEL_TOO_LOW", "NETWORK_CONNECTION_REQUIREMENT_NOT_MET"]
+    )
+    fun `test that camera uploads warning action is visible when should show warning action based on the finish reason`(
+        finishReason: CameraUploadsFinishedReason,
+    ) = runTest {
+        whenever(hasCameraUploadsPermissionUseCase()) doReturn true
+        cameraUploadsStatusFlow.emit(
+            CameraUploadsStatusInfo.Finished(
+                reason = finishReason
             )
+        )
 
-            underTest.checkCameraUploadsPermissions()
+        underTest.checkCameraUploadsPermissions()
 
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().showCameraUploadsWarning).isTrue()
-            }
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.Warning)
         }
+    }
 
     @Test
     fun `test that camera uploads warning banner is visible when CU permissions are not granted`() =
@@ -436,6 +441,23 @@ class MediaCameraUploadViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().isWarningBannerShown).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that camera uploads warning action is visible when the media permission access is not fully granted`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn true
+            cameraUploadsStatusFlow.emit(
+                CameraUploadsStatusInfo.Finished(
+                    reason = CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
+                )
+            )
+
+            underTest.checkCameraUploadsPermissions()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.Warning)
             }
         }
 }

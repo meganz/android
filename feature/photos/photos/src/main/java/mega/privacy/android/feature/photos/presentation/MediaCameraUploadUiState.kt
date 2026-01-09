@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
  */
 data class MediaCameraUploadUiState(
     val status: CUStatusUiState = CUStatusUiState.None,
-    val showCameraUploadsWarning: Boolean = false,
     val cameraUploadsProgress: Float = 0f,
     val cameraUploadsTotalUploaded: Int = 0,
     val cameraUploadsFinishedReason: CameraUploadsFinishedReason? = null,

@@ -151,15 +151,6 @@ fun MediaMainRoute(
     val context = LocalContext.current
     var addToPlaylistIsRetry by rememberSaveable { mutableStateOf(false) }
     var addedVideoHandle by rememberSaveable { mutableStateOf<Long?>(null) }
-    val nameCollisionLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.nameCollisionActivityContract
-    ) { message ->
-        if (!message.isNullOrEmpty()) {
-            scope.launch {
-                snackBarEventQueue.queueMessage(message)
-            }
-        }
-    }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     val videoToPlaylistLauncher = rememberLauncherForActivityResult(
@@ -413,11 +404,27 @@ fun MediaMainScreen(
     var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val isCuWarningStatusVisible = mediaCameraUploadUiState.showCameraUploadsWarning
-    val isCuDefaultStatusVisible =
-        mediaCameraUploadUiState.enableCameraUploadButtonShowing && !isCuWarningStatusVisible
-    val isCuCompleteStatusVisible =
-        mediaCameraUploadUiState.status is CUStatusUiState.UpToDate && !isCuDefaultStatusVisible
+    val isCuDefaultStatusVisible by remember(mediaCameraUploadUiState.enableCameraUploadButtonShowing) {
+        derivedStateOf {
+            mediaCameraUploadUiState.enableCameraUploadButtonShowing
+        }
+    }
+    val isCuWarningStatusVisible by remember(
+        mediaCameraUploadUiState.status,
+        isCuDefaultStatusVisible
+    ) {
+        derivedStateOf {
+            mediaCameraUploadUiState.status is CUStatusUiState.Warning && !isCuDefaultStatusVisible
+        }
+    }
+    val isCuCompleteStatusVisible by remember(
+        mediaCameraUploadUiState.status,
+        isCuWarningStatusVisible
+    ) {
+        derivedStateOf {
+            mediaCameraUploadUiState.status is CUStatusUiState.UpToDate && !isCuWarningStatusVisible
+        }
+    }
 
     var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
 

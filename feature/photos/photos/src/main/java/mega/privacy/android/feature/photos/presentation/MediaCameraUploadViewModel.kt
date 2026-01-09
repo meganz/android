@@ -117,8 +117,8 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     private fun handleCameraUploadsCheckStatus() {
+        if (isStatusUpdatedForWarning()) return
         setCameraUploadsSyncState()
-        setCameraUploadsWarningMenu(false)
     }
 
     private fun setCameraUploadsSyncState() {
@@ -126,6 +126,7 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
+        if (isStatusUpdatedForWarning()) return
         _uiState.update {
             it.copy(
                 status = CUStatusUiState.UploadInProgress(
@@ -147,6 +148,7 @@ class MediaCameraUploadViewModel @Inject constructor(
 
         when (cameraUploadsFinishedReason) {
             CameraUploadsFinishedReason.COMPLETED -> {
+                if (isStatusUpdatedForWarning()) return
                 if (isCameraUploadsUploading) {
                     _uiState.update {
                         it.copy(
@@ -165,23 +167,15 @@ class MediaCameraUploadViewModel @Inject constructor(
             }
 
             CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                setCameraUploadsWarningMenu(isVisible = true)
+                _uiState.update { it.copy(status = CUStatusUiState.Warning) }
                 updateIsWarningBannerShown(true)
                 hideCameraUploadsFab()
             }
 
             else -> {
-                if (shouldShowWarningBanner()) {
-                    hideCameraUploadsFab()
-                } else {
-                    _uiState.update {
-                        it.copy(
-                            status = CUStatusUiState.Warning,
-                            cameraUploadsProgress = 0.5f,
-                        )
-                    }
+                if (shouldShowWarningAction()) {
+                    _uiState.update { it.copy(status = CUStatusUiState.Warning) }
                 }
-                setCameraUploadsWarningMenu(shouldShowWarningMenu())
                 updateIsWarningBannerShown(shouldShowWarningBanner())
             }
         }
@@ -189,6 +183,13 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     private fun setCameraUploadsFinishedReason(reason: CameraUploadsFinishedReason) {
         _uiState.update { it.copy(cameraUploadsFinishedReason = reason) }
+    }
+
+    private fun isStatusUpdatedForWarning(): Boolean {
+        return if (shouldShowWarningAction()) {
+            _uiState.update { it.copy(status = CUStatusUiState.Warning) }
+            true
+        } else false
     }
 
     internal fun setCameraUploadsCompletedMessage(show: Boolean) {
@@ -210,14 +211,15 @@ class MediaCameraUploadViewModel @Inject constructor(
         } ?: false
     }
 
-    internal fun shouldShowWarningMenu(): Boolean {
-        return _uiState.value.cameraUploadsFinishedReason?.let { reason ->
+    internal fun shouldShowWarningAction(): Boolean {
+        val isFinishReasonAWarning = _uiState.value.cameraUploadsFinishedReason?.let { reason ->
             reason in setOf(
                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
                 CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
                 CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
             )
         } ?: false
+        return isFinishReasonAWarning || _uiState.value.isCameraUploadsLimitedAccess
     }
 
     private fun syncCameraUploadsStatus() {
@@ -250,18 +252,19 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     internal fun handleCameraUploadsPermissionsResult() {
         val hasPermissions = hasMediaPermissionUseCase()
+        val showWarningAction = !hasPermissions || shouldShowWarningAction()
 
         setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
-        setCameraUploadsWarningMenu(isVisible = !hasPermissions || shouldShowWarningMenu())
-        updateIsWarningBannerShown(!hasPermissions || shouldShowWarningMenu())
+        _uiState.update {
+            it.copy(
+                status = if (showWarningAction) CUStatusUiState.Warning else it.status
+            )
+        }
+        updateIsWarningBannerShown(!hasPermissions || shouldShowWarningAction())
     }
 
     internal fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
         _uiState.update { it.copy(isCameraUploadsLimitedAccess = isLimitedAccess) }
-    }
-
-    internal fun setCameraUploadsWarningMenu(isVisible: Boolean) {
-        _uiState.update { it.copy(showCameraUploadsWarning = isVisible) }
     }
 
     internal fun updateIsWarningBannerShown(isShown: Boolean) {
@@ -329,7 +332,7 @@ class MediaCameraUploadViewModel @Inject constructor(
     internal fun checkCameraUploadsPermissions() {
         val hasPermissions = hasCameraUploadsPermissionUseCase()
         _uiState.update { currentState ->
-            val showWarningMenu = !hasPermissions || shouldShowWarningMenu()
+            val showWarningAction = !hasPermissions || shouldShowWarningAction()
             val showWarningBanner = !hasPermissions || shouldShowWarningBanner()
             if (showWarningBanner) {
                 hideCameraUploadsFab()
@@ -337,7 +340,7 @@ class MediaCameraUploadViewModel @Inject constructor(
             currentState.copy(
                 isCameraUploadsLimitedAccess = !hasPermissions,
                 isWarningBannerShown = showWarningBanner,
-                showCameraUploadsWarning = showWarningMenu,
+                status = if (showWarningAction) CUStatusUiState.Warning else currentState.status
             )
         }
     }
