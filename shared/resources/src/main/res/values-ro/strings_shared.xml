@@ -1940,4 +1940,10 @@
     <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
     <!-- Multiple album deletion success message -->
     <string name="albums_multiple_delete_success_message">%d albums deleted</string>
+    <!-- Home Screen - No Network Connection description -->
+    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
+    <!-- Home Screen - No Network Connection description with offline files -->
+    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
+    <!-- Home Screen - View Offline files button -->
+    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
 </resources>
