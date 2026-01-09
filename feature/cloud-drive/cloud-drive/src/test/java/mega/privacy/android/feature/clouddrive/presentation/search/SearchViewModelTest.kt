@@ -29,8 +29,10 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
@@ -62,6 +64,8 @@ class SearchViewModelTest {
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -89,6 +93,8 @@ class SearchViewModelTest {
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
+        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+        monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     )
 
     private fun setupTestData(
@@ -787,4 +793,68 @@ class SearchViewModelTest {
             assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
         }
     }
+
+    @Test
+    fun `test that monitorShowHiddenNodesSettings updates showHiddenNodes`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+
+            val underTest = createViewModel()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.isHiddenNodeSettingsLoading).isFalse()
+                assertThat(finalState.isLoading).isFalse()
+                assertThat(finalState.showHiddenNodes).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that monitorHiddenNodesEnabledUseCase handles disabled state gracefully`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that monitorHiddenNodesEnabledUseCase handles enabled state correctly`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.isHiddenNodesEnabled).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that all hidden nodes properties are updated correctly`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val finalState = awaitItem()
+                assertThat(finalState.showHiddenNodes).isTrue()
+                assertThat(finalState.isHiddenNodesEnabled).isTrue()
+            }
+        }
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
@@ -35,8 +36,10 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
@@ -59,7 +62,9 @@ class SearchViewModel @AssistedInject constructor(
     private val monitorViewTypeUseCase: MonitorViewType,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    private val setCloudSortOrderUseCase: SetCloudSortOrder
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -76,6 +81,7 @@ class SearchViewModel @AssistedInject constructor(
         monitorViewType()
         // TODO Handle others, links sort types
         monitorSortOrder()
+        monitorHiddenNodeSettings()
     }
 
     fun processAction(action: SearchUiAction) {
@@ -153,7 +159,6 @@ class SearchViewModel @AssistedInject constructor(
                     items = nodeUiItems,
                     searchedQuery = query,
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
-                    isHiddenNodeSettingsLoading = false
                 )
             }
         }.onFailure { throwable ->
@@ -275,6 +280,28 @@ class SearchViewModel @AssistedInject constructor(
     private fun onOpenedFileNodeHandled() {
         _uiState.update { state ->
             state.copy(openedFileNode = null)
+        }
+    }
+
+    private fun monitorHiddenNodeSettings() {
+        viewModelScope.launch {
+            combine(
+                monitorHiddenNodesEnabledUseCase()
+                    .catch { Timber.e(it) },
+                monitorShowHiddenItemsUseCase()
+                    .catch { Timber.e(it) },
+                ::Pair
+            ).collectLatest { pair ->
+                val isHiddenNodesEnabled = pair.first
+                val showHiddenItems = pair.second
+                _uiState.update { state ->
+                    state.copy(
+                        isHiddenNodeSettingsLoading = false,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        showHiddenNodes = showHiddenItems
+                    )
+                }
+            }
         }
     }
 
