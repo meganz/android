@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation.playlists
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -121,7 +122,16 @@ class VideoPlaylistsTabViewModelTest {
         advanceUntilIdle()
 
         underTest.uiState.test {
-            assertThat(awaitItem()).isInstanceOf(VideoPlaylistsTabUiState.Loading::class.java)
+            val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+            if (actual != null) {
+                assertThat(actual.videoPlaylistEntities).isNotEmpty()
+                assertThat(actual.videoPlaylists).isNotEmpty()
+                assertThat(actual.sortOrder).isEqualTo(expectedSortOrder)
+                assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
+                assertThat(actual.selectedPlaylists).isEmpty()
+                assertThat(actual.playlistsRemovedEvent).isEqualTo(consumed())
+                assertThat(actual.query).isNull()
+            }
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -140,7 +150,6 @@ class VideoPlaylistsTabViewModelTest {
             advanceUntilIdle()
 
             underTest.uiState.test {
-                skipItems(1)
                 val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
                 if (actual != null) {
                     verify(setCloudSortOrderUseCase).invoke(sortOrder)
@@ -175,7 +184,6 @@ class VideoPlaylistsTabViewModelTest {
             advanceUntilIdle()
 
             underTest.uiState.test {
-                skipItems(1)
                 val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
                 if (actual != null) {
                     assertThat(actual.sortOrder).isEqualTo(SortOrder.ORDER_DEFAULT_ASC)
@@ -194,6 +202,7 @@ class VideoPlaylistsTabViewModelTest {
             initVideoPlaylists(listOf(playlist1, playlist2))
             initUnderTest()
             underTest.onItemLongClicked(playlist1)
+            advanceUntilIdle()
 
             underTest.uiState.test {
                 skipItems(1)
@@ -224,24 +233,26 @@ class VideoPlaylistsTabViewModelTest {
 
             initVideoPlaylists(listOf(playlist1, playlist2))
             initUnderTest()
+            underTest.onItemLongClicked(playlist1)
             advanceUntilIdle()
 
             underTest.uiState.test {
-                skipItems(1)
-                var actual = awaitItem() as? VideoPlaylistsTabUiState.Data
-                if (actual != null) {
-                    assertThat(actual.videoPlaylistEntities).isNotEmpty()
-                    assertThat(actual.selectedPlaylists).isEmpty()
-                }
+                skipItems(2)
 
                 underTest.selectAllVideos()
-                actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                var actual = awaitItem() as? VideoPlaylistsTabUiState.Data
                 if (actual != null) {
                     assertThat(actual.selectedPlaylists).hasSize(2)
                     assertThat(actual.selectedPlaylists.map { it.id }).containsExactly(
                         playlist1.id,
                         playlist2.id
                     )
+                }
+
+                underTest.clearSelection()
+                actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+                if (actual != null) {
+                    assertThat(actual.selectedPlaylists).isEmpty()
                 }
                 cancelAndIgnoreRemainingEvents()
             }
@@ -259,7 +270,6 @@ class VideoPlaylistsTabViewModelTest {
             advanceUntilIdle()
 
             underTest.uiState.test {
-                skipItems(1)
                 val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
                 if (actual != null) {
                     assertThat(actual.selectedPlaylists).hasSize(1)
@@ -282,11 +292,11 @@ class VideoPlaylistsTabViewModelTest {
             ).thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
 
             initUnderTest()
+            underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
             advanceUntilIdle()
 
             underTest.uiState.test {
-                skipItems(2)
-                underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+                skipItems(1)
                 val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
                 if (actual != null) {
                     assertThat(actual.playlistsRemovedEvent).isEqualTo(
@@ -295,8 +305,36 @@ class VideoPlaylistsTabViewModelTest {
                         )
                     )
                 }
+                cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that uiState is correctly updated when searchQuery is invoked`() = runTest {
+        val query = "query"
+        val videoPlaylist = createVideoPlaylistUiEntity(handle = 2L, name = "Playlist in query")
+        whenever(
+            getVideoPlaylistsUseCase()
+        ).thenReturn(listOf(mock()))
+        whenever(videoPlaylistUiEntityMapper(any())).thenReturn(videoPlaylist)
+
+        initUnderTest()
+        underTest.searchQuery(query)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            skipItems(1)
+            val actual = awaitItem() as? VideoPlaylistsTabUiState.Data
+            if (actual != null) {
+                assertThat(actual.videoPlaylistEntities).isNotEmpty()
+                assertThat(actual.videoPlaylistEntities.map { it.id }).containsExactly(
+                    videoPlaylist.id
+                )
+                assertThat(actual.query).isEqualTo(query)
+            }
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun createVideoPlaylistUiEntity(
         handle: Long,

@@ -21,6 +21,7 @@ sealed interface VideoPlaylistsTabUiState {
      * @property selectedSortConfiguration the selected sort configuration
      * @property selectedPlaylists the selected playlists
      * @property playlistsRemovedEvent event for playlists removed
+     * @property query the search query
      */
     data class Data(
         val videoPlaylistEntities: List<VideoPlaylistUiEntity> = emptyList(),
@@ -29,5 +30,6 @@ sealed interface VideoPlaylistsTabUiState {
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val selectedPlaylists: Set<VideoPlaylistUiEntity> = emptySet(),
         val playlistsRemovedEvent: StateEventWithContent<List<String>> = consumed(),
+        val query: String? = null,
     ) : VideoPlaylistsTabUiState
 }

@@ -24,10 +24,17 @@ class VideoPlaylistsTabAppBarTest {
     private fun setComposeContent(
         count: Int = 0,
         isAllSelected: Boolean = false,
+        isSelectionMode: Boolean = true,
         onSelectAllClicked: () -> Unit = {},
         onCancelSelectionClicked: () -> Unit = {},
         removePlaylist: () -> Unit = {},
+        searchQuery: String? = null,
+        updateSearchQuery: (String) -> Unit = {},
         modifier: Modifier = Modifier,
+        title: String = "",
+        isSearchMode: Boolean = true,
+        onBackPressed: () -> Unit = {},
+        onSearchingModeChanged: ((Boolean) -> Unit)? = null,
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabAppBar(
@@ -36,7 +43,14 @@ class VideoPlaylistsTabAppBarTest {
                 onSelectAllClicked = onSelectAllClicked,
                 onCancelSelectionClicked = onCancelSelectionClicked,
                 removePlaylist = removePlaylist,
-                modifier = modifier
+                modifier = modifier,
+                isSelectionMode = isSelectionMode,
+                searchQuery = searchQuery,
+                updateSearchQuery = updateSearchQuery,
+                title = title,
+                isSearchMode = isSearchMode,
+                onBackPressed = onBackPressed,
+                onSearchingModeChanged = onSearchingModeChanged
             )
         }
     }
@@ -47,6 +61,16 @@ class VideoPlaylistsTabAppBarTest {
 
         composeTestRule
             .onNodeWithTag(VIDEO_PLAYLISTS_TAB_SELECTION_TOP_APP_BAR_TAG)
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that search top bar is displayed as expected`() {
+        setComposeContent(isSelectionMode = false)
+
+        composeTestRule
+            .onNodeWithTag(VIDEO_PLAYLISTS_TAB_SEARCH_TOP_APP_BAR_TAG)
             .assertExists()
             .assertIsDisplayed()
     }

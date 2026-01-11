@@ -49,6 +49,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val playlistsRemovedFlow =
         MutableStateFlow<StateEventWithContent<List<String>>>(consumed())
+    private val queryFlow = MutableStateFlow<String?>(null)
 
     private val dataUpdateFlow =
         combine(
@@ -83,16 +84,18 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal val uiState: StateFlow<VideoPlaylistsTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             dataUpdateFlow,
+            queryFlow,
             selectedVideoPlaylistsFlow,
-        ) { uiState, selectedVideoPlaylists ->
+        ) { uiState, searchQuery, selectedVideoPlaylists ->
             val selectedIds = selectedVideoPlaylists.map { playlist -> playlist.id }
             val videoPlaylistEntities = uiState.videoPlaylistEntities.map {
                 it.copy(isSelected = it.id in selectedIds)
-            }
+            }.filterVideoPlaylistsBySearchQuery(searchQuery)
 
             uiState.copy(
                 videoPlaylistEntities = videoPlaylistEntities,
                 selectedPlaylists = selectedVideoPlaylists,
+                query = searchQuery,
             )
         }.catch {
             Timber.e(it)
@@ -180,4 +183,17 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal fun resetPlaylistsRemovedEvent() {
         playlistsRemovedFlow.update { consumed() }
     }
+
+    internal fun searchQuery(queryString: String?) {
+        if (queryFlow.value != queryString) {
+            queryFlow.update { queryString }
+        }
+    }
+
+    private fun List<VideoPlaylistUiEntity>.filterVideoPlaylistsBySearchQuery(
+        queryString: String?,
+    ) =
+        filter { playlist ->
+            playlist.title.contains(queryString ?: "", true)
+        }
 }

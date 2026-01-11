@@ -410,6 +410,8 @@ fun MediaMainScreen(
     var selectedPlaylistCount by rememberSaveable { mutableIntStateOf(0) }
     var areAllPlaylistsSelected by rememberSaveable { mutableStateOf(false) }
     var isPlaylistsSelectionMode by rememberSaveable { mutableStateOf(false) }
+    var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
+    var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     val isCuWarningStatusVisible = mediaCameraUploadUiState.showCameraUploadsWarning
     val isCuDefaultStatusVisible =
@@ -461,8 +463,19 @@ fun MediaMainScreen(
         }
     }
 
+    BackHandler(isPlaylistsTabSearchBarVisible) {
+        if (isPlaylistsTabSearchBarVisible) {
+            isPlaylistsTabSearchBarVisible = false
+            videoPlaylistsTabViewModel.searchQuery(null)
+        }
+    }
+
     LaunchedEffect(isVideosSelectionMode) {
         setNavigationItemVisibility(!isVideosSelectionMode)
+    }
+
+    LaunchedEffect(isPlaylistsSelectionMode) {
+        setNavigationItemVisibility(!isPlaylistsSelectionMode)
     }
 
     LaunchedEffect(videosTabUiState) {
@@ -495,7 +508,9 @@ fun MediaMainScreen(
     LaunchedEffect(playlistsTabUiState) {
         if (playlistsTabUiState is VideoPlaylistsTabUiState.Data) {
             val state = playlistsTabUiState as VideoPlaylistsTabUiState.Data
-
+            if (playlistsTabQuery != state.query) {
+                playlistsTabQuery = state.query
+            }
             if (selectedPlaylistCount != state.selectedPlaylists.size) {
                 selectedPlaylistCount = state.selectedPlaylists.size
                 areAllPlaylistsSelected = selectedPlaylistCount == state.videoPlaylistEntities.size
@@ -551,7 +566,7 @@ fun MediaMainScreen(
                         }
                     )
 
-                isPlaylistsSelectionMode -> {
+                isPlaylistsTabSearchBarVisible || isPlaylistsSelectionMode -> {
                     VideoPlaylistsTabAppBar(
                         count = selectedPlaylistCount,
                         isAllSelected = areAllPlaylistsSelected,
@@ -560,6 +575,15 @@ fun MediaMainScreen(
                         removePlaylist = {
                             showVideoPlaylistRemovedDialog = true
                         },
+                        isSelectionMode = isPlaylistsSelectionMode,
+                        searchQuery = playlistsTabQuery,
+                        updateSearchQuery = videoPlaylistsTabViewModel::searchQuery,
+                        onSearchingModeChanged = { isSearching ->
+                            if (!isSearching) {
+                                isPlaylistsTabSearchBarVisible = false
+                                videoPlaylistsTabViewModel.searchQuery(null)
+                            }
+                        }
                     )
                 }
 
@@ -629,10 +653,14 @@ fun MediaMainScreen(
                     actions = buildList {
                         add(
                             MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
-                                if (currentTabIndex == MediaScreen.Videos.ordinal) {
-                                    isVideosTabSearchBarVisible = true
-                                } else {
-                                    if (mediaMainUiState.isMediaRevampPhase2Enabled) {
+                                when (currentTabIndex) {
+                                    MediaScreen.Videos.ordinal ->
+                                        isVideosTabSearchBarVisible = true
+
+                                    MediaScreen.Playlists.ordinal ->
+                                        isPlaylistsTabSearchBarVisible = true
+
+                                    else -> if (mediaMainUiState.isMediaRevampPhase2Enabled) {
                                         navigateToMediaSearch(MediaSearchNavKey)
                                     } else {
                                         navigateToMediaSearch(LegacyPhotosSearchNavKey)
