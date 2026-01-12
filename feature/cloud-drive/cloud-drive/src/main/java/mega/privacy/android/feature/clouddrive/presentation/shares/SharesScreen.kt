@@ -3,7 +3,6 @@ package mega.privacy.android.feature.clouddrive.presentation.shares
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +40,6 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
-import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -153,7 +151,6 @@ internal fun SharesScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.systemBarsIgnoringBottom,
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
