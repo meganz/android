@@ -1003,8 +1003,13 @@ object MegaNodeUtil {
             val location = when {
                 fromIncomingShare -> {
                     if (parent != null) {
+                        val parentNodeName = if (parent.isNodeKeyDecrypted) {
+                            parent.name
+                        } else {
+                            app.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
+                        }
                         app.getString(
-                            R.string.location_label, parent.name,
+                            R.string.location_label, parentNodeName,
                             app.getString(R.string.tab_incoming_shares)
                         )
                     } else {
