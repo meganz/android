@@ -311,6 +311,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         ChooseAccountActivity::class.java
                                     ) ?: Intent(activity, ChooseAccountActivity::class.java))
                                         .apply {
+                                            this.action = action
+                                            this.data = data
+                                            flags?.let { this.flags = it }
+                                            putExtras(bundle)
                                             putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
                                             putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)
                                         }
