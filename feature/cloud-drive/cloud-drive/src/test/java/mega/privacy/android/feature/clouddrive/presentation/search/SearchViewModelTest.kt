@@ -47,6 +47,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -98,8 +99,14 @@ class SearchViewModelTest {
     )
 
     private fun setupTestData(
-        nodeUiItems: List<NodeUiItem<TypedNode>>,
+        items: List<TypedNode> = emptyList(),
     ) {
+        val nodeUiItems = items.map { node ->
+            NodeUiItem(
+                node = node,
+                isSelected = false
+            )
+        }
         runBlocking {
             whenever(
                 nodeUiItemMapper(
@@ -113,7 +120,7 @@ class SearchViewModelTest {
                     isContactVerificationOn = any(),
                 )
             ).thenReturn(nodeUiItems)
-            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(emptyList())
+            whenever(searchUseCase(any(), any(), any(), any())).thenReturn(items)
         }
 
         whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
@@ -156,7 +163,6 @@ class SearchViewModelTest {
             on { id }.thenReturn(NodeId(123L))
             on { name }.thenReturn("file.txt")
         }
-        val nodeUiItem = mock<NodeUiItem<TypedNode>>()
         whenever(
             searchUseCase(
                 parentHandle = any(),
@@ -165,7 +171,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        setupTestData(listOf(nodeUiItem))
+        setupTestData(listOf(typedFileNode))
 
         val underTest = createViewModel()
 
@@ -187,7 +193,6 @@ class SearchViewModelTest {
             on { id }.thenReturn(NodeId(123L))
             on { name }.thenReturn("file.txt")
         }
-        val nodeUiItem = mock<NodeUiItem<TypedNode>>()
         whenever(
             searchUseCase(
                 parentHandle = any(),
@@ -196,7 +201,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        setupTestData(listOf(nodeUiItem))
+        setupTestData(listOf(typedFileNode))
 
         val underTest = createViewModel()
         advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
@@ -211,7 +216,7 @@ class SearchViewModelTest {
             )
         ).thenReturn(listOf(typedFileNode))
         whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
-        setupTestData(listOf(nodeUiItem))
+        setupTestData(listOf(typedFileNode))
 
         underTest.uiState.test {
             skipItems(1)
@@ -293,7 +298,6 @@ class SearchViewModelTest {
             on { id }.thenReturn(NodeId(123L))
             on { name }.thenReturn("file.txt")
         }
-        val nodeUiItem = mock<NodeUiItem<TypedNode>>()
         whenever(
             searchUseCase(
                 parentHandle = any(),
@@ -302,7 +306,7 @@ class SearchViewModelTest {
                 isSingleActivityEnabled = any(),
             )
         ).thenReturn(listOf(typedFileNode))
-        setupTestData(listOf(nodeUiItem))
+        setupTestData(listOf(typedFileNode))
 
         val underTest = createViewModel()
 
@@ -791,6 +795,167 @@ class SearchViewModelTest {
         underTest.uiState.test {
             val updatedState = awaitItem() // State after monitorViewType flow emits
             assertThat(updatedState.currentViewType).isEqualTo(ViewType.LIST)
+        }
+    }
+
+    @Test
+    fun `test that DeselectAllItems action deselects all items in state`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        setupTestData(listOf(node1, node2))
+        val underTest = createViewModel()
+
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.SelectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.DeselectAllItems)
+        testScheduler.advanceUntilIdle()
+
+        val updatedState = underTest.uiState.value
+        assertThat(updatedState.isInSelectionMode).isFalse()
+        assertThat(updatedState.isSelecting).isFalse()
+        assertThat(updatedState.items[0].isSelected).isFalse()
+        assertThat(updatedState.items[1].isSelected).isFalse()
+    }
+
+    @Test
+    fun `test that SelectAllItems selects all items when nodes are fully loaded`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        setupTestData(listOf(node1, node2))
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+        // Wait for initial loading to complete
+        testScheduler.advanceUntilIdle()
+
+        // Verify we're in fully loaded state
+        val fullyLoadedState = underTest.uiState.value
+        assertThat(fullyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
+
+        underTest.processAction(SearchUiAction.SelectAllItems)
+        // Advance the coroutine to let it execute
+        testScheduler.advanceUntilIdle()
+
+        val stateAfterSelectAll = underTest.uiState.value
+        // Verify that isSelecting is false and all items are selected
+        assertThat(stateAfterSelectAll.isSelecting).isFalse()
+        assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
+        assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
+        assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
+    }
+
+    @Test
+    fun `test that toggleItemSelection removes item from selection when already selected`() =
+        runTest {
+            val node1 = mock<TypedNode> {
+                on { id } doReturn NodeId(1L)
+            }
+
+            setupTestData(listOf(node1))
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+            underTest.uiState.test {
+                awaitItem()
+                val loadedState = awaitItem()
+
+                val nodeUiItem1 = loadedState.items[0]
+                underTest.processAction(SearchUiAction.ItemLongClicked(nodeUiItem1))
+                val stateAfterSelection = awaitItem()
+
+                val updatedNodeUiItem1 = stateAfterSelection.items[0]
+                underTest.processAction(SearchUiAction.ItemLongClicked(updatedNodeUiItem1))
+                val updatedState = awaitItem()
+
+                assertThat(updatedState.isInSelectionMode).isFalse()
+                assertThat(updatedState.items[0].isSelected).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isInSelectionMode is true when items are selected`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+
+        setupTestData(listOf(node1))
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+        underTest.uiState.test {
+            awaitItem()
+            val loadedState = awaitItem()
+
+            val nodeUiItem1 = loadedState.items[0]
+            underTest.processAction(SearchUiAction.ItemLongClicked(nodeUiItem1))
+            val state = awaitItem()
+
+            assertThat(state.isInSelectionMode).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isInSelectionMode is false when no items are selected`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+
+        setupTestData(listOf(node1))
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+        underTest.uiState.test {
+            awaitItem()
+            val loadedState = awaitItem()
+
+            assertThat(loadedState.isInSelectionMode).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that multiple items can be selected`() = runTest {
+        val node1 = mock<TypedNode> {
+            on { id } doReturn NodeId(1L)
+        }
+        val node2 = mock<TypedNode> {
+            on { id } doReturn NodeId(2L)
+        }
+
+        setupTestData(listOf(node1, node2))
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+        underTest.uiState.test {
+            awaitItem()
+            val loadedState = awaitItem()
+
+            val nodeUiItem1 = loadedState.items[0]
+            underTest.processAction(SearchUiAction.ItemLongClicked(nodeUiItem1))
+            awaitItem()
+
+            val nodeUiItem2 = loadedState.items[1]
+            underTest.processAction(SearchUiAction.ItemLongClicked(nodeUiItem2))
+            val updatedState = awaitItem()
+
+            assertThat(updatedState.isInSelectionMode).isTrue()
+            assertThat(updatedState.items[0].isSelected).isTrue()
+            assertThat(updatedState.items[1].isSelected).isTrue()
         }
     }
 

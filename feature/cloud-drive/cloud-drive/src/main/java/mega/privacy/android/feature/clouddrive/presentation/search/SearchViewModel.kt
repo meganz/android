@@ -10,6 +10,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,9 +18,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
@@ -71,6 +74,7 @@ class SearchViewModel @AssistedInject constructor(
     val uiState = _uiState.asStateFlow()
 
     private val searchQueryFlow = MutableStateFlow("")
+    private var nodeMultiSelectionJob: Job? = null
 
     init {
         viewModelScope.launch {
@@ -89,12 +93,12 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.UpdateSearchText -> updateSearchText(action.text)
             is SearchUiAction.SelectFilter -> updateFilter(action.result)
             is SearchUiAction.ItemClicked -> onItemClicked(action.nodeUiItem)
-            is SearchUiAction.ItemLongClicked -> {} // TODO
+            is SearchUiAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
             is SearchUiAction.SetSortOrder -> setSortOrder(action.sortConfiguration)
             is SearchUiAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
             is SearchUiAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
-            is SearchUiAction.SelectAllItems -> {} // TODO
-            is SearchUiAction.DeselectAllItems -> {} // TODO
+            is SearchUiAction.SelectAllItems -> selectAllItems()
+            is SearchUiAction.DeselectAllItems -> deselectAllItems()
             is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is SearchUiAction.NavigateBackEventConsumed -> {} // TODO
             is SearchUiAction.OverQuotaConsumptionWarning -> {} // TODO
@@ -133,6 +137,7 @@ class SearchViewModel @AssistedInject constructor(
 
         _uiState.update { it.copy(nodesLoadingState = NodesLoadingState.Loading) }
 
+        deselectAllItems()
         runCatching {
             cancelCancelTokenUseCase()
             val nodes = searchUseCase(
@@ -177,7 +182,10 @@ class SearchViewModel @AssistedInject constructor(
      * Handle item click - navigate to folder if it's a folder
      */
     private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        // TODO handle selection mode
+        if (uiState.value.isInSelectionMode) {
+            toggleItemSelection(nodeUiItem)
+            return
+        }
 
         when (val node = nodeUiItem.node) {
             is TypedFolderNode -> {
@@ -203,6 +211,82 @@ class SearchViewModel @AssistedInject constructor(
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Handle item long click - toggle selection state
+     */
+    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
+        toggleItemSelection(nodeUiItem)
+    }
+
+    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
+        val updatedItems = uiState.value.items.map { item ->
+            if (item.node.id == nodeUiItem.node.id) {
+                item.copy(isSelected = !item.isSelected)
+            } else {
+                item
+            }
+        }
+        _uiState.update { state ->
+            state.copy(items = updatedItems)
+        }
+
+        // Cancel any ongoing multi-selection job if user manually deselects all items
+        if (!uiState.value.isInSelectionMode) {
+            nodeMultiSelectionJob?.cancel()
+        }
+    }
+
+    /**
+     * Deselect all items and reset selection state
+     */
+    private fun deselectAllItems() {
+        nodeMultiSelectionJob?.cancel()
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
+        }
+    }
+
+    /**
+     * Select all items
+     */
+    private fun selectAllItems() {
+        nodeMultiSelectionJob?.cancel()
+        nodeMultiSelectionJob = viewModelScope.launch {
+            runCatching {
+                // Select all items that are already loaded
+                performAllItemSelection()
+                // If nodes are still loading, wait until fully loaded then select all
+                if (uiState.value.nodesLoadingState != NodesLoadingState.FullyLoaded) {
+                    _uiState.update { state ->
+                        state.copy(isSelecting = true)
+                    }
+                    uiState.first { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
+                    if (isActive) {
+                        performAllItemSelection()
+                    }
+                }
+            }.onFailure {
+                _uiState.update { state ->
+                    state.copy(isSelecting = false)
+                }
+            }
+        }
+    }
+
+    private fun performAllItemSelection() {
+        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
+        _uiState.update { state ->
+            state.copy(
+                items = updatedItems,
+                isSelecting = false
+            )
         }
     }
 

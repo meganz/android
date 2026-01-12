@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,6 +39,9 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
@@ -60,6 +64,7 @@ import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFi
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 
 
@@ -73,6 +78,13 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val megaNavigator = rememberMegaNavigator()
+    val selectionModeActionHandler = rememberMultiNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel,
+        megaNavigator = megaNavigator,
+    )
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val snackbarHostState = LocalSnackBarHostState.current
@@ -87,12 +99,32 @@ fun SearchScreen(
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
         topBar = {
-            SearchTopAppBar(
-                searchText = uiState.searchText,
-                onSearchTextChanged = {
-                    viewModel.processAction(SearchUiAction.UpdateSearchText(it))
-                },
-                onBack = navigationHandler::back,
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedItemsCount,
+                    isAllSelected = uiState.isAllSelected,
+                    isSelecting = uiState.isSelecting,
+                    onSelectAllClicked = { viewModel.processAction(SearchUiAction.SelectAllItems) },
+                    onCancelSelectionClicked = { viewModel.processAction(SearchUiAction.DeselectAllItems) }
+                )
+            } else {
+                SearchTopAppBar(
+                    searchText = uiState.searchText,
+                    onSearchTextChanged = {
+                        viewModel.processAction(SearchUiAction.UpdateSearchText(it))
+                    },
+                    onBack = navigationHandler::back,
+                )
+            }
+        },
+        bottomBar = {
+            NodeSelectionModeBottomBar(
+                availableActions = nodeActionState.availableActions,
+                visibleActions = nodeActionState.visibleActions,
+                visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
+                multiNodeActionHandler = selectionModeActionHandler,
+                selectedNodes = uiState.selectedNodes,
+                isSelecting = uiState.isSelecting,
             )
         }
     ) { contentPadding ->
@@ -124,7 +156,7 @@ fun SearchScreen(
                 viewModel.processAction(SearchUiAction.ItemClicked(it))
             },
             onLongClicked = { nodeUiItem ->
-                // TODO handle selection mode
+                viewModel.processAction(SearchUiAction.ItemLongClicked(nodeUiItem))
             },
             onSortOrderClick = {
                 showSortBottomSheet = true
@@ -146,6 +178,28 @@ fun SearchScreen(
                 nodeSourceType = uiState.nodeSourceType
             )
         )
+    }
+
+    LaunchedEffect(uiState.selectedItemsCount) {
+        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+            uiState.selectedNodes.toSet(),
+            nodeSourceType = uiState.nodeSourceType
+        )
+    }
+
+    EventEffect(
+        event = nodeActionState.actionTriggeredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetActionTriggered
+    ) {
+        viewModel.processAction(SearchUiAction.DeselectAllItems)
+    }
+
+
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss
+    ) {
+        viewModel.processAction(SearchUiAction.DeselectAllItems)
     }
 
     uiState.openedFileNode?.let { openedFileNode ->
@@ -233,7 +287,7 @@ fun SearchContent(
     ) {
         if (uiState.isFilterAllowed) {
             SearchFilterChips(
-                modifier = Modifier.padding(bottom = 12.dp),
+                modifier = Modifier.padding(vertical = 12.dp),
                 typeFilterOption = uiState.typeFilterOption,
                 dateModifiedFilterOption = uiState.dateModifiedFilterOption,
                 dateAddedFilterOption = uiState.dateAddedFilterOption,
