@@ -7,6 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.StateEvent
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderState
 import mega.privacy.android.core.nodecomponents.dialog.removeshare.RemoveShareFolderViewModel
 import mega.privacy.android.domain.entity.node.NodeId
@@ -32,11 +34,16 @@ fun RemoveShareFolderDialog(
     LaunchedEffect(Unit) {
         viewModel.getContactInfoForSharedFolder(nodeList)
     }
+
+    EventEffect(
+        event = state.shareRemovedEvent,
+        onConsumed = {},
+        action = onDismiss
+    )
+
     RemoveShareFolderDialogBody(
-        state = state, onConfirm = {
-            viewModel.removeShare(nodeList)
-            onDismiss()
-        },
+        state = state,
+        onConfirm = { viewModel.removeShare(nodeList) },
         onDismiss = onDismiss
     )
 }
