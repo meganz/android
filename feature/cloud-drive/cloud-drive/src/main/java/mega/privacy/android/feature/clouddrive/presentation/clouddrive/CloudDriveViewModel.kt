@@ -109,7 +109,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         monitorCloudSortOrder()
         monitorStorageOverQuota()
         monitorTransferOverQuota()
-        checkWritePermission()
         checkSearchRevampEnabled()
     }
 
@@ -138,6 +137,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             } else {
                 folderId
             }
+            checkWritePermission(folderOrRootNodeId)
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
                 .catch { Timber.e(it) }
                 .collect { (nodes, hasMore) ->
@@ -517,10 +517,12 @@ class CloudDriveViewModel @AssistedInject constructor(
         }
     }
 
-    private fun checkWritePermission() {
+    private fun checkWritePermission(
+        folderId: NodeId = uiState.value.currentFolderId
+    ) {
         viewModelScope.launch {
             runCatching {
-                val accessPermission = getNodeAccessPermission(uiState.value.currentFolderId)
+                val accessPermission = getNodeAccessPermission(folderId)
                 val hasWritePermission = accessPermission == AccessPermission.OWNER ||
                         accessPermission == AccessPermission.READWRITE ||
                         accessPermission == AccessPermission.FULL
