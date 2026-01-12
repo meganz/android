@@ -6,6 +6,10 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -282,6 +286,7 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
         metadata = transparentMetadata()
     ) {
         val context = LocalContext.current
+        var hasLaunched by rememberSaveable { mutableStateOf(false) }
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -300,8 +305,11 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
         }
 
         LaunchedEffect(Unit) {
-            val intent = Intent(context, PhotosSearchActivity::class.java)
-            launcher.launch(intent)
+            if (!hasLaunched) {
+                hasLaunched = true
+                val intent = Intent(context, PhotosSearchActivity::class.java)
+                launcher.launch(intent)
+            }
         }
     }
 }
