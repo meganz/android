@@ -52,6 +52,7 @@ import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
+import nz.mega.sdk.MegaUploadOptions
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -100,29 +101,42 @@ internal class MegaApiFacade @Inject constructor(
     override fun getNodesFromMegaNodeList(nodeList: MegaNodeList): List<MegaNode> =
         MegaApiJava.nodeListToArray(nodeList)?.toList() ?: emptyList()
 
+    @Deprecated(message = "This will be removed soon. Use startUpload with MegaUploadOptions param instead.")
     override fun startUpload(
         localPath: String,
-        parentNode: MegaNode,
+        parent: MegaNode,
         fileName: String?,
-        modificationTime: Long?,
+        mtime: Long?,
         appData: String?,
         isSourceTemporary: Boolean,
-        shouldStartFirst: Boolean,
+        startFirst: Boolean,
         cancelToken: MegaCancelToken?,
         listener: MegaTransferListenerInterface,
-    ) {
-        megaApi.startUpload(
-            localPath,
-            parentNode,
-            fileName,
-            modificationTime ?: INVALID_CUSTOM_MOD_TIME,
-            appData,
-            isSourceTemporary,
-            shouldStartFirst,
-            cancelToken,
-            listener,
-        )
-    }
+    ) = megaApi.startUpload(
+        localPath,
+        parent,
+        fileName,
+        mtime ?: INVALID_CUSTOM_MOD_TIME,
+        appData,
+        isSourceTemporary,
+        startFirst,
+        cancelToken,
+        listener,
+    )
+
+    override fun startUpload(
+        localPath: String,
+        parent: MegaNode,
+        cancelToken: MegaCancelToken?,
+        options: MegaUploadOptions,
+        listener: MegaTransferListenerInterface,
+    ) = megaApi.startUpload(
+        localPath,
+        parent,
+        cancelToken,
+        options,
+        listener,
+    )
 
     override fun addTransferListener(listener: MegaTransferListenerInterface) =
         megaApi.addTransferListener(listener)

@@ -31,6 +31,7 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.Progress
@@ -114,6 +115,7 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val transfersPreferencesGateway = mock<TransfersPreferencesGateway>()
+    private val megaUploadOptionsMapper = mock<MegaUploadOptionsMapper>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -149,6 +151,7 @@ class DefaultTransfersRepositoryTest {
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway = { transfersPreferencesGateway },
+            megaUploadOptionsMapper = megaUploadOptionsMapper,
         )
     }
 
@@ -173,6 +176,7 @@ class DefaultTransfersRepositoryTest {
             activeTransferTotalsMapper,
             monitorFetchNodesFinishUseCase,
             transfersPreferencesGateway,
+            megaUploadOptionsMapper
         )
     }
 
@@ -182,13 +186,21 @@ class DefaultTransfersRepositoryTest {
 
         private fun mockStartUpload() = megaApiGateway.startUpload(
             localPath = any(),
-            parentNode = any(),
+            parent = any(),
             fileName = anyOrNull(),
-            modificationTime = any(),
+            mtime = any(),
             appData = anyOrNull(),
             isSourceTemporary = any(),
-            shouldStartFirst = any(),
+            startFirst = any(),
             cancelToken = anyOrNull(),
+            listener = any(),
+        )
+
+        private fun mockStartUploadWithOptions() = megaApiGateway.startUpload(
+            localPath = any(),
+            parent = any(),
+            cancelToken = anyOrNull(),
+            options = any(),
             listener = any(),
         )
 
@@ -435,6 +447,80 @@ class DefaultTransfersRepositoryTest {
                 any(),
                 anyOrNull(),
                 any()
+            )
+        }
+
+        @Test
+        fun `test that correct startUpload is invoked if MegaUploadOptions is get`() = runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(mockStartUploadWithOptions()).thenAnswer {
+                (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferData(
+                    api = mock(),
+                    transfer = mock(),
+                    buffer = byteArrayOf(),
+                )
+            }
+            whenever(transferEventMapper.invoke(any())).thenReturn(mock<TransferEvent.TransferDataEvent>())
+            whenever(
+                megaUploadOptionsMapper(
+                    fileName = anyOrNull(),
+                    mtime = anyOrNull(),
+                    appData = anyOrNull(),
+                    isSourceTemporary = any(),
+                    startFirst = any(),
+                    pitagTrigger = any()
+                )
+            ) doReturn mock()
+
+            startUploadFlow().test {
+                assertThat(awaitItem()).isNotNull()
+            }
+
+            verify(megaApiGateway).startUpload(
+                localPath = any(),
+                parent = any(),
+                cancelToken = anyOrNull(),
+                options = any(),
+                listener = any()
+            )
+        }
+
+        @Test
+        fun `test that correct startUpload is invoked if MegaUploadOptions is null`() = runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(mock())
+            whenever(mockStartUpload()).thenAnswer {
+                (it.arguments.last() as OptionalMegaTransferListenerInterface).onTransferData(
+                    api = mock(),
+                    transfer = mock(),
+                    buffer = byteArrayOf(),
+                )
+            }
+            whenever(transferEventMapper.invoke(any())).thenReturn(mock<TransferEvent.TransferDataEvent>())
+            whenever(
+                megaUploadOptionsMapper(
+                    fileName = anyOrNull(),
+                    mtime = anyOrNull(),
+                    appData = anyOrNull(),
+                    isSourceTemporary = any(),
+                    startFirst = any(),
+                    pitagTrigger = any()
+                )
+            ) doReturn null
+
+            startUploadFlow().test {
+                assertThat(awaitItem()).isNotNull()
+            }
+
+            verify(megaApiGateway).startUpload(
+                localPath = any(),
+                parent = any(),
+                fileName = anyOrNull(),
+                mtime = anyOrNull(),
+                appData = anyOrNull(),
+                isSourceTemporary = any(),
+                startFirst = any(),
+                cancelToken = anyOrNull(),
+                listener = any()
             )
         }
     }

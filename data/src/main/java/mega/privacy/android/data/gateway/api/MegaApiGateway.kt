@@ -31,6 +31,7 @@ import nz.mega.sdk.MegaSyncList
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
+import nz.mega.sdk.MegaUploadOptions
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import java.io.File
@@ -102,32 +103,127 @@ interface MegaApiGateway {
     fun getNodesFromMegaNodeList(nodeList: MegaNodeList): List<MegaNode>
 
     /**
-     * Upload a file or folder
+     * Upload a file or a folder
      *
-     * @param localPath The local path of the file or folder
-     * @param parentNode The parent node for the file or folder
-     * @param fileName The custom file name for the file or folder. Leave the parameter as "null"
-     * if there are no changes
-     * @param modificationTime The custom modification time for the file or folder, denoted in
-     * seconds since the epoch
-     * @param appData The custom app data to save, which can be nullable
-     * @param isSourceTemporary Whether the temporary file or folder that is created for upload
-     * should be deleted or not
-     * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
-     * queue or not
-     * @param cancelToken The token to cancel an ongoing file or folder upload, which can be
-     * nullable
-     * @param listener The [MegaTransferListenerInterface] to track the upload
+     * If the status of the business account is expired, onTransferFinish will be called with the error
+     * code MegaError::API_EBUSINESSPASTDUE. In this case, apps should show a warning message similar to
+     * "Your business account is overdue, please contact your administrator."
+     *
+     * When user wants to upload/download a batch of items that at least contains one folder, SDK mutex will be partially
+     * locked until:
+     * - we have received onTransferStart for every file in the batch
+     * - we have received onTransferUpdate with MegaTransfer::getStage == MegaTransfer::STAGE_TRANSFERRING_FILES
+     * for every folder in the batch
+     *
+     * During this period, the only safe method (to avoid deadlocks) to cancel transfers is by calling CancelToken::cancel(true).
+     * This method will cancel all transfers(not finished yet).
+     *
+     * Important considerations:
+     * - A cancel token instance can be shared by multiple transfers, and calling CancelToken::cancel(true) will affect all
+     * of those transfers.
+     *
+     * - It's app responsibility, to keep cancel token instance alive until receive MegaTransferListener::onTransferFinish for all MegaTransfers
+     * that shares the same cancel token instance.
+     *
+     * In case any other folder is being uploaded/downloaded, and MegaTransfer::getStage for that transfer returns
+     * a value between the following stages: MegaTransfer::STAGE_SCAN and MegaTransfer::STAGE_PROCESS_TRANSFER_QUEUE
+     * both included, don't use MegaApi::cancelTransfer to cancel this transfer (it could generate a deadlock),
+     * instead of that, use MegaCancelToken::cancel(true) calling through MegaCancelToken instance associated to this transfer.
+     *
+     * For more information about MegaTransfer stages please refer to onTransferUpdate documentation.
+     *
+     * @param localPath         Local path of the file or folder
+     * @param parent            Parent node for the file or folder in the MEGA account
+     * @param fileName          Custom file name for the file or folder in MEGA
+     *                          + If you don't need this param provide NULL as value
+     * @param mtime             Custom modification time for the file in MEGA (in seconds since the epoch)
+     *                          + If you don't need this param provide MegaApi::INVALID_CUSTOM_MOD_TIME as value
+     * @param appData           Custom app data to save in the MegaTransfer object
+     *                          The data in this parameter can be accessed using MegaTransfer::getAppData in callbacks
+     *                          related to the transfer. If a transfer is started with exactly the same data
+     *                          (local path and target parent) as another one in the transfer queue, the new transfer
+     *                          fails with the error API_EEXISTS and the appData of the new transfer is appended to
+     *                          the appData of the old transfer, using a '!' separator if the old transfer had already
+     *                          appData.
+     *                          + If you don't need this param provide NULL as value
+     * @param isSourceTemporary Pass the ownership of the file to the SDK, that will DELETE it when the upload finishes.
+     *                          This parameter is intended to automatically delete temporary files that are only created to be uploaded.
+     *                          Use this parameter with caution. Set it to true only if you are sure about what are you doing.
+     *                          + If you don't need this param provide false as value
+     * @param startFirst        puts the transfer on top of the upload queue
+     *                          + If you don't need this param provide false as value
+     * @param cancelToken       MegaCancelToken to be able to cancel a folder/file upload process.
+     *                          This param is required to be able to cancel the transfer safely.
+     *                          App retains the ownership of this param.
+     * @param listener          MegaTransferListener to track this transfer
+     *
+     * @deprecated This version of the function is deprecated. Please, use the non-deprecated
+     * one.
+     */
+    @Deprecated(message = "This will be removed soon. Use startUpload with MegaUploadOptions param instead.")
+    fun startUpload(
+        localPath: String,
+        parent: MegaNode,
+        fileName: String?,
+        mtime: Long?,
+        appData: String?,
+        isSourceTemporary: Boolean,
+        startFirst: Boolean,
+        cancelToken: MegaCancelToken?,
+        listener: MegaTransferListenerInterface,
+    )
+
+    /**
+     * Upload a file or a folder.
+     *
+     * This method starts an upload transfer for a local file or folder into the specified
+     * parent node.
+     *
+     * Business account overdue:
+     * If the status of the business account is expired/overdue,
+     * MegaTransferListener::onTransferFinish() will be called with error code
+     * MegaError::API_EBUSINESSPASTDUE. In this case, apps should show a warning message similar
+     * to "Your business account is overdue, please contact your administrator."
+     *
+     * Folder batch deadlock considerations:
+     * When uploading a batch of items that contains at least one folder, the SDK mutex will be
+     * partially locked until:
+     * - onTransferStart has been received for every file in the batch, and
+     * - onTransferUpdate has been received with MegaTransfer::getStage() ==
+     * MegaTransfer::STAGE_TRANSFERRING_FILES for every folder in the batch.
+     *
+     * During this period, the only safe method (to avoid deadlocks) to cancel transfers is by
+     * calling CancelToken::cancel(true). This cancels all transfers (not finished yet)
+     * associated with that cancel token instance.
+     *
+     * Important considerations about cancel tokens:
+     * - A MegaCancelToken instance can be shared by multiple transfers. Calling cancel(true)
+     * affects all transfers that share the token.
+     * - It is the app responsibility to keep the MegaCancelToken instance alive until
+     * MegaTransferListener::onTransferFinish() is received for all MegaTransfers that share
+     * it.
+     *
+     * For more information about MegaTransfer stages please refer to
+     * MegaTransferListener::onTransferUpdate documentation.
+     *
+     * @param localPath   Local path of the file or folder to upload.
+     * @param parent      Parent node where the file/folder will be created in the MEGA account.
+     * @param cancelToken MegaCancelToken used to cancel the upload process safely (required for
+     *                    safe cancellation). App retains ownership and must keep it alive as described above.
+     * @param options     Optional upload customization parameters.
+     * @param listener    Optional MegaTransferListener to track this transfer. The app retains the
+     *                    ownership of the object. It can be deleted after the call returns.
+     *
+     * NOTE In case we find a node in cloud drive with the same content but a different mtime
+     * than the file to be uploaded, this function will try to update it's mtime instead of
+     * starting a new file upload. If setting the mtime fails, the transfer will fail with
+     * API_EWRITE.
      */
     fun startUpload(
         localPath: String,
-        parentNode: MegaNode,
-        fileName: String?,
-        modificationTime: Long?,
-        appData: String?,
-        isSourceTemporary: Boolean,
-        shouldStartFirst: Boolean,
+        parent: MegaNode,
         cancelToken: MegaCancelToken?,
+        options: MegaUploadOptions,
         listener: MegaTransferListenerInterface,
     )
 
@@ -520,7 +616,7 @@ interface MegaApiGateway {
 
     /**
      * Ascertain if the node is marked as sensitive or a descendent of such
-     * <p>
+     *
      * see MegaNode::isMarkedSensitive to see if the node is sensitive
      *
      * @param node node to inspect
@@ -652,7 +748,7 @@ interface MegaApiGateway {
 
     /**
      * Retry all pending requests.
-     * <p>
+     *
      * When requests fails they wait some time before being retried. That delay grows exponentially if the request
      * fails again. For this reason, and since this request is very lightweight, it's recommended to call it with
      * the default parameters on every user interaction with the application. This will prevent very big delays
@@ -941,11 +1037,11 @@ interface MegaApiGateway {
 
     /**
      * Move a transfer to the top of the transfer queue
-     * <p>
+     *
      * If the transfer is successfully moved, onTransferUpdate will be called
      * for the corresponding listeners of the moved transfer and the new priority
      * of the transfer will be available using MegaTransfer::getPriority
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
@@ -959,11 +1055,11 @@ interface MegaApiGateway {
 
     /**
      * Move a transfer to the top of the transfer queue
-     * <p>
+     *
      * If the transfer is successfully moved, onTransferUpdate will be called
      * for the corresponding listeners of the moved transfer and the new priority
      * of the transfer will be available using MegaTransfer::getPriority
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
@@ -977,11 +1073,11 @@ interface MegaApiGateway {
 
     /**
      * Move a transfer before another one in the transfer queue
-     * <p>
+     *
      * If the transfer is successfully moved, onTransferUpdate will be called
      * for the corresponding listeners of the moved transfer and the new priority
      * of the transfer will be available using MegaTransfer::getPriority
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
@@ -1703,7 +1799,7 @@ interface MegaApiGateway {
 
     /**
      * Reset the verified phone number for the account logged in.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_RESET_SMS_VERIFIED_NUMBER
      * If there's no verified phone number associated for the account logged in, the error code
      * provided in onRequestFinish is MegaError::API_ENOENT.
@@ -1888,7 +1984,7 @@ interface MegaApiGateway {
 
     /**
      * Submit a purchase receipt for verification
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_SUBMIT_PURCHASE_RECEIPT
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getNumber - Returns the payment gateway
@@ -1925,15 +2021,15 @@ interface MegaApiGateway {
 
     /**
      * Gets My chat files target folder.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_MY_CHAT_FILES_FOLDER
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getNodehandle - Returns the handle of the node where My Chat Files are stored
-     * <p>
+     *
      * If the folder is not set, the request will fail with the error code MegaError::API_ENOENT.
      *
      * @param listener MegaRequestListener to track this request
@@ -1942,17 +2038,17 @@ interface MegaApiGateway {
 
     /**
      * Check if file versioning is enabled or disabled
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
-     * <p>
+     *
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getText - "1" for disable, "0" for enable
      * - MegaRequest::getFlag - True if disabled, false if enabled
-     * <p>
+     *
      * If the option has never been set, the error code will be MegaError::API_ENOENT.
      * In that case, file versioning is enabled by default and MegaRequest::getFlag returns false.
      *
@@ -1962,12 +2058,12 @@ interface MegaApiGateway {
 
     /**
      * Enable or disable file versioning
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
-     * <p>
+     *
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the value MegaApi::USER_ATTR_DISABLE_VERSIONS
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish:
      * - MegaRequest::getText - "1" for disable, "0" for enable
      *
@@ -2059,15 +2155,15 @@ interface MegaApiGateway {
 
     /**
      * Check if the master key has been exported
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_PWD_REMINDER
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getAccess - Returns true if the master key has been exported
-     * <p>
+     *
      * If the corresponding user attribute is not set yet, the request will fail with the
      * error code MegaError::API_ENOENT.
      * @param listener MegaRequestListener to track this request
@@ -2083,7 +2179,7 @@ interface MegaApiGateway {
     /**
      * Enable multi-factor authentication for the account
      * The MegaApi object must be logged into an account to successfully use this function.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_MULTI_FACTOR_AUTH_SET
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getFlag - Returns true
@@ -2200,11 +2296,11 @@ interface MegaApiGateway {
 
     /**
      * Get information about a recovery link created by MegaApi::resetPassword.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_QUERY_RECOVERY_LINK
      * Valid data in the MegaRequest object received on all callbacks:
      * - MegaRequest::getLink - Returns the recovery link
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getEmail - Return the email associated with the link
@@ -2326,7 +2422,7 @@ interface MegaApiGateway {
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getEmail - Returns the first parameter
      * - MegaRequest::getPassword - Returns the second parameter
-     * <p>
+     *
      * If the email/password aren't valid the error code provided in onRequestFinish is
      * MegaError::API_ENOENT.
      *
@@ -2483,7 +2579,7 @@ interface MegaApiGateway {
 
     /**
      * Remove a contact to the MEGA account
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_REMOVE_CONTACT
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getEmail - Returns the email of the contact
@@ -2503,10 +2599,10 @@ interface MegaApiGateway {
      * @param lastNode Last node handle to be synced
      * @param listener MegaRequestListener to track this request
      *                 Send heartbeat associated with an existing backup
-     *                 <p>
+     *                
      *                 The client should call this method regularly for every registered backup, in order to
      *                 inform about the status of the backup.
-     *                 <p>
+     *                
      *                 Progress, last timestamp and last node are not always meaningful (ie. when the Camera
      *                 Uploads starts a new batch, there isn't a last node, or when the CU up to date and
      *                 inactive for long time, the progress doesn't make sense). In consequence, these parameters
@@ -2514,7 +2610,7 @@ interface MegaApiGateway {
      *                 - lastNode = INVALID_HANDLE
      *                 - lastTs = -1
      *                 - progress = -1
-     *                 <p>
+     *                
      *                 The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT_HEART_BEAT
      *                 Valid data in the MegaRequest object received on callbacks:
      *                 - MegaRequest::getParentHandle - Returns the backupId
@@ -2539,12 +2635,12 @@ interface MegaApiGateway {
      * @param subState    backup subState
      * @param listener    MegaRequestListener to track this request
      *                    Update the information about a registered backup for Backup Centre
-     *                    <p>
+     *                   
      *                    Possible types of backups:
      *                    BACKUP_TYPE_INVALID = -1,
      *                    BACKUP_TYPE_CAMERA_UPLOADS = 3,
      *                    BACKUP_TYPE_MEDIA_UPLOADS = 4,   // Android has a secondary CU
-     *                    <p>
+     *                   
      *                    Params that keep the same value are passed with invalid value to avoid to send to the server
      *                    Invalid values:
      *                    - type: BACKUP_TYPE_INVALID
@@ -2554,9 +2650,9 @@ interface MegaApiGateway {
      *                    - state: -1
      *                    - subState: -1
      *                    - extraData: nullptr
-     *                    <p>
+     *                   
      *                    If you want to update the backup name, use \c MegaApi::setBackupName.
-     *                    <p>
+     *                   
      *                    The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT
      *                    Valid data in the MegaRequest object received on callbacks:
      *                    - MegaRequest::getParentHandle - Returns the backupId
@@ -2575,10 +2671,10 @@ interface MegaApiGateway {
 
     /**
      * Set the GPS coordinates of image files as a node attribute.
-     * <p>
+     *
      * To remove the existing coordinates, set both the latitude and longitude to
      * the value MegaNode::INVALID_COORDINATE.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_NODE
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getNodeHandle - Returns the handle of the node that receive the attribute
@@ -2586,7 +2682,7 @@ interface MegaApiGateway {
      * - MegaRequest::getParamType - Returns MegaApi::NODE_ATTR_COORDINATES
      * - MegaRequest::getNumDetails - Returns the longitude, scaled to integer in the range of [0, 2^24]
      * - MegaRequest::getTransferTag() - Returns the latitude, scaled to integer in the range of [0, 2^24)
-     * <p>
+     *
      * If the MEGA account is a business account and it's status is expired, onRequestFinish will
      * be called with the error code MegaError::API_EBUSINESSPASTDUE.
      *
@@ -2645,19 +2741,19 @@ interface MegaApiGateway {
      * @param subState    subState
      * @param listener    MegaRequestListener to track this request
      *                    Registers a backup to display in Backup Centre
-     *                    <p>
+     *                   
      *                    Apps should register backups, like CameraUploads, in order to be listed in the
      *                    BackupCentre. The client should send heartbeats to indicate the progress of the
      *                    backup (see \c MegaApi::sendBackupHeartbeats).
-     *                    <p>
+     *                   
      *                    Possible types of backups:
      *                    BACKUP_TYPE_CAMERA_UPLOADS = 3,
      *                    BACKUP_TYPE_MEDIA_UPLOADS = 4,   // Android has a secondary CU
-     *                    <p>
+     *                   
      *                    Note that the backup name is not registered in the API as part of the data of this
      *                    backup. It will be stored in a user's attribute after this request finished. For
      *                    more information, see \c MegaApi::setBackupName and MegaApi::getBackupName.
-     *                    <p>
+     *                   
      *                    The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT
      *                    Valid data in the MegaRequest object received on callbacks:
      *                    - MegaRequest::getParentHandle - Returns the backupId
@@ -2680,10 +2776,10 @@ interface MegaApiGateway {
      * @param backupId backup id identifying the backup to be removed
      * @param listener MegaRequestListener to track this request
      *                 Unregister a backup already registered for the Backup Centre
-     *                 <p>
+     *                
      *                 This method allows to remove a backup from the list of backups displayed in the
      *                 Backup Centre. @see \c MegaApi::setBackup.
-     *                 <p>
+     *                
      *                 The associated request type with this request is MegaRequest::TYPE_BACKUP_REMOVE
      *                 Valid data in the MegaRequest object received on callbacks:
      *                 - MegaRequest::getParentHandle - Returns the backupId
@@ -2750,13 +2846,13 @@ interface MegaApiGateway {
 
     /**
      * Returns the name previously set for a device
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_DEVICE_NAMES
      * - MegaRequest::getText - Returns passed device id (or the value returned by getDeviceId()
      * if deviceId was initially passed as null).
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getName - Returns device name.
@@ -3131,7 +3227,7 @@ interface MegaApiGateway {
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_GEOLOCATION
-     * <p>
+     *
      * Sending a Geolocation message is enabled if the MegaRequest object, received in onRequestFinish,
      * has error code MegaError::API_OK. In other cases, send geolocation messages is not enabled and
      * the application has to answer before send a message of this type.
@@ -3161,9 +3257,9 @@ interface MegaApiGateway {
 
     /**
      * Fetch miscellaneous flags when not logged in
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_MISC_FLAGS.
-     * <p>
+     *
      * When onRequestFinish is called with MegaError::API_OK, the miscellaneous flags are available.
      * If you are logged in into an account, the error code provided in onRequestFinish is
      * MegaError::API_EACCESS.
@@ -3204,12 +3300,12 @@ interface MegaApiGateway {
 
     /**
      * Check if the app should show the rich link warning dialog to the user
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
      * - MegaRequest::getNumDetails - Returns one
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getFlag - Returns true if it is necessary to show the rich link warning
@@ -3217,7 +3313,7 @@ interface MegaApiGateway {
      * modify the message with a rich link. If number is bigger than three, the extra option "Never"
      * must be added to the warning dialog.
      * - MegaRequest::getMegaStringMap - Returns the raw content of the attribute: [<key><value>]*
-     * <p>
+     *
      * If the corresponding user attribute is not set yet, the request will fail with the
      * error code MegaError::API_ENOENT, but the value of MegaRequest::getFlag will still be valid (true).
      *
@@ -3227,17 +3323,17 @@ interface MegaApiGateway {
 
     /**
      * Check if rich previews are automatically generated
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RICH_PREVIEWS
      * - MegaRequest::getNumDetails - Returns zero
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getFlag - Returns true if generation of rich previews is enabled
      * - MegaRequest::getMegaStringMap - Returns the raw content of the attribute: [<key><value>]*
-     * <p>
+     *
      * If the corresponding user attribute is not set yet, the request will fail with the
      * error code MegaError::API_ENOENT, but the value of MegaRequest::getFlag will still be valid (false).
      *
@@ -3640,7 +3736,7 @@ interface MegaApiGateway {
 
     /**
      * Initialize the creation of a new MEGA account, with firstname and lastname
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getEmail - Returns the email for the account
@@ -3648,15 +3744,15 @@ interface MegaApiGateway {
      * - MegaRequest::getName - Returns the firstname of the user
      * - MegaRequest::getText - Returns the lastname of the user
      * - MegaRequest::getParamType - Returns the value MegaApi::CREATE_ACCOUNT
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getSessionKey - Returns the session id to resume the process
-     * <p>
+     *
      * If this request succeeds, a new ephemeral account will be created for the new user
      * and a confirmation email will be sent to the specified email address. The app may
      * resume the create-account process by using MegaApi::resumeCreateAccount.
-     * <p>
+     *
      * If an account with the same email already exists, you will get the error code
      * MegaError::API_EEXIST in onRequestFinish
      *
@@ -3708,9 +3804,9 @@ interface MegaApiGateway {
 
     /**
      * Remove all versions from the MEGA account
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_REMOVE_VERSIONS
-     * <p>
+     *
      * When the request finishes, file versions might not be deleted yet.
      * Deletions are notified using onNodesUpdate callbacks.
      *
@@ -3744,10 +3840,10 @@ interface MegaApiGateway {
 
     /**
      * Resume a registration process
-     * <p>
+     *
      * When a user begins the account registration process by calling MegaApi::createAccount,
      * an ephemeral account is created.
-     * <p>
+     *
      * Until the user successfully confirms the signup link sent to the provided email address,
      * you can resume the ephemeral session in order to change the email address, resend the
      * signup link (@see MegaApi::sendSignupLink) and also to receive notifications in case the
@@ -3755,12 +3851,12 @@ interface MegaApiGateway {
      * MegaListener::onAccountUpdate). It is also possible to cancel the registration process by
      * MegaApi::cancelCreateAccount, which invalidates the signup link associated to the ephemeral
      * session (the session will be still valid).
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_CREATE_ACCOUNT.
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getSessionKey - Returns the session id to resume the process
      * - MegaRequest::getParamType - Returns the value MegaApi::RESUME_ACCOUNT
-     * <p>
+     *
      * In case the account is already confirmed, the associated request will fail with
      * error MegaError::API_EARGS.
      *
@@ -3771,14 +3867,14 @@ interface MegaApiGateway {
 
     /**
      * Requests a list of all Smart Banners available for current user.
-     * <p>
+     *
      * The response value is stored as a MegaBannerList.
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_BANNERS
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getMegaBannerList: the list of banners
-     * <p>
+     *
      * On the onRequestFinish error, the error code associated to the MegaError can be:
      * - MegaError::API_EACCESS - If called with no user being logged in.
      * - MegaError::API_EINTERNAL - If the internally used user attribute exists but can't be decoded.
@@ -3797,11 +3893,11 @@ interface MegaApiGateway {
 
     /**
      * Get the number of days for rubbish-bin cleaning scheduler
-     * <p>
+     *
      * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
      * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_RUBBISH_TIME
-     * <p>
+     *
      * Valid data in the MegaRequest object received in onRequestFinish when the error code
      * is MegaError::API_OK:
      * - MegaRequest::getNumber - Returns the days for rubbish-bin cleaning scheduler.
@@ -3829,7 +3925,7 @@ interface MegaApiGateway {
 
     /**
      * Check if server-side Rubbish Bin autopurging is enabled for the current account
-     * <p>
+     *
      * This function will NOT return a valid value until the callback onEvent with
      * type MegaApi::EVENT_MISC_FLAGS_READY is received. You can also rely on the completion of
      * a fetchNodes to check this value, but only when it follows a login with user and password,

@@ -47,9 +47,11 @@ import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
 import mega.privacy.android.data.mapper.transfer.TransferEventMapper
 import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
+import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
@@ -118,6 +120,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
+    private val megaUploadOptionsMapper: MegaUploadOptionsMapper,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -166,17 +169,39 @@ internal class DefaultTransfersRepository @Inject constructor(
         requireNotNull(parentNode)
         val listener = transferListener(channel)
 
-        megaApiGateway.startUpload(
-            localPath = localPath,
-            parentNode = parentNode,
-            fileName = fileName,
-            modificationTime = modificationTime,
-            appData = transferAppDataStringMapper(appData),
-            isSourceTemporary = isSourceTemporary,
-            shouldStartFirst = shouldStartFirst,
-            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
-            listener = listener,
-        )
+        runCatching {
+            megaUploadOptionsMapper(
+                fileName = fileName,
+                mtime = modificationTime,
+                appData = appData,
+                isSourceTemporary = isSourceTemporary,
+                startFirst = shouldStartFirst,
+                //Pending to implement, value by default
+                pitagTrigger = PitagTrigger.NotApplicable,
+            )
+        }.onFailure { Timber.e(it) }.getOrNull()?.let { options ->
+            Timber.d("Using startUpload with MegaUploadOptions")
+            megaApiGateway.startUpload(
+                localPath = localPath,
+                parent = parentNode,
+                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+                options = options,
+                listener = listener,
+            )
+        } ?: run {
+            Timber.d("Using deprecated startUpload as MegaUploadOptions is null")
+            megaApiGateway.startUpload(
+                localPath = localPath,
+                parent = parentNode,
+                fileName = fileName,
+                mtime = modificationTime,
+                appData = transferAppDataStringMapper(appData),
+                isSourceTemporary = isSourceTemporary,
+                startFirst = shouldStartFirst,
+                cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+                listener = listener,
+            )
+        }
         awaitClose()
     }
         .flowOn(ioDispatcher)
