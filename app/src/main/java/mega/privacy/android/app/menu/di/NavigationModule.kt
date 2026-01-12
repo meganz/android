@@ -23,7 +23,7 @@ import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.menu.navigation.TransferItItem
 import mega.privacy.android.app.menu.navigation.TransfersItem
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorHasActiveCallUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavDrawerItem
 
@@ -65,8 +65,8 @@ class NavigationModule {
     @IntKey(55)
     fun provideChatItem(
         getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
-        monitorOngoingCallUseCase: MonitorOngoingCallUseCase,
-    ): NavDrawerItem = ChatItem(getNumUnreadChatsUseCase, monitorOngoingCallUseCase)
+        monitorHasActiveCallUseCase: MonitorHasActiveCallUseCase,
+    ): NavDrawerItem = ChatItem(getNumUnreadChatsUseCase, monitorHasActiveCallUseCase)
 
     @Provides
     @IntoMap

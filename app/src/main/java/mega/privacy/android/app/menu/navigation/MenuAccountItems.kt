@@ -3,7 +3,7 @@ package mega.privacy.android.app.menu.navigation
 import kotlinx.coroutines.flow.combine
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorOngoingCallUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorHasActiveCallUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.DefaultIconBadge
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
@@ -54,16 +54,16 @@ object SharedItemsItem : NavDrawerItem.Account(
 
 class ChatItem(
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
-    monitorOngoingCallUseCase: MonitorOngoingCallUseCase,
+    monitorHasActiveCallUseCase: MonitorHasActiveCallUseCase,
 ) : NavDrawerItem.Account(
     destination = ChatListNavKey(),
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
     badge = combine(
-        monitorOngoingCallUseCase(),
+        monitorHasActiveCallUseCase(),
         getNumUnreadChatsUseCase()
     ) { ongoingCall, unreadChats ->
-        if (ongoingCall != null) {
+        if (ongoingCall) {
             DefaultIconBadge(IconPack.Medium.Thin.Solid.Phone01)
         } else if (unreadChats > 0) {
             DefaultNumberBadge(unreadChats)
