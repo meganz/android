@@ -26,17 +26,18 @@ import mega.privacy.android.app.deeplinks.DeepLinksDialogDestinations
 import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
+import mega.privacy.android.app.presentation.business.BusinessAccountExpiredDialogDestinations
 import mega.privacy.android.app.presentation.contact.link.dialog.ContactLinkDialogDestinations
 import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
+import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogDestinations
 import mega.privacy.android.app.presentation.folderlink.FolderLinkDeepLinkHandler
 import mega.privacy.android.app.presentation.login.LoginDeepLinkHandler
 import mega.privacy.android.app.presentation.login.createaccount.AccountInvitationDeepLinkHandler
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
-import mega.privacy.android.app.presentation.business.BusinessAccountExpiredDialogDestinations
-import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogDestinations
+import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitDialogDestination
 import mega.privacy.android.app.presentation.photos.albums.navigation.AlbumsDeepLinkHandler
 import mega.privacy.android.app.presentation.purchase.PurchaseResultDialogDestinations
 import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
@@ -196,6 +197,7 @@ internal class AppModule {
             PurchaseResultDialogDestinations,
             BusinessAccountExpiredDialogDestinations,
             SecurityUpgradeDialogDestinations,
+            FreePlanParticipantsLimitDialogDestination
         )
 
     @Provides

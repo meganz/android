@@ -14,6 +14,7 @@ import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
+import mega.privacy.android.app.presentation.meeting.navigation.MeetingFeatureDestination
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
@@ -75,4 +76,8 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun providePsaFeatureDestination(): FeatureDestination = PsaFeatureDestinations()
+
+    @Provides
+    @IntoSet
+    fun provideMeetingFeatureDestination(): FeatureDestination = MeetingFeatureDestination
 }

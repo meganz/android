@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,24 +13,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.PrimaryFilledButton
-import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.drawableId
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.mobile.analytics.event.MaxCallDurationReachedModalEvent
 import mega.privacy.mobile.analytics.event.UpgradeToProToGetUnlimitedCallsDialogEvent
 
@@ -36,16 +43,19 @@ import mega.privacy.mobile.analytics.event.UpgradeToProToGetUnlimitedCallsDialog
  * Composable function to show the bottom sheet to upgrade to Pro plan.
  */
 @Composable
-fun UpgradeProPlanBottomSheet(
+fun LegacyUpgradeProPlanBottomSheet(
     modifier: Modifier = Modifier,
-    onUpgradeToProPlan: () -> Unit = {},
     hideSheet: () -> Unit = {},
 ) {
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(UpgradeToProToGetUnlimitedCallsDialogEvent)
     }
 
-    Column(modifier = modifier) {
+    val context = LocalContext.current
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.colors.background)
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -59,36 +69,40 @@ fun UpgradeProPlanBottomSheet(
                     .width(90.dp)
                     .height(90.dp)
                     .semantics { drawableId = R.drawable.ic_rocket }
-                    .testTag(UPGRADE_IMAGE_TEST_TAG)
+                    .testTag(LEGACY_UPGRADE_IMAGE_TEST_TAG)
             )
         }
-        MegaText(
+        Text(
             text = stringResource(id = R.string.meetings_upgrade_pro_plan_title),
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = AppTheme.typography.titleMedium
+            color = MaterialTheme.colors.textColorPrimary,
+            style = MaterialTheme.typography.subtitle1medium
         )
         Spacer(modifier = Modifier.padding(top = 20.dp))
-        MegaText(
+        Text(
             text = stringResource(id = R.string.meetings_upgrade_pro_plan_body),
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = AppTheme.typography.bodySmall
+            color = MaterialTheme.colors.textColorSecondary,
+            style = MaterialTheme.typography.caption,
         )
         Spacer(modifier = Modifier.padding(top = 32.dp))
-        PrimaryFilledButton(
+        RaisedDefaultMegaButton(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .fillMaxWidth(),
-            text = stringResource(R.string.meetings_upgrade_pro_plan_button),
+            textId = R.string.meetings_upgrade_pro_plan_button,
             onClick = {
                 Analytics.tracker.trackEvent(MaxCallDurationReachedModalEvent)
+                context.megaNavigator.openUpgradeAccount(
+                    context = context,
+                )
                 hideSheet()
-                onUpgradeToProPlan()
             }
         )
         Spacer(modifier = Modifier.padding(top = 24.dp))
@@ -104,9 +118,9 @@ fun UpgradeProPlanBottomSheet(
 @CombinedThemePreviews
 @Composable
 private fun UpgradeProPlanBottomSheetPreview() {
-    AndroidThemeForPreviews {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
         UpgradeProPlanBottomSheet()
     }
 }
 
-internal const val UPGRADE_IMAGE_TEST_TAG = "meetings_upgrade_pro_plan:image_rocket"
+private const val LEGACY_UPGRADE_IMAGE_TEST_TAG = "meetings_upgrade_pro_plan:image_rocket"

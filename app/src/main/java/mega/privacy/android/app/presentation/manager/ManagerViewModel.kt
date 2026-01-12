@@ -449,7 +449,7 @@ class ManagerViewModel @Inject constructor(
         monitorCallInChatJob = viewModelScope.launch {
             monitorChatCallUpdatesUseCase()
                 .collect {
-                    it.apply {
+                    it.run {
                         when (status) {
                             ChatCallStatus.TerminatingUserParticipation, ChatCallStatus.GenericNotification ->
                                 if (termCode == ChatCallTermCodeType.CallUsersLimit

@@ -188,7 +188,7 @@ import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
-import mega.privacy.android.app.presentation.meeting.chat.view.sheet.UpgradeProPlanBottomSheet
+import mega.privacy.android.app.presentation.meeting.chat.view.sheet.LegacyUpgradeProPlanBottomSheet
 import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.DenyEntryToCallDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.FreePlanLimitParticipantsDialog
@@ -1138,7 +1138,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                             sheetBody = {
                                 when {
                                     isUpgradeToProPlanShown -> {
-                                        UpgradeProPlanBottomSheet {
+                                        LegacyUpgradeProPlanBottomSheet {
                                             coroutineScope.launch {
                                                 upgradeToProPlanBottomSheetState.hide()
                                             }

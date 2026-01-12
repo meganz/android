@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
@@ -109,6 +110,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun providePsaInitialiser(initialiser: PsaInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideMeetingEventsPostLoginInitialiser(initialiser: MeetingEventsPostLoginInitialiser): PostLoginInitialiser =
         initialiser
 
 }
