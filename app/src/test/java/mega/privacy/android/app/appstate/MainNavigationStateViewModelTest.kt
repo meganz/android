@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -338,6 +339,85 @@ class MainNavigationStateViewModelTest {
                     cancelAndIgnoreRemainingEvents()
                 }
         }
+
+    @Test
+    fun `test that NavigationItems update correctly when network connectivity changes`() = runTest {
+        stubEmptyStartScreenPreference()
+        stubAllEnabledFlaggedItems()
+
+        val onlineNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(TestMainNavItemNavKey)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(1))
+            on { availableOffline }.thenReturn(false)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn(android.R.string.ok)
+            on { icon }.thenReturn(Icons.Default.Home)
+            on { badge }.thenReturn(null)
+        }
+
+        val offlineNavItem = mock<MainNavItem> {
+            on { destination }.thenReturn(TestMainNavItemNavKey)
+            on { preferredSlot }.thenReturn(PreferredSlot.Ordered(2))
+            on { availableOffline }.thenReturn(true)
+            on { analyticsEventIdentifier }.thenReturn(mock())
+            on { label }.thenReturn(android.R.string.cancel)
+            on { icon }.thenReturn(Icons.Default.Settings)
+            on { badge }.thenReturn(null)
+        }
+
+        val mainDestinations = setOf(onlineNavItem, offlineNavItem)
+
+        // Use MutableStateFlow to better match StateFlow behavior
+        // Start with true, then we can change it during the test
+        val connectivityFlow = MutableStateFlow(true)
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(connectivityFlow)
+        }
+
+        initUnderTest(mainDestinations)
+
+        underTest.state
+            .filterIsInstance<MainNavState.Data>()
+            .test {
+                // Initial state should be connected
+                val connectedState = awaitItem()
+                // Both items should be enabled when connected
+                assertThat(connectedState.mainNavItems.size).isEqualTo(2)
+                assertThat(connectedState.mainNavItems.all { it.isEnabled }).isTrue()
+                assertThat(connectedState.isConnected).isTrue()
+
+                // Change connectivity to false
+                connectivityFlow.value = false
+                awaitItem()
+                val disconnectedState = awaitItem()
+                // Verify isConnected is false
+                assertThat(disconnectedState.isConnected).isFalse()
+                // Only offline-available item should be enabled when disconnected
+                // Find items by their properties to ensure we get the right ones
+                val onlineItem = disconnectedState.mainNavItems.firstOrNull {
+                    it.label == onlineNavItem.label && it.preferredSlot == onlineNavItem.preferredSlot
+                }
+                val offlineItem = disconnectedState.mainNavItems.firstOrNull {
+                    it.label == offlineNavItem.label && it.preferredSlot == offlineNavItem.preferredSlot
+                }
+                assertThat(onlineItem).isNotNull()
+                assertThat(offlineItem).isNotNull()
+                // Verify the online item (availableOffline = false) is disabled when disconnected
+                assertThat(onlineItem?.isEnabled).isFalse()
+                // Verify the offline item (availableOffline = true) is still enabled when disconnected
+                assertThat(offlineItem?.isEnabled).isTrue()
+
+                // Change connectivity back to true
+                connectivityFlow.value = true
+                awaitItem()
+                val reconnectedState = awaitItem()
+                // Both items should be enabled again when reconnected
+                assertThat(reconnectedState.mainNavItems.all { it.isEnabled }).isTrue()
+                assertThat(reconnectedState.isConnected).isTrue()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
 
 
     private fun initUnderTest(

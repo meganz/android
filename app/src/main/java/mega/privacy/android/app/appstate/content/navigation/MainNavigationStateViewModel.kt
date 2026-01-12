@@ -7,7 +7,6 @@ import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -16,7 +15,7 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import mega.privacy.android.app.appstate.content.mapper.ScreenPreferenceDestinationMapper
 import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
@@ -34,8 +33,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainNavigationStateViewModel @Inject constructor(
-    private val mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
-    private val getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
+    mainDestinations: Set<@JvmSuppressWildcards MainNavItem>,
+    getEnabledFlaggedItemsUseCase: GetEnabledFlaggedItemsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorStartScreenPreferenceDestinationUseCase: MonitorStartScreenPreferenceDestinationUseCase,
     private val screenPreferenceDestinationMapper: ScreenPreferenceDestinationMapper,
@@ -45,10 +44,10 @@ class MainNavigationStateViewModel @Inject constructor(
 
     val state: StateFlow<MainNavState> by lazy {
         combine(
-            filteredMainNavItemsFlow()
-                .asNavigationItems()
+            isConnected,
+            getNavigationItems()
                 .log("Navigation Items"),
-            filteredMainNavItemsFlow()
+            filteredMainNavItemsFlow
                 .map { itemSet -> itemSet.map { it.screen }.toSet().toImmutableSet() }
                 .log("Main Nav Screens"),
             monitorStartScreenPreferenceDestinationUseCase()
@@ -56,11 +55,12 @@ class MainNavigationStateViewModel @Inject constructor(
                     screenPreferenceDestinationMapper(it) ?: defaultStartScreen
                 }.take(1)
                 .log("Start Screen Preference Destination"),
-        ) { navigationItems, mainScreens, startScreenPreferenceDestination ->
+        ) { isConnected, navigationItems, mainScreens, startScreenPreferenceDestination ->
             MainNavState.Data(
                 mainNavItems = navigationItems,
                 mainNavScreens = mainScreens,
-                initialDestination = startScreenPreferenceDestination
+                initialDestination = startScreenPreferenceDestination,
+                isConnected = isConnected
             )
         }.catch { Timber.e(it, "Error in NavigationItemStateViewModel") }
             .asUiStateFlow(
@@ -69,20 +69,24 @@ class MainNavigationStateViewModel @Inject constructor(
             )
     }
 
-    private fun filteredMainNavItemsFlow(): SharedFlow<Set<@JvmSuppressWildcards MainNavItem>> =
+    private val isConnected: StateFlow<Boolean> =
+        getConnectivityStateOrDefault()
+            .stateIn(viewModelScope, SharingStarted.Lazily, true)
+
+    private val filteredMainNavItemsFlow =
         getEnabledFlaggedItemsUseCase(mainDestinations)
-            .shareIn(viewModelScope, started = SharingStarted.WhileSubscribed(200), replay = 1)
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptySet())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun Flow<Set<MainNavItem>>.asNavigationItems(): Flow<ImmutableSet<NavigationItem>> {
-        return combine(
-            getConnectivityStateOrDefault(),
-            this.map { mainNavItemsSet ->
-                mainNavItemsSet.map { (it.badge ?: flowOf(null)) to it }
-            }
-        ) { connected: Boolean, badgeFlowPair: List<Pair<Flow<MainNavItemBadge?>, MainNavItem>> ->
-            badgeFlowPair.map { (badgeFlow, mainNavItem) ->
-                badgeFlow.map { badge ->
+    private fun getNavigationItems(): Flow<ImmutableSet<NavigationItem>> {
+        return filteredMainNavItemsFlow.flatMapConcat { items ->
+            val badgeFlowPair: List<Pair<Flow<MainNavItemBadge?>, MainNavItem>> =
+                items.map { (it.badge ?: flowOf(null)) to it }
+            val navigationItemFlows = badgeFlowPair.map { (badgeFlow, mainNavItem) ->
+                combine(
+                    isConnected,
+                    badgeFlow
+                ) { connected: Boolean, badge: MainNavItemBadge? ->
                     mapToNavigationItem(
                         mainNavItem = mainNavItem,
                         connected = connected,
@@ -90,8 +94,7 @@ class MainNavigationStateViewModel @Inject constructor(
                     )
                 }
             }
-        }.flatMapConcat { flowsList ->
-            combine(flowsList) { it.toSet().toImmutableSet() }
+            combine(navigationItemFlows) { it.toSet().toImmutableSet() }
         }
     }
 

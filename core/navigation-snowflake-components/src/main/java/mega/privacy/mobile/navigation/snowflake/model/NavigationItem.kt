@@ -25,7 +25,7 @@ data class NavigationItem(
     val badge: MainNavItemBadge?,
     val analyticsEventIdentifier: NavigationEventIdentifier?,
     val preferredSlot: PreferredSlot,
-    val testTag: String = "main_navigation:navigation_item_${destination::class.simpleName}"
-){
+    val testTag: String = "main_navigation:navigation_item_${destination::class.simpleName}",
+) {
     fun getIcon(isSelected: Boolean) = selectedIcon?.takeIf { isSelected } ?: icon
 }

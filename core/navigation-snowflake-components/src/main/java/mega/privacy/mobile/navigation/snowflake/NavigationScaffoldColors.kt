@@ -22,21 +22,21 @@ internal object NavigationScaffoldColors {
     fun itemColors() = NavigationSuiteItemColors(
         navigationBarItemColors = NavigationBarItemColors(
             selectedIconColor = DSTokens.colors.icon.brand,
-            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedIconColor = DSTokens.colors.icon.secondary,
             selectedIndicatorColor = Color.Transparent, // Transparent background
             selectedTextColor = DSTokens.colors.icon.brand,
-            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedTextColor = DSTokens.colors.text.secondary,
+            disabledIconColor = DSTokens.colors.icon.disabled,
+            disabledTextColor = DSTokens.colors.text.disabled,
         ),
         navigationRailItemColors = NavigationRailItemColors(
             selectedIconColor = DSTokens.colors.icon.brand,
-            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedIconColor = DSTokens.colors.icon.secondary,
             selectedIndicatorColor = Color.Transparent, // Transparent background
             selectedTextColor = DSTokens.colors.icon.brand,
-            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            disabledTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            unselectedTextColor = DSTokens.colors.text.secondary,
+            disabledIconColor = DSTokens.colors.icon.disabled,
+            disabledTextColor = DSTokens.colors.text.disabled,
         ),
         navigationDrawerItemColors = NavigationDrawerItemDefaults.colors(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,

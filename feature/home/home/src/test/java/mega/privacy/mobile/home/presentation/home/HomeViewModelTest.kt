@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
@@ -32,12 +34,16 @@ class HomeViewModelTest {
     )
     private val monitorHomeWidgetConfigurationUseCase =
         mock<MonitorHomeWidgetConfigurationUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
 
     @BeforeEach
     fun setUp() {
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            hasOfflineFilesUseCase = hasOfflineFilesUseCase,
         )
     }
 
@@ -47,11 +53,14 @@ class HomeViewModelTest {
             dynamicWidgetsProvider,
             staticWidgetsProvider,
             monitorHomeWidgetConfigurationUseCase,
+            monitorConnectivityUseCase,
+            hasOfflineFilesUseCase,
         )
     }
 
     @Test
     fun `test that widgets are displayed if no configurations exist`() = runTest {
+        stubConnectivity(connected = true)
         monitorHomeWidgetConfigurationUseCase.stub {
             on { invoke() } doReturn flow {
                 emit(emptyList())
@@ -81,6 +90,7 @@ class HomeViewModelTest {
 
     @Test
     fun `test that configuration overrides displaying widgets`() = runTest {
+        stubConnectivity(connected = true)
         val staticIdentifier = "static1"
         val dynamicIdentifier = "dynamic1"
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -125,6 +135,7 @@ class HomeViewModelTest {
 
     @Test
     fun `test that configuration items override default order`() = runTest {
+        stubConnectivity(connected = true)
         val staticIdentifier = "static1"
         val dynamicIdentifier = "dynamic1"
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -166,6 +177,110 @@ class HomeViewModelTest {
             assertThat(actual.widgets).hasSize(2)
             assertThat(actual.widgets[0].identifier).isEqualTo(dynamicIdentifier)
             assertThat(actual.widgets[1].identifier).isEqualTo(staticIdentifier)
+        }
+    }
+
+    @Test
+    fun `test that offline state is returned when disconnected and has offline files`() = runTest {
+        stubConnectivity(connected = false)
+        stubHasOfflineFiles(hasOfflineFiles = true)
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            // Find the Offline state (may skip Loading if flows emit immediately)
+            val actual = awaitItem().let { state ->
+                if (state is HomeUiState.Offline) {
+                    state
+                } else {
+                    // If first item was Loading, await the next one
+                    awaitItem() as HomeUiState.Offline
+                }
+            }
+            assertThat(actual.hasOfflineFiles).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that offline state is returned when disconnected and has no offline files`() = runTest {
+        stubConnectivity(connected = false)
+        stubHasOfflineFiles(hasOfflineFiles = false)
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            // Find the Offline state (may skip Loading if flows emit immediately)
+            val actual = awaitItem().let { state ->
+                if (state is HomeUiState.Offline) {
+                    state
+                } else {
+                    // If first item was Loading, await the next one
+                    awaitItem() as HomeUiState.Offline
+                }
+            }
+            assertThat(actual.hasOfflineFiles).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that offline state defaults to false when hasOfflineFilesUseCase throws exception`() = runTest {
+        stubConnectivity(connected = false)
+        hasOfflineFilesUseCase.stub {
+            onBlocking { invoke() }.thenThrow(RuntimeException("Test exception"))
+        }
+        stubWidgetProviders()
+        monitorHomeWidgetConfigurationUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(emptyList())
+                awaitCancellation()
+            }
+        }
+
+        underTest.state.test {
+            // Find the Offline state (may skip Loading if flows emit immediately)
+            val actual = awaitItem().let { state ->
+                if (state is HomeUiState.Offline) {
+                    state
+                } else {
+                    // If first item was Loading, await the next one
+                    awaitItem() as HomeUiState.Offline
+                }
+            }
+            assertThat(actual.hasOfflineFiles).isFalse()
+        }
+    }
+
+    private fun stubConnectivity(connected: Boolean = true) {
+        monitorConnectivityUseCase.stub {
+            on { invoke() } doReturn flow {
+                emit(connected)
+                awaitCancellation()
+            }
+        }
+    }
+
+    private fun stubHasOfflineFiles(hasOfflineFiles: Boolean) {
+        hasOfflineFilesUseCase.stub {
+            onBlocking { invoke() } doReturn hasOfflineFiles
+        }
+    }
+
+    private fun stubWidgetProviders() {
+        dynamicWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn emptySet()
+        }
+        staticWidgetsProvider.stub {
+            onBlocking { getWidgets() } doReturn emptySet()
         }
     }
 

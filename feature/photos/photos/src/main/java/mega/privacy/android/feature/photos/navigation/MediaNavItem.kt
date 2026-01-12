@@ -35,7 +35,7 @@ class MediaNavItem : MainNavItem {
     override val badge: Flow<MainNavItemBadge?>? = null
     override val label: Int = sharedR.string.media_feature_title
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(2)
-    override val availableOffline: Boolean = true
+    override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
         PhotosBottomNavigationItemEvent
 }

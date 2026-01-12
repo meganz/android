@@ -151,12 +151,14 @@ internal fun HomeScreen(
             )
         },
         floatingActionButton = {
-            AddContentFab(
-                visible = true,
-                onClick = {
-                    navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
-                }
-            )
+            if (state !is HomeUiState.Offline) {
+                AddContentFab(
+                    visible = true,
+                    onClick = {
+                        navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
+                    }
+                )
+            }
         },
         contentWindowInsets = WindowInsets.systemBarsIgnoringBottom,
     ) { paddingValues ->
@@ -173,6 +175,18 @@ internal fun HomeScreen(
                         it.content(Modifier, navigationHandler, transferHandler)
                     }
                 }
+            }
+
+            is HomeUiState.Offline -> {
+                HomeOfflineScreen(
+                    hasOfflineFiles = state.hasOfflineFiles,
+                    onViewOfflineFilesClick = {
+                        navigationHandler.navigate(
+                            mega.privacy.android.navigation.destination.OfflineNavKey()
+                        )
+                    },
+                    modifier = Modifier.padding(paddingValues.excludingBottomPadding()),
+                )
             }
 
             is HomeUiState.Loading -> {

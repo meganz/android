@@ -37,6 +37,7 @@ import mega.privacy.android.navigation.contract.transition.OrientationAwareSlide
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.mobile.home.presentation.home.Home
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,6 +87,12 @@ fun HomeScreens(
                 key.root?.let {
                     homeScreenStacks.switchTopLevel(it)
                     key.destinations?.let { destinations -> homeScreenStacks.addAll(destinations) }
+                }
+            }
+
+            LaunchedEffect(currentState.isConnected) {
+                if (!currentState.isConnected) {
+                    homeScreenStacks.switchTopLevel(Home)
                 }
             }
 

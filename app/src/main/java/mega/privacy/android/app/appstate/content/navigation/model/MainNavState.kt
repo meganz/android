@@ -18,5 +18,6 @@ sealed interface MainNavState {
         val mainNavItems: ImmutableSet<NavigationItem>,
         val mainNavScreens: ImmutableSet<EntryProviderScope<NavKey>.(navigationHandler: NavigationHandler, NavigationUiController, TransferHandler) -> Unit>,
         val initialDestination: MainNavItemNavKey,
+        val isConnected: Boolean
     ) : MainNavState
 }

@@ -8,4 +8,8 @@ sealed interface HomeUiState {
     data class Data(
         val widgets: List<HomeWidgetItem>,
     ) : HomeUiState
+
+    data class Offline(
+        val hasOfflineFiles: Boolean,
+    ) : HomeUiState
 }
