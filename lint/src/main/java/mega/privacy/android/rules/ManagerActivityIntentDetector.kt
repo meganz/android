@@ -1,7 +1,7 @@
 package mega.privacy.android.rules
 
 import com.android.tools.lint.client.api.UElementHandler
-import com.android.tools.lint.detector.api.Category.Companion.CORRECTNESS
+import com.android.tools.lint.detector.api.Category.Companion.CUSTOM_LINT_CHECKS
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Implementation
 import com.android.tools.lint.detector.api.Issue
@@ -54,7 +54,7 @@ internal class ManagerActivityIntentDetector : Detector(), Detector.UastScanner 
             id = ID,
             briefDescription = DESCRIPTION,
             explanation = EXPLANATION,
-            category = CORRECTNESS,
+            category = CUSTOM_LINT_CHECKS,
             priority = 7,
             severity = Severity.WARNING,
             Implementation(ManagerActivityIntentDetector::class.java, Scope.JAVA_FILE_SCOPE)

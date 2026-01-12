@@ -11,6 +11,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -29,8 +31,10 @@ import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -67,10 +71,12 @@ internal class FileExplorerViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(kotlinx.coroutines.flow.emptyFlow())
     }
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val testDispatcher = StandardTestDispatcher()
 
     private fun initViewModel() {
         underTest = FileExplorerViewModel(
-            ioDispatcher = StandardTestDispatcher(),
+            ioDispatcher = testDispatcher,
             monitorStorageStateEventUseCase = mock(),
             getCopyLatestTargetPathUseCase = getCopyLatestTargetPathUseCase,
             getMoveLatestTargetPathUseCase = getMoveLatestTargetPathUseCase,
@@ -84,6 +90,7 @@ internal class FileExplorerViewModelTest {
             savedStateHandle = savedStateHandle,
             getFolderTypeByHandleUseCase = getFolderTypeByHandleUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            getNodeLocationUseCase = getNodeLocationUseCase,
         )
     }
 
@@ -99,7 +106,8 @@ internal class FileExplorerViewModelTest {
             sendChatAttachmentsUseCase,
             getDocumentsFromSharedUrisUseCase,
             getFolderTypeByHandleUseCase,
-            monitorNodeUpdatesUseCase
+            monitorNodeUpdatesUseCase,
+            getNodeLocationUseCase
         )
         // Set default behavior for monitorNodeUpdatesUseCase
         whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
@@ -473,4 +481,43 @@ internal class FileExplorerViewModelTest {
         underTest.consumeNodeUpdate()
         assertThat(underTest.uiState.value.nodeUpdatedEvent).isEqualTo(consumed)
     }
+
+    @Test
+    fun `test that navigateToCloud event is triggered and consumed`() = runTest {
+        val handle = 123L
+        val message = "Test message"
+        val nodeId = NodeId(handle)
+        val mockNode = mock<TypedFileNode> {
+            on { id } doReturn nodeId
+            on { parentId } doReturn NodeId(456L)
+        }
+        val ancestorIds = listOf(NodeId(200L), NodeId(300L))
+        val nodeLocation = NodeLocation(
+            node = mockNode,
+            nodeSourceType = mega.privacy.android.domain.entity.node.NodeSourceType.CLOUD_DRIVE,
+            ancestorIds = ancestorIds
+        )
+        val folderDestinations = ancestorIds.plus(nodeId).map { folderId ->
+            CloudDriveNavKey(nodeHandle = folderId.longValue)
+        }
+
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(mockNode)
+        whenever(getNodeLocationUseCase(mockNode)).thenReturn(nodeLocation)
+
+        underTest.getFolderDestinations(handle, message)
+
+        assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(
+            triggered(
+                FileExplorerUiState.NavigateToCloudEvent(
+                    nodeId,
+                    folderDestinations,
+                    message
+                )
+            )
+        )
+        underTest.consumeFolderDestinations()
+
+        assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(consumed())
+    }
+
 }

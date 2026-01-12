@@ -1,6 +1,7 @@
 package mega.privacy.android.app.main
 
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -26,12 +27,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import de.palm.composestateevents.EventEffect
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -76,6 +77,7 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
+import mega.privacy.android.app.menu.presentation.MenuHomeScreen
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment.Companion.newInstance
 import mega.privacy.android.app.presentation.documentscanner.dialogs.DiscardScanUploadingWarningDialog
@@ -119,7 +121,12 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.file.CheckFileNameCollisionsUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodeUseCase
-import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
@@ -182,6 +189,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     @Inject
     @LoginMutex
@@ -259,7 +269,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     ) { result ->
         viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = false)
         backToCloud(
-            if (result != null) parentHandle else INVALID_HANDLE,
+            if (result == null) parentHandle else INVALID_HANDLE,
             result
         )
     }
@@ -339,13 +349,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 if (totalAttached + totalErrors == pendingToAttach) {
                     finishFileExplorer()
                     if (totalErrors == 0 || totalAttached > 0) {
-                        val intent = Intent(this, ManagerActivity::class.java)
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        intent.action = Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE
-                        if (chatListItems.size == 1) {
-                            intent.putExtra(Constants.CHAT_ID, chatListItems[0].chatId)
-                        }
-                        startActivity(intent)
+                        navigateToChat()
                     } else {
                         showSnackbar(getString(R.string.files_send_to_chat_error))
                     }
@@ -659,6 +663,17 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     onConsumed = viewModel::consumeNodeUpdate
                 ) {
                     handleNodeUpdates()
+                }
+
+                EventEffect(
+                    event = state.navigateToCloud,
+                    onConsumed = viewModel::consumeFolderDestinations
+                ) {
+                    navigateToCloud(
+                        nodeId = it.nodeId,
+                        folderDestinations = it.folderDestinations,
+                        message = it.message
+                    )
                 }
 
                 if (state.isUploadingScans && state.isScanUploadingAborted) {
@@ -1602,21 +1617,21 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         viewModel.uploadFilesToChat(
             chatIds, documentsToShare ?: emptyList(), nodeIds,
             toDoAfter = {
-                openManagerAndFinish()
+                navigateToChat()
             }
         )
     }
 
     private fun openManagerAndFinish() {
-        val intent = Intent(this, ManagerActivity::class.java).apply {
-            if (isFromUploadDestinationActivity) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        megaNavigator.openManagerActivity(
+            context = this,
+            flags = if (isFromUploadDestinationActivity) {
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
             } else {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-        }
-        startActivity(intent)
+                Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
+            singleActivityDestination = null
+        )
         finish()
     }
 
@@ -1976,36 +1991,45 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Goes back to Cloud.
+     * Starts back to Cloud navigation after checking destinations hierarchy in the view model.
      *
      * @param handle        Parent handle of the folder to open.
      * @param message       Message to show.
      */
-    private fun backToCloud(handle: Long, message: String?) = lifecycleScope.launch {
+    private fun backToCloud(handle: Long, message: String?) {
         Timber.d("handle: %s", handle)
-        val isSingleActivity = getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-        if (isSingleActivity) {
-            finish()
-            return@launch
-        }
+        viewModel.getFolderDestinations(handle, message)
+    }
 
-        val startIntent = Intent(this@FileExplorerActivity, ManagerActivity::class.java).apply {
-            if (isFromUploadDestinationActivity) {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    private fun navigateToCloud(
+        nodeId: NodeId?,
+        folderDestinations: List<CloudDriveNavKey>?,
+        message: String?,
+    ) {
+        megaNavigator.openManagerActivity(
+            context = this,
+            action = if (nodeId != null) {
+                Constants.ACTION_OPEN_FOLDER
             } else {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            }
-        }
-
-        if (handle != INVALID_HANDLE) {
-            startIntent.action = Constants.ACTION_OPEN_FOLDER
-            startIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, handle)
-        }
-
-        startIntent.putExtra(Constants.EXTRA_MESSAGE, message)
-
-        startActivity(startIntent)
+                ACTION_VIEW
+            },
+            flags = if (isFromUploadDestinationActivity) {
+                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            } else {
+                Intent.FLAG_ACTIVITY_CLEAR_TOP
+            },
+            bundle = Bundle().apply {
+                putString(Constants.EXTRA_MESSAGE, message)
+                nodeId?.let {
+                    putLong(Constants.INTENT_EXTRA_KEY_PARENT_HANDLE, nodeId.longValue)
+                }
+            },
+            singleActivityDestination = HomeScreensNavKey(
+                root = DriveSyncNavKey(),
+                destinations = folderDestinations
+            ),
+            singleActivityMessage = message,
+        )
         finish()
     }
 
@@ -2435,19 +2459,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     megaChatApi.sendMessage(chatListItems[i].chatId, message)
                 }
 
-                if (chatListItems.size == 1) {
-                    val chatItem = chatListItems[0]
-                    val idChat = chatItem.chatId
-                    val intent = Intent(this, ManagerActivity::class.java)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    intent.action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                    intent.putExtra(Constants.CHAT_ID, idChat)
-                    startActivity(intent)
-                } else {
-                    val chatIntent = Intent(this, ManagerActivity::class.java)
-                    chatIntent.action = Constants.ACTION_CHAT_SUMMARY
-                    startActivity(chatIntent)
-                }
+                navigateToChat()
             }
 
             return
@@ -2466,6 +2478,27 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             onIntentProcessed(filePreparedDocuments)
         }
         return
+    }
+
+    private fun navigateToChat() {
+        val singleChatId = chatListItems.singleOrNull()?.chatId
+        val singleChat = singleChatId != null
+        megaNavigator.openManagerActivity(
+            context = this,
+            action = if (singleChat) Constants.ACTION_CHAT_NOTIFICATION_MESSAGE else Constants.ACTION_CHAT_SUMMARY,
+            flags = if (singleChat) Intent.FLAG_ACTIVITY_CLEAR_TOP else 0,
+            bundle = Bundle().apply {
+                singleChatId?.let { putLong(Constants.CHAT_ID, singleChatId) }
+            },
+            singleActivityDestinations = listOfNotNull(
+                HomeScreensNavKey(MenuHomeScreen),
+                ChatListNavKey(),
+                singleChatId?.let {
+                    ChatNavKey(chatId = singleChatId, action = null)
+                },
+            )
+        )
+        finish()
     }
 
     private fun onChatPresenceLastGreen(userhandle: Long, lastGreen: Int) {

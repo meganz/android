@@ -35,7 +35,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -50,9 +49,12 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -76,6 +78,7 @@ class FileExplorerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -616,5 +619,41 @@ class FileExplorerViewModel @Inject constructor(
      */
     fun consumeNodeUpdate() {
         _uiState.update { it.copy(nodeUpdatedEvent = consumed) }
+    }
+
+    fun getFolderDestinations(
+        handle: Long,
+        message: String?,
+    ) {
+        viewModelScope.launch {
+            val nodeId = NodeId(handle).takeIf { handle != INVALID_HANDLE }
+            val ancestorIds = runCatching {
+                val node = nodeId?.let { getNodeByIdUseCase(nodeId) }
+                node?.let {
+                    getNodeLocationUseCase(it).ancestorIds
+                }?.plus(
+                    if (node.parentId.longValue == INVALID_HANDLE) null else NodeId(handle) //add the destination itself if it's not root
+                )
+            }.getOrNull()
+            val folderDestinations = ancestorIds?.filterNotNull()?.map { folderId ->
+                CloudDriveNavKey(nodeHandle = folderId.longValue)
+            }
+            _uiState.update {
+                it.copy(
+                    navigateToCloud = triggered(
+                        FileExplorerUiState.NavigateToCloudEvent(
+                            nodeId = nodeId,
+                            folderDestinations = folderDestinations,
+                            message = message
+                        )
+                    )
+                )
+            }
+
+        }
+    }
+
+    fun consumeFolderDestinations() {
+        _uiState.update { it.copy(navigateToCloud = consumed()) }
     }
 }

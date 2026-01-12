@@ -99,11 +99,11 @@ import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -139,6 +139,19 @@ internal class MegaNavigatorImpl @Inject constructor(
     private fun navigateForSingleActivity(
         context: Context,
         singleActivityDestination: NavKey?,
+        singleActivityMessage: String? = null,
+        legacyNavigation: suspend () -> Unit,
+    ) = navigateForSingleActivity(
+        context = context,
+        singleActivityDestinations = listOfNotNull(singleActivityDestination),
+        singleActivityMessage = singleActivityMessage,
+        legacyNavigation = legacyNavigation
+    )
+
+    private fun navigateForSingleActivity(
+        context: Context,
+        singleActivityDestinations: List<NavKey>,
+        singleActivityMessage: String? = null,
         legacyNavigation: suspend () -> Unit,
     ) {
         applicationScope.launch {
@@ -148,7 +161,12 @@ internal class MegaNavigatorImpl @Inject constructor(
                 }.onSuccess { singleActivity ->
                     if (singleActivity) {
                         launchMegaActivityIfNeeded(context)
-                        singleActivityDestination?.let { navigationQueue.emit(it) }
+                        singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
+                            navigationQueue.emit(it)
+                        }
+                        singleActivityMessage?.let {
+                            snackbarEventQueue.queueMessage(singleActivityMessage)
+                        }
                     } else {
                         legacyNavigation()
                     }
@@ -938,14 +956,35 @@ internal class MegaNavigatorImpl @Inject constructor(
         action: String?,
         bundle: Bundle?,
         flags: Int?,
+        singleActivityMessage: String?,
         singleActivityDestination: NavKey?,
         onIntentCreated: (suspend (Intent) -> Unit)?,
     ) {
         navigateForSingleActivity(
             context = context,
             singleActivityDestination = singleActivityDestination,
+            singleActivityMessage = singleActivityMessage,
         ) {
             navigateToManagerActivity(context, action, data, bundle, flags, onIntentCreated)
+        }
+    }
+
+    override fun openManagerActivity(
+        context: Context,
+        data: Uri?,
+        action: String?,
+        bundle: Bundle?,
+        flags: Int?,
+        singleActivityMessage: String?,
+        singleActivityDestinations: List<NavKey>,
+        onIntentCreated: (suspend (Intent) -> Unit)?,
+    ) {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestinations = singleActivityDestinations,
+            singleActivityMessage = singleActivityMessage,
+        ) {
+            navigateToManagerActivity(context, action, data, bundle, flags)
         }
     }
 

@@ -432,7 +432,7 @@ class MegaActivity : ComponentActivity() {
     companion object {
 
         /**
-         * Get Intent to open this activity with Single top and clear top flags
+         * Get Intent to open this activity with Single top and clear top flags with optionals action and message
          */
         fun getIntent(context: Context, action: String? = null, warningMessage: String? = null) =
             Intent(

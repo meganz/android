@@ -4,7 +4,9 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 
 /**
  * The File Explorer UI State
@@ -28,7 +30,15 @@ data class FileExplorerUiState(
     val shouldFinishScreen: Boolean = false,
     val isAskingForCollisionsResolution: Boolean = false,
     val nodeUpdatedEvent: StateEvent = consumed,
+    val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
 ) {
+
+    data class NavigateToCloudEvent(
+        val nodeId: NodeId?,
+        val folderDestinations: List<CloudDriveNavKey>?,
+        val message: String?,
+    )
+
     /**
      * Documents associated by its uri value
      */
