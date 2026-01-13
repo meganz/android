@@ -89,7 +89,7 @@ class MenuViewModel @Inject constructor(
         monitorUserDataAndAvatar()
         refreshAccountStorageDetails()
         monitorAccountDetails()
-        refreshUserName(false)
+        refreshUserName()
         refreshCurrentUserEmail()
         monitorUserChanges()
         monitorUnreadNotificationsCount()
@@ -159,7 +159,7 @@ class MenuViewModel @Inject constructor(
                         UserChanges.Firstname,
                         UserChanges.Lastname,
                             -> {
-                            refreshUserName(true)
+                            refreshUserName()
                             getUserAvatarOrDefault(true)
                         }
 
@@ -284,13 +284,13 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    private fun refreshUserName(forceRefresh: Boolean) {
+    private fun refreshUserName() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     name = runCatching {
                         getUserFullNameUseCase(
-                            forceRefresh = forceRefresh,
+                            forceRefresh = true,
                         )
                     }.getOrNull()
                 )

@@ -601,14 +601,14 @@ class MenuViewModelTest {
         stubDefaultDependencies()
         val expectedName = "John Doe"
 
-        whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn(expectedName)
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(expectedName)
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(expectedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -648,7 +648,7 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(2)).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -671,7 +671,7 @@ class MenuViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.name).isEqualTo(updatedName)
-            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(2)).invoke(forceRefresh = true)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -711,7 +711,7 @@ class MenuViewModelTest {
         verify(
             getUserFullNameUseCase,
             times(1)
-        ).invoke(forceRefresh = false) // Only initial call
+        ).invoke(forceRefresh = true) // Only initial call
         verify(getCurrentUserEmail, times(1)).invoke() // Only initial call
     }
 
@@ -728,7 +728,7 @@ class MenuViewModelTest {
         // Should not crash despite error in user updates monitoring
         val state = underTest.uiState.value
         assertThat(state).isNotNull()
-        verify(getUserFullNameUseCase, times(0)).invoke(true)
+        verify(getUserFullNameUseCase, times(1)).invoke(true) // Only initial call
     }
 
     @Test
