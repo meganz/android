@@ -263,7 +263,7 @@ class MediaPlayerFacade @Inject constructor(
                     }
 
                     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                        mediaPlayerCallback.onPlayWhenReadyChangedCallback(playWhenReady)
+                        mediaPlayerCallback.onPlayWhenReadyChangedCallback(playWhenReady, reason)
                         if (playWhenReady && notificationDismissed) {
                             playerNotificationManager?.setPlayer(player)
                             notificationDismissed = false

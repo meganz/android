@@ -48,6 +48,7 @@ class AudioPlayerViewModel @Inject constructor(
         handle: Long,
         name: String,
         status: PlaybackPositionStatus = playbackPositionStatus,
+        isResume: Boolean = true,
         playbackPositionStatusCallback: (PlaybackPositionStatus) -> Unit,
     ) {
         playbackPositionJob?.cancel()
@@ -69,7 +70,7 @@ class AudioPlayerViewModel @Inject constructor(
                         playbackPositionStatusCallback(playbackPositionStatus)
                     }
 
-                    else -> updatePlaybackPositionStatus(status, playbackPosition)
+                    else -> updatePlaybackPositionStatus(status, playbackPosition, isResume)
                 }
             }
         }
@@ -78,6 +79,7 @@ class AudioPlayerViewModel @Inject constructor(
     internal fun updatePlaybackPositionStatus(
         status: PlaybackPositionStatus,
         playbackPosition: Long? = uiState.value.playbackPosition,
+        isResume: Boolean = true,
     ) {
         if (status == PlaybackPositionStatus.Resume && playbackPosition != null) {
             mediaPlayerGateway.playerSeekToPositionInMs(playbackPosition)
@@ -86,7 +88,7 @@ class AudioPlayerViewModel @Inject constructor(
         playbackPositionStatus = status
         uiState.update { it.copy(showPlaybackDialog = false) }
 
-        if (!mediaPlayerGateway.getPlayWhenReady()) {
+        if (!mediaPlayerGateway.getPlayWhenReady() && isResume) {
             mediaPlayerGateway.setPlayWhenReady(true)
         }
     }

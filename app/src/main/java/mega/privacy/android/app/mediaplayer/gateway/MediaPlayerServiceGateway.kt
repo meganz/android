@@ -131,4 +131,11 @@ interface MediaPlayerServiceGateway {
      * @return the current playback position status
      */
     fun getPlaybackPositionStatus(): PlaybackPositionStatus
+
+    /**
+     * Check whether the player is paused by user
+     *
+     * @return true if paused by user, false otherwise
+     */
+    fun isPausedByUser(): Boolean
 }

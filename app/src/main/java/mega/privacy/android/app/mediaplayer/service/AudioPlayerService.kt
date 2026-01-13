@@ -132,6 +132,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
 
     private var playbackPositionStatus = PlaybackPositionStatus.Initial
 
+    private var isPausedByUser: Boolean = false
+
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
@@ -220,6 +222,9 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     isUpdateName: Boolean,
                 ) {
                     handle?.let {
+                        if (isPausedByUser) {
+                            isPausedByUser = false
+                        }
                         setCurrentPlayingHandle(it.toLong())
                         if (isUpdateName) {
                             val nodeName = getPlaylistItem(it)?.nodeName ?: ""
@@ -251,8 +256,10 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                     setAudioRepeatMode(repeatToggleMode)
                 }
 
-                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
+                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean, reason: Int) {
                     setPaused(!playWhenReady)
+                    isPausedByUser =
+                        reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST && !playWhenReady
                 }
 
                 override fun onPlaybackStateChangedCallback(state: Int) {
@@ -262,6 +269,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                         state == MEDIA_PLAYER_STATE_READY -> {
                             if (!mediaPlayerGateway.getPlayWhenReady() &&
                                 playbackPositionStatus != PlaybackPositionStatus.DialogShowing
+                                && !isPausedByUser
                             ) {
                                 setPlayWhenReady(true)
                             }
@@ -652,6 +660,8 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         //Stop audio player when app is killed.
         stopPlayer()
     }
+
+    override fun isPausedByUser(): Boolean = isPausedByUser
 
     companion object {
         private const val PLAYBACK_NOTIFICATION_ID = 1

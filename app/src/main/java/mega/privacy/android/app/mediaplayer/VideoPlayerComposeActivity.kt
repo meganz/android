@@ -384,7 +384,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                 override fun onRepeatModeChangedCallback(repeatToggleMode: RepeatToggleMode) =
                     videoPlayerViewModel.updateRepeatToggleMode(repeatToggleMode)
 
-                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean) {
+                override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean, reason: Int) {
                     videoPlayerViewModel.updatePlaybackState(
                         if (playWhenReady)
                             MediaPlaybackState.Playing

@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.di.isAdaptiveLayoutEnabled
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
@@ -51,6 +50,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange1XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChange2XEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerSpeedChangeHalfXEvent
@@ -244,11 +244,13 @@ class AudioPlayerFragment : Fragment() {
                             val name = gateway.getPlaylistItem(it.toString())?.nodeName
                                 ?: activity?.intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
                                 ?: ""
+                            val isPausedByUser = serviceGateway?.isPausedByUser() ?: false
                             audioViewModel.checkPlaybackPositionOfPlayingItem(
                                 handle = handle,
                                 name = name,
                                 status = serviceGateway?.getPlaybackPositionStatus()
-                                    ?: PlaybackPositionStatus.Initial
+                                    ?: PlaybackPositionStatus.Initial,
+                                isResume = !isPausedByUser
                             ) { status ->
                                 serviceGateway?.updatePlaybackPositionStatus(status)
                             }

@@ -114,6 +114,7 @@ class AudioPlayerViewModelTest {
                 testHandle,
                 testName,
                 PlaybackPositionStatus.Initial,
+                true,
                 mockPlaybackPositionStatusCallback
             )
             advanceUntilIdle()

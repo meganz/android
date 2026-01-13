@@ -33,7 +33,10 @@ interface MediaPlayerCallback {
      *
      * @param playWhenReady true is play when ready, otherwise is false
      */
-    fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean)
+    fun onPlayWhenReadyChangedCallback(
+        playWhenReady: Boolean,
+        reason: Int,
+    )
 
     /**
      * Callback from onPlaybackStateChanged
