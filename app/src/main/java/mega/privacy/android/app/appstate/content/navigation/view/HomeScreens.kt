@@ -111,7 +111,11 @@ fun HomeScreens(
                         .weight(1f),
                     mainNavItems = currentState.mainNavItems,
                     onDestinationClick = { destination ->
-                        homeScreenStacks.switchTopLevel(destination)
+                        if (destination == homeScreenStacks.topLevelKey) {
+                            homeScreenStacks.replaceStack()
+                        } else {
+                            homeScreenStacks.switchTopLevel(destination)
+                        }
                     },
                     isSelected = { destination ->
                         homeScreenStacks.topLevelKey::class == destination::class
