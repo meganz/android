@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.model
 
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -38,6 +39,7 @@ data class SearchUiState(
     val openedFileNode: TypedFileNode? = null,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
+    val navigateBack: StateEvent = consumed,
 ) {
     /**
      * True if nodes or hidden node settings are loading

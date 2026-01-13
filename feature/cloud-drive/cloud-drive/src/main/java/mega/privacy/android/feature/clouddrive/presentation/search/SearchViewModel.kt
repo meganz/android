@@ -29,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchParameters
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -68,6 +70,7 @@ class SearchViewModel @AssistedInject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SearchUiState())
@@ -86,6 +89,7 @@ class SearchViewModel @AssistedInject constructor(
         // TODO Handle others, links sort types
         monitorSortOrder()
         monitorHiddenNodeSettings()
+        monitorNodeUpdates()
     }
 
     fun processAction(action: SearchUiAction) {
@@ -100,7 +104,7 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.SelectAllItems -> selectAllItems()
             is SearchUiAction.DeselectAllItems -> deselectAllItems()
             is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
-            is SearchUiAction.NavigateBackEventConsumed -> {} // TODO
+            is SearchUiAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             is SearchUiAction.OverQuotaConsumptionWarning -> {} // TODO
         }
     }
@@ -117,7 +121,12 @@ class SearchViewModel @AssistedInject constructor(
     }
 
     private fun updateSearchText(text: String) {
-        _uiState.update { it.copy(searchText = text) }
+        _uiState.update {
+            it.copy(
+                searchText = text,
+                nodesLoadingState = NodesLoadingState.Loading
+            )
+        }
         searchQueryFlow.value = text
     }
 
@@ -134,8 +143,6 @@ class SearchViewModel @AssistedInject constructor(
             }
             return
         }
-
-        _uiState.update { it.copy(nodesLoadingState = NodesLoadingState.Loading) }
 
         deselectAllItems()
         runCatching {
@@ -177,6 +184,32 @@ class SearchViewModel @AssistedInject constructor(
             }
         }
     }
+
+
+    private fun monitorNodeUpdates() {
+        viewModelScope.launch {
+            // TODO handle for links source
+            monitorNodeUpdatesByIdUseCase(
+                nodeId = NodeId(args.parentHandle),
+                nodeSourceType = args.nodeSourceType
+            )
+                .catch { Timber.e(it) }
+                .collectLatest { change ->
+                    if (change == NodeChanges.Remove) {
+                        // If current folder is moved to rubbish bin, navigate back
+                        _uiState.update {
+                            it.copy(navigateBack = triggered)
+                        }
+                    } else {
+                        // If nodes are currently loading, ignore updates
+                        if (!uiState.value.nodesLoadingState.isInProgress) {
+                            performSearch()
+                        }
+                    }
+                }
+        }
+    }
+
 
     /**
      * Handle item click - navigate to folder if it's a folder
@@ -386,6 +419,15 @@ class SearchViewModel @AssistedInject constructor(
                     )
                 }
             }
+        }
+    }
+
+    /**
+     * Consume navigate back event
+     */
+    private fun onNavigateBackEventConsumed() {
+        _uiState.update { state ->
+            state.copy(navigateBack = consumed)
         }
     }
 

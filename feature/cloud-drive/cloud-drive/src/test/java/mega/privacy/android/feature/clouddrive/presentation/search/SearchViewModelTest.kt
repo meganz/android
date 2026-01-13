@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
+import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
@@ -67,6 +69,7 @@ class SearchViewModelTest {
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+    private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
@@ -78,7 +81,12 @@ class SearchViewModelTest {
 
     @AfterEach
     fun tearDown() {
-        reset(searchUseCase, cancelCancelTokenUseCase, nodeUiItemMapper)
+        reset(
+            searchUseCase,
+            cancelCancelTokenUseCase,
+            nodeUiItemMapper,
+            monitorNodeUpdatesByIdUseCase
+        )
     }
 
     private fun createViewModel(
@@ -96,6 +104,7 @@ class SearchViewModelTest {
         monitorViewTypeUseCase = monitorViewTypeUseCase,
         monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+        monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
     )
 
     private fun setupTestData(
@@ -128,6 +137,12 @@ class SearchViewModelTest {
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(parentHandle),
+                nodeSourceType
+            )
+        ).thenReturn(flowOf())
     }
 
     @Test
@@ -1022,4 +1037,106 @@ class SearchViewModelTest {
                 assertThat(finalState.isHiddenNodesEnabled).isTrue()
             }
         }
+
+    @Test
+    fun `test that monitorNodeUpdates triggers navigateBack when NodeChanges_Remove is received`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(parentHandle),
+                    nodeSourceType
+                )
+            ).thenReturn(flowOf(NodeChanges.Remove))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val updatedState = awaitItem()
+                assertThat(updatedState.navigateBack).isEqualTo(triggered)
+            }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger performSearch when nodes are loading`() =
+        runTest {
+            setupTestData(emptyList())
+
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(parentHandle),
+                    nodeSourceType
+                )
+            ).thenReturn(flowOf(NodeChanges.Attributes))
+
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText("test"))
+
+            advanceTimeBy(100)
+
+            verify(searchUseCase, times(0)).invoke(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any()
+            )
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates does not trigger navigateBack for Attributes`() = runTest {
+        setupTestData(emptyList())
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(parentHandle),
+                nodeSourceType
+            )
+        ).thenReturn(flowOf(NodeChanges.Attributes))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val updatedState = awaitItem()
+            assertThat(updatedState.navigateBack).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that monitorNodeUpdates handles multiple NodeChanges correctly`() = runTest {
+        setupTestData(emptyList())
+        val nodeChangesFlow = flowOf(NodeChanges.Attributes, NodeChanges.Remove)
+        whenever(
+            monitorNodeUpdatesByIdUseCase(
+                NodeId(parentHandle),
+                nodeSourceType
+            )
+        ).thenReturn(nodeChangesFlow)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val finalState = awaitItem()
+            assertThat(finalState.navigateBack).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that NavigateBackEventConsumed action consumes the navigate back event`() = runTest {
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(NodeId(parentHandle))).thenReturn(flowOf(NodeChanges.Remove))
+
+        val underTest = createViewModel()
+
+        underTest.uiState.test {
+            val stateAfterRemove = awaitItem() // State after Remove triggers navigateBack
+            assertThat(stateAfterRemove.navigateBack).isEqualTo(triggered)
+
+            underTest.processAction(SearchUiAction.NavigateBackEventConsumed)
+            val stateAfterConsume = awaitItem() // State after consuming the event
+            assertThat(stateAfterConsume.navigateBack).isEqualTo(consumed)
+        }
+    }
+
 }

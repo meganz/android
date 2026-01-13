@@ -180,6 +180,13 @@ fun SearchScreen(
         )
     }
 
+    EventEffect(
+        event = uiState.navigateBack,
+        onConsumed = { viewModel.processAction(SearchUiAction.NavigateBackEventConsumed) }
+    ) {
+        navigationHandler.back()
+    }
+
     LaunchedEffect(uiState.selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
             uiState.selectedNodes.toSet(),
@@ -312,11 +319,7 @@ fun SearchContent(
                         .padding(top = 100.dp)
                         .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
                 ) {
-                    MegaText(
-                        "Search for files and folders",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+
                 }
             }
 
