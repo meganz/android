@@ -1139,4 +1139,91 @@ class SearchViewModelTest {
         }
     }
 
+    @Test
+    fun `test that SearchParameters includes description and tag when nodeSourceType is not RUBBISH_BIN`() =
+        runTest {
+            val query = "#test"
+            whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file.txt")
+            }
+            setupTestData(listOf(typedFileNode))
+
+            val underTest = createViewModel()
+            underTest.processAction(SearchUiAction.UpdateSearchText(query))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            verify(searchUseCase, atLeast(1)).invoke(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = argThat { params ->
+                    params.description == query && params.tag == "test"
+                },
+                isSingleActivityEnabled = any()
+            )
+        }
+
+    @Test
+    fun `test that SearchParameters includes description but tag is null when nodeSourceType is RUBBISH_BIN`() =
+        runTest {
+            val query = "#test"
+            whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
+            val rubbishBinArgs = SearchViewModel.Args(
+                parentHandle = parentHandle,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN
+            )
+            val typedFileNode = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(123L))
+                on { name }.thenReturn("file.txt")
+            }
+            setupTestData(listOf(typedFileNode))
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(parentHandle),
+                    NodeSourceType.RUBBISH_BIN
+                )
+            ).thenReturn(flowOf())
+
+            val underTest = createViewModel(rubbishBinArgs)
+            underTest.processAction(SearchUiAction.UpdateSearchText(query))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            verify(searchUseCase, atLeast(1)).invoke(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = argThat { params ->
+                    params.description == query && params.tag == null
+                },
+                isSingleActivityEnabled = any()
+            )
+        }
+
+    @Test
+    fun `test that SearchParameters tag removes hash prefix correctly`() = runTest {
+        val query = "test"
+        whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("file.txt")
+        }
+        setupTestData(listOf(typedFileNode))
+
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText(query))
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        verify(searchUseCase, atLeast(1)).invoke(
+            parentHandle = any(),
+            nodeSourceType = any(),
+            searchParameters = argThat { params ->
+                params.description == query && params.tag == query
+            },
+            isSingleActivityEnabled = any()
+        )
+    }
+
 }

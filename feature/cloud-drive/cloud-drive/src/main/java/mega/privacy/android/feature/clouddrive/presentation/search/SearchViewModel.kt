@@ -158,6 +158,10 @@ class SearchViewModel @AssistedInject constructor(
                     ),
                     modificationDate = uiState.value.dateModifiedFilterOption,
                     creationDate = uiState.value.dateAddedFilterOption,
+                    description = query,
+                    tag = query.removePrefix("#").takeIf {
+                        args.nodeSourceType != NodeSourceType.RUBBISH_BIN
+                    }
                 ),
                 isSingleActivityEnabled = true
             )
@@ -185,7 +189,6 @@ class SearchViewModel @AssistedInject constructor(
         }
     }
 
-
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
             // TODO handle for links source
@@ -209,7 +212,6 @@ class SearchViewModel @AssistedInject constructor(
                 }
         }
     }
-
 
     /**
      * Handle item click - navigate to folder if it's a folder

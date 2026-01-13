@@ -201,7 +201,6 @@ fun SearchScreen(
         viewModel.processAction(SearchUiAction.DeselectAllItems)
     }
 
-
     EventEffect(
         event = nodeActionState.dismissEvent,
         onConsumed = nodeOptionsActionViewModel::resetDismiss
