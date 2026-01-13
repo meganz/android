@@ -22,6 +22,8 @@ import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailRoute
+import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
@@ -36,6 +38,7 @@ import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
+import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
@@ -140,6 +143,19 @@ fun EntryProviderScope<NavKey>.albumContentScreen(
             onTransfer = onTransfer,
             viewModel = viewModel,
         )
+    }
+}
+
+fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<VideoPlaylistDetailNavKey> { args ->
+        val viewModel =
+            hiltViewModel<VideoPlaylistDetailViewModel, VideoPlaylistDetailViewModel.Factory> { factory ->
+                factory.create(args.playlistHandle, args.type)
+            }
+
+        VideoPlaylistDetailRoute(navigationHandler, viewModel)
     }
 }
 

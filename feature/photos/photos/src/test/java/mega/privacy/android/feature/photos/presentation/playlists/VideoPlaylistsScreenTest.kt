@@ -34,7 +34,8 @@ class VideoPlaylistsScreenTest {
         onConsumedPlaylistRemovedEvent: () -> Unit = {},
         onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
         onRemovedDialogDismiss: () -> Unit = {},
-        snackBarQueue: SnackbarEventQueue = mock()
+        snackBarQueue: SnackbarEventQueue = mock(),
+        onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit = {}
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
@@ -47,7 +48,8 @@ class VideoPlaylistsScreenTest {
                 onConsumedPlaylistRemovedEvent = onConsumedPlaylistRemovedEvent,
                 onDeleteButtonClicked = onDeleteButtonClicked,
                 onRemovedDialogDismiss = onRemovedDialogDismiss,
-                snackBarQueue = snackBarQueue
+                snackBarQueue = snackBarQueue,
+                onNavigateToDetail = onNavigateToDetail
             )
         }
     }

@@ -48,4 +48,5 @@ data class VideoUiEntity(
     val watchedDate: Long = 0,
     val collectionTitle: String? = null,
     val hasThumbnail: Boolean = true,
+    val durationString: String = "",
 )

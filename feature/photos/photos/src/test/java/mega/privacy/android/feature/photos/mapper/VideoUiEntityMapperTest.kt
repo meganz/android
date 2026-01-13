@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
@@ -12,12 +13,16 @@ import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.minutes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VideoUiEntityMapperTest {
     private lateinit var underTest: VideoUiEntityMapper
+
+    private val durationInSecondsTextMapper = mock<DurationInSecondsTextMapper>()
 
     private val expectedId = NodeId(123456L)
     private val expectedParentId = NodeId(654321L)
@@ -32,10 +37,12 @@ class VideoUiEntityMapperTest {
     private val expectedType = mock<VideoFileTypeInfo>()
     private val expectedWatchedTimestamp = 100L
     private val expectedCollectionTitle = "collection title"
+    private val expectedDurationString = "10:00"
 
     @BeforeAll
     fun setUp() {
-        underTest = VideoUiEntityMapper()
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(expectedDurationString)
+        underTest = VideoUiEntityMapper(durationInSecondsTextMapper)
     }
 
     @Test
@@ -139,7 +146,8 @@ class VideoUiEntityMapperTest {
                 { assertThat(it.nodeLabel).isEqualTo(expectedNodeLabel) },
                 { assertThat(it.fileTypeInfo).isEqualTo(expectedType) },
                 { assertThat(it.watchedDate).isEqualTo(expectedWatchedTimestamp) },
-                { assertThat(it.collectionTitle).isEqualTo(expectedCollectionTitle) }
+                { assertThat(it.collectionTitle).isEqualTo(expectedCollectionTitle) },
+                { assertThat(it.durationString).isEqualTo(expectedDurationString) },
             )
         }
     }

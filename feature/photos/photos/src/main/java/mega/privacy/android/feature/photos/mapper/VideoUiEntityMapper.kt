@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.mapper
 
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import javax.inject.Inject
@@ -7,7 +8,9 @@ import javax.inject.Inject
 /**
  * The mapper class to convert the TypedVideoNode to VideoUIEntity
  */
-class VideoUiEntityMapper @Inject constructor() {
+class VideoUiEntityMapper @Inject constructor(
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+) {
     /**
      * Convert to VideoNode to VideoUIEntity
      */
@@ -32,5 +35,6 @@ class VideoUiEntityMapper @Inject constructor() {
         watchedDate = typedVideoNode.watchedTimestamp,
         collectionTitle = typedVideoNode.collectionTitle,
         hasThumbnail = typedVideoNode.hasThumbnail,
+        durationString = durationInSecondsTextMapper(typedVideoNode.duration)
     )
 }

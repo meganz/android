@@ -99,7 +99,6 @@ internal fun VideosTabScreen(
     durationOptionSelected: (DurationFilterOption) -> Unit = {},
 ) {
     val lazyListState = rememberLazyListState()
-    val durationInSecondsTextMapper = remember { DurationInSecondsTextMapper() }
     val coroutineScope = rememberCoroutineScope()
 
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -179,7 +178,7 @@ internal fun VideosTabScreen(
                                 name = videoItem.name,
                                 description = videoItem.description?.replace("\n", " "),
                                 fileSize = formatFileSize(videoItem.size, LocalContext.current),
-                                duration = durationInSecondsTextMapper(videoItem.duration),
+                                duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
                                 isSharedWithPublicLink = videoItem.isSharedItems,

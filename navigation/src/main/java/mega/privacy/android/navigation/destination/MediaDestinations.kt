@@ -15,7 +15,7 @@ data object MediaMainNavKey : MainNavItemNavKey
 data class AlbumContentNavKey(val id: Long?, val type: String?) : NavKey
 
 @Serializable
-data class VideoPlaylistDetailNavKey(val playlistId: NodeId, val type: PlaylistType) : NavKey
+data class VideoPlaylistDetailNavKey(val playlistHandle: Long, val type: PlaylistType) : NavKey
 
 @Serializable
 data object MediaSearchNavKey : NavKey

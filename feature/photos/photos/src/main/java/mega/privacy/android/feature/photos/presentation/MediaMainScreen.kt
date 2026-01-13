@@ -1042,7 +1042,8 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Playlists -> VideoPlaylistsTabRoute(
             showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
             dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
-            modifier = modifier
+            modifier = modifier,
+            navigateToVideoPlaylistDetail = navigationHandler::navigate
         )
     }
 }

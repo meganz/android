@@ -40,13 +40,14 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun VideoPlaylistsTabRoute(
     showVideoPlaylistRemovedDialog: Boolean,
     dismissVideoPlaylistRemovedDialog: () -> Unit,
+    navigateToVideoPlaylistDetail: (VideoPlaylistDetailNavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
@@ -61,7 +62,10 @@ fun VideoPlaylistsTabRoute(
         onLongClick = viewModel::onItemLongClicked,
         onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
         onDeleteButtonClicked = viewModel::removeVideoPlaylists,
-        onRemovedDialogDismiss = dismissVideoPlaylistRemovedDialog
+        onRemovedDialogDismiss = dismissVideoPlaylistRemovedDialog,
+        onNavigateToDetail = {
+            navigateToVideoPlaylistDetail(VideoPlaylistDetailNavKey(it.id.longValue, it.type))
+        }
     )
 }
 
@@ -78,6 +82,7 @@ internal fun VideoPlaylistsTabScreen(
     onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
     onRemovedDialogDismiss: () -> Unit = {},
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
+    onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
@@ -92,11 +97,6 @@ internal fun VideoPlaylistsTabScreen(
 
     var showRemovedDialog by rememberSaveable(showVideoPlaylistRemovedDialog) {
         mutableStateOf(showVideoPlaylistRemovedDialog)
-    }
-
-    val dismissDialog: () -> Unit = {
-        onRemovedDialogDismiss()
-        showRemovedDialog = false
     }
 
     when (uiState) {
@@ -169,7 +169,13 @@ internal fun VideoPlaylistsTabScreen(
                             totalDuration = videoPlaylistItem.totalDuration,
                             isSelected = videoPlaylistItem.isSelected,
                             isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
-                            onClick = { onClick(videoPlaylistItem) },
+                            onClick = {
+                                if (uiState.selectedPlaylists.isEmpty()) {
+                                    onNavigateToDetail(videoPlaylistItem)
+                                } else {
+                                    onClick(videoPlaylistItem)
+                                }
+                            },
                             onMenuClick = {
                                 showPlaylistBottomSheet = true
                                 selectedVideoPlaylist = videoPlaylistItem
@@ -206,15 +212,8 @@ internal fun VideoPlaylistsTabScreen(
                 }
 
                 if (showRemovedDialog) {
-                    BasicDialog(
-                        modifier = Modifier.testTag(
-                            VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
-                        ),
-                        title = stringResource(id = R.string.video_section_playlists_delete_playlist_dialog_title),
-                        description = null,
-                        positiveButtonText = stringResource(R.string.video_section_playlists_delete_playlist_dialog_delete_button),
-                        negativeButtonText = stringResource(R.string.general_dialog_cancel_button),
-                        onPositiveButtonClicked = {
+                    VideoPlaylistsRemovedDialog(
+                        onDeleteButtonClicked = {
                             val playlists = uiState.selectedPlaylists.ifEmpty {
                                 selectedVideoPlaylist?.let(::setOf).orEmpty()
                             }
@@ -222,10 +221,11 @@ internal fun VideoPlaylistsTabScreen(
                             if (selectedVideoPlaylist != null) {
                                 selectedVideoPlaylist = null
                             }
-                            dismissDialog()
                         },
-                        onNegativeButtonClicked = dismissDialog,
-                        onDismiss = dismissDialog
+                        onRemovedDialogDismiss = {
+                            onRemovedDialogDismiss()
+                            showRemovedDialog = false
+                        }
                     )
                 }
 
@@ -258,6 +258,28 @@ internal fun VideoPlaylistsTabScreen(
             }
         }
     }
+}
+
+@Composable
+private fun VideoPlaylistsRemovedDialog(
+    onDeleteButtonClicked: () -> Unit,
+    onRemovedDialogDismiss: () -> Unit,
+) {
+    BasicDialog(
+        modifier = Modifier.testTag(
+            VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+        ),
+        title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+        description = null,
+        positiveButtonText = stringResource(sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onPositiveButtonClicked = {
+            onDeleteButtonClicked()
+            onRemovedDialogDismiss()
+        },
+        onNegativeButtonClicked = onRemovedDialogDismiss,
+        onDismiss = onRemovedDialogDismiss
+    )
 }
 
 /**

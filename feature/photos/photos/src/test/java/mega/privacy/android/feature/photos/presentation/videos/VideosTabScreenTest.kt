@@ -180,6 +180,7 @@ class VideosTabScreenTest {
         name: String = "Video name $handle",
         size: Long = 1024L,
         duration: Duration = 60.seconds,
+        durationString: String = "01:00",
         fileTypeInfo: FileTypeInfo = testVideoType,
         parentHandle: Long = 100L,
     ) = mock<VideoUiEntity> {
@@ -189,5 +190,6 @@ class VideosTabScreenTest {
         on { this.duration }.thenReturn(duration)
         on { this.fileTypeInfo }.thenReturn(fileTypeInfo)
         on { parentId }.thenReturn(NodeId(parentHandle))
+        on { this.durationString }.thenReturn(durationString)
     }
 }
