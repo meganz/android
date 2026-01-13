@@ -40,7 +40,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragThumbnailGetter
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.SortByHeaderBinding
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel

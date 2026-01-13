@@ -26,7 +26,7 @@
         android:theme="@style/Widget.Mega.TextInputLayout"
         app:errorTextAppearance="@style/TextAppearance.InputHint.Error">
 
-        <mega.privacy.android.app.components.twemoji.EmojiEditText
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
             android:id="@+id/text_file"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

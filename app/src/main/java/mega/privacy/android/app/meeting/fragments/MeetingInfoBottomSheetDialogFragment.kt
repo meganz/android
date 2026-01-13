@@ -25,7 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
 import mega.privacy.android.app.meeting.listenAction

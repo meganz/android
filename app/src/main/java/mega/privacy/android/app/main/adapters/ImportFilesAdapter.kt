@@ -25,7 +25,7 @@ import coil3.transform.RoundedCornersTransformation
 import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil

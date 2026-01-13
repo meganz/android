@@ -51,7 +51,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <mega.privacy.android.app.components.twemoji.EmojiEditText
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
             android:id="@+id/type_meeting_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

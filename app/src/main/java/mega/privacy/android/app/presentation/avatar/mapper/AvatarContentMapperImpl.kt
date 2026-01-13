@@ -6,7 +6,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapper
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent

@@ -222,6 +222,7 @@ dependencies {
     preBuiltSdkDependency(rootProject.extra)
     implementation(project(":core:transfers"))
     implementation(project(":feature:myaccount"))
+    implementation(project(":third-party-lib:twemoji"))
 
     //Test Modules
     testImplementation(project(":core-test"))

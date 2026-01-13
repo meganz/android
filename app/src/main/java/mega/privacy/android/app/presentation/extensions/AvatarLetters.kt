@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.extensions
 
 import com.vdurmont.emoji.EmojiParser
-import mega.privacy.android.app.components.twemoji.EmojiUtils
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtils
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import java.util.Locale
@@ -50,8 +50,10 @@ fun getAvatarFirstLetter(text: String): String {
 
     val emojis = EmojiUtils.emojis(resultTitle)
 
-    if (emojis.size > 0 && emojis[0].start == 0) {
-        return resultTitle.substring(emojis[0].start, emojis[0].end)
+    if (emojis.isNotEmpty() && emojis[0].start == 0) {
+        emojis[0].let { first ->
+            return resultTitle.substring(first.start, first.end)
+        }
     }
 
     val resultEmojiCompat = getEmojiCompatAtFirst(resultTitle)

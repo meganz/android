@@ -54,7 +54,7 @@ import mega.privacy.android.app.components.HeaderItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.PhoneContactInfo
 import mega.privacy.android.app.main.ShareContactInfo

@@ -12,7 +12,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment

@@ -78,6 +78,7 @@ import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import mega.privacy.mobile.navigation.snowflake.NavigationBadge
 
 @Composable
@@ -169,11 +170,14 @@ fun MenuHomeScreenUi(
         )
         {
             item(key = "${uiState.name} ${uiState.email} ${uiState.lastModifiedTime}") {
+                val emojifiedName = remember(uiState.name) {
+                    uiState.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+                }
                 FlexibleLineListItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .testTag(MY_ACCOUNT_ITEM),
-                    title = uiState.name.orEmpty(),
+                    title = emojifiedName,
                     subtitle = uiState.email.orEmpty(),
                     leadingElement = {
                         MediumProfilePicture(

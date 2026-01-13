@@ -16,7 +16,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil

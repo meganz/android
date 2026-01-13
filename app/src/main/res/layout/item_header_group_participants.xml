@@ -54,7 +54,7 @@
                 android:paddingEnd="10dp"
                 android:weightSum="1">
 
-                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                     android:id="@+id/chat_group_contact_properties_info_title"
                     style="@style/TextAppearance.Mega.Subtitle1.Variant"
                     android:layout_width="wrap_content"

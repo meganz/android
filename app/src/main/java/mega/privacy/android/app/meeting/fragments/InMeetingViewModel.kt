@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.listeners.GetUserEmailListener
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_CHAT_ID

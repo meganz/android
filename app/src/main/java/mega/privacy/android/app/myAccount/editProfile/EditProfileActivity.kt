@@ -38,7 +38,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding

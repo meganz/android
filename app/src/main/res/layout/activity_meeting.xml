@@ -31,7 +31,7 @@
                 android:gravity="center_vertical"
                 android:orientation="vertical">
 
-                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                     android:id="@+id/title_toolbar"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
             android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                 android:id="@+id/banner_another_call_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -151,7 +151,7 @@
                 android:visibility="gone"
                 tool:ignore="ContentDescription" />
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                 android:id="@+id/banner_mute_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

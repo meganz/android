@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -64,15 +65,9 @@ public class EmojiEditText extends AppCompatEditText implements EmojiEditTextInt
         final float defaultEmojiSize = fontMetrics.descent - fontMetrics.ascent;
         EmojiManager.getInstance().replaceWithImages(mContext, getText(), emojiSize, defaultEmojiSize);
 
-        // TODO this logic should be moved to its own page
-        /*if (mContext instanceof GroupChatInfoActivity || mContext instanceof AddContactActivity) {
-            setFilters(new InputFilter[]{new InputFilter.LengthFilter(getMaxAllowed(getText()))});
-            super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
-        } else {*/
         if (lengthAfter > lengthBefore) {
             super.onTextChanged(getText(), start, lengthBefore, lengthAfter);
         }
-//        }
     }
 
     @Override

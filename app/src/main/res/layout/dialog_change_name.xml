@@ -21,7 +21,7 @@
             app:errorEnabled="true"
             app:layout_constraintTop_toTopOf="parent">
 
-            <mega.privacy.android.app.components.twemoji.EmojiEditText
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
                 android:id="@+id/first_name_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             app:errorEnabled="true"
             app:layout_constraintTop_toBottomOf="@+id/first_name_error_icon">
 
-            <mega.privacy.android.app.components.twemoji.EmojiEditText
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
                 android:id="@+id/last_name_field"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:placeholderImage="@android:drawable/ic_menu_camera" />
 
-    <mega.privacy.android.app.components.twemoji.EmojiTextView
+    <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
         android:id="@+id/txt_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

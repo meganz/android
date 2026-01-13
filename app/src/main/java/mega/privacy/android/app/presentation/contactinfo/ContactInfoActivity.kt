@@ -54,7 +54,7 @@ import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityCo
 import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback

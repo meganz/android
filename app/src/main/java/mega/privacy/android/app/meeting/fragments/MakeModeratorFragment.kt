@@ -19,7 +19,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.MakeModeratorFragmentBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.adapter.AssignParticipantsAdapter

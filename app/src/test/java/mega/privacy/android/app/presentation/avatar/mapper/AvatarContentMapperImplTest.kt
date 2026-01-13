@@ -9,7 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapper
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent

@@ -39,7 +39,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.MarqueeTextView;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.scrollBar.SectionTitleProvider;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ChatUserAvatarListener;
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment;

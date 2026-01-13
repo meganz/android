@@ -48,7 +48,7 @@
                 android:layout_centerVertical="true"
                 app:tint="?attr/textColorHint" />
 
-            <mega.privacy.android.app.components.twemoji.EmojiTextView
+            <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                 android:id="@+id/group_participants_chat_name_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

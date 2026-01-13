@@ -39,7 +39,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityGroupChatPropertiesBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower

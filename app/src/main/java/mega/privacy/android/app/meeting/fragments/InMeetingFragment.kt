@@ -48,7 +48,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener

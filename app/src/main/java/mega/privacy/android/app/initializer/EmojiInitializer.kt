@@ -12,9 +12,9 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiManager
-import mega.privacy.android.app.components.twemoji.EmojiManagerShortcodes
-import mega.privacy.android.app.components.twemoji.TwitterEmojiProvider
+import mega.privacy.android.thirdpartylib.twemoji.EmojiManager
+import mega.privacy.android.thirdpartylib.twemoji.EmojiManagerShortcodes
+import mega.privacy.android.thirdpartylib.twemoji.TwitterEmojiProvider
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 

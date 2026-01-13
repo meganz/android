@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp">
 
-                <mega.privacy.android.app.components.twemoji.EmojiTextView
+                <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
                     android:id="@+id/chat_explorer_list_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

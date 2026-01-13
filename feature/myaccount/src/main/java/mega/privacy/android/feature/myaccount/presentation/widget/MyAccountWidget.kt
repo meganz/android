@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -39,6 +40,7 @@ import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidget
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 
 /**
  * Shimmer view that mimics the MyAccount widget layout
@@ -179,9 +181,12 @@ internal fun MyAccountWidget(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
+                    val emojifiedName = remember(state.name) {
+                        state.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+                    }
                     // User name
                     MegaText(
-                        text = "${stringResource(R.string.general_hi)} ${state.name ?: ""}!",
+                        text = "${stringResource(R.string.general_hi)} $emojifiedName!",
                         style = AppTheme.typography.titleMedium,
                         modifier = Modifier.height(24.dp),
                         maxLines = 1

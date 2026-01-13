@@ -43,10 +43,10 @@ import java.util.Map;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.components.twemoji.EmojiManager;
-import mega.privacy.android.app.components.twemoji.EmojiRange;
-import mega.privacy.android.app.components.twemoji.EmojiUtils;
-import mega.privacy.android.app.components.twemoji.EmojiUtilsShortcodes;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiManager;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiRange;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtils;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes;
 import mega.privacy.android.app.main.ShareContactInfo;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -79,7 +79,7 @@ public class AvatarUtil {
 
         List<EmojiRange> emojis = EmojiUtils.emojis(resultTitle);
 
-        if (emojis != null && emojis.size() > 0 && emojis.get(0).start == 0) {
+        if (!emojis.isEmpty() && emojis.get(0).start == 0) {
             String megaEmoji = resultTitle.substring(emojis.get(0).start, emojis.get(0).end);
             return megaEmoji;
         }
@@ -255,7 +255,7 @@ public class AvatarUtil {
 
         String firstLetter = getFirstLetter(textAvatar);
         if (customEmojis && EmojiManager.getInstance().getFirstEmoji(firstLetter) != null) {
-            Bitmap emojiBitmap = Bitmap.createScaledBitmap(EmojiManager.getInstance().getFirstEmoji(firstLetter).getBitmap(), textSize, textSize, false);
+            Bitmap emojiBitmap = Bitmap.createScaledBitmap(EmojiManager.getInstance().getFirstEmoji(firstLetter).getBitmap(MegaApplication.getInstance()), textSize, textSize, false);
             int xPos = (c.getWidth() - emojiBitmap.getWidth()) / 2;
             int yPos = (c.getHeight() - emojiBitmap.getHeight()) / 2;
             c.drawBitmap(emojiBitmap, xPos, yPos, paintText);

@@ -33,7 +33,7 @@ import coil3.util.CoilUtils.dispose
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.listeners.ChatNonContactNameListener
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity

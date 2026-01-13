@@ -40,7 +40,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.MarqueeTextView
-import mega.privacy.android.app.components.twemoji.EmojiTextView
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.contacts.requests.ContactRequestsFragment.Companion.EXTRA_IS_OUTGOING
 import mega.privacy.android.app.contacts.requests.adapter.ContactRequestListAdapter
 import mega.privacy.android.app.contacts.requests.data.ContactRequestItem

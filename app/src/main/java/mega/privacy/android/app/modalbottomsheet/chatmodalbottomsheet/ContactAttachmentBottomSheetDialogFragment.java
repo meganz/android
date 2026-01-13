@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;

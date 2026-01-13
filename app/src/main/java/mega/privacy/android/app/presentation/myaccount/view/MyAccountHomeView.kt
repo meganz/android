@@ -137,6 +137,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.white_grey_
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 
 internal object Constants {
     const val AVATAR_SIZE = 60
@@ -228,6 +229,9 @@ fun MyAccountHomeView(
                 .background(MaterialTheme.colors.grey_020_black)
                 .verticalScroll(scrollState)
         ) {
+            val emojifiedName = remember(uiState.name) {
+                uiState.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+            }
             MyAccountHeader(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -239,7 +243,7 @@ fun MyAccountHomeView(
                         headerHeight = with(density) { c.size.height.toDp() }
                     },
                 avatarContent = uiState.avatarContent,
-                name = uiState.name,
+                name = emojifiedName,
                 email = uiState.email,
                 verifiedPhoneNumber = uiState.verifiedPhoneNumber,
                 onClickUserAvatar = uiActions::onClickUserAvatar,

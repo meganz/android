@@ -21,7 +21,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.twemoji.EmojiEditText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback

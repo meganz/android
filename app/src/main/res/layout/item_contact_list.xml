@@ -76,7 +76,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="13dp">
 
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
             android:id="@+id/contact_list_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

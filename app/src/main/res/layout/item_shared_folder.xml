@@ -56,7 +56,7 @@
         android:layout_toRightOf="@id/shared_folder_contact_relative_layout_avatar"
         android:layout_toLeftOf="@id/shared_folder_three_dots_layout">
 
-        <mega.privacy.android.app.components.twemoji.EmojiTextView
+        <mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
             android:id="@+id/shared_folder_contact_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

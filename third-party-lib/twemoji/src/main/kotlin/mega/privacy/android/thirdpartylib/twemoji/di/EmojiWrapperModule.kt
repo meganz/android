@@ -1,11 +1,11 @@
-package mega.privacy.android.app.di
+package mega.privacy.android.thirdpartylib.twemoji.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapper
-import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapperImpl
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapperImpl
 
 /**
  * DI module for Emoji wrappers

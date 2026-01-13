@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.app.components.twemoji.EmojiTextView;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.main.PhoneContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
