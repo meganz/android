@@ -74,7 +74,7 @@ import timber.log.Timber
  * Delay before showing actual content to allow bottom sheet animation to complete.
  * This prevents visual flickering when transitioning from skeleton to content.
  */
-private const val SHEET_READY_DELAY_MS = 350L
+private const val SHEET_READY_DELAY_MS = 250L
 
 /**
  * Number of skeleton menu items to show during loading state.
