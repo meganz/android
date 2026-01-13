@@ -148,8 +148,7 @@ data object SyncListNavKey : NavKey, Parcelable
 @Serializable
 data class SyncNewFolderNavKey(
     val syncType: SyncType = SyncType.TYPE_TWOWAY,
-    val isFromManagerActivity: Boolean = false,
-    val isFromCloudDrive: Boolean = false,
+    val isFromDeviceCenter: Boolean = false,
     val remoteFolderHandle: Long? = null,
     val remoteFolderName: String? = null,
 ) : NavKey

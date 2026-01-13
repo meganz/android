@@ -152,7 +152,11 @@ private fun SyncNewFolderScreenScaffold(
                     SyncType.TYPE_BACKUP -> stringResource(id = sharedResR.string.sync_add_new_backup_toolbar_title)
                     else -> stringResource(R.string.sync_toolbar_title)
                 },
-                onNavigationPressed = { onBackClicked() },
+                onNavigationPressed = {
+                    if (state.isLoading.not()) {
+                        onBackClicked()
+                    }
+                },
                 windowInsets = appBarWindowInsets,
                 elevation = if (isWarningBannerDisplayed) AppBarDefaults.TopAppBarElevation else 0.dp,
             )

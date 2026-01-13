@@ -126,7 +126,7 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
     private fun launchManagerActivity() {
         runCatching {
             megaNavigator.openManagerActivity(
-                context = this,
+                context = this@OverDiskQuotaPaywallActivity,
                 onIntentCreated = {
                     it.putExtra(
                         EXTRA_ASK_PERMISSIONS,

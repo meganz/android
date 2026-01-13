@@ -1457,7 +1457,6 @@ class NodeActionClickHandlerTest {
             SyncNewFolderNavKey(
                 remoteFolderHandle = mockFolderNode.id.longValue,
                 remoteFolderName = mockFolderNode.name,
-                isFromManagerActivity = true
             )
         )
     }

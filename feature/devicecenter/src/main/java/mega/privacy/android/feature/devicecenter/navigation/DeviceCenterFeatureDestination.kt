@@ -26,7 +26,12 @@ class DeviceCenterFeatureDestination : FeatureDestination {
                     navigationHandler.navigate(SyncListNavKey)
                 },
                 onNavigateToNewSync = { syncType: SyncType ->
-                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = syncType))
+                    navigationHandler.navigate(
+                        SyncNewFolderNavKey(
+                            syncType = syncType,
+                            isFromDeviceCenter = true
+                        )
+                    )
                 },
                 onNavigateToCameraUploads = {
                     navigationHandler.navigate(SettingsCameraUploadsNavKey)

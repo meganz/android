@@ -190,7 +190,6 @@ internal fun DriveSyncScreen(
                             navigationHandler.navigate(
                                 SyncNewFolderNavKey(
                                     syncType = SyncType.TYPE_TWOWAY,
-                                    isFromCloudDrive = true
                                 )
                             )
                         },
@@ -198,7 +197,6 @@ internal fun DriveSyncScreen(
                             navigationHandler.navigate(
                                 SyncNewFolderNavKey(
                                     syncType = SyncType.TYPE_BACKUP,
-                                    isFromCloudDrive = true
                                 )
                             )
                         },

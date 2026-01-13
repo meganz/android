@@ -34,4 +34,5 @@ internal data class SyncNewFolderState(
     val openSyncListScreen: StateEvent = consumed,
     val showSnackbar: StateEventWithContent<Int?> = consumed(),
     val showRenameAndCreateBackupDialog: String? = null,
+    val isLoading: Boolean = false,
 )

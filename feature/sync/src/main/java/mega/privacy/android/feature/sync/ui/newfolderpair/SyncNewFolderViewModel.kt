@@ -161,41 +161,65 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
 
             is SyncNewFolderAction.NextClicked -> {
                 viewModelScope.launch {
-                    when {
-                        isStorageOverQuotaUseCase() -> {
-                            _state.update { state ->
-                                state.copy(showStorageOverQuota = true)
+                    runCatching {
+                        _state.update { state ->
+                            state.copy(isLoading = true)
+                        }
+                        when {
+                            isStorageOverQuotaUseCase() -> {
+                                _state.update { state ->
+                                    state.copy(
+                                        showStorageOverQuota = true,
+                                        isLoading = false
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                when (state.value.syncType) {
+                                    SyncType.TYPE_BACKUP -> {
+                                        if (myBackupsFolderExistsUseCase().not()) {
+                                            runCatching {
+                                                setMyBackupsFolderUseCase(
+                                                    BACKUPS_FOLDER_DEFAULT_NAME
+                                                )
+                                            }.onSuccess {
+                                                if (createBackup().not()) {
+                                                    _state.update { state ->
+                                                        state.copy(isLoading = false)
+                                                    }
+                                                    return@launch
+                                                }
+                                            }.onFailure {
+                                                Timber.e(it)
+                                            }
+                                        } else {
+                                            if (createBackup().not()) {
+                                                _state.update { state ->
+                                                    state.copy(isLoading = false)
+                                                }
+                                                return@launch
+                                            }
+                                        }
+                                    }
+
+                                    else -> {
+                                        state.value.selectedMegaFolder?.let { remoteFolder ->
+                                            syncFolderPairUseCase(
+                                                syncType = state.value.syncType,
+                                                name = remoteFolder.name,
+                                                localPath = state.value.selectedLocalFolder,
+                                                remotePath = remoteFolder,
+                                            )
+                                        }
+                                    }
+                                }
+                                openSyncListScreen()
                             }
                         }
-
-                        else -> {
-                            when (state.value.syncType) {
-                                SyncType.TYPE_BACKUP -> {
-                                    if (myBackupsFolderExistsUseCase().not()) {
-                                        runCatching {
-                                            setMyBackupsFolderUseCase(BACKUPS_FOLDER_DEFAULT_NAME)
-                                        }.onSuccess {
-                                            if (createBackup().not()) return@launch
-                                        }.onFailure {
-                                            Timber.e(it)
-                                        }
-                                    } else {
-                                        if (createBackup().not()) return@launch
-                                    }
-                                }
-
-                                else -> {
-                                    state.value.selectedMegaFolder?.let { remoteFolder ->
-                                        syncFolderPairUseCase(
-                                            syncType = state.value.syncType,
-                                            name = remoteFolder.name,
-                                            localPath = state.value.selectedLocalFolder,
-                                            remotePath = remoteFolder,
-                                        )
-                                    }
-                                }
-                            }
-                            openSyncListScreen()
+                    }.onFailure {
+                        _state.update { state ->
+                            state.copy(isLoading = false)
                         }
                     }
                 }
@@ -225,7 +249,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             )
         }.onSuccess { result ->
             onShowRenameAndCreateBackupDialogConsumed()
-            return result != false
+            return result
         }.onFailure { exception ->
             if (exception is BackupAlreadyExistsException) {
                 _state.update { state ->
@@ -251,13 +275,23 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
      * Consumes the event of showing rename and create backup dialog.
      */
     fun onShowRenameAndCreateBackupDialogConsumed() {
-        _state.update { state -> state.copy(showRenameAndCreateBackupDialog = null) }
+        _state.update { state ->
+            state.copy(
+                showRenameAndCreateBackupDialog = null,
+                isLoading = false
+            )
+        }
     }
 
     /**
      * Triggers the event to open sync list screen
      */
     fun openSyncListScreen() {
-        _state.update { state -> state.copy(openSyncListScreen = triggered) }
+        _state.update { state ->
+            state.copy(
+                openSyncListScreen = triggered,
+                isLoading = false
+            )
+        }
     }
 }

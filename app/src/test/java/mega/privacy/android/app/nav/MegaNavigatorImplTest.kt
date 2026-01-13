@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
@@ -42,7 +43,7 @@ class MegaNavigatorImplTest {
     private val getFileTypeInfoUseCase = mock<GetFileTypeInfoUseCase>()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val settingsNavigator =
-        mock<mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl>()
+        mock<SettingsNavigatorImpl>()
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val mediaPlayerIntentMapper = mock<MediaPlayerIntentMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -54,6 +55,7 @@ class MegaNavigatorImplTest {
 
     private val context = mock<Context>()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeAll
     fun setup() {
         underTest = MegaNavigatorImpl(
@@ -67,7 +69,8 @@ class MegaNavigatorImplTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationQueue = navigationQueue,
             activityLifecycleHandler = activityLifecycleHandler,
-            snackbarEventQueue = snackbarEventQueue
+            snackbarEventQueue = snackbarEventQueue,
+            mainDispatcher = UnconfinedTestDispatcher()
         )
     }
 
@@ -226,4 +229,3 @@ class MegaNavigatorImplTest {
             verifyNoInteractions(snackbarEventQueue)
         }
 }
-

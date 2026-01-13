@@ -11,8 +11,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.result.ActivityResultLauncher
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.constants.IntentConstants
@@ -79,6 +81,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -93,8 +96,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.DeviceCenterNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
@@ -106,8 +107,6 @@ import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
-import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
-import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
@@ -133,6 +132,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     private val navigationQueue: NavigationEventQueue,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val snackbarEventQueue: SnackbarEventQueue,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
 ) : MegaNavigator,
     AppNavigatorImpl, SettingsNavigator by settingsNavigator {
 
@@ -157,18 +157,22 @@ internal class MegaNavigatorImpl @Inject constructor(
         applicationScope.launch {
             runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
                 .onFailure {
-                    legacyNavigation()
-                }.onSuccess { singleActivity ->
-                    if (singleActivity) {
-                        launchMegaActivityIfNeeded(context)
-                        singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
-                            navigationQueue.emit(it)
-                        }
-                        singleActivityMessage?.let {
-                            snackbarEventQueue.queueMessage(singleActivityMessage)
-                        }
-                    } else {
+                    withContext(mainDispatcher) {
                         legacyNavigation()
+                    }
+                }.onSuccess { singleActivity ->
+                    withContext(mainDispatcher) {
+                        if (singleActivity) {
+                            launchMegaActivityIfNeeded(context)
+                            singleActivityDestinations.takeIf { it.isNotEmpty() }?.let {
+                                navigationQueue.emit(it)
+                            }
+                            singleActivityMessage?.let {
+                                snackbarEventQueue.queueMessage(singleActivityMessage)
+                            }
+                        } else {
+                            legacyNavigation()
+                        }
                     }
                 }
         }
@@ -530,29 +534,18 @@ internal class MegaNavigatorImpl @Inject constructor(
         remoteFolderHandle: Long?,
         remoteFolderName: String?,
     ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = SyncNewFolderNavKey(
-                syncType = syncType,
-                isFromManagerActivity = isFromManagerActivity,
-                isFromCloudDrive = isFromCloudDrive,
-                remoteFolderHandle = remoteFolderHandle,
-                remoteFolderName = remoteFolderName
-            )
-        ) {
-            context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
-                putExtra(
-                    SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
-                    SyncNewFolder(
-                        syncType = syncType,
-                        isFromManagerActivity = isFromManagerActivity,
-                        remoteFolderHandle = remoteFolderHandle,
-                        remoteFolderName = remoteFolderName,
-                    )
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
+            putExtra(
+                SyncHostActivity.EXTRA_NEW_FOLDER_DETAIL,
+                SyncNewFolder(
+                    syncType = syncType,
+                    isFromManagerActivity = isFromManagerActivity,
+                    remoteFolderHandle = remoteFolderHandle,
+                    remoteFolderName = remoteFolderName,
                 )
-                putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
-            })
-        }
+            )
+            putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, isFromCloudDrive)
+        })
     }
 
     override fun openInternalFolderPicker(
@@ -582,10 +575,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openSyncMegaFolder(context: Context, handle: Long) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = CloudDriveNavKey(nodeHandle = handle)
-        ) {
+        applicationScope.launch {
             navigateToManagerActivity(
                 context = context,
                 action = ACTION_OPEN_SYNC_MEGA_FOLDER,
@@ -596,14 +586,10 @@ internal class MegaNavigatorImpl @Inject constructor(
                 flags = FLAG_ACTIVITY_CLEAR_TOP
             )
         }
-
     }
 
     override fun openDeviceCenter(context: Context) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = DeviceCenterNavKey
-        ) {
+        applicationScope.launch {
             navigateToManagerActivity(
                 context = context,
                 action = ACTION_OPEN_DEVICE_CENTER,
@@ -618,16 +604,11 @@ internal class MegaNavigatorImpl @Inject constructor(
         context: Context,
         folderName: String?,
     ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = SyncSelectStopBackupDestinationNavKey(folderName = folderName)
-        ) {
-            context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
-                putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, true)
-                putExtra(SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, true)
-                putExtra(SyncHostActivity.EXTRA_FOLDER_NAME, folderName)
-            })
-        }
+        context.startActivity(Intent(context, SyncHostActivity::class.java).apply {
+            putExtra(SyncHostActivity.EXTRA_IS_FROM_CLOUD_DRIVE, true)
+            putExtra(SyncHostActivity.EXTRA_OPEN_SELECT_STOP_BACKUP_DESTINATION, true)
+            putExtra(SyncHostActivity.EXTRA_FOLDER_NAME, folderName)
+        })
     }
 
     override fun openPdfActivity(
@@ -1020,13 +1001,15 @@ internal class MegaNavigatorImpl @Inject constructor(
         flags: Int? = null,
         onIntentCreated: (suspend (Intent) -> Unit)? = null,
     ) {
-        val intent = Intent(context, ManagerActivity::class.java)
-        intent.action = action
-        intent.data = data
-        flags?.let { intent.flags = it }
-        bundle?.let { intent.putExtras(it) }
-        onIntentCreated?.invoke(intent)
-        context.startActivity(intent)
+        withContext(mainDispatcher) {
+            val intent = Intent(context, ManagerActivity::class.java)
+            intent.action = action
+            intent.data = data
+            flags?.let { intent.flags = it }
+            bundle?.let { intent.putExtras(it) }
+            onIntentCreated?.invoke(intent)
+            context.startActivity(intent)
+        }
     }
 
     override fun openMediaDiscoveryActivity(

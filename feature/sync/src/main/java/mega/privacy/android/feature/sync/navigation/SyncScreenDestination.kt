@@ -108,7 +108,10 @@ fun EntryProviderScope<NavKey>.syncScreens(
                     navigationHandler.navigate(SyncMegaPickerNavKey)
                 },
                 openNextScreen = { _ ->
-                    navigationHandler.navigate(SyncListNavKey)
+                    if (navKey.isFromDeviceCenter) {
+                        navigationHandler.navigate(SyncListNavKey)
+                    }
+                    navigationHandler.remove(navKey)
                 },
                 openUpgradeAccount = openUpgradeAccountPage,
                 onBackClicked = {

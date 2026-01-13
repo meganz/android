@@ -20,7 +20,6 @@ class SyncActionClickHandler @Inject constructor() : SingleNodeAction {
             SyncNewFolderNavKey(
                 remoteFolderHandle = node.id.longValue,
                 remoteFolderName = node.name,
-                isFromManagerActivity = true,
             )
         )
     }
