@@ -407,7 +407,8 @@ class AlbumContentScreenComposeTest {
                     isVisible = false,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    onAction = {}
+                    onAction = {},
+                    actions = AlbumContentSelectionAction.bottomBarItems
                 )
             }
         }
@@ -428,7 +429,8 @@ class AlbumContentScreenComposeTest {
                     isVisible = true,
                     onDismiss = {},
                     albumUiState = albumUiState,
-                    onAction = {}
+                    onAction = {},
+                    actions = AlbumContentSelectionAction.bottomBarItems
                 )
             }
         }

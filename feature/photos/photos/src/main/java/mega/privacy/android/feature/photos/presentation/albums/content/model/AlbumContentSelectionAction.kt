@@ -185,13 +185,5 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             Delete,
             RemoveFavourites
         )
-
-        val bottomSheetItems = listOf(
-            Rename,
-            SelectAlbumCover,
-            ManageLink,
-            RemoveLink,
-            Delete
-        )
     }
 }

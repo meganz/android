@@ -556,7 +556,16 @@ internal fun AlbumContentScreen(
             onDismiss = { isMoreOptionsSheetVisible = false },
             albumUiState = uiState.uiAlbum,
             onAction = handleAction,
-            isDarkTheme = uiState.themeMode.isDarkMode()
+            isDarkTheme = uiState.themeMode.isDarkMode(),
+            actions = buildList {
+                add(AlbumContentSelectionAction.Rename)
+                if (uiState.photos.isNotEmpty()) {
+                    add(AlbumContentSelectionAction.SelectAlbumCover)
+                }
+                add(AlbumContentSelectionAction.ManageLink)
+                add(AlbumContentSelectionAction.RemoveLink)
+                add(AlbumContentSelectionAction.Delete)
+            }
         )
 
         if (uiState.showUpdateAlbumName == triggered) {
@@ -647,6 +656,7 @@ internal fun RemoveLinksDialog(
 internal fun AlbumOptionsBottomSheet(
     onDismiss: () -> Unit,
     albumUiState: AlbumUiState?,
+    actions: List<AlbumContentSelectionAction>,
     onAction: (AlbumContentSelectionAction) -> Unit,
     isVisible: Boolean = false,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -713,7 +723,7 @@ internal fun AlbumOptionsBottomSheet(
                     onClickListener = null
                 )
 
-                AlbumContentSelectionAction.bottomSheetItems.forEach { action ->
+                actions.forEach { action ->
                     NodeActionListTile(
                         modifier = Modifier
                             .fillMaxWidth()
