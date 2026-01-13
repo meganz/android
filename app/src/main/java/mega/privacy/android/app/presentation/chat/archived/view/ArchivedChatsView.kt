@@ -137,7 +137,6 @@ fun ArchivedChatsView(
                 selectedIds = emptyList(),
                 scrollToTop = false,
                 isSearchMode = isSearchMode,
-                isNew = noteToSelfState.isNewFeature,
                 isMeetingView = false,
                 onItemClick = onItemClick,
                 onItemMoreClick = { chatItem ->

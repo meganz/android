@@ -175,7 +175,7 @@ fun ChatInfoView(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 item(key = "Chat title") {
-                    if (state.isNoteToSelf && noteToSelfChatState.isNoteToYourselfFeatureFlagEnabled) {
+                    if (state.isNoteToSelf) {
                         NoteToSelfView(
                             isHint = noteToSelfChatState.isNoteToSelfChatEmpty,
                         )

@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUs
 import mega.privacy.android.domain.usecase.contact.GetUserUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RequestUserLastGreenUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -54,7 +53,6 @@ class ChatExplorerViewModelTest {
     private val getArchivedChatListItemsUseCase: GetArchivedChatListItemsUseCase = mock()
     private val getUserUseCase: GetUserUseCase = mock()
     private val isAnEmptyChatUseCase: IsAnEmptyChatUseCase = mock()
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
 
@@ -80,7 +78,6 @@ class ChatExplorerViewModelTest {
             getVisibleContactsWithoutChatRoomUseCase = getVisibleContactsWithoutChatRoomUseCase,
             userContactMapper = userContactMapper,
             isAnEmptyChatUseCase = isAnEmptyChatUseCase,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             defaultDispatcher = extension.testDispatcher,
             getStringFromStringResMapper = getStringFromStringResMapper,
@@ -106,7 +103,6 @@ class ChatExplorerViewModelTest {
             requestUserLastGreenUseCase,
             getVisibleContactsWithoutChatRoomUseCase,
             isAnEmptyChatUseCase,
-            getFeatureFlagValueUseCase,
             getNoteToSelfChatUseCase,
             getStringFromStringResMapper,
             savedStateHandle

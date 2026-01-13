@@ -40,7 +40,6 @@ import androidx.constraintlayout.compose.Visibility
 import androidx.core.graphics.toColorInt
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.chat.view.NOTE_TO_SELF_ITEM_NEW_LABEL
 import mega.privacy.android.app.presentation.meeting.chat.view.NoteToSelfAvatarView
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
@@ -54,8 +53,6 @@ import mega.privacy.android.shared.original.core.ui.controls.chat.messages.Messa
 import mega.privacy.android.shared.original.core.ui.controls.chip.BadgeSize
 import mega.privacy.android.shared.original.core.ui.controls.chip.CounterBadge
 import mega.privacy.android.shared.original.core.ui.controls.chip.IconBadge
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.chip.TagChipStyle
 import mega.privacy.android.shared.original.core.ui.controls.meetings.CallChronometer
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -72,7 +69,6 @@ import mega.privacy.android.shared.resources.R as sharedR
  *
  * @param item                  [ChatRoomItem]
  * @param isSelected
- * @param isNew
  * @param isSelectionEnabled
  * @param isEmptyStateShowed
  * @param onItemClick
@@ -90,7 +86,6 @@ internal fun ChatRoomItemView(
     onItemMoreClick: (ChatRoomItem) -> Unit,
     onItemSelected: (Long) -> Unit,
     modifier: Modifier = Modifier,
-    isNew: Boolean = false,
     isEmptyStateShowed: Boolean = false,
 ) {
     val hapticFeedback = LocalHapticFeedback.current
@@ -436,22 +431,6 @@ internal fun ChatRoomItemView(
                 },
         )
 
-        if (isNoteToSelfChat && isNew) {
-            MegaChip(
-                selected = true,
-                text = stringResource(sharedR.string.notifications_notification_item_new_tag),
-                style = TagChipStyle,
-                modifier = Modifier
-                    .testTag(NOTE_TO_SELF_ITEM_NEW_LABEL)
-                    .constrainAs(unreadCountIcon) {
-                        end.linkTo(moreButton.start, 16.dp)
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        visibility = Visibility.Visible
-                    },
-            )
-        }
-
         createVerticalChain(
             titleText,
             middleText,
@@ -590,25 +569,6 @@ private fun PreviewIndividualChatRoomItem(
         )
     }
 }
-
-@CombinedThemeComponentPreviews
-@Composable
-private fun PreviewNoteToSelfChatRoomItem(
-    @PreviewParameter(ChatRoomItemProvider::class) itemToSelected: Pair<ChatRoomItem, Boolean>,
-) {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        ChatRoomItemView(
-            item = itemToSelected.first,
-            isSelected = itemToSelected.second,
-            isNew = true,
-            isSelectionEnabled = itemToSelected.second,
-            onItemClick = { _, _ -> },
-            onItemMoreClick = {},
-            onItemSelected = {},
-        )
-    }
-}
-
 
 class ChatRoomItemProvider : PreviewParameterProvider<Pair<ChatRoomItem, Boolean>> {
     override val values = sequenceOf(

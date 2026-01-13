@@ -36,15 +36,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Note to yourself feature flag
-     */
-    NoteToYourselfFlag(
-        "n2s",
-        "Enable note to yourself",
-        false
-    ),
-
-    /**
      * Migration to mega app domain.
      */
     MegaDotAppDomain(

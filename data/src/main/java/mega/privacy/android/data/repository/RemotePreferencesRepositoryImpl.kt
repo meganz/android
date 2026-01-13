@@ -29,7 +29,6 @@ internal class RemotePreferencesRepositoryImpl @Inject constructor(
 
     companion object {
         private const val MEETING_ONBOARDING_PREF_KEY = "aObSm"
-        private const val NOTE_TO_SELF_CHAT_PREF_KEY = "aN2Sb"
     }
 
     override suspend fun setMeetingTooltipPreference(item: MeetingTooltipItem) =
@@ -46,21 +45,6 @@ internal class RemotePreferencesRepositoryImpl @Inject constructor(
                 ?.let(stringWrapper::decodeBase64)
                 ?.let(MeetingTooltipItem::valueOf)
                 ?: MeetingTooltipItem.CREATE
-        }
-
-    override suspend fun setNoteToSelfChatNewLabelPreference(counter: String) =
-        withContext(ioDispatcher) {
-            val preference = mapOf(
-                NOTE_TO_SELF_CHAT_PREF_KEY to stringWrapper.encodeBase64(counter)
-            )
-            updateAppPreferences(preference)
-        }
-
-    override suspend fun getNoteToSelfChatNewLabelPreference(): String =
-        withContext(ioDispatcher) {
-            getAppPreferences()[NOTE_TO_SELF_CHAT_PREF_KEY]
-                ?.let(stringWrapper::decodeBase64)
-                ?: "-1"
         }
 
     private suspend fun getAppPreferences(): Map<String, String> =

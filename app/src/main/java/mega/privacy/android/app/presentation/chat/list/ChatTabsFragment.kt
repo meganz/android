@@ -62,7 +62,6 @@ import mega.privacy.android.app.presentation.chat.list.model.ChatTab
 import mega.privacy.android.app.presentation.chat.list.view.ChatTabsView
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.NoteToSelfChatViewModel
@@ -81,6 +80,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -488,13 +488,6 @@ class ChatTabsFragment : Fragment() {
     }
 
     private fun collectFlows() {
-        viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.noteToSelfChatRoom }
-            .distinctUntilChanged()) {
-            it?.also {
-                noteToSelfChatViewModel.getNoteToSelfPreference()
-            }
-        }
-
         viewLifecycleOwner.collectFlow(noteToSelfChatViewModel.state.map { it.isNoteToSelfChatEmpty }
             .distinctUntilChanged()) {
             checkSearchVisibility(isNoteToSelfChatEmpty = it)

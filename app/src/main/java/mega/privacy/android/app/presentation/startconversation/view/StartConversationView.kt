@@ -147,14 +147,11 @@ fun StartConversationView(
                     contactsList.isNotEmpty() -> {
                         item(key = "Contacts header") { ContactsHeader() }
 
-                        if (noteToSelfChatUIState.isNoteToYourselfFeatureFlagEnabled) {
-                            item(key = "Note to self") {
-                                NoteToSelfView(
-                                    onNoteToSelfClicked,
-                                    isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
-                                    isNew = noteToSelfChatUIState.isNewFeature
-                                )
-                            }
+                        item(key = "Note to self") {
+                            NoteToSelfView(
+                                onNoteToSelfClicked,
+                                isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
+                            )
                         }
 
                         val defaultAvatarContent = contactsList[0].getAvatarFirstLetter()
@@ -172,14 +169,11 @@ fun StartConversationView(
 
                     else -> {
                         item(key = "Contacts header") { ContactsHeader() }
-                        if (noteToSelfChatUIState.isNoteToYourselfFeatureFlagEnabled) {
-                            item(key = "Note to self") {
-                                NoteToSelfView(
-                                    onNoteToSelfClicked,
-                                    isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
-                                    isNew = noteToSelfChatUIState.isNewFeature
-                                )
-                            }
+                        item(key = "Note to self") {
+                            NoteToSelfView(
+                                onNoteToSelfClicked,
+                                isHint = noteToSelfChatUIState.isNoteToSelfChatEmpty,
+                            )
                         }
                         item(key = "Empty contacts") { EmptyContactsView(onInviteContactsClicked) }
                     }

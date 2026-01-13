@@ -24,20 +24,10 @@ class NoteToSelfViewTest {
         ).assertIsDisplayed()
     }
 
-    @Test
-    fun `test that new is shown`() {
-        initComposeRuleContent(isNew = true, isHint = true)
-        composeRule.onNodeWithTag(
-            NOTE_TO_SELF_ITEM_NEW_LABEL,
-            useUnmergedTree = true
-        ).assertIsDisplayed()
-    }
-
-    private fun initComposeRuleContent(isNew: Boolean = false, isHint: Boolean = false) {
+    private fun initComposeRuleContent(isHint: Boolean = false) {
         composeRule.setContent {
             NoteToSelfView(
                 onNoteToSelfClicked = {},
-                isNew = isNew,
                 isHint = isHint
             )
         }

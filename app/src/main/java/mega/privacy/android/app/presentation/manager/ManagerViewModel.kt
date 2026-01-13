@@ -622,10 +622,8 @@ class ManagerViewModel @Inject constructor(
     private fun initialiseNoteToSelfChat() {
         viewModelScope.launch {
             runCatching {
-                if (getFeatureFlagValueUseCase(ApiFeatures.NoteToYourselfFlag)) {
-                    getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
-                        Timber.d("Note to self chat created")
-                    }
+                getNoteToSelfChatUseCase()?.let { noteToSelfChatRoom ->
+                    Timber.d("Note to self chat created")
                 }
             }.onFailure {
                 Timber.e(it, "Note to self chat failed")
