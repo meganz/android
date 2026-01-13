@@ -6,10 +6,6 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -27,6 +23,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.app.presentation.photos.search.PhotosSearchActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
@@ -56,7 +53,7 @@ fun EntryProviderScope<NavKey>.legacyAlbumCoverSelection(
             returnResult(LegacyAlbumCoverSelectionNavKey.MESSAGE, result)
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedOnceEffect {
             launcher.launch(contract)
         }
     }
@@ -76,7 +73,7 @@ fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
             returnResult(LegacyPhotoSelectionNavKey.RESULT, albumId)
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedOnceEffect {
             if (contract.captureResult) {
                 // Navigate to the photos selection screen by listening to its result
                 launcher.launch(contract)
@@ -248,7 +245,7 @@ fun EntryProviderScope<NavKey>.legacyAddToAlbumActivityNavKey(returnResult: (Str
             returnResult(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT, message)
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedOnceEffect {
             val intent = Intent(context, AddToAlbumActivity::class.java).apply {
                 val ids = args.photoIds.toTypedArray()
                 putExtra("ids", ids)
@@ -286,7 +283,6 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
         metadata = transparentMetadata()
     ) {
         val context = LocalContext.current
-        var hasLaunched by rememberSaveable { mutableStateOf(false) }
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
@@ -304,12 +300,9 @@ fun EntryProviderScope<NavKey>.legacyPhotosSearch(
             }
         }
 
-        LaunchedEffect(Unit) {
-            if (!hasLaunched) {
-                hasLaunched = true
-                val intent = Intent(context, PhotosSearchActivity::class.java)
-                launcher.launch(intent)
-            }
+        LaunchedOnceEffect {
+            val intent = Intent(context, PhotosSearchActivity::class.java)
+            launcher.launch(intent)
         }
     }
 }

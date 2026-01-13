@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.videosection
 
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation3.runtime.EntryProviderScope
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
@@ -23,7 +23,7 @@ fun EntryProviderScope<NavKey>.legacyVideoToPlaylistDestination(
             removeDestination()
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedOnceEffect {
             launcher.launch(key.nodeHandle)
         }
     }
