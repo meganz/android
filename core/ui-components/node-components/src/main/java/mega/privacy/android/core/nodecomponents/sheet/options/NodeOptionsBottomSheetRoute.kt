@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.sheet.options
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -127,6 +128,10 @@ internal fun NodeOptionsBottomSheetRoute(
             val handles = it.nodes.map { node -> node.id.longValue }.toLongArray()
             shareFolderLauncher.launch(handles)
         }
+    }
+
+    BackHandler {
+        onDismiss()
     }
 
     // Event handlers
