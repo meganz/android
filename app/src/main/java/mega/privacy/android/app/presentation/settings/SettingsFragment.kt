@@ -69,7 +69,6 @@ import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAu
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import mega.privacy.android.shared.resources.R as sharedResR
 import javax.inject.Inject
@@ -85,9 +84,6 @@ class SettingsFragment :
 
     @Inject
     lateinit var viewModelPreferenceDataStoreFactory: ViewModelPreferenceDataStoreFactory
-
-    @Inject
-    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var numberOfClicksAppVersion = 0
 
@@ -173,6 +169,11 @@ class SettingsFragment :
 
                         isChecked = state.showHiddenItems
                     }
+
+                    findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isVisible =
+                        !state.isSingleActivityEnabled
+                    findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.isVisible =
+                        !state.isSingleActivityEnabled
                 }
             }
         }
@@ -180,7 +181,6 @@ class SettingsFragment :
 
     private fun updateSubFolderMediaDiscovery(checked: Boolean) {
         findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.apply {
-            isVisible = true
             isChecked = checked
         }
     }

@@ -126,6 +126,7 @@ class SettingsViewModel @Inject constructor(
             subFolderMediaDiscoveryChecked = true,
             showHiddenItems = false,
             accountDetail = null,
+            isSingleActivityEnabled = true,
         )
     }
 
@@ -204,6 +205,10 @@ class SettingsViewModel @Inject constructor(
                 monitorAccountDetailUseCase()
                     .map { accountDetail ->
                         { state: SettingsState -> state.copy(accountDetail = accountDetail) }
+                    },
+                flow { emit(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) }
+                    .map { isSingleActivityEnabled ->
+                        { state: SettingsState -> state.copy(isSingleActivityEnabled = isSingleActivityEnabled) }
                     },
             ).catch {
                 Timber.e(it)

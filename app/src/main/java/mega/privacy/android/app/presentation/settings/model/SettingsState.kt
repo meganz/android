@@ -48,4 +48,5 @@ data class SettingsState(
     val subFolderMediaDiscoveryChecked: Boolean,
     val showHiddenItems: Boolean,
     val accountDetail: AccountDetail?,
+    val isSingleActivityEnabled: Boolean = false,
 )
