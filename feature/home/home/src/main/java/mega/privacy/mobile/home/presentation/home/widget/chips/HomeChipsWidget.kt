@@ -27,9 +27,10 @@ import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.mobile.analytics.core.event.type.AnalyticsEvent
+import mega.privacy.mobile.analytics.event.ChatChipButtonPressedEvent
+import mega.privacy.mobile.analytics.event.FavouritesChipButtonPressedEvent
+import mega.privacy.mobile.analytics.event.OfflineChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VideosChipButtonPressedEvent
-import timber.log.Timber
 import javax.inject.Inject
 
 class HomeChipsWidget @Inject constructor(
@@ -68,6 +69,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Heart),
             onClick = {
+                Analytics.tracker.trackEvent(FavouritesChipButtonPressedEvent)
                 onNavigate(FavouritesNavKey)
             },
         )
@@ -85,6 +87,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ArrowDownCircle),
             onClick = {
+                Analytics.tracker.trackEvent(OfflineChipButtonPressedEvent)
                 onNavigate(OfflineNavKey())
             },
         )
@@ -93,6 +96,7 @@ private fun HomeChips(
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.MessageChatCircle),
             onClick = {
+                Analytics.tracker.trackEvent(ChatChipButtonPressedEvent)
                 onNavigate(ChatListNavKey())
             },
         )
