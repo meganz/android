@@ -25,6 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.NewLoginView
 import mega.privacy.android.app.utils.Constants
@@ -79,7 +80,15 @@ fun LoginScreen(
     }
 
     EventEffect(uiState.openUrlEvent, viewModel::onOpenUrlEventConsumed) {
-        openUrl(context, it)
+        Timber.d("Open url $it")
+        context.launchUrl(it)
+
+        if (uiState.intentState == LoginIntentState.ReadyForFinalSetup
+            && uiState.isPendingToGetLinkWithSession
+        ) {
+            Timber.d("Finish after opening pending url")
+            activity?.finish()
+        }
     }
 
     BackHandler {
@@ -211,9 +220,4 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
     intent.data = link.toUri()
     intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
     context.startActivity(intent)
-}
-
-private fun openUrl(context: Context, url: String) {
-    Timber.d("Open recovery url $url")
-    context.launchUrl(url)
 }

@@ -1392,6 +1392,10 @@ class LoginViewModel @Inject constructor(
         }
     }
 
+    fun setPendingToGetLinkWithSession() {
+        _state.update { it.copy(isPendingToGetLinkWithSession = true) }
+    }
+
     companion object {
         /**
          * Intent action for showing the login fetching nodes.

@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import mega.privacy.android.app.MegaApplication
@@ -48,6 +49,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
     var intentDataString: String? by remember { mutableStateOf(null) }
     var intentParentHandle: Long by remember { mutableLongStateOf(-1L) }
     var intentShareInfo: Boolean by remember { mutableStateOf(false) }
+    var isPendingToGetLinkWithSession: Boolean by rememberSaveable { mutableStateOf(false) }
     val activity = LocalActivity.current ?: return
 
     val readyToFinish = remember {
@@ -332,8 +334,10 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                             }
                         }
                     }
-                    Timber.d("LoginActivity finish")
-                    activity.finish()
+                    if (!isPendingToGetLinkWithSession) {
+                        Timber.d("LoginActivity finish")
+                        activity.finish()
+                    }
                 }
             } else {
                 Timber.d("Go to ChooseAccountActivity")
@@ -474,6 +478,11 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
 
                                     activity.finish()
                                 } else {
+                                    if (intentAction == ACTION_REFRESH_AND_OPEN_SESSION_LINK) {
+                                        isPendingToGetLinkWithSession = true
+                                        viewModel.setPendingToGetLinkWithSession()
+                                    }
+
                                     viewModel.fastLogin(activity.intent?.action == Constants.ACTION_REFRESH_API_SERVER)
                                 }
 

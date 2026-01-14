@@ -112,6 +112,7 @@ data class LoginState(
     val shouldShowNotificationPermission: Boolean = false,
     val initialEmail: String? = null,
     val isSingleActivityEnabled: Boolean = false,
+    val isPendingToGetLinkWithSession: Boolean = false,
 ) {
 
     /**
