@@ -58,6 +58,7 @@ fun HomeScreens(
     val slideTransitionSceneStrategy = remember(isLandscapeMode) {
         OrientationAwareSlideTransitionSceneStrategy<NavKey>(isLandscapeMode)
     }
+    var isNetworkChangeHandled by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(storageUiState.storageState) {
         if (storageUiState.storageState == StorageState.Red
@@ -91,8 +92,9 @@ fun HomeScreens(
             }
 
             LaunchedEffect(currentState.isConnected) {
-                if (!currentState.isConnected) {
+                if (!currentState.isConnected && !isNetworkChangeHandled) {
                     homeScreenStacks.switchTopLevel(Home)
+                    isNetworkChangeHandled = true
                 }
             }
 

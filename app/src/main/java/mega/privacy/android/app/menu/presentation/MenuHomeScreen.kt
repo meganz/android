@@ -187,6 +187,7 @@ fun MenuHomeScreenUi(
                             avatarColor = uiState.avatarColor
                         )
                     },
+                    enableClick = uiState.isConnectedToNetwork,
                     trailingElement = {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
@@ -205,6 +206,7 @@ fun MenuHomeScreenUi(
             ) { item ->
                 AccountItem(
                     item = item,
+                    enable = uiState.isConnectedToNetwork || item.availableOffline,
                     onNavigate = {
                         navigateToFeature(item.destination)
                     }
@@ -273,12 +275,14 @@ fun MenuHomeScreenUi(
 @Composable
 private fun AccountItem(
     item: NavDrawerItem.Account,
+    enable: Boolean,
     onNavigate: () -> Unit,
 ) {
     val hasActionLabel = item.actionLabel != null
     val subtitle by item.subTitle?.collectAsState(null) ?: remember { mutableStateOf(null) }
     val badge by item.badge?.collectAsState(null) ?: remember { mutableStateOf(null) }
     FlexibleLineListItem(
+        enable = enable,
         modifier = Modifier
             .fillMaxWidth()
             .testTag(ACCOUNT_ITEM),
@@ -287,7 +291,6 @@ private fun AccountItem(
         leadingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(item.icon),
-                tint = IconColor.Primary,
                 contentDescription = null
             )
         },
@@ -298,15 +301,16 @@ private fun AccountItem(
                         .wrapContentSize(),
                     text = stringResource(id = it),
                     isLoading = false,
+                    enabled = enable,
                     onClick = onNavigate,
                 )
             } ?: MegaIcon(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                tint = IconColor.Primary,
+                tint = if (enable) IconColor.Secondary else IconColor.Disabled,
                 contentDescription = "arrow right",
             )
         },
-        enableClick = hasActionLabel.not(),
+        enableClick = hasActionLabel.not() && enable,
         onClickListener = onNavigate,
         titleTrailingElement = badge?.composeLet { count ->
             NavigationBadge(

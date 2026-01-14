@@ -82,13 +82,15 @@ object DeviceCentreItem : NavDrawerItem.Account(
 object TransfersItem : NavDrawerItem.Account(
     destination = TransfersNavKey(),
     icon = IconPack.Medium.Thin.Outline.ArrowsUpDownCircle,
-    title = sharedR.string.general_section_transfers
+    title = sharedR.string.general_section_transfers,
+    availableOffline = true
 )
 
 object OfflineFilesItem : NavDrawerItem.Account(
     destination = OfflineNavKey(),
     icon = IconPack.Medium.Thin.Outline.CloudOff,
-    title = sharedR.string.general_section_offline_files
+    title = sharedR.string.general_section_offline_files,
+    availableOffline = true
 )
 
 object RubbishBinItem : NavDrawerItem.Account(

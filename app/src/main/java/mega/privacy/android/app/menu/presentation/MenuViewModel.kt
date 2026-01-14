@@ -110,7 +110,7 @@ class MenuViewModel @Inject constructor(
 
     private fun filterMyAccountItems(isAchievementsEnabled: Boolean): Map<Int, NavDrawerItem.Account> =
         menuItems
-            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || it is AchievementsItem && isAchievementsEnabled) }
+            .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || isAchievementsEnabled) }
             .mapValues {
                 val item = it.value as NavDrawerItem.Account
                 when (item) {
