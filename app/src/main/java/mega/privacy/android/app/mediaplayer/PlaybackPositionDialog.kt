@@ -16,7 +16,7 @@ internal fun PlaybackPositionDialog(
     showPlaybackDialog: Boolean,
     currentPlayingItemName: String,
     playbackPosition: Long,
-    onPlaybackPositionStatusUpdated: (PlaybackPositionStatus) -> Unit,
+    onPlaybackPositionStatusUpdated: (PlaybackPositionStatus, Boolean) -> Unit,
 ) {
     if (showPlaybackDialog) {
         MegaAlertDialog(
@@ -50,15 +50,16 @@ internal fun PlaybackPositionDialog(
                     R.string.video_playback_position_dialog_resume_button
                 }
             ),
-            onConfirm = { onPlaybackPositionStatusUpdated(PlaybackPositionStatus.Restart) },
-            onCancel = { onPlaybackPositionStatusUpdated(PlaybackPositionStatus.Resume) },
+            onConfirm = { onPlaybackPositionStatusUpdated(PlaybackPositionStatus.Restart, true) },
+            onCancel = { onPlaybackPositionStatusUpdated(PlaybackPositionStatus.Resume, false) },
             onDismiss = {
                 onPlaybackPositionStatusUpdated(
                     if (type == MediaType.Audio) {
                         PlaybackPositionStatus.Restart
                     } else {
                         PlaybackPositionStatus.Initial
-                    }
+                    },
+                    false
                 )
             },
         )

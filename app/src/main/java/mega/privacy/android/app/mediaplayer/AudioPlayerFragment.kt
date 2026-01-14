@@ -331,8 +331,12 @@ class AudioPlayerFragment : Fragment() {
                         showPlaybackDialog = uiState.showPlaybackDialog,
                         currentPlayingItemName = uiState.currentPlayingItemName ?: "",
                         playbackPosition = uiState.playbackPosition ?: 0,
-                        onPlaybackPositionStatusUpdated = { status ->
-                            audioViewModel.updatePlaybackPositionStatus(status)
+                        onPlaybackPositionStatusUpdated = { status, isClearPosition ->
+                            audioViewModel.updatePlaybackPositionStatus(
+                                handle = uiState.currentPlayingHandle,
+                                status = status,
+                                isClearPosition = isClearPosition
+                            )
                             serviceGateway?.updatePlaybackPositionStatus(status)
                         }
                     )

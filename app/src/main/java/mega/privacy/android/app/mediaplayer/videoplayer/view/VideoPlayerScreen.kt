@@ -445,7 +445,9 @@ internal fun VideoPlayerScreen(
                     showPlaybackDialog = uiState.showPlaybackDialog,
                     currentPlayingItemName = uiState.currentPlayingItemName ?: "",
                     playbackPosition = uiState.playbackPosition ?: 0,
-                    onPlaybackPositionStatusUpdated = viewModel::updatePlaybackPositionStatus,
+                    onPlaybackPositionStatusUpdated = { status, _ ->
+                        viewModel.updatePlaybackPositionStatus(status)
+                    },
                 )
 
                 AddSubtitlesDialog(

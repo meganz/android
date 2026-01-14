@@ -10,6 +10,7 @@ import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetMediaPlaybackInfoUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,6 +33,7 @@ class AudioPlayerViewModelTest {
 
     private val mediaPlayerGateway = mock<MediaPlayerGateway>()
     private val getMediaPlaybackInfoUseCase = mock<GetMediaPlaybackInfoUseCase>()
+    private val deleteAudioPlaybackInfoUseCase = mock<DeleteAudioPlaybackInfoUseCase>()
 
     private val testHandle = 12345L
     private val testName = "Test Audio"
@@ -44,7 +47,8 @@ class AudioPlayerViewModelTest {
     private fun initUnderTest() {
         underTest = AudioPlayerViewModel(
             mediaPlayerGateway = mediaPlayerGateway,
-            getMediaPlaybackInfoUseCase = getMediaPlaybackInfoUseCase
+            getMediaPlaybackInfoUseCase = getMediaPlaybackInfoUseCase,
+            deleteAudioPlaybackInfoUseCase = deleteAudioPlaybackInfoUseCase,
         )
     }
 
@@ -52,7 +56,8 @@ class AudioPlayerViewModelTest {
     fun resetMocks() {
         reset(
             mediaPlayerGateway,
-            getMediaPlaybackInfoUseCase
+            getMediaPlaybackInfoUseCase,
+            deleteAudioPlaybackInfoUseCase
         )
     }
 
@@ -111,11 +116,11 @@ class AudioPlayerViewModelTest {
             initUnderTest()
 
             underTest.checkPlaybackPositionOfPlayingItem(
-                testHandle,
-                testName,
-                PlaybackPositionStatus.Initial,
-                true,
-                mockPlaybackPositionStatusCallback
+                handle = testHandle,
+                name = testName,
+                status = PlaybackPositionStatus.Initial,
+                isResume = true,
+                playbackPositionStatusCallback = mockPlaybackPositionStatusCallback
             )
             advanceUntilIdle()
             underTest.uiState.test {
@@ -128,21 +133,63 @@ class AudioPlayerViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "when playback status is {0}")
+    @ParameterizedTest(name = "and playback status is {0}")
     @EnumSource(PlaybackPositionStatus::class)
-    fun `test that functions are invoked expected`(status: PlaybackPositionStatus) = runTest {
-        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+    fun `test that functions are invoked expected when isClearPosition is true`(status: PlaybackPositionStatus) =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
 
-        initUnderTest()
-        underTest.updatePlaybackPositionStatus(status, testPosition)
-        advanceUntilIdle()
+            initUnderTest()
+            underTest.updatePlaybackPositionStatus(
+                handle = testHandle,
+                status = status,
+                playbackPosition = testPosition,
+                isClearPosition = true
+            )
+            advanceUntilIdle()
 
-        underTest.uiState.test {
-            assertThat(awaitItem().showPlaybackDialog).isFalse()
-            if (status == PlaybackPositionStatus.Resume) {
-                verify(mediaPlayerGateway).playerSeekToPositionInMs(testPosition)
+            underTest.uiState.test {
+                assertThat(awaitItem().showPlaybackDialog).isFalse()
+                when (status) {
+                    PlaybackPositionStatus.Restart ->
+                        verify(deleteAudioPlaybackInfoUseCase).invoke(testHandle)
+
+                    PlaybackPositionStatus.Resume ->
+                        verify(mediaPlayerGateway).playerSeekToPositionInMs(testPosition)
+
+                    else -> {}
+                }
+                verify(mediaPlayerGateway).setPlayWhenReady(true)
             }
-            verify(mediaPlayerGateway).setPlayWhenReady(true)
         }
-    }
+
+    @ParameterizedTest(name = "and playback status is {0}")
+    @EnumSource(PlaybackPositionStatus::class)
+    fun `test that functions are invoked expected when isClearPosition is false`(status: PlaybackPositionStatus) =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+
+            initUnderTest()
+            underTest.updatePlaybackPositionStatus(
+                handle = testHandle,
+                status = status,
+                playbackPosition = testPosition,
+                isClearPosition = false
+            )
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().showPlaybackDialog).isFalse()
+                when (status) {
+                    PlaybackPositionStatus.Restart ->
+                        verifyNoInteractions(deleteAudioPlaybackInfoUseCase)
+
+                    PlaybackPositionStatus.Resume ->
+                        verify(mediaPlayerGateway).playerSeekToPositionInMs(testPosition)
+
+                    else -> {}
+                }
+                verify(mediaPlayerGateway).setPlayWhenReady(true)
+            }
+        }
 }

@@ -15,12 +15,14 @@ import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
+import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetMediaPlaybackInfoUseCase
 
 @HiltViewModel
 class AudioPlayerViewModel @Inject constructor(
     @AudioPlayer private val mediaPlayerGateway: MediaPlayerGateway,
     private val getMediaPlaybackInfoUseCase: GetMediaPlaybackInfoUseCase,
+    private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
 ) : ViewModel() {
     val uiState: StateFlow<AudioPlayerUiState>
         field: MutableStateFlow<AudioPlayerUiState> = MutableStateFlow(AudioPlayerUiState())
@@ -70,26 +72,39 @@ class AudioPlayerViewModel @Inject constructor(
                         playbackPositionStatusCallback(playbackPositionStatus)
                     }
 
-                    else -> updatePlaybackPositionStatus(status, playbackPosition, isResume)
+                    else -> updatePlaybackPositionStatus(
+                        handle = handle,
+                        status = status,
+                        playbackPosition = playbackPosition,
+                        isResume = isResume,
+                    )
                 }
             }
         }
     }
 
     internal fun updatePlaybackPositionStatus(
+        handle: Long,
         status: PlaybackPositionStatus,
         playbackPosition: Long? = uiState.value.playbackPosition,
         isResume: Boolean = true,
+        isClearPosition: Boolean = false,
     ) {
-        if (status == PlaybackPositionStatus.Resume && playbackPosition != null) {
-            mediaPlayerGateway.playerSeekToPositionInMs(playbackPosition)
-        }
+        viewModelScope.launch {
+            when {
+                status == PlaybackPositionStatus.Resume && playbackPosition != null ->
+                    mediaPlayerGateway.playerSeekToPositionInMs(playbackPosition)
 
-        playbackPositionStatus = status
-        uiState.update { it.copy(showPlaybackDialog = false) }
+                status == PlaybackPositionStatus.Restart && playbackPosition != null && isClearPosition ->
+                    deleteAudioPlaybackInfoUseCase(handle)
+            }
 
-        if (!mediaPlayerGateway.getPlayWhenReady() && isResume) {
-            mediaPlayerGateway.setPlayWhenReady(true)
+            playbackPositionStatus = status
+            uiState.update { it.copy(showPlaybackDialog = false) }
+
+            if (!mediaPlayerGateway.getPlayWhenReady() && isResume) {
+                mediaPlayerGateway.setPlayWhenReady(true)
+            }
         }
     }
 }
