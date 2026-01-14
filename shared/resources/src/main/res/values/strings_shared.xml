@@ -2001,4 +2001,10 @@
     <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <!-- Title for the external checkout information bottom sheet shown when the user is leaving the MEGA app -->
+    <string name="external_checkout_information_title">Leaving MEGA</string>
+    <!-- Description shown in the external checkout information bottom sheet, warning the user about leaving MEGA and handling of purchases outside Google Play; %1$s is the external website's URL -->
+    <string name="external_checkout_information_description">You are about to open an external website (%1$s). MEGA is responsible for transactions and customer support.</string>
+    <!-- Checkbox label for whether to show the external checkout information next time -->
+    <string name="external_checkout_show_next_time">Show this next time</string>
 </resources>

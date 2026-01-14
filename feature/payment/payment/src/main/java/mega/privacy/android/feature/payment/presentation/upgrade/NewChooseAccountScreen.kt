@@ -17,15 +17,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -42,12 +46,16 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getString
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.Badge
 import mega.android.core.ui.components.badge.BadgeType
 import mega.android.core.ui.components.chip.MegaChip
+import mega.android.core.ui.components.sheets.MegaModalBottomSheet
+import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -80,6 +88,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewChooseAccountScreen(
     onInAppCheckoutClick: (Subscription) -> Unit,
@@ -96,11 +105,61 @@ fun NewChooseAccountScreen(
     onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
     clearExternalPurchaseError: () -> Unit = {},
     onBack: () -> Unit,
+    showExternalCheckoutInformation: Boolean = true,
+    onSetExternalCheckoutInformationPreference: (Boolean) -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val locale = Locale.getDefault()
+    val coroutineScope = rememberCoroutineScope()
+
+    // Information bottom sheet state
+    @OptIn(ExperimentalMaterial3Api::class)
+    val informationBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showInformationBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var pendingExternalCheckout by rememberSaveable {
+        mutableStateOf<Pair<Subscription, Boolean>?>(
+            null
+        )
+    }
+    var shouldProceedWithCheckout by rememberSaveable { mutableStateOf(false) }
+
+    // Local state for checkbox (synced with preference)
+    var showInformationNextTime by rememberSaveable { mutableStateOf(showExternalCheckoutInformation) }
+
+    // Update local state when preference changes
+    LaunchedEffect(showExternalCheckoutInformation) {
+        showInformationNextTime = showExternalCheckoutInformation
+    }
+
+    // Show bottom sheet when triggered
+    LaunchedEffect(showInformationBottomSheet) {
+        if (showInformationBottomSheet) {
+            informationBottomSheetState.show()
+        }
+    }
+
+    // Handle bottom sheet dismissal and proceed with external checkout only if Continue was clicked
+    LaunchedEffect(informationBottomSheetState) {
+        snapshotFlow { informationBottomSheetState.isVisible }
+            .distinctUntilChanged()
+            .collect { isVisible ->
+                // When sheet becomes invisible and we had it shown, handle cleanup
+                if (!isVisible && showInformationBottomSheet) {
+                    showInformationBottomSheet = false
+                    // Only proceed with external checkout if Continue was clicked
+                    if (shouldProceedWithCheckout) {
+                        pendingExternalCheckout?.let { (subscription, monthly) ->
+                            onExternalCheckoutClick(subscription, monthly)
+                        }
+                    }
+                    // Reset states
+                    pendingExternalCheckout = null
+                    shouldProceedWithCheckout = false
+                }
+            }
+    }
 
     val lazyListState = rememberLazyListState()
     val topBarHeightPx =
@@ -216,8 +275,16 @@ fun NewChooseAccountScreen(
                     selectedSubscription = selectedSubscription,
                     isMonthly = isMonthly,
                     onInAppCheckoutClick = onInAppCheckoutClick,
-                    onExternalCheckoutClick = {
-                        onExternalCheckoutClick(it, isMonthly)
+                    onExternalCheckoutClick = { subscription ->
+                        // Check if we should show the information bottom sheet
+                        if (showExternalCheckoutInformation) {
+                            // Show information bottom sheet first
+                            pendingExternalCheckout = subscription to isMonthly
+                            showInformationBottomSheet = true
+                        } else {
+                            // Skip bottom sheet and proceed directly
+                            onExternalCheckoutClick(subscription, isMonthly)
+                        }
                     },
                 )
             }
@@ -452,6 +519,44 @@ fun NewChooseAccountScreen(
             }
         }
     }
+
+    // Information bottom sheet
+    if (showInformationBottomSheet) {
+        @OptIn(ExperimentalMaterial3Api::class)
+        MegaModalBottomSheet(
+            modifier = Modifier.testTag(TEST_TAG_INFORMATION_BOTTOM_SHEET),
+            sheetState = informationBottomSheetState,
+            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+            onDismissRequest = {
+                coroutineScope.launch {
+                    informationBottomSheetState.hide()
+                }
+            }
+        ) {
+            ExternalCheckoutInformationBottomSheetContent(
+                showInformationNextTime = showInformationNextTime,
+                onShowInformationNextTimeChanged = { newValue ->
+                    showInformationNextTime = newValue
+                    // Save preference when checkbox changes
+                    onSetExternalCheckoutInformationPreference(newValue)
+                },
+                onCancel = {
+                    shouldProceedWithCheckout = false
+                    coroutineScope.launch {
+                        informationBottomSheetState.hide()
+                    }
+                },
+                onContinue = {
+                    shouldProceedWithCheckout = true
+                    coroutineScope.launch {
+                        informationBottomSheetState.hide()
+                    }
+                },
+                coroutineScope = coroutineScope,
+                domainUrl = uiState.domainUrl
+            )
+        }
+    }
 }
 
 fun isCurrentPlan(
@@ -645,3 +750,38 @@ internal const val TEST_TAG_TERMS_AND_POLICIES = "choose_account_screen:terms_an
  * Test tag for lazy column
  */
 internal const val TEST_TAG_LAZY_COLUMN = "choose_account_screen:lazy_column"
+
+/**
+ * Test tag for the information bottom sheet
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET = "choose_account_screen:information_bottom_sheet"
+
+/**
+ * Test tag for the information bottom sheet title
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_TITLE = "choose_account_screen:information_bottom_sheet:title"
+
+/**
+ * Test tag for the information bottom sheet description
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_DESCRIPTION = "choose_account_screen:information_bottom_sheet:description"
+
+/**
+ * Test tag for the information bottom sheet checkbox
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_CHECKBOX = "choose_account_screen:information_bottom_sheet:checkbox"
+
+/**
+ * Test tag for the information bottom sheet checkbox label
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_CHECKBOX_LABEL = "choose_account_screen:information_bottom_sheet:checkbox_label"
+
+/**
+ * Test tag for the information bottom sheet cancel button
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_CANCEL = "choose_account_screen:information_bottom_sheet:cancel"
+
+/**
+ * Test tag for the information bottom sheet continue button
+ */
+internal const val TEST_TAG_INFORMATION_BOTTOM_SHEET_CONTINUE = "choose_account_screen:information_bottom_sheet:continue"

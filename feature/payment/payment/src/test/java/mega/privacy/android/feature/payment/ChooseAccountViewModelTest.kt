@@ -5,6 +5,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -26,18 +27,23 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
+import mega.privacy.android.feature.payment.usecase.GetExternalCheckoutInformationPreferenceUseCase
+import mega.privacy.android.feature.payment.usecase.SetExternalCheckoutInformationPreferenceUseCase
 import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -69,6 +75,11 @@ class ChooseAccountViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val ageSignalUseCase = mock<AgeSignalUseCase>()
+    private val getExternalCheckoutInformationPreferenceUseCase =
+        mock<GetExternalCheckoutInformationPreferenceUseCase>()
+    private val setExternalCheckoutInformationPreferenceUseCase =
+        mock<SetExternalCheckoutInformationPreferenceUseCase>()
+    private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -82,6 +93,9 @@ class ChooseAccountViewModelTest {
             monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase,
             ageSignalUseCase,
+            getExternalCheckoutInformationPreferenceUseCase,
+            setExternalCheckoutInformationPreferenceUseCase,
+            getDomainNameUseCase,
         )
     }
 
@@ -94,6 +108,9 @@ class ChooseAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ageSignalUseCase = ageSignalUseCase,
+            getExternalCheckoutInformationPreferenceUseCase = getExternalCheckoutInformationPreferenceUseCase,
+            setExternalCheckoutInformationPreferenceUseCase = setExternalCheckoutInformationPreferenceUseCase,
+            getDomainNameUseCase = getDomainNameUseCase,
             savedStateHandle = mock { on { get<Boolean>(any()) }.thenReturn(true) },
         )
     }
@@ -182,30 +199,9 @@ class ChooseAccountViewModelTest {
             }
         }
 
-    @Test
-    fun `test that isExternalCheckoutEnabled is set from feature flag`() = runTest {
-        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getSubscriptionsUseCase()).thenReturn(
-            Subscriptions(
-                expectedMonthlySubscriptionsList,
-                expectedYearlySubscriptionsList
-            )
-        )
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
-            .thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-
-        initViewModel()
-
-        underTest.state.map { it.isExternalCheckoutEnabled }.test {
-            Truth.assertThat(awaitItem()).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that isExternalCheckoutEnabled is false when feature flag is disabled`() = runTest {
+    @ParameterizedTest(name = "test that isExternalCheckoutEnabled is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isExternalCheckoutEnabled is set from feature flag`(expectedValue: Boolean) = runTest {
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getSubscriptionsUseCase()).thenReturn(
             Subscriptions(
@@ -214,7 +210,7 @@ class ChooseAccountViewModelTest {
             )
         )
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-            .thenReturn(false)
+            .thenReturn(expectedValue)
         wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
@@ -222,12 +218,13 @@ class ChooseAccountViewModelTest {
         initViewModel()
 
         underTest.state.map { it.isExternalCheckoutEnabled }.test {
-            Truth.assertThat(awaitItem()).isFalse()
+            Truth.assertThat(awaitItem()).isEqualTo(expectedValue)
         }
     }
 
-    @Test
-    fun `test that isExternalCheckoutDefault is set from AB test flag`() = runTest {
+    @ParameterizedTest(name = "test that isExternalCheckoutDefault is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that isExternalCheckoutDefault is set from AB test flag`(expectedValue: Boolean) = runTest {
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getSubscriptionsUseCase()).thenReturn(
             Subscriptions(
@@ -237,36 +234,14 @@ class ChooseAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
             .thenReturn(true)
-        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
+        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(expectedValue)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
 
         initViewModel()
 
         underTest.state.map { it.isExternalCheckoutDefault }.test {
-            Truth.assertThat(awaitItem()).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that isExternalCheckoutDefault is false when AB test flag is disabled`() = runTest {
-        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getSubscriptionsUseCase()).thenReturn(
-            Subscriptions(
-                expectedMonthlySubscriptionsList,
-                expectedYearlySubscriptionsList
-            )
-        )
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers))
-            .thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(ABTestFeatures.ande)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-
-        initViewModel()
-
-        underTest.state.map { it.isExternalCheckoutDefault }.test {
-            Truth.assertThat(awaitItem()).isFalse()
+            Truth.assertThat(awaitItem()).isEqualTo(expectedValue)
         }
     }
 
@@ -395,6 +370,72 @@ class ChooseAccountViewModelTest {
         }
 
         verify(ageSignalUseCase, never()).invoke()
+    }
+
+    @ParameterizedTest(name = "test that showExternalCheckoutInformation is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that showExternalCheckoutInformation is loaded from preference on initialization`(
+        expectedValue: Boolean
+    ) = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        wheneverBlocking { getExternalCheckoutInformationPreferenceUseCase() }.thenReturn(expectedValue)
+
+        initViewModel()
+
+        underTest.state.test {
+            Truth.assertThat(awaitItem().showExternalCheckoutInformation).isEqualTo(expectedValue)
+        }
+    }
+
+    @Test
+    fun `test that setExternalCheckoutInformationPreference updates the state`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        wheneverBlocking { getExternalCheckoutInformationPreferenceUseCase() }.thenReturn(true)
+        wheneverBlocking { setExternalCheckoutInformationPreferenceUseCase(any()) }.thenReturn(Unit)
+
+        initViewModel()
+
+        underTest.state.test {
+            Truth.assertThat(awaitItem().showExternalCheckoutInformation).isTrue()
+            underTest.setExternalCheckoutInformationPreference(false)
+            advanceUntilIdle()
+            Truth.assertThat(awaitItem().showExternalCheckoutInformation).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that setExternalCheckoutInformationPreference calls use case`() = runTest {
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(
+                expectedMonthlySubscriptionsList,
+                expectedYearlySubscriptionsList
+            )
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        wheneverBlocking { getExternalCheckoutInformationPreferenceUseCase() }.thenReturn(true)
+        wheneverBlocking { setExternalCheckoutInformationPreferenceUseCase(any()) }.thenReturn(Unit)
+
+        initViewModel()
+
+        underTest.setExternalCheckoutInformationPreference(false)
+        advanceUntilIdle()
+
+        verify(setExternalCheckoutInformationPreferenceUseCase).invoke(false)
     }
 
     private val subscriptionProIMonthly = Subscription(
