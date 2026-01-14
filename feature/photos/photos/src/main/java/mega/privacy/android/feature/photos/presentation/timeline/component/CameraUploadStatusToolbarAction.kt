@@ -27,6 +27,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG),
                 type = CameraUploadsStatusType.Warning,
+                shouldShowRipple = false,
                 onClick = { updateIsWarningBannerShown(true) }
             )
         }
@@ -55,6 +56,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG),
                 type = CameraUploadsStatusType.Sync,
+                shouldShowRipple = false,
                 onClick = {}
             )
         }
@@ -74,6 +76,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG),
                 type = CameraUploadsStatusType.UploadComplete,
+                shouldShowRipple = false,
                 progress = { 1F },
                 onClick = {}
             )
