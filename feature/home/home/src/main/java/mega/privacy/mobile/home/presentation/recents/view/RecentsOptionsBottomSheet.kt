@@ -1,5 +1,6 @@
 package mega.privacy.mobile.home.presentation.recents.view
 
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,11 +31,12 @@ internal fun RecentsOptionsBottomSheet(
 
     if (isVisible) {
         MegaModalBottomSheet(
+            modifier = Modifier.navigationBarsPadding(),
             bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
             sheetState = optionsBottomSheetState,
             onDismissRequest = {
                 onDismiss()
-            }
+            },
         ) {
             RecentsOptionsBottomSheetContent(
                 isHideRecentsEnabled = isHideRecentsEnabled,

@@ -1,5 +1,6 @@
 package mega.privacy.mobile.home.presentation.recents.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -19,7 +20,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -68,8 +68,9 @@ internal fun RecentsEmptyView(
             }
         }
         Spacer(modifier = Modifier.width(16.dp))
-        MegaIcon(
+        Image(
             painter = painterResource(IconPackR.drawable.ic_recents),
+            contentDescription = "Empty",
             modifier = Modifier
                 .size(60.dp)
         )
