@@ -59,7 +59,6 @@ import mega.privacy.android.app.appstate.global.GlobalStateViewModel
 import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presence.SignalPresenceViewModel
@@ -81,6 +80,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -122,6 +122,7 @@ class MegaActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         this.intent = intent
+        Timber.d("New intent received. Action: ${intent.action}")
         lifecycleScope.launch {
             consumeIntentExtras()
         }
@@ -153,7 +154,7 @@ class MegaActivity : ComponentActivity() {
                 }
             }
 
-            LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT -> {
+            RefreshEvent.SdkReload.name -> {
                 globalStateViewModel.refreshSession(RefreshEvent.SdkReload)
                 intent.action = null
             }
@@ -289,13 +290,6 @@ class MegaActivity : ComponentActivity() {
                                 val transferState by appTransferViewModel.state.collectAsStateWithLifecycle()
                                 val loginState by loginViewModel.state.collectAsStateWithLifecycle()
                                 val navigationEvents by navigationEventViewModel.navigationEvents.collectAsStateWithLifecycle()
-
-
-                                LaunchedEffect(loginState.isPendingToFinishActivity) {
-                                    if (loginState.isPendingToFinishActivity) {
-                                        finish()
-                                    }
-                                }
 
                                 EventEffect(
                                     event = snackbarEventsState,

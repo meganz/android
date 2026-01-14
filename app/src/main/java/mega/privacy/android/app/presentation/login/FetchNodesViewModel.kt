@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
@@ -29,6 +28,7 @@ import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
@@ -107,11 +107,11 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     private fun performFetchNodesOrLogin() = runCatching {
         viewModelScope.launch {
-            if (args.refreshEvent == RefreshEvent.ChangeEnvironment || args.refreshEvent == RefreshEvent.SdkReload) {
+            if (args.refreshEvent == RefreshEvent.ChangeEnvironment) {
                 Timber.d("Fast login due to ${args.refreshEvent} event")
                 fastLogin(session = args.session, refreshChatUrl = true)
-            } else if (args.refreshEvent == RefreshEvent.ManualRefresh) {
-                Timber.d("Refresh event - fetch nodes")
+            } else if (args.refreshEvent == RefreshEvent.ManualRefresh || args.refreshEvent == RefreshEvent.SdkReload) {
+                Timber.d("Refresh event ${args.refreshEvent} - fetch nodes")
                 fetchNodes(isRefreshSession = true)
             } else if (isMegaApiLoggedInUseCase()) {
                 Timber.d("User is logged in, fetch nodes")

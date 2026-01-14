@@ -7,9 +7,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.usecase.orientation.InitializeAdaptiveLayoutUseCase
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
@@ -17,6 +15,7 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -76,7 +75,7 @@ class GlobalOnEventHandler @Inject constructor(
                     updateDomainName()
                     updateAdaptiveLayoutFeatureFlag()
                 }
-                MegaApplication.Companion.getInstance().checkEnabledCookies()
+                MegaApplication.getInstance().checkEnabledCookies()
                 initialiseAdsIfNeeded()
             }
 
@@ -93,17 +92,14 @@ class GlobalOnEventHandler @Inject constructor(
      */
     private fun showLoginFetchingNodes() {
         applicationScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                appContext.startActivity(Intent(appContext, MegaActivity::class.java).apply {
-                    action = LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
+            if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity).not()) {
+                appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
+                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+                    action = RefreshEvent.SdkReload.name
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 })
             } else {
-                appContext.startActivity(Intent(appContext, LoginActivity::class.java).apply {
-                    putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-                    action = LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                })
+                // Handled by ReloadEventInitialiser
             }
         }
     }

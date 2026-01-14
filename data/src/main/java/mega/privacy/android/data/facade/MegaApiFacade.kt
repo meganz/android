@@ -266,7 +266,7 @@ internal class MegaApiFacade @Inject constructor(
             }
 
             override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
-                Timber.d("Global update onEvent")
+                Timber.d("Global update onEvent: ${event?.type}")
                 if (event?.type == MegaEvent.EVENT_RELOADING) {
                     trySend(GlobalUpdate.OnReloadNeeded)
                 }

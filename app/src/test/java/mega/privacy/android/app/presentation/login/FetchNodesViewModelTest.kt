@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.login.TemporaryWaitingError
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
@@ -570,4 +570,35 @@ class FetchNodesViewModelTest {
         }
     }
 
+    @Test
+    fun `test that sdk reload refresh event triggers fetch nodes but not fast login`() = runTest {
+        // Setup mocks
+        whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(loginMutex.isLocked).thenReturn(false)
+        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+        val fetchNodesFlow = MutableStateFlow(FetchNodesUpdate())
+        whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+
+        initViewModel(
+            args = FetchNodesViewModel.Args(
+                session = "test-session",
+                isFromLogin = false,
+                refreshEvent = RefreshEvent.SdkReload
+            )
+        )
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.fetchNodesUpdate).isNotNull()
+
+            verify(fetchNodesUseCase).invoke()
+            verify(globalInitialiser, never()).onPostLogin(any(), any())
+            verify(fastLoginUseCase, never()).invoke(any(), any(), any())
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 } 

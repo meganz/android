@@ -19,6 +19,7 @@ import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginIn
 import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
+import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
 import mega.privacy.android.app.sslverification.initialiser.SSLErrorMonitorInitialiser
 import mega.privacy.android.domain.logging.Log
@@ -115,6 +116,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideMeetingEventsPostLoginInitialiser(initialiser: MeetingEventsPostLoginInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideReloadEventMonitorAppStartInitialiser(initialiser: ReloadEventInitialiser): AppStartInitialiser =
         initialiser
 
 }

@@ -32,7 +32,6 @@ import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
-import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
@@ -123,7 +123,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * View Model for [LoginFragment]
+ * View Model for Login and registration flows
  *
  * @property state View state as [LoginState]
  */
@@ -336,7 +336,7 @@ class LoginViewModel @Inject constructor(
                 monitorFetchNodesFinishUseCase().catch { Timber.e(it) }.map {
                     with(pendingAction) {
                         when (this) {
-                            ACTION_FORCE_RELOAD_ACCOUNT -> {
+                            RefreshEvent.SdkReload.name -> {
                                 { state: LoginState -> state.copy(isPendingToFinishActivity = true) }
                             }
 
@@ -442,7 +442,7 @@ class LoginViewModel @Inject constructor(
      * Sets [ACTION_FORCE_RELOAD_ACCOUNT] as pendingAction.
      */
     fun setForceReloadAccountAsPendingAction() {
-        pendingAction = ACTION_FORCE_RELOAD_ACCOUNT
+        pendingAction = RefreshEvent.SdkReload.name
         _state.update { state ->
             state.copy(
                 intentState = LoginIntentState.AlreadySet,
@@ -1397,10 +1397,6 @@ class LoginViewModel @Inject constructor(
     }
 
     companion object {
-        /**
-         * Intent action for showing the login fetching nodes.
-         */
-        const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
 
         /**
          * Intent action for opening app.

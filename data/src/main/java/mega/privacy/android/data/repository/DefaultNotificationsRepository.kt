@@ -122,6 +122,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
         }
         .flowOn(dispatcher)
 
+    override fun monitorSdkReloadNeeded(): Flow<Boolean> = megaApiGateway.globalUpdates
+        .filterIsInstance<GlobalUpdate.OnReloadNeeded>()
+        .mapNotNull { true }
+        .flowOn(dispatcher)
+
     override suspend fun getUserAlerts(): List<UserAlert> =
         withContext(dispatcher) {
             megaApiGateway.getUserAlerts().mapAndFilterMeetingIfNeeded()

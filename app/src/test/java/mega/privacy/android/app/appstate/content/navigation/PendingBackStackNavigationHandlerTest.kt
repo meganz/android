@@ -6,8 +6,8 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import org.junit.jupiter.api.AfterEach

@@ -25,10 +25,10 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase

@@ -1,8 +1,8 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey

@@ -10,9 +10,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
-import mega.privacy.android.app.appstate.global.model.RefreshEvent
 import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.login.view.FetchNodesContent
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 
 @Serializable

@@ -32,6 +32,7 @@ import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
+import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.megaNavigator
@@ -91,7 +92,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         return@ReadyToFinish
                     }
 
-                    Constants.ACTION_REFRESH == intentAction || LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT == intentAction -> {
+                    Constants.ACTION_REFRESH == intentAction || RefreshEvent.SdkReload.name == intentAction -> {
                         Timber.d("Intent to refresh")
                         activity.apply {
                             setResult(Activity.RESULT_OK)
@@ -418,7 +419,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                     }
                                 }
 
-                                if (loginUiState.rootNodesExists && intentAction != LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT) {
+                                if (loginUiState.rootNodesExists && intentAction != RefreshEvent.SdkReload.name) {
                                     var newIntent: Intent? = null
                                     var flags: Int? = null
                                     val bundle = Bundle()
@@ -639,7 +640,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         intentDataString = intent.dataString
                     }
 
-                    LoginViewModel.ACTION_FORCE_RELOAD_ACCOUNT -> {
+                    RefreshEvent.SdkReload.name -> {
                         viewModel.setForceReloadAccountAsPendingAction()
                         return@LaunchedEffect
                     }

@@ -169,4 +169,11 @@ interface NotificationsRepository {
      * @return ID of the last read Notification
      */
     suspend fun getLastReadNotificationId(): Long
+
+    /**
+     * Monitor sdk reload needed
+     *
+     * @return a flow of [Boolean], true indicating if sdk reload is needed
+     */
+    fun monitorSdkReloadNeeded(): Flow<Boolean>
 }

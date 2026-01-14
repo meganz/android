@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.global.model
+package mega.privacy.android.domain.entity.node.root
 
 enum class RefreshEvent {
     ManualRefresh,
