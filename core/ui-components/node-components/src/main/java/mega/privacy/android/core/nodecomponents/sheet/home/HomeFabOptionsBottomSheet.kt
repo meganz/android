@@ -15,7 +15,12 @@ import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionItem
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.mobile.analytics.event.HomeAddNewBackupMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.HomeAddNewSyncMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.HomeCaptureMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.HomeNewChatMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeNewTextFileMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.HomeScanDocumentMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFolderMenuToolbarEvent
 
@@ -68,6 +73,7 @@ fun HomeFabOptionsBottomSheet(
             icon = IconPack.Medium.Thin.Outline.FileScan,
             testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
             onClick = {
+                Analytics.tracker.trackEvent(HomeScanDocumentMenuToolbarEvent)
                 onScanDocumentClicked()
             },
         )
@@ -76,6 +82,7 @@ fun HomeFabOptionsBottomSheet(
             icon = IconPack.Medium.Thin.Outline.Camera,
             testTag = TEST_TAG_CAPTURE_ACTION,
             onClick = {
+                Analytics.tracker.trackEvent(HomeCaptureMenuToolbarEvent)
                 onCaptureClicked()
             },
         )
@@ -101,6 +108,7 @@ fun HomeFabOptionsBottomSheet(
             icon = IconPack.Medium.Thin.Outline.Sync01,
             testTag = TEST_TAG_ADD_NEW_SYNC_ACTION,
             onClick = {
+                Analytics.tracker.trackEvent(HomeAddNewSyncMenuToolbarEvent)
                 onAddNewSyncClicked()
             },
         )
@@ -109,6 +117,7 @@ fun HomeFabOptionsBottomSheet(
             icon = IconPack.Medium.Thin.Outline.Database,
             testTag = TEST_TAG_ADD_NEW_BACKUP_ACTION,
             onClick = {
+                Analytics.tracker.trackEvent(HomeAddNewBackupMenuToolbarEvent)
                 onAddNewBackupClicked()
             },
         )
@@ -125,6 +134,7 @@ fun HomeFabOptionsBottomSheet(
             icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
             testTag = TEST_TAG_NEW_CHAT_ACTION,
             onClick = {
+                Analytics.tracker.trackEvent(HomeNewChatMenuToolbarEvent)
                 onNewChatClicked()
             },
         )

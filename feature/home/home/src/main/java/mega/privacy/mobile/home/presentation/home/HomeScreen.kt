@@ -33,6 +33,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOption
@@ -57,6 +58,7 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 
 
@@ -155,6 +157,7 @@ internal fun HomeScreen(
                 AddContentFab(
                     visible = true,
                     onClick = {
+                        Analytics.tracker.trackEvent(HomeFabOptionsButtonPressedEvent)
                         navigationHandler.navigate(HomeFabOptionsBottomSheetNavKey)
                     }
                 )
