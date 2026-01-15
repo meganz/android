@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import timber.log.Timber
 
 /**
@@ -26,6 +28,7 @@ class DeepLinksViewModel @AssistedInject constructor(
     private val deepLinkHandlers: List<@JvmSuppressWildcards DeepLinkHandler>,
     private val getDecodedUrlRegexPatternTypeUseCase: GetDecodedUrlRegexPatternTypeUseCase,
     private val getAccountCredentials: GetAccountCredentialsUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @Assisted val args: Args,
 ) : ViewModel() {
 
@@ -55,8 +58,10 @@ class DeepLinksViewModel @AssistedInject constructor(
                 }
                 _uiState.update { state -> state.copy(navKeys = navKeys) }
             } ?: run {
-                // This should not happen because WebViewDeepLinkHandler should handle all deep links defined in the manifest
+                // This should only happen in case the link is not supported by MEGA app
                 Timber.e("Deep link not handled: $args.uri")
+                _uiState.update { state -> state.copy(navKeys = emptyList()) }
+                snackbarEventQueue.queueMessage(R.string.open_link_not_valid_link)
             }
         }
     }

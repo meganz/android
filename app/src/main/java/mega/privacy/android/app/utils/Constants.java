@@ -439,13 +439,15 @@ public class Constants {
     /**
      * This Regex Pattern will check for the existence of:
      * 1. Domain with HTTPS protocol
-     * 2. Followed by either: Mega.co.nz, Mega.nz, Mega.io, Megaad.nz, Mega.app
-     * 3. No words are allowed after the domain name, for example; <a href="https://mega.co.nzxxx">...</a> is not allowed
-     * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; <a href="https://mega.nz/home">...</a>
+     * 2. Followed by either: mega.co.nz, mega.nz, mega.io, megaad.nz, mega.app
+     * 3. No words are allowed after the domain name, for example; <a href="https://mega.co.nzxxx">https://mega.co.nzxxx</a> is not allowed
+     * 4. Backslashes (/) or Question Mark (?) are allowed to allow path and query parameters after the MEGA domain, for example; <a href="https://mega.nz/home">https://mega.nz/home</a>
      * 5. Any characters after Backslashes (/) or Question Mark (?) are allowed, except At Sign(@)
+     * 6. Pure domain is allowed. For example: <a href="https://mega.nz">https://mega.nz</a>
      */
     public static final String[] MEGA_REGEXS = {
             "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$",
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)$",
             "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$"
     };
 

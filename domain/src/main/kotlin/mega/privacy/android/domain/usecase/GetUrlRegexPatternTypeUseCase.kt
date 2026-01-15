@@ -122,6 +122,7 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
          */
         private val MEGA_REGEX = arrayOf(
             "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$",
+            "^https://mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)",
             "^https://([a-z0-9]+\\.)+mega(?:\\.co\\.nz|\\.nz|\\.io|ad\\.nz|\\.app)(\\/|\\?)[^@]*$"
         )
 

@@ -562,6 +562,11 @@ class GetUrlRegexPatternTypeUseCaseTest {
             "https://mega.io/whatever",
             RegexPatternType.MEGA_LINK
         ),
+        Arguments.of(
+            "MEGA Link",
+            "https://mega.nz",
+            RegexPatternType.MEGA_LINK
+        ),
     )
 
     private fun invalidFileLinks(): Stream<Arguments> = Stream.of(

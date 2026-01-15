@@ -8,11 +8,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.R
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.link.GetDecodedUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -44,6 +47,7 @@ class DeepLinksViewModelTest {
     private val navKey = mock<NavKey>()
     private val navKeys = listOf(navKey)
     private val argsWithUri = DeepLinksViewModel.Args(uri)
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
     private val argsWithUriAndRegex = DeepLinksViewModel.Args(uri, regexPatternType)
 
     private fun initViewModel(
@@ -53,6 +57,7 @@ class DeepLinksViewModelTest {
             deepLinkHandlers = deepLinkHandlers,
             getDecodedUrlRegexPatternTypeUseCase = getDecodedUrlRegexPatternTypeUseCase,
             getAccountCredentials = getAccountCredentials,
+            snackbarEventQueue = snackbarEventQueue,
             args = args,
         )
     }
@@ -64,6 +69,7 @@ class DeepLinksViewModelTest {
             deepLinkHandler2,
             getDecodedUrlRegexPatternTypeUseCase,
             getAccountCredentials,
+            snackbarEventQueue,
         )
     }
 
@@ -84,10 +90,12 @@ class DeepLinksViewModelTest {
             underTest.uiState.map { it.navKeys }.test {
                 assertThat(awaitItem()).isEqualTo(navKeys)
             }
+
+            verifyNoInteractions(snackbarEventQueue)
         }
 
     @Test
-    fun `test that state is not updated with nav keys if deep link is not handled when args only contains the uri`() =
+    fun `test that state is updated with empty nav keys and snackbarEventQueue is invoked if deep link is not handled when args only contains the uri`() =
         runTest {
             whenever(getDecodedUrlRegexPatternTypeUseCase(linkString)) doReturn regexPatternType
             whenever(getAccountCredentials()) doReturn null
@@ -101,8 +109,10 @@ class DeepLinksViewModelTest {
             initViewModel(argsWithUri)
 
             underTest.uiState.map { it.navKeys }.test {
-                assertThat(awaitItem()).isNull()
+                assertThat(awaitItem()).isEmpty()
             }
+
+            verify(snackbarEventQueue).queueMessage(R.string.open_link_not_valid_link)
         }
 
     @Test
@@ -123,10 +133,11 @@ class DeepLinksViewModelTest {
 
             verifyNoInteractions(getDecodedUrlRegexPatternTypeUseCase)
             verifyNoInteractions(getAccountCredentials)
+            verifyNoInteractions(snackbarEventQueue)
         }
 
     @Test
-    fun `test that state is not updated with nav keys if deep link is not handled when args contains the uri and the regexPatternType`() =
+    fun `test that state is updated with empty nav keys and snackbarEventQueue is invoked if deep link is not handled when args contains the uri and the regexPatternType`() =
         runTest {
             whenever(
                 deepLinkHandler1.getNavKeysInternal(uri, regexPatternType, true)
@@ -138,11 +149,12 @@ class DeepLinksViewModelTest {
             initViewModel(argsWithUriAndRegex)
 
             underTest.uiState.map { it.navKeys }.test {
-                assertThat(awaitItem()).isNull()
+                assertThat(awaitItem()).isEmpty()
             }
 
             verifyNoInteractions(getDecodedUrlRegexPatternTypeUseCase)
             verifyNoInteractions(getAccountCredentials)
+            verify(snackbarEventQueue).queueMessage(R.string.open_link_not_valid_link)
         }
 
     companion object {
