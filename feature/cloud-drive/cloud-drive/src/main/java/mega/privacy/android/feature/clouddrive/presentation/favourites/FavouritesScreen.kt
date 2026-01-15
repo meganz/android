@@ -5,12 +5,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -25,6 +27,8 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.view.Favo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
+import mega.privacy.mobile.analytics.event.FavouritesScreenEvent
 
 /**
  * Favourites Screen, used to display all favourite nodes
@@ -54,6 +58,12 @@ fun FavouritesScreen(
         viewModel.processAction(DeselectAllItems)
     }
 
+    LifecycleResumeEffect(Unit) {
+        Analytics.tracker.trackEvent(FavouritesScreenEvent)
+        onPauseOrDispose {}
+    }
+
+
     EventEffect(
         event = nodeOptionsActionUiState.actionTriggeredEvent,
         onConsumed = nodeOptionsActionViewModel::resetActionTriggered,
@@ -75,7 +85,10 @@ fun FavouritesScreen(
             } else {
                 MegaTopAppBar(
                     title = "Favourites",
-                    navigationType = AppBarNavigationType.Back(navigationHandler::back),
+                    navigationType = AppBarNavigationType.Back {
+                        Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                        navigationHandler.back()
+                    },
                     trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
                     actions = buildList {
                         if (!uiState.isEmpty) {

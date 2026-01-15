@@ -28,6 +28,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.list.NodesView
@@ -55,6 +56,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,7 +149,10 @@ internal fun FavouritesContent(
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
                 onSortOrderClick = { showSortBottomSheet = true },
-                onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
+                onChangeViewTypeClicked = {
+                    Analytics.tracker.trackEvent(ViewModeButtonPressedEvent)
+                    onAction(ChangeViewTypeClicked)
+                },
                 showMediaDiscoveryButton = false,
                 onEnterMediaDiscoveryClick = {},
                 inSelectionMode = uiState.isInSelectionMode,
