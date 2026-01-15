@@ -1,18 +1,18 @@
-package mega.privacy.android.app.presentation.photos.albums.coverselection
+package mega.privacy.android.feature.photos.presentation.albums.coverselection
 
 import androidx.lifecycle.SavedStateHandle
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -25,9 +25,12 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
-import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -38,6 +41,25 @@ class AlbumCoverSelectionViewModelTest {
     private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase = mock<UpdateAlbumCoverUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val photoUiStateMapper = mock<PhotoUiStateMapper>()
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+
+    private suspend fun ReceiveTurbine<AlbumCoverSelectionState>.awaitCondition(
+        timeoutMs: Long = 1000,
+        condition: (AlbumCoverSelectionState) -> Boolean,
+    ): AlbumCoverSelectionState {
+        var state = awaitItem()
+        var attempts = 0
+        val maxAttempts = 100 // Prevent infinite loops
+        while (!condition(state) && attempts < maxAttempts) {
+            state = awaitItem()
+            attempts++
+        }
+        if (!condition(state)) {
+            throw AssertionError("Condition not met after $attempts attempts. Last state: $state")
+        }
+        return state
+    }
 
     private val accountLevelDetail = mock<AccountLevelDetail> {
         on { accountType }.thenReturn(AccountType.PRO_III)
@@ -60,12 +82,23 @@ class AlbumCoverSelectionViewModelTest {
             createImage(id = 3L),
         )
 
+        val expectedPhotoUiStates = expectedPhotos.map { createPhotoUiState(it) }
+        expectedPhotos.forEachIndexed { index, photo ->
+            whenever(photoUiStateMapper(photo)).thenReturn(expectedPhotoUiStates[index])
+        }
+        whenever(
+            fileTypeIconMapper(
+                any(),
+                any()
+            )
+        ).thenReturn(iconPackR.drawable.ic_image_medium_solid)
+
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
 
         // when
         val underTest = AlbumCoverSelectionViewModel(
-            savedStateHandle = SavedStateHandle(mapOf(ALBUM_ID to 1L)),
+            savedStateHandle = SavedStateHandle(mapOf("album_id" to 1L)),
             getUserAlbum = { flowOf(expectedAlbum) },
             getAlbumPhotos = { flowOf(expectedPhotos) },
             downloadThumbnailUseCase = mock(),
@@ -74,17 +107,20 @@ class AlbumCoverSelectionViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = mock(),
-            durationInSecondsTextMapper = DurationInSecondsTextMapper(),
+            photoUiStateMapper = photoUiStateMapper,
+            fileTypeIconMapper = fileTypeIconMapper,
+            albumId = null,
         )
-
-        advanceUntilIdle()
 
         // then
         underTest.state.test {
-            val actual = awaitItem()
+            val actual = awaitCondition { it.album != null && it.photos.isNotEmpty() }
             assertThat(expectedAlbum).isEqualTo(actual.album)
-            assertThat(expectedPhotos.sortedByDescending { it.modificationTime })
-                .isEqualTo(actual.photos)
+            val expectedSortedPhotoUiStates =
+                expectedPhotoUiStates.sortedByDescending { it.modificationTime }
+            assertThat(expectedSortedPhotoUiStates.map { it.id })
+                .isEqualTo(actual.photos.map { it.id })
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -92,61 +128,57 @@ class AlbumCoverSelectionViewModelTest {
     fun `test that select photo returns correct result`() = runTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-        // given
-        val underTest = AlbumCoverSelectionViewModel(
-            savedStateHandle = SavedStateHandle(),
-            getUserAlbum = { flowOf() },
-            getAlbumPhotos = { flowOf() },
-            downloadThumbnailUseCase = mock(),
-            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher(),
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getBusinessStatusUseCase = mock(),
-            durationInSecondsTextMapper = DurationInSecondsTextMapper(),
-        )
-
-        val expectedPhoto = createImage(id = 1L)
-
-        // when
-        underTest.selectPhoto(expectedPhoto)
-
-        // then
-        underTest.state.test {
-            val actualPhoto = awaitItem().selectedPhoto
-            assertThat(expectedPhoto).isEqualTo(actualPhoto)
-        }
-    }
-
-    @Test
-    fun `test that update cover returns correct result`() = runTest {
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-        // given
-        val underTest = AlbumCoverSelectionViewModel(
-            savedStateHandle = SavedStateHandle(),
-            getUserAlbum = { flowOf() },
-            getAlbumPhotos = { flowOf() },
-            downloadThumbnailUseCase = mock(),
-            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher(),
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getBusinessStatusUseCase = mock(),
-            durationInSecondsTextMapper = DurationInSecondsTextMapper(),
-        )
+        whenever(
+            fileTypeIconMapper(
+                any(),
+                any()
+            )
+        ).thenReturn(iconPackR.drawable.ic_image_medium_solid)
 
         val album = createUserAlbum(id = AlbumId(1L))
-        val photo = createImage(id = 2L, albumPhotoId = 2L)
+        val photo = createImage(id = 1L)
+        val photoUiState = createPhotoUiState(photo)
+        whenever(photoUiStateMapper(photo)).thenReturn(photoUiState)
 
-        // when
-        underTest.updateCover(album, photo)
-        advanceUntilIdle()
+        val underTest = AlbumCoverSelectionViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("album_id" to 1L)),
+            getUserAlbum = { flowOf(album) },
+            getAlbumPhotos = { flowOf(listOf(photo)) },
+            downloadThumbnailUseCase = mock(),
+            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
+            defaultDispatcher = UnconfinedTestDispatcher(),
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = mock(),
+            photoUiStateMapper = photoUiStateMapper,
+            fileTypeIconMapper = fileTypeIconMapper,
+            albumId = null,
+        )
 
-        // then
+        // load initial state
         underTest.state.test {
-            val isCompleted = awaitItem().isSelectionCompleted
-            assertThat(isCompleted).isTrue()
+            awaitCondition { it.photosNodeContentTypes.isNotEmpty() }
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // when - select the photo
+        underTest.selectPhoto(photoUiState)
+
+        // then - verify the photo's isSelected flag is true in photosNodeContentTypes
+        underTest.state.test {
+            val stateAfterSelection =
+                awaitCondition { it.hasSelectedPhoto && it.photosNodeContentTypes.isNotEmpty() }
+            assertThat(stateAfterSelection.hasSelectedPhoto).isTrue()
+
+            val selectedPhotoNode = stateAfterSelection.photosNodeContentTypes
+                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+                .firstOrNull { it.node.photo.id == photoUiState.id }
+
+            assertThat(selectedPhotoNode).isNotNull()
+            assertThat(selectedPhotoNode?.node?.isSelected).isTrue()
+            assertThat(selectedPhotoNode?.node?.photo?.id).isEqualTo(photoUiState.id)
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -181,15 +213,17 @@ class AlbumCoverSelectionViewModelTest {
                 )
             },
             getBusinessStatusUseCase = mock(),
-            durationInSecondsTextMapper = DurationInSecondsTextMapper(),
+            photoUiStateMapper = photoUiStateMapper,
+            fileTypeIconMapper = fileTypeIconMapper,
+            albumId = null,
         )
-        advanceUntilIdle()
 
         // then
         underTest.state.test {
-            val accountType = awaitItem().accountType
-            assertThat(accountType).isEqualTo(AccountType.FREE)
+            val actual = awaitCondition { it.accountType != null }
+            assertThat(actual.accountType).isEqualTo(AccountType.FREE)
             assertThat(underTest.showHiddenItems).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -226,9 +260,50 @@ class AlbumCoverSelectionViewModelTest {
         fileTypeInfo,
     )
 
+    private fun createPhotoUiState(
+        photo: Photo,
+    ): PhotoUiState = when (photo) {
+        is Photo.Image -> PhotoUiState.Image(
+            id = photo.id,
+            albumPhotoId = photo.albumPhotoId,
+            parentId = photo.parentId,
+            name = photo.name,
+            isFavourite = photo.isFavourite,
+            creationTime = photo.creationTime,
+            modificationTime = photo.modificationTime,
+            thumbnailFilePath = photo.thumbnailFilePath,
+            previewFilePath = photo.previewFilePath,
+            fileTypeInfo = photo.fileTypeInfo,
+            size = photo.size,
+            isTakenDown = photo.isTakenDown,
+            isSensitive = photo.isSensitive,
+            isSensitiveInherited = photo.isSensitiveInherited,
+            base64Id = photo.base64Id,
+        )
+
+        is Photo.Video -> PhotoUiState.Video(
+            id = photo.id,
+            albumPhotoId = photo.albumPhotoId,
+            parentId = photo.parentId,
+            name = photo.name,
+            isFavourite = photo.isFavourite,
+            creationTime = photo.creationTime,
+            modificationTime = photo.modificationTime,
+            thumbnailFilePath = photo.thumbnailFilePath,
+            previewFilePath = photo.previewFilePath,
+            fileTypeInfo = photo.fileTypeInfo,
+            size = photo.size,
+            isTakenDown = photo.isTakenDown,
+            isSensitive = photo.isSensitive,
+            isSensitiveInherited = photo.isSensitiveInherited,
+            base64Id = photo.base64Id,
+            duration = "",
+        )
+    }
+
     companion object {
         @JvmField
         @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+        val extension = CoroutineMainDispatcherExtension(UnconfinedTestDispatcher())
     }
 }

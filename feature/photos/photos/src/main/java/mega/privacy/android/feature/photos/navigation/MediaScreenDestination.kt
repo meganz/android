@@ -22,15 +22,18 @@ import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
+import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
+import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionViewModel
+import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
-import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -38,8 +41,8 @@ import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
-import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
+import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
@@ -205,6 +208,30 @@ fun EntryProviderScope<NavKey>.mediaSearchScreen(
             updateRecentQueries = photosSearchViewModel::updateRecentQueries,
             searchPhotos = photosSearchViewModel::search,
             onCloseScreen = { navigationHandler.remove(args) },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.albumCoverSelectionScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<AlbumCoverSelectionNavKey> { args ->
+        val snackbarEventQueue = rememberSnackBarQueue()
+        val coroutineScope = rememberCoroutineScope()
+        val viewModel =
+            hiltViewModel<AlbumCoverSelectionViewModel, AlbumCoverSelectionViewModel.Factory>(
+                creationCallback = { it.create(args.albumId) }
+            )
+
+        AlbumCoverSelectionScreen(
+            viewModel = viewModel,
+            onBackClicked = navigationHandler::back,
+            onCompletion = { message ->
+                coroutineScope.launch {
+                    snackbarEventQueue.queueMessage(message)
+                    navigationHandler.remove(args)
+                }
+            },
         )
     }
 }

@@ -1,9 +1,12 @@
-package mega.privacy.android.app.presentation.photos.albums.coverselection
+package mega.privacy.android.feature.photos.presentation.albums.coverselection
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,16 +16,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -36,13 +35,16 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.PhotoNodeUiState
+import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = AlbumCoverSelectionViewModel.Factory::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class AlbumCoverSelectionViewModel @Inject constructor(
+class AlbumCoverSelectionViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
@@ -52,7 +54,9 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val photoUiStateMapper: PhotoUiStateMapper,
+    private val fileTypeIconMapper: FileTypeIconMapper,
+    @Assisted private val albumId: Long?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumCoverSelectionState())
     val state: StateFlow<AlbumCoverSelectionState> = _state
@@ -62,23 +66,28 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     @VisibleForTesting
     internal var showHiddenItems: Boolean? = null
 
+    private var selectedCover: PhotoUiState? = null
+
+    private val currentAlbumId: Long?
+        get() = savedStateHandle["album_id"] ?: albumId
+
     init {
         viewModelScope.launch {
             fetchShowHiddenItems()
             fetchAccountDetail()
-
             fetchAlbum()
         }
     }
 
-    private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
-        .filterNotNull()
-        .flatMapLatest { id -> getUserAlbum(albumId = AlbumId(id)) }
-        .onEach(::updateAlbum)
-        .filterNotNull()
-        .onEach(::fetchPhotos)
-        .catch { exception -> Timber.e(exception) }
-        .launchIn(viewModelScope)
+    private fun fetchAlbum() {
+        val id = currentAlbumId ?: return
+        getUserAlbum(albumId = AlbumId(id))
+            .onEach(::updateAlbum)
+            .filterNotNull()
+            .onEach(::fetchPhotos)
+            .catch { exception -> Timber.e(exception) }
+            .launchIn(viewModelScope)
+    }
 
     private suspend fun fetchShowHiddenItems() {
         showHiddenItems = monitorShowHiddenItemsUseCase().firstOrNull() ?: true
@@ -104,18 +113,21 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private fun updateAlbum(album: Album.UserAlbum?) {
         val showHiddenItems = showHiddenItems ?: true
         val isPaid = _state.value.accountType?.isPaid ?: false
+        selectedCover = album
+            ?.cover
+            ?.let { photo ->
+                if (showHiddenItems || !isPaid) {
+                    photo
+                } else {
+                    photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
+                }
+            }
+            ?.let(photoUiStateMapper::invoke)
 
         _state.update { state ->
             state.copy(
                 album = album,
                 isInvalidAlbum = album == null,
-                selectedPhoto = album?.cover?.let { photo ->
-                    if (showHiddenItems || !isPaid) {
-                        photo
-                    } else {
-                        photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
-                    }
-                },
             )
         }
     }
@@ -132,25 +144,27 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         val sortedPhotos = sortPhotos(photos)
         val nonSensitivePhotos = filterNonSensitivePhotos(sortedPhotos)
         val uiPhotos = nonSensitivePhotos.toUIPhotos()
+        val selectedPhotoId = selectedCover?.id ?: nonSensitivePhotos.firstOrNull()?.id
+        val updatedPhotosNodeContentTypes = uiPhotos.withSelection(selectedPhotoId)
 
         _state.update { state ->
             state.copy(
                 photos = sortedPhotos,
-                mediaListItems = uiPhotos,
-                selectedPhoto = state.selectedPhoto ?: nonSensitivePhotos.firstOrNull(),
+                photosNodeContentTypes = updatedPhotosNodeContentTypes,
+                hasSelectedPhoto = selectedPhotoId != null,
             )
         }
     }
 
-    private suspend fun sortPhotos(photos: List<Photo>): List<Photo> =
+    private suspend fun sortPhotos(photos: List<Photo>): List<PhotoUiState> =
         withContext(defaultDispatcher) {
-            photos.sortedWith(compareByDescending<Photo> { it.modificationTime }.thenByDescending { it.id })
+            val photosUiState = photos.map(photoUiStateMapper::invoke)
+            photosUiState.sortedWith(compareByDescending<PhotoUiState> { it.modificationTime }.thenByDescending { it.id })
         }
 
-    private fun filterNonSensitivePhotos(photos: List<Photo>): List<Photo> {
+    private fun filterNonSensitivePhotos(photos: List<PhotoUiState>): List<PhotoUiState> {
         val showHiddenItems = showHiddenItems ?: return photos
         val isPaid = _state.value.accountType?.isPaid ?: return photos
-
         return if (showHiddenItems || !isPaid || _state.value.isBusinessAccountExpired) {
             photos
         } else {
@@ -158,16 +172,17 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         }
     }
 
-    private suspend fun List<Photo>.toUIPhotos(): List<MediaListItem> =
+    private suspend fun List<PhotoUiState>.toUIPhotos(): List<PhotosNodeContentType> =
         withContext(defaultDispatcher) {
-            this@toUIPhotos.map {
-                when (it) {
-                    is Photo.Image -> PhotoItem(it)
-                    is Photo.Video -> MediaListItem.VideoItem(
-                        it,
-                        durationInSecondsTextMapper(it.fileTypeInfo.duration)
+            this@toUIPhotos.map { photo ->
+                PhotosNodeContentType.PhotoNodeItem(
+                    node = PhotoNodeUiState(
+                        photo = photo,
+                        isSensitive = photo.isSensitive || photo.isSensitiveInherited,
+                        isSelected = false,
+                        defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                     )
-                }
+                )
             }
         }
 
@@ -185,26 +200,56 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         }
     }
 
-    fun selectPhoto(photo: Photo) {
+    fun selectPhoto(photo: PhotoUiState) {
+        val selectedPhotoId = photo.id
         _state.update { state ->
+            val updatedPhotosNodeContentTypes =
+                state.photosNodeContentTypes.withSelection(selectedPhotoId)
             state.copy(
-                selectedPhoto = photo,
-                hasSelectedPhoto = state.hasSelectedPhoto.let { hasSelectedPhoto ->
-                    if (hasSelectedPhoto) hasSelectedPhoto
-                    else photo != state.selectedPhoto
-                },
+                photosNodeContentTypes = updatedPhotosNodeContentTypes,
+                hasSelectedPhoto = true,
             )
         }
     }
 
-    fun updateCover(album: Album.UserAlbum?, photo: Photo?) = viewModelScope.launch {
-        val albumId = album?.id ?: return@launch
-        val elementId = photo?.albumPhotoId?.let { NodeId(it) } ?: return@launch
+    private fun List<PhotosNodeContentType>.withSelection(
+        selectedPhotoId: Long?,
+    ): List<PhotosNodeContentType> {
+        if (selectedPhotoId == null) return this
+        return this.map { contentType ->
+            when (contentType) {
+                is PhotosNodeContentType.PhotoNodeItem -> {
+                    val isSelected = contentType.node.photo.id == selectedPhotoId
+                    contentType.copy(node = contentType.node.copy(isSelected = isSelected))
+                }
 
-        updateAlbumCoverUseCase(albumId, elementId)
-
-        _state.update {
-            it.copy(isSelectionCompleted = true)
+                is PhotosNodeContentType.HeaderItem -> contentType
+            }
         }
+    }
+
+    fun updateCover() {
+        val currentState = _state.value
+        val selectedPhotoNode = currentState.photosNodeContentTypes
+            .firstOrNull {
+                it is PhotosNodeContentType.PhotoNodeItem && it.node.isSelected
+            } as? PhotosNodeContentType.PhotoNodeItem ?: return
+        val albumId = currentState.album?.id ?: return
+        val elementId = selectedPhotoNode.node.photo.albumPhotoId?.let { NodeId(it) } ?: return
+
+        viewModelScope.launch {
+            runCatching {
+                updateAlbumCoverUseCase(albumId, elementId)
+            }.onSuccess {
+                _state.update {
+                    it.copy(isSelectionCompleted = true)
+                }
+            }
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(albumId: Long?): AlbumCoverSelectionViewModel
     }
 }

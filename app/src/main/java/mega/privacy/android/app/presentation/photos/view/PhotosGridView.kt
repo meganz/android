@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListMedia
+import mega.privacy.android.feature.photos.model.MediaListItem
+import mega.privacy.android.feature.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.timeline.view.PhotoImageView
 import mega.privacy.android.app.presentation.photos.util.DATE_FORMAT_DAY

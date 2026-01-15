@@ -22,9 +22,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_FLOW
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.Separator
+import mega.privacy.android.feature.photos.model.MediaListItem
+import mega.privacy.android.feature.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.feature.photos.model.MediaListItem.Separator
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId

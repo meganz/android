@@ -4,7 +4,6 @@ import android.os.Parcelable
 import androidx.navigation3.runtime.NavKey
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
@@ -19,6 +18,9 @@ data class VideoPlaylistDetailNavKey(val playlistHandle: Long, val type: Playlis
 
 @Serializable
 data object MediaSearchNavKey : NavKey
+
+@Serializable
+data class AlbumCoverSelectionNavKey(val albumId: Long) : NavKey
 
 @Serializable
 @Parcelize

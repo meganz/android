@@ -23,7 +23,7 @@ class MediaFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent
             )
-
+            albumCoverSelectionScreen(navigationHandler = navigationHandler)
             cameraUploadsProgressRoute(
                 modifier = Modifier.fillMaxSize(),
                 onNavigateUp = navigationHandler::back

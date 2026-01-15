@@ -27,10 +27,10 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.app.presentation.photos.model.MediaListItem.VideoItem
-import mega.privacy.android.app.presentation.photos.model.MediaListMedia
+import mega.privacy.android.feature.photos.model.MediaListItem
+import mega.privacy.android.feature.photos.model.MediaListItem.PhotoItem
+import mega.privacy.android.feature.photos.model.MediaListItem.VideoItem
+import mega.privacy.android.feature.photos.model.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList

@@ -89,8 +89,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -141,7 +141,7 @@ fun AlbumContentScreen(
         resetShowUpdateAlbumName = viewModel::resetShowUpdateAlbumName,
         selectAlbumCover = {
             navigationHandler.navigate(
-                LegacyAlbumCoverSelectionNavKey(it.id)
+                AlbumCoverSelectionNavKey(it.id)
             )
         },
         resetSelectAlbumCoverEvent = viewModel::resetSelectAlbumCoverEvent,

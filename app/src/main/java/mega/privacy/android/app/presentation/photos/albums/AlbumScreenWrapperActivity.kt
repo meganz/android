@@ -21,7 +21,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
+import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
@@ -122,7 +122,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                         setResult(RESULT_OK, data)
                         finish()
                     },
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
 

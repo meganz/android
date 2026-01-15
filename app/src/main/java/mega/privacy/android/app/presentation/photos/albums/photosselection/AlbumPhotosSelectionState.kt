@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.photosselection
 
-import mega.privacy.android.app.presentation.photos.model.MediaListItem
+import mega.privacy.android.feature.photos.model.MediaListItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo

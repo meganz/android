@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.model
+package mega.privacy.android.feature.photos.model
 
 import mega.privacy.android.domain.entity.photos.Photo
 import java.time.LocalDateTime

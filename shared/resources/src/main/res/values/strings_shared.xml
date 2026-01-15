@@ -2007,4 +2007,8 @@
     <string name="external_checkout_information_description">You are about to open an external website (%1$s). MEGA is responsible for transactions and customer support.</string>
     <!-- Checkbox label for whether to show the external checkout information next time -->
     <string name="external_checkout_show_next_time">Show this next time</string>
+    <!-- General action save button text -->
+    <string name="general_action_save">Save</string>
+    <!-- Message to show to the user when album cover has been set and saved -->
+    <string name="album_cover_selected_success_message">Album cover updated</string>
 </resources>
