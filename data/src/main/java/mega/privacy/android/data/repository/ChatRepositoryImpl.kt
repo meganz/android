@@ -1335,7 +1335,6 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaApiGateway.globalUpdates
                 .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
                 .filter {
-                    println("filter") //TODO remove
                     val currentUserHandle = megaApiGateway.myUser?.handle
                     it.users?.any { user ->
                         user.isOwnChange == 0

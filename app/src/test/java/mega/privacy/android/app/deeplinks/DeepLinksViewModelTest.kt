@@ -165,7 +165,3 @@ class DeepLinksViewModelTest {
         val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
 }
-
-private fun StringBuilder.randomString() {
-    TODO("Not yet implemented")
-}
