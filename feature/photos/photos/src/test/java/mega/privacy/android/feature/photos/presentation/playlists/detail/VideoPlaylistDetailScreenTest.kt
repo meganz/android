@@ -7,6 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import org.junit.Rule
@@ -57,7 +58,7 @@ class VideoPlaylistDetailScreenTest {
     fun `test that empty view is displayed as expected when currentPlaylist is null`() {
         setComposeContent(
             uiState = VideoPlaylistDetailUiState.Data(
-                currentPlaylist = null
+                playlistDetail = null
             )
         )
 
@@ -73,23 +74,10 @@ class VideoPlaylistDetailScreenTest {
     }
 
     @Test
-    fun `test that empty view is displayed as expected when videos is null`() {
-        setComposeContent(
-            uiState = VideoPlaylistDetailUiState.Data(
-                currentPlaylist = mock<VideoPlaylistUiEntity> {
-                    on { videos }.thenReturn(null)
-                }
-            )
-        )
-
-        VIDEO_PLAYLIST_DETAIL_VIDEOS_EMPTY_VIEW_TEST_TAG.assertIsDisplayedWithTag()
-    }
-
-    @Test
     fun `test that empty view is displayed as expected when videos is empty`() {
         setComposeContent(
             uiState = VideoPlaylistDetailUiState.Data(
-                currentPlaylist = mock<VideoPlaylistUiEntity> {
+                playlistDetail = mock<VideoPlaylistDetailUiEntity> {
                     on { videos }.thenReturn(emptyList())
                 }
             )
@@ -108,12 +96,16 @@ class VideoPlaylistDetailScreenTest {
                 on { durationString }.thenReturn("00:10")
             }
         )
-        val playlist = mock<VideoPlaylistUiEntity> {
+        val videoPlaylistEntity = mock<VideoPlaylistUiEntity> {
+            on { thumbnailList }.thenReturn(emptyList())
+        }
+        val playlistDetail = mock<VideoPlaylistDetailUiEntity> {
+            on { uiEntity }.thenReturn(videoPlaylistEntity)
             on { this.videos }.thenReturn(videos)
         }
         setComposeContent(
             uiState = VideoPlaylistDetailUiState.Data(
-                currentPlaylist = playlist
+                playlistDetail = playlistDetail
             )
         )
 

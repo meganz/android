@@ -9,7 +9,6 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -26,7 +25,6 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -59,6 +57,9 @@ import mega.privacy.mobile.analytics.event.LocationFilterAllLocationsClickedEven
 import mega.privacy.mobile.analytics.event.LocationFilterCameraUploadClickedEvent
 import mega.privacy.mobile.analytics.event.LocationFilterCloudDriveClickedEvent
 import mega.privacy.mobile.analytics.event.LocationFilterSharedItemClickedEvent
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun VideosTabRoute(
@@ -79,8 +80,6 @@ fun VideosTabRoute(
         uiState = uiState,
         onClick = viewModel::onItemClicked,
         onLongClick = viewModel::onItemLongClicked,
-        locationOptionSelected = viewModel::setLocationSelectedFilterOption,
-        durationOptionSelected = viewModel::setDurationSelectedFilterOption,
         onSortNodes = viewModel::setCloudSortOrder,
         navigationHandler = navigationHandler
     )
@@ -95,8 +94,6 @@ internal fun VideosTabScreen(
     onSortNodes: (NodeSortConfiguration) -> Unit,
     navigationHandler: NavigationHandler,
     modifier: Modifier = Modifier,
-    locationOptionSelected: (LocationFilterOption) -> Unit = {},
-    durationOptionSelected: (DurationFilterOption) -> Unit = {},
 ) {
     val lazyListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -109,8 +106,16 @@ internal fun VideosTabScreen(
     val locationModalSheetState = rememberModalBottomSheetState(true)
     val durationModalSheetState = rememberModalBottomSheetState(true)
 
-    var selectedLocationFilterOption by remember { mutableStateOf(LocationFilterOption.AllLocations) }
-    var selectedDurationFilterOption by remember { mutableStateOf(DurationFilterOption.AllDurations) }
+    var selectedLocationFilterOption: LocationFilterOption by rememberSaveable {
+        mutableStateOf(
+            LocationFilterOption.AllLocations
+        )
+    }
+    var selectedDurationFilterOption: DurationFilterOption by rememberSaveable {
+        mutableStateOf(
+            DurationFilterOption.AllDurations
+        )
+    }
     var isAllLocations by rememberSaveable { mutableStateOf(true) }
     var isAllDurations by rememberSaveable { mutableStateOf(true) }
 
@@ -150,7 +155,12 @@ internal fun VideosTabScreen(
                         imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                     )
                 } else {
-                    val items = uiState.allVideoEntities
+                    val items = uiState.allVideoEntities.filter {
+                        selectedDurationFilterOption.checkDuration(
+                            it.duration
+                        )
+                    }.filter { it.locations.contains(selectedLocationFilterOption) }
+
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
@@ -271,7 +281,6 @@ internal fun VideosTabScreen(
                     val locationOption = convertToLocationFilterOption(option)
                     selectedLocationFilterOption = locationOption
                     isAllLocations = locationOption == LocationFilterOption.AllLocations
-                    locationOptionSelected(locationOption)
                 }
             )
         }
@@ -297,11 +306,21 @@ internal fun VideosTabScreen(
                     val durationOption = convertToDurationFilterOption(option)
                     selectedDurationFilterOption = durationOption
                     isAllDurations = durationOption == DurationFilterOption.AllDurations
-                    durationOptionSelected(durationOption)
                 }
             )
         }
     }
+}
+
+private fun DurationFilterOption.checkDuration(
+    duration: Duration,
+) = when (this) {
+    DurationFilterOption.AllDurations -> true
+    DurationFilterOption.LessThan10Seconds -> duration < 10.seconds
+    DurationFilterOption.Between10And60Seconds -> duration in 10.seconds..60.seconds
+    DurationFilterOption.Between1And4 -> duration in 1.minutes..4.minutes
+    DurationFilterOption.Between4And20 -> duration in 4.minutes..20.minutes
+    DurationFilterOption.MoreThan20 -> duration > 20.minutes
 }
 
 private fun convertToLocationFilterOption(option: FilterOption) =

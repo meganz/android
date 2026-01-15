@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation.videos.model
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import kotlin.time.Duration
 
@@ -27,6 +28,8 @@ import kotlin.time.Duration
  * @property watchedDate the video's watched date
  * @property collectionTitle the collection title of the video
  * @property hasThumbnail the video if has thumbnail
+ * @property durationString the video's duration string
+ * @property locations the video's locations
  */
 data class VideoUiEntity(
     val id: NodeId,
@@ -49,4 +52,5 @@ data class VideoUiEntity(
     val collectionTitle: String? = null,
     val hasThumbnail: Boolean = true,
     val durationString: String = "",
+    val locations: List<LocationFilterOption>,
 )

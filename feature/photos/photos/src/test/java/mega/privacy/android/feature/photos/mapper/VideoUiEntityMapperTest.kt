@@ -39,6 +39,8 @@ class VideoUiEntityMapperTest {
     private val expectedCollectionTitle = "collection title"
     private val expectedDurationString = "10:00"
 
+    //    TODO: Update tests for new location property
+
     @BeforeAll
     fun setUp() {
         whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn(expectedDurationString)
@@ -49,7 +51,7 @@ class VideoUiEntityMapperTest {
     fun `test that VideoUiEntity can be mapped correctly when exportedData is not null and isOutShare is false`() =
         runTest {
             val testNode = initTypedVideoNode(expectedExportedData, false)
-            val videoUiEntity = underTest(testNode)
+            val videoUiEntity = underTest(testNode, emptyList())
             assertMappedVideoUiEntity(
                 videoUiEntity = videoUiEntity,
                 expectedIsShared = true
@@ -60,7 +62,7 @@ class VideoUiEntityMapperTest {
     fun `test that VideoUiEntity can be mapped correctly when exportedData is not null and isOutShare is true`() =
         runTest {
             val testNode = initTypedVideoNode(expectedExportedData, true)
-            val videoUiEntity = underTest(testNode)
+            val videoUiEntity = underTest(testNode, emptyList())
             assertMappedVideoUiEntity(
                 videoUiEntity = videoUiEntity,
                 expectedIsShared = true
@@ -71,7 +73,7 @@ class VideoUiEntityMapperTest {
     fun `test that VideoUiEntity can be mapped correctly when exportedData is null and isOutShared is true`() =
         runTest {
             val testNode = initTypedVideoNode(null, true)
-            val videoUiEntity = underTest(testNode)
+            val videoUiEntity = underTest(testNode, emptyList())
             assertMappedVideoUiEntity(
                 videoUiEntity = videoUiEntity,
                 expectedIsShared = true
@@ -82,7 +84,7 @@ class VideoUiEntityMapperTest {
     fun `test that VideoUiEntity can be mapped correctly when exportedData is null and isOutShared is false`() =
         runTest {
             val testNode = initTypedVideoNode(null, false)
-            val videoUiEntity = underTest(testNode)
+            val videoUiEntity = underTest(testNode, emptyList())
             assertMappedVideoUiEntity(
                 videoUiEntity = videoUiEntity,
                 expectedIsShared = false
@@ -97,7 +99,7 @@ class VideoUiEntityMapperTest {
                 expectedIsOutShared = false,
                 elementIDParam = null
             )
-            val videoUiEntity = underTest(testNode)
+            val videoUiEntity = underTest(testNode, emptyList())
             assertMappedVideoUiEntity(
                 videoUiEntity = videoUiEntity,
                 expectedIsShared = false,

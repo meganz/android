@@ -14,8 +14,6 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.photos.components.DURATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.components.LOCATION_FILTER_BUTTON_TEXT_TEST_TAG
-import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
-import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.NavigationHandler
 import org.junit.Rule
@@ -45,8 +43,6 @@ class VideosTabScreenTest {
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
         navigationHandler: NavigationHandler = mock(),
-        locationOptionSelected: (LocationFilterOption) -> Unit = {},
-        durationOptionSelected: (DurationFilterOption) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideosTabScreen(
@@ -56,8 +52,6 @@ class VideosTabScreenTest {
                 onLongClick = onLongClick,
                 onSortNodes = onSortNodes,
                 navigationHandler = navigationHandler,
-                locationOptionSelected = locationOptionSelected,
-                durationOptionSelected = durationOptionSelected,
             )
         }
     }

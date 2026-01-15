@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.mapper
 
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.TypedVideoNode
+import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import javax.inject.Inject
 
@@ -16,6 +17,7 @@ class VideoUiEntityMapper @Inject constructor(
      */
     operator fun invoke(
         typedVideoNode: TypedVideoNode,
+        syncFolderIds: List<Long>,
     ) = VideoUiEntity(
         id = typedVideoNode.id,
         parentId = typedVideoNode.parentId,
@@ -35,6 +37,17 @@ class VideoUiEntityMapper @Inject constructor(
         watchedDate = typedVideoNode.watchedTimestamp,
         collectionTitle = typedVideoNode.collectionTitle,
         hasThumbnail = typedVideoNode.hasThumbnail,
-        durationString = durationInSecondsTextMapper(typedVideoNode.duration)
+        durationString = durationInSecondsTextMapper(typedVideoNode.duration),
+        locations = getLocationList(typedVideoNode, syncFolderIds),
     )
+
+    private fun getLocationList(
+        node: TypedVideoNode,
+        syncFolderIds: List<Long>,
+    ) = buildList {
+        add(LocationFilterOption.AllLocations)
+        if (node.parentId.longValue !in syncFolderIds) add(LocationFilterOption.CloudDrive)
+        if (node.parentId.longValue in syncFolderIds) add(LocationFilterOption.CameraUploads)
+        if (node.exportedData != null || node.isOutShared) add(LocationFilterOption.SharedItems)
+    }
 }

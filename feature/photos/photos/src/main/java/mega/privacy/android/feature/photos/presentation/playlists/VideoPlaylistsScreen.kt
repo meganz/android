@@ -135,7 +135,9 @@ internal fun VideoPlaylistsTabScreen(
                     imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
                 )
             } else {
-                val items = uiState.videoPlaylistEntities
+                val items = uiState.videoPlaylistEntities.filter { playlist ->
+                    playlist.title.contains(uiState.query ?: "", true)
+                }
                 FastScrollLazyColumn(
                     state = lazyListState,
                     totalItems = items.size,

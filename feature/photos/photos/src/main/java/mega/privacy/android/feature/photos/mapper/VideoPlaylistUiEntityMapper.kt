@@ -19,7 +19,6 @@ import kotlin.time.Duration.Companion.seconds
  */
 class VideoPlaylistUiEntityMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
-    private val videoUiEntityMapper: VideoUiEntityMapper,
     @ApplicationContext private val context: Context,
 ) {
 
@@ -46,9 +45,6 @@ class VideoPlaylistUiEntityMapper @Inject constructor(
             },
             numberOfVideos = videoPlaylist.videos?.size ?: 0,
             totalDuration = getTotalDuration(videoPlaylist.videos),
-            videos = videoPlaylist.videos?.map {
-                videoUiEntityMapper(it)
-            },
             isSystemVideoPlayer = videoPlaylist is SystemVideoPlaylist
         )
 

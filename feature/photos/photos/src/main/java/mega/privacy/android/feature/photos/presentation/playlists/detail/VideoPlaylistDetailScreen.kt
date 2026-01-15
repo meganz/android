@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -25,7 +24,6 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
@@ -66,7 +64,8 @@ fun VideoPlaylistDetailScreen(
                 modifier = Modifier
                     .testTag(VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG),
                 navigationType = AppBarNavigationType.Back(onBack),
-                title = (uiState as? VideoPlaylistDetailUiState.Data)?.currentPlaylist?.title ?: "",
+                title = (uiState as? VideoPlaylistDetailUiState.Data)?.playlistDetail?.uiEntity?.title
+                    ?: "",
                 actions = emptyList()
             )
         }
@@ -81,18 +80,17 @@ fun VideoPlaylistDetailScreen(
             )
 
             is VideoPlaylistDetailUiState.Data -> {
-                if (uiState.currentPlaylist == null
-                    || uiState.currentPlaylist.videos == null
-                    || uiState.currentPlaylist.videos.isEmpty()
+                val playlistDetail = uiState.playlistDetail
+                if (playlistDetail == null || playlistDetail.videos.isEmpty()
                 ) {
                     VideoPlaylistDetailEmptyView(
-                        title = uiState.currentPlaylist?.title,
-                        totalDuration = uiState.currentPlaylist?.totalDuration,
-                        numberOfVideos = uiState.currentPlaylist?.numberOfVideos,
+                        title = playlistDetail?.uiEntity?.title,
+                        totalDuration = playlistDetail?.uiEntity?.totalDuration,
+                        numberOfVideos = playlistDetail?.uiEntity?.numberOfVideos,
                         modifier = modifier.padding(innerPadding)
                     )
                 } else {
-                    val items = uiState.currentPlaylist.videos
+                    val items = uiState.playlistDetail.videos
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
@@ -103,12 +101,12 @@ fun VideoPlaylistDetailScreen(
                         item(key = "header") {
                             VideoPlaylistDetailHeaderView(
                                 thumbnailList =
-                                    uiState.currentPlaylist.thumbnailList?.map { id ->
+                                    playlistDetail.uiEntity.thumbnailList?.map { id ->
                                         ThumbnailRequest(id)
                                     },
-                                title = uiState.currentPlaylist.title,
-                                totalDuration = uiState.currentPlaylist.totalDuration,
-                                numberOfVideos = uiState.currentPlaylist.numberOfVideos,
+                                title = playlistDetail.uiEntity.title,
+                                totalDuration = playlistDetail.uiEntity.totalDuration,
+                                numberOfVideos = playlistDetail.uiEntity.numberOfVideos,
                                 modifier = Modifier.padding(16.dp),
                                 onPlayAllClicked = {}
                             )

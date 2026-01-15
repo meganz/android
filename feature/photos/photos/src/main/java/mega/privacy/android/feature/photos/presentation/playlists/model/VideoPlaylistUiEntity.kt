@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.playlists.model
 
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.videosection.PlaylistType
-import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 
 /**
  * The entity for the playlist in videos section
@@ -15,7 +14,6 @@ import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEnti
  * @property thumbnailList The node ID of the video item that is associated with the thumbnail.
  * @property numberOfVideos the number of videos in the playlist
  * @property totalDuration the total duration of videos in the playlist
- * @property videos the videos in the playlist
  * @property isSelected the playlist if is selected
  * @property isSystemVideoPlayer the playlist if is system video player
  */
@@ -28,7 +26,6 @@ data class VideoPlaylistUiEntity(
     val thumbnailList: List<NodeId>? = null,
     val numberOfVideos: Int = 0,
     val totalDuration: String = "",
-    val videos: List<VideoUiEntity>? = null,
     val isSelected: Boolean = false,
     val isSystemVideoPlayer: Boolean = false
 ) {

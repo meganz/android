@@ -14,16 +14,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -32,7 +32,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
@@ -41,10 +41,9 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetAllVideosUseCase
 import mega.privacy.android.domain.usecase.videosection.GetSyncUploadsFolderIdsUseCase
 import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
-import mega.privacy.android.feature.photos.presentation.videos.model.DurationFilterOption
-import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,18 +54,15 @@ class VideosTabViewModel @Inject constructor(
     private val getSyncUploadsFolderIdsUseCase: GetSyncUploadsFolderIdsUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
-    private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
-    private val fileNodeContentToNavKeyMapper: FileNodeContentToNavKeyMapper,
-    monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
-    monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
 ) : ViewModel() {
-    private val triggerFlow = MutableStateFlow(false)
     private val queryFlow = MutableStateFlow<String?>(null)
-    private val locationFilterOptionFlow = MutableStateFlow(LocationFilterOption.AllLocations)
-    private val durationFilterOptionFlow = MutableStateFlow(DurationFilterOption.AllDurations)
     private val selectedVideoIdsFlow = MutableStateFlow<List<Long>>(emptyList())
 
     private val navigateToVideoPlayerFlow =
@@ -76,109 +72,73 @@ class VideosTabViewModel @Inject constructor(
                 navigateToVideoPlayerFlow
             }
 
-    private val dataUpdatedFlow: Flow<VideosTabUiState.Data> =
+    private val sortOrder: StateFlow<SortOrder> by lazy {
+        monitorSortCloudOrderUseCase()
+            .mapLatest { it ?: SortOrder.ORDER_DEFAULT_ASC }
+            .catch { Timber.e(it) }
+            .asUiStateFlow(
+                viewModelScope,
+                SortOrder.ORDER_DEFAULT_ASC
+            )
+    }
+
+    private fun combinedTriggerFlow(): Flow<Unit> = merge(
+        monitorNodeUpdatesUseCase().filter {
+            it.changes.keys.any { node ->
+                node is FileNode && node.type is VideoFileTypeInfo
+            }
+        }.mapLatest { }
+            .catch { Timber.e(it) },
+        monitorOfflineNodeUpdatesUseCase().mapLatest { }
+            .catch { Timber.e(it) },
+        monitorSortCloudOrderUseCase().mapLatest { }
+            .catch { Timber.d(it) }
+    ).onStart { emit(Unit) }
+
+    private fun getVideoListFlow(): Flow<Pair<List<TypedVideoNode>, String?>> =
+        combinedTriggerFlow().flatMapLatest {
+            queryFlow.mapLatest { query ->
+                getAllVideosUseCase(
+                    searchQuery = query.orEmpty(),
+                    tag = query?.removePrefix("#"),
+                    description = query
+                ) to query
+            }
+        }
+
+    private fun getShowHiddenItemsFlow(): Flow<Boolean> = combine(
+        monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
+        monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
+    ) { isHiddenNodesEnabled, isShowHiddenItems ->
+        isShowHiddenItems || !isHiddenNodesEnabled
+    }
+
+    internal val uiState: StateFlow<VideosTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            merge(
-                monitorNodeUpdatesUseCase().filter {
-                    it.changes.keys.any { node ->
-                        node is FileNode && node.type is VideoFileTypeInfo
-                    }
-                }.catch { Timber.e(it) },
-                monitorOfflineNodeUpdatesUseCase().catch { Timber.e(it) }
-            ).onStart { emit(Unit) },
-            monitorSortCloudOrderUseCase().catch { Timber.e(it) },
-            monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
-            monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
-        ) { _, sortOrder, isHiddenNodesEnabled, isShowHiddenItems ->
-            val showHiddenItems = isShowHiddenItems || !isHiddenNodesEnabled
-            val videoNodes = getVideoNodeList()
-                .filterVideosByDuration()
-                .filterVideosByLocation()
+            getVideoListFlow(),
+            sortOrder,
+            getShowHiddenItemsFlow(),
+            flow { emit(getSyncUploadsFolderIdsUseCase()) },
+            selectedVideoIdsFlow,
+        ) { (videoList, query), sortOrder, showHiddenItems, syncUploadsFolderIds, selectedItems ->
+            val videoNodes = videoList
                 .filterNonSensitiveItems(showHiddenItems)
-            val uiEntities = videoNodes.map { videoUiEntityMapper(it) }
-            val order = sortOrder ?: SortOrder.ORDER_DEFAULT_ASC
-            val sortOrderPair = nodeSortConfigurationUiMapper(order)
+            val uiEntities = videoNodes.map { videoUiEntityMapper(it, syncUploadsFolderIds) }
+                .map { it.copy(isSelected = it.id.longValue in selectedItems) }
+            val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
 
             VideosTabUiState.Data(
                 allVideoEntities = uiEntities,
-                allVideoNodes = videoNodes,
-                sortOrder = order,
-                query = queryFlow.value,
+                query = query,
                 selectedSortConfiguration = sortOrderPair,
-                locationSelectedFilterOption = locationFilterOptionFlow.value,
-                durationSelectedFilterOption = durationFilterOptionFlow.value,
-                showHiddenItems = showHiddenItems
+                showHiddenItems = showHiddenItems,
+                selectedTypedNodes = videoNodes.filter { it.id.longValue in selectedItems }
             )
-        }
-
-    internal val uiState: StateFlow<VideosTabUiState> by lazy(LazyThreadSafetyMode.NONE) {
-        triggerFlow.flatMapLatest {
-            flow {
-                emit(VideosTabUiState.Loading)
-                emitAll(
-                    combine(
-                        dataUpdatedFlow,
-                        selectedVideoIdsFlow
-                    ) { uiState, selectedVideoIds ->
-                        val uiEntities = uiState.allVideoEntities.map {
-                            it.copy(isSelected = it.id.longValue in selectedVideoIds)
-                        }
-                        val selectedNodes = uiState.allVideoNodes.filter {
-                            it.id.longValue in selectedVideoIds
-                        }
-
-                        uiState.copy(
-                            allVideoEntities = uiEntities,
-                            selectedTypedNodes = selectedNodes
-                        )
-                    }.catch {
-                        Timber.e(it)
-                    }
-                )
-            }
         }.asUiStateFlow(
             viewModelScope,
             VideosTabUiState.Loading
         )
     }
-
-    fun triggerRefresh() {
-        triggerFlow.update { !it }
-    }
-
-    private suspend fun getVideoNodeList(): List<TypedVideoNode> {
-        val query = getCurrentSearchQuery()
-        return getAllVideosUseCase(
-            searchQuery = query,
-            tag = query.removePrefix("#"),
-            description = query
-        )
-    }
-
-    private suspend fun List<TypedVideoNode>.filterVideosByLocation(): List<TypedVideoNode> {
-        val syncUploadsFolderIds = getSyncUploadsFolderIdsUseCase()
-        return filter {
-            when (locationFilterOptionFlow.value) {
-                LocationFilterOption.AllLocations -> true
-                LocationFilterOption.CloudDrive -> it.parentId.longValue !in syncUploadsFolderIds
-                LocationFilterOption.CameraUploads -> it.parentId.longValue in syncUploadsFolderIds
-                LocationFilterOption.SharedItems -> it.exportedData != null || it.isOutShared
-            }
-        }
-    }
-
-    private fun List<TypedVideoNode>.filterVideosByDuration() =
-        filter {
-            val seconds = it.duration.inWholeSeconds
-            when (durationFilterOptionFlow.value) {
-                DurationFilterOption.AllDurations -> true
-                DurationFilterOption.LessThan10Seconds -> seconds < 10
-                DurationFilterOption.Between10And60Seconds -> seconds in 10..60
-                DurationFilterOption.Between1And4 -> seconds in 61..240
-                DurationFilterOption.Between4And20 -> seconds in 241..1200
-                DurationFilterOption.MoreThan20 -> seconds > 1200
-            }
-        }
 
     private fun List<TypedVideoNode>.filterNonSensitiveItems(showHiddenItems: Boolean) =
         if (showHiddenItems) {
@@ -187,22 +147,11 @@ class VideosTabViewModel @Inject constructor(
             filterNot { it.isMarkedSensitive || it.isSensitiveInherited }
         }
 
-    internal fun setLocationSelectedFilterOption(locationFilterOption: LocationFilterOption) {
-        locationFilterOptionFlow.update { locationFilterOption }
-        triggerRefresh()
-    }
-
-    internal fun setDurationSelectedFilterOption(durationFilterOption: DurationFilterOption) {
-        durationFilterOptionFlow.update { durationFilterOption }
-        triggerRefresh()
-    }
-
     internal fun getCurrentSearchQuery() = queryFlow.value.orEmpty()
 
     internal fun searchQuery(queryString: String?) {
         if (queryFlow.value != queryString) {
             queryFlow.update { queryString }
-            triggerRefresh()
         }
     }
 
@@ -227,28 +176,40 @@ class VideosTabViewModel @Inject constructor(
 
     private fun navigateToVideoPlayer(item: VideoUiEntity) {
         viewModelScope.launch {
-            val state = uiState.value as? VideosTabUiState.Data ?: return@launch
-            val videoNode = state.allVideoNodes.firstOrNull { it.id == item.id } ?: return@launch
-            val content = FileNodeContent.AudioOrVideo(uri = getNodeContentUriUseCase(videoNode))
+            val uri = runCatching {
+                getNodeContentUriByHandleUseCase(item.id.longValue)
+            }.onFailure { Timber.e(it) }.getOrNull() ?: return@launch
 
-            val isSearchMode = !state.query.isNullOrEmpty()
-            fileNodeContentToNavKeyMapper(
-                content = content,
-                fileNode = videoNode,
-                nodeSourceType = if (isSearchMode) {
-                    NodeSourceType.SEARCH
-                } else {
-                    NodeSourceType.VIDEOS
-                },
-                sortOrder = state.sortOrder,
+            val content = FileNodeContent.AudioOrVideo(uri = uri)
+
+            val isSearchMode = queryFlow.value.isNullOrEmpty()
+
+            val navKey = LegacyMediaPlayerNavKey(
+                nodeHandle = item.id.longValue,
+                nodeContentUri = content.uri,
+                nodeSourceType = nodeSourceTypeToViewTypeMapper(
+                    if (isSearchMode) {
+                        NodeSourceType.SEARCH
+                    } else {
+                        NodeSourceType.VIDEOS
+                    }
+                ),
+                sortOrder = sortOrder.value,
+                isFolderLink = false,
+                fileName = item.name,
+                parentHandle = item.parentId.longValue,
+                fileHandle = item.id.longValue,
+                fileTypeInfo = item.fileTypeInfo,
                 searchedItems = if (isSearchMode) {
-                    state.allVideoNodes.map { it.id.longValue }
+                    (uiState.value as? VideosTabUiState.Data)?.allVideoEntities?.map { it.id.longValue }
                 } else {
                     null
-                }
-            )?.let { navKey ->
-                navigateToVideoPlayerFlow.update { triggered(navKey) }
-            }
+                },
+                nodeHandles = null,
+            )
+
+            navigateToVideoPlayerFlow.update { triggered(navKey) }
+
         }
     }
 

@@ -20,19 +20,19 @@ import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
-import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
+import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = VideoPlaylistDetailViewModel.Factory::class)
 class VideoPlaylistDetailViewModel @AssistedInject constructor(
-    private val videoPlaylistUiEntityMapper: VideoPlaylistUiEntityMapper,
+    private val videoPlaylistDetailUiEntityMapper: VideoPlaylistDetailUiEntityMapper,
     private val getVideoPlaylistByIdUseCase: GetVideoPlaylistByIdUseCase,
+    private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
     @Assisted private val playlistHandle: Long,
     @Assisted private val type: PlaylistType,
-    monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<VideoPlaylistDetailUiState> by lazy(LazyThreadSafetyMode.NONE) {
@@ -48,11 +48,11 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         ) {
             val videoPlaylist = getVideoPlaylistByIdUseCase(NodeId(playlistHandle), type)
             val videoPlaylistUiEntity = videoPlaylist?.let {
-                videoPlaylistUiEntityMapper(it)
+                videoPlaylistDetailUiEntityMapper(it)
             }
 
             VideoPlaylistDetailUiState.Data(
-                currentPlaylist = videoPlaylistUiEntity,
+                playlistDetail = videoPlaylistUiEntity,
             )
         }.catch {
             Timber.e(it)
@@ -73,7 +73,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private fun hasMatchingIdWithPlaylist(list: List<Long>): Boolean {
         if (uiState.value !is VideoPlaylistDetailUiState.Data) return false
         val state = uiState.value as VideoPlaylistDetailUiState.Data
-        val ids = state.currentPlaylist?.videos?.map { it.id.longValue }?.toSet() ?: emptySet()
+        val ids = state.playlistDetail?.videos?.map { it.id.longValue }?.toSet() ?: emptySet()
         return list.any { id -> id in ids }
     }
 
