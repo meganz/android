@@ -51,6 +51,8 @@ class MediaCameraUploadViewModel @Inject constructor(
     private val hasCameraUploadsPermissionUseCase: HasCameraUploadsPermissionUseCase,
 ) : ViewModel() {
 
+    private var isWarningBannerDismissed = false
+
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
     private val _uiState = MutableStateFlow(MediaCameraUploadUiState())
     internal val uiState = _uiState.asUiStateFlow(
@@ -268,7 +270,10 @@ class MediaCameraUploadViewModel @Inject constructor(
     }
 
     internal fun updateIsWarningBannerShown(isShown: Boolean) {
-        _uiState.update { it.copy(isWarningBannerShown = isShown) }
+        if (!isShown && !isWarningBannerDismissed) {
+            isWarningBannerDismissed = true
+        }
+        _uiState.update { it.copy(isWarningBannerShown = isShown && !isWarningBannerDismissed) }
     }
 
     internal fun setInitialPreferences() {
@@ -339,7 +344,7 @@ class MediaCameraUploadViewModel @Inject constructor(
             }
             currentState.copy(
                 isCameraUploadsLimitedAccess = !hasPermissions,
-                isWarningBannerShown = showWarningBanner,
+                isWarningBannerShown = showWarningBanner && !isWarningBannerDismissed,
                 status = if (showWarningAction) CUStatusUiState.Warning else currentState.status
             )
         }

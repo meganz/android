@@ -460,4 +460,38 @@ class MediaCameraUploadViewModelTest {
                 assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.Warning)
             }
         }
+
+    @Test
+    fun `test that the warning banner is shown when it hasn't been dismissed`() = runTest {
+        underTest.updateIsWarningBannerShown(isShown = true)
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().isWarningBannerShown).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the warning banner is not shown when it hasn't been dismissed even though it is in warning state`() =
+        runTest {
+            underTest.updateIsWarningBannerShown(isShown = false)
+
+            underTest.updateIsWarningBannerShown(isShown = true)
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isWarningBannerShown).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that the warning banner is not shown when CU permissions are not granted but the banner has been dismissed`() =
+        runTest {
+            whenever(hasCameraUploadsPermissionUseCase()) doReturn false
+
+            underTest.updateIsWarningBannerShown(isShown = false)
+            underTest.checkCameraUploadsPermissions()
+
+            underTest.uiState.test {
+                assertThat(expectMostRecentItem().isWarningBannerShown).isFalse()
+            }
+        }
 }
