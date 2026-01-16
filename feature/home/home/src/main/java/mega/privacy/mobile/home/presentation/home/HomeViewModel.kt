@@ -7,11 +7,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
@@ -26,6 +29,7 @@ class HomeViewModel @Inject constructor(
     private val monitorHomeWidgetConfigurationUseCase: MonitorHomeWidgetConfigurationUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val hasOfflineFilesUseCase: HasOfflineFilesUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     val state: StateFlow<HomeUiState> by lazy {
@@ -54,9 +58,13 @@ class HomeViewModel @Inject constructor(
                     list
                 },
             monitorConnectivityUseCase().catch { Timber.e(it) },
-        ) { widgets, hasInternetConnection ->
+            monitorSearchRevampFeatureFlag().catch { Timber.e(it) },
+        ) { widgets, hasInternetConnection, isSearchRevampEnabled ->
             if (hasInternetConnection) {
-                HomeUiState.Data(widgets = widgets)
+                HomeUiState.Data(
+                    widgets = widgets,
+                    isSearchRevampEnabled = isSearchRevampEnabled
+                )
             } else {
                 val hasOfflineFiles = runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
                 HomeUiState.Offline(hasOfflineFiles = hasOfflineFiles)
@@ -65,5 +73,9 @@ class HomeViewModel @Inject constructor(
             viewModelScope,
             HomeUiState.Loading,
         )
+    }
+
+    private fun monitorSearchRevampFeatureFlag() = flow {
+        emit(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp))
     }
 }

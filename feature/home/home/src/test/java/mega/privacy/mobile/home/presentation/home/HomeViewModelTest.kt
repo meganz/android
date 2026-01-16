@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.home.MonitorHomeWidgetConfigurationUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.offline.HasOfflineFilesUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetProvider
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
@@ -36,14 +38,17 @@ class HomeViewModelTest {
         mock<MonitorHomeWidgetConfigurationUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val hasOfflineFilesUseCase = mock<HasOfflineFilesUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
+        stubFeatureFlag()
         underTest = HomeViewModel(
             widgetProviders = homeWidgetProviders,
             monitorHomeWidgetConfigurationUseCase = monitorHomeWidgetConfigurationUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             hasOfflineFilesUseCase = hasOfflineFilesUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -55,6 +60,7 @@ class HomeViewModelTest {
             monitorHomeWidgetConfigurationUseCase,
             monitorConnectivityUseCase,
             hasOfflineFilesUseCase,
+            getFeatureFlagValueUseCase,
         )
     }
 
@@ -291,6 +297,12 @@ class HomeViewModelTest {
         return mock<HomeWidget> {
             on { this.identifier } doReturn identifier
             on { this.defaultOrder } doReturn defaultOrder
+        }
+    }
+
+    private fun stubFeatureFlag(enabled: Boolean = false) {
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.SearchRevamp) } doReturn enabled
         }
     }
 }

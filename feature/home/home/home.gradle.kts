@@ -25,6 +25,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
+    implementation(project(":core:feature-flags"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))

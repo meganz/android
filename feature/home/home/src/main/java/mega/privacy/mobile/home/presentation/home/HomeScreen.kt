@@ -48,18 +48,17 @@ import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBo
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
+import mega.privacy.mobile.home.presentation.home.model.searchNavKey
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,16 +139,13 @@ internal fun HomeScreen(
                 title = stringResource(sharedR.string.general_section_home),
                 navigationType = AppBarNavigationType.None,
                 trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
-                actions = listOf(
-                    MenuActionWithClick(CommonAppBarAction.Search) {
-                        navigationHandler.navigate(
-                            LegacySearchNavKey(
-                                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                                parentHandle = -1L
-                            )
-                        )
+                actions = buildList {
+                    if (state is HomeUiState.Data) {
+                        add(MenuActionWithClick(CommonAppBarAction.Search) {
+                            navigationHandler.navigate(state.searchNavKey)
+                        })
                     }
-                ).takeIf { state !is HomeUiState.Offline }.orEmpty()
+                }
             )
         },
         floatingActionButton = {
