@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,7 +31,6 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -59,6 +57,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Nod
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterBottomSheetContent
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
@@ -323,18 +322,10 @@ fun SearchContent(
             }
 
             uiState.isEmpty -> {
-                Box(
+                SearchEmptyView(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 100.dp)
                         .testTag(SEARCH_CONTENT_EMPTY_TAG),
-                ) {
-                    MegaText(
-                        "No results found",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                }
+                )
             }
 
             else -> NodesView(
