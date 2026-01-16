@@ -53,4 +53,15 @@ data class OfflineUiState(
      */
     val selectedOfflineNodes: List<OfflineFileInformation>
         get() = offlineNodes.filter { it.isSelected }.map { it.offlineFileInformation }
+
+    /**
+     * Check if all nodes are selected
+     *
+     * Works by comparing the size of the selected nodes with the size of the offline nodes
+     * to make the calculation more efficient and avoid looping through all the nodes to check
+     * if they are selected.
+     *
+     * @return true if all nodes are selected
+     */
+    val areAllNodesSelected: Boolean = selectedNodeHandles.size == offlineNodes.size
 }

@@ -252,7 +252,11 @@ internal fun OfflineScreen(
                         .testTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG),
                     title = uiState.selectedNodeHandles.size.toString(),
                     navigationType = AppBarNavigationType.Close(deselectAll),
-                    actions = OfflineSelectionAction.topBarItems,
+                    actions = buildList {
+                        if (!uiState.areAllNodesSelected) {
+                            add(OfflineSelectionAction.SelectAll)
+                        }
+                    },
                     onActionPressed = { action ->
                         when (action) {
                             is OfflineSelectionAction.SelectAll -> selectAll()

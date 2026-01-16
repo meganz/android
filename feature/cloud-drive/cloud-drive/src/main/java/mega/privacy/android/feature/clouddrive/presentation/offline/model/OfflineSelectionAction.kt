@@ -58,7 +58,6 @@ sealed interface OfflineSelectionAction {
     }
 
     companion object {
-        val topBarItems = listOf(SelectAll)
         val bottomBarItems = listOf(Download, Share, Delete)
     }
 }
