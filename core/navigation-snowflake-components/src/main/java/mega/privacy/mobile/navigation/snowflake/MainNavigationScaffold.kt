@@ -21,7 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
@@ -130,20 +130,22 @@ private fun MegaNavigationSuite(
         layoutType = navSuiteType,
         colors = scaffoldColors,
         modifier = Modifier
-            .drawBehind {
-                val strokeWidth = 2.dp.toPx()
+            .drawWithContent {
+                drawContent()
+                val strokeWidth = 1.dp.toPx()
+                val delta = strokeWidth / 2f
                 if (navSuiteType == NavigationSuiteType.NavigationBar) {
                     drawLine(
                         color = borderColor,
-                        start = Offset(0f, 0f),
-                        end = Offset(size.width, 0f),
+                        start = Offset(0f, delta),
+                        end = Offset(size.width, delta),
                         strokeWidth = strokeWidth
                     )
                 } else {
                     drawLine(
                         color = borderColor,
-                        start = Offset(size.width, 0f),
-                        end = Offset(size.width, size.height),
+                        start = Offset(size.width - delta, 0f),
+                        end = Offset(size.width - delta, size.height),
                         strokeWidth = strokeWidth
                     )
                 }
