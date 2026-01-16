@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.navigation
 
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -25,6 +26,7 @@ import mega.privacy.android.feature.photos.presentation.albums.content.AlbumCont
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionViewModel
+import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
@@ -37,6 +39,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
+import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -274,6 +277,17 @@ fun EntryProviderScope<NavKey>.albumPhotosSelectionScreen(
                 val result = album.id.id.takeIf { numCommittedPhotos > 0 }
                 navigationHandler.returnResult(PhotosSelectionNavKey.RESULT, result)
             },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.albumDecryptionKey(
+    navigationHandler: NavigationHandler,
+) {
+    entry<AlbumDecryptionKeyNavKey> {
+        AlbumDecryptionKeyScreen(
+            modifier = Modifier.fillMaxSize(),
+            onBack = navigationHandler::back
         )
     }
 }

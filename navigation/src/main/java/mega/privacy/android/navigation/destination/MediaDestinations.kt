@@ -34,5 +34,8 @@ data class PhotosSelectionNavKey(
 }
 
 @Serializable
+data object AlbumDecryptionKeyNavKey : NavKey
+
+@Serializable
 @Parcelize
 data object CameraUploadsProgressNavKey : NavKey, Parcelable

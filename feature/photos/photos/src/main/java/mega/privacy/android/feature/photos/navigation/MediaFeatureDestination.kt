@@ -25,6 +25,7 @@ class MediaFeatureDestination : FeatureDestination {
             )
             albumCoverSelectionScreen(navigationHandler = navigationHandler)
             albumPhotosSelectionScreen(navigationHandler = navigationHandler)
+            albumDecryptionKey(navigationHandler = navigationHandler)
             cameraUploadsProgressRoute(
                 modifier = Modifier.fillMaxSize(),
                 onNavigateUp = navigationHandler::back

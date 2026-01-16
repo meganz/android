@@ -1918,7 +1918,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">This folder is empty</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nothing in your cloud drive yet</string>
+    <string name="context_empty_cloud_drive_title">Nothing in your private vault yet</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Keep something safe with zero-knowledge encryption</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -2028,4 +2028,8 @@
         <item quantity="one">Added %1$d item to “%2$s“</item>
         <item quantity="other">Added %1$d items to “%2$s”</item>
     </plurals>
+    <!-- Album decryption key screen title -->
+    <string name="album_decryption_key_title">Decryption key</string>
+    <!-- Album decryption key screen feature description -->
+    <string name="album_decryption_key_description">Our zero-knowledge encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
 </resources>
