@@ -23,5 +23,16 @@ data object MediaSearchNavKey : NavKey
 data class AlbumCoverSelectionNavKey(val albumId: Long) : NavKey
 
 @Serializable
+data class PhotosSelectionNavKey(
+    val albumId: Long,
+    val selectionMode: Int,
+    val captureResult: Boolean = true,
+) : NavKey {
+    companion object {
+        const val RESULT = "PhotosSelectionNavKey::result"
+    }
+}
+
+@Serializable
 @Parcelize
 data object CameraUploadsProgressNavKey : NavKey, Parcelable

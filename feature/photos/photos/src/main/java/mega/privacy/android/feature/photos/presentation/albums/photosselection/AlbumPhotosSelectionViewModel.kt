@@ -1,9 +1,14 @@
-package mega.privacy.android.app.presentation.photos.albums.photosselection
+package mega.privacy.android.feature.photos.presentation.albums.photosselection
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,12 +25,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_FLOW
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.feature.photos.model.MediaListItem
-import mega.privacy.android.feature.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.feature.photos.model.MediaListItem.Separator
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -44,19 +44,22 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.AlbumFlow
+import mega.privacy.android.feature.photos.model.PhotoNodeUiState
+import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
-import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
+@HiltViewModel(assistedFactory = AlbumPhotosSelectionViewModel.Factory::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class AlbumPhotosSelectionViewModel @Inject constructor(
+class AlbumPhotosSelectionViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
@@ -71,7 +74,10 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val photoUiStateMapper: PhotoUiStateMapper,
+    private val fileTypeIconMapper: FileTypeIconMapper,
+    @Assisted private val albumId: Long?,
+    @Assisted private val selectionMode: Int?,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumPhotosSelectionState())
     val state: StateFlow<AlbumPhotosSelectionState> = _state
@@ -90,7 +96,8 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun extractAlbumFlow() = savedStateHandle.getStateFlow(ALBUM_FLOW, 0)
+    private fun extractAlbumFlow() = savedStateHandle
+        .getStateFlow("album_flow", selectionMode ?: 0)
         .onEach(::updateAlbumFlow)
         .catch { exception -> Timber.e(exception) }
         .launchIn(viewModelScope)
@@ -101,7 +108,8 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun fetchAlbum() = savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
+    private fun fetchAlbum() = savedStateHandle
+        .getStateFlow("album_id", albumId)
         .filterNotNull()
         .flatMapLatest { id -> getUserAlbum(albumId = AlbumId(id)) }
         .onEach(::updateAlbum)
@@ -140,7 +148,6 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
             emitAll(getTimelinePhotosUseCase())
         }
     }
-
 
     private fun fetchPhotos() = getPhotos()
         .mapLatest(::sortPhotos)
@@ -212,21 +219,25 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         _state.update {
             it.copy(selectedLocation = location)
         }
+        filterPhotos()
     }
 
-    fun filterPhotos() = viewModelScope.launch {
-        val photos = _state.value.photos
-        val location = _state.value.selectedLocation
+    fun filterPhotos() {
+        viewModelScope.launch {
+            val photos = _state.value.photos
+            val location = _state.value.selectedLocation
+            val selectedPhotoIds = _state.value.selectedPhotoIds
 
-        val filteredPhotos = when (location) {
-            ALL_PHOTOS -> photos
-            CLOUD_DRIVE -> filterCloudDrivePhotos(photos)
-            CAMERA_UPLOAD -> filterCameraUploadPhotos(photos)
-        }
+            val filteredPhotos = when (location) {
+                ALL_PHOTOS -> photos
+                CLOUD_DRIVE -> filterCloudDrivePhotos(photos)
+                CAMERA_UPLOAD -> filterCameraUploadPhotos(photos)
+            }
 
-        val uiPhotos = filteredPhotos.toUIPhotos()
-        _state.update {
-            it.copy(mediaListItems = uiPhotos)
+            val uiPhotos = filteredPhotos.toUIPhotos(selectedPhotoIds)
+            _state.update {
+                it.copy(photosNodeContentTypes = uiPhotos)
+            }
         }
     }
 
@@ -269,9 +280,10 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         _state.update {
             it.copy(selectedPhotoIds = selectedPhotoIds)
         }
+        filterPhotos()
     }
 
-    private suspend fun List<Photo>.toUIPhotos(): List<MediaListItem> =
+    private suspend fun List<Photo>.toUIPhotos(selectedPhotoIds: Set<Long>): List<PhotosNodeContentType> =
         withContext(defaultDispatcher) {
             flatMapIndexed { index, photo ->
                 val comparePeriods = {
@@ -281,15 +293,22 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
                 }
                 val showDateSeparator = index == 0 || !comparePeriods()
 
+                val photoUiState = photoUiStateMapper(photo)
+                val isSelected = photo.id in selectedPhotoIds
+
                 listOfNotNull(
-                    Separator(photo.modificationTime).takeIf { showDateSeparator },
-                    when (photo) {
-                        is Photo.Image -> PhotoItem(photo)
-                        is Photo.Video -> MediaListItem.VideoItem(
-                            photo,
-                            durationInSecondsTextMapper(photo.fileTypeInfo.duration)
+                    PhotosNodeContentType.HeaderItem(
+                        time = photo.modificationTime,
+                        shouldShowGridSizeSettings = false,
+                    ).takeIf { showDateSeparator },
+                    PhotosNodeContentType.PhotoNodeItem(
+                        node = PhotoNodeUiState(
+                            photo = photoUiState,
+                            isSensitive = photo.isSensitive || photo.isSensitiveInherited,
+                            isSelected = isSelected,
+                            defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                         )
-                    },
+                    ),
                 )
             }
         }
@@ -311,59 +330,105 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     fun selectAllPhotos() = viewModelScope.launch {
         _state.update {
             val selectedPhotoIds = withContext(defaultDispatcher) {
-                val photoIds = it.mediaListItems
-                    .filterIsInstance<PhotoItem>()
-                    .map { item -> item.photo.id }
+                val photoIds = it.photosNodeContentTypes
+                    .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+                    .map { item -> item.node.photo.id }
                 it.selectedPhotoIds + photoIds
             }
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+            val updatedPhotosNodeContentTypes =
+                it.photosNodeContentTypes.withSelection(selectedPhotoIds)
+            it.copy(
+                selectedPhotoIds = selectedPhotoIds,
+                photosNodeContentTypes = updatedPhotosNodeContentTypes,
+            )
         }
     }
 
     fun clearSelection() {
         _state.update {
-            it.copy(selectedPhotoIds = setOf())
+            val updatedPhotosNodeContentTypes = it.photosNodeContentTypes.withSelection(setOf())
+            it.copy(
+                selectedPhotoIds = setOf(),
+                photosNodeContentTypes = updatedPhotosNodeContentTypes,
+            )
         }
     }
 
-    fun selectPhoto(photo: Photo) {
+    fun selectPhoto(photo: PhotoUiState) {
         synchronized(Unit) {
             if (_state.value.selectedPhotoIds.size < MAX_SELECTION_NUM) {
+                val selectedPhotoIds = _state.value.selectedPhotoIds + photo.id
                 _state.update {
-                    val selectedPhotoIds = it.selectedPhotoIds + photo.id
-                    it.copy(selectedPhotoIds = selectedPhotoIds)
+                    val updatedPhotosNodeContentTypes =
+                        it.photosNodeContentTypes.withSelection(selectedPhotoIds)
+                    it.copy(
+                        selectedPhotoIds = selectedPhotoIds,
+                        photosNodeContentTypes = updatedPhotosNodeContentTypes,
+                    )
                 }
             }
         }
     }
 
-    fun unselectPhoto(photo: Photo) {
+    fun unselectPhoto(photo: PhotoUiState) {
+        val selectedPhotoIds = _state.value.selectedPhotoIds - photo.id
         _state.update {
-            val selectedPhotoIds = it.selectedPhotoIds - photo.id
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+            val updatedPhotosNodeContentTypes =
+                it.photosNodeContentTypes.withSelection(selectedPhotoIds)
+            it.copy(
+                selectedPhotoIds = selectedPhotoIds,
+                photosNodeContentTypes = updatedPhotosNodeContentTypes,
+            )
         }
     }
 
-    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) = viewModelScope.launch {
-        val photoIds = withContext(defaultDispatcher) {
-            val albumPhotoIds = _state.value.albumPhotoIds
-            selectedPhotoIds - albumPhotoIds
-        }
+    private fun List<PhotosNodeContentType>.withSelection(
+        selectedPhotoIds: Set<Long>,
+    ): List<PhotosNodeContentType> {
+        return this.map { contentType ->
+            when (contentType) {
+                is PhotosNodeContentType.PhotoNodeItem -> {
+                    val isSelected = contentType.node.photo.id in selectedPhotoIds
+                    contentType.copy(node = contentType.node.copy(isSelected = isSelected))
+                }
 
-        if (photoIds.isNotEmpty()) {
-            addPhotosToAlbum(
-                albumId = album.id,
-                photoIds = photoIds.map { NodeId(it) },
-                isAsync = false,
-            )
+                is PhotosNodeContentType.HeaderItem -> contentType
+            }
         }
+    }
 
+    fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) {
+        viewModelScope.launch {
+            val photoIds = withContext(defaultDispatcher) {
+                val albumPhotoIds = _state.value.albumPhotoIds
+                selectedPhotoIds - albumPhotoIds
+            }
+
+            if (photoIds.isEmpty()) return@launch
+
+            runCatching {
+                addPhotosToAlbum(
+                    albumId = album.id,
+                    photoIds = photoIds.map { NodeId(it) },
+                    isAsync = false,
+                )
+            }.onSuccess {
+                _state.update {
+                    it.copy(photosSelectionCompletedEvent = triggered(photoIds.size))
+                }
+            }
+        }
+    }
+
+    fun resetPhotosSelectionCompletedEvent() {
         _state.update {
-            it.copy(
-                isSelectionCompleted = true,
-                numCommittedPhotos = photoIds.size,
-            )
+            it.copy(photosSelectionCompletedEvent = consumed())
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(albumId: Long?, selectionMode: Int?): AlbumPhotosSelectionViewModel
     }
 
     companion object {

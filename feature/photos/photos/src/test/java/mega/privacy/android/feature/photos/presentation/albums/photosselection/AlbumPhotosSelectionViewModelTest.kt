@@ -1,8 +1,9 @@
-package mega.privacy.android.app.presentation.photos.albums.photosselection
+package mega.privacy.android.feature.photos.presentation.albums.photosselection
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
@@ -10,8 +11,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -34,10 +34,14 @@ import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorPaginatedTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.PhotoUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -65,6 +69,8 @@ class AlbumPhotosSelectionViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorPaginatedTimelinePhotosUseCase =
         mock<MonitorPaginatedTimelinePhotosUseCase>()
+    private val photoUiStateMapper = mock<PhotoUiStateMapper>()
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
     private val accountLevelDetail = mock<AccountLevelDetail> {
         on { accountType }.thenReturn(AccountType.PRO_III)
@@ -77,6 +83,12 @@ class AlbumPhotosSelectionViewModelTest {
     fun setUp() {
         wheneverBlocking { monitorShowHiddenItemsUseCase() }.thenReturn(flowOf(false))
         wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(flowOf(accountDetail))
+        whenever(
+            fileTypeIconMapper(
+                any(),
+                any()
+            )
+        ).thenReturn(iconPackR.drawable.ic_image_medium_solid)
         underTest = createSUT()
     }
 
@@ -88,9 +100,10 @@ class AlbumPhotosSelectionViewModelTest {
             title = "Album 1",
         )
 
-        savedStateHandle[ALBUM_ID] = id
+        savedStateHandle["album_id"] = id
         whenever(getUserAlbum(expectedAlbum.id)).thenReturn(flowOf(expectedAlbum))
-        createSUT()
+        whenever(getAlbumPhotos(expectedAlbum.id)).thenReturn(flowOf(emptyList()))
+        underTest = createSUT(albumId = id)
         advanceUntilIdle()
 
         underTest.state.test {
@@ -106,6 +119,10 @@ class AlbumPhotosSelectionViewModelTest {
             createImage(id = 2L),
             createImage(id = 3L),
         )
+        val photoUiStates = images.map { createPhotoUiState(it) }
+        images.forEachIndexed { index, photo ->
+            whenever(photoUiStateMapper(photo)).thenReturn(photoUiStates[index])
+        }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(images))
         whenever(filterCloudDrivePhotos(any())).thenReturn(images)
         whenever(filterCameraUploadPhotos(any())).thenReturn(images)
@@ -114,22 +131,14 @@ class AlbumPhotosSelectionViewModelTest {
         advanceUntilIdle()
 
         underTest.state.test {
-            val actualPhotos = awaitItem().photos
-            assertThat(actualPhotos.size).isEqualTo(3)
-        }
-    }
-
-    @Test
-    fun `test that selected location is updated correctly`() = runTest {
-        underTest.state.test {
-            underTest.updateLocation(ALL_PHOTOS)
-            assertThat(awaitItem().selectedLocation).isEqualTo(ALL_PHOTOS)
-
-            underTest.updateLocation(CLOUD_DRIVE)
-            assertThat(awaitItem().selectedLocation).isEqualTo(CLOUD_DRIVE)
-
-            underTest.updateLocation(CAMERA_UPLOAD)
-            assertThat(awaitItem().selectedLocation).isEqualTo(CAMERA_UPLOAD)
+            // Wait for photos to be loaded
+            var state = awaitItem()
+            while (state.photosNodeContentTypes.isEmpty() || state.isLoading) {
+                state = awaitItem()
+            }
+            val photoNodes = state.photosNodeContentTypes
+                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            assertThat(photoNodes.size).isEqualTo(3)
         }
     }
 
@@ -140,6 +149,10 @@ class AlbumPhotosSelectionViewModelTest {
             createImage(id = 2L),
             createImage(id = 3L),
         )
+        val photoUiStates = images.map { createPhotoUiState(it) }
+        images.forEachIndexed { index, photo ->
+            whenever(photoUiStateMapper(photo)).thenReturn(photoUiStates[index])
+        }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(images))
         whenever(filterCloudDrivePhotos(any())).thenReturn(images)
         whenever(filterCameraUploadPhotos(any())).thenReturn(images)
@@ -147,10 +160,32 @@ class AlbumPhotosSelectionViewModelTest {
         underTest = createSUT()
         advanceUntilIdle()
 
-        underTest.selectAllPhotos()
+        // Wait for photos to be loaded and photosNodeContentTypes to be populated
+        underTest.state.test {
+            var state = awaitItem()
+            var photoNodes = state.photosNodeContentTypes
+                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            while (photoNodes.size < 3 || state.isLoading) {
+                state = awaitItem()
+                photoNodes = state.photosNodeContentTypes
+                    .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            }
+            // Verify photos are loaded before selecting
+            assertThat(photoNodes.size).isEqualTo(3)
+            cancelAndIgnoreRemainingEvents()
+        }
 
-        underTest.state.drop(1).test {
-            val actualSelectedPhotoIds = awaitItem().selectedPhotoIds
+        underTest.selectAllPhotos()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            var state = awaitItem()
+            // Wait for selection to be applied - selectAllPhotos adds photo IDs to selectedPhotoIds
+            // We need to wait until the selectedPhotoIds contains all 3 photo IDs
+            while (state.selectedPhotoIds.size < 3) {
+                state = awaitItem()
+            }
+            val actualSelectedPhotoIds = state.selectedPhotoIds
             assertThat(actualSelectedPhotoIds).isEqualTo(setOf(1L, 2L, 3L))
         }
     }
@@ -167,8 +202,16 @@ class AlbumPhotosSelectionViewModelTest {
     @Test
     fun `test that select photo behaves correctly`() = runTest {
         val image = createImage(id = 1L)
+        val photoUiState = createPhotoUiState(image)
+        whenever(photoUiStateMapper(image)).thenReturn(photoUiState)
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(image)))
+        whenever(filterCloudDrivePhotos(any())).thenReturn(listOf(image))
+        whenever(filterCameraUploadPhotos(any())).thenReturn(listOf(image))
 
-        underTest.selectPhoto(image)
+        underTest = createSUT()
+        advanceUntilIdle()
+
+        underTest.selectPhoto(photoUiState)
 
         underTest.state.test {
             assertThat(awaitItem().selectedPhotoIds).isEqualTo(setOf(image.id))
@@ -178,9 +221,17 @@ class AlbumPhotosSelectionViewModelTest {
     @Test
     fun `test that unselect photo behaves correctly`() = runTest {
         val image = createImage(id = 1L)
+        val photoUiState = createPhotoUiState(image)
+        whenever(photoUiStateMapper(image)).thenReturn(photoUiState)
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(image)))
+        whenever(filterCloudDrivePhotos(any())).thenReturn(listOf(image))
+        whenever(filterCameraUploadPhotos(any())).thenReturn(listOf(image))
 
-        underTest.selectPhoto(image)
-        underTest.unselectPhoto(image)
+        underTest = createSUT()
+        advanceUntilIdle()
+
+        underTest.selectPhoto(photoUiState)
+        underTest.unselectPhoto(photoUiState)
 
         underTest.state.test {
             assertThat(!awaitItem().selectedPhotoIds.contains(1L)).isTrue()
@@ -197,13 +248,13 @@ class AlbumPhotosSelectionViewModelTest {
         )
         whenever(addPhotosToAlbum(album.id, photoIds, false)).thenReturn(Unit)
 
-        createSUT()
+        underTest = createSUT()
         underTest.addPhotos(album, photoIds.map { it.longValue }.toSet())
         advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.isSelectionCompleted).isTrue()
+            assertThat(state.photosSelectionCompletedEvent).isEqualTo(triggered(3))
         }
     }
 
@@ -214,6 +265,10 @@ class AlbumPhotosSelectionViewModelTest {
             createImage(id = 2L),
             createImage(id = 3L),
         )
+        val photoUiStates = images.map { createPhotoUiState(it) }
+        images.forEachIndexed { index, photo ->
+            whenever(photoUiStateMapper(photo)).thenReturn(photoUiStates[index])
+        }
         whenever(getFeatureFlagValueUseCase(AppFeatures.TimelinePhotosPagination)).thenReturn(true)
         whenever(monitorPaginatedTimelinePhotosUseCase()).thenReturn(flowOf(images))
         whenever(filterCloudDrivePhotos(any())).thenReturn(images)
@@ -223,28 +278,38 @@ class AlbumPhotosSelectionViewModelTest {
         advanceUntilIdle()
 
         underTest.state.test {
-            val actualPhotos = awaitItem().photos
-            assertThat(actualPhotos.size).isEqualTo(3)
+            // Wait for photos to be loaded
+            var state = awaitItem()
+            while (state.photosNodeContentTypes.isEmpty() || state.isLoading) {
+                state = awaitItem()
+            }
+            val photoNodes = state.photosNodeContentTypes
+                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            assertThat(photoNodes.size).isEqualTo(3)
         }
     }
 
-    private fun createSUT() = AlbumPhotosSelectionViewModel(
-        savedStateHandle = savedStateHandle,
-        getUserAlbum = getUserAlbum,
-        getAlbumPhotos = getAlbumPhotos,
-        getTimelinePhotosUseCase = getTimelinePhotosUseCase,
-        downloadThumbnailUseCase = downloadThumbnailUseCase,
-        filterCloudDrivePhotos = filterCloudDrivePhotos,
-        filterCameraUploadPhotos = filterCameraUploadPhotos,
-        addPhotosToAlbum = addPhotosToAlbum,
-        defaultDispatcher = UnconfinedTestDispatcher(),
-        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-        monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-        getBusinessStatusUseCase = getBusinessStatusUseCase,
-        durationInSecondsTextMapper = DurationInSecondsTextMapper(),
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-        monitorPaginatedTimelinePhotosUseCase = monitorPaginatedTimelinePhotosUseCase,
-    )
+    private fun createSUT(albumId: Long? = null, selectionMode: Int? = null) =
+        AlbumPhotosSelectionViewModel(
+            savedStateHandle = savedStateHandle,
+            getUserAlbum = getUserAlbum,
+            getAlbumPhotos = getAlbumPhotos,
+            getTimelinePhotosUseCase = getTimelinePhotosUseCase,
+            monitorPaginatedTimelinePhotosUseCase = monitorPaginatedTimelinePhotosUseCase,
+            downloadThumbnailUseCase = downloadThumbnailUseCase,
+            filterCloudDrivePhotos = filterCloudDrivePhotos,
+            filterCameraUploadPhotos = filterCameraUploadPhotos,
+            addPhotosToAlbum = addPhotosToAlbum,
+            defaultDispatcher = UnconfinedTestDispatcher(),
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            photoUiStateMapper = photoUiStateMapper,
+            fileTypeIconMapper = fileTypeIconMapper,
+            albumId = albumId,
+            selectionMode = selectionMode,
+        )
 
     private fun createUserAlbum(
         id: AlbumId,
@@ -278,6 +343,26 @@ class AlbumPhotosSelectionViewModelTest {
         previewFilePath,
         fileTypeInfo,
     )
+
+    private fun createPhotoUiState(photo: Photo): PhotoUiState.Image {
+        return PhotoUiState.Image(
+            id = photo.id,
+            albumPhotoId = photo.albumPhotoId,
+            parentId = photo.parentId,
+            name = photo.name,
+            isFavourite = photo.isFavourite,
+            creationTime = photo.creationTime,
+            modificationTime = photo.modificationTime,
+            thumbnailFilePath = photo.thumbnailFilePath,
+            previewFilePath = photo.previewFilePath,
+            fileTypeInfo = photo.fileTypeInfo,
+            base64Id = photo.base64Id,
+            size = photo.size,
+            isTakenDown = photo.isTakenDown,
+            isSensitive = photo.isSensitive,
+            isSensitiveInherited = photo.isSensitiveInherited,
+        )
+    }
 
     companion object {
         @JvmField

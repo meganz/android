@@ -19,20 +19,18 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
-import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -40,6 +38,8 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.photos.model.AlbumFlow
+import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
+import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
@@ -100,15 +100,14 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             AlbumScreen.AlbumPhotosSelectionScreen -> {
                 AlbumPhotosSelectionScreen(
                     onBackClicked = ::finish,
-                    onCompletion = { albumId, numCommittedPhotos ->
+                    onCompletion = { album, numCommittedPhotos ->
                         val data = Intent().apply {
-                            putExtra(ALBUM_ID, albumId.id)
+                            putExtra(ALBUM_ID, album.id.id)
                             putExtra(NUM_PHOTOS, numCommittedPhotos)
                         }
                         setResult(RESULT_OK, data)
                         finish()
                     },
-                    fileTypeIconMapper = fileTypeIconMapper
                 )
             }
 

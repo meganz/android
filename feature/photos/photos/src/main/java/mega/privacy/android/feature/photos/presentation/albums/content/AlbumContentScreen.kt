@@ -91,8 +91,8 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
-import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
+import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
@@ -167,7 +167,7 @@ fun AlbumContentScreen(
         resetPreviewPhoto = viewModel::resetPreviewPhoto,
         navigateToPhotoPreview = navigationHandler::navigate,
         resetAddMoreItems = viewModel::resetAddMoreItems,
-        navigateToLegacyPhotoSelection = navigationHandler::navigate,
+        navigateToPhotoSelection = navigationHandler::navigate,
         onTransfer = onTransfer,
         consumeDownloadEvent = actionViewModel::markDownloadEventConsumed,
         consumeInfoToShowEvent = actionViewModel::onInfoToShowEventConsumed,
@@ -215,7 +215,7 @@ internal fun AlbumContentScreen(
     resetPreviewPhoto: () -> Unit,
     navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit,
     resetAddMoreItems: () -> Unit,
-    navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit,
+    navigateToPhotoSelection: (PhotosSelectionNavKey) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     consumeDownloadEvent: () -> Unit,
     consumeInfoToShowEvent: () -> Unit,
@@ -334,8 +334,8 @@ internal fun AlbumContentScreen(
         action = {
             val album = (uiState.uiAlbum?.mediaAlbum as? MediaAlbum.User) ?: return@EventEffect
 
-            navigateToLegacyPhotoSelection(
-                LegacyPhotoSelectionNavKey(
+            navigateToPhotoSelection(
+                PhotosSelectionNavKey(
                     albumId = album.id.id,
                     selectionMode = AlbumFlow.Addition.ordinal,
                     captureResult = false
@@ -787,7 +787,7 @@ private fun AlbumContentScreenPreview() {
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},
             handleAction = {},
-            navigateToLegacyPhotoSelection = {}
+            navigateToPhotoSelection = {}
         )
     }
 }

@@ -2011,4 +2011,21 @@
     <string name="general_action_save">Save</string>
     <!-- Message to show to the user when album cover has been set and saved -->
     <string name="album_cover_selected_success_message">Album cover updated</string>
+    <!-- General action filter -->
+    <string name="general_action_filter">Filter</string>
+    <!-- Timeline photos source description for all locations -->
+    <string name="timeline_photos_source_all_locations">All locations</string>
+    <!-- Dialog title displaying an error message when exceeding selection limit -->
+    <string name="album_photos_selection_limit_dialog_title">Cannot select more</string>
+    <!-- Dialog title displaying an error message when exceeding selection limit. %d represents the number of items -->
+    <string name="album_photos_selection_limit_dialog_description">You can add only up to %d items at a time to an album.</string>
+    <!-- Empty state description when no media is found on the device when selecting photos -->
+    <string name="album_photos_selection_empty_state_no_media_found">No media found</string>
+    <!-- Title of album photos selection screen -->
+    <string name="album_photos_selection_screen_title">Add items to “%s”</string>
+    <!-- Message after photos are successfully added in album -->
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">Added %1$d item to “%2$s“</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
+    </plurals>
 </resources>

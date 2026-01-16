@@ -1,6 +1,8 @@
-package mega.privacy.android.app.presentation.photos.albums.photosselection
+package mega.privacy.android.feature.photos.presentation.albums.photosselection
 
-import mega.privacy.android.feature.photos.model.MediaListItem
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
@@ -15,13 +17,12 @@ data class AlbumPhotosSelectionState(
     val sourcePhotos: List<Photo> = listOf(),
     val photos: List<Photo> = listOf(),
     val filteredPhotoIds: Set<Long> = setOf(),
-    val mediaListItems: List<MediaListItem> = listOf(),
+    val photosNodeContentTypes: List<PhotosNodeContentType> = listOf(),
     val selectedPhotoIds: Set<Long> = setOf(),
     val selectedLocation: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS,
     val isLocationDetermined: Boolean = false,
     val showFilterMenu: Boolean = false,
-    val isSelectionCompleted: Boolean = false,
-    val numCommittedPhotos: Int = 0,
+    val photosSelectionCompletedEvent: StateEventWithContent<Int> = consumed(),
     val accountType: AccountType? = null,
     val isLoading: Boolean = true,
     val isBusinessAccountExpired: Boolean = false,

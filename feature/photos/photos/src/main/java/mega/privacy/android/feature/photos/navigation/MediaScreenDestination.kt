@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -24,6 +25,8 @@ import mega.privacy.android.feature.photos.presentation.albums.content.AlbumCont
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionViewModel
+import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
+import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
@@ -38,11 +41,12 @@ import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
-import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
+import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
@@ -54,7 +58,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
 ) {
     entry<MediaMainNavKey> {
         val snackBarEventQueue = rememberSnackBarQueue()
-        val photoSelectionResult by photoSelectionResultFlow(LegacyPhotoSelectionNavKey.RESULT)
+        val photoSelectionResult by photoSelectionResultFlow(PhotosSelectionNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
         val timelineAddToAlbumResult by timelineAddToAlbumResultFlow(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
             .collectAsStateWithLifecycle(null)
@@ -79,7 +83,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
                     )
                 )
 
-                navigationHandler.clearResult(LegacyPhotoSelectionNavKey.RESULT)
+                navigationHandler.clearResult(PhotosSelectionNavKey.RESULT)
             }
         }
 
@@ -103,11 +107,8 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
         MediaMainRoute(
             timelineViewModel = timelineViewModel,
             navigationHandler = navigationHandler,
-            navigateToAlbumContent = navigationHandler::navigate,
-            navigateToLegacyPhotoSelection = navigationHandler::navigate,
             setNavigationItemVisibility = setNavigationItemVisibility,
             onNavigateToTimelinePhotoPreview = navigationHandler::navigate,
-            onTransfer = onTransfer,
             onNavigateToAddToAlbum = navigationHandler::navigate,
             onNavigateToCameraUploadsSettings = navigationHandler::navigate,
             onNavigateToUpgradeAccount = navigationHandler::navigate,
@@ -231,6 +232,47 @@ fun EntryProviderScope<NavKey>.albumCoverSelectionScreen(
                     snackbarEventQueue.queueMessage(message)
                     navigationHandler.remove(args)
                 }
+            },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.albumPhotosSelectionScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<PhotosSelectionNavKey> { args ->
+        val snackbarEventQueue = rememberSnackBarQueue()
+        val coroutineScope = rememberCoroutineScope()
+        val resources = LocalResources.current
+        val viewModel =
+            hiltViewModel<AlbumPhotosSelectionViewModel, AlbumPhotosSelectionViewModel.Factory>(
+                creationCallback = { it.create(args.albumId, args.selectionMode) }
+            )
+
+        AlbumPhotosSelectionScreen(
+            viewModel = viewModel,
+            onBackClicked = navigationHandler::back,
+            onCompletion = { album, numCommittedPhotos ->
+                if (numCommittedPhotos > 0) {
+                    coroutineScope.launch {
+                        snackbarEventQueue.queueMessage(
+                            resources.getQuantityString(
+                                sharedR.plurals.album_photos_selection_success_message,
+                                numCommittedPhotos,
+                                numCommittedPhotos,
+                                album.title
+                            )
+                        )
+                    }
+                }
+
+                if (!args.captureResult) {
+                    navigationHandler.back()
+                    return@AlbumPhotosSelectionScreen
+                }
+
+                val result = album.id.id.takeIf { numCommittedPhotos > 0 }
+                navigationHandler.returnResult(PhotosSelectionNavKey.RESULT, result)
             },
         )
     }

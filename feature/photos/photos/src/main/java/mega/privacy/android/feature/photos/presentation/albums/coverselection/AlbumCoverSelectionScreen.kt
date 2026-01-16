@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.albums.coverselection
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.surface.RowSurface
@@ -34,7 +33,6 @@ import mega.privacy.android.feature.photos.presentation.component.PhotosNodeGrid
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AlbumCoverSelectionScreen(
     modifier: Modifier = Modifier,
@@ -55,7 +53,7 @@ fun AlbumCoverSelectionScreen(
         onCompletion = onCompletion,
     )
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
             .systemBarsPadding(),

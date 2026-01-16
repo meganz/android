@@ -34,7 +34,7 @@ import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
-import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
@@ -93,7 +93,7 @@ internal fun AlbumsTabScreen(
     ) { albumId ->
         resetNewAlbumDialogEvent()
         onNavigate(
-            LegacyPhotoSelectionNavKey(
+            PhotosSelectionNavKey(
                 albumId = albumId.id,
                 selectionMode = AlbumFlow.Creation.ordinal
             )

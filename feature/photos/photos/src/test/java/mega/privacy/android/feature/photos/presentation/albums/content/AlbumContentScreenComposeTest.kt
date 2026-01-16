@@ -34,7 +34,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
 import mega.privacy.android.feature.photos.presentation.albums.view.ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
-import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
+import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
@@ -101,7 +101,7 @@ class AlbumContentScreenComposeTest {
         resetPreviewPhoto: () -> Unit = {},
         navigateToPhotoPreview: (AlbumContentPreviewNavKey) -> Unit = {},
         resetAddMoreItems: () -> Unit = {},
-        navigateToLegacyPhotoSelection: (LegacyPhotoSelectionNavKey) -> Unit = {},
+        navigateToPhotoSelection: (PhotosSelectionNavKey) -> Unit = {},
         onTransfer: (TransferTriggerEvent) -> Unit = {},
         consumeDownloadEvent: () -> Unit = {},
         consumeInfoToShowEvent: () -> Unit = {},
@@ -147,7 +147,7 @@ class AlbumContentScreenComposeTest {
                     resetPreviewPhoto = resetPreviewPhoto,
                     navigateToPhotoPreview = navigateToPhotoPreview,
                     resetAddMoreItems = resetAddMoreItems,
-                    navigateToLegacyPhotoSelection = navigateToLegacyPhotoSelection,
+                    navigateToPhotoSelection = navigateToPhotoSelection,
                     onTransfer = onTransfer,
                     consumeDownloadEvent = consumeDownloadEvent,
                     consumeInfoToShowEvent = consumeInfoToShowEvent,
