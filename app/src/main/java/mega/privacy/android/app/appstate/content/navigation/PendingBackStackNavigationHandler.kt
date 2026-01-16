@@ -16,6 +16,7 @@ class PendingBackStackNavigationHandler(
     private val backstack: PendingBackStack<NavKey>,
     private var currentAuthStatus: AuthStatus,
     private var hasRootNode: Boolean,
+    private var isConnected: Boolean,
     private val defaultLandingScreen: NavKey,
     private var isPasscodeLocked: Boolean,
     private val passcodeDestination: NavKey,
@@ -125,6 +126,10 @@ class PendingBackStackNavigationHandler(
 
         // Navigate back after setting the result
         backstack.removeLastOrNull()
+    }
+
+    fun onNetworkChange(isConnected: Boolean) {
+        this.isConnected = isConnected
     }
 
     fun onLoginChange(authStatus: AuthStatus) {
@@ -244,7 +249,7 @@ class PendingBackStackNavigationHandler(
             fromLogin,
             refreshEvent
         )
-    }
+    }?.takeIf { isConnected }
 
     private fun AuthStatus?.sessionOrNull(): String? =
         (this as? AuthStatus.LoggedIn)?.session

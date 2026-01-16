@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -35,9 +34,12 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,6 +55,8 @@ class GlobalStateViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
 ) : ViewModel() {
     private val refreshSessionFlow = MutableSharedFlow<RefreshEvent>()
 
@@ -72,20 +76,29 @@ class GlobalStateViewModel @Inject constructor(
             )
     }
 
-    private fun getStateValues(): Flow<GlobalState> {
-        return monitorBlockedState().map { blockedState ->
-            if (blockedState is BlockedState.NotBlocked && blockedState.session != null) {
-                { themeMode: ThemeMode -> GlobalState.LoggedIn(themeMode, blockedState.session) }
-            } else {
-                { themeMode: ThemeMode -> GlobalState.RequireLogin(themeMode, blockedState) }
-            }
-        }.flatMapLatest { stateFunction ->
-            monitorThemeModeUseCase().catch {
-                Timber.e(it, "Error monitoring theme mode")
-                emit(ThemeMode.System)
-            }.map { themeMode ->
-                stateFunction(themeMode)
-            }
+    private fun getStateValues(): Flow<GlobalState> = combine(
+        monitorBlockedState(),
+        monitorThemeModeUseCase().catch {
+            Timber.e(it, "Error monitoring theme mode")
+            emit(ThemeMode.System)
+        },
+        monitorConnectivityUseCase().catch {
+            Timber.e(it)
+            emit(false)
+        },
+    ) { blockedState, themeMode, isConnected ->
+        if (blockedState is BlockedState.NotBlocked && blockedState.session != null) {
+            GlobalState.LoggedIn(
+                themeMode = themeMode,
+                session = blockedState.session,
+                isConnected = isConnected
+            )
+        } else {
+            GlobalState.RequireLogin(
+                themeMode = themeMode,
+                accountBlockedState = blockedState,
+                isConnected = isConnected
+            )
         }
     }
 
@@ -156,5 +169,18 @@ class GlobalStateViewModel @Inject constructor(
                 started = SharingStarted.Lazily,
                 replay = 1,
             )
+    }
+
+    /**
+     * Perform fast login in background
+     */
+    fun backgroundFastLogin() {
+        viewModelScope.launch {
+            runCatching {
+                backgroundFastLoginUseCase()
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(sharedR.string.login_connected_to_server)
+            }
+        }
     }
 }

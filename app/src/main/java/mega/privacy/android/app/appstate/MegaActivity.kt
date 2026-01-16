@@ -91,6 +91,7 @@ import mega.privacy.android.navigation.contract.transition.slideForwardTransitio
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.mobile.home.presentation.home.Home
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -239,12 +240,18 @@ class MegaActivity : ComponentActivity() {
                         defaultLoginDestination = LoginNavKey(),
                         initialLoginDestination = TourNavKey,
                         hasRootNode = rootNodeState.exists,
+                        isConnected = globalState.isConnected,
                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                         passcodeDestination = PasscodeNavKey,
                         fetchRootNodeDestination = ::FetchingContentNavKey,
                         navigationResultManager = navigationResultManager,
                     )
                 }
+                SessionConnectivityObserver(
+                    globalState = globalState,
+                    rootNodeState = rootNodeState,
+                    reconnect = globalStateViewModel::backgroundFastLogin
+                )
 
                 LaunchedEffect(globalState) {
                     val authStatus =
@@ -254,6 +261,7 @@ class MegaActivity : ComponentActivity() {
                     if (authStatus == PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn) {
                         loginViewModel.stopLogin(isPerformLocalLogOut = false)
                     }
+                    navigationHandler.onNetworkChange(globalState.isConnected)
                     navigationHandler.onLoginChange(authStatus)
                 }
 
@@ -499,7 +507,6 @@ class MegaActivity : ComponentActivity() {
         internal const val ACTION_DEEP_LINKS = "deepLinks"
     }
 }
-
 
 private infix fun <T : Any> SceneStrategy<T>.chain(sceneStrategy: SceneStrategy<T>): SceneStrategy<T> =
     object : SceneStrategy<T> {

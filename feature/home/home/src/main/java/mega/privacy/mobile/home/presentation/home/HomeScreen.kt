@@ -149,7 +149,7 @@ internal fun HomeScreen(
                             )
                         )
                     }
-                )
+                ).takeIf { state !is HomeUiState.Offline }.orEmpty()
             )
         },
         floatingActionButton = {

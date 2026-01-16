@@ -40,7 +40,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -52,7 +51,6 @@ import timber.log.Timber
  */
 @HiltViewModel(assistedFactory = FetchNodesViewModel.Factory::class)
 class FetchNodesViewModel @AssistedInject constructor(
-    private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
     private val fetchNodesUseCase: FetchNodesUseCase,
@@ -71,12 +69,6 @@ class FetchNodesViewModel @AssistedInject constructor(
 
     private val _state = MutableStateFlow(FetchNodesUiState(isFromLogin = args.isFromLogin))
     val state: StateFlow<FetchNodesUiState> = _state
-
-    /**
-     * Is connected
-     */
-    val isConnected: Boolean
-        get() = isConnectedToInternetUseCase()
 
     private var pendingAction: String? = null
 

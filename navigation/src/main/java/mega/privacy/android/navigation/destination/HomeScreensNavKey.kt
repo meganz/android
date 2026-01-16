@@ -7,6 +7,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 
 @Serializable
 data object RecentsScreenNavKey : NavKey
@@ -33,7 +34,7 @@ data class HomeScreensNavKey(
     private val serialisedRoot: String?,
     private val serialisedDestinations: String?,
     private val timestamp: Long = 0,
-) : NavKey {
+) : NoNodeNavKey {
 
     constructor() : this(
         serialisedRoot = null,

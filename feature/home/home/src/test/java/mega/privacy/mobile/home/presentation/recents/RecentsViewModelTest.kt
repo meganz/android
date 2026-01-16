@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -50,6 +51,7 @@ class RecentsViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -103,6 +105,7 @@ class RecentsViewModelTest {
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             maxBucketCount = 4
         )
     }
@@ -283,6 +286,7 @@ class RecentsViewModelTest {
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             maxBucketCount = testMaxBucketCount
         )
         advanceUntilIdle()

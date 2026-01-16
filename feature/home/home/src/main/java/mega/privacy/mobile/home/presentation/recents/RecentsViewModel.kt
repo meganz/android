@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
@@ -40,6 +41,7 @@ class RecentsViewModel @AssistedInject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecentsUiState())
@@ -51,6 +53,19 @@ class RecentsViewModel @AssistedInject constructor(
         monitorHiddenNodesState()
         monitorHideRecentActivity()
         monitorNodeUpdates()
+        monitorFetchNodesFinish()
+    }
+
+    private fun monitorFetchNodesFinish() {
+        viewModelScope.launch {
+            monitorFetchNodesFinishUseCase()
+                .catch { Timber.e(it) }
+                .collect { finished ->
+                    if (finished) {
+                        loadRecents()
+                    }
+                }
+        }
     }
 
     private fun loadRecents() {

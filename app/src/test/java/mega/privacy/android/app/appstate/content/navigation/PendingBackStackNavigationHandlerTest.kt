@@ -77,6 +77,7 @@ class PendingBackStackNavigationHandlerTest {
             isPasscodeLocked = isPasscodeLocked,
             passcodeDestination = PasscodeDestination,
             navigationResultManager = navigationResultManager,
+            isConnected = true
         )
 
     @AfterEach

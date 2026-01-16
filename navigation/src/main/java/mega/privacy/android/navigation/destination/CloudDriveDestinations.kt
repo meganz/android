@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 
 /**
  * Cloud drive route args
@@ -44,7 +45,7 @@ data class OfflineNavKey(
     val nodeId: Int = -1,
     val path: String? = null,
     val highlightedFiles: String? = null,
-) : NavKey
+) : NoNodeNavKey
 
 @Serializable
 data class DriveSyncNavKey(

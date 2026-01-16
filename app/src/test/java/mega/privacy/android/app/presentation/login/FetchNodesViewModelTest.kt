@@ -33,7 +33,6 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
-import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.requeststatus.EnableRequestStatusMonitorUseCase
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
@@ -56,7 +55,6 @@ import org.mockito.kotlin.wheneverBlocking
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FetchNodesViewModelTest {
     private lateinit var underTest: FetchNodesViewModel
-    private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val fastLoginUseCase = mock<FastLoginUseCase>()
     private val fetchNodesUseCase = mock<FetchNodesUseCase>()
@@ -95,7 +93,6 @@ class FetchNodesViewModelTest {
     fun setUp() {
         // Reset mocks before each test
         reset(
-            isConnectedToInternetUseCase,
             rootNodeExistsUseCase,
             fastLoginUseCase,
             fetchNodesUseCase,
@@ -119,7 +116,6 @@ class FetchNodesViewModelTest {
         ),
     ) {
         underTest = FetchNodesViewModel(
-            isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             fastLoginUseCase = fastLoginUseCase,
             fetchNodesUseCase = fetchNodesUseCase,
@@ -141,7 +137,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that initializers are called during initialization`() = runTest {
         // Setup default mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -157,7 +152,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that fast login is performed when user is not logged in`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -187,7 +181,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that fetch nodes is performed when user is already logged in`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -212,7 +205,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that login waiting status shows temporary error`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -239,7 +231,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that login exception is handled correctly`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -262,7 +253,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that fetch nodes progress updates are handled correctly`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -296,7 +286,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that fetch nodes exception is handled correctly`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -319,7 +308,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that fetch nodes error access is handled without snackbar`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -342,7 +330,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that request status progress updates are handled correctly`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         val requestStatusFlow = MutableStateFlow<Progress?>(null)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(requestStatusFlow)
@@ -374,7 +361,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that account blocked events stop fetch nodes`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(isMegaApiLoggedInUseCase()).thenReturn(true)
@@ -400,26 +386,8 @@ class FetchNodesViewModelTest {
     }
 
     @Test
-    fun `test that isConnected returns correct value`() {
-        // Setup mocks
-        whenever(loginMutex.isLocked).thenReturn(false)
-        whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
-        whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
-        wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
-
-        initViewModel()
-
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
-        assertThat(underTest.isConnected).isTrue()
-
-        whenever(isConnectedToInternetUseCase()).thenReturn(false)
-        assertThat(underTest.isConnected).isFalse()
-    }
-
-    @Test
     fun `test that request status progress error hides progress bar`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(
             flow { throw RuntimeException("Test error") }
@@ -440,7 +408,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that isFromLogin is passed correctly to state`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -466,7 +433,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that refresh event Refresh triggers fetch nodes with refresh session`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -502,7 +468,6 @@ class FetchNodesViewModelTest {
     fun `test that refresh event ChangeEnvironment triggers fast login with refreshChatUrl true`() =
         runTest {
             // Setup mocks
-            whenever(isConnectedToInternetUseCase()).thenReturn(true)
             whenever(loginMutex.isLocked).thenReturn(false)
             whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
             whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -541,7 +506,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that null refresh event triggers normal fetch nodes flow when logged in`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
@@ -573,7 +537,6 @@ class FetchNodesViewModelTest {
     @Test
     fun `test that sdk reload refresh event triggers fetch nodes but not fast login`() = runTest {
         // Setup mocks
-        whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(loginMutex.isLocked).thenReturn(false)
         whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())

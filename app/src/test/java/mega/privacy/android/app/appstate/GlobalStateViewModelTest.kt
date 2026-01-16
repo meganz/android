@@ -27,8 +27,11 @@ import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
@@ -57,6 +60,8 @@ class GlobalStateViewModelTest {
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
 
     private val globalInitialiser = mock<GlobalInitialiser>()
+    private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
 
     @BeforeAll
     fun initialisation() {
@@ -80,6 +85,8 @@ class GlobalStateViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase
         )
     }
 
@@ -93,6 +100,8 @@ class GlobalStateViewModelTest {
             snackbarEventQueue,
             monitorFetchNodesFinishUseCase,
             rootNodeExistsUseCase,
+            backgroundFastLoginUseCase,
+            monitorConnectivityUseCase,
         )
     }
 
@@ -111,6 +120,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+        stubConnectivity()
 
         stubNotBlockedState()
 
@@ -142,6 +152,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
+        stubConnectivity()
 
         underTest.state.test {
             val state = awaitItem()
@@ -171,6 +182,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
+        stubConnectivity()
 
         stubNotBlockedState()
 
@@ -193,6 +205,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+        stubConnectivity()
 
         stubNotBlockedState()
 
@@ -221,6 +234,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+        stubConnectivity()
 
         underTest.state.test {
             val state = awaitItem()
@@ -247,6 +261,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
 
             stubNotBlockedState()
 
@@ -275,6 +290,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
 
             stubNotBlockedState()
 
@@ -304,6 +320,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(credentialsFlow)
         }
+        stubConnectivity()
 
         stubNotBlockedState()
 
@@ -343,6 +360,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(credentialsFlow)
             }
+            stubConnectivity()
             stubNotBlockedState()
 
             underTest.state.test {
@@ -381,6 +399,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
+        stubConnectivity()
 
         underTest.state.filterIsInstance<GlobalState.LoggedIn>().test {
             val initialState = awaitItem()
@@ -403,6 +422,7 @@ class GlobalStateViewModelTest {
         whenever(monitorUserCredentialsUseCase()).thenReturn(
             flow { throw RuntimeException("Test error") }
         )
+        stubConnectivity()
 
         underTest.state.test {
             // Should still emit the initial loading state even with errors
@@ -430,6 +450,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(credentials))
         }
+        stubConnectivity()
 
         stubNotBlockedState()
 
@@ -451,11 +472,9 @@ class GlobalStateViewModelTest {
             myHandle = "123456789"
         )
 
-        val expectedThemeMode = ThemeMode.Light
         monitorThemeModeUseCase.stub {
             on { invoke() }.thenReturn(
                 flow { throw RuntimeException("Test error") },
-                MutableStateFlow(expectedThemeMode)
             )
         }
 
@@ -463,7 +482,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(credentialsFlow)
         }
-
+        stubConnectivity()
         stubNotBlockedState()
 
         underTest.state.test {
@@ -475,7 +494,7 @@ class GlobalStateViewModelTest {
             val newState = awaitItem()
             assertThat(newState).isInstanceOf(GlobalState.LoggedIn::class.java)
             assertThat((newState as GlobalState.LoggedIn).themeMode).isEqualTo(
-                expectedThemeMode
+                ThemeMode.System
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -499,6 +518,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test {
                 val state = awaitItem()
@@ -517,6 +537,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(null))
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test {
                 val state = awaitItem()
@@ -544,6 +565,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
             monitorAccountBlockedUseCase.stub {
                 on { invoke() }.thenReturn(flow {
                     emit(blockedEvent)
@@ -584,6 +606,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
 
             val blockedFlow = MutableStateFlow(notBlockedEvent)
             monitorAccountBlockedUseCase.stub {
@@ -630,6 +653,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
 
             val blockedFlow = MutableStateFlow(
                 AccountBlockedEvent(
@@ -690,6 +714,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(credentialsFlow)
             }
+            stubConnectivity()
             stubNotBlockedState()
 
             underTest.state.test {
@@ -725,6 +750,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
@@ -750,6 +776,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test {
                 assertThat(awaitItem()).isInstanceOf(GlobalState.LoggedIn::class.java)
@@ -781,6 +808,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(credentialsFlow)
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test {
                 assertThat(awaitItem()).isInstanceOf(GlobalState.LoggedIn::class.java)
@@ -823,6 +851,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(credentialsFlow)
             }
+            stubConnectivity()
             stubNotBlockedState()
 
             underTest.state.test {
@@ -856,6 +885,7 @@ class GlobalStateViewModelTest {
             monitorUserCredentialsUseCase.stub {
                 on { invoke() }.thenReturn(MutableStateFlow(credentials))
             }
+            stubConnectivity()
             stubNotBlockedState()
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
@@ -871,6 +901,7 @@ class GlobalStateViewModelTest {
         monitorUserCredentialsUseCase.stub {
             on { invoke() }.thenReturn(MutableStateFlow(null))
         }
+        stubConnectivity()
 
         underTest.state.test { cancelAndIgnoreRemainingEvents() }
         verify(handleBlockedStateSessionUseCase).invoke(notBlockedEvent)
@@ -882,6 +913,109 @@ class GlobalStateViewModelTest {
         underTest.queueMessage(message)
 
         verify(snackbarEventQueue).queueMessage(message)
+    }
+
+    @Test
+    fun `test that connectivity changes are reflected in logged in state`() = runTest {
+        val credentials = UserCredentials(
+            email = "test@example.com",
+            session = "test-session",
+            firstName = "John",
+            lastName = "Doe",
+            myHandle = "123456789"
+        )
+
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(credentials))
+        }
+        stubNotBlockedState()
+
+        val connectivityFlow = MutableStateFlow(true)
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(connectivityFlow)
+        }
+
+        underTest.state.filterIsInstance<GlobalState.LoggedIn>().test {
+            val initialState = awaitItem()
+            assertThat(initialState.isConnected).isTrue()
+
+            // Change connectivity to false
+            connectivityFlow.value = false
+            val disconnectedState = awaitItem()
+            assertThat(disconnectedState.isConnected).isFalse()
+            assertThat(disconnectedState.session).isEqualTo(credentials.session)
+
+            // Change connectivity back to true
+            connectivityFlow.value = true
+            val reconnectedState = awaitItem()
+            assertThat(reconnectedState.isConnected).isTrue()
+            assertThat(reconnectedState.session).isEqualTo(credentials.session)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that connectivity changes are reflected in require login state`() = runTest {
+        val themeMode = ThemeMode.Light
+        monitorThemeModeUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
+        }
+        monitorUserCredentialsUseCase.stub {
+            on { invoke() }.thenReturn(MutableStateFlow(null))
+        }
+        stubNotBlockedState()
+
+        val connectivityFlow = MutableStateFlow(true)
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(connectivityFlow)
+        }
+
+        underTest.state.filterIsInstance<GlobalState.RequireLogin>().test {
+            val initialState = awaitItem()
+            assertThat(initialState.isConnected).isTrue()
+
+            // Change connectivity to false
+            connectivityFlow.value = false
+            val disconnectedState = awaitItem()
+            assertThat(disconnectedState.isConnected).isFalse()
+
+            // Change connectivity back to true
+            connectivityFlow.value = true
+            val reconnectedState = awaitItem()
+            assertThat(reconnectedState.isConnected).isTrue()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that backgroundFastLogin calls use case and shows success message on success`() =
+        runTest {
+            backgroundFastLoginUseCase.stub {
+                onBlocking { invoke() }.thenReturn("fast-login-session")
+            }
+
+            underTest.backgroundFastLogin()
+
+            verify(backgroundFastLoginUseCase).invoke()
+            verify(snackbarEventQueue).queueMessage(sharedR.string.login_connected_to_server)
+        }
+
+    @Test
+    fun `test that backgroundFastLogin does not show message on failure`() = runTest {
+        backgroundFastLoginUseCase.stub {
+            onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+        }
+
+        underTest.backgroundFastLogin()
+
+        verify(backgroundFastLoginUseCase).invoke()
+        verify(snackbarEventQueue, times(0)).queueMessage(sharedR.string.login_connected_to_server)
     }
 
     private val notBlockedEvent = AccountBlockedEvent(
@@ -898,6 +1032,17 @@ class GlobalStateViewModelTest {
                 )
                 awaitCancellation()
             })
+        }
+    }
+
+    private fun stubConnectivity(connected: Boolean = true) {
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(
+                flow {
+                    emit(connected)
+                    awaitCancellation()
+                }
+            )
         }
     }
 
