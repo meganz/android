@@ -51,6 +51,7 @@ import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
@@ -178,6 +179,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                 startFirst = shouldStartFirst,
                 //Pending to implement, value by default
                 pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
         }.onFailure { Timber.e(it) }.getOrNull()?.let { options ->
             Timber.d("Using startUpload with MegaUploadOptions")

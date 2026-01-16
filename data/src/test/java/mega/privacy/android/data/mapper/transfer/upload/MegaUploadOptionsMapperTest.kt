@@ -1,8 +1,10 @@
 package mega.privacy.android.data.mapper.transfer.upload
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.data.mapper.pitag.PitagTargetMapper
 import mega.privacy.android.data.mapper.pitag.PitagTriggerMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
+import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import nz.mega.sdk.MegaApiJava
@@ -24,12 +26,15 @@ class MegaUploadOptionsMapperTest {
 
     private val transferAppDataStringMapper = mock<TransferAppDataStringMapper>()
     private val pitagTriggerMapper = mock<PitagTriggerMapper>()
+    private val pitagTargetMapper = mock<PitagTargetMapper>()
     private val megaUploadOptionsProvider = mock<MegaUploadOptionsProvider>()
 
     private val sourceTemporary = false
     private val shouldStartFirst = true
     private val pitagTrigger = PitagTrigger.SyncAlgorithm
+    private val pitagTarget = PitagTarget.CloudDrive
     private val pitagTriggerChar = MegaApiJava.PITAG_TRIGGER_SYNC_ALGORITHM
+    private val pitagTargetChar = MegaApiJava.PITAG_TARGET_CLOUD_DRIVE
     private val options = mock<MegaUploadOptions>()
 
     @BeforeAll
@@ -37,6 +42,7 @@ class MegaUploadOptionsMapperTest {
         underTest = MegaUploadOptionsMapper(
             transferAppDataStringMapper = transferAppDataStringMapper,
             pitagTriggerMapper = pitagTriggerMapper,
+            pitagTargetMapper = pitagTargetMapper,
             megaUploadOptionsProvider = megaUploadOptionsProvider,
         )
     }
@@ -46,6 +52,7 @@ class MegaUploadOptionsMapperTest {
         reset(
             transferAppDataStringMapper,
             pitagTriggerMapper,
+            pitagTargetMapper,
             megaUploadOptionsProvider,
         )
     }
@@ -57,10 +64,12 @@ class MegaUploadOptionsMapperTest {
             this.isSourceTemporary = sourceTemporary
             this.startFirst = shouldStartFirst
             pitagTrigger = pitagTriggerChar
+            pitagTarget = pitagTargetChar
         }
 
         whenever(megaUploadOptionsProvider()) doReturn options
         whenever(pitagTriggerMapper(pitagTrigger)) doReturn pitagTriggerChar
+        whenever(pitagTargetMapper(pitagTarget)) doReturn pitagTargetChar
 
         val actual = underTest(
             fileName = null,
@@ -69,6 +78,7 @@ class MegaUploadOptionsMapperTest {
             isSourceTemporary = sourceTemporary,
             startFirst = shouldStartFirst,
             pitagTrigger = pitagTrigger,
+            pitagTarget = pitagTarget,
         )
 
         assertThat(actual?.fileName).isEqualTo(expected.fileName)
@@ -77,6 +87,7 @@ class MegaUploadOptionsMapperTest {
         assertThat(actual?.isSourceTemporary).isEqualTo(expected.isSourceTemporary)
         assertThat(actual?.startFirst).isEqualTo(expected.startFirst)
         assertThat(actual?.pitagTrigger).isEqualTo(expected.pitagTrigger)
+        assertThat(actual?.pitagTarget).isEqualTo(expected.pitagTarget)
     }
 
     @Test
@@ -92,9 +103,11 @@ class MegaUploadOptionsMapperTest {
             this.isSourceTemporary = sourceTemporary
             this.startFirst = shouldStartFirst
             pitagTrigger = pitagTriggerChar
+            pitagTarget = pitagTargetChar
         }
 
         whenever(megaUploadOptionsProvider()) doReturn options
+        whenever(pitagTriggerMapper(pitagTrigger)) doReturn pitagTriggerChar
         whenever(pitagTriggerMapper(pitagTrigger)) doReturn pitagTriggerChar
         whenever(transferAppDataStringMapper(appData)) doReturn appDataString
 
@@ -105,6 +118,7 @@ class MegaUploadOptionsMapperTest {
             isSourceTemporary = sourceTemporary,
             startFirst = shouldStartFirst,
             pitagTrigger = pitagTrigger,
+            pitagTarget = pitagTarget,
         )
 
         assertThat(actual?.fileName).isEqualTo(expected.fileName)
@@ -113,5 +127,6 @@ class MegaUploadOptionsMapperTest {
         assertThat(actual?.isSourceTemporary).isEqualTo(expected.isSourceTemporary)
         assertThat(actual?.startFirst).isEqualTo(expected.startFirst)
         assertThat(actual?.pitagTrigger).isEqualTo(expected.pitagTrigger)
+        assertThat(actual?.pitagTarget).isEqualTo(expected.pitagTarget)
     }
 }

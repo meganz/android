@@ -1,7 +1,9 @@
 package mega.privacy.android.data.mapper.transfer.upload
 
+import mega.privacy.android.data.mapper.pitag.PitagTargetMapper
 import mega.privacy.android.data.mapper.pitag.PitagTriggerMapper
 import mega.privacy.android.data.mapper.transfer.TransferAppDataStringMapper
+import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import nz.mega.sdk.MegaUploadOptions.INVALID_CUSTOM_MOD_TIME
@@ -10,6 +12,7 @@ import javax.inject.Inject
 internal class MegaUploadOptionsMapper @Inject constructor(
     private val transferAppDataStringMapper: TransferAppDataStringMapper,
     private val pitagTriggerMapper: PitagTriggerMapper,
+    private val pitagTargetMapper: PitagTargetMapper,
     private val megaUploadOptionsProvider: MegaUploadOptionsProvider,
 ) {
 
@@ -20,6 +23,7 @@ internal class MegaUploadOptionsMapper @Inject constructor(
         isSourceTemporary: Boolean,
         startFirst: Boolean,
         pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ) = megaUploadOptionsProvider()?.apply {
         fileName?.let { this.fileName = fileName }
         this.mtime = mtime ?: INVALID_CUSTOM_MOD_TIME
@@ -27,5 +31,6 @@ internal class MegaUploadOptionsMapper @Inject constructor(
         this.isSourceTemporary = isSourceTemporary
         this.startFirst = startFirst
         this.pitagTrigger = pitagTriggerMapper(pitagTrigger)
+        this.pitagTarget = pitagTargetMapper(pitagTarget)
     }
 }

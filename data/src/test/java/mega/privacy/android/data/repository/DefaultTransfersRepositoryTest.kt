@@ -468,7 +468,8 @@ class DefaultTransfersRepositoryTest {
                     appData = anyOrNull(),
                     isSourceTemporary = any(),
                     startFirst = any(),
-                    pitagTrigger = any()
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
             ) doReturn mock()
 
@@ -503,7 +504,8 @@ class DefaultTransfersRepositoryTest {
                     appData = anyOrNull(),
                     isSourceTemporary = any(),
                     startFirst = any(),
-                    pitagTrigger = any()
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
             ) doReturn null
 
