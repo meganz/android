@@ -26,7 +26,6 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
-import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.model.DateFilterWithName
@@ -58,6 +57,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTypeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaApiJava

@@ -24,12 +24,14 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesUiState
+import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,6 +46,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val setOthersSortOrder: SetOthersSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(IncomingSharesUiState())
@@ -54,6 +57,7 @@ class IncomingSharesViewModel @Inject constructor(
         getSortOrder()
         viewModelScope.launch { loadNodes() }
         monitorNodeUpdates()
+        checkSearchRevampEnabled()
     }
 
     /**
@@ -255,6 +259,15 @@ class IncomingSharesViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it, "Failed to set sort order")
             }
+        }
+    }
+
+    private fun checkSearchRevampEnabled() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
+                .onSuccess { isEnabled ->
+                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
+                }
         }
     }
 }

@@ -17,7 +17,7 @@ import mega.privacy.android.app.presentation.search.SearchActivity
 import mega.privacy.android.app.presentation.search.LegacySearchViewModel
 import mega.privacy.android.app.presentation.search.mapper.DateFilterOptionStringResMapper
 import mega.privacy.android.app.presentation.search.mapper.EmptySearchViewMapper
-import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.app.presentation.search.mapper.SearchFilterMapper
 import mega.privacy.android.app.presentation.search.mapper.TypeFilterOptionStringResMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper

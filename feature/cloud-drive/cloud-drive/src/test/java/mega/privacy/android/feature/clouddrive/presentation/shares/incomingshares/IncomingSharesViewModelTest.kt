@@ -33,10 +33,12 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
 import org.junit.After
 import org.junit.Before
@@ -63,6 +65,7 @@ class IncomingSharesViewModelTest {
     private val setOthersSortOrder: SetOthersSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
 
@@ -86,7 +89,8 @@ class IncomingSharesViewModelTest {
             getOthersSortOrder,
             setOthersSortOrder,
             nodeSortConfigurationUiMapper,
-            getContactVerificationWarningUseCase
+            getContactVerificationWarningUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -100,6 +104,7 @@ class IncomingSharesViewModelTest {
         setOthersSortOrder = setOthersSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
 
     private suspend fun setupTestData(items: List<ShareNode>) {
@@ -132,6 +137,8 @@ class IncomingSharesViewModelTest {
 
         // Setup contact verification mock
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+        // Setup feature flag mock
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp)).thenReturn(false)
     }
 
     @Test
@@ -870,4 +877,21 @@ class IncomingSharesViewModelTest {
             assertThat(state.items).hasSize(1)
         }
     }
+
+    @Test
+    fun `test that checkSearchRevampEnabled updates UI state when feature flag is enabled`() =
+        runTest {
+            setupTestData(emptyList())
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp)).thenReturn(true)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSearchRevampEnabled).isTrue()
+            }
+
+            verify(getFeatureFlagValueUseCase).invoke(AppFeatures.SearchRevamp)
+        }
 }

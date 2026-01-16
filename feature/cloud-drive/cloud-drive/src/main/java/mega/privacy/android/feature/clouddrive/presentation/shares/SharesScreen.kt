@@ -45,6 +45,7 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.feature.clouddrive.navigation.getSearchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.model.IncomingSharesAction
@@ -55,7 +56,6 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -176,12 +176,11 @@ internal fun SharesScreen(
                     actions = buildList {
                         add(
                             MenuActionWithClick(CommonAppBarAction.Search) {
-                                navigationHandler.navigate(
-                                    LegacySearchNavKey(
-                                        nodeSourceType = selectedTab.toNodeSourceType(),
-                                        parentHandle = -1L
-                                    )
+                                val searchNavKey = selectedTab.toNodeSourceType().getSearchNavKey(
+                                    folderId = -1L,
+                                    isRevampEnabled = incomingSharesUiState.isSearchRevampEnabled
                                 )
+                                navigationHandler.navigate(searchNavKey)
                             }
                         )
                     },

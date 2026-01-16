@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
+import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
@@ -72,6 +74,7 @@ class SearchViewModelTest {
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val parentHandle = 123L
     private val args = SearchViewModel.Args(
@@ -85,7 +88,8 @@ class SearchViewModelTest {
             searchUseCase,
             cancelCancelTokenUseCase,
             nodeUiItemMapper,
-            monitorNodeUpdatesByIdUseCase
+            monitorNodeUpdatesByIdUseCase,
+            nodeSourceTypeToSearchTargetMapper
         )
     }
 
@@ -105,6 +109,7 @@ class SearchViewModelTest {
         monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+        nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
     )
 
     private fun setupTestData(
@@ -143,6 +148,7 @@ class SearchViewModelTest {
                 nodeSourceType
             )
         ).thenReturn(flowOf())
+        whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
     }
 
     @Test
@@ -1225,5 +1231,53 @@ class SearchViewModelTest {
             isSingleActivityEnabled = any()
         )
     }
+
+    @Test
+    fun `test that nodeSourceTypeToSearchTargetMapper is called with correct nodeSourceType and SearchTarget is used in SearchParameters`() =
+        runTest {
+            val query = "test query"
+            val incomingSharesArgs = SearchViewModel.Args(
+                parentHandle = parentHandle,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
+            val expectedSearchTarget = SearchTarget.INCOMING_SHARE
+
+            whenever(typeFilterToSearchMapper(anyOrNull(), any())).thenReturn(SearchCategory.ALL)
+            setupTestData(emptyList())
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    NodeId(parentHandle),
+                    NodeSourceType.INCOMING_SHARES
+                )
+            ).thenReturn(flowOf())
+            whenever(nodeSourceTypeToSearchTargetMapper(NodeSourceType.INCOMING_SHARES)).thenReturn(
+                expectedSearchTarget
+            )
+
+            val underTest = createViewModel(incomingSharesArgs)
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+            reset(nodeSourceTypeToSearchTargetMapper)
+            whenever(nodeSourceTypeToSearchTargetMapper(NodeSourceType.INCOMING_SHARES)).thenReturn(
+                expectedSearchTarget
+            )
+
+            underTest.processAction(SearchUiAction.UpdateSearchText(query))
+            advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+            advanceUntilIdle()
+
+            verify(nodeSourceTypeToSearchTargetMapper, atLeast(1)).invoke(
+                nodeSourceType = NodeSourceType.INCOMING_SHARES
+            )
+
+            verify(searchUseCase, atLeast(1)).invoke(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = argThat { params ->
+                    params.searchTarget == expectedSearchTarget
+                },
+                isSingleActivityEnabled = any()
+            )
+        }
 
 }

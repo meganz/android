@@ -1,7 +1,6 @@
-package mega.privacy.android.app.presentation.search.mapper
+package mega.privacy.android.feature.clouddrive.presentation.search.mapper
 
-import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
+import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.search.SearchTarget
 import org.junit.jupiter.api.BeforeAll
@@ -29,7 +28,7 @@ internal class NodeSourceTypeToSearchTargetMapperTest {
         nodeSourceType: NodeSourceType,
         searchTarget: SearchTarget,
     ) {
-        assertThat(underTest(nodeSourceType)).isEqualTo(searchTarget)
+        Truth.assertThat(underTest(nodeSourceType)).isEqualTo(searchTarget)
     }
 
     private fun provideParameters() = Stream.of(

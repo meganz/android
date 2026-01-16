@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
@@ -71,9 +72,14 @@ class SearchViewModel @AssistedInject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
+    private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(SearchUiState())
+    private val _uiState = MutableStateFlow(
+        SearchUiState(
+            nodeSourceType = args.nodeSourceType
+        )
+    )
     val uiState = _uiState.asStateFlow()
 
     private val searchQueryFlow = MutableStateFlow("")
@@ -150,19 +156,7 @@ class SearchViewModel @AssistedInject constructor(
             val nodes = searchUseCase(
                 parentHandle = NodeId(args.parentHandle),
                 nodeSourceType = args.nodeSourceType,
-                searchParameters = SearchParameters(
-                    query = query,
-                    searchCategory = typeFilterToSearchMapper(
-                        typeFilterOption = uiState.value.typeFilterOption,
-                        nodeSourceType = args.nodeSourceType
-                    ),
-                    modificationDate = uiState.value.dateModifiedFilterOption,
-                    creationDate = uiState.value.dateAddedFilterOption,
-                    description = query,
-                    tag = query.removePrefix("#").takeIf {
-                        args.nodeSourceType != NodeSourceType.RUBBISH_BIN
-                    }
-                ),
+                searchParameters = getSearchParameters(query),
                 isSingleActivityEnabled = true
             )
             val nodeUiItems = nodeUiItemMapper(
@@ -188,6 +182,25 @@ class SearchViewModel @AssistedInject constructor(
             }
         }
     }
+
+    private fun getSearchParameters(
+        query: String,
+    ) = SearchParameters(
+        query = query,
+        searchCategory = typeFilterToSearchMapper(
+            typeFilterOption = uiState.value.typeFilterOption,
+            nodeSourceType = args.nodeSourceType
+        ),
+        searchTarget = nodeSourceTypeToSearchTargetMapper(
+            nodeSourceType = args.nodeSourceType
+        ),
+        modificationDate = uiState.value.dateModifiedFilterOption,
+        creationDate = uiState.value.dateAddedFilterOption,
+        description = query,
+        tag = query.removePrefix("#").takeIf {
+            args.nodeSourceType != NodeSourceType.RUBBISH_BIN
+        }
+    )
 
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
