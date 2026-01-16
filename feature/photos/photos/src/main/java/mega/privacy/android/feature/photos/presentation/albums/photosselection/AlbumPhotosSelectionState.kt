@@ -2,12 +2,12 @@ package mega.privacy.android.feature.photos.presentation.albums.photosselection
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.AlbumFlow
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 
 data class AlbumPhotosSelectionState(
     val albumFlow: AlbumFlow = AlbumFlow.Creation,
@@ -27,7 +27,14 @@ data class AlbumPhotosSelectionState(
     val isLoading: Boolean = true,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
-)
+) {
+    /**
+     * Flag to check if all nodes are selected
+     */
+    val areAllNodesSelected: Boolean = photosNodeContentTypes
+        .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+        .size == selectedPhotoIds.size
+}
 
 typealias PhotoDownload = suspend (
     photo: Photo,
