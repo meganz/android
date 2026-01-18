@@ -38,7 +38,6 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -56,7 +55,6 @@ import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
@@ -67,6 +65,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -213,7 +212,7 @@ class FileInfoActivity : BaseActivity() {
                         viewModel.initiateChangePermission(listOf(it.contactItem.email))
                     },
                     onSharedWithContactMoreInfoClick = {
-                        ContactUtil.openContactInfoActivity(this, it.contactItem.email)
+                        megaNavigator.openContactInfoActivity(this, it.contactItem.email)
                     }
                 )
                 uiState.leaveFolderNodeIds?.let { nodeIds ->
@@ -432,7 +431,7 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToUserDetails(contactItem: ContactItem) {
-        ContactUtil.openContactInfoActivity(this, contactItem.email)
+        megaNavigator.openContactInfoActivity(this, contactItem.email)
     }
 
     private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))

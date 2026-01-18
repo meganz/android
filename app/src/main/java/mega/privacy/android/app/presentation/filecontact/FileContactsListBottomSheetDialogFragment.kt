@@ -20,12 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.fileinfo.view.ShareContactOptionsContent
 import mega.privacy.android.app.presentation.fileinfo.view.ShareNonContactOptionsContent
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -158,7 +157,7 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                                 allowChangePermission = node == null || !megaApi.isInVault(node),
                                 onInfoClicked = {
                                     email()?.let {
-                                        ContactUtil.openContactInfoActivity(requireActivity(), it)
+                                        megaNavigator.openContactInfoActivity(requireActivity(), it)
                                     }
                                     dismissAllowingStateLoss()
                                 },

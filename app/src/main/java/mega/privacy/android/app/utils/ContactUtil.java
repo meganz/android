@@ -4,9 +4,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDAT
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
-import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
-import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
@@ -14,8 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaUser;
@@ -195,29 +190,5 @@ public class ContactUtil {
         return contactDB != null ? contactDB.getEmail() : null;
     }
 
-    /**
-     * Method to open ContactInfoActivity.class.
-     *
-     * @param context Activity context.
-     * @param name    The name of the contact.
-     */
-    public static void openContactInfoActivity(Context context, String name) {
-        Intent i = new Intent(context, ContactInfoActivity.class);
-        i.putExtra(NAME, name);
-        context.startActivity(i);
-    }
 
-    /**
-     * Method to open ContactAttachmentActivity.class.
-     *
-     * @param context Activity context.
-     * @param chatId  The ID of a chat.
-     * @param msgId   The ID of a message.
-     */
-    public static void openContactAttachmentActivity(Context context, long chatId, long msgId) {
-        Intent i = new Intent(context, ContactAttachmentActivity.class);
-        i.putExtra(CHAT_ID, chatId);
-        i.putExtra(MESSAGE_ID, msgId);
-        context.startActivity(i);
-    }
 }

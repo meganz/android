@@ -33,13 +33,12 @@ import java.util.ArrayList;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -291,11 +290,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
 
             if (contactHandle != MEGACHAT_INVALID_HANDLE) {
-                ContactUtil.openContactInfoActivity(requireActivity(), contactEmail);
+                megaNavigator.openContactInfoActivity(requireActivity(), contactEmail);
             }
         } else if (id == R.id.option_view) {
             Timber.d("View option");
-            ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
+            megaNavigator.openContactAttachmentActivity(requireActivity(), chatId, messageId);
         } else if (id == R.id.option_invite) {
             if (!isOnline(requireContext())) {
                 return;

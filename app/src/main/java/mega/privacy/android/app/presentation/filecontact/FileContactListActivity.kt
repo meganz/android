@@ -42,7 +42,6 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil
@@ -133,7 +132,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun activateActionMode() {
-        Timber.Forest.d("activateActionMode")
+        Timber.d("activateActionMode")
         if (adapter?.isMultipleSelect == false) {
             adapter?.isMultipleSelect = true
             actionMode = startSupportActionMode(ActionBarCallBack())
@@ -144,7 +143,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     private inner class ActionBarCallBack : ActionMode.Callback {
         @SuppressLint("NonConstantResourceId")
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
-            Timber.Forest.d("onActionItemClicked")
+            Timber.d("onActionItemClicked")
             val shares = adapter?.selectedShares
 
             val itemId = item.itemId
@@ -183,10 +182,10 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 R.id.action_file_contact_list_delete -> {
                     shares?.takeUnless { it.isEmpty() }?.let {
                         if (it.size > 1) {
-                            Timber.Forest.d("Remove multiple contacts")
+                            Timber.d("Remove multiple contacts")
                             showConfirmationRemoveMultipleContactFromShare(shares)
                         } else {
-                            Timber.Forest.d("Remove one contact")
+                            Timber.d("Remove one contact")
                             showConfirmationRemoveContactFromShare(shares[0].user)
                         }
                     }
@@ -204,7 +203,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
-            Timber.Forest.d("onCreateActionMode")
+            Timber.d("onCreateActionMode")
             val inflater = mode.menuInflater
             inflater.inflate(R.menu.file_contact_shared_browser_action, menu)
             fab?.visibility = View.GONE
@@ -213,7 +212,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onDestroyActionMode(arg0: ActionMode) {
-            Timber.Forest.d("onDestroyActionMode")
+            Timber.d("onDestroyActionMode")
             adapter?.clearSelections()
             adapter?.isMultipleSelect = false
             fab?.visibility = View.VISIBLE
@@ -221,7 +220,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         }
 
         override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean {
-            Timber.Forest.d("onPrepareActionMode")
+            Timber.d("onPrepareActionMode")
             val selected = adapter?.selectedShares
             var deleteShare = false
             var permissions = false
@@ -276,7 +275,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
     override fun onCreate(savedInstanceState: Bundle?) {
         this.enableEdgeToEdge()
-        Timber.Forest.d("onCreate")
+        Timber.d("onCreate")
         super.onCreate(savedInstanceState)
 
         initFileBackupManager()
@@ -366,7 +365,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 super.registerReceiver(broadcastReceiver, filter)
             }
         } catch (e: IllegalStateException) {
-            Timber.Forest.e(e, "IllegalStateException registering receiver")
+            Timber.e(e, "IllegalStateException registering receiver")
         }
     }
 
@@ -420,7 +419,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
 
     fun showOptionsPanel(sShare: MegaShare?) {
-        Timber.Forest.d("showNodeOptionsPanel")
+        Timber.d("showNodeOptionsPanel")
 
         if (node == null || sShare == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
 
@@ -519,7 +518,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         intent.setClass(this, AddContactActivity::class.java)
         intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
         intent.putExtra("MULTISELECT", 0)
-        intent.putExtra(AddContactActivity.Companion.EXTRA_NODE_HANDLE, node?.handle)
+        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node?.handle)
         startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT)
     }
 
@@ -531,7 +530,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun selectAll() {
-        Timber.Forest.d("selectAll")
+        Timber.d("selectAll")
         if (adapter != null) {
             if (adapter?.isMultipleSelect == true) {
                 adapter?.selectAll()
@@ -546,7 +545,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun itemClick(position: Int) {
-        Timber.Forest.d("Position: %s", position)
+        Timber.d("Position: %s", position)
 
         if (adapter?.isMultipleSelect == true) {
             adapter?.toggleSelection(position)
@@ -555,7 +554,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             val user = listContacts?.get(position)?.user
             val contact = megaApi.getContact(user)
             if (contact?.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                ContactUtil.openContactInfoActivity(this, user)
+                megaNavigator.openContactInfoActivity(this, contact.email)
             }
         }
     }
@@ -563,7 +562,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     @Deprecated("Deprecated in Java")
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
-        Timber.Forest.d("onBackPressed")
+        Timber.d("onBackPressed")
         retryConnectionsAndSignalPresence()
 
         if (adapter?.positionClicked != -1) {
@@ -594,13 +593,13 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     private fun updateActionModeTitle() {
-        Timber.Forest.d("updateActionModeTitle")
+        Timber.d("updateActionModeTitle")
         if (actionMode == null) {
             return
         }
         val contacts = adapter?.selectedShares
         if (contacts != null) {
-            Timber.Forest.d("Contacts selected: %s", contacts.size)
+            Timber.d("Contacts selected: %s", contacts.size)
         }
 
         actionMode?.title = resources.getQuantityString(
@@ -609,7 +608,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         try {
             actionMode?.invalidate()
         } catch (e: NullPointerException) {
-            Timber.Forest.e(e, "Invalidate error")
+            Timber.e(e, "Invalidate error")
         }
     }
 
@@ -637,7 +636,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun changePermissions(userEmail: String) {
-        Timber.Forest.d("changePermissions")
+        Timber.d("changePermissions")
         notifyDataSetChanged()
         val nodeType = MegaNodeUtil.checkBackupNodeTypeByHandle(megaApi, node)
         if (nodeType != MegaNodeDialogUtil.BACKUP_NONE) {
@@ -662,7 +661,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             permissionsDialog?.dismiss()
             contactController.changePermission(
                 selectedShare?.user, item, node, ShareListener(
-                    this, ShareListener.Companion.CHANGE_PERMISSIONS_LISTENER, 1
+                    this, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1
                 )
             )
         }
@@ -720,9 +719,9 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             }
 
             val emails =
-                intent.getStringArrayListExtra(AddContactActivity.Companion.EXTRA_CONTACTS)
+                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
                     ?: arrayListOf()
-            val nodeHandle = intent.getLongExtra(AddContactActivity.Companion.EXTRA_NODE_HANDLE, -1)
+            val nodeHandle = intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
 
             if (nodeHandle != -1L) {
                 node = megaApi.getNodeByHandle(nodeHandle)
@@ -764,11 +763,11 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-        Timber.Forest.d("onUserupdate")
+        Timber.d("onUserupdate")
     }
 
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-        Timber.Forest.d("onUserAlertsUpdate")
+        Timber.d("onUserAlertsUpdate")
     }
 
     override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
@@ -781,12 +780,12 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
-        Timber.Forest.d("onNodesUpdate")
+        Timber.d("onNodesUpdate")
 
         try {
             statusDialog?.dismiss()
         } catch (ex: Exception) {
-            Timber.Forest.e(ex, "Error dismiss status dialog")
+            Timber.e(ex, "Error dismiss status dialog")
         }
 
         if (node?.isFolder == true) {
@@ -833,7 +832,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
                 )
                 nodeController.removeShare(
                     ShareListener(
-                        this, ShareListener.Companion.REMOVE_SHARE_LISTENER, 1
+                        this, ShareListener.REMOVE_SHARE_LISTENER, 1
                     ), node, email
                 )
             }.setNegativeButton(
@@ -842,7 +841,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     fun showConfirmationRemoveMultipleContactFromShare(contacts: ArrayList<MegaShare>) {
-        Timber.Forest.d("showConfirmationRemoveMultipleContactFromShare")
+        Timber.d("showConfirmationRemoveMultipleContactFromShare")
 
         val dialogClickListener =
             DialogInterface.OnClickListener { _: DialogInterface?, which: Int ->
@@ -867,7 +866,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
     }
 
     private fun removeMultipleShares(shares: ArrayList<MegaShare>) {
-        Timber.Forest.d("Number of shared to remove: %s", shares.size)
+        Timber.d("Number of shared to remove: %s", shares.size)
 
         statusDialog = MegaProgressDialogUtil.createProgressDialog(
             this, getString(R.string.context_removing_contact_folder)

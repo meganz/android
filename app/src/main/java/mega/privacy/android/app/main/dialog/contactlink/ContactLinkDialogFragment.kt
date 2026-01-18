@@ -18,10 +18,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -34,6 +34,9 @@ internal class ContactLinkDialogFragment : DialogFragment() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,7 +74,7 @@ internal class ContactLinkDialogFragment : DialogFragment() {
                                     cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                                     onConfirm = {
                                         if (contactLink.isContact) {
-                                            ContactUtil.openContactInfoActivity(
+                                            megaNavigator.openContactInfoActivity(
                                                 requireContext(),
                                                 email
                                             )

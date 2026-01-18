@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.RoundedImageView
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
@@ -22,9 +21,9 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatRoom
@@ -262,9 +261,13 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
     override fun onClick(v: View) {
         val id = v.id
         if (id == R.id.contact_info_group_participants_chat) {
-            ContactUtil.openContactInfoActivity(
+            val email = chatC?.getParticipantEmail(participantHandle) ?: run {
+                Timber.w("Cannot open contact info. Selected email is NULL")
+                return
+            }
+            megaNavigator.openContactInfoActivity(
                 requireActivity(),
-                chatC?.getParticipantEmail(participantHandle)
+                email
             )
         } else if (id == R.id.start_chat_group_participants_chat) {
             (requireActivity() as GroupChatInfoActivity).startConversation(participantHandle)

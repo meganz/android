@@ -30,7 +30,6 @@ import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachme
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -211,7 +210,7 @@ class ContactListFragment : Fragment() {
     }
 
     private fun onContactInfoClick(userEmail: String) {
-        ContactUtil.openContactInfoActivity(context, userEmail)
+        navigator.openContactInfoActivity(requireContext(), userEmail)
     }
 
     private fun onContactMoreClick(userHandle: Long) {

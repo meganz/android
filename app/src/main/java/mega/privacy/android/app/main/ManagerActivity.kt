@@ -124,7 +124,6 @@ import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragmentDirections
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieDialogHandler
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
-import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
@@ -247,7 +246,6 @@ import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -5873,7 +5871,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     }
 
     override fun navigateToContactInfo(email: String) {
-        ContactUtil.openContactInfoActivity(this, email)
+        megaNavigator.openContactInfoActivity(this, email)
     }
 
     override fun manageCopyMoveException(throwable: Throwable?): Boolean = when (throwable) {

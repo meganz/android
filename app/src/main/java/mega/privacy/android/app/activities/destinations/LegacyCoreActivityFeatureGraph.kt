@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestinati
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.navigation.authenticityCredentialsLegacyDestination
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
+import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
 import mega.privacy.android.app.presentation.documentscanner.navigation.saveScannedDocumentsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
@@ -59,7 +60,7 @@ class LegacyCoreActivityFeatureGraph(
             inviteContactLegacyDestination(navigationHandler::back)
             authenticityCredentialsLegacyDestination(navigationHandler::back)
             chatLegacyDestination(navigationHandler::back)
-            manageChatHistoryLegacyDestination(navigationHandler::back)
+            manageChatHistoryLegacyDestination(navigationHandler::remove)
             testPasswordLegacyDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
             legacyExportRecoveryKeyScreen(navigationHandler::back)
@@ -97,5 +98,6 @@ class LegacyCoreActivityFeatureGraph(
                 navigationHandler::returnResult
             )
             legacyImagePreview(navigationHandler::back)
+            contactAttachmentLegacyDestination(navigationHandler::remove)
         }
 }

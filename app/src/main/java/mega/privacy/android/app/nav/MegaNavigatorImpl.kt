@@ -22,12 +22,14 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.getLink.GetLinkActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.main.megachat.ContactAttachmentActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsActivity
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
@@ -96,6 +98,8 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
@@ -1043,6 +1047,31 @@ internal class MegaNavigatorImpl @Inject constructor(
                     )
                 }
             )
+        }
+    }
+
+    override fun openContactInfoActivity(context: Context, email: String) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactInfoNavKey(email = email)
+        ) {
+            val i = Intent(context, ContactInfoActivity::class.java)
+            i.putExtra(Constants.NAME, email)
+            context.startActivity(i)
+        }
+    }
+
+
+    override fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactAttachmentNavKey(
+                chatId = chatId,
+                messageId = msgId
+            )
+        ) {
+            val i = Intent(context, ContactAttachmentActivity::class.java)
+            i.putExtra(Constants.CHAT_ID, chatId)
+            i.putExtra(Constants.MESSAGE_ID, msgId)
+            context.startActivity(i)
         }
     }
 }

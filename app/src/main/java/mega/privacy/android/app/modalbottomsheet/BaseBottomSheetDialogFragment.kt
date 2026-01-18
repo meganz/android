@@ -28,6 +28,7 @@ import mega.privacy.android.app.utils.Util.getNavigationBarHeight
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import javax.inject.Inject
@@ -78,6 +79,9 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
     @Inject
     lateinit var dbH: LegacyDatabaseHandler
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     protected lateinit var contentView: View
     protected lateinit var itemsLayout: View

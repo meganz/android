@@ -11,14 +11,14 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 
-fun EntryProviderScope<NavKey>.manageChatHistoryLegacyDestination(removeDestination: () -> Unit) {
+fun EntryProviderScope<NavKey>.manageChatHistoryLegacyDestination(removeDestination: (NavKey) -> Unit) {
     entry<ManageChatHistoryNavKey>(
         metadata = transparentMetadata()
     ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             context.startActivity(createManageChatHistoryIntent(context, key))
-            removeDestination()
+            removeDestination(key)
         }
     }
 }

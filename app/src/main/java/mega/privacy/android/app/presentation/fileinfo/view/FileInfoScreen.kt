@@ -93,29 +93,30 @@ internal fun FileInfoScreen(
             onShareContactOptionsDismissed()
         }
     }
-    BottomSheet(modalSheetState = modalSheetState, sheetBody =
-    {
-        viewState.contactToShowOptions?.let {
-            ShareContactOptionsContent(
-                contactPermission = it,
-                allowChangePermission = !viewState.isNodeInBackups,
-                onInfoClicked = {
-                    onSharedWithContactMoreInfoClick(it)
+    BottomSheet(
+        modalSheetState = modalSheetState, sheetBody =
+            {
+                viewState.contactToShowOptions?.let {
+                    ShareContactOptionsContent(
+                        contactPermission = it,
+                        allowChangePermission = !viewState.isNodeInBackups,
+                        onInfoClicked = {
+                            onSharedWithContactMoreInfoClick(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                        onChangePermissionClicked = {
+                            onSharedWithContactChangePermissionClicked(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                        onRemoveClicked = {
+                            onSharedWithContactRemoveClicked(it)
+                            coroutineScope.launch { modalSheetState.hide() }
+                        },
+                    )
+                } ?: run {
                     coroutineScope.launch { modalSheetState.hide() }
-                },
-                onChangePermissionClicked = {
-                    onSharedWithContactChangePermissionClicked(it)
-                    coroutineScope.launch { modalSheetState.hide() }
-                },
-                onRemoveClicked = {
-                    onSharedWithContactRemoveClicked(it)
-                    coroutineScope.launch { modalSheetState.hide() }
-                },
-            )
-        } ?: run {
-            coroutineScope.launch { modalSheetState.hide() }
-        }
-    }) {
+                }
+            }) {
         ScaffoldWithCollapsibleHeader(
             modifier = modifier.imePadding(),
             headerIncludingSystemBar = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview }

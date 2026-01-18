@@ -37,7 +37,6 @@ import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.Constants.SELECTED_USERS
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.user.ContactAvatar
@@ -229,7 +228,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun setupButtons(contactEmail: String, contactHandle: Long) {
         binding.optionInfo.setOnClickListener {
-            ContactUtil.openContactInfoActivity(context, contactEmail)
+            navigator.openContactInfoActivity(requireContext(), contactEmail)
             dismiss()
         }
 

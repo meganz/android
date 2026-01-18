@@ -32,12 +32,11 @@ import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
-import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
 import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel;
-import mega.privacy.android.app.utils.ContactUtil;
+import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -252,7 +251,7 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.contact_info_group_participants_chat) {
-            ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
+            megaNavigator.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
         } else if (id == R.id.start_chat_group_participants_chat) {
             if (viewModel != null) {
                 viewModel.onSendMsgTap();

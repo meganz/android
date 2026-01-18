@@ -662,6 +662,23 @@ interface AppNavigator {
         context: Context,
         message: String,
     )
+
+    /**
+     * Method to open ContactInfoActivity.class.
+     *
+     * @param context Activity context.
+     * @param email    The email of the contact.
+     */
+    fun openContactInfoActivity(context: Context, email: String)
+
+    /**
+     * Method to open ContactAttachmentActivity.class.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of a chat.
+     * @param msgId   The ID of a message.
+     */
+    fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long)
 }
 
 /**
