@@ -1002,4 +1002,22 @@ interface ChatRepository {
      * @return the [NodeId] of the folder for saving chat files in user attributes, null if it's not configured yet
      */
     suspend fun getMyChatsFilesFolderId(): NodeId?
+
+    /**
+     * Checks if the given chat is a group.
+     * To avoid mapping and extra processing.
+     *
+     * @param chatId Chat id to check.
+     * @return True if the chat is group, false otherwise.
+     */
+    suspend fun isGroupChat(chatId: Long): Boolean?
+
+    /**
+     * Checks if the given chat is the note to self chat.
+     * To avoid mapping and extra processing.
+     *
+     * @param chatId Chat id to check.
+     * @return True if the chat is the note to self, false otherwise.
+     */
+    suspend fun isNoteToSelfChat(chatId: Long): Boolean?
 }

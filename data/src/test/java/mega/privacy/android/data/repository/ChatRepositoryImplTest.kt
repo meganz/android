@@ -91,6 +91,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.NullSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
@@ -1338,6 +1340,44 @@ class ChatRepositoryImplTest {
             yield() // listening to global updates is in another scope, we need to yield to get the update
             val expected = underTest.getMyChatsFilesFolderId()
             assertThat(expected?.longValue).isEqualTo(handle)
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        @NullSource
+        fun `test that isGroupChat returns correctly`(
+            isGroup: Boolean?,
+        ) = runTest {
+            val chatRoom = if (isGroup == null) {
+                null
+            } else {
+                mock<MegaChatRoom> {
+                    on { this.isGroup } doReturn isGroup
+                }
+            }
+
+            whenever(megaChatApiGateway.getChatRoom(chatId)) doReturn chatRoom
+
+            assertThat(underTest.isGroupChat(chatId)).isEqualTo(isGroup)
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = [true, false])
+        @NullSource
+        fun `test that isNoteToSelfChat returns correctly`(
+            isNoteToSelf: Boolean?,
+        ) = runTest {
+            val chatRoom = if (isNoteToSelf == null) {
+                null
+            } else {
+                mock<MegaChatRoom> {
+                    on { this.isNoteToSelf } doReturn isNoteToSelf
+                }
+            }
+
+            whenever(megaChatApiGateway.getChatRoom(chatId)) doReturn chatRoom
+
+            assertThat(underTest.isNoteToSelfChat(chatId)).isEqualTo(isNoteToSelf)
         }
 
         private fun stubGetMyChatFilesFolder(folderHandle: Long = 1L) {

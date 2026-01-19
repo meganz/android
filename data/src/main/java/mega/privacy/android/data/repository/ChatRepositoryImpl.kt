@@ -1309,6 +1309,14 @@ internal class ChatRepositoryImpl @Inject constructor(
             getMyChatsFilesFolderIdFromGateway()
         }
 
+    override suspend fun isGroupChat(chatId: Long): Boolean? = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatRoom(chatId)?.isGroup
+    }
+
+    override suspend fun isNoteToSelfChat(chatId: Long): Boolean? = withContext(ioDispatcher) {
+        megaChatApiGateway.getChatRoom(chatId)?.isNoteToSelf
+    }
+
     private suspend fun getMyChatsFilesFolderIdFromGateway(): NodeId? = withContext(ioDispatcher) {
         runCatching {
             suspendCancellableCoroutine { continuation ->
