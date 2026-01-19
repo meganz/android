@@ -26,10 +26,12 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesUiState
 import timber.log.Timber
@@ -44,6 +46,7 @@ class FavouritesViewModel @Inject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FavouritesUiState())
@@ -53,6 +56,7 @@ class FavouritesViewModel @Inject constructor(
         monitorViewType()
         monitorFavourites()
         monitorCloudSortOrder()
+        checkSearchRevampEnabled()
     }
 
     /**
@@ -258,6 +262,15 @@ class FavouritesViewModel @Inject constructor(
     private fun onOpenedFileNodeHandled() {
         _uiState.update { state ->
             state.copy(openedFileNode = null)
+        }
+    }
+
+    private fun checkSearchRevampEnabled() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
+                .onSuccess { isEnabled ->
+                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
+                }
         }
     }
 }

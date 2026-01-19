@@ -25,6 +25,7 @@ data class FavouritesUiState(
     val openedFileNode: TypedFileNode? = null,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
+    val isSearchRevampEnabled: Boolean = false,
 ) {
 
     /**

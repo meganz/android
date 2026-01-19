@@ -24,10 +24,12 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -58,6 +60,7 @@ class FavouritesViewModelTest {
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @AfterEach
     fun tearDown() {
@@ -68,7 +71,8 @@ class FavouritesViewModelTest {
             nodeUiItemMapper,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
-            monitorSortCloudOrderUseCase
+            monitorSortCloudOrderUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 
@@ -80,6 +84,7 @@ class FavouritesViewModelTest {
         setCloudSortOrderUseCase = setCloudSortOrderUseCase,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
 
     private suspend fun setupTestData(items: List<TypedNode>) {
@@ -826,6 +831,20 @@ class FavouritesViewModelTest {
 
             val secondState = awaitItem() // After second emission
             assertThat(secondState.items).hasSize(2)
+        }
+    }
+
+    @Test
+    fun `test that isSearchRevampEnabled is updated when feature flag is enabled`() = runTest {
+        setupTestData(emptyList())
+        whenever(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp)).thenReturn(true)
+
+        val underTest = createViewModel()
+        testScheduler.advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isSearchRevampEnabled).isTrue()
         }
     }
 }
