@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetDefaults
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
@@ -215,6 +216,7 @@ private fun SyncSettingsSheetBody(
             MegaText(
                 text = stringResource(syncR.string.sync_menu_clear_issues),
                 textColor = TextColor.Primary,
+                style = MaterialTheme.typography.subtitle1,
                 modifier = Modifier
                     .clickable {
                         onOptionSelected()
@@ -228,6 +230,7 @@ private fun SyncSettingsSheetBody(
         MegaText(
             text = stringResource(sharedR.string.settings_sync_connection_type_title),
             textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle1,
             modifier = Modifier
                 .clickable {
                     onOptionSelected()
@@ -240,6 +243,7 @@ private fun SyncSettingsSheetBody(
         MegaText(
             text = stringResource(sharedR.string.settings_sync_power_settings_title),
             textColor = TextColor.Primary,
+            style = MaterialTheme.typography.subtitle1,
             modifier = Modifier
                 .clickable {
                     onOptionSelected()
