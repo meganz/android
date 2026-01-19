@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
@@ -24,7 +23,6 @@ import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDis
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,6 +30,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -220,7 +219,7 @@ class MediaCameraUploadViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().status).isEqualTo(
-                    CUStatusUiState.Warning.BannerAndAction.NetworkConnectionRequirementNotMet
+                    CUStatusUiState.Warning.NetworkConnectionRequirementNotMet
                 )
             }
         }
@@ -235,7 +234,7 @@ class MediaCameraUploadViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().status).isEqualTo(
-                    CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess
+                    CUStatusUiState.Warning.HasLimitedAccess
                 )
             }
         }
@@ -247,13 +246,17 @@ class MediaCameraUploadViewModelTest {
         verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
     }
 
-    @Test
-    fun `test that the correct CU status is set when CU is disabled`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct CU status is set when CU is disabled`(isVisible: Boolean) =
         runTest {
             isCameraUploadsEnabledFlow.value = false
+            enableCameraUploadBannerVisibilityFlow.emit(isVisible)
 
             underTest.uiState.test {
-                assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.Disabled)
+                assertThat(expectMostRecentItem().status).isEqualTo(
+                    CUStatusUiState.Disabled(shouldNotifyUser = isVisible)
+                )
             }
         }
 
@@ -298,17 +301,6 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that enable CU banner is displayed when the visibility is visible and the CU is not enabled`() =
-        runTest {
-            enableCameraUploadBannerVisibilityFlow.emit(true)
-            isCameraUploadsEnabledFlow.emit(false)
-
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().shouldShowCUBanner).isTrue()
-            }
-        }
-
-    @Test
     fun `test that enable CU banner visibility is reset if visible`() =
         runTest {
             enableCameraUploadBannerVisibilityFlow.emit(true)
@@ -319,38 +311,10 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that enable CU banner is not displayed when the visibility is visible but the CU is enabled`() =
-        runTest {
-            whenever(
-                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
-            ) doReturn flowOf(true)
-            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(true)
-
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().shouldShowCUBanner).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that enable CU banner is not displayed when the CU is disabled but the visibility is not visible`() =
-        runTest {
-            whenever(
-                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow
-            ) doReturn flowOf(false)
-            whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled) doReturn flowOf(
-                false
-            )
-
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().shouldShowCUBanner).isFalse()
-            }
-        }
-
-    @Test
     fun `test that the enable CU banner is successfully dismissed`() = runTest {
-        val bannerType = CameraUploadsBannerType.EnableCameraUploads
+        val status = CUStatusUiState.Disabled()
 
-        underTest.dismissCUBanner(bannerType = bannerType)
+        underTest.dismissCUBanner(status = status)
 
         verify(setEnableCameraUploadBannerDismissedTimestampUseCase).invoke()
     }
@@ -365,7 +329,7 @@ class MediaCameraUploadViewModelTest {
 
             underTest.uiState.test {
                 assertThat(expectMostRecentItem().status).isEqualTo(
-                    CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess
+                    CUStatusUiState.Warning.HasLimitedAccess
                 )
             }
         }
@@ -385,7 +349,7 @@ class MediaCameraUploadViewModelTest {
                 underTest.checkCameraUploadsPermissions()
 
                 assertThat(expectMostRecentItem().status).isEqualTo(
-                    CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess
+                    CUStatusUiState.Warning.HasLimitedAccess
                 )
             }
         }
@@ -411,15 +375,15 @@ class MediaCameraUploadViewModelTest {
         underTest.uiState.test {
             val expected = when (finishReason) {
                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                    CUStatusUiState.Warning.BannerAndAction.DeviceChargingRequirementNotMet
+                    CUStatusUiState.Warning.DeviceChargingRequirementNotMet
                 }
 
                 CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
-                    CUStatusUiState.Warning.BannerAndAction.BatteryLevelTooLow
+                    CUStatusUiState.Warning.BatteryLevelTooLow
                 }
 
                 CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
-                    CUStatusUiState.Warning.BannerAndAction.NetworkConnectionRequirementNotMet
+                    CUStatusUiState.Warning.NetworkConnectionRequirementNotMet
                 }
 
                 else -> CUStatusUiState.None
@@ -430,12 +394,12 @@ class MediaCameraUploadViewModelTest {
 
     @Test
     fun `test that the banner is successfully dismissed`() = runTest {
-        val bannerType = CameraUploadsBannerType.EnableCameraUploads
+        val status = CUStatusUiState.Disabled()
 
-        underTest.dismissCUBanner(bannerType = bannerType)
+        underTest.dismissCUBanner(status = status)
 
         underTest.uiState.test {
-            assertThat(expectMostRecentItem().shouldShowCUBanner).isFalse()
+            assertThat(expectMostRecentItem().status).isEqualTo(CUStatusUiState.None)
         }
     }
 }

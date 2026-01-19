@@ -41,79 +41,60 @@ import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.R
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButtonPressedEvent
 
-/**
- * Contents in this file are copied from the legacy CameraUploadsStatus file
- * with a little tweak to use material 3 and the correct color.
- */
-
 @Composable
 internal fun CameraUploadsBanner(
-    bannerType: CameraUploadsBannerType,
-    shouldShowEnableCUBanner: Boolean,
-    shouldShowCUWarningBanner: Boolean,
+    status: CUStatusUiState,
     onEnableCameraUploads: () -> Unit,
-    onDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onDismissRequest: (status: CUStatusUiState) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateUpgradeScreen: () -> Unit,
 ) {
-    when (bannerType) {
-        CameraUploadsBannerType.EnableCameraUploads -> {
-            if (shouldShowEnableCUBanner) {
+    when (status) {
+        is CUStatusUiState.Disabled -> {
+            if (status.shouldNotifyUser) {
                 EnableCameraUploadsBanner(
                     onEnableCUClick = onEnableCameraUploads,
-                    onDismissRequest = { onDismissRequest(bannerType) }
+                    onDismissRequest = { onDismissRequest(status) }
                 )
             }
         }
 
-        CameraUploadsBannerType.NoFullAccess -> {
-            if (shouldShowCUWarningBanner) {
-                CameraUploadsNoFullAccessBanner(
-                    onClick = onChangeCameraUploadsPermissions,
-                    onClose = { onDismissRequest(bannerType) },
-                )
-            }
+        CUStatusUiState.Warning.HasLimitedAccess -> {
+            CameraUploadsNoFullAccessBanner(
+                onClick = onChangeCameraUploadsPermissions,
+                onClose = { onDismissRequest(status) },
+            )
         }
 
-        CameraUploadsBannerType.LowBattery -> {
-            if (shouldShowCUWarningBanner) {
-                LowBatteryPausedBanner(onClose = { onDismissRequest(bannerType) })
-            }
+        CUStatusUiState.Warning.BatteryLevelTooLow -> {
+            LowBatteryPausedBanner(onClose = { onDismissRequest(status) })
         }
 
-        CameraUploadsBannerType.DeviceChargingNotMet -> {
-            if (shouldShowCUWarningBanner) {
-                DeviceChargingNotMetPausedBanner(
-                    onOpenSettingsClicked = onNavigateToCameraUploadsSettings
-                )
-            }
+        CUStatusUiState.Warning.DeviceChargingRequirementNotMet -> {
+            DeviceChargingNotMetPausedBanner(
+                onOpenSettingsClicked = onNavigateToCameraUploadsSettings
+            )
         }
 
-        CameraUploadsBannerType.NetworkRequirementNotMet -> {
-            if (shouldShowCUWarningBanner) {
-                NetworkRequirementNotMetPausedBanner(
-                    onNavigateMobileDataSetting = onNavigateMobileDataSetting
-                )
-            }
+        CUStatusUiState.Warning.NetworkConnectionRequirementNotMet -> {
+            NetworkRequirementNotMetPausedBanner(
+                onNavigateMobileDataSetting = onNavigateMobileDataSetting
+            )
         }
 
-        CameraUploadsBannerType.FullStorage -> {
-            if (shouldShowCUWarningBanner) {
-                FullStorageBanner(
-                    onUpgradeClicked = onNavigateUpgradeScreen
-                )
-            }
+        CUStatusUiState.Warning.AccountStorageOverQuota -> {
+            FullStorageBanner(onUpgradeClicked = onNavigateUpgradeScreen)
         }
 
-        else -> {}
+        else -> Unit
     }
 }
 

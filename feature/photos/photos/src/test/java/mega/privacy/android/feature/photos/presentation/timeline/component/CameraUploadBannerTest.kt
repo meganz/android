@@ -10,7 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Before
 import org.junit.Rule
@@ -36,11 +36,10 @@ class CameraUploadBannerTest {
     }
 
     @Test
-    fun `test that the enable CU banner is displayed`() {
+    fun `test that the enable CU banner is displayed when should notify users`() {
         composeRuleScope {
             setBanner(
-                bannerType = CameraUploadsBannerType.EnableCameraUploads,
-                shouldShowEnableCUBanner = true
+                status = CUStatusUiState.Disabled(shouldNotifyUser = true),
             )
 
             onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG).assertIsDisplayed()
@@ -48,29 +47,34 @@ class CameraUploadBannerTest {
     }
 
     @Test
-    fun `test that the enable CU banner is successfully dismissed`() {
-        val bannerType = CameraUploadsBannerType.EnableCameraUploads
+    fun `test that the enable CU banner is not displayed when shouldn't notify users`() {
         composeRuleScope {
-            val onDismissRequest = mock<(bannerType: CameraUploadsBannerType) -> Unit>()
+            setBanner(status = CUStatusUiState.Disabled(shouldNotifyUser = false))
+
+            onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that the enable CU banner is successfully dismissed`() {
+        val status = CUStatusUiState.Disabled(shouldNotifyUser = true)
+        composeRuleScope {
+            val onDismissRequest = mock<(status: CUStatusUiState) -> Unit>()
             setBanner(
-                bannerType = bannerType,
-                shouldShowEnableCUBanner = true,
+                status = status,
                 onDismissRequest = onDismissRequest
             )
 
             onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_DISMISS_ICON_TEST_TAG).performClick()
 
-            verify(onDismissRequest).invoke(bannerType)
+            verify(onDismissRequest).invoke(status)
         }
     }
 
     @Test
     fun `test that the no full access banner is displayed`() {
         composeRuleScope {
-            setBanner(
-                bannerType = CameraUploadsBannerType.NoFullAccess,
-                shouldShowCUWarningBanner = true
-            )
+            setBanner(status = CUStatusUiState.Warning.HasLimitedAccess)
 
             onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG).assertIsDisplayed()
         }
@@ -81,8 +85,7 @@ class CameraUploadBannerTest {
         composeRuleScope {
             val onChangeCameraUploadsPermissions = mock<() -> Unit>()
             setBanner(
-                bannerType = CameraUploadsBannerType.NoFullAccess,
-                shouldShowCUWarningBanner = true,
+                status = CUStatusUiState.Warning.HasLimitedAccess,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions
             )
 
@@ -97,10 +100,7 @@ class CameraUploadBannerTest {
     @Test
     fun `test that the low battery banner is displayed`() {
         composeRuleScope {
-            setBanner(
-                bannerType = CameraUploadsBannerType.LowBattery,
-                shouldShowCUWarningBanner = true
-            )
+            setBanner(status = CUStatusUiState.Warning.BatteryLevelTooLow)
 
             onNodeWithTag(TIMELINE_CAMERA_UPLOADS_LOW_BATTERY_BANNER_TEST_TAG).assertIsDisplayed()
         }
@@ -109,10 +109,7 @@ class CameraUploadBannerTest {
     @Test
     fun `test that the device charging not met banner is displayed`() {
         composeRuleScope {
-            setBanner(
-                bannerType = CameraUploadsBannerType.DeviceChargingNotMet,
-                shouldShowCUWarningBanner = true
-            )
+            setBanner(status = CUStatusUiState.Warning.DeviceChargingRequirementNotMet)
 
             onNodeWithTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG).assertIsDisplayed()
         }
@@ -121,10 +118,7 @@ class CameraUploadBannerTest {
     @Test
     fun `test that the network requirement not met banner is displayed`() {
         composeRuleScope {
-            setBanner(
-                bannerType = CameraUploadsBannerType.NetworkRequirementNotMet,
-                shouldShowCUWarningBanner = true
-            )
+            setBanner(status = CUStatusUiState.Warning.NetworkConnectionRequirementNotMet)
 
             onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_PAUSED_BANNER_TEST_TAG).assertIsDisplayed()
         }
@@ -133,10 +127,7 @@ class CameraUploadBannerTest {
     @Test
     fun `test that the full storage banner is displayed`() {
         composeRuleScope {
-            setBanner(
-                bannerType = CameraUploadsBannerType.FullStorage,
-                shouldShowCUWarningBanner = true
-            )
+            setBanner(status = CUStatusUiState.Warning.AccountStorageOverQuota)
 
             onNodeWithTag(TIMELINE_CAMERA_UPLOADS_FULL_STORAGE_BANNER_TEST_TAG).assertIsDisplayed()
         }
@@ -147,8 +138,7 @@ class CameraUploadBannerTest {
         composeRuleScope {
             val onNavigateUpgradeScreen = mock<() -> Unit>()
             setBanner(
-                bannerType = CameraUploadsBannerType.FullStorage,
-                shouldShowCUWarningBanner = true,
+                status = CUStatusUiState.Warning.AccountStorageOverQuota,
                 onNavigateUpgradeScreen = onNavigateUpgradeScreen
             )
 
@@ -167,11 +157,9 @@ class CameraUploadBannerTest {
     }
 
     private fun ComposeContentTestRule.setBanner(
-        bannerType: CameraUploadsBannerType = CameraUploadsBannerType.NONE,
-        shouldShowEnableCUBanner: Boolean = false,
-        shouldShowCUWarningBanner: Boolean = false,
+        status: CUStatusUiState = CUStatusUiState.None,
         onEnableCameraUploads: () -> Unit = {},
-        onDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit = {},
+        onDismissRequest: (status: CUStatusUiState) -> Unit = {},
         onChangeCameraUploadsPermissions: () -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateMobileDataSetting: () -> Unit = {},
@@ -179,9 +167,7 @@ class CameraUploadBannerTest {
     ) {
         setContent {
             CameraUploadsBanner(
-                bannerType = bannerType,
-                shouldShowEnableCUBanner = shouldShowEnableCUBanner,
-                shouldShowCUWarningBanner = shouldShowCUWarningBanner,
+                status = status,
                 onEnableCameraUploads = onEnableCameraUploads,
                 onDismissRequest = onDismissRequest,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,

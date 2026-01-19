@@ -34,7 +34,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,7 +55,6 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
@@ -69,7 +67,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Enabl
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
@@ -94,7 +91,7 @@ internal fun TimelineTabRoute(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -143,7 +140,7 @@ internal fun TimelineTabScreen(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -168,13 +165,6 @@ internal fun TimelineTabScreen(
     var shouldScrollToIndex by remember { mutableIntStateOf(-1) }
     val showEnableCUPage = mediaCameraUploadUiState.enableCameraUploadPageShowing
             && timelineFilterUiState.mediaSource != FilterMediaSource.CloudDrive
-    val cuBannerType by remember(mediaCameraUploadUiState) {
-        mutableStateOf(
-            value = getCameraUploadsBannerType(
-                mediaCameraUploadUiState = mediaCameraUploadUiState
-            )
-        )
-    }
     val cameraUploadsPermissionsLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             handleCameraUploadsPermissionsResult()
@@ -275,13 +265,11 @@ internal fun TimelineTabScreen(
                 modifier = modifier,
                 contentPadding = contentPadding,
                 uiState = uiState,
-                shouldShowEnableCUBanner = mediaCameraUploadUiState.shouldShowCUBanner && mediaCameraUploadUiState.status is CUStatusUiState.Disabled,
-                shouldShowCUWarningBanner = mediaCameraUploadUiState.shouldShowCUBanner && mediaCameraUploadUiState.status is CUStatusUiState.Warning,
+                cuStatusUiState = mediaCameraUploadUiState.status,
                 lazyGridState = timelineLazyListState.lazyGridState,
                 lazyListState = timelineLazyListState.lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
                 shouldShowTimePeriodSelector = shouldShowTimePeriodSelector,
-                bannerType = cuBannerType,
                 onPhotoTimePeriodSelected = {
                     val scrollIndex =
                         timelineLazyListState.calculateScrollIndexBasedOnTimePeriodClick(
@@ -380,33 +368,26 @@ private fun EmptyBodyContent(modifier: Modifier = Modifier) {
 @Composable
 private fun TimelineTabContent(
     uiState: TimelineTabUiState,
-    shouldShowEnableCUBanner: Boolean,
-    shouldShowCUWarningBanner: Boolean,
+    cuStatusUiState: CUStatusUiState,
     lazyGridState: LazyGridState,
     lazyListState: LazyListState,
     selectedTimePeriod: PhotoModificationTimePeriod,
     shouldShowTimePeriodSelector: Boolean,
-    bannerType: CameraUploadsBannerType,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateToUpgradeScreen: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val shouldShowCUBanner by remember(
-        key1 = uiState.selectedPhotoCount,
-        key2 = bannerType
-    ) {
-        derivedStateOf {
-            uiState.selectedPhotoCount == 0 && bannerType != CameraUploadsBannerType.NONE
-        }
+    val shouldShowCUBanner by remember(uiState.selectedPhotoCount) {
+        derivedStateOf { uiState.selectedPhotoCount == 0 }
     }
     Box(modifier = modifier) {
         when (selectedTimePeriod) {
@@ -425,9 +406,7 @@ private fun TimelineTabContent(
                     header = {
                         if (shouldShowCUBanner) {
                             CameraUploadsBanner(
-                                bannerType = bannerType,
-                                shouldShowEnableCUBanner = shouldShowEnableCUBanner,
-                                shouldShowCUWarningBanner = shouldShowCUWarningBanner,
+                                status = cuStatusUiState,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -457,9 +436,7 @@ private fun TimelineTabContent(
                     header = {
                         if (shouldShowCUBanner) {
                             CameraUploadsBanner(
-                                bannerType = bannerType,
-                                shouldShowEnableCUBanner = shouldShowEnableCUBanner,
-                                shouldShowCUWarningBanner = shouldShowCUWarningBanner,
+                                status = cuStatusUiState,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
@@ -524,37 +501,6 @@ private fun PhotoModificationTimePeriodSelector(
                 }
             }
         }
-    }
-}
-
-private fun getCameraUploadsBannerType(
-    mediaCameraUploadUiState: MediaCameraUploadUiState,
-): CameraUploadsBannerType {
-    return when {
-        mediaCameraUploadUiState.status is CUStatusUiState.Disabled ->
-            CameraUploadsBannerType.EnableCameraUploads
-
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
-            -> CameraUploadsBannerType.FullStorage
-
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
-            -> CameraUploadsBannerType.NetworkRequirementNotMet
-
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
-            -> CameraUploadsBannerType.LowBattery
-
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
-            -> CameraUploadsBannerType.DeviceChargingNotMet
-
-        mediaCameraUploadUiState.status is CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess -> CameraUploadsBannerType.NoFullAccess
-
-        mediaCameraUploadUiState.status is CUStatusUiState.Sync ->
-            CameraUploadsBannerType.CheckingUploads
-
-        mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress || mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete ->
-            CameraUploadsBannerType.PendingCount
-
-        else -> CameraUploadsBannerType.NONE
     }
 }
 

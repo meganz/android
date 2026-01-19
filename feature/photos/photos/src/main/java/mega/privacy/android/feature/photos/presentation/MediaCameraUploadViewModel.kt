@@ -33,7 +33,6 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -90,7 +89,7 @@ class MediaCameraUploadViewModel @Inject constructor(
             )
         }.flatMapLatest { transition ->
             if (transition.permissionsState == MediaCUPermissionsState.Denied) {
-                flowOf(CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess)
+                flowOf(CUStatusUiState.Warning.HasLimitedAccess)
             } else {
                 val previousStatus = transition.previousStatus
                 val currentStatus = transition.currentStatus
@@ -122,19 +121,19 @@ class MediaCameraUploadViewModel @Inject constructor(
                             val status = when (currentStatus.reason) {
                                 CameraUploadsFinishedReason.COMPLETED -> CUStatusUiState.UpToDate
                                 CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                                    CUStatusUiState.Warning.BannerAndAction.DeviceChargingRequirementNotMet
+                                    CUStatusUiState.Warning.DeviceChargingRequirementNotMet
                                 }
 
                                 CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
-                                    CUStatusUiState.Warning.BannerAndAction.BatteryLevelTooLow
+                                    CUStatusUiState.Warning.BatteryLevelTooLow
                                 }
 
                                 CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
-                                    CUStatusUiState.Warning.BannerAndAction.NetworkConnectionRequirementNotMet
+                                    CUStatusUiState.Warning.NetworkConnectionRequirementNotMet
                                 }
 
                                 CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA -> {
-                                    CUStatusUiState.Warning.BannerOnly.AccountStorageOverQuota
+                                    CUStatusUiState.Warning.AccountStorageOverQuota
                                 }
 
                                 else -> CUStatusUiState.None
@@ -202,8 +201,9 @@ class MediaCameraUploadViewModel @Inject constructor(
                 if (!isCUEnabled) {
                     _uiState.update {
                         it.copy(
-                            status = CUStatusUiState.Disabled,
-                            shouldShowCUBanner = isVisible
+                            status = CUStatusUiState.Disabled(
+                                shouldNotifyUser = isVisible
+                            )
                         )
                     }
                     if (isVisible) {
@@ -216,7 +216,6 @@ class MediaCameraUploadViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             status = cuStatus,
-                            shouldShowCUBanner = cuStatus is CUStatusUiState.Warning,
                             enableCameraUploadPageShowing = false
                         )
                     }
@@ -312,11 +311,11 @@ class MediaCameraUploadViewModel @Inject constructor(
         }
     }
 
-    internal fun dismissCUBanner(bannerType: CameraUploadsBannerType) {
-        if (bannerType == CameraUploadsBannerType.EnableCameraUploads) {
+    internal fun dismissCUBanner(status: CUStatusUiState) {
+        if (status is CUStatusUiState.Disabled) {
             dismissEnableCUBanner()
         }
-        _uiState.update { it.copy(shouldShowCUBanner = false) }
+        _uiState.update { it.copy(status = CUStatusUiState.None) }
     }
 
     private fun dismissEnableCUBanner() {

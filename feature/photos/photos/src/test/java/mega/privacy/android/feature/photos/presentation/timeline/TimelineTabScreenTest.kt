@@ -23,7 +23,6 @@ import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_IMAGE_NODE_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.component.ENABLE_CAMERA_UPLOADS_CONTENT_ENABLE_BUTTON_TAG
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -154,7 +153,7 @@ class TimelineTabScreenTest {
             setScreen(
                 uiState = TimelineTabUiState(isLoading = false),
                 mediaCameraUploadUiState = MediaCameraUploadUiState(
-                    status = CUStatusUiState.Disabled
+                    status = CUStatusUiState.Disabled()
                 ),
                 timelineFilterUiState = TimelineFilterUiState(
                     mediaSource = FilterMediaSource.CameraUpload
@@ -337,7 +336,7 @@ class TimelineTabScreenTest {
         onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
         onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
         handleCameraUploadsPermissionsResult: () -> Unit = {},
-        onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit = {},
+        onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit = {},
         onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
         onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
         onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},

@@ -92,7 +92,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabView
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
-import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
@@ -332,7 +331,7 @@ fun MediaMainScreen(
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     setCameraUploadsMessage: (message: String) -> Unit,
-    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
@@ -971,7 +970,7 @@ private fun MediaScreen.MediaContent(
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     navigationHandler: NavigationHandler,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
+    onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,

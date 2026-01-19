@@ -13,7 +13,6 @@ data class MediaCameraUploadUiState(
     val cameraUploadsTotalUploaded: Int = 0,
     val cameraUploadsFinishedReason: CameraUploadsFinishedReason? = null,
     val showCameraUploadsCompletedMessage: Boolean = false,
-    val shouldShowCUBanner: Boolean = false,
     val enableCameraUploadPageShowing: Boolean = false,
     val cameraUploadsMessage: String = "",
 )
@@ -22,7 +21,7 @@ sealed interface CUStatusUiState {
 
     data object None : CUStatusUiState
 
-    data object Disabled : CUStatusUiState
+    data class Disabled(val shouldNotifyUser: Boolean = false) : CUStatusUiState
 
     data object Sync : CUStatusUiState
 
@@ -39,23 +38,15 @@ sealed interface CUStatusUiState {
 
     sealed interface Warning : CUStatusUiState {
 
-        sealed interface BannerOnly : Warning {
+        data object AccountStorageOverQuota : Warning
 
-            data object AccountStorageOverQuota : BannerOnly
-        }
+        data object DeviceChargingRequirementNotMet : Warning
 
-        sealed interface BannerAndAction : Warning {
+        data object BatteryLevelTooLow : Warning
 
-            data object DeviceChargingRequirementNotMet : Warning
+        data object NetworkConnectionRequirementNotMet : Warning
 
-            data object BatteryLevelTooLow : Warning
-
-            data object NetworkConnectionRequirementNotMet : Warning
-
-            data object HasLimitedAccess : Warning
-        }
-
-        data object Unknown : Warning
+        data object HasLimitedAccess : Warning
     }
 }
 
