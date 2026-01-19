@@ -12,6 +12,7 @@ import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.qualifier.DefaultStartScreen
 import mega.privacy.mobile.home.navigation.HomeFeatureGraph
 import mega.privacy.mobile.home.navigation.HomeNavItem
+import mega.privacy.mobile.home.presentation.home.widget.banner.BannerWidget
 import mega.privacy.mobile.home.presentation.home.widget.chips.HomeChipsWidget
 import mega.privacy.mobile.home.presentation.home.widget.recents.RecentsWidget
 
@@ -39,4 +40,8 @@ class HomeModule {
     @Provides
     @IntoSet
     fun provideHomeChipsWidget(widget: HomeChipsWidget): HomeWidget = widget
+
+    @Provides
+    @IntoSet
+    fun provideBannerWidget(widget: BannerWidget): HomeWidget = widget
 }

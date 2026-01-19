@@ -22,6 +22,11 @@ import mega.privacy.android.domain.entity.banner.PromotionalBanner as DomainProm
 
 /**
  * Scrollable banner component that displays multiple PromoBanner instances horizontally
+ *
+ * @param banners List of domain PromoBanner entities to display
+ * @param onDismiss Callback when a banner is dismissed, receives banner ID
+ * @param onClick Callback when a banner is clicked, receives banner URL
+ * @param modifier Modifier for the composable
  */
 @Composable
 fun ScrollableBanner(

@@ -5,9 +5,9 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.banner.Banner
+import mega.privacy.android.domain.entity.banner.PromotionalBanner
 import mega.privacy.android.domain.usecase.banner.DismissBannerUseCase
-import mega.privacy.android.domain.usecase.banner.GetBannersUseCase
+import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,45 +23,44 @@ import org.mockito.kotlin.whenever
 class BannerWidgetViewModelTest {
 
     private lateinit var underTest: BannerWidgetViewModel
-
-    private val getBannersUseCase = mock<GetBannersUseCase>()
+    private val getPromoBannersUseCase = mock<GetPromoBannersUseCase>()
     private val dismissBannerUseCase = mock<DismissBannerUseCase>()
 
-    private val banner1 = Banner(
+    private val banner1 = PromotionalBanner(
         id = 1,
         title = "Test Banner 1",
-        description = "Description 1",
         image = "image1.png",
         backgroundImage = "bg1.png",
         url = "https://test.com/1",
-        imageLocation = "https://cdn.test.com/"
+        imageLocation = "https://cdn.test.com/",
+        buttonText = "Lear More"
     )
 
-    private val banner2 = Banner(
+    private val banner2 = PromotionalBanner(
         id = 2,
         title = "Test Banner 2",
-        description = "Description 2",
         image = "image2.png",
         backgroundImage = "bg2.png",
         url = "https://test.com/2",
-        imageLocation = "https://cdn.test.com/"
+        imageLocation = "https://cdn.test.com/",
+        buttonText = "Lear More"
     )
 
     @BeforeEach
     fun setUp() {
-        reset(getBannersUseCase, dismissBannerUseCase)
+        reset(dismissBannerUseCase, getPromoBannersUseCase)
     }
 
     private fun initViewModel() {
         underTest = BannerWidgetViewModel(
-            getBannersUseCase = getBannersUseCase,
             dismissBannerUseCase = dismissBannerUseCase,
+            getPromoBannersUseCase = getPromoBannersUseCase
         )
     }
 
     @Test
     fun `test that empty list is returned when no banners available`() = runTest {
-        whenever(getBannersUseCase()).thenReturn(emptyList())
+        whenever(getPromoBannersUseCase()).thenReturn(emptyList())
 
         initViewModel()
 
@@ -75,7 +74,7 @@ class BannerWidgetViewModelTest {
     @Test
     fun `test that banners are loaded successfully`() = runTest {
         val bannerList = listOf(banner1, banner2)
-        whenever(getBannersUseCase()).thenReturn(bannerList)
+        whenever(getPromoBannersUseCase()).thenReturn(bannerList)
 
         initViewModel()
 
@@ -88,7 +87,7 @@ class BannerWidgetViewModelTest {
 
     @Test
     fun `test that single banner is loaded successfully`() = runTest {
-        whenever(getBannersUseCase()).thenReturn(listOf(banner1))
+        whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
 
         initViewModel()
 
@@ -101,7 +100,7 @@ class BannerWidgetViewModelTest {
 
     @Test
     fun `test that empty list is returned when loading fails`() = runTest {
-        whenever(getBannersUseCase()).thenThrow(RuntimeException("Network error"))
+        whenever(getPromoBannersUseCase()).thenThrow(RuntimeException("Network error"))
 
         initViewModel()
 
@@ -115,7 +114,7 @@ class BannerWidgetViewModelTest {
     @Test
     fun `test that dismissBanner calls use case`() = runTest {
         val bannerList = listOf(banner1, banner2)
-        whenever(getBannersUseCase()).thenReturn(bannerList)
+        whenever(getPromoBannersUseCase()).thenReturn(bannerList)
         whenever(dismissBannerUseCase(1)).thenReturn(Unit)
 
         initViewModel()
@@ -128,7 +127,7 @@ class BannerWidgetViewModelTest {
     @Test
     fun `test that dismissBanner removes banner from list`() = runTest {
         val bannerList = listOf(banner1, banner2)
-        whenever(getBannersUseCase()).thenReturn(bannerList)
+        whenever(getPromoBannersUseCase()).thenReturn(bannerList)
         whenever(dismissBannerUseCase(1)).thenReturn(Unit)
 
         initViewModel()
@@ -147,7 +146,7 @@ class BannerWidgetViewModelTest {
 
     @Test
     fun `test that dismissing last banner results in empty list`() = runTest {
-        whenever(getBannersUseCase()).thenReturn(listOf(banner1))
+        whenever(getPromoBannersUseCase()).thenReturn(listOf(banner1))
         whenever(dismissBannerUseCase(1)).thenReturn(Unit)
 
         initViewModel()
@@ -167,7 +166,7 @@ class BannerWidgetViewModelTest {
     @Test
     fun `test that dismissBanner failure keeps current list`() = runTest {
         val bannerList = listOf(banner1, banner2)
-        whenever(getBannersUseCase()).thenReturn(bannerList)
+        whenever(getPromoBannersUseCase()).thenReturn(bannerList)
         whenever(dismissBannerUseCase(1)).thenThrow(RuntimeException("Dismiss failed"))
 
         initViewModel()

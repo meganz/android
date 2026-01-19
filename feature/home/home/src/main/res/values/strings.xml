@@ -42,4 +42,7 @@
 
     <!-- Label to reference a recents section -->
     <string name="section_recents">Recents</string>
+
+    <!-- Label to reference Banner section -->
+    <string name="section_banners">Banners</string>
 </resources>

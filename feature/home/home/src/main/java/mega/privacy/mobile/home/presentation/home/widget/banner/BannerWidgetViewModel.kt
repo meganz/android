@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.banner.DismissBannerUseCase
-import mega.privacy.android.domain.usecase.banner.GetBannersUseCase
+import mega.privacy.android.domain.usecase.banner.GetPromoBannersUseCase
 import mega.privacy.mobile.home.presentation.home.widget.banner.model.BannerUiState
 import timber.log.Timber
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class BannerWidgetViewModel @Inject constructor(
-    private val getBannersUseCase: GetBannersUseCase,
+    private val getPromoBannersUseCase: GetPromoBannersUseCase,
     private val dismissBannerUseCase: DismissBannerUseCase,
 ) : ViewModel() {
 
@@ -38,8 +38,9 @@ class BannerWidgetViewModel @Inject constructor(
             _uiState.update {
                 it.copy(isLoading = true)
             }
+
             runCatching {
-                getBannersUseCase()
+                getPromoBannersUseCase()
             }.onSuccess { bannerList ->
                 _uiState.update {
                     it.copy(

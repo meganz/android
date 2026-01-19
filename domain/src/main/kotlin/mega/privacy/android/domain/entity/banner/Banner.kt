@@ -18,4 +18,5 @@ data class Banner(
     val backgroundImage: String,
     val url: String,
     val imageLocation: String,
+    val buttonText: String?
 )

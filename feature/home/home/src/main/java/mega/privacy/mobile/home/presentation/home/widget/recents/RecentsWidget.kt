@@ -60,7 +60,7 @@ import javax.inject.Inject
 class RecentsWidget @Inject constructor() : HomeWidget {
 
     override val identifier: String = "RecentsWidgetProvider"
-    override val defaultOrder: Int = 2
+    override val defaultOrder: Int = 3
     override val canDelete: Boolean = false
     override suspend fun getWidgetName() = LocalizedText.StringRes(R.string.section_recents)
 
