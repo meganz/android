@@ -73,6 +73,7 @@ import mega.privacy.android.shared.original.core.ui.controls.chip.ChipBar
 import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.android.shared.original.core.ui.utils.ComposableLifecycle
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AndroidBackupFABButtonPressedEvent
@@ -328,6 +329,7 @@ private fun SyncListScreenContent(
         onRefresh = {
             syncFoldersViewModel.onSyncRefresh()
         })
+    val isSyncNotEmpty = syncFoldersUiState.syncUiItems.isNotEmpty()
 
     Column(modifier) {
         if (syncFoldersUiState.isStorageOverQuota) {
@@ -362,7 +364,9 @@ private fun SyncListScreenContent(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .pullRefresh(pullToRefreshState)
+                .conditional(isSyncNotEmpty) {
+                    pullRefresh(pullToRefreshState)
+                }
         ) {
             SelectedChipScreen(
                 onAddNewSyncClicked = onAddNewSyncClicked,
@@ -382,11 +386,13 @@ private fun SyncListScreenContent(
                 snackBarHostState = snackBarHostState,
                 deviceName = deviceName,
             )
-            PullRefreshIndicator(
-                modifier = Modifier.align(Alignment.TopCenter),
-                refreshing = syncFoldersUiState.isRefreshing,
-                state = pullToRefreshState
-            )
+            if (isSyncNotEmpty) {
+                PullRefreshIndicator(
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    refreshing = syncFoldersUiState.isRefreshing,
+                    state = pullToRefreshState
+                )
+            }
         }
     }
 }
