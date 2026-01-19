@@ -168,4 +168,11 @@ interface VideoSectionRepository {
      * @return favourites video playlist
      */
     suspend fun getFavouritePlaylist(order: SortOrder): FavouritesVideoPlaylist
+
+    /**
+     * Get video playlist titles
+     *
+     * @return list of video playlist titles
+     */
+    suspend fun getVideoPlaylistTitles(): List<String>
 }

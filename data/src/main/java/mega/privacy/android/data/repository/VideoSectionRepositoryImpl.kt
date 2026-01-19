@@ -469,6 +469,13 @@ internal class VideoSectionRepositoryImpl @Inject constructor(
             getFavouritesVideoPlaylist(order, offlineItems)
         }
 
+    override suspend fun getVideoPlaylistTitles(): List<String> =
+        if (videoPlaylistsMap.isNotEmpty()) {
+            videoPlaylistsMap.values.map { it.name }
+        } else {
+            getAllUserSets().map { it.name }
+        }
+
     companion object {
         private const val PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS =
             "PREFERENCE_KEY_RECENTLY_WATCHED_VIDEOS"

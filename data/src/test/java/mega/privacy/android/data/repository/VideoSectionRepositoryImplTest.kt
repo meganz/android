@@ -199,7 +199,7 @@ class VideoSectionRepositoryImplTest {
         }
 
     private suspend fun initEmptyFavouritesVideoPlaylist(
-        favouritePlaylist: FavouritesVideoPlaylist = mock()
+        favouritePlaylist: FavouritesVideoPlaylist = mock(),
     ) {
         val filter = mock<MegaSearchFilter>()
         val token = mock<MegaCancelToken>()
@@ -990,4 +990,41 @@ class VideoSectionRepositoryImplTest {
         val result = underTest.getFavouritePlaylist(SortOrder.ORDER_NONE)
         assertThat(result).isEqualTo(testFavouritePlaylist)
     }
+
+    @Test
+    fun `test that getVideoPlaylistTitles returns correct list of titles`() = runTest {
+        val megaSet1 = createMegaSet(1L)
+        val megaSet2 = createMegaSet(2L)
+
+        val megaSetList = mock<MegaSetList> {
+            on { size() }.thenReturn(2L)
+            on { get(0) }.thenReturn(megaSet1)
+            on { get(1) }.thenReturn(megaSet2)
+        }
+
+        val megaSetElementList = mock<MegaSetElementList> {
+            on { size() }.thenReturn(0L)
+        }
+
+        initReturnValues(megaSetList, megaSetElementList)
+
+        val result = underTest.getVideoPlaylistTitles()
+        assertThat(result).containsExactly(
+            megaSet1.name(),
+            megaSet2.name()
+        )
+    }
+
+    @Test
+    fun `test that getVideoPlaylistTitles returns correct list of titles when playlists is empty`() =
+        runTest {
+            val emptyMegaSetList = mock<MegaSetList> {
+                on { size() }.thenReturn(0)
+            }
+            whenever(megaApiGateway.getSets()).thenReturn(emptyMegaSetList)
+            underTest.getVideoPlaylistSets() // This clears videoPlaylistsMap
+
+            val result = underTest.getVideoPlaylistTitles()
+            assertThat(result).isEmpty()
+        }
 }

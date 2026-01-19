@@ -8,6 +8,7 @@ import javax.inject.Inject
  * Use Case to create a video playlist
  */
 class CreateVideoPlaylistUseCase @Inject constructor(
+    private val validatePlaylistNameUseCase: ValidatePlaylistNameUseCase,
     private val videoSectionRepository: VideoSectionRepository,
 ) {
     /**
@@ -15,6 +16,8 @@ class CreateVideoPlaylistUseCase @Inject constructor(
      *
      * @param title The title of the new video playlist.
      */
-    suspend operator fun invoke(title: String): VideoPlaylist =
-        videoSectionRepository.createVideoPlaylist(title)
+    suspend operator fun invoke(title: String): VideoPlaylist {
+        validatePlaylistNameUseCase(title)
+        return videoSectionRepository.createVideoPlaylist(title)
+    }
 }
