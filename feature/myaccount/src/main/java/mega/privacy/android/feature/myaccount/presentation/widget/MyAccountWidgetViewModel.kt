@@ -72,7 +72,7 @@ class MyAccountWidgetViewModel @Inject constructor(
                 totalStorage = storageDetail?.totalStorage ?: 0L,
                 usedStoragePercentage = usedPercentage,
                 storageState = storageState,
-                storageQuotaLevel = quotaLevelMapper(usedPercentage, storageState),
+                storageQuotaLevel = quotaLevelMapper(storageState),
                 accountTypeNameResource = accountTypeNameMapper(accountDetail.levelDetail?.accountType),
                 avatarFile = avatarFile,
                 avatarColor = avatarColor?.let { color -> Color(color) } ?: Color.Unspecified,

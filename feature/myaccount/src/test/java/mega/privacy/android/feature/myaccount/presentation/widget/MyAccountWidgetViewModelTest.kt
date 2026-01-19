@@ -331,16 +331,13 @@ class MyAccountWidgetViewModelTest {
         assertThat(state.avatarFile).isNull()
     }
 
-    @ParameterizedTest(name = "usedPercentage: {0}, storageState: {1}, expected: {2}")
+    @ParameterizedTest(name = "storageState: {0}, expected: {1}")
     @MethodSource("quotaLevelTestCases")
     fun `test that quota level is calculated correctly`(
-        usedPercentage: Int,
         storageState: StorageState?,
         expectedQuotaLevel: QuotaLevel,
     ) = runTest {
         val accountDetail = createAccountDetail(
-            usedStorage = (usedPercentage * 10).toLong(),
-            totalStorage = 1000L,
             accountType = AccountType.FREE
         )
 
@@ -393,7 +390,7 @@ class MyAccountWidgetViewModelTest {
         avatarColor: Int? = null,
         avatarColorThrows: Throwable? = null,
         accountTypeMapper: ((AccountType?) -> Int)? = null,
-        quotaLevelMapperFunc: ((Int, StorageState?) -> QuotaLevel)? = null,
+        quotaLevelMapperFunc: ((StorageState?) -> QuotaLevel)? = null,
     ) {
         val defaultAccountDetail = createAccountDetail()
         whenever(monitorAccountDetailUseCase()).thenReturn(
@@ -426,13 +423,12 @@ class MyAccountWidgetViewModelTest {
             accountTypeMapper?.invoke(invocation.getArgument(0)) ?: 0
         }
 
-        whenever(quotaLevelMapper(any(), any())).thenAnswer { invocation ->
-            val usedPercentage = invocation.getArgument<Int>(0)
-            val storageState = invocation.getArgument<StorageState?>(1)
-            quotaLevelMapperFunc?.invoke(usedPercentage, storageState)
-                ?: when {
-                    storageState == StorageState.Red || usedPercentage >= 90 -> QuotaLevel.Error
-                    storageState == StorageState.Orange || usedPercentage >= 80 -> QuotaLevel.Warning
+        whenever(quotaLevelMapper(any())).thenAnswer { invocation ->
+            val storageState = invocation.getArgument<StorageState?>(0)
+            quotaLevelMapperFunc?.invoke(storageState)
+                ?: when (storageState) {
+                    StorageState.Red -> QuotaLevel.Error
+                    StorageState.Orange -> QuotaLevel.Warning
                     else -> QuotaLevel.Success
                 }
         }
@@ -485,18 +481,14 @@ class MyAccountWidgetViewModelTest {
     companion object {
         @JvmStatic
         fun quotaLevelTestCases(): Stream<Arguments> = Stream.of(
-            // usedPercentage, storageState, expectedQuotaLevel
-            Arguments.of(50, null, QuotaLevel.Success),
-            Arguments.of(79, null, QuotaLevel.Success),
-            Arguments.of(80, null, QuotaLevel.Warning),
-            Arguments.of(85, null, QuotaLevel.Warning),
-            Arguments.of(90, null, QuotaLevel.Error),
-            Arguments.of(95, null, QuotaLevel.Error),
-            Arguments.of(50, StorageState.Green, QuotaLevel.Success),
-            Arguments.of(50, StorageState.Orange, QuotaLevel.Warning),
-            Arguments.of(50, StorageState.Red, QuotaLevel.Error),
-            Arguments.of(85, StorageState.Orange, QuotaLevel.Warning),
-            Arguments.of(95, StorageState.Red, QuotaLevel.Error),
+            // storageState, expectedQuotaLevel
+            Arguments.of(null, QuotaLevel.Success),
+            Arguments.of(StorageState.Green, QuotaLevel.Success),
+            Arguments.of(StorageState.Unknown, QuotaLevel.Success),
+            Arguments.of(StorageState.Change, QuotaLevel.Success),
+            Arguments.of(StorageState.PayWall, QuotaLevel.Success),
+            Arguments.of(StorageState.Orange, QuotaLevel.Warning),
+            Arguments.of(StorageState.Red, QuotaLevel.Error),
         )
     }
 }
