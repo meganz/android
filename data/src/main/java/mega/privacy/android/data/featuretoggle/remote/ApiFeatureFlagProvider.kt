@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.featureflag.FlagMapper
+import mega.privacy.android.data.qualifier.FeatureFlagCache
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.featureflag.ApiFeature
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
@@ -30,10 +31,15 @@ internal class ApiFeatureFlagProvider @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val flagMapper: FlagMapper,
     private val accountRepository: AccountRepository,
+    @FeatureFlagCache private val featureFlagCache: HashMap<Feature, Boolean?>,
 ) : FeatureFlagValueProvider {
     override suspend fun isEnabled(feature: Feature): Boolean? =
         withContext(ioDispatcher) {
             if (feature is ApiFeature && feature.checkRemote) {
+                if (featureFlagCache.containsKey(feature) && feature.singleCheckPerRun) {
+                    return@withContext featureFlagCache[feature]
+                }
+
                 // Fail-safe: Call getUserData if not called already. This will trigger EVENT_MISC_FLAGS_READY event
                 accountRepository.getCurrentMiscState()
                     .takeIf { it is MiscLoadedState.NotLoaded }
@@ -48,7 +54,7 @@ internal class ApiFeatureFlagProvider @Inject constructor(
                     }
                     .firstOrNull() ?: return@withContext null
 
-                megaApiGateway.getFlag(
+                val result = megaApiGateway.getFlag(
                     feature.experimentName, commit = true
                 )?.let { megaFlag ->
                     flagMapper(megaFlag).group
@@ -57,6 +63,12 @@ internal class ApiFeatureFlagProvider @Inject constructor(
                         it
                     )
                 }
+
+                if (feature.singleCheckPerRun && result != null) {
+                    featureFlagCache[feature] = result
+                }
+
+                result
             } else {
                 null
             }

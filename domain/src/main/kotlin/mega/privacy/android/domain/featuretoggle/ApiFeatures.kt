@@ -16,6 +16,7 @@ enum class ApiFeatures(
     override val description: String,
     private val defaultValue: Boolean,
     override val checkRemote: Boolean = true,
+    override val singleCheckPerRun: Boolean = false,
 ) : ApiFeature {
     /**
      * Call unlimited for pro users

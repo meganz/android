@@ -17,6 +17,11 @@ interface ApiFeature : Feature {
     val checkRemote: Boolean
 
     /**
+     * whether this feature should be checked only once per app run
+     */
+    val singleCheckPerRun: Boolean
+
+    /**
      * map value to boolean
      */
     fun mapValue(input: GroupFlagTypes): Boolean = when (input) {

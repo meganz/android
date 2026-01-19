@@ -44,21 +44,25 @@ class ApiFeatureFlagProviderTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val flagMapper = mock<FlagMapper>()
     private val accountRepository = mock<AccountRepository>()
+    private val featureFlagCache = hashMapOf<Feature, Boolean?>()
 
     @BeforeEach
     internal fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        featureFlagCache.clear()
         underTest = ApiFeatureFlagProvider(
             ioDispatcher = UnconfinedTestDispatcher(),
             megaApiGateway = megaApiGateway,
             flagMapper = flagMapper,
-            accountRepository = accountRepository
+            accountRepository = accountRepository,
+            featureFlagCache = featureFlagCache
         )
     }
 
     @AfterEach
     internal fun tearDown() {
         Dispatchers.resetMain()
+        featureFlagCache.clear()
         reset(megaApiGateway, flagMapper, accountRepository)
     }
 
@@ -74,6 +78,7 @@ class ApiFeatureFlagProviderTest {
     internal fun `test that null is returned if check remote is false`() = runTest {
         val feature = mock<ApiFeature> {
             on { checkRemote } doReturn false
+            on { singleCheckPerRun } doReturn false
         }
         assertThat(underTest.isEnabled(feature)).isNull()
     }
@@ -83,6 +88,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { singleCheckPerRun } doReturn false
             on { mapValue(GroupFlagTypes.Enabled) } doReturn true
         }
         val megaFlag = mock<MegaFlag> {
@@ -107,6 +113,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { singleCheckPerRun } doReturn false
             on { mapValue(GroupFlagTypes.Disabled) } doReturn false
         }
         val megaFlag = mock<MegaFlag> {
@@ -132,6 +139,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { singleCheckPerRun } doReturn false
             on { mapValue(GroupFlagTypes.Enabled) } doReturn true
         }
 
@@ -162,6 +170,7 @@ class ApiFeatureFlagProviderTest {
             val feature = mock<ApiFeature> {
                 on { experimentName } doReturn "chmon"
                 on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn false
                 on { mapValue(GroupFlagTypes.Enabled) } doReturn true
             }
 
@@ -190,6 +199,7 @@ class ApiFeatureFlagProviderTest {
         val feature = mock<ApiFeature> {
             on { experimentName } doReturn "chmon"
             on { checkRemote } doReturn true
+            on { singleCheckPerRun } doReturn false
             on { mapValue(GroupFlagTypes.Enabled) } doReturn true
         }
 
@@ -219,4 +229,152 @@ class ApiFeatureFlagProviderTest {
 
         job.await()
     }
+
+    @Test
+    fun `test that cached value is returned when singleCheckPerRun is true and feature is in cache`() =
+        runTest {
+            val feature = mock<ApiFeature> {
+                on { experimentName } doReturn "chmon"
+                on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn true
+            }
+
+            // Pre-populate cache
+            featureFlagCache[feature] = true
+
+            val result = underTest.isEnabled(feature)
+
+            assertThat(result).isTrue()
+            verifyNoInteractions(megaApiGateway)
+            verifyNoInteractions(accountRepository)
+        }
+
+    @Test
+    fun `test that remote is checked when singleCheckPerRun is false even if feature is in cache`() =
+        runTest {
+            val feature = mock<ApiFeature> {
+                on { experimentName } doReturn "chmon"
+                on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn false
+                on { mapValue(GroupFlagTypes.Enabled) } doReturn true
+            }
+
+            // Pre-populate cache
+            featureFlagCache[feature] = false
+
+            val megaFlag = mock<MegaFlag> {
+                on { group } doReturn 1L
+            }
+            val flag = mock<Flag> {
+                on { group } doReturn GroupFlagTypes.Enabled
+            }
+            whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+            whenever(flagMapper(megaFlag)).thenReturn(flag)
+            accountRepository.stub {
+                on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+                on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+            }
+
+            val result = underTest.isEnabled(feature)
+
+            assertThat(result).isTrue()
+            verify(megaApiGateway).getFlag(feature.experimentName, true)
+        }
+
+    @Test
+    fun `test that result is cached when singleCheckPerRun is true and result is not null`() =
+        runTest {
+            val feature = mock<ApiFeature> {
+                on { experimentName } doReturn "chmon"
+                on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn true
+                on { mapValue(GroupFlagTypes.Enabled) } doReturn true
+            }
+
+            val megaFlag = mock<MegaFlag> {
+                on { group } doReturn 1L
+            }
+            val flag = mock<Flag> {
+                on { group } doReturn GroupFlagTypes.Enabled
+            }
+            whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+            whenever(flagMapper(megaFlag)).thenReturn(flag)
+            accountRepository.stub {
+                on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+                on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+            }
+
+            val result = underTest.isEnabled(feature)
+
+            assertThat(result).isTrue()
+            assertThat(featureFlagCache[feature]).isTrue()
+        }
+
+    @Test
+    fun `test that result is not cached when singleCheckPerRun is false`() = runTest {
+        val feature = mock<ApiFeature> {
+            on { experimentName } doReturn "chmon"
+            on { checkRemote } doReturn true
+            on { singleCheckPerRun } doReturn false
+            on { mapValue(GroupFlagTypes.Enabled) } doReturn true
+        }
+
+        val megaFlag = mock<MegaFlag> {
+            on { group } doReturn 1L
+        }
+        val flag = mock<Flag> {
+            on { group } doReturn GroupFlagTypes.Enabled
+        }
+        whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(megaFlag)
+        whenever(flagMapper(megaFlag)).thenReturn(flag)
+        accountRepository.stub {
+            on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+            on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+        }
+
+        val result = underTest.isEnabled(feature)
+
+        assertThat(result).isTrue()
+        assertThat(featureFlagCache.containsKey(feature)).isFalse()
+    }
+
+    @Test
+    fun `test that result is not cached when singleCheckPerRun is true but result is null`() =
+        runTest {
+            val feature = mock<ApiFeature> {
+                on { experimentName } doReturn "chmon"
+                on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn true
+            }
+
+            whenever(megaApiGateway.getFlag(feature.experimentName, true)).thenReturn(null)
+            accountRepository.stub {
+                on { monitorMiscState() } doReturn flowOf(MiscLoadedState.FlagsReady)
+                on { getCurrentMiscState() } doReturn MiscLoadedState.FlagsReady
+            }
+
+            val result = underTest.isEnabled(feature)
+
+            assertThat(result).isNull()
+            assertThat(featureFlagCache.containsKey(feature)).isFalse()
+        }
+
+    @Test
+    fun `test that remote is not called when cached value exists for singleCheckPerRun feature`() =
+        runTest {
+            val feature = mock<ApiFeature> {
+                on { experimentName } doReturn "chmon"
+                on { checkRemote } doReturn true
+                on { singleCheckPerRun } doReturn true
+            }
+
+            // Pre-populate cache with false
+            featureFlagCache[feature] = false
+
+            val result = underTest.isEnabled(feature)
+
+            assertThat(result).isFalse()
+            verifyNoInteractions(megaApiGateway)
+            verifyNoInteractions(accountRepository)
+        }
 }

@@ -10,9 +10,11 @@ import mega.privacy.android.data.cache.ExpiringCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
+import mega.privacy.android.data.qualifier.FeatureFlagCache
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
 import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.banner.Banner
 import mega.privacy.android.domain.entity.billing.MegaPurchase
@@ -94,4 +96,9 @@ internal object LocalCacheModule {
     @Singleton
     @DisplayPathFromUriCache
     fun provideDisplayPathFromUriCache(): HashMap<String, String> = hashMapOf()
+
+    @FeatureFlagCache
+    @Provides
+    @Singleton
+    fun provideFeatureFlagCache(): HashMap<Feature, Boolean?> = hashMapOf()
 }
