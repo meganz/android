@@ -86,12 +86,10 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
-import mega.privacy.android.navigation.contract.transition.slideBackwardTransition
-import mega.privacy.android.navigation.contract.transition.slideForwardTransition
+import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.mobile.home.presentation.home.Home
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -347,9 +345,9 @@ class MegaActivity : ComponentActivity() {
 
                                             passcodeView(passcodeCryptObjectFactory)
                                         },
-                                        transitionSpec = { slideForwardTransition },
-                                        popTransitionSpec = { slideBackwardTransition },
-                                        predictivePopTransitionSpec = { slideBackwardTransition }
+                                        transitionSpec = { fadeTransition },
+                                        popTransitionSpec = { fadeTransition },
+                                        predictivePopTransitionSpec = { fadeTransition }
                                     )
 
                                     StartTransferComponent(

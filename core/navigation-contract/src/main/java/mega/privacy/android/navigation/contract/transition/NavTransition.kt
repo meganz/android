@@ -34,4 +34,4 @@ val fadeTransition = fadeIn(
     animationSpec = tween(FADE_ANIM_DURATION_MS)
 )
 
-private const val FADE_ANIM_DURATION_MS = 700
+private const val FADE_ANIM_DURATION_MS = 500

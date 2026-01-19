@@ -1,6 +1,5 @@
 package mega.privacy.android.app.appstate.content.navigation.view
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -33,7 +31,6 @@ import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.transition.OrientationAwareSlideTransitionSceneStrategy
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
@@ -53,11 +50,6 @@ fun HomeScreens(
     val storageUiState by storageStateViewModel.state.collectAsStateWithLifecycle()
     var handledStorageState by rememberSaveable { mutableStateOf(StorageState.Unknown) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val localConfiguration = LocalConfiguration.current
-    val isLandscapeMode = localConfiguration.orientation == Configuration.ORIENTATION_LANDSCAPE
-    val slideTransitionSceneStrategy = remember(isLandscapeMode) {
-        OrientationAwareSlideTransitionSceneStrategy<NavKey>(isLandscapeMode)
-    }
     var isNetworkChangeHandled by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(storageUiState.storageState) {
@@ -134,7 +126,6 @@ fun HomeScreens(
                                     rememberSaveableStateHolderNavEntryDecorator(),
                                     rememberViewModelStoreNavEntryDecorator()
                                 ),
-                                sceneStrategy = slideTransitionSceneStrategy,
                                 entryProvider = entryProvider({
                                     fallback(
                                         unknownKey = it,
@@ -150,6 +141,8 @@ fun HomeScreens(
                                         )
                                     }
                                 },
+                                transitionSpec = { fadeTransition },
+                                popTransitionSpec = { fadeTransition },
                                 predictivePopTransitionSpec = { fadeTransition }
                             )
                             MiniAudioPlayerView(
