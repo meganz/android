@@ -16,7 +16,6 @@ internal fun CameraUploadStatusToolbarAction(
     isCuCompleteStatusVisible: Boolean,
     cameraUploadsStatus: CUStatusUiState,
     setCameraUploadsMessage: (message: String) -> Unit,
-    updateIsWarningBannerShown: (value: Boolean) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     modifier: Modifier = Modifier,
@@ -27,8 +26,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG),
                 type = CameraUploadsStatusType.Warning,
-                shouldShowRipple = false,
-                onClick = { updateIsWarningBannerShown(true) }
+                enabled = false
             )
         }
 
@@ -56,8 +54,7 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG),
                 type = CameraUploadsStatusType.Sync,
-                shouldShowRipple = false,
-                onClick = {}
+                enabled = false
             )
         }
 
@@ -76,9 +73,8 @@ internal fun CameraUploadStatusToolbarAction(
             CameraUploadsStatusIcon(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG),
                 type = CameraUploadsStatusType.UploadComplete,
-                shouldShowRipple = false,
                 progress = { 1F },
-                onClick = {}
+                enabled = false
             )
         }
     }

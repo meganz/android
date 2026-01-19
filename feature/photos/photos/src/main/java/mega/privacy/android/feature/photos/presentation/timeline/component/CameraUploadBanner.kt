@@ -58,9 +58,8 @@ internal fun CameraUploadsBanner(
     shouldShowEnableCUBanner: Boolean,
     shouldShowCUWarningBanner: Boolean,
     onEnableCameraUploads: () -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
+    onDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onDismissWarningBanner: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateUpgradeScreen: () -> Unit,
@@ -70,7 +69,7 @@ internal fun CameraUploadsBanner(
             if (shouldShowEnableCUBanner) {
                 EnableCameraUploadsBanner(
                     onEnableCUClick = onEnableCameraUploads,
-                    onDismissRequest = onDismissEnableCameraUploadsBanner
+                    onDismissRequest = { onDismissRequest(bannerType) }
                 )
             }
         }
@@ -79,14 +78,14 @@ internal fun CameraUploadsBanner(
             if (shouldShowCUWarningBanner) {
                 CameraUploadsNoFullAccessBanner(
                     onClick = onChangeCameraUploadsPermissions,
-                    onClose = onDismissWarningBanner,
+                    onClose = { onDismissRequest(bannerType) },
                 )
             }
         }
 
         CameraUploadsBannerType.LowBattery -> {
             if (shouldShowCUWarningBanner) {
-                LowBatteryPausedBanner(onClose = onDismissWarningBanner)
+                LowBatteryPausedBanner(onClose = { onDismissRequest(bannerType) })
             }
         }
 

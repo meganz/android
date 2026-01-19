@@ -36,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -94,9 +93,8 @@ internal fun TimelineTabRoute(
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -120,9 +118,8 @@ internal fun TimelineTabRoute(
         onSortOptionChange = onSortOptionChange,
         onPhotoClick = onPhotoClick,
         onPhotoSelected = onPhotoSelected,
-        onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-        updateIsWarningBannerShown = updateIsWarningBannerShown,
+        onCUBannerDismissRequest = onCUBannerDismissRequest,
         onTabsVisibilityChange = onTabsVisibilityChange,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
@@ -145,9 +142,8 @@ internal fun TimelineTabScreen(
     onSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -183,7 +179,6 @@ internal fun TimelineTabScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             handleCameraUploadsPermissionsResult()
         }
-    var isWarningBannerStateValid by rememberSaveable { mutableStateOf(false) }
 
     if (uiState.isLoading.not()) {
         LaunchedEffect(shouldScrollToIndex, selectedTimePeriod) {
@@ -203,18 +198,6 @@ internal fun TimelineTabScreen(
                 timelineLazyListState.scrollToItem(index = index)
                 shouldScrollToIndex = -1
             }
-        }
-
-        LaunchedEffect(
-            mediaCameraUploadUiState.isCameraUploadsLimitedAccess,
-            mediaCameraUploadUiState.cameraUploadsFinishedReason,
-            mediaCameraUploadUiState.isWarningBannerShown
-        ) {
-            isWarningBannerStateValid = mediaCameraUploadUiState.isWarningBannerShown &&
-                    isCUBannerTypeValidForWarningBanner(
-                        bannerType = cuBannerType,
-                        mediaCameraUploadUiState = mediaCameraUploadUiState
-                    )
         }
 
         LaunchedEffect(
@@ -281,7 +264,7 @@ internal fun TimelineTabScreen(
         uiState.displayedPhotos.isEmpty() -> {
             EmptyBody(
                 modifier = Modifier.testTag(TIMELINE_TAB_SCREEN_EMPTY_BODY_TAG),
-                enableCameraUploadButtonShowing = mediaCameraUploadUiState.enableCameraUploadButtonShowing,
+                enableCameraUploadButtonShowing = mediaCameraUploadUiState.status is CUStatusUiState.Disabled,
                 mediaSource = timelineFilterUiState.mediaSource,
                 setEnableCUPage = setEnableCUPage,
             )
@@ -292,8 +275,8 @@ internal fun TimelineTabScreen(
                 modifier = modifier,
                 contentPadding = contentPadding,
                 uiState = uiState,
-                shouldShowEnableCUBanner = mediaCameraUploadUiState.shouldShowEnableCUBanner,
-                shouldShowCUWarningBanner = isWarningBannerStateValid,
+                shouldShowEnableCUBanner = mediaCameraUploadUiState.shouldShowCUBanner && mediaCameraUploadUiState.status is CUStatusUiState.Disabled,
+                shouldShowCUWarningBanner = mediaCameraUploadUiState.shouldShowCUBanner && mediaCameraUploadUiState.status is CUStatusUiState.Warning,
                 lazyGridState = timelineLazyListState.lazyGridState,
                 lazyListState = timelineLazyListState.lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
@@ -326,12 +309,11 @@ internal fun TimelineTabScreen(
                             monthsCardPhotos = uiState.monthsCardPhotos,
                         )
                 },
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 onChangeCameraUploadsPermissions = {
                     val cameraUploadsPermissions = getCameraUploadsPermissions()
                     cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
                 },
-                onDismissWarningBanner = { updateIsWarningBannerShown(false) },
+                onCUBannerDismissRequest = onCUBannerDismissRequest,
                 onNavigateToCameraUploadsSettings = {
                     onNavigateToCameraUploadsSettings(
                         LegacySettingsCameraUploadsActivityNavKey()
@@ -410,9 +392,8 @@ private fun TimelineTabContent(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
-    onDismissWarningBanner: () -> Unit,
+    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateToUpgradeScreen: () -> Unit,
@@ -448,9 +429,8 @@ private fun TimelineTabContent(
                                 shouldShowEnableCUBanner = shouldShowEnableCUBanner,
                                 shouldShowCUWarningBanner = shouldShowCUWarningBanner,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
-                                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                                onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                                onDismissWarningBanner = onDismissWarningBanner,
                                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                                 onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
@@ -481,9 +461,8 @@ private fun TimelineTabContent(
                                 shouldShowEnableCUBanner = shouldShowEnableCUBanner,
                                 shouldShowCUWarningBanner = shouldShowCUWarningBanner,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
-                                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                                onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                                onDismissWarningBanner = onDismissWarningBanner,
                                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                                 onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
@@ -552,7 +531,7 @@ private fun getCameraUploadsBannerType(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
 ): CameraUploadsBannerType {
     return when {
-        mediaCameraUploadUiState.enableCameraUploadButtonShowing ->
+        mediaCameraUploadUiState.status is CUStatusUiState.Disabled ->
             CameraUploadsBannerType.EnableCameraUploads
 
         mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
@@ -567,7 +546,7 @@ private fun getCameraUploadsBannerType(
         mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
             -> CameraUploadsBannerType.DeviceChargingNotMet
 
-        mediaCameraUploadUiState.isCameraUploadsLimitedAccess -> CameraUploadsBannerType.NoFullAccess
+        mediaCameraUploadUiState.status is CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess -> CameraUploadsBannerType.NoFullAccess
 
         mediaCameraUploadUiState.status is CUStatusUiState.Sync ->
             CameraUploadsBannerType.CheckingUploads
@@ -577,27 +556,6 @@ private fun getCameraUploadsBannerType(
 
         else -> CameraUploadsBannerType.NONE
     }
-}
-
-private fun isCUBannerTypeValidForWarningBanner(
-    bannerType: CameraUploadsBannerType,
-    mediaCameraUploadUiState: MediaCameraUploadUiState,
-) = when (bannerType) {
-    CameraUploadsBannerType.FullStorage ->
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
-
-    CameraUploadsBannerType.NetworkRequirementNotMet ->
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
-
-    CameraUploadsBannerType.NoFullAccess -> mediaCameraUploadUiState.isCameraUploadsLimitedAccess
-
-    CameraUploadsBannerType.DeviceChargingNotMet ->
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET
-
-    CameraUploadsBannerType.LowBattery ->
-        mediaCameraUploadUiState.cameraUploadsFinishedReason == CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW
-
-    else -> false
 }
 
 private fun getCameraUploadsPermissions() =
@@ -655,9 +613,8 @@ private fun TimelineTabScreenPreview() {
             onSortOptionChange = {},
             onPhotoClick = {},
             onPhotoSelected = {},
-            onDismissEnableCameraUploadsBanner = {},
             handleCameraUploadsPermissionsResult = {},
-            updateIsWarningBannerShown = {},
+            onCUBannerDismissRequest = {},
             onTabsVisibilityChange = {},
             onNavigateToUpgradeAccount = {},
             onPhotoTimePeriodSelected = {}

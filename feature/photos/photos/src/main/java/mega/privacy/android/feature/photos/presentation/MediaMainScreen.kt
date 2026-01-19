@@ -92,6 +92,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabView
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
+import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
@@ -291,13 +292,12 @@ fun MediaMainRoute(
             mediaCameraUploadViewModel.setCameraUploadsCompletedMessage(false)
         },
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-        onDismissEnableCameraUploadsBanner = mediaCameraUploadViewModel::dismissEnableCUBanner,
         multiNodeActionHandler = selectionModeActionHandler,
         navigateToMediaSearch = navigationHandler::navigate,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
         setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
-        updateIsWarningBannerShown = mediaCameraUploadViewModel::updateIsWarningBannerShown,
+        onCUBannerDismissRequest = mediaCameraUploadViewModel::dismissCUBanner,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected,
         onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
@@ -330,10 +330,9 @@ fun MediaMainScreen(
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
     setCameraUploadsMessage: (message: String) -> Unit,
-    updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
@@ -394,9 +393,9 @@ fun MediaMainScreen(
     var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val isCuDefaultStatusVisible by remember(mediaCameraUploadUiState.enableCameraUploadButtonShowing) {
+    val isCuDefaultStatusVisible by remember(mediaCameraUploadUiState.status) {
         derivedStateOf {
-            mediaCameraUploadUiState.enableCameraUploadButtonShowing
+            mediaCameraUploadUiState.status is CUStatusUiState.Disabled
         }
     }
     val isCuWarningStatusVisible by remember(
@@ -637,7 +636,6 @@ fun MediaMainScreen(
                                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
                                 cameraUploadsStatus = mediaCameraUploadUiState.status,
                                 setCameraUploadsMessage = setCameraUploadsMessage,
-                                updateIsWarningBannerShown = updateIsWarningBannerShown,
                                 onNavigateToCameraUploadsSettings = {
                                     onNavigateToCameraUploadsSettings(
                                         LegacySettingsCameraUploadsActivityNavKey()
@@ -682,7 +680,7 @@ fun MediaMainScreen(
                                 )
                             }
 
-                            if (!mediaCameraUploadUiState.enableCameraUploadButtonShowing) {
+                            if (mediaCameraUploadUiState.status !is CUStatusUiState.Disabled) {
                                 add(
                                     MenuActionWithClick(
                                         menuAction = MediaAppBarAction.CameraUploadsSettings,
@@ -844,10 +842,9 @@ fun MediaMainScreen(
                                         clearCameraUploadsMessage = clearCameraUploadsMessage,
                                         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                                         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                                        onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                                         navigationHandler = navigationHandler,
                                         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                                        updateIsWarningBannerShown = updateIsWarningBannerShown,
+                                        onCUBannerDismissRequest = onCUBannerDismissRequest,
                                         onTabsVisibilityChange = { shouldHideTabs = it },
                                         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                                         onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
@@ -972,10 +969,9 @@ private fun MediaScreen.MediaContent(
     clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
-    onDismissEnableCameraUploadsBanner: () -> Unit,
     navigationHandler: NavigationHandler,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    updateIsWarningBannerShown: (value: Boolean) -> Unit,
+    onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -1005,9 +1001,8 @@ private fun MediaScreen.MediaContent(
                 onSortOptionChange = onTimelineSortOptionChange,
                 onPhotoClick = onTimelinePhotoClick,
                 onPhotoSelected = onTimelinePhotoSelected,
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                updateIsWarningBannerShown = updateIsWarningBannerShown,
+                onCUBannerDismissRequest = onCUBannerDismissRequest,
                 onTabsVisibilityChange = onTabsVisibilityChange,
                 onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                 onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
@@ -1086,7 +1081,6 @@ fun PhotosMainScreenPreview() {
             clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
             onNavigateToCameraUploadsSettings = {},
-            onDismissEnableCameraUploadsBanner = {},
             multiNodeActionHandler = rememberMultiNodeActionHandler(),
             navigateToMediaSearch = {},
             navigationHandler = object : NavigationHandler {
@@ -1110,7 +1104,7 @@ fun PhotosMainScreenPreview() {
             },
             handleCameraUploadsPermissionsResult = {},
             setCameraUploadsMessage = {},
-            updateIsWarningBannerShown = {},
+            onCUBannerDismissRequest = {},
             onNavigateToUpgradeAccount = {},
             onPhotoTimePeriodSelected = {},
             onNavigateToCameraUploadsProgressScreen = {},

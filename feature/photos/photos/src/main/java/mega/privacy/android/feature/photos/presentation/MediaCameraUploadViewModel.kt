@@ -3,11 +3,17 @@ package mega.privacy.android.feature.photos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
@@ -27,6 +33,7 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,8 +58,6 @@ class MediaCameraUploadViewModel @Inject constructor(
     private val hasCameraUploadsPermissionUseCase: HasCameraUploadsPermissionUseCase,
 ) : ViewModel() {
 
-    private var isWarningBannerDismissed = false
-
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
     private val _uiState = MutableStateFlow(MediaCameraUploadUiState())
     internal val uiState = _uiState.asUiStateFlow(
@@ -61,18 +66,169 @@ class MediaCameraUploadViewModel @Inject constructor(
     )
 
     private var isCameraUploadsFirstSyncTriggered = false
-    private var isCameraUploadsUploading = false
+
+    private val permissionsStateFlow = MutableStateFlow(MediaCUPermissionsState.Unknown)
+    private val cuStatusInfoFlow = MutableStateFlow<CameraUploadsStatusInfo?>(null)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val cuStatusFlow: StateFlow<CUStatusUiState> =
+        combine(
+            flow = permissionsStateFlow,
+            flow2 = cuStatusInfoFlow,
+            transform = ::Pair
+        ).scan(
+            initial = CUStatusFlowTransition(
+                permissionsState = MediaCUPermissionsState.Unknown,
+                previousStatus = null,
+                currentStatus = null
+            )
+        ) { acc, (permissionsState, currentStatus) ->
+            CUStatusFlowTransition(
+                permissionsState = permissionsState,
+                previousStatus = acc.currentStatus,
+                currentStatus = currentStatus
+            )
+        }.flatMapLatest { transition ->
+            if (transition.permissionsState == MediaCUPermissionsState.Denied) {
+                flowOf(CUStatusUiState.Warning.BannerAndAction.HasLimitedAccess)
+            } else {
+                val previousStatus = transition.previousStatus
+                val currentStatus = transition.currentStatus
+                when (currentStatus) {
+                    is CameraUploadsStatusInfo.CheckFilesForUpload -> {
+                        flowOf(CUStatusUiState.Sync)
+                    }
+
+                    is CameraUploadsStatusInfo.UploadProgress -> {
+                        flowOf(
+                            CUStatusUiState.UploadInProgress(
+                                progress = currentStatus.progress.floatValue,
+                                pending = currentStatus.totalToUpload - currentStatus.totalUploaded,
+                            )
+                        )
+                    }
+
+                    is CameraUploadsStatusInfo.Finished -> {
+                        val isCameraUploadsUploading =
+                            currentStatus.reason == CameraUploadsFinishedReason.COMPLETED &&
+                                    previousStatus is CameraUploadsStatusInfo.UploadProgress
+                        if (isCameraUploadsUploading) {
+                            flow {
+                                emit(CUStatusUiState.UploadComplete)
+                                delay(4.seconds)
+                                emit(CUStatusUiState.UpToDate)
+                            }
+                        } else {
+                            val status = when (currentStatus.reason) {
+                                CameraUploadsFinishedReason.COMPLETED -> CUStatusUiState.UpToDate
+                                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
+                                    CUStatusUiState.Warning.BannerAndAction.DeviceChargingRequirementNotMet
+                                }
+
+                                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
+                                    CUStatusUiState.Warning.BannerAndAction.BatteryLevelTooLow
+                                }
+
+                                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
+                                    CUStatusUiState.Warning.BannerAndAction.NetworkConnectionRequirementNotMet
+                                }
+
+                                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA -> {
+                                    CUStatusUiState.Warning.BannerOnly.AccountStorageOverQuota
+                                }
+
+                                else -> CUStatusUiState.None
+                            }
+                            flowOf(status)
+                        }
+                    }
+
+                    else -> flowOf(CUStatusUiState.None)
+                }
+            }
+        }.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = CUStatusUiState.None
+        )
 
     init {
         startMonitoring()
     }
 
     private fun startMonitoring() {
-        monitorCameraUploadShownStatus()
         monitorCameraUploadsStatus()
-        monitorEnableCUBannerVisibility()
+        monitorCUBannerVisibility()
+        monitorCameraUploadShownStatus()
         syncCameraUploadsStatus()
-        monitorCameraUploadsEnable()
+    }
+
+    private fun monitorCameraUploadsStatus() {
+        viewModelScope.launch {
+            monitorCameraUploadsStatusInfoUseCase()
+                .catch { Timber.e(it, "Unable to monitor camera uploads status info") }
+                .collectLatest { statusInfo ->
+                    when (statusInfo) {
+                        is CameraUploadsStatusInfo.UploadProgress -> {
+                            _uiState.update {
+                                it.copy(cameraUploadsTotalUploaded = statusInfo.totalToUpload)
+                            }
+                        }
+
+                        is CameraUploadsStatusInfo.Finished -> {
+                            if (statusInfo.reason != CameraUploadsFinishedReason.UNKNOWN) {
+                                _uiState.update {
+                                    it.copy(cameraUploadsFinishedReason = statusInfo.reason)
+                                }
+                            }
+                        }
+
+                        else -> Unit
+                    }
+                    cuStatusInfoFlow.update { statusInfo }
+                }
+        }
+    }
+
+    private fun monitorCUBannerVisibility() {
+        viewModelScope.launch {
+            combine(
+                flow = isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled,
+                flow2 = monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow,
+                flow3 = cuStatusFlow,
+                transform = ::Triple
+            ).catch {
+                Timber.e(it, "Unable to monitor CU banner visibility")
+            }.collect { (isCUEnabled, isVisible, cuStatus) ->
+                if (!isCUEnabled) {
+                    _uiState.update {
+                        it.copy(
+                            status = CUStatusUiState.Disabled,
+                            shouldShowCUBanner = isVisible
+                        )
+                    }
+                    if (isVisible) {
+                        runCatching { resetEnableCameraUploadBannerVisibilityUseCase() }
+                            .onFailure {
+                                Timber.e(it, "Unable to reset enable CU banner visibility")
+                            }
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            status = cuStatus,
+                            shouldShowCUBanner = cuStatus is CUStatusUiState.Warning,
+                            enableCameraUploadPageShowing = false
+                        )
+                    }
+
+                    if (cuStatus == CUStatusUiState.UploadComplete) {
+                        _uiState.update {
+                            it.copy(showCameraUploadsCompletedMessage = true)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun monitorCameraUploadShownStatus() {
@@ -96,132 +252,8 @@ class MediaCameraUploadViewModel @Inject constructor(
         }
     }
 
-
-    private fun monitorCameraUploadsStatus() = viewModelScope.launch {
-        monitorCameraUploadsStatusInfoUseCase()
-            .collectLatest {
-                when (it) {
-                    is CameraUploadsStatusInfo.CheckFilesForUpload -> {
-                        handleCameraUploadsCheckStatus()
-                    }
-
-                    is CameraUploadsStatusInfo.UploadProgress -> {
-                        handleCameraUploadsProgressStatus(it)
-                    }
-
-                    is CameraUploadsStatusInfo.Finished -> {
-                        handleCameraUploadsFinishedStatus(it)
-                    }
-
-                    else -> Unit
-                }
-            }
-    }
-
-    private fun handleCameraUploadsCheckStatus() {
-        if (isStatusUpdatedForWarning()) return
-        setCameraUploadsSyncState()
-    }
-
-    private fun setCameraUploadsSyncState() {
-        _uiState.update { it.copy(status = CUStatusUiState.Sync) }
-    }
-
-    private fun handleCameraUploadsProgressStatus(info: CameraUploadsStatusInfo.UploadProgress) {
-        if (isStatusUpdatedForWarning()) return
-        _uiState.update {
-            it.copy(
-                status = CUStatusUiState.UploadInProgress(
-                    progress = info.progress.floatValue,
-                    pending = info.totalToUpload - info.totalUploaded,
-                ),
-                cameraUploadsTotalUploaded = info.totalToUpload,
-            )
-        }
-        isCameraUploadsUploading = true
-    }
-
-    private suspend fun handleCameraUploadsFinishedStatus(info: CameraUploadsStatusInfo.Finished) {
-        val cameraUploadsFinishedReason = info.reason
-
-        if (cameraUploadsFinishedReason == CameraUploadsFinishedReason.UNKNOWN) return
-
-        setCameraUploadsFinishedReason(reason = cameraUploadsFinishedReason)
-
-        when (cameraUploadsFinishedReason) {
-            CameraUploadsFinishedReason.COMPLETED -> {
-                if (isStatusUpdatedForWarning()) return
-                if (isCameraUploadsUploading) {
-                    _uiState.update {
-                        it.copy(
-                            status = CUStatusUiState.UploadComplete,
-                            showCameraUploadsCompletedMessage = true
-                        )
-                    }
-
-                    isCameraUploadsUploading = false
-                    delay(4.seconds)
-                }
-
-                _uiState.update { uiState ->
-                    uiState.copy(status = CUStatusUiState.UpToDate)
-                }
-            }
-
-            CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                _uiState.update { it.copy(status = CUStatusUiState.Warning) }
-                updateIsWarningBannerShown(true)
-                hideCameraUploadsFab()
-            }
-
-            else -> {
-                if (shouldShowWarningAction()) {
-                    _uiState.update { it.copy(status = CUStatusUiState.Warning) }
-                }
-                updateIsWarningBannerShown(shouldShowWarningBanner())
-            }
-        }
-    }
-
-    private fun setCameraUploadsFinishedReason(reason: CameraUploadsFinishedReason) {
-        _uiState.update { it.copy(cameraUploadsFinishedReason = reason) }
-    }
-
-    private fun isStatusUpdatedForWarning(): Boolean {
-        return if (shouldShowWarningAction()) {
-            _uiState.update { it.copy(status = CUStatusUiState.Warning) }
-            true
-        } else false
-    }
-
     internal fun setCameraUploadsCompletedMessage(show: Boolean) {
         _uiState.update { it.copy(showCameraUploadsCompletedMessage = show) }
-    }
-
-    private fun hideCameraUploadsFab() {
-        _uiState.update { it.copy(status = CUStatusUiState.None) }
-    }
-
-    internal fun shouldShowWarningBanner(): Boolean {
-        return _uiState.value.cameraUploadsFinishedReason?.let { reason ->
-            reason in setOf(
-                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
-                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
-                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
-                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA
-            )
-        } ?: false
-    }
-
-    internal fun shouldShowWarningAction(): Boolean {
-        val isFinishReasonAWarning = _uiState.value.cameraUploadsFinishedReason?.let { reason ->
-            reason in setOf(
-                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET,
-                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW,
-                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET
-            )
-        } ?: false
-        return isFinishReasonAWarning || _uiState.value.isCameraUploadsLimitedAccess
     }
 
     private fun syncCameraUploadsStatus() {
@@ -233,47 +265,12 @@ class MediaCameraUploadViewModel @Inject constructor(
         }
     }
 
-    private fun monitorCameraUploadsEnable() {
-        viewModelScope.launch {
-            isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled
-                .catch { Timber.e(it, "Unable to monitor camera uploads enabled") }
-                .collectLatest { isEnabled ->
-                    if (isEnabled) {
-                        _uiState.update {
-                            it.copy(
-                                enableCameraUploadButtonShowing = false,
-                                enableCameraUploadPageShowing = false,
-                            )
-                        }
-                    } else {
-                        _uiState.update { it.copy(enableCameraUploadButtonShowing = true) }
-                    }
-                }
-        }
-    }
-
     internal fun handleCameraUploadsPermissionsResult() {
         val hasPermissions = hasMediaPermissionUseCase()
-        val showWarningAction = !hasPermissions || shouldShowWarningAction()
-
-        setCameraUploadsLimitedAccess(isLimitedAccess = !hasPermissions)
-        _uiState.update {
-            it.copy(
-                status = if (showWarningAction) CUStatusUiState.Warning else it.status
-            )
+        permissionsStateFlow.update {
+            if (hasPermissions) MediaCUPermissionsState.Granted
+            else MediaCUPermissionsState.Denied
         }
-        updateIsWarningBannerShown(!hasPermissions || shouldShowWarningAction())
-    }
-
-    internal fun setCameraUploadsLimitedAccess(isLimitedAccess: Boolean) {
-        _uiState.update { it.copy(isCameraUploadsLimitedAccess = isLimitedAccess) }
-    }
-
-    internal fun updateIsWarningBannerShown(isShown: Boolean) {
-        if (!isShown && !isWarningBannerDismissed) {
-            isWarningBannerDismissed = true
-        }
-        _uiState.update { it.copy(isWarningBannerShown = isShown && !isWarningBannerDismissed) }
     }
 
     internal fun setInitialPreferences() {
@@ -307,46 +304,25 @@ class MediaCameraUploadViewModel @Inject constructor(
             }
     }
 
-    private fun monitorEnableCUBannerVisibility() {
-        viewModelScope.launch {
-            combine(
-                isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled,
-                monitorEnableCameraUploadBannerVisibilityUseCase.enableCameraUploadBannerVisibilityFlow,
-                ::Pair
-            ).catch {
-                Timber.e(it, "Unable to monitor enable CU banner visibility")
-            }.collectLatest { (isCUEnabled, isVisible) ->
-                _uiState.update { it.copy(shouldShowEnableCUBanner = isVisible && !isCUEnabled) }
-                if (isVisible) {
-                    runCatching { resetEnableCameraUploadBannerVisibilityUseCase() }
-                        .onFailure {
-                            Timber.e(it, "Unable to reset enable CU banner visibility")
-                        }
-                }
-            }
+    internal fun checkCameraUploadsPermissions() {
+        val hasPermissions = hasCameraUploadsPermissionUseCase()
+        permissionsStateFlow.update {
+            if (hasPermissions) MediaCUPermissionsState.Granted
+            else MediaCUPermissionsState.Denied
         }
     }
 
-    internal fun dismissEnableCUBanner() {
+    internal fun dismissCUBanner(bannerType: CameraUploadsBannerType) {
+        if (bannerType == CameraUploadsBannerType.EnableCameraUploads) {
+            dismissEnableCUBanner()
+        }
+        _uiState.update { it.copy(shouldShowCUBanner = false) }
+    }
+
+    private fun dismissEnableCUBanner() {
         viewModelScope.launch {
             runCatching { setEnableCameraUploadBannerDismissedTimestampUseCase() }
                 .onFailure { Timber.e(it, "Unable to set enable CU banner dismiss timestamp") }
-        }
-    }
-
-    internal fun checkCameraUploadsPermissions() {
-        val hasPermissions = hasCameraUploadsPermissionUseCase()
-        _uiState.update { currentState ->
-            val showWarningAction = !hasPermissions || shouldShowWarningAction()
-            val showWarningBanner = !hasPermissions || shouldShowWarningBanner()
-            if (showWarningBanner) {
-                hideCameraUploadsFab()
-            }
-            currentState.copy(
-                isCameraUploadsLimitedAccess = !hasPermissions,
-                isWarningBannerShown = showWarningBanner && !isWarningBannerDismissed,
-                status = if (showWarningAction) CUStatusUiState.Warning else currentState.status
-            )
         }
     }
 }

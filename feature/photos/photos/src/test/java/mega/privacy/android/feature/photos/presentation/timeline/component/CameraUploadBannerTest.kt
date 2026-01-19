@@ -49,17 +49,18 @@ class CameraUploadBannerTest {
 
     @Test
     fun `test that the enable CU banner is successfully dismissed`() {
+        val bannerType = CameraUploadsBannerType.EnableCameraUploads
         composeRuleScope {
-            val onDismissEnableCameraUploadsBanner = mock<() -> Unit>()
+            val onDismissRequest = mock<(bannerType: CameraUploadsBannerType) -> Unit>()
             setBanner(
-                bannerType = CameraUploadsBannerType.EnableCameraUploads,
+                bannerType = bannerType,
                 shouldShowEnableCUBanner = true,
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner
+                onDismissRequest = onDismissRequest
             )
 
             onNodeWithTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_DISMISS_ICON_TEST_TAG).performClick()
 
-            verify(onDismissEnableCameraUploadsBanner).invoke()
+            verify(onDismissRequest).invoke(bannerType)
         }
     }
 
@@ -170,9 +171,8 @@ class CameraUploadBannerTest {
         shouldShowEnableCUBanner: Boolean = false,
         shouldShowCUWarningBanner: Boolean = false,
         onEnableCameraUploads: () -> Unit = {},
-        onDismissEnableCameraUploadsBanner: () -> Unit = {},
+        onDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit = {},
         onChangeCameraUploadsPermissions: () -> Unit = {},
-        onDismissWarningBanner: () -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateMobileDataSetting: () -> Unit = {},
         onNavigateUpgradeScreen: () -> Unit = {},
@@ -183,9 +183,8 @@ class CameraUploadBannerTest {
                 shouldShowEnableCUBanner = shouldShowEnableCUBanner,
                 shouldShowCUWarningBanner = shouldShowCUWarningBanner,
                 onEnableCameraUploads = onEnableCameraUploads,
-                onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
+                onDismissRequest = onDismissRequest,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
-                onDismissWarningBanner = onDismissWarningBanner,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                 onNavigateUpgradeScreen = onNavigateUpgradeScreen

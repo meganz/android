@@ -32,21 +32,6 @@ class CameraUploadStatusToolbarActionTest {
     }
 
     @Test
-    fun `test that the warning banner is shown when the warning icon is clicked`() {
-        composeRuleScope {
-            val updateIsWarningBannerShown = mock<(value: Boolean) -> Unit>()
-            setAction(
-                isCuWarningStatusVisible = true,
-                updateIsWarningBannerShown = updateIsWarningBannerShown
-            )
-
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG).performClick()
-
-            verify(updateIsWarningBannerShown).invoke(true)
-        }
-    }
-
-    @Test
     fun `test that the default icon is displayed`() {
         composeRuleScope {
             setAction(
@@ -176,7 +161,6 @@ class CameraUploadStatusToolbarActionTest {
         isCuCompleteStatusVisible: Boolean = false,
         cameraUploadsStatus: CUStatusUiState = CUStatusUiState.None,
         setCameraUploadsMessage: (message: String) -> Unit = {},
-        updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateToCameraUploadsProgressScreen: () -> Unit = {},
     ) {
@@ -187,7 +171,6 @@ class CameraUploadStatusToolbarActionTest {
                 isCuCompleteStatusVisible = isCuCompleteStatusVisible,
                 cameraUploadsStatus = cameraUploadsStatus,
                 setCameraUploadsMessage = setCameraUploadsMessage,
-                updateIsWarningBannerShown = updateIsWarningBannerShown,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
             )

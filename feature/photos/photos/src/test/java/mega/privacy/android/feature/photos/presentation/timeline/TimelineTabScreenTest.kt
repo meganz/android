@@ -19,9 +19,11 @@ import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_IMAGE_NODE_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.component.ENABLE_CAMERA_UPLOADS_CONTENT_ENABLE_BUTTON_TAG
+import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -137,7 +139,7 @@ class TimelineTabScreenTest {
             setScreen(
                 uiState = TimelineTabUiState(isLoading = false),
                 mediaCameraUploadUiState = MediaCameraUploadUiState(
-                    enableCameraUploadButtonShowing = false
+                    status = CUStatusUiState.None
                 )
             )
 
@@ -152,7 +154,7 @@ class TimelineTabScreenTest {
             setScreen(
                 uiState = TimelineTabUiState(isLoading = false),
                 mediaCameraUploadUiState = MediaCameraUploadUiState(
-                    enableCameraUploadButtonShowing = true
+                    status = CUStatusUiState.Disabled
                 ),
                 timelineFilterUiState = TimelineFilterUiState(
                     mediaSource = FilterMediaSource.CameraUpload
@@ -334,9 +336,8 @@ class TimelineTabScreenTest {
         onSortOptionChange: (value: TimelineTabSortOptions) -> Unit = {},
         onPhotoClick: (node: PhotoNodeUiState) -> Unit = {},
         onPhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
-        onDismissEnableCameraUploadsBanner: () -> Unit = {},
         handleCameraUploadsPermissionsResult: () -> Unit = {},
-        updateIsWarningBannerShown: (value: Boolean) -> Unit = {},
+        onCUBannerDismissRequest: (bannerType: CameraUploadsBannerType) -> Unit = {},
         onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
         onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
         onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
@@ -358,9 +359,8 @@ class TimelineTabScreenTest {
                     onSortOptionChange = onSortOptionChange,
                     onPhotoClick = onPhotoClick,
                     onPhotoSelected = onPhotoSelected,
-                    onDismissEnableCameraUploadsBanner = onDismissEnableCameraUploadsBanner,
                     handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                    updateIsWarningBannerShown = updateIsWarningBannerShown,
+                    onCUBannerDismissRequest = onCUBannerDismissRequest,
                     onTabsVisibilityChange = onTabsVisibilityChange,
                     onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                     onPhotoTimePeriodSelected = onPhotoTimePeriodSelected

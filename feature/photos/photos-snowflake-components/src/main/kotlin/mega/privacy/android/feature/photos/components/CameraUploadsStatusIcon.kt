@@ -30,18 +30,19 @@ import mega.privacy.android.icon.pack.R as IconPackR
 @Composable
 fun CameraUploadsStatusIcon(
     type: CameraUploadsStatusType,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shouldShowRipple: Boolean = true,
+    enabled: Boolean = true,
+    onClick: (() -> Unit)? = null,
     progress: (() -> Float)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
             .clickable(
+                enabled = enabled,
                 interactionSource = interactionSource,
-                indication = if (shouldShowRipple) ripple(bounded = false) else null,
-                onClick = onClick,
+                indication = ripple(bounded = false),
+                onClick = { onClick?.invoke() },
             )
     ) {
         CameraUploadsIcon(
@@ -51,8 +52,7 @@ fun CameraUploadsStatusIcon(
 
         StatusIcon(
             modifier = Modifier.align(Alignment.BottomEnd),
-            type = type,
-            progress = progress
+            type = type
         )
     }
 }
@@ -104,7 +104,6 @@ private fun CameraUploadsIcon(
 private fun StatusIcon(
     type: CameraUploadsStatusType,
     modifier: Modifier = Modifier,
-    progress: (() -> Float)? = null,
 ) {
     if (type != CameraUploadsStatusType.Default) {
         val color = when (type) {
