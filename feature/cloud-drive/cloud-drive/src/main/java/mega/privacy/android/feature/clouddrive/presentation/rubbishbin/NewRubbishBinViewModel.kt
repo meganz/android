@@ -43,10 +43,12 @@ import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
@@ -87,6 +89,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     private val cleanRubbishBinUseCase: CleanRubbishBinUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     @Assisted private val navKey: RubbishBinNavKey,
 ) : ViewModel() {
     private val args = navKey
@@ -114,6 +117,7 @@ class NewRubbishBinViewModel @AssistedInject constructor(
         monitorViewTypeChanges()
         getCloudSortOrderAndRefresh()
         monitorAccountDetail()
+        checkSearchRevampEnabled()
     }
 
     private fun setupNodesLoading() {
@@ -464,6 +468,15 @@ class NewRubbishBinViewModel @AssistedInject constructor(
     fun onOpenFolderEventConsumed() {
         _uiState.update {
             it.copy(openFolderEvent = consumed())
+        }
+    }
+
+    private fun checkSearchRevampEnabled() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SearchRevamp) }
+                .onSuccess { isEnabled ->
+                    _uiState.update { it.copy(isSearchRevampEnabled = isEnabled) }
+                }
         }
     }
 

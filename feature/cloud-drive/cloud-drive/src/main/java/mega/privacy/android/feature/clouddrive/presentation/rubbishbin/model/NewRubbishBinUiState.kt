@@ -49,6 +49,7 @@ data class NewRubbishBinUiState(
     val messageEvent: StateEventWithContent<LocalizedText> = consumed(),
     val openedFileNode: TypedFileNode? = null,
     val openFolderEvent: StateEventWithContent<NodeId> = consumed(),
+    val isSearchRevampEnabled: Boolean = false,
 ) {
     val isLoading = nodesLoadingState == NodesLoadingState.Loading
 

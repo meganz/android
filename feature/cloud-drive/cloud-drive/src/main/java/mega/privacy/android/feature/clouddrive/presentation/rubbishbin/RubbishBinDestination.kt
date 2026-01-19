@@ -5,11 +5,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
-import mega.privacy.android.navigation.destination.LegacySearchNavKey
 
 fun EntryProviderScope<NavKey>.rubbishBin(
     navigationHandler: NavigationHandler,
@@ -35,17 +33,6 @@ fun EntryProviderScope<NavKey>.rubbishBin(
             viewModel = viewModel,
             navigationHandler = navigationHandler,
             onTransfer = transferHandler::setTransferEvent,
-            onFolderClick = {
-                navigationHandler.navigate(RubbishBinNavKey(it.longValue))
-            },
-            openSearch = { parentHandle ->
-                navigationHandler.navigate(
-                    LegacySearchNavKey(
-                        nodeSourceType = NodeSourceType.RUBBISH_BIN,
-                        parentHandle = parentHandle
-                    )
-                )
-            },
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
         )
     }

@@ -31,8 +31,8 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
@@ -45,7 +45,6 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -55,6 +54,9 @@ import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.Clea
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.navigation.destination.LegacySearchNavKey
+import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -69,8 +71,6 @@ internal fun RubbishBinScreen(
     viewModel: NewRubbishBinViewModel,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onFolderClick: (NodeId) -> Unit,
-    openSearch: (Long) -> Unit,
     nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -97,7 +97,12 @@ internal fun RubbishBinScreen(
         event = uiState.openFolderEvent,
         onConsumed = viewModel::onOpenFolderEventConsumed
     ) { folderId ->
-        onFolderClick(folderId)
+        navigationHandler.navigate(
+            CloudDriveNavKey(
+                nodeHandle = folderId.longValue,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN
+            )
+        )
     }
 
     EventEffect(
@@ -155,9 +160,18 @@ internal fun RubbishBinScreen(
                     actions = if (uiState.items.isNotEmpty()) {
                         buildList {
                             add(MenuActionWithClick(RubbishBinAppBarAction.Search) {
-                                openSearch(
-                                    uiState.currentFolderId.longValue,
-                                )
+                                val searchNavKey = if (uiState.isSearchRevampEnabled) {
+                                    SearchNavKey(
+                                        parentHandle = uiState.currentFolderId.longValue,
+                                        nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                    )
+                                } else {
+                                    LegacySearchNavKey(
+                                        parentHandle = uiState.currentFolderId.longValue,
+                                        nodeSourceType = NodeSourceType.RUBBISH_BIN
+                                    )
+                                }
+                                navigationHandler.navigate(searchNavKey)
                             })
                             if (isRootDirectory) {
                                 add(
