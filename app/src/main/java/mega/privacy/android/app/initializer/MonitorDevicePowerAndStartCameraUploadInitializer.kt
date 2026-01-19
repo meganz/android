@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.global.initialisation.appstart
+package mega.privacy.android.app.initializer
 
 import android.content.Context
 import androidx.startup.Initializer
@@ -19,7 +19,7 @@ import timber.log.Timber
  * Initialiser that monitors device power connection state and starts camera upload when connected.
  * This initialiser runs on app start and continuously monitors the power connection state.
  */
-class MonitorDevicePowerAndStartCameraUploadInitialiser : Initializer<Unit> {
+class MonitorDevicePowerAndStartCameraUploadInitializer : Initializer<Unit> {
 
     @EntryPoint
     @InstallIn(SingletonComponent::class)

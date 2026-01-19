@@ -51,7 +51,6 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
-import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -76,7 +75,6 @@ import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
-import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
@@ -91,7 +89,6 @@ import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContact
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
@@ -99,7 +96,6 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.environment.MonitorDevicePowerConnectionStateUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.FilePrepareUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
@@ -175,8 +171,6 @@ import javax.inject.Inject
  * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
  * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
  * @property monitorSecurityUpgradeInAppUseCase Use case for monitoring security upgrade in app.
- * @property monitorUserUpdates Use case for monitoring user updates.
- * @property establishCameraUploadsSyncHandlesUseCase Use case for establishing camera uploads sync handles.
  * @property startCameraUploadUseCase Use case for starting camera uploads.
  * @property stopCameraUploadsUseCase Use case for stopping camera uploads.
  * @property saveContactByEmailUseCase Use case for saving a contact by email.
@@ -240,8 +234,6 @@ class ManagerViewModel @Inject constructor(
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val monitorSecurityUpgradeInAppUseCase: MonitorSecurityUpgradeInAppUseCase,
-    private val monitorUserUpdates: MonitorUserUpdates,
-    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
@@ -286,7 +278,6 @@ class ManagerViewModel @Inject constructor(
     private val getUsersCallLimitRemindersUseCase: GetUsersCallLimitRemindersUseCase,
     private val broadcastHomeBadgeCountUseCase: BroadcastHomeBadgeCountUseCase,
     private val monitorUpgradeDialogClosedUseCase: MonitorUpgradeDialogClosedUseCase,
-    private val monitorDevicePowerConnectionStateUseCase: MonitorDevicePowerConnectionStateUseCase,
     private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
     private val scannerHandler: ScannerHandler,
@@ -418,19 +409,6 @@ class ManagerViewModel @Inject constructor(
             deleteOldestCompletedTransfersUseCase()
         }
         viewModelScope.launch {
-            monitorUserUpdates()
-                .catch { Timber.w("Exception monitoring user updates: $it") }
-                .filter { it == UserChanges.CameraUploadsFolder }
-                .collect {
-                    Timber.d(
-                        "The Camera Uploads Sync Handles have been changed in the API + " +
-                                "Refresh the Sync Handles"
-                    )
-                    runCatching { establishCameraUploadsSyncHandlesUseCase() }
-                        .onFailure { Timber.e(it) }
-                }
-        }
-        viewModelScope.launch {
             monitorUpdatePushNotificationSettingsUseCase().collect {
                 _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
             }
@@ -544,19 +522,6 @@ class ManagerViewModel @Inject constructor(
                 Timber.e(it)
             }.collect {
                 _state.update { it.copy(shouldUpgradeToProPlan = false) }
-            }
-        }
-
-        viewModelScope.launch {
-            monitorDevicePowerConnectionStateUseCase().catch {
-                Timber.e(
-                    "An error occurred while monitoring the Device Power Connection State $it"
-                )
-            }.collect { state ->
-                Timber.d("The Device Power Connection State is $state")
-                if (state == DevicePowerConnectionState.Connected) {
-                    startCameraUploadUseCase()
-                }
             }
         }
 

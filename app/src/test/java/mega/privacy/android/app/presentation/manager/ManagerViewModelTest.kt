@@ -12,7 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -63,7 +62,6 @@ import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
-import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -78,7 +76,6 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -89,7 +86,6 @@ import mega.privacy.android.domain.usecase.GetNumUnreadUserAlertsUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
-import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -102,7 +98,6 @@ import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContact
 import mega.privacy.android.domain.usecase.call.AnswerChatCallUseCase
 import mega.privacy.android.domain.usecase.call.GetChatCallUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
@@ -291,14 +286,9 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
-    private val monitorUserUpdates = mock<MonitorUserUpdates> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
-    }
     private var monitorMyAccountUpdateFakeFlow = MutableSharedFlow<MyAccountUpdate>()
     private var monitorAccountDetailFakeFlow = MutableSharedFlow<AccountDetail>()
     private val fcmManager = mock<FcmManager>()
-    private val establishCameraUploadsSyncHandlesUseCase =
-        mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
@@ -345,8 +335,6 @@ class ManagerViewModelTest {
     private val startOfflineSyncWorkerUseCase: StartOfflineSyncWorkerUseCase = mock()
     private val scannerHandler: ScannerHandler = mock()
     private val fakeCallUpdatesFlow = MutableSharedFlow<ChatCall>()
-    private var monitorDevicePowerConnectionFakeFlow =
-        MutableSharedFlow<DevicePowerConnectionState>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
 
 
@@ -402,8 +390,6 @@ class ManagerViewModelTest {
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             monitorSecurityUpgradeInAppUseCase = monitorSecurityUpgradeInAppUseCase,
-            monitorUserUpdates = monitorUserUpdates,
-            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             saveContactByEmailUseCase = saveContactByEmailUseCase,
@@ -452,9 +438,6 @@ class ManagerViewModelTest {
             setUsersCallLimitRemindersUseCase = setUsersCallLimitRemindersUseCase,
             broadcastHomeBadgeCountUseCase = broadcastHomeBadgeCountUseCase,
             monitorUpgradeDialogClosedUseCase = monitorUpgradeDialogClosedUseCase,
-            monitorDevicePowerConnectionStateUseCase = mock {
-                on { invoke() }.thenReturn(monitorDevicePowerConnectionFakeFlow)
-            },
             startOfflineSyncWorkerUseCase = startOfflineSyncWorkerUseCase,
             filePrepareUseCase = filePrepareUseCase,
             scannerHandler = scannerHandler,
@@ -485,7 +468,6 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase,
             setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase,
-            establishCameraUploadsSyncHandlesUseCase,
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
             saveContactByEmailUseCase,
@@ -533,7 +515,6 @@ class ManagerViewModelTest {
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
-        whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
@@ -547,7 +528,6 @@ class ManagerViewModelTest {
         monitorSyncsUseCaseFakeFlow = MutableSharedFlow()
         monitorMyAccountUpdateFakeFlow = MutableSharedFlow()
         monitorAccountDetailFakeFlow = MutableSharedFlow()
-        monitorDevicePowerConnectionFakeFlow = MutableSharedFlow()
         initViewModel()
     }
 
@@ -731,23 +711,6 @@ class ManagerViewModelTest {
             assertThat(awaitItem().show2FADialog).isTrue()
         }
     }
-
-    @Test
-    fun `test that the camera uploads sync handles are established when receiving an update to change the camera uploads folders`() =
-        runTest {
-            val userUpdates = listOf(
-                UserChanges.Birthday,
-                UserChanges.CameraUploadsFolder,
-                UserChanges.Country,
-            )
-
-            testScheduler.advanceUntilIdle()
-            whenever(monitorUserUpdates()).thenReturn(userUpdates.asFlow())
-            initViewModel()
-            testScheduler.advanceUntilIdle()
-
-            verify(establishCameraUploadsSyncHandlesUseCase).invoke()
-        }
 
     @Test
     fun `test that when push notification settings is updated state is also updated`() =
@@ -1491,33 +1454,6 @@ class ManagerViewModelTest {
         Arguments.of(ChatCallStatus.TerminatingUserParticipation),
         Arguments.of(ChatCallStatus.GenericNotification),
     )
-
-    @Test
-    fun `test that camera uploads automatically starts when the device begins charging`() =
-        runTest {
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Connected)
-            testScheduler.advanceUntilIdle()
-
-            verify(startCameraUploadUseCase).invoke()
-        }
-
-    @Test
-    fun `test that camera uploads does not automatically start when the device is not charging`() =
-        runTest {
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Disconnected)
-            testScheduler.advanceUntilIdle()
-
-            verifyNoInteractions(startCameraUploadUseCase)
-        }
-
-    @Test
-    fun `test that camera uploads does not automatically start when the device charging state is unknown`() =
-        runTest {
-            monitorDevicePowerConnectionFakeFlow.emit(DevicePowerConnectionState.Unknown)
-            testScheduler.advanceUntilIdle()
-
-            verifyNoInteractions(startCameraUploadUseCase)
-        }
 
     @Test
     fun `test that message update correctly when chat call update status emit the call with too many participants code`() =

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.global.initialisation.appstart
+package mega.privacy.android.app.initializer
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -17,8 +17,8 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class MonitorDevicePowerAndStartCameraUploadInitialiserTest {
-    private lateinit var underTest: MonitorDevicePowerAndStartCameraUploadInitialiser
+class MonitorDevicePowerAndStartCameraUploadInitializerTest {
+    private lateinit var underTest: MonitorDevicePowerAndStartCameraUploadInitializer
 
     private val monitorDevicePowerConnectionStateUseCase =
         mock<MonitorDevicePowerConnectionStateUseCase>()
@@ -31,8 +31,7 @@ class MonitorDevicePowerAndStartCameraUploadInitialiserTest {
         whenever(monitorDevicePowerConnectionStateUseCase()).thenReturn(
             monitorDevicePowerConnectionFakeFlow
         )
-        underTest = MonitorDevicePowerAndStartCameraUploadInitialiser(
-        )
+        underTest = MonitorDevicePowerAndStartCameraUploadInitializer()
     }
 
     @BeforeEach

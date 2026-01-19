@@ -624,7 +624,10 @@
                 android:name="mega.privacy.android.app.initializer.CameraUploadsWorkerNotificationInitializer"
                 android:value="androidx.startup" />
             <meta-data
-                android:name="mega.privacy.android.app.appstate.global.initialisation.appstart.MonitorDevicePowerAndStartCameraUploadInitialiser"
+                android:name="mega.privacy.android.app.initializer.MonitorDevicePowerAndStartCameraUploadInitializer"
+                android:value="androidx.startup" />
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.MonitorUserUpdatesAndEstablishCameraUploadsSyncHandlesInitializer"
                 android:value="androidx.startup" />
             <meta-data
                 android:name="mega.privacy.android.app.initializer.NotificationChannelsInitializer"
