@@ -6,7 +6,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.NotificationTopicsInitializer
@@ -16,9 +20,6 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInit
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
@@ -133,5 +134,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideEnable2FAInitialiser(initialiser: Enable2FAInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideMonitorUserUpdatesAndEstablishCameraUploadsSyncHandlesInitializer(initialiser: CameraUploadsSyncHandlesUpdaterInitializer): PostLoginInitialiser =
         initialiser
 }

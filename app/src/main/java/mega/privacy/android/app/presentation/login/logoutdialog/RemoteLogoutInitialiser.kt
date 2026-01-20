@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.login.logoutdialog
 
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.MonitorLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent

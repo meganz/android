@@ -1,6 +1,6 @@
 package mega.privacy.android.app.appstate.initialisation.postlogin
 
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.usecase.billing.MonitorSuccessfulPurchasesUseCase
 import javax.inject.Inject

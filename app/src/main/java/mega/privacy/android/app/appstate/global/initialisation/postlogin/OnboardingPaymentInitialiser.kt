@@ -1,6 +1,6 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase

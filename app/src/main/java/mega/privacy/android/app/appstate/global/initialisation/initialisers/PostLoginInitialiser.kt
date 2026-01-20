@@ -1,11 +1,11 @@
-package mega.privacy.android.app.appstate.initialisation.initialisers
+package mega.privacy.android.app.appstate.global.initialisation.initialisers
 
 /**
  * Post login initialiser that executes a given action and handles any exceptions that may occur.
  * These are injected via multi injection into the auth viewmodel and executed after login.
  * They will not block the post login process from proceeding.
  *
- * @property action The suspend function to be executed during pre-login initialisation. It takes the non nullable session string as a parameter.
+ * @property action The suspend function to be executed during post-login initialisation. It takes the non nullable session string and isFastLogin boolean as parameters.
  */
 open class PostLoginInitialiser(private val action: suspend (String, Boolean) -> Unit) {
     suspend operator fun invoke(session: String, isFastLogin: Boolean) {

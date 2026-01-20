@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.initialisation.initialisers
+package mega.privacy.android.app.appstate.global.initialisation.initialisers
 
 /**
  * Pre-login initialiser that executes a given action and handles any exceptions that may occur.

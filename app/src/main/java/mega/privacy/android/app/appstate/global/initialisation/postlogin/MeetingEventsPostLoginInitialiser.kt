@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import kotlinx.coroutines.flow.retry
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitNavKey
 import mega.privacy.android.app.presentation.meeting.navigation.UpgradeProPlanBottomSheetNavKey
 import mega.privacy.android.domain.entity.call.ChatCallStatus

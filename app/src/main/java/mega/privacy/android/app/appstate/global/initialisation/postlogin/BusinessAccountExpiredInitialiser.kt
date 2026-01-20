@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase

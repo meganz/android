@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.timeout
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.consent.AdConsentWrapper
 import mega.privacy.android.app.consent.CookieDialog
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase

@@ -4,9 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockito.kotlin.any

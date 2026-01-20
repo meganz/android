@@ -2,7 +2,7 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.take
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail

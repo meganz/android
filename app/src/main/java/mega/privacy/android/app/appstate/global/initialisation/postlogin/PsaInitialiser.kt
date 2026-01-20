@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.presentation.psa.InfoPsaBottomSheet
 import mega.privacy.android.app.presentation.psa.StandardPsaBottomSheet
 import mega.privacy.android.app.presentation.psa.WebPsaScreen

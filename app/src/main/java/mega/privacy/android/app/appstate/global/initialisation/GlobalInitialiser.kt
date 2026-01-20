@@ -3,9 +3,9 @@ package mega.privacy.android.app.appstate.initialisation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.initialisation.initialisers.PreLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
 import javax.inject.Inject
