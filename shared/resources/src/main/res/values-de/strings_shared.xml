@@ -1874,58 +1874,85 @@
     <string name="invalid_chat_link_error_message">Diese Unterhaltung ist nicht mehr verfügbar</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Suche&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">Sie möchten MEGA ohne Werbung nutzen?</string>
+    <string name="payment_ads_free_intro_description">Upgraden Sie auf ein Pro-Paket mit reichlich Speicherplatz und mehr. Unsere Pro-Pakete sind bereits ab %1$s pro Monat erhältlich.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Dieser Link wird nicht mehr öffentlich verfügbar sein.</item>
+        <item quantity="other">Diese Links werden nicht mehr öffentlich verfügbar sein</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Diesen Ordner nicht mehr freigeben?</item>
+        <item quantity="other">Diese %1$d Ordner nicht mehr freigeben?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Der Transfer wird wiederholt, den Fortschritt können Sie auf dem Reiter „Aktiv“ verfolgen</item>
+        <item quantity="other">Die Transfers werden wiederholt, den Fortschritt können Sie auf dem Reiter „Aktiv“ verfolgen</item>
+    </plurals>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s für %3$s</string>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Album löschen?</item>
+        <item quantity="other">Alben löschen?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Link entfernen?</item>
+        <item quantity="other">Links entfernen?</item>
+    </plurals>
+    <string name="timeline_tab_grid_size_menu_title">Rastergröße</string>
+    <string name="timeline_tab_grid_size_compact">Kompakt</string>
+    <string name="timeline_tab_grid_size_large">Groß</string>
+    <string name="timeline_tab_filter_apply_filter_button">Filter anwenden</string>
+    <string name="general_invite_contact">Kontakt einladen</string>
+    <string name="contact_found_dialog_title">Kontakt gefunden</string>
+    <string name="album_content_action_remove_favourites">Aus Favoriten entfernen</string>
+    <string name="context_empty_folder_title">Dieser Ordner ist leer</string>
+    <string name="context_empty_cloud_drive_title">Noch keine Inhalte in Ihrem privaten Datentresor</string>
+    <string name="context_empty_cloud_drive_description">Speichern Sie Ihre Inhalte sicher mit Zero-Knowledge-Verschlüsselung</string>
+    <string name="open_link_account_confirmation_error">Sie sind bereits mit einem anderen MEGA-Account eingeloggt. Loggen Sie sich zuerst aus und öffnen Sie dann den Bestätigungslink erneut.</string>
+    <string name="general_invalid_link">Ungültiger Link. Bitte versuchen Sie es erneut oder fordern Sie einen neuen Link an.</string>
+    <string name="can_only_join_one_call_error_message">Um an dieser Konferenz teilnehmen zu können, müssen Sie zunächst auflegen</string>
+    <string name="album_content_remove_link_dialog_title">Link entfernen?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Links entfernen?</string>
+    <string name="album_content_remove_link_dialog_description">Die Personen, mit denen Sie diesen Link geteilt haben, werden keinen Zugriff mehr auf das Album haben</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Die Personen, mit denen Sie diese Links geteilt haben, werden keinen Zugriff mehr auf die Alben haben</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Album löschen?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Alben löschen?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">Die Inhalte des Albums werden nicht gelöscht</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">Die Inhalte der Alben werden nicht gelöscht</string>
+    <string name="external_checkout_information_title">Sie verlassen MEGA</string>
+    <string name="external_checkout_information_description">Sie sind dabei, eine externe Website (%1$s) zu öffnen. MEGA ist nicht für Transaktionen und Kundensupport verantwortlich.</string>
+    <string name="external_checkout_show_next_time">Beim nächsten Mal wieder anzeigen</string>
+    <string name="general_action_save">Speichern</string>
+    <string name="album_cover_selected_success_message">Albumcover aktualisiert</string>
+    <string name="general_action_filter">Filter</string>
+    <string name="timeline_photos_source_all_locations">Alle Speicherorte</string>
+    <string name="album_photos_selection_limit_dialog_title">Keine weitere Auswahl möglich</string>
+    <string name="album_photos_selection_limit_dialog_description">Sie können nur bis zu %d Elemente gleichzeitig zu einem Album hinzufügen.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Keine Medien gefunden</string>
+    <string name="album_photos_selection_screen_title">Elemente zu „%s“ hinzufügen</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">%1$d Element zu „%2$s“ hinzugefügt</item>
+        <item quantity="other">%1$d Elemente zu „%2$s“ hinzugefügt</item>
+    </plurals>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

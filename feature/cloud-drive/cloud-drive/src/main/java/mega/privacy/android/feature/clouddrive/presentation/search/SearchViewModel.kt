@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -49,12 +51,15 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.SearchPlaceholderMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import kotlin.coroutines.cancellation.CancellationException
+
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = SearchViewModel.Factory::class)
@@ -73,6 +78,8 @@ class SearchViewModel @AssistedInject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
+    private val searchPlaceholderMapper: SearchPlaceholderMapper,
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -96,6 +103,7 @@ class SearchViewModel @AssistedInject constructor(
         monitorSortOrder()
         monitorHiddenNodeSettings()
         monitorNodeUpdates()
+        updateSearchPlaceholder()
     }
 
     fun processAction(action: SearchUiAction) {
@@ -111,7 +119,6 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.DeselectAllItems -> deselectAllItems()
             is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is SearchUiAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
-            is SearchUiAction.OverQuotaConsumptionWarning -> {} // TODO
         }
     }
 
@@ -204,7 +211,6 @@ class SearchViewModel @AssistedInject constructor(
 
     private fun monitorNodeUpdates() {
         viewModelScope.launch {
-            // TODO handle for links source
             monitorNodeUpdatesByIdUseCase(
                 nodeId = NodeId(args.parentHandle),
                 nodeSourceType = args.nodeSourceType
@@ -220,6 +226,7 @@ class SearchViewModel @AssistedInject constructor(
                         // If nodes are currently loading, ignore updates
                         if (!uiState.value.nodesLoadingState.isInProgress) {
                             performSearch()
+                            updateSearchPlaceholder()
                         }
                     }
                 }
@@ -443,6 +450,26 @@ class SearchViewModel @AssistedInject constructor(
     private fun onNavigateBackEventConsumed() {
         _uiState.update { state ->
             state.copy(navigateBack = consumed)
+        }
+    }
+
+    private fun updateSearchPlaceholder() {
+        viewModelScope.launch {
+            val nodeId = NodeId(args.parentHandle)
+            val placeholder = runCatching {
+                val nodeName = args.parentHandle
+                    .takeIf { it != -1L }
+                    ?.let { getNodeInfoByIdUseCase(nodeId)?.name }
+                searchPlaceholderMapper(
+                    nodeName = nodeName,
+                    nodeSourceType = args.nodeSourceType
+                )
+            }.getOrElse {
+                LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
+            }
+            _uiState.update {
+                it.copy(placeholderText = placeholder)
+            }
         }
     }
 

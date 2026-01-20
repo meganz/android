@@ -435,7 +435,7 @@
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">Overdrachten starten...</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
-    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Sluit de applicatie niet. Als u sluit, gaan overdrachten die nog niet in de wachtrij staan ​​verloren.</string>
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Sluit de applicatie niet. Als u sluit, gaan overdrachten die nog niet in de wachtrij staan verloren.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="one">%1$d map</item>
@@ -462,7 +462,7 @@
         <item quantity="other">%1$s en %2$d bestanden gevonden.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
-    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Overdrachten annuleren...</string>
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Overdrachten annuleren&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
     <string name="report_issue_error_minimum_characters">Vragen moeten minstens 10 tekens lang zijn</string>
     <!-- placeholder message for report issue-->
@@ -720,7 +720,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass en MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Stel wachtwoorden en vervaldata in voor bestands- en maplinks.</string>
+    <string name="payment_ads_free_intro_additional_security_description">Maak uw online leven veiliger, sneller en gemakkelijker met onze wachtwoordmanager en supersnelle VPN.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Bekijk Pro abonnementen</string>
     <!-- Label for call option on settings -->
@@ -853,11 +853,11 @@
         <item quantity="other">%2$d bestanden toegevoegd aan “%1$s”. Dubbele bestanden kunnen niet opnieuw worden toegevoegd.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">%1$sopslaan naar Cloud drive...</string>
+    <string name="transfers_start_upload_profile_qr_code_message">%1$sopslaan naar Cloud schijf&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Uploaden&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploaden...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% uploaden&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inactief</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -957,7 +957,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Heeft u al een MEGA-account? [A]Log in[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Bestand wordt geladen...</string>
+    <string name="transfers_fake_preview_text">Bestand wordt geladen&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Weergave annuleren?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -1144,7 +1144,7 @@
     <string name="choose_account_screen_billed_yearly">%1$s jaarlijks in rekening gebracht</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
-        <item quantity="one">%1$d items niet verborgen</item>
+        <item quantity="one">%1$d item niet verborgen</item>
         <item quantity="other">%1$d items niet verborgen</item>
     </plurals>
     <!-- Title for secure slideshow mode tutorial -->
@@ -1368,7 +1368,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">U heeft geen enkele applicaties geïnstalleerd die deze bestandstype ondersteunen</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Er is een fout opgetreden, probeer het alstublieft opnieuw.</string>
+    <string name="general_text_error">Er is een fout opgetreden, probeer het nogmaals</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">Selecteer of maak een nieuwe map</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
@@ -1407,7 +1407,7 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Bezoek [A]https://%1$s[/A] in uw webbrowser.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Controleren op uploads...</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Controleren op uploads&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">Uploaden: %d items over</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
@@ -1524,8 +1524,8 @@
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Kon %1$d gedeelde map niet verlaten</item>
-        <item quantity="other">Kon %1$d gedeelde map niet verlaten</item>
+        <item quantity="one">Kon gedeelde map %1$d niet verlaten</item>
+        <item quantity="other">Kon gedeelde mappen %1$d niet verlaten</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
@@ -1574,7 +1574,7 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item hersteld maar %d items zijn niet hersteld. Probeer het later nog eens.</item>
+        <item quantity="one">1 item hersteld maar %d item zijn niet hersteld. Probeer het later nog eens.</item>
         <item quantity="other">1 item hersteld maar %d items zijn niet hersteld. Probeer het later nog eens.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
@@ -1739,7 +1739,7 @@
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s voor de eerste %2$d jaar</item>
+        <item quantity="one">%1$s voor het eerste %2$d jaar</item>
         <item quantity="other">%1$s voor de eerste %2$d jaar</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
@@ -1887,7 +1887,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Deze map is leeg</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Nog niets op uw cloudschijf</string>
+    <string name="context_empty_cloud_drive_title">Nog niets in uw privé kluis</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Bewaar iets veilig met zero-knowledge codering</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -1900,58 +1900,113 @@
     <string name="can_only_join_one_call_error_message">Om aan dit gesprek deel te nemen, moet u uw huidige gesprek beëindigen</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Zoeken&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <string name="payment_ads_free_intro_title">Wilt u MEGA zonder advertenties?</string>
+    <string name="payment_ads_free_intro_description">Upgrade naar een Pro-abonnement met veel opslagruimte en meer. Onze Pro-abonnementen beginnen al vanaf %1$s per maand.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Deze link zal niet langer publiekelijk beschikbaar zijn.</item>
+        <item quantity="other">Deze links zullen niet langer publiekelijk beschikbaar zijn</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Deze map niet meer delen?</item>
+        <item quantity="other">Deze %1$d-mappen niet meer delen?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">De overdracht wordt opnieuw geprobeerd. Zie het tabblad Actief voor de voortgang</item>
+        <item quantity="other">Overdrachten worden opnieuw geprobeerd. Zie het tabblad Actief voor de voortgang</item>
+    </plurals>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s voor %3$s</string>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Album verwijderen?</item>
+        <item quantity="other">Albums verwijderen?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Link verwijderen?</item>
+        <item quantity="other">Links verwijderen?</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">Link verwijderen?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Links verwijderen?</string>
+    <string name="album_content_remove_link_dialog_description">De mensen met wie u deze link hebt gedeeld, verliezen de toegang tot het album</string>
+    <string name="album_content_remove_multiple_links_dialog_description">De mensen met wie u deze links hebt gedeeld, verliezen de toegang tot de albums</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Album verwijderen?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Albums verwijderen?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">De inhoud van het album wordt niet verwijderd</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">De inhoud van de albums worden niet verwijderd</string>
+    <string name="external_checkout_information_title">MEGA verlaten</string>
+    <string name="external_checkout_information_description">U staat op het punt een externe website te openen (%1$s). MEGA is verantwoordelijk voor de transacties en de klantenservice.</string>
+    <string name="external_checkout_show_next_time">Dit de volgende keer weergeven</string>
+    <string name="general_action_save">Opslaan</string>
+    <string name="album_cover_selected_success_message">Albumomslag bijgewerkt</string>
+    <string name="general_action_filter">Filter</string>
+    <string name="timeline_photos_source_all_locations">Alle lokaties</string>
+    <string name="album_photos_selection_limit_dialog_title">Kan niet meer selecteren</string>
+    <string name="album_photos_selection_limit_dialog_description">U kunt alleen tot %d items per keer naar een album toevoegen.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Geen media gevonden</string>
+    <string name="album_photos_selection_screen_title">Items toevoegen naar “%s ”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">Item%1$d toegevoegd naar “%2$s“</item>
+        <item quantity="other">Items %1$d toegevoed naar “%2$s”</item>
+    </plurals>
+    <string name="albums_multiple_delete_success_message">%d albums verwijderd</string>
+    <string name="home_screen_no_network_desc">U bent offline.\nAls u bestanden offline beschikbaar maakt, kunt u ze nog steeds openen zonder internetverbinding.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">U bent offline. \nItems die u heeft opgeslagen voor offline gebruik zijn nog steeds beschikbaar.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Offline bestanden weergeven</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Toestemmingen bijwerken</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Om ervoor te zorgen dat we geen van uw herinneringen missen, heeft MEGA volledige toegang nodig tot uw fotobibliotheek.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Batterijniveau te laag. Laad het apparaat op om camera-uploads te starten.</string>
+    <string name="media_main_screen_camera_uploads_updated">Camera-uploads bijgewerkt</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera-uploads zijn up-to-date.</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Overdrachtstegoed overschreden</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Opslagtegoed overschreden</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Gepauzeerd</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">In de wachtrij</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Voltooien</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Opnieuw proberen</string>
     <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">Decoderingssleutel</string>
+    <string name="album_decryption_key_description">Ons zero-knowledge coderingssysteem vereist een unieke sleutel die automatisch voor dit bestand of deze map wordt gegenereerd. Standaard wordt een link met deze sleutel aangemaakt, maar u kunt de decoderingssleutel apart exporteren voor een extra beveiligingslaag.</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

@@ -1946,58 +1946,26 @@
     <string name="invalid_chat_link_error_message">Já não é possível acessar este chat</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Pesquisar&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

@@ -1673,7 +1673,7 @@
     <!--header for the Camera Uploads transfer in progress items -->
     <string name="camera_uploads_tranfer_header_in_progress">Devam ediyor</string>
     <!--header for the Camera Uploads transfer in queue items -->
-    <string name="camera_uploads_tranfer_header_in_queue">Kuyruğa alınıyor</string>
+    <string name="camera_uploads_tranfer_header_in_queue">Sıraya alınıyor</string>
     <!--Title for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_title">Tümü tamamlandı</string>
     <!--description for the Camera Uploads transfer empty view -->
@@ -1807,8 +1807,8 @@
     <string name="delete_singular_album_confirmation_message">“%s” silindi</string>
     <!-- Delete albums confirmation description. -->
     <plurals name="delete_album_confirmation_dialog_description">
-        <item quantity="one">Albüm silinecek ancak içeriği Zaman akışınızda kalacaktır.</item>
-        <item quantity="other">Albümler silinecek ancak içerikleri Zaman akışınızda kalacaktır.</item>
+        <item quantity="one">Albüm silinecek ancak içeriği Zaman çizelgenizde kalacaktır.</item>
+        <item quantity="other">Albümler silinecek ancak içerikleri Zaman çizelgenizde kalacaktır.</item>
     </plurals>
     <!-- External checkout button text -->
     <string name="external_checkout_button_text">Web sitemizden satın alın (%%%1$.0f kadar tasarruf edin)</string>
@@ -1896,7 +1896,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Bu klasör boş</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Bulut depolamanızda henüz bir şey yok</string>
+    <string name="context_empty_cloud_drive_title">Özel kasanızda henüz bir şey yok</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Sıfır bilgi şifrelemesi ile bir şeyleri güvende tutun</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -1909,58 +1909,106 @@
     <string name="can_only_join_one_call_error_message">Bu aramaya katılmak için mevcut aramanızı sonlandırmanız gerekiyor</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Ara&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Bu bağlantı artık herkese açık olmayacak.</item>
+        <item quantity="other">Bu bağlantılar artık herkese açık olmayacak</item>
+    </plurals>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Albüm silinsin mi?</item>
+        <item quantity="other">Albümler silinsin mi?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Bağlantı kaldırılsın mı?</item>
+        <item quantity="other">Bağlantılar kaldırılsın mı?</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">Bağlantı kaldırılsın mı?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Bağlantılar kaldırılsın mı?</string>
+    <string name="album_content_remove_link_dialog_description">Bu bağlantıyı paylaştığınız kişiler albüme erişimini kaybedecek</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Bu bağlantıları paylaştığınız kişiler albüme erişimini kaybedecek</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Albüm silinsin mi?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Albümler silinsin mi?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">Albümün içeriği silinmeyecek</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">Albümlerin içeriği silinmeyecek</string>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Bu klasörün paylaşımı kaldırılsın mı?</item>
+        <item quantity="other">Bu %1$d klasörün paylaşımı kaldırılsın mı?</item>
+    </plurals>
+    <string name="external_checkout_information_title">MEGA’dan ayrılıyorsunuz</string>
+    <string name="external_checkout_information_description">Harici bir web sitesini (%1$s) açmak üzeresiniz. İşlemlerden ve müşteri desteğinden MEGA sorumludur.</string>
+    <string name="external_checkout_show_next_time">Bunu bir dahaki sefere göster</string>
+    <string name="general_action_save">Kaydet</string>
+    <string name="album_cover_selected_success_message">Albüm kapağı güncellendi</string>
+    <string name="general_action_filter">Filtre</string>
+    <string name="timeline_photos_source_all_locations">Tüm konumlar</string>
+    <string name="album_photos_selection_limit_dialog_title">Daha fazla seçilemiyor</string>
+    <string name="album_photos_selection_limit_dialog_description">Bir albüme tek seferde en fazla %d öğe ekleyebilirsiniz.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Medya bulunamadı</string>
+    <string name="album_photos_selection_screen_title">“%s” albümüne öğe ekle</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">%1$d öğe “%2$s“ albümüne eklendi</item>
+        <item quantity="other">%1$d öğe “%2$s“ albümüne eklendi</item>
+    </plurals>
+    <string name="albums_multiple_delete_success_message">%d albüm silindi</string>
+    <string name="home_screen_no_network_desc">Çevrim dışısınız.\nDosyaları çevrim dışı kullanıma açarsanız bağlantı olmadan da onlara erişebilirsiniz.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Çevrim dışısınız.\nÇevrim dışı kullanım için kaydettiğiniz öğeler hâlâ erişilebilir durumdadır.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Çevrim dışı dosyaları görüntüle</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">İzinleri güncelle</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Hiçbir anınızın gözden kaçmadığından emin olmak için MEGA’nın fotoğraf kitaplığınıza tam erişimi olması gerekir.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Şarj seviyesi çok düşük. Kamera yüklemelerini başlatmak için cihazı şarj edin.</string>
+    <string name="media_main_screen_camera_uploads_updated">Kamera yüklemeleri güncellendi</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Kamera yüklemeleri güncel</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Aktarım kotası aşıldı</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Depolama kotası aşıldı</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Duraklatıldı</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">Sırada</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Tamamlanıyor</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Yeniden deneniyor</string>
     <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">Şifre çözme anahtarı</string>
+    <string name="album_decryption_key_description">Sıfır bilgi şifreleme sistemimiz, bu dosya veya klasör için otomatik olarak oluşturulan benzersiz bir anahtar gerektirir. Varsayılan olarak bu anahtarla bir bağlantı oluşturulur, ancak ek bir güvenlik katmanı için şifre çözme anahtarını ayrı olarak dışa aktarabilirsiniz.</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

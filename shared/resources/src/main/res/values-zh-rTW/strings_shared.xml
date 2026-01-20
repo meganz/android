@@ -1457,9 +1457,9 @@
         <item quantity="other">此資料夾已與%1$d個聯絡人共享。要停止共用嗎？</item>
     </plurals>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with dynamic valid duration -->
-    <string name="figures_storage_referrals_achievements_text">每個邀請可獲得%1$s額外儲存空間。有效期為%2$d天。</string>
+    <string name="figures_storage_referrals_achievements_text">每個邀請可獲得%1$s額外儲存空間。有效期為%2$d天</string>
     <!-- sentence to detail the figures of storage and transfer quota related to referrals achievement with permanent valid duration -->
-    <string name="figures_storage_referrals_achievements_text_permanent">每個邀請可獲得%1$s額外儲存空間。永久有效。</string>
+    <string name="figures_storage_referrals_achievements_text_permanent">每個邀請可獲得%1$s額外儲存空間。永久有效</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with dynamic valid duration -->
     <string name="figures_storage_achievements_text">%1$s額外儲存空間，有效期為%2$d天</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement with permanent valid duration -->
@@ -1571,9 +1571,9 @@
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <string name="general_links_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Snackbar message when retry success on failed transfers tab, singular form. -->
-    <string name="transfers_retry_feedback_snackbar_message_singular">正在重試傳輸，請查看進行中的傳輸分頁瞭解進度</string>
+    <string name="transfers_retry_feedback_snackbar_message_singular">正在重試傳輸，請查看進行中的分頁瞭解傳輸進度</string>
     <!-- Snackbar message when retry success on failed transfers tab, plural form. -->
-    <string name="transfers_retry_feedback_snackbar_message_plural">正在重試傳輸，請查看進行中的傳輸分頁瞭解進度</string>
+    <string name="transfers_retry_feedback_snackbar_message_plural">正在重試傳輸，請查看進行中的分頁瞭解傳輸進度</string>
     <!--Default file name for scanned documents. Placeholder value is for the current date and time values eg:   Scanned_2025091120323.  -->
     <string name="document_scanning_default_file_name">掃描_%1$s</string>
     <!-- Benefit: Rewind up to specified days of deleted data -->
@@ -1675,11 +1675,11 @@
     <!--Media screen timeline default chip text to show All timeline media-->
     <string name="media_timeline_default_chip_text">全部</string>
     <!-- category in sort by action to sort by link created date -->
-    <string name="action_sort_by_link_created">連結已建立</string>
+    <string name="action_sort_by_link_created">已建立連結</string>
     <!-- category in sort by action to sort by share created date -->
-    <string name="action_sort_by_share_created">共享已建立</string>
+    <string name="action_sort_by_share_created">已建立共享</string>
     <!-- The title of camera uploads paused warning banner -->
-    <string name="camera_update_paused_warning_banner_title">相機上傳已暫停</string>
+    <string name="camera_update_paused_warning_banner_title">已暫停相機上傳</string>
     <!-- The description of camera uploads device charging not met paused warning banner -->
     <string name="camera_update_device_charging_not_met_banner_description">僅在裝置充電時上傳。您可以在設定中更改此設定。</string>
     <!-- The button text of camera uploads device charging not met paused warning banner -->
@@ -1687,7 +1687,7 @@
     <!-- The description of camera uploads low battery paused warning banner -->
     <string name="camera_update_low_battery_banner_description">由於電池電量不足，上傳已暫停。請為您的裝置充電以繼續上傳。</string>
     <!-- The description of camera uploads network requirement not met paused warning banner -->
-    <string name="camera_update_network_requirement_not_met_banner_description">梘機上傳已暫停，請連線Wi-Fi或開啟行動數據連線</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">已暫停相機上傳，請連線Wi-Fi或開啟行動數據連線</string>
     <!-- The button text of camera uploads network requirement not met paused warning banner -->
     <string name="camera_update_network_requirement_not_met_banner_button_text">使用行動數據網路</string>
     <!-- campaign name for Black Friday deal -->
@@ -1764,7 +1764,7 @@
     <string name="external_checkout_button_text">在我們的網站上購買（最多可省%1$.0f%%）</string>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
-        <item quantity="other">與您共享這些連結的人將無法存取這些相簿。</item>
+        <item quantity="other">與您共享連結的人將無法存取相簿。</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_positive_button">
@@ -1856,58 +1856,56 @@
     <string name="can_only_join_one_call_error_message">如要加入本此通話，您必須先結束目前的通話</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">搜尋⋯</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">想要無廣告的MEGA嗎？</string>
+    <string name="payment_ads_free_intro_description">升級到具有更多儲存空間和功能的Pro方案。我們的Pro方案每月僅%1$s起。</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">連結將不再公開</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">取消共享%1$d個資料夾？</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">正在重試傳輸，請查看進行中的分頁以瞭解進度</item>
+    </plurals>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">刪除相簿？</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">移除連結？</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">移除連結？</string>
+    <string name="album_content_remove_multiple_links_dialog_title">移除連結？</string>
+    <string name="album_content_remove_link_dialog_description">與您共享此連結的人將無法存取相簿</string>
+    <string name="album_content_remove_multiple_links_dialog_description">與您共享這些連結的人將無法存取這些相簿</string>
+    <string name="delete_album_singular_confirmation_dialog_title">刪除相簿？</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">刪除相簿？</string>
+    <string name="delete_album_singular_confirmation_dialog_description">相簿內容不會被刪除</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">專輯內容不會被刪除</string>
+    <string name="external_checkout_information_title">離開MEGA</string>
+    <string name="external_checkout_information_description">您即將開啟一個外部網站（%1$s）。 MEGA負責當中交易和客戶支援。</string>
+    <string name="external_checkout_show_next_time">下次提醒</string>
+    <string name="general_action_save">儲存</string>
+    <string name="album_cover_selected_success_message">已更新相簿封面</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

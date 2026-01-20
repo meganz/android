@@ -31,6 +31,4 @@ sealed interface SearchUiAction {
     data object NavigateToFolderEventConsumed : SearchUiAction
 
     data object NavigateBackEventConsumed : SearchUiAction
-
-    data object OverQuotaConsumptionWarning : SearchUiAction
 }

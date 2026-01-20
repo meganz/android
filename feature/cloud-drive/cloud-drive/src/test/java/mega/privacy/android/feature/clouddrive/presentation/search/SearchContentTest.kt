@@ -44,6 +44,7 @@ class SearchContentTest {
                 searchText = "test",
                 searchedQuery = "test",
                 nodesLoadingState = NodesLoadingState.FullyLoaded,
+                isHiddenNodeSettingsLoading = false
             )
         )
 

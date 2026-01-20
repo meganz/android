@@ -1928,58 +1928,67 @@
     <string name="invalid_chat_link_error_message">Această conversație nu mai este disponibilă</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Caută&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">Vrei MEGA fără reclame?</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Acest link nu va mai fi disponibil publicului.</item>
+        <item quantity="few">Aceste linkuri nu vor mai fi disponibili public.</item>
+        <item quantity="other">Aceste linkuri nu vor mai fi disponibili public.</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Anulați partajarea acestui folder?</item>
+        <item quantity="few">Anulați partajarea acestor foldere?</item>
+        <item quantity="other">Anulați partajarea acestor foldere?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Se reîncearcă transferul, consultați fila Activ pentru progres</item>
+        <item quantity="few">Reîncercarea transferurilor, consultați fila Active pentru progres</item>
+        <item quantity="other">Reîncercarea transferurilor, consultați fila Active pentru progres</item>
+    </plurals>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s pentru %3$s</string>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Ștergi albumul?</item>
+        <item quantity="few">Ștergi albumele?</item>
+        <item quantity="other">Ștergi albumele?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Eliminați linkul?</item>
+        <item quantity="few">Elimină linkurile?</item>
+        <item quantity="other">Elimină linkurile?</item>
+    </plurals>
+    <string name="timeline_tab_filter_apply_filter_button">Aplică filtrul</string>
+    <string name="general_invite_contact">Invită contactul</string>
+    <string name="contact_found_dialog_title">Contact găsit</string>
+    <string name="album_content_action_remove_favourites">Elimină din Favorite</string>
+    <string name="context_empty_cloud_drive_title">Nimic în seiful tău privat încă</string>
+    <string name="open_link_account_confirmation_error">Ești deja conectat la un cont MEGA diferit. Deconectează-te mai întâi, apoi deschide din nou linkul de confirmare a contului.</string>
+    <string name="general_invalid_link">Link invalid. Vă rugăm să încercați din nou sau să solicitați un alt link.</string>
+    <string name="can_only_join_one_call_error_message">Pentru a te alătura acestui apel, trebuie să închei apelul actual</string>
+    <string name="album_content_remove_link_dialog_title">Eliminați linkul?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Elimină linkurile?</string>
+    <string name="album_content_remove_link_dialog_description">Persoanele cu care ai partajat acest link vor pierde accesul la album</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Persoanele cu care ai partajat aceste linkuri vor pierde accesul la albumele</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Ștergi albumul?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Ștergi albumele?</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

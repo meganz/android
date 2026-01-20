@@ -1988,58 +1988,124 @@
     <string name="can_only_join_one_call_error_message">Чтобы присоединиться к этому звонку, вы должны завершить текущий</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Поиск&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">Хотите MEGA без рекламы?</string>
+    <string name="payment_ads_free_intro_description">Перейдите на Pro-план с большим объёмом места для хранения и многого другого. Наши Pro-планы начинаются всего за %1$s в месяц.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Эта ссылка больше не будет доступна публично.</item>
+        <item quantity="few">Эти ссылки больше не будут доступны публично.</item>
+        <item quantity="many">Эти ссылки больше не будут доступны публично.</item>
+        <item quantity="other">Эти ссылки больше не будут доступны публично.</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Закрыть общий доступ к этой %1$d папке?</item>
+        <item quantity="few">Закрыть общий доступ к этим %1$d папкам?</item>
+        <item quantity="many">Закрыть общий доступ к этим %1$d папкам?</item>
+        <item quantity="other">Закрыть общий доступ к этим %1$d папкам?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Повтор передачи — смотрите статус на вкладке «Активные»</item>
+        <item quantity="few">Повтор передач — смотрите статус на вкладке «Активные»</item>
+        <item quantity="many">Повтор передач — смотрите статус на вкладке «Активные»</item>
+        <item quantity="other">Повтор передач — смотрите статус на вкладке «Активные»</item>
+    </plurals>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Удалить альбом?</item>
+        <item quantity="few">Удалить альбомы?</item>
+        <item quantity="many">Удалить альбомы?</item>
+        <item quantity="other">Удалить альбомы?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Удалить ссылку?</item>
+        <item quantity="few">Удалить ссылки?</item>
+        <item quantity="many">Удалить ссылки?</item>
+        <item quantity="other">Удалить ссылки?</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">Удалить ссылку?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Удалить ссылки?</string>
+    <string name="album_content_remove_link_dialog_description">Получатели этой ссылки потеряют доступ к альбому</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Получатели этой ссылки потеряют доступ к альбомам</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Удалить альбом?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Удалить альбомы?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">Содержимое альбома не будет удалено</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">Содержимое альбомов не будет удалено</string>
+    <string name="external_checkout_information_title">Переход из MEGA</string>
+    <string name="external_checkout_information_description">Вы собираетесь открыть внешний сайт (%1$s). MEGA отвечает за транзакции и поддержку клиентов.</string>
+    <string name="external_checkout_show_next_time">Показывать в следующий раз</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Слишком низкий заряд батареи. Для загрузок из камеры зарядите устройство</string>
+    <string name="media_main_screen_camera_uploads_updated">Загрузки из камеры обновлены</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Загрузки из камеры синхронизированы</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Превышен лимит передачи данных</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Превышен лимит хранения данных</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Приостановлено</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">В очереди</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Завершение</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Повторная попытка</string>
+    <string name="label_file_speed_byte">%1$s&#160;Б/с</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;КБ/с</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;МБ/с</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;ГБ/с</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;ТБ/с</string>
+    <string name="label_file_size_byte">%1$s&#160;Б</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;КБ</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;МБ</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;ГБ</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;ТБ</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;ПБ</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;ЭБ</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;Б/с</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;КБ/с</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;МБ/с</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;ГБ/с</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;ТБ/с</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;Б</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;КБ</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;МБ</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;ГБ</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;ТБ</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;ПБ</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;ЭБ</string>
+    <string name="album_decryption_key_title">Ключ дешифрования</string>
+    <string name="album_decryption_key_description">Наша система шифрования с нулевым разглашением требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создаётся по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
+    <string name="general_action_save">Сохранить</string>
+    <string name="album_cover_selected_success_message">Обложка альбома обновлена</string>
+    <string name="general_action_filter">Фильтр</string>
+    <string name="timeline_photos_source_all_locations">Все расположения</string>
+    <string name="album_photos_selection_limit_dialog_title">Нельзя выбрать больше</string>
+    <string name="album_photos_selection_limit_dialog_description">В альбом можно добавить только до %d элементов за один раз.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Медиафайлы не найдены</string>
+    <string name="album_photos_selection_screen_title">Добавление элементов в «%s»</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">Добавлен %1$d элемент в «%2$s»</item>
+        <item quantity="few">Добавлено %1$d элемента в «%2$s»</item>
+        <item quantity="many">Добавлено %1$d элементов в «%2$s»</item>
+        <item quantity="other">Добавлено %1$d элементов в «%2$s»</item>
+    </plurals>
+    <string name="albums_multiple_delete_success_message">Альбомы удалены (%d)</string>
+    <string name="home_screen_no_network_desc">Вы не в сети.\nЕсли вы сделаете файлы доступными локально, они будут доступны без Интернета.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Вы не в сети.\nЭлементы, сохранённые для локального использования, по-прежнему доступны.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Просмотреть файлы локально</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Обновить разрешения</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Чтобы мы не пропустили все ваши воспоминания, MEGA нужен полный доступ к галерее.</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

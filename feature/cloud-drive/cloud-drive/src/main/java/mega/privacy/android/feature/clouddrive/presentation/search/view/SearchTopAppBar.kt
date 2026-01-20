@@ -9,17 +9,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun SearchTopAppBar(
     searchText: String,
+    placeholderText: String,
     onSearchTextChanged: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -33,7 +32,7 @@ fun SearchTopAppBar(
         query = searchText,
         title = "",
         navigationType = AppBarNavigationType.Back(onBack),
-        searchPlaceholder = stringResource(sharedR.string.search_bar_placeholder_text),
+        searchPlaceholder = placeholderText,
         onQueryChanged = {
             if (!isExiting) {
                 onSearchTextChanged(it)
@@ -58,7 +57,8 @@ fun SearchTopAppBar(
 private fun PreviewSearchTopAppBar() {
     AndroidThemeForPreviews {
         SearchTopAppBar(
-            searchText = "Sample Search",
+            searchText = "",
+            placeholderText = "Search...",
             onSearchTextChanged = {},
             onBack = {}
         )

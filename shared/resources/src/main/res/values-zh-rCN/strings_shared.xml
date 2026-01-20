@@ -1856,52 +1856,64 @@
     <string name="can_only_join_one_call_error_message">要加入此次通话，您必须结束当前的通话</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">搜索&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">想要无广告的MEGA吗？</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">链接将无法再被公开访问</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">取消共享 %1$d个 文件夹？</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">正在重试传输，参见“进行中的传输”选项卡了解进度</item>
+    </plurals>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">是否删除相册？</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">是否移除链接？</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">是否移除链接？</string>
+    <string name="album_content_remove_multiple_links_dialog_title">是否移除链接？</string>
+    <string name="album_content_remove_link_dialog_description">被您分享过此链接的人将失去对该相册的访问权限。</string>
+    <string name="album_content_remove_multiple_links_dialog_description">被您分享过链接的人将失去对这些相册的访问权限。</string>
+    <string name="delete_album_singular_confirmation_dialog_title">是否删除相册？</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">是否删除相册？</string>
+    <string name="delete_album_singular_confirmation_dialog_description">相册的内容将不会被删除。</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">相册中的内容不会被删除。</string>
+    <string name="external_checkout_information_title">离开MEGA</string>
+    <string name="external_checkout_information_description">您即将打开一个外部网站（%1$s）。将由MEGA负责交易和客户支持。</string>
+    <string name="external_checkout_show_next_time">下次再显示这个</string>
+    <string name="general_action_save">保存</string>
+    <string name="album_cover_selected_success_message">相册封面已更新</string>
+    <string name="general_action_filter">筛选</string>
+    <string name="timeline_photos_source_all_locations">所有位置</string>
+    <string name="album_photos_selection_limit_dialog_title">无法选择更多</string>
+    <string name="album_photos_selection_limit_dialog_description">您一次只能向相册添加最多 %d 项内容。</string>
+    <string name="album_photos_selection_empty_state_no_media_found">未找到媒体文件</string>
+    <string name="album_photos_selection_screen_title">添加项目到“%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="other">已添加%1$d个项目到“%2$s”</item>
+    </plurals>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

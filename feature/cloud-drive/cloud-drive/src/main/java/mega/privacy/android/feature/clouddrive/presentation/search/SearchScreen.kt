@@ -109,6 +109,7 @@ fun SearchScreen(
             } else {
                 SearchTopAppBar(
                     searchText = uiState.searchText,
+                    placeholderText = uiState.placeholderText.text,
                     onSearchTextChanged = {
                         viewModel.processAction(SearchUiAction.UpdateSearchText(it))
                     },
@@ -303,13 +304,6 @@ fun SearchContent(
         }
 
         when {
-            uiState.isLoading -> {
-                NodesViewSkeleton(
-                    isListView = isListView,
-                    spanCount = spanCount,
-                )
-            }
-
             uiState.isPreSearch -> {
                 Box(
                     modifier = Modifier
@@ -319,6 +313,13 @@ fun SearchContent(
                 ) {
 
                 }
+            }
+
+            uiState.isLoading -> {
+                NodesViewSkeleton(
+                    isListView = isListView,
+                    spanCount = spanCount,
+                )
             }
 
             uiState.isEmpty -> {

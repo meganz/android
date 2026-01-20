@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.search.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
@@ -26,7 +27,7 @@ data class SearchUiState(
     val items: List<NodeUiItem<TypedNode>> = emptyList(),
     val currentViewType: ViewType = ViewType.LIST,
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Idle,
-    val isHiddenNodeSettingsLoading: Boolean = false, // TODO Change to true when implementing
+    val isHiddenNodeSettingsLoading: Boolean = true,
     val isHiddenNodesEnabled: Boolean = false,
     val showHiddenNodes: Boolean = false,
     val isSelecting: Boolean = false,
@@ -40,6 +41,7 @@ data class SearchUiState(
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val navigateBack: StateEvent = consumed,
+    val placeholderText: LocalizedText = LocalizedText.Literal("")
 ) {
     /**
      * True if nodes or hidden node settings are loading

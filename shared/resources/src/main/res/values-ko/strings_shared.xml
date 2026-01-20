@@ -15,9 +15,9 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_EXPIRED -->
     <string name="general_sync_account_expired">요금제가 만료되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
-    <string name="general_sync_foreign_target_overshare">이 폴더를 공유한 사람의 저장소 한도에 도달하여 폴더를 동기화할 수 없습니다.</string>
+    <string name="general_sync_foreign_target_overshare">이 폴더를 공유한 사람의 저장소 한도에 도달하여 폴더를 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">당신에게 전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다.</string>
+    <string name="general_sync_share_non_full_access">당신에게 전체 권한 없이 공유된 폴더이기 때문에 폴더를 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="general_sync_put_nodes_error">이 폴더의 파일을 동기화 또는 백업할 수 없습니다. 데스크톱 앱에서 동기화 또는 백업을 다시 활성화 해야 합니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
@@ -35,7 +35,7 @@
     <!-- The name of the Device or Folder Sub State when its code is BACKUP_SOURCE_NOT_BELOW_DRIVE -->
     <string name="general_sync_backup_source_not_below_drive">외부 드라이브에 있는 폴더를 찾을 수 없습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_SAME_PATH -->
-    <string name="general_sync_active_sync_same_path">같은 위치에 이미 동기화된 폴더가 있습니다.</string>
+    <string name="general_sync_active_sync_same_path">같은 위치에 이미 동기화된 폴더가 있습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_MOVE_CLOUD_NODES -->
     <string name="general_sync_could_not_move_cloud_nodes">이름 변경 실패</string>
     <!-- The name of the Device or Folder Sub State when its code is COULD_NOT_CREATE_IGNORE_FILE -->
@@ -289,7 +289,7 @@
     <!-- error label for add tags page when special characters added -->
     <string name="add_tags_error_special_characters">태그는 공백 또는 영숫자가 아닌 기호를 포함할 수 없습니다. 대문자로 쓴 태그는 소문자로 표기됩니다.</string>
     <!-- error label for add tags page when tag count is maximum -->
-    <string name="add_tags_error_max_tags">최대 태그 수는 %1$d입니다.</string>
+    <string name="add_tags_error_max_tags">최대 태그 수는 %1$d입니다</string>
     <!-- title label for tags page -->
     <string name="add_tags_page_title_label">태그</string>
     <!-- The placeholder for read only files/folders with no description in info screen-->
@@ -379,9 +379,9 @@
     <!-- Title shown when needing to reactivate the subscription using a web browser -->
     <string name="account_cancellation_instructions_reactivation_web_browser_needed">웹 브라우저를 이용하여 구독을 재활성화하여야 합니다</string>
     <!-- Message shown when reactivating the current plan in the instructions screen, informing the user about how to reactivate the subscription -->
-    <string name="account_cancellation_instructions_reactivation_web_browser_description">당신이 웹 브라우저에서 MEGA를 구독하였기 때문입니다.\n구독을 재활성화 하려면, 다음을 해야 합니다:</string>
+    <string name="account_cancellation_instructions_reactivation_web_browser_description">당신이 웹 브라우저에서 MEGA를 구독하였기 때문입니다. 구독을 재활성화 하려면, 다음을 해야 합니다:</string>
     <!-- Description explaining why the subscription needs to be canceled using a web browser -->
-    <string name="account_cancellation_instructions_web_browser_description">당신이 웹 브라우저에서 MEGA를 구독하였기 때문입니다.\n구독을 취소 하려면, 다음을 해야 합니다:</string>
+    <string name="account_cancellation_instructions_web_browser_description">당신이 웹 브라우저에서 MEGA를 구독하였기 때문입니다. 구독을 취소 하려면, 다음을 해야 합니다:</string>
     <!-- Label for cancellation instructions on a computer -->
     <string name="account_cancellation_instructions_on_computer">컴퓨터에서</string>
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
@@ -389,9 +389,9 @@
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
     <string name="account_cancellation_instructions_click_main_menu">3. 메인 메뉴를 클릭합니다.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
-    <string name="account_cancellation_instructions_click_settings">4. [A]설정[/A]을 클릭합니다.</string>
+    <string name="account_cancellation_instructions_click_settings">4. [A]설정[/A]을 클릭합니다</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_plan">5. [A]요금제[/A]를 클릭합니다</string>
+    <string name="account_cancellation_instructions_click_plan">5. [A]요금제[/A]를 클릭합니다.</string>
     <!-- Step 6: instruction step no.6 Click Cancel subscription of the MEGA account on MEGA website -->
     <string name="account_cancellation_instructions_click_cancel_subscription">6. [A]구독 취소[/A]를 클릭합니다.</string>
     <!-- Alternative Step 6: instruction step no.5 Click Reactivate subscription when user's subscription has expired of the MEGA account on MEGA website-->
@@ -423,9 +423,9 @@
     <!-- Sync settings section title-->
     <string name="settings_section_sync">동기화</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
-    <string name="transfers_scanning_folders_dialog_creating_folders_title">폴더 생성 중...</string>
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">폴더 생성 중&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">전송 시작 중...</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">전송 시작 중&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">앱을 닫지 마세요. 만약 닫으면, 아직 대기열에 들어가지 않은 전송이 손실됩니다.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
@@ -448,10 +448,10 @@
     <string name="settings_sync_debris_cleared_message">.debris 폴더를 성공적으로 지웠습니다</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This message will inform how many files and folders were found. Example: "Found 134 folders and 5689 files." As it has double pluralization, folders will be pluralized in another string resource: transfers_scanning_folders_dialog_scanning_folders_subtitle -->
     <plurals name="transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle">
-        <item quantity="other">%1$s와/과 파일 %2$d개 발견</item>
+        <item quantity="other">%1$s와/과 파일 %2$d개 발견.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
-    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중...</string>
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
     <string name="report_issue_error_minimum_characters">문의사항은 최소 10자이어야 합니다</string>
     <!-- placeholder message for report issue-->
@@ -621,7 +621,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_title">아직 설정된 동기화 또는 백업이 없습니다</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요.</string>
+    <string name="device_center_sync_backup_list_empty_state_message">장치의 폴더를 MEGA의 폴더와 동기화 또는 백업하세요</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">MEGA는 회의 이름과 설명을 볼 수 있지만, 비밀로 유지합니다</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -635,7 +635,7 @@
     <!-- Title for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded -->
     <string name="dialog_not_enough_space_to_upload_title">새 파일을 업로드할 공간이 충분하지 않습니다</string>
     <!-- Message for a warning dialog informing the account is in storage over quota and cannot upload anything unless it is upgraded. Please do not remove the placeholders, it is for highlighting the text as a link. -->
-    <string name="dialog_not_enough_space_to_upload_message">당신의 저장소 할당량을 초과하였습니다. 새 파일을 업로드하려면 더 높은 요금제로 업그레이드하거나 공간을 확보하세요. [A]더 알아보기[/A]</string>
+    <string name="dialog_not_enough_space_to_upload_message">당신의 저장소 할당량을 초과하였습니다. 새 파일을 업로드하려면 더 높은 요금제로 업그레이드하거나 공간을 확보하세요. [A]더 알아보기[/A].</string>
     <!-- Name for a general button which action is navigate to the "Upgrade" account -->
     <string name="general_upgrade_button">업그레이드</string>
     <!-- Photos search welcome title -->
@@ -699,7 +699,7 @@
     <!-- The Generous storage label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_generous_storage_label">넉넉한 저장소</string>
     <!-- The Generous storage description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_generous_storage_description">무제한 데이터 보관, %1$s부터 시작</string>
+    <string name="payment_ads_free_intro_generous_storage_description">무제한 데이터 보관, %1$s부터 시작.</string>
     <!-- The Transfer sharing label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_transfer_sharing_label">전송 공유</string>
     <!-- The Transfer sharing description in the ads free introduction screen -->
@@ -837,11 +837,11 @@
         <item quantity="other">파일 %2$d개가 “%1$s”에 추가되었습니다. 중복 파일은 다시 추가할 수 없습니다.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">클라우드 드라이브에 %1$s를/을 저장하는 중...</string>
+    <string name="transfers_start_upload_profile_qr_code_message">클라우드 드라이브에 %1$s를/을 저장하는 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
-    <string name="device_center_list_view_item_status_uploading">업로드 중...</string>
+    <string name="device_center_list_view_item_status_uploading">업로드 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% 업로드 중...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% 업로드 중&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">비활성</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -941,7 +941,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">이미 MEGA 계정이 있나요? [A]로그인[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">파일 불러오는 중...</string>
+    <string name="transfers_fake_preview_text">파일 불러오는 중&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">미리 보기를 취소할까요?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -969,11 +969,11 @@
     <!-- USP Carousel page 2 title-->
     <string name="carousel_page_title_slide_2">모든 순간을 안전하게 보관</string>
     <!-- USP Carousel page 2 description-->
-    <string name="carousel_page_description_slide_2">MEGA Cloud 자동 카메라 업로드 기능과 넉넉한 용량으로 절대 소중한 추억을 잃지 않습니다.</string>
+    <string name="carousel_page_description_slide_2">MEGA Cloud 자동 카메라 업로드 기능과 넉넉한 용량으로 절대 소중한 추억을 잃지 않습니다</string>
     <!-- USP Carousel page 3 title-->
     <string name="carousel_page_title_slide_3">당신의 데이터. 당신의 공간.</string>
     <!-- USP Carousel page 3 description-->
-    <string name="carousel_page_description_slide_3">충분한 저장소와 간편한 파일 전송, 공유, 정리 방법을 통해 어떤 용도로든 MEGA를 안전하게 사용할 수 있습니다.</string>
+    <string name="carousel_page_description_slide_3">충분한 저장소와 간편한 파일 전송, 공유, 정리 방법을 통해 어떤 용도로든 MEGA를 안전하게 사용할 수 있습니다</string>
     <!-- USP Carousel page 4 title-->
     <string name="carousel_page_title_slide_4">비공개로 말하기</string>
     <!-- USP Carousel page 4 description-->
@@ -999,7 +999,7 @@
     <!--Camera backup permission screen description-->
     <string name="camera_backup_permission_screen_description">당신의 추억은 중요합니다.\n\n카메라 업로드가 당신의 사진과 동영상을 자동으로 MEGA 클라우드 드라이브로 백업하여, 당신은 추억을 잃을 걱정을 하지 않아도 됩니다.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">카메라 업로드는 장치의 사진 라이브러리에 대해 [A]전체 접근[/A]이 필요합니다.</string>
+    <string name="camera_backup_permission_banner_info_description">카메라 업로드는 장치의 사진 라이브러리에 대해 [A]전체 접근[/A]이 필요합니다</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">카메라 업로드 활성화</string>
     <!--Permission screen skip requesting permission button text-->
@@ -1065,7 +1065,7 @@
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">무료 요금제로 시작하세요</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">아직 유료 요금제를 이용할 필요는 없습니다, 무료 요금제는 넉넉한 양의 저장소와 전송 할당량을 제공합니다.</string>
+    <string name="free_plan_card_description">아직 유료 요금제를 이용할 필요는 없습니다, 무료 요금제는 넉넉한 양의 저장소와 전송 할당량을 제공합니다</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">제한된 전송</string>
     <!-- Button text for Free Plan card -->
@@ -1245,7 +1245,7 @@
     <!--Title of playback position dialog that is displayed when audio has playback position history. -->
     <string name="audio_playback_position_dialog_title">이어서 들을까요?</string>
     <!--Message of playback position dialog that is displayed when audio has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="audio_playback_position_dialog_message">%1$s는/은 %2$s부터 재개됩니다</string>
+    <string name="audio_playback_position_dialog_message">%1$s는/은 %2$s부터 재개됩니다.</string>
     <!--Resume of playback position dialog for playing audio from the playback position history. -->
     <string name="audio_playback_position_dialog_resume_button">재개</string>
     <!--Resume of playback position dialog for playing audio from beginning. -->
@@ -1351,7 +1351,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">이 파일 유형을 지원하는 앱을 설치하지 않은 것 같습니다</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요.</string>
+    <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">폴더를 선택하거나 새 폴더를 만드세요</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
@@ -1389,7 +1389,7 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. 웹 브라우저에서 [A]https://%1$s[/A]에 방문하세요.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">업로드 확인 중...</string>
+    <string name="camera_uploads_banner_checking_uploads_text">업로드 확인 중&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">업로드 중: %d개 항목 남음</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
@@ -1397,11 +1397,11 @@
     <!-- when Merge folders action is selected , title of the apply to all dialog  -->
     <string name="sync_stalled_issue_merge_folders_title">폴더를 합치고 파일 이름을 바꿀까요?</string>
     <!-- when Choose the local file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_local_file_title">로컬 파일을 선택하세요</string>
+    <string name="sync_stalled_issue_choose_local_file_title">로컬 파일을 선택하세요?</string>
     <!-- when Choose the file stored in MEGA action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_remote_file_title">MEGA에 저장될 파일을 선택하세요</string>
+    <string name="sync_stalled_issue_choose_remote_file_title">MEGA에 저장될 파일을 선택하세요?</string>
     <!-- when Choose the last modified file action is selected , title of the apply to all dialog -->
-    <string name="sync_stalled_issue_choose_latest_modified_time_title">마지막으로 수정된 파일을 선택하세요</string>
+    <string name="sync_stalled_issue_choose_latest_modified_time_title">마지막으로 수정된 파일을 선택하세요?</string>
     <!-- Colored folders onboarding title -->
     <string name="colored_folders_onboarding_title">여러 색의 폴더, 더 깔끔한 정리</string>
     <!-- Colored folders onboarding description -->
@@ -1551,7 +1551,7 @@
     <!-- Benefit: Rewind up to specified days of deleted data -->
     <string name="pro_plan_benefit_rewind_days">최대 %1$d일의 삭제된 데이터 되감기</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">링크 제거를 실패하였습니다, 나중에 다시 시도하세요.</string>
+    <string name="public_link_node_removal_error_message">링크 제거를 실패하였습니다, 나중에 다시 시도하세요</string>
     <!-- Warning that appears prior to remove links of files-->
     <string name="remove_links_warning_message">링크를 삭제하는 것은 콘텐츠가 공개적으로 접근할 수 없다는 것을 의미합니다</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
@@ -1816,58 +1816,52 @@
     <string name="can_only_join_one_call_error_message">이 통화에 참여하려면 현재 통화를 마쳐야합니다</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">검색&#8230;</string>
-    <!-- Media timeline tab: CU permission waning banner action text -->
-    <string name="timeline_tab_cu_permission_warning_banner_action">Update permissions</string>
-    <!-- Media timeline tab: CU permission waning banner description -->
-    <string name="timeline_tab_cu_permission_warning_banner_description">To ensure we don’t miss all your memories, MEGA needs full access to your photo library.</string>
-    <!-- Media timeline tab: CU battery level waning banner description -->
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Battery level too low. Charge device to start camera uploads.</string>
-    <!-- Media main screen: Camera uploads updated info message. -->
-    <string name="media_main_screen_camera_uploads_updated">Camera uploads updated</string>
-    <!-- Media main screen: Camera uploads up to date info message in the toolbar. -->
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera uploads up to date</string>
-    <!-- Multiple album deletion success message -->
-    <string name="albums_multiple_delete_success_message">%d albums deleted</string>
-    <!-- Home Screen - No Network Connection description -->
-    <string name="home_screen_no_network_desc">You’re offline.\nIf you make files available offline, you’ll still be able to access them without a connection.</string>
-    <!-- Home Screen - No Network Connection description with offline files -->
-    <string name="home_screen_no_network_desc_with_offline_files">You’re offline.\nItems you’ve saved for offline use are still available.</string>
-    <!-- Home Screen - View Offline files button -->
-    <string name="home_screen_no_network_view_offline_files_button">View offline files</string>
-    <!-- Label indicating transfer over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Transfer quota exceeded</string>
-    <!-- Label indicating storage over quota in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_storage_over_quota">Storage quota exceeded</string>
-    <!-- Label indicating that the transfer is paused in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Paused</string>
-    <!-- Label indicating that the transfer is queued in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_queued">Queued</string>
-    <!-- Label indicating that the transfer is completing in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_completing">Completing</string>
-    <!-- Label indicating that the transfer is retrying in CU progress screen -->
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">Retrying</string>
-    <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
-    <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
-    <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
-    <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
-    <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
-    <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%1$s&#160;B</string>
-    <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
-    <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
-    <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
-    <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
-    <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
-    <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="payment_ads_free_intro_title">광고 없는 MEGA를 원하나요?</string>
+    <string name="payment_ads_free_intro_description">넉넉한 저장소와 그 이상이 있는 Pro 요금제로 업그레이드 하세요. Pro 요금제는 단돈 월 %1$s부터 시작합니다.</string>
+    <plurals name="context_link_removal_error">
+        <item quantity="other">링크 제거 실패. 나중에 다시 시도하세요.</item>
+    </plurals>
+    <plurals name="context_link_removal_success">
+        <item quantity="other">링크 제거됨</item>
+    </plurals>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">이 링크를 더 이상 공개적으로 이용할 수 없게 됩니다</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">폴더 %1$d개를 공유 해제할까요?</item>
+    </plurals>
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">%1$d개의 공유된 폴더를 떠났습니다</item>
+    </plurals>
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">%1$d개의 공유된 폴더를 떠날 수 없었습니다</item>
+    </plurals>
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">%1$d개의 공유된 폴더를 떠났습니다,&#160;</item>
+    </plurals>
+    <string name="external_checkout_information_title">MEGA에서 나가는 중</string>
+    <string name="external_checkout_show_next_time">이것을 다음에 보여주세요</string>
+    <string name="external_checkout_information_description">외부 웹사이트(%1$s)를 열려고 합니다. MEGA는 거래와 고객 지원에 책임이 있습니다.</string>
+    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
+    <string name="search_placeholder_folder">Search in %s</string>
+    <!-- Placeholder text for search bar when searching in Cloud drive section -->
+    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
+    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
+    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
+    <!-- Placeholder text for search bar when searching in Incoming shares section -->
+    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
+    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
+    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
+    <!-- Placeholder text for search bar when searching in Links section -->
+    <string name="search_placeholder_links">Search in Links</string>
+    <!-- Placeholder text for search bar when searching in Favourites section -->
+    <string name="search_placeholder_favourites">Search in Favourites</string>
+    <!-- Placeholder text for search bar when searching in Documents section -->
+    <string name="search_placeholder_documents">Search in Documents</string>
+    <!-- Placeholder text for search bar when searching in Audio section -->
+    <string name="search_placeholder_audios">Search in Audios</string>
+    <!-- Placeholder text for search bar when searching in Videos section -->
+    <string name="search_placeholder_videos">Search in Videos</string>
+    <!-- Placeholder text for search bar when searching in Backups section -->
+    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

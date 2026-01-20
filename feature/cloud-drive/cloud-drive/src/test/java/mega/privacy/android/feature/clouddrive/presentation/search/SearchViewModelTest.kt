@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -19,6 +20,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -29,6 +31,7 @@ import mega.privacy.android.domain.entity.search.DateFilterOption
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.entity.search.TypeFilterOption
+import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
@@ -40,9 +43,11 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.NodeSourceTypeToSearchTargetMapper
+import mega.privacy.android.feature.clouddrive.presentation.search.mapper.SearchPlaceholderMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.mapper.TypeFilterToSearchMapper
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterResult
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -75,6 +80,8 @@ class SearchViewModelTest {
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
+    private val searchPlaceholderMapper: SearchPlaceholderMapper = mock()
+    private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val parentHandle = 123L
     private val args = SearchViewModel.Args(
@@ -110,6 +117,8 @@ class SearchViewModelTest {
         monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
+        searchPlaceholderMapper = searchPlaceholderMapper,
+        getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
     )
 
     private fun setupTestData(
@@ -149,6 +158,15 @@ class SearchViewModelTest {
             )
         ).thenReturn(flowOf())
         whenever(nodeSourceTypeToSearchTargetMapper(any())).thenReturn(SearchTarget.ROOT_NODES)
+        runBlocking {
+            whenever(getNodeInfoByIdUseCase(any())).thenReturn(null)
+            whenever(
+                searchPlaceholderMapper(
+                    nodeSourceType = any(),
+                    nodeName = anyOrNull()
+                )
+            ).thenReturn(LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text))
+        }
     }
 
     @Test
@@ -1278,6 +1296,108 @@ class SearchViewModelTest {
                 },
                 isSingleActivityEnabled = any()
             )
+        }
+
+    @Test
+    fun `test that updateSearchPlaceholder sets placeholder when parentHandle is -1L`() = runTest {
+        val args = SearchViewModel.Args(
+            parentHandle = -1L,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
+        val expectedPlaceholder =
+            LocalizedText.StringRes(sharedR.string.search_placeholder_cloud_drive)
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(
+            searchPlaceholderMapper(
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                nodeName = null
+            )
+        ).thenReturn(expectedPlaceholder)
+
+        val underTest = createViewModel(args)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.placeholderText).isEqualTo(expectedPlaceholder)
+        }
+    }
+
+    @Test
+    fun `test that updateSearchPlaceholder sets placeholder when node name is available`() =
+        runTest {
+            val nodeName = "My Folder"
+            val nodeInfo = NodeInfo(name = nodeName, isNodeKeyDecrypted = true)
+            val expectedPlaceholder = LocalizedText.StringRes(
+                resId = sharedR.string.search_placeholder_folder,
+                formatArgs = listOf(nodeName)
+            )
+            setupTestData(emptyList())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+            whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(nodeInfo)
+            whenever(
+                searchPlaceholderMapper(
+                    nodeSourceType = nodeSourceType,
+                    nodeName = nodeName
+                )
+            ).thenReturn(expectedPlaceholder)
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.placeholderText).isEqualTo(expectedPlaceholder)
+            }
+        }
+
+    @Test
+    fun `test that updateSearchPlaceholder sets placeholder when node info is null`() = runTest {
+        val expectedPlaceholder =
+            LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
+        setupTestData(emptyList())
+        whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+        whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(null)
+        whenever(
+            searchPlaceholderMapper(
+                nodeSourceType = nodeSourceType,
+                nodeName = null
+            )
+        ).thenReturn(expectedPlaceholder)
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.placeholderText).isEqualTo(expectedPlaceholder)
+        }
+    }
+
+    @Test
+    fun `test that updateSearchPlaceholder falls back to default when mapper throws exception`() =
+        runTest {
+            val nodeInfo = NodeInfo(name = "My Folder", isNodeKeyDecrypted = true)
+            val expectedPlaceholder =
+                LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text)
+            setupTestData(emptyList())
+            whenever(monitorNodeUpdatesByIdUseCase(any(), any())).thenReturn(flowOf())
+            whenever(getNodeInfoByIdUseCase(NodeId(parentHandle))).thenReturn(nodeInfo)
+            whenever(
+                searchPlaceholderMapper(
+                    nodeSourceType = nodeSourceType,
+                    nodeName = nodeInfo.name
+                )
+            ).thenThrow(RuntimeException("Mapper error"))
+
+            val underTest = createViewModel()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.placeholderText).isEqualTo(expectedPlaceholder)
+            }
         }
 
 }
