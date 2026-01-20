@@ -22,5 +22,8 @@ internal class PitagTriggerMapper @Inject constructor() {
         PitagTrigger.Camera -> MegaApiJava.PITAG_TRIGGER_CAMERA
         PitagTrigger.Scanner -> MegaApiJava.PITAG_TRIGGER_SCANNER
         PitagTrigger.SyncAlgorithm -> MegaApiJava.PITAG_TRIGGER_SYNC_ALGORITHM
+        PitagTrigger.ShareFromApp -> MegaApiJava.PITAG_TRIGGER_SHARE_FROM_APP
+        PitagTrigger.CameraCapture -> MegaApiJava.PITAG_TRIGGER_CAMERA_CAPTURE
+        PitagTrigger.ExplorerExtension -> MegaApiJava.PITAG_TRIGGER_EXPLORER_EXTENSION
     }
 }

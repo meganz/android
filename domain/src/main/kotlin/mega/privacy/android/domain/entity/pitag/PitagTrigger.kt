@@ -10,4 +10,7 @@ enum class PitagTrigger {
     Camera,
     Scanner,
     SyncAlgorithm,
+    ShareFromApp,
+    CameraCapture,
+    ExplorerExtension,
 }
