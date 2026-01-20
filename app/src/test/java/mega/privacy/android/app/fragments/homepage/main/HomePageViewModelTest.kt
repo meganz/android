@@ -136,4 +136,25 @@ class HomePageViewModelTest {
                 assertThat(awaitItem()).isEqualTo(banners)
             }
         }
+
+    @Test
+    fun `test that getBanners filters out banners with variant other than 0`() = runTest {
+        val banner0 = mock<Banner> {
+            on { variant } doReturn 0
+        }
+        val banner1 = mock<Banner> {
+            on { variant } doReturn 1
+        }
+        val allBanners = listOf(banner0, banner1)
+
+        whenever(getBannersUseCase()).thenReturn(allBanners)
+
+        underTest.getBanners()
+
+        underTest.banners.test {
+            val result = awaitItem()
+            assertThat(result).containsExactly(banner0)
+            assertThat(result).doesNotContain(banner1)
+        }
+    }
 }

@@ -44,7 +44,8 @@ internal class BannerRepositoryImplTest {
             "http://test.com",
             "http://test.com",
             "http://test.com",
-            buttonText = null
+            buttonText = null,
+            variant = 0
         ),
         Banner(
             2,
@@ -54,7 +55,8 @@ internal class BannerRepositoryImplTest {
             "http://test2.com",
             "http://test2.com",
             "http://test2.com",
-            buttonText = null
+            buttonText = null,
+            variant = 0
         )
     )
 

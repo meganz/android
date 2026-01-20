@@ -29,7 +29,8 @@ internal class GetPromoBannersUseCaseTest {
             backgroundImage = "bg1.jpg",
             imageLocation = "https://images.example.com",
             url = "https://test.com",
-            buttonText = "Click Me"
+            buttonText = "Click Me",
+            variant = 1
         ),
         Banner(
             id = 2,
@@ -39,7 +40,8 @@ internal class GetPromoBannersUseCaseTest {
             backgroundImage = "bg2.jpg",
             imageLocation = "https://images.example.com",
             url = "https://test2.com",
-            buttonText = null
+            buttonText = null,
+            variant = 1
         )
     )
 

@@ -22,7 +22,8 @@ internal class MegaBannerMapper @Inject constructor() {
                 backgroundImage = megaBanner.backgroundImage.orEmpty(),
                 url = megaBanner.url.orEmpty(),
                 imageLocation = megaBanner.imageLocation.orEmpty(),
-                buttonText = megaBanner.button.orEmpty()
+                buttonText = megaBanner.button.orEmpty(),
+                variant = megaBanner.variant
             )
         }
     }
