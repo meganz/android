@@ -842,4 +842,43 @@ class MonitorNodeUpdatesByIdUseCaseTest {
                 cancelAndConsumeRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that invoke returns NodeChanges_Attributes when effectiveNodeId is root with LINKS source type`() =
+        runTest {
+            val rootNodeId = NodeId(0L)
+            val rootNode = mock<FolderNode> {
+                on { id } doReturn rootNodeId
+            }
+            val folderNode = mock<FolderNode>()
+            whenever(folderNode.id).thenReturn(NodeId(999L))
+            whenever(folderNode.parentId).thenReturn(NodeId(888L))
+            whenever(folderNode.isInRubbishBin).thenReturn(false)
+
+            val nodeUpdateFlow = flow {
+                emit(
+                    NodeUpdate(
+                        mapOf(folderNode to listOf(NodeChanges.Attributes))
+                    )
+                )
+            }
+
+            whenever(getRootNodeUseCase()).thenReturn(rootNode)
+            whenever(nodeRepository.monitorNodeUpdates()).thenReturn(nodeUpdateFlow)
+            whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
+            whenever(monitorRefreshSessionUseCase()).thenReturn(emptyFlow())
+            whenever(monitorContactNameUpdatesUseCase(updateContactCache = true)).thenReturn(
+                flowOf(
+                    UserUpdate(
+                        emptyMap(),
+                        emptyMap()
+                    )
+                )
+            )
+
+            underTest(NodeId(-1L), NodeSourceType.LINKS).test {
+                assertThat(awaitItem()).isEqualTo(NodeChanges.Attributes)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 }

@@ -103,6 +103,7 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
                 node.parentId == effectiveNodeId
                         || node.id == effectiveNodeId
                         || update.isChangesInOutgoingShares(node, nodeSourceType)
+                        || isChangesInLinks(nodeSourceType, effectiveNodeId)
             }
         }
         .map {
@@ -124,6 +125,14 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     ) = nodeSourceType == NodeSourceType.OUTGOING_SHARES
             && ((node as? FolderNode)?.isShared == true
             || this.changes[node]?.contains(NodeChanges.Outshare) == true)
+
+    /**
+     * Check if there are changes in root directory of links
+     */
+    private fun isChangesInLinks(
+        nodeSourceType: NodeSourceType,
+        effectiveNodeId: NodeId
+    ) = nodeSourceType == NodeSourceType.LINKS && effectiveNodeId.longValue == -1L
 
     private fun monitorOfflineNodeUpdates(nodeIdsToMatch: Set<Long>) =
         monitorOfflineNodeUpdatesUseCase()
