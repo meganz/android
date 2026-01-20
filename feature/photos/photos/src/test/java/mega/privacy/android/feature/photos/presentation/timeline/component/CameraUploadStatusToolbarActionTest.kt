@@ -1,16 +1,22 @@
 package mega.privacy.android.feature.photos.presentation.timeline.component
 
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
@@ -21,6 +27,9 @@ class CameraUploadStatusToolbarActionTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val snackBarHostState = mock<SnackbarHostState>()
 
     @Test
     fun `test that the warning icon is displayed`() {
@@ -67,15 +76,15 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the camera upload message is displayed when the complete icon is clicked`() {
         composeRuleScope {
-            val setCameraUploadsMessage = mock<(message: String) -> Unit>()
-            setAction(
-                cameraUploadsStatus = CUStatusUiState.UpToDate,
-                setCameraUploadsMessage = setCameraUploadsMessage
-            )
+            runTest {
+                setAction(cameraUploadsStatus = CUStatusUiState.UpToDate)
 
-            onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG).performClick()
+                onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG).performClick()
 
-            verify(setCameraUploadsMessage).invoke(any())
+                verify(snackBarHostState).showAutoDurationSnackbar(
+                    message = context.getString(SharedR.string.media_main_screen_camera_uploads_updated)
+                )
+            }
         }
     }
 
@@ -134,17 +143,17 @@ class CameraUploadStatusToolbarActionTest {
 
     private fun ComposeContentTestRule.setAction(
         cameraUploadsStatus: CUStatusUiState = CUStatusUiState.None,
-        setCameraUploadsMessage: (message: String) -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateToCameraUploadsProgressScreen: () -> Unit = {},
     ) {
         setContent {
-            CameraUploadStatusToolbarAction(
-                cameraUploadsStatus = cameraUploadsStatus,
-                setCameraUploadsMessage = setCameraUploadsMessage,
-                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
-            )
+            CompositionLocalProvider(LocalSnackBarHostState provides snackBarHostState) {
+                CameraUploadStatusToolbarAction(
+                    cameraUploadsStatus = cameraUploadsStatus,
+                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                    onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
+                )
+            }
         }
     }
 }

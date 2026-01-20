@@ -284,16 +284,12 @@ fun MediaMainRoute(
         onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
         onNavigateToAddToAlbum = onNavigateToAddToAlbum,
-        clearCameraUploadsMessage = {
-            mediaCameraUploadViewModel.setCameraUploadsMessage("")
-        },
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         multiNodeActionHandler = selectionModeActionHandler,
         navigateToMediaSearch = navigationHandler::navigate,
         navigationHandler = navigationHandler,
         handleCameraUploadsPermissionsResult = mediaCameraUploadViewModel::handleCameraUploadsPermissionsResult,
-        setCameraUploadsMessage = mediaCameraUploadViewModel::setCameraUploadsMessage,
         onCUBannerDismissRequest = mediaCameraUploadViewModel::dismissCUBanner,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onPhotoTimePeriodSelected = timelineViewModel::onPhotoTimePeriodSelected,
@@ -324,11 +320,9 @@ fun MediaMainScreen(
     onClearTimelinePhotosSelection: () -> Unit,
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
     onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
-    clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
-    setCameraUploadsMessage: (message: String) -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
@@ -607,7 +601,6 @@ fun MediaMainScreen(
                             CameraUploadStatusToolbarAction(
                                 modifier = Modifier.padding(end = 14.dp),
                                 cameraUploadsStatus = mediaCameraUploadUiState.status,
-                                setCameraUploadsMessage = setCameraUploadsMessage,
                                 onNavigateToCameraUploadsSettings = {
                                     onNavigateToCameraUploadsSettings(
                                         LegacySettingsCameraUploadsActivityNavKey()
@@ -811,7 +804,6 @@ fun MediaMainScreen(
                                             }
                                         },
                                         onTimelinePhotoSelected = onTimelinePhotoSelected,
-                                        clearCameraUploadsMessage = clearCameraUploadsMessage,
                                         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                                         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                         navigationHandler = navigationHandler,
@@ -938,7 +930,6 @@ private fun MediaScreen.MediaContent(
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelinePhotoClick: (node: PhotoNodeUiState) -> Unit,
     onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit,
-    clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     navigationHandler: NavigationHandler,
@@ -964,7 +955,6 @@ private fun MediaScreen.MediaContent(
                 timelineFilterUiState = timelineFilterUiState,
                 showTimelineSortDialog = showTimelineSortDialog,
                 selectedTimePeriod = selectedTimePeriod,
-                clearCameraUploadsMessage = clearCameraUploadsMessage,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 setEnableCUPage = setEnableCUPage,
@@ -1050,7 +1040,6 @@ fun PhotosMainScreenPreview() {
             onClearTimelinePhotosSelection = {},
             onNavigateToTimelinePhotoPreview = {},
             onNavigateToAddToAlbum = {},
-            clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
             onNavigateToCameraUploadsSettings = {},
             multiNodeActionHandler = rememberMultiNodeActionHandler(),
@@ -1075,7 +1064,6 @@ fun PhotosMainScreenPreview() {
                 override fun clearAllResults() {}
             },
             handleCameraUploadsPermissionsResult = {},
-            setCameraUploadsMessage = {},
             onCUBannerDismissRequest = {},
             onNavigateToUpgradeAccount = {},
             onPhotoTimePeriodSelected = {},

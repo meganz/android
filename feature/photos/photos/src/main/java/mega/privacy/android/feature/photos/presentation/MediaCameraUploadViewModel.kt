@@ -272,10 +272,6 @@ class MediaCameraUploadViewModel @Inject constructor(
         }
     }
 
-    internal fun setCameraUploadsMessage(message: String) {
-        _uiState.update { it.copy(cameraUploadsMessage = message) }
-    }
-
     internal fun shouldEnableCUPage(mediaSource: FilterMediaSource, show: Boolean) {
         val isShown = show && mediaSource != FilterMediaSource.CloudDrive
         _uiState.update { it.copy(enableCameraUploadPageShowing = isShown) }

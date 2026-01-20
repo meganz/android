@@ -1,9 +1,13 @@
 package mega.privacy.android.feature.photos.presentation.timeline.component
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.feature.photos.components.CameraUploadsStatusIcon
 import mega.privacy.android.feature.photos.components.CameraUploadsStatusType
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
@@ -12,12 +16,14 @@ import mega.privacy.android.shared.resources.R as SharedR
 @Composable
 internal fun CameraUploadStatusToolbarAction(
     cameraUploadsStatus: CUStatusUiState,
-    setCameraUploadsMessage: (message: String) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackBarHostState = LocalSnackBarHostState.current
+
     when (cameraUploadsStatus) {
         is CUStatusUiState.Warning -> {
             CameraUploadsStatusIcon(
@@ -40,9 +46,11 @@ internal fun CameraUploadStatusToolbarAction(
                 modifier = modifier.testTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG),
                 type = CameraUploadsStatusType.UpToDate,
                 onClick = {
-                    setCameraUploadsMessage(
-                        context.getString(SharedR.string.media_main_screen_camera_uploads_updated),
-                    )
+                    scope.launch {
+                        snackBarHostState?.showAutoDurationSnackbar(
+                            message = context.getString(SharedR.string.media_main_screen_camera_uploads_updated)
+                        )
+                    }
                 }
             )
         }

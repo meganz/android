@@ -67,21 +67,6 @@ class TimelineTabScreenTest {
     }
 
     @Test
-    fun `test that the camera upload message is successfully cleared`() {
-        composeRuleScope {
-            val clearCameraUploadsMessage = mock<() -> Unit>()
-            setScreen(
-                mediaCameraUploadUiState = MediaCameraUploadUiState(
-                    cameraUploadsMessage = "cameraUploadsMessage"
-                ),
-                clearCameraUploadsMessage = clearCameraUploadsMessage
-            )
-
-            verify(clearCameraUploadsMessage).invoke()
-        }
-    }
-
-    @Test
     fun `test that the enable camera uploads content is successfully displayed when should enable the CU page`() {
         composeRuleScope {
             setScreen(
@@ -327,7 +312,6 @@ class TimelineTabScreenTest {
         timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         showTimelineSortDialog: Boolean = false,
         selectedTimePeriod: PhotoModificationTimePeriod = PhotoModificationTimePeriod.All,
-        clearCameraUploadsMessage: () -> Unit = {},
         clearCameraUploadsCompletedMessage: () -> Unit = {},
         onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit = {},
         setEnableCUPage: (Boolean) -> Unit = {},
@@ -350,7 +334,6 @@ class TimelineTabScreenTest {
                     timelineFilterUiState = timelineFilterUiState,
                     showTimelineSortDialog = showTimelineSortDialog,
                     selectedTimePeriod = selectedTimePeriod,
-                    clearCameraUploadsMessage = clearCameraUploadsMessage,
                     clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
                     onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                     setEnableCUPage = setEnableCUPage,

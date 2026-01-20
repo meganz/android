@@ -84,7 +84,6 @@ internal fun TimelineTabRoute(
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: PhotoModificationTimePeriod,
-    clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -109,7 +108,6 @@ internal fun TimelineTabRoute(
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         showTimelineSortDialog = showTimelineSortDialog,
         selectedTimePeriod = selectedTimePeriod,
-        clearCameraUploadsMessage = clearCameraUploadsMessage,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         setEnableCUPage = setEnableCUPage,
@@ -133,7 +131,6 @@ internal fun TimelineTabScreen(
     timelineFilterUiState: TimelineFilterUiState,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: PhotoModificationTimePeriod,
-    clearCameraUploadsMessage: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
@@ -201,15 +198,6 @@ internal fun TimelineTabScreen(
         ) {
             val shouldShowTabs = isScrolledToTop || (!isScrollingDown && !isScrolledToEnd)
             onTabsVisibilityChange(!shouldShowTabs)
-        }
-    }
-
-    LaunchedEffect(mediaCameraUploadUiState.cameraUploadsMessage) {
-        if (mediaCameraUploadUiState.cameraUploadsMessage.isNotEmpty()) {
-            snackBarHostState?.showAutoDurationSnackbar(
-                message = mediaCameraUploadUiState.cameraUploadsMessage,
-            )
-            clearCameraUploadsMessage()
         }
     }
 
@@ -556,7 +544,6 @@ private fun TimelineTabScreenPreview() {
             timelineFilterUiState = TimelineFilterUiState(),
             showTimelineSortDialog = false,
             selectedTimePeriod = PhotoModificationTimePeriod.All,
-            clearCameraUploadsMessage = {},
             clearCameraUploadsCompletedMessage = {},
             setEnableCUPage = {},
             onNavigateToCameraUploadsSettings = {},

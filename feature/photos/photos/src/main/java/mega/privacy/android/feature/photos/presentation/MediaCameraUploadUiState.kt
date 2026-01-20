@@ -10,7 +10,6 @@ data class MediaCameraUploadUiState(
     val status: CUStatusUiState = CUStatusUiState.None,
     val uploadComplete: StateEventWithContent<TotalUploaded> = consumed(),
     val enableCameraUploadPageShowing: Boolean = false,
-    val cameraUploadsMessage: String = "",
 )
 
 sealed interface CUStatusUiState {
