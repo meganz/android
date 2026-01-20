@@ -38,6 +38,7 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
@@ -431,7 +432,9 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToUserDetails(contactItem: ContactItem) {
-        megaNavigator.openContactInfoActivity(this, contactItem.email)
+        val i = Intent(this, ContactInfoActivity::class.java)
+        i.putExtra(Constants.NAME, contactItem.email)
+        startActivity(i)
     }
 
     private fun navigateToCopy() = copyLauncher.launch(longArrayOf(viewModel.nodeId.longValue))
