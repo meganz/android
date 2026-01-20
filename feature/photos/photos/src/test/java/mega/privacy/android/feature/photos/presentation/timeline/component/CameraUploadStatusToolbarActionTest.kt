@@ -25,7 +25,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the warning icon is displayed`() {
         composeRuleScope {
-            setAction(isCuWarningStatusVisible = true)
+            setAction(cameraUploadsStatus = CUStatusUiState.Warning.HasLimitedAccess)
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_WARNING_TAG).assertIsDisplayed()
         }
@@ -34,10 +34,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the default icon is displayed`() {
         composeRuleScope {
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = true
-            )
+            setAction(cameraUploadsStatus = CUStatusUiState.Disabled())
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_DEFAULT_TAG).assertIsDisplayed()
         }
@@ -48,8 +45,7 @@ class CameraUploadStatusToolbarActionTest {
         composeRuleScope {
             val onNavigateCameraUploadsSettings = mock<() -> Unit>()
             setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = true,
+                cameraUploadsStatus = CUStatusUiState.Disabled(),
                 onNavigateToCameraUploadsSettings = onNavigateCameraUploadsSettings
             )
 
@@ -62,11 +58,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the complete icon is displayed`() {
         composeRuleScope {
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = true
-            )
+            setAction(cameraUploadsStatus = CUStatusUiState.UpToDate)
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_COMPLETE_TAG).assertIsDisplayed()
         }
@@ -77,9 +69,7 @@ class CameraUploadStatusToolbarActionTest {
         composeRuleScope {
             val setCameraUploadsMessage = mock<(message: String) -> Unit>()
             setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = true,
+                cameraUploadsStatus = CUStatusUiState.UpToDate,
                 setCameraUploadsMessage = setCameraUploadsMessage
             )
 
@@ -92,12 +82,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the sync icon is displayed`() {
         composeRuleScope {
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = false,
-                cameraUploadsStatus = CUStatusUiState.Sync
-            )
+            setAction(cameraUploadsStatus = CUStatusUiState.Sync)
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_SYNC_TAG).assertIsDisplayed()
         }
@@ -107,10 +92,10 @@ class CameraUploadStatusToolbarActionTest {
     fun `test that the upload in-progress icon is displayed`() {
         composeRuleScope {
             setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = false,
-                cameraUploadsStatus = CUStatusUiState.UploadInProgress(1F, 1)
+                cameraUploadsStatus = CUStatusUiState.UploadInProgress(
+                    progress = 1F,
+                    pending = 1
+                )
             )
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_IN_PROGRESS_TAG).assertIsDisplayed()
@@ -120,12 +105,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the upload complete icon is displayed`() {
         composeRuleScope {
-            setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = false,
-                cameraUploadsStatus = CUStatusUiState.UploadComplete
-            )
+            setAction(cameraUploadsStatus = CUStatusUiState.UploadComplete)
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG).assertIsDisplayed()
         }
@@ -136,9 +116,6 @@ class CameraUploadStatusToolbarActionTest {
         composeRuleScope {
             val onNavigateToCameraUploadsProgressScreen = mock<() -> Unit>()
             setAction(
-                isCuWarningStatusVisible = false,
-                isCuDefaultStatusVisible = false,
-                isCuCompleteStatusVisible = false,
                 cameraUploadsStatus = CUStatusUiState.UploadInProgress(1F, 1),
                 onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
             )
@@ -156,9 +133,6 @@ class CameraUploadStatusToolbarActionTest {
     }
 
     private fun ComposeContentTestRule.setAction(
-        isCuWarningStatusVisible: Boolean = false,
-        isCuDefaultStatusVisible: Boolean = false,
-        isCuCompleteStatusVisible: Boolean = false,
         cameraUploadsStatus: CUStatusUiState = CUStatusUiState.None,
         setCameraUploadsMessage: (message: String) -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
@@ -166,9 +140,6 @@ class CameraUploadStatusToolbarActionTest {
     ) {
         setContent {
             CameraUploadStatusToolbarAction(
-                isCuWarningStatusVisible = isCuWarningStatusVisible,
-                isCuDefaultStatusVisible = isCuDefaultStatusVisible,
-                isCuCompleteStatusVisible = isCuCompleteStatusVisible,
                 cameraUploadsStatus = cameraUploadsStatus,
                 setCameraUploadsMessage = setCameraUploadsMessage,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,

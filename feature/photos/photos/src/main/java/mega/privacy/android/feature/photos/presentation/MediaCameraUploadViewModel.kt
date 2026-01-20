@@ -173,14 +173,6 @@ class MediaCameraUploadViewModel @Inject constructor(
                             }
                         }
 
-                        is CameraUploadsStatusInfo.Finished -> {
-                            if (statusInfo.reason != CameraUploadsFinishedReason.UNKNOWN) {
-                                _uiState.update {
-                                    it.copy(cameraUploadsFinishedReason = statusInfo.reason)
-                                }
-                            }
-                        }
-
                         else -> Unit
                     }
                     cuStatusInfoFlow.update { statusInfo }

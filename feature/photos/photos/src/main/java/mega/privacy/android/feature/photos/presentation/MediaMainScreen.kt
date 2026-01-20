@@ -392,28 +392,6 @@ fun MediaMainScreen(
     var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val isCuDefaultStatusVisible by remember(mediaCameraUploadUiState.status) {
-        derivedStateOf {
-            mediaCameraUploadUiState.status is CUStatusUiState.Disabled
-        }
-    }
-    val isCuWarningStatusVisible by remember(
-        mediaCameraUploadUiState.status,
-        isCuDefaultStatusVisible
-    ) {
-        derivedStateOf {
-            mediaCameraUploadUiState.status is CUStatusUiState.Warning && !isCuDefaultStatusVisible
-        }
-    }
-    val isCuCompleteStatusVisible by remember(
-        mediaCameraUploadUiState.status,
-        isCuWarningStatusVisible
-    ) {
-        derivedStateOf {
-            mediaCameraUploadUiState.status is CUStatusUiState.UpToDate && !isCuWarningStatusVisible
-        }
-    }
-
     var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
 
     // Handling back handler for timeline filter
@@ -587,16 +565,16 @@ fun MediaMainScreen(
                     title = stringResource(sharedResR.string.media_feature_title),
                     subtitle = when {
                         currentTabIndex == MediaScreen.Timeline.ordinal -> {
-                            when {
-                                isCuCompleteStatusVisible -> {
+                            when (mediaCameraUploadUiState.status) {
+                                is CUStatusUiState.UpToDate -> {
                                     stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
                                 }
 
-                                mediaCameraUploadUiState.status is CUStatusUiState.Sync -> {
+                                is CUStatusUiState.Sync -> {
                                     stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
                                 }
 
-                                mediaCameraUploadUiState.status is CUStatusUiState.UploadInProgress -> {
+                                is CUStatusUiState.UploadInProgress -> {
                                     pluralStringResource(
                                         id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
                                         count = mediaCameraUploadUiState.status.pending,
@@ -604,7 +582,7 @@ fun MediaMainScreen(
                                     )
                                 }
 
-                                mediaCameraUploadUiState.status is CUStatusUiState.UploadComplete -> {
+                                is CUStatusUiState.UploadComplete -> {
                                     stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
                                 }
 
@@ -630,9 +608,6 @@ fun MediaMainScreen(
 
                             CameraUploadStatusToolbarAction(
                                 modifier = Modifier.padding(end = 14.dp),
-                                isCuWarningStatusVisible = isCuWarningStatusVisible,
-                                isCuDefaultStatusVisible = isCuDefaultStatusVisible,
-                                isCuCompleteStatusVisible = isCuCompleteStatusVisible,
                                 cameraUploadsStatus = mediaCameraUploadUiState.status,
                                 setCameraUploadsMessage = setCameraUploadsMessage,
                                 onNavigateToCameraUploadsSettings = {

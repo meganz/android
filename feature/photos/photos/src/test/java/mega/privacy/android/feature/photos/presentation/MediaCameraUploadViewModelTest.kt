@@ -195,12 +195,10 @@ class MediaCameraUploadViewModelTest {
                 // Initial emission
                 expectMostRecentItem()
 
-                val finishReason = CameraUploadsFinishedReason.COMPLETED
                 cameraUploadsStatusFlow.value = CameraUploadsStatusInfo.Finished(
-                    reason = finishReason
+                    reason = CameraUploadsFinishedReason.COMPLETED
                 )
 
-                assertThat(awaitItem().cameraUploadsFinishedReason).isEqualTo(finishReason)
                 val completeState = awaitItem()
                 assertThat(completeState.status).isEqualTo(CUStatusUiState.UploadComplete)
                 assertThat(completeState.showCameraUploadsCompletedMessage).isTrue()

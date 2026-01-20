@@ -1,17 +1,11 @@
 package mega.privacy.android.feature.photos.presentation
 
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedReason
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
 
-/**
- * Due to the time constraint, this class contains a copy of CU-related properties from
- * TimelineViewState.
- */
 data class MediaCameraUploadUiState(
     val status: CUStatusUiState = CUStatusUiState.None,
     val cameraUploadsProgress: Float = 0f,
     val cameraUploadsTotalUploaded: Int = 0,
-    val cameraUploadsFinishedReason: CameraUploadsFinishedReason? = null,
     val showCameraUploadsCompletedMessage: Boolean = false,
     val enableCameraUploadPageShowing: Boolean = false,
     val cameraUploadsMessage: String = "",
