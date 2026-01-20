@@ -6,21 +6,6 @@
     android:layout_height="match_parent"
     tools:layout_height="@dimen/audio_player_mini_controller_height">
 
-    <androidx.media3.ui.DefaultTimeBar
-        android:id="@id/exo_progress"
-        style="@style/Widget.Mega.TimeBar"
-        android:layout_width="0dp"
-        android:layout_height="2dp"
-        app:buffered_color="@color/grey_200_grey_600"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:played_color="@color/color_button_brand"
-        app:scrubber_disabled_size="0dp"
-        app:scrubber_dragged_size="0dp"
-        app:scrubber_enabled_size="0dp"
-        app:unplayed_color="@color/grey_200_grey_600" />
-
     <FrameLayout
         android:id="@+id/play_pause_placeholder"
         android:layout_width="35dp"
@@ -32,7 +17,7 @@
         android:visibility="visible">
 
         <ImageButton
-            android:id="@id/exo_play_pause"
+            android:id="@+id/exo_play_pause"
             style="@style/ExoStyledControls.Button.Center.PlayPause"
             android:layout_width="35dp"
             android:layout_height="35dp"
@@ -79,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@id/track_name"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="Two Fingers"
-        tools:visibility="gone" />
+    />
 
     <ImageButton
         android:id="@+id/close"
@@ -90,4 +75,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@color/grey_060_white_060" />
+
+    <androidx.media3.ui.DefaultTimeBar
+        android:id="@id/exo_progress"
+        style="@style/Widget.Mega.TimeBar"
+        android:layout_width="0dp"
+        android:layout_height="2dp"
+        app:buffered_color="@color/grey_200_grey_600"
+        app:layout_constraintTop_toBottomOf="@+id/close"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:played_color="@color/color_button_brand"
+        android:layout_marginTop="-2dp"
+        app:scrubber_disabled_size="0dp"
+        app:scrubber_dragged_size="0dp"
+        app:scrubber_enabled_size="0dp"
+        app:unplayed_color="@color/grey_200_grey_600"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>

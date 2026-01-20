@@ -8,6 +8,8 @@ import android.os.IBinder
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -29,6 +31,7 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.icon.pack.R as iconPackR
 
 /**
  * A helper class containing UI logic of mini player, it help us keep ManagerActivity clean.
@@ -56,6 +59,10 @@ class MiniAudioPlayerController(
     private val playerListener = object : Player.Listener {
         override fun onPlaybackStateChanged(state: Int) {
             updateUIRegardingPlayback(state)
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            applyTintToPlayPauseButton()
         }
     }
 
@@ -119,9 +126,17 @@ class MiniAudioPlayerController(
     init {
         audioPlayerPlaying.observeForever(audioPlayerPlayingObserver)
 
-        playerView.findViewById<ImageButton>(R.id.close).setOnClickListener {
-            serviceGateway?.stopPlayer()
+        playerView.findViewById<ImageButton>(R.id.close)?.let {
+            val tintedIcon = DrawableCompat.wrap(it.drawable).mutate()
+            val tintColor = ContextCompat.getColor(context, R.color.black_white)
+            DrawableCompat.setTint(tintedIcon, tintColor)
+            it.setImageDrawable(tintedIcon)
+            it.setOnClickListener {
+                serviceGateway?.stopPlayer()
+            }
         }
+
+        applyTintToPlayPauseButton()
 
         playerView.setOnClickListener {
             if (!CallUtil.participatingInACall()) {
@@ -218,6 +233,19 @@ class MiniAudioPlayerController(
             state == Player.STATE_BUFFERING
         playerView.findViewById<View>(R.id.play_pause_placeholder).visibility =
             if (state > Player.STATE_BUFFERING) View.VISIBLE else View.INVISIBLE
+    }
+
+    private fun applyTintToPlayPauseButton() {
+        playerView.post {
+            playerView.findViewById<ImageButton>(R.id.exo_play_pause).let { playPauseButton ->
+                playPauseButton.drawable?.let {
+                    val tintedIcon = DrawableCompat.wrap(it).mutate()
+                    val tintColor = ContextCompat.getColor(context, R.color.black_white)
+                    DrawableCompat.setTint(tintedIcon, tintColor)
+                    playPauseButton.setImageDrawable(tintedIcon)
+                }
+            }
+        }
     }
 
     companion object {
