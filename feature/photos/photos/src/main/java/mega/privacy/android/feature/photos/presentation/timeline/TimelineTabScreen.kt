@@ -35,6 +35,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.chip.MegaChip
@@ -149,6 +152,7 @@ internal fun TimelineTabScreen(
 ) {
     val resource = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
+    val scope = rememberCoroutineScope()
 
     val timelineLazyListState =
         rememberTimelineLazyListState(selectedTimePeriod = selectedTimePeriod)
@@ -209,17 +213,19 @@ internal fun TimelineTabScreen(
         }
     }
 
-    LaunchedEffect(mediaCameraUploadUiState.showCameraUploadsCompletedMessage) {
-        if (mediaCameraUploadUiState.showCameraUploadsCompletedMessage) {
+    EventEffect(
+        event = mediaCameraUploadUiState.uploadComplete,
+        onConsumed = clearCameraUploadsCompletedMessage
+    ) {
+        scope.launch {
             snackBarHostState?.showAutoDurationSnackbar(
                 message = resource.getQuantityString(
                     sharedR.plurals.timeline_tab_camera_uploads_completed,
-                    mediaCameraUploadUiState.cameraUploadsTotalUploaded,
-                    mediaCameraUploadUiState.cameraUploadsTotalUploaded,
+                    it,
+                    it,
                 )
             )
         }
-        clearCameraUploadsCompletedMessage()
     }
 
     if (showTimelineSortDialog) {

@@ -3,6 +3,8 @@ package mega.privacy.android.feature.photos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,7 +115,11 @@ class MediaCameraUploadViewModel @Inject constructor(
                                     previousStatus is CameraUploadsStatusInfo.UploadProgress
                         if (isCameraUploadsUploading) {
                             flow {
-                                emit(CUStatusUiState.UploadComplete)
+                                emit(
+                                    value = CUStatusUiState.UploadComplete(
+                                        totalUploaded = previousStatus.totalToUpload
+                                    )
+                                )
                                 delay(4.seconds)
                                 emit(CUStatusUiState.UpToDate)
                             }
@@ -166,15 +172,6 @@ class MediaCameraUploadViewModel @Inject constructor(
             monitorCameraUploadsStatusInfoUseCase()
                 .catch { Timber.e(it, "Unable to monitor camera uploads status info") }
                 .collectLatest { statusInfo ->
-                    when (statusInfo) {
-                        is CameraUploadsStatusInfo.UploadProgress -> {
-                            _uiState.update {
-                                it.copy(cameraUploadsTotalUploaded = statusInfo.totalToUpload)
-                            }
-                        }
-
-                        else -> Unit
-                    }
                     cuStatusInfoFlow.update { statusInfo }
                 }
         }
@@ -212,9 +209,9 @@ class MediaCameraUploadViewModel @Inject constructor(
                         )
                     }
 
-                    if (cuStatus == CUStatusUiState.UploadComplete) {
+                    if (cuStatus is CUStatusUiState.UploadComplete) {
                         _uiState.update {
-                            it.copy(showCameraUploadsCompletedMessage = true)
+                            it.copy(uploadComplete = triggered(content = cuStatus.totalUploaded))
                         }
                     }
                 }
@@ -241,10 +238,6 @@ class MediaCameraUploadViewModel @Inject constructor(
             runCatching { setCameraUploadShownUseCase() }
                 .onFailure { Timber.e(it, "Unable to set CU shown") }
         }
-    }
-
-    internal fun setCameraUploadsCompletedMessage(show: Boolean) {
-        _uiState.update { it.copy(showCameraUploadsCompletedMessage = show) }
     }
 
     private fun syncCameraUploadsStatus() {
@@ -315,5 +308,9 @@ class MediaCameraUploadViewModel @Inject constructor(
             runCatching { setEnableCameraUploadBannerDismissedTimestampUseCase() }
                 .onFailure { Timber.e(it, "Unable to set enable CU banner dismiss timestamp") }
         }
+    }
+
+    internal fun onConsumeUploadCompleteEvent() {
+        _uiState.update { it.copy(uploadComplete = consumed()) }
     }
 }

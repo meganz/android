@@ -287,9 +287,7 @@ fun MediaMainRoute(
         clearCameraUploadsMessage = {
             mediaCameraUploadViewModel.setCameraUploadsMessage("")
         },
-        clearCameraUploadsCompletedMessage = {
-            mediaCameraUploadViewModel.setCameraUploadsCompletedMessage(false)
-        },
+        clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         multiNodeActionHandler = selectionModeActionHandler,
         navigateToMediaSearch = navigationHandler::navigate,

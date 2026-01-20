@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
@@ -149,7 +150,7 @@ class MediaCameraUploadViewModelTest {
         }
 
     @Test
-    fun `test that the UI state shows Uploading FAB with progress when status is UploadProgress`() =
+    fun `test that the UI state shows Uploading toolbar action with progress when status is UploadProgress`() =
         runTest {
             isCameraUploadsEnabledFlow.value = true
             val totalToUpload = 100
@@ -174,7 +175,6 @@ class MediaCameraUploadViewModelTest {
                         pending = totalToUpload - totalUploaded,
                     )
                 )
-                assertThat(item.cameraUploadsTotalUploaded).isEqualTo(totalToUpload)
             }
         }
 
@@ -182,9 +182,10 @@ class MediaCameraUploadViewModelTest {
     fun `test that the status is set to upload complete when the finish reason is completed`() =
         runTest {
             isCameraUploadsEnabledFlow.value = true
+            val totalToUpload = 5
             cameraUploadsStatusFlow.value = CameraUploadsStatusInfo.UploadProgress(
                 totalUploaded = 10,
-                totalToUpload = 5,
+                totalToUpload = totalToUpload,
                 totalUploadedBytes = 50,
                 totalUploadBytes = 0L,
                 progress = Progress(0.25F),
@@ -200,11 +201,14 @@ class MediaCameraUploadViewModelTest {
                 )
 
                 val completeState = awaitItem()
-                assertThat(completeState.status).isEqualTo(CUStatusUiState.UploadComplete)
-                assertThat(completeState.showCameraUploadsCompletedMessage).isTrue()
+                assertThat(completeState.status).isEqualTo(
+                    CUStatusUiState.UploadComplete(
+                        totalUploaded = totalToUpload
+                    )
+                )
+                assertThat(completeState.uploadComplete).isEqualTo(triggered(content = totalToUpload))
                 val upToDateState = awaitItem()
                 assertThat(upToDateState.status).isEqualTo(CUStatusUiState.UpToDate)
-                assertThat(upToDateState.showCameraUploadsCompletedMessage).isTrue()
             }
         }
 

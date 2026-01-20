@@ -105,7 +105,7 @@ class CameraUploadStatusToolbarActionTest {
     @Test
     fun `test that the upload complete icon is displayed`() {
         composeRuleScope {
-            setAction(cameraUploadsStatus = CUStatusUiState.UploadComplete)
+            setAction(cameraUploadsStatus = CUStatusUiState.UploadComplete(totalUploaded = 1))
 
             onNodeWithTag(CAMERA_UPLOAD_STATUS_TOOLBAR_ACTION_UPLOAD_COMPLETE_TAG).assertIsDisplayed()
         }

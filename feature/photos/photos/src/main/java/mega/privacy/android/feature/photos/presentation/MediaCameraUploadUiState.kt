@@ -1,12 +1,14 @@
 package mega.privacy.android.feature.photos.presentation
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+
+typealias TotalUploaded = Int
 
 data class MediaCameraUploadUiState(
     val status: CUStatusUiState = CUStatusUiState.None,
-    val cameraUploadsProgress: Float = 0f,
-    val cameraUploadsTotalUploaded: Int = 0,
-    val showCameraUploadsCompletedMessage: Boolean = false,
+    val uploadComplete: StateEventWithContent<TotalUploaded> = consumed(),
     val enableCameraUploadPageShowing: Boolean = false,
     val cameraUploadsMessage: String = "",
 )
@@ -24,7 +26,7 @@ sealed interface CUStatusUiState {
         val pending: Int,
     ) : CUStatusUiState
 
-    data object UploadComplete : CUStatusUiState
+    data class UploadComplete(val totalUploaded: Int) : CUStatusUiState
 
     data object UpToDate : CUStatusUiState
 

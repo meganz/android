@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import de.palm.composestateevents.triggered
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.FilterMediaSource
@@ -252,7 +253,7 @@ class TimelineTabScreenTest {
             val clearCameraUploadsCompletedMessage = mock<() -> Unit>()
             setScreen(
                 mediaCameraUploadUiState = MediaCameraUploadUiState(
-                    showCameraUploadsCompletedMessage = true
+                    uploadComplete = triggered(content = 5)
                 ),
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage
             )
