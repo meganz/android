@@ -287,7 +287,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (importFileF && importFragmentSelected != CLOUD_FRAGMENT) {
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> {
-                        if (ACTION_UPLOAD_TO_CHAT == action) {
+                        if (ACTION_UPLOAD_SCAN_TO_CHAT == action) {
                             if (chatExplorer != null && chatExplorer?.isSelectMode == true) {
                                 chatExplorer?.clearSelections()
                             } else {
@@ -400,7 +400,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         } else if (importFileF) {
             when {
                 importFragmentSelected != -1 -> chooseFragment(importFragmentSelected)
-                ACTION_UPLOAD_TO_CHAT == action -> chooseFragment(CHAT_FRAGMENT)
+                ACTION_UPLOAD_SCAN_TO_CHAT == action -> chooseFragment(CHAT_FRAGMENT)
                 else -> chooseFragment(IMPORT_FRAGMENT)
             }
 
@@ -746,7 +746,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("SHOW action bar")
 
         val upButtonRes =
-            if (intent.action == ACTION_SAVE_TO_CLOUD || intent.action == ACTION_UPLOAD_TO_CHAT) {
+            if (isDocumentScannerAction()) {
                 // Use the "X" Button when accessing this Activity from Document Scanner
                 R.drawable.ic_close_white
             } else {
@@ -831,7 +831,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     setView(SHOW_TABS, true)
                 }
 
-                ACTION_SAVE_TO_CLOUD -> {
+                ACTION_UPLOAD_SCAN_TO_CLOUD -> {
                     Timber.d("action = SAVE to Cloud Drive")
                     mode = SAVE
                     isSelectFile = false
@@ -859,7 +859,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     importFileF = true
                     viewModel.ownFilePrepareTask(this, intent)
                     chooseFragment(
-                        if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                        if (intent.action == ACTION_UPLOAD_SCAN_TO_CHAT) {
                             CHAT_FRAGMENT
                         } else {
                             IMPORT_FRAGMENT
@@ -1879,7 +1879,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                 UPLOAD, SAVE -> {
                     Timber.d("mode UPLOAD")
-                    if (intent.action == ACTION_SAVE_TO_CLOUD) {
+                    if (intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD) {
                         logDocumentScanEvent(isCloudDrive = true)
                     }
                     if (viewModel.isImportingText(intent)) {
@@ -2411,7 +2411,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         when (v.id) {
             R.id.fab_file_explorer -> {
-                if (intent.action == ACTION_UPLOAD_TO_CHAT) {
+                if (intent.action == ACTION_UPLOAD_SCAN_TO_CHAT) {
                     logDocumentScanEvent(isCloudDrive = false)
                 }
                 v.isEnabled = false
@@ -2764,6 +2764,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
+    private fun isDocumentScannerAction() =
+        intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD || intent.action == ACTION_UPLOAD_SCAN_TO_CHAT
+
     companion object {
         private const val SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH"
         private const val QUERY_AFTER_SEARCH = "QUERY_AFTER_SEARCH"
@@ -2870,13 +2873,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          * Intent action for uploading to chat.
          */
         @JvmField
-        var ACTION_UPLOAD_TO_CHAT = "ACTION_UPLOAD_TO_CHAT"
+        var ACTION_UPLOAD_SCAN_TO_CHAT = "ACTION_UPLOAD_SCAN_TO_CHAT"
 
         /**
          * Intent action for saving to cloud.
          */
         @JvmField
-        var ACTION_SAVE_TO_CLOUD = "ACTION_SAVE_TO_CLOUD"
+        var ACTION_UPLOAD_SCAN_TO_CLOUD = "ACTION_UPLOAD_SCAN_TO_CLOUD"
 
         /**
          * Intent action for importing an album.

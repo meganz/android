@@ -24,8 +24,8 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.resources.R as SharedR
@@ -127,7 +127,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
             putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !uiState.canSelectScanFileType)
             when (scanDestination) {
                 ScanDestination.CloudDrive -> {
-                    action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD
+                    action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CLOUD
                     putExtra(
                         FileExplorerActivity.EXTRA_PARENT_HANDLE,
                         uiState.cloudDriveParentHandle,
@@ -135,7 +135,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 }
 
                 ScanDestination.Chat -> {
-                    action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
+                    action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
                 }
             }
             type = contentResolver.getType(uriToUpload)
