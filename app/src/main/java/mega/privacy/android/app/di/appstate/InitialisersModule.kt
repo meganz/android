@@ -20,6 +20,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInit
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartCameraUploadsAfterStorageStateEventInitializer
 import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
@@ -139,5 +140,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideMonitorUserUpdatesAndEstablishCameraUploadsSyncHandlesInitializer(initialiser: CameraUploadsSyncHandlesUpdaterInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideStartCameraUploadsAfterStorageStateEventInitializer(initialiser: StartCameraUploadsAfterStorageStateEventInitializer): PostLoginInitialiser =
         initialiser
 }

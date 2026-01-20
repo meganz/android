@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,7 +43,6 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -127,8 +125,6 @@ import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
@@ -167,8 +163,6 @@ import javax.inject.Inject
  * @property setCopyLatestTargetPathUseCase Use case for setting the latest target path for copy operations.
  * @property setMoveLatestTargetPathUseCase Use case for setting the latest target path for move operations.
  * @property monitorSecurityUpgradeInAppUseCase Use case for monitoring security upgrade in app.
- * @property startCameraUploadUseCase Use case for starting camera uploads.
- * @property stopCameraUploadsUseCase Use case for stopping camera uploads.
  * @property saveContactByEmailUseCase Use case for saving a contact by email.
  * @property createShareKeyUseCase Use case for creating a share key.
  * @property getNodeByIdUseCase Use case for getting a node by its ID.
@@ -230,8 +224,6 @@ class ManagerViewModel @Inject constructor(
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val monitorSecurityUpgradeInAppUseCase: MonitorSecurityUpgradeInAppUseCase,
-    private val startCameraUploadUseCase: StartCameraUploadUseCase,
-    private val stopCameraUploadsUseCase: StopCameraUploadsUseCase,
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -499,16 +491,6 @@ class ManagerViewModel @Inject constructor(
                     )
                 }
             }
-        }
-
-        viewModelScope.launch {
-            monitorMyAccountUpdateEvent
-                .filter {
-                    it.storageState == StorageState.Green || it.storageState == StorageState.Orange
-                }
-                .collect {
-                    startCameraUploads()
-                }
         }
 
         viewModelScope.launch {
@@ -823,22 +805,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun onConsumeShouldUpgradeToProPlan() {
         _state.update { state -> state.copy(shouldUpgradeToProPlan = false) }
-    }
-
-    /**
-     * Start camera uploads
-     */
-    private fun startCameraUploads() = viewModelScope.launch {
-        startCameraUploadUseCase()
-    }
-
-    /**
-     * Stop and disable camera uploads
-     */
-    fun stopAndDisableCameraUploads() = viewModelScope.launch {
-        runCatching {
-            stopCameraUploadsUseCase(restartMode = CameraUploadsRestartMode.StopAndDisable)
-        }.onFailure { Timber.d(it) }
     }
 
     /**

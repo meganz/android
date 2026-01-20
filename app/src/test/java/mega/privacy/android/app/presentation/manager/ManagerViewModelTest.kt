@@ -52,7 +52,6 @@ import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
-import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.chat.ChatLinkContent
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -136,7 +135,6 @@ import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
-import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -152,13 +150,11 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -282,7 +278,6 @@ class ManagerViewModelTest {
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private var monitorMyAccountUpdateFakeFlow = MutableSharedFlow<MyAccountUpdate>()
-    private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadsUseCase = mock<StopCameraUploadsUseCase>()
     private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
@@ -383,8 +378,6 @@ class ManagerViewModelTest {
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             monitorSecurityUpgradeInAppUseCase = monitorSecurityUpgradeInAppUseCase,
-            startCameraUploadUseCase = startCameraUploadUseCase,
-            stopCameraUploadsUseCase = stopCameraUploadsUseCase,
             saveContactByEmailUseCase = saveContactByEmailUseCase,
             createShareKeyUseCase = createShareKeyUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -457,7 +450,6 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase,
             setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase,
-            startCameraUploadUseCase,
             stopCameraUploadsUseCase,
             saveContactByEmailUseCase,
             createShareKeyUseCase,
@@ -710,46 +702,6 @@ class ManagerViewModelTest {
                 assertThat(state.isPushNotificationSettingsUpdatedEvent).isTrue()
             }
         }
-
-    @Test
-    fun `test that when stopAndDisableCameraUploads is called, stopCameraUploadUseCase is called`() =
-        runTest {
-            underTest.stopAndDisableCameraUploads()
-            testScheduler.advanceUntilIdle()
-            verify(stopCameraUploadsUseCase).invoke(CameraUploadsRestartMode.StopAndDisable)
-        }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = StorageState::class,
-        names = ["Green", "Orange"],
-        mode = EnumSource.Mode.INCLUDE,
-    )
-    fun `test that camera uploads is started when an account event indicating enough storage space is received`(
-        storageState: StorageState,
-    ) = runTest {
-        monitorMyAccountUpdateFakeFlow.emit(
-            MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
-        )
-        advanceUntilIdle()
-        verify(startCameraUploadUseCase).invoke()
-    }
-
-    @ParameterizedTest
-    @EnumSource(
-        value = StorageState::class,
-        names = ["Green", "Orange"],
-        mode = EnumSource.Mode.EXCLUDE,
-    )
-    fun `test that camera uploads is not started when an account event indicating not enough storage space is received`(
-        storageState: StorageState,
-    ) = runTest {
-        monitorMyAccountUpdateFakeFlow.emit(
-            MyAccountUpdate(Action.STORAGE_STATE_CHANGED, storageState)
-        )
-        advanceUntilIdle()
-        verify(startCameraUploadUseCase, never()).invoke()
-    }
 
     @Test
     fun `test that monitor camera upload folder icon update events are returned`() =
