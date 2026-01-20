@@ -148,7 +148,10 @@ class PendingBackStackNavigationHandler(
             backstack.removeAll { it is NoSessionNavKey }
             val fetchNodeOrLoginDestination =
                 currentFetchNodesDestinationOrNull(currentAuthStatus) ?: defaultLoginDestination
-            navigate(listOf(fetchNodeOrLoginDestination))
+            val currentTopDestination = backstack.lastOrNull()
+            if (currentTopDestination == null || currentTopDestination::class != fetchNodeOrLoginDestination::class) {
+                navigate(listOf(fetchNodeOrLoginDestination))
+            }
         } else {
             replaceAuthRequiredDestinations(defaultLoginDestination)
         }

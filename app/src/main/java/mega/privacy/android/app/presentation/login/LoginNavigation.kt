@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login
 
 import android.os.Parcelable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -68,7 +69,9 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
     entry<LoginNavKey> { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
 
-        checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
+        LaunchedEffect(key.action, key.link) {
+            checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
+        }
 
         LoginScreen(
             viewModel = sharedViewModel,

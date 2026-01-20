@@ -91,7 +91,7 @@ class FetchNodesViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        // Reset mocks before each test
+        wheneverBlocking { rootNodeExistsUseCase() }.thenReturn(false)
         reset(
             rootNodeExistsUseCase,
             fastLoginUseCase,

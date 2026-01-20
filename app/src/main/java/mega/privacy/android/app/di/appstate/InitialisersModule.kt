@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
@@ -123,4 +124,8 @@ class InitialisersModule {
     fun provideReloadEventMonitorAppStartInitialiser(initialiser: ReloadEventInitialiser): AppStartInitialiser =
         initialiser
 
+    @Provides
+    @IntoSet
+    fun provideEnable2FAInitialiser(initialiser: Enable2FAInitialiser): PostLoginInitialiser =
+        initialiser
 }
