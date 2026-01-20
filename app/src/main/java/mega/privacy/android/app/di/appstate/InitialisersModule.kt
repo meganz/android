@@ -9,6 +9,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.NotificationTopicsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
@@ -122,6 +123,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideReloadEventMonitorAppStartInitialiser(initialiser: ReloadEventInitialiser): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideNotificationTopicsInitializer(initialiser: NotificationTopicsInitializer): PostLoginInitialiser =
         initialiser
 
     @Provides

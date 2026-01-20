@@ -16,16 +16,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.conflate
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.fcm.FcmManager
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
@@ -76,7 +73,6 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorOfflineFileAvailabilityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
-import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -289,8 +285,6 @@ class ManagerViewModel @Inject constructor(
     private val legacyState: LegacyPsaGlobalState,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
-    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val fcmManager: FcmManager,
     private val cloudDriveDeepLinkHandler: CloudDriveDeepLinkHandler,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     @ApplicationScope private val appScope: CoroutineScope,
@@ -536,18 +530,6 @@ class ManagerViewModel @Inject constructor(
                     checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NAVIGATION_TOOLBAR_ICON)
                 }
             }
-        }
-
-        // Subscribe to FCM topic according to account type
-        viewModelScope.launch {
-            monitorAccountDetailUseCase()
-                .catch { Timber.e(it) }
-                .mapNotNull { it.levelDetail?.accountType }
-                .distinctUntilChanged()
-                .collect {
-                    fcmManager.subscribeToAccountTypeTopic(it)
-                    fcmManager.setAccountTypeUserProperty(it)
-                }
         }
     }
 
