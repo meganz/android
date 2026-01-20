@@ -25,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.withCreationCallback
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -35,11 +36,11 @@ import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.coroutine.collectFlow
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
@@ -79,7 +80,13 @@ class LoginActivity : BaseActivity() {
 
     }
 
-    private val viewModel by viewModels<LoginViewModel>()
+    private val viewModel: LoginViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<LoginViewModel.Factory> { factory ->
+                factory.create(isInSingleActivity = false)
+            }
+        }
+    )
 
     /**
      * Flag to delay showing the splash screen.
@@ -120,8 +127,9 @@ class LoginActivity : BaseActivity() {
             return
         }
 
+        val refreshForShare = intent.action == Constants.ACTION_FILE_EXPLORER_UPLOAD
         collectFlow(viewModel.state) { uiState ->
-            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled) {
+            if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled && !refreshForShare) {
                 startActivity(Intent(this@LoginActivity, MegaActivity::class.java))
                 finish()
             }

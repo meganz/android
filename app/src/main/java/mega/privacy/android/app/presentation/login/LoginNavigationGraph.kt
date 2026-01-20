@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.login
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -44,19 +42,14 @@ data object StartRoute : NoSessionNavKey.Mandatory
 fun NavGraphBuilder.loginNavigationGraph(
     navController: NavController,
     onFinish: () -> Unit,
-    activityViewModel: LoginViewModel? = null,
+    activityViewModel: LoginViewModel,
     stopShowingSplashScreen: () -> Unit,
 ) {
     navigation<LoginGraph>(
         startDestination = StartRoute,
     ) {
         composable<StartRoute> { backStackEntry ->
-            val sharedViewModel = activityViewModel ?: run {
-                val parentEntry = remember(backStackEntry) {
-                    navController.getBackStackEntry<LoginGraph>()
-                }
-                hiltViewModel<LoginViewModel>(parentEntry)
-            }
+            val sharedViewModel = activityViewModel
             val uiState by sharedViewModel.state.collectAsStateWithLifecycle()
             val focusManager = LocalFocusManager.current
             // start composable to handle the initial state and navigation logic

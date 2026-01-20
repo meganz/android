@@ -247,6 +247,7 @@ internal class LoginViewModelTest {
             getCookieSettingsUseCase = getCookieSettingsUseCase,
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
+            isInSingleActivity = false
         )
     }
 

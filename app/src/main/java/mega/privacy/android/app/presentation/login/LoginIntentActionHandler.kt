@@ -741,7 +741,10 @@ private data class IntentInfo(
 
 private fun toSharePage(activity: Activity) = with(activity) {
     startActivity(
-        this.intent.setClass(activity, FileExplorerActivity::class.java)
+        this.intent.apply {
+            action = Constants.ACTION_FILE_EXPLORER_UPLOAD
+            setClass(activity, FileExplorerActivity::class.java)
+        }
     )
     finish()
 }

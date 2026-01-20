@@ -207,7 +207,11 @@ class MegaActivity : ComponentActivity() {
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
-            val loginViewModel = hiltViewModel<LoginViewModel>()
+            val loginViewModel = hiltViewModel<LoginViewModel, LoginViewModel.Factory>(
+                creationCallback = { factory ->
+                    factory.create(isInSingleActivity = true)
+                }
+            )
             val navigationEventViewModel = hiltViewModel<QueueEventViewModel>()
 
             val navGraphState by navGraphViewModel.state.collectAsStateWithLifecycle()

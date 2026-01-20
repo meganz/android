@@ -5,6 +5,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -120,15 +123,14 @@ import mega.privacy.mobile.analytics.event.AccountRegistrationEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationFailedEvent
 import mega.privacy.mobile.analytics.event.MultiFactorAuthVerificationSuccessEvent
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * View Model for Login and registration flows
  *
  * @property state View state as [LoginState]
  */
-@HiltViewModel
-class LoginViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = LoginViewModel.Factory::class)
+class LoginViewModel @AssistedInject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
@@ -184,6 +186,7 @@ class LoginViewModel @Inject constructor(
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
+    @Assisted val isInSingleActivity: Boolean,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -898,11 +901,8 @@ class LoginViewModel @Inject constructor(
             if (!isFastLogin) {
                 shouldShowUpgradeAccount()
             }
-            val isSingleActivityEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.SingleActivity)
-            }.getOrDefault(false)
-            // allow fast login to fetch nodes even if single activity is enabled
-            if (isFastLogin || !isSingleActivityEnabled) {
+            // allow fetching node for legacy activity, in new single activity, fetchNodes called in another screen
+            if (!isInSingleActivity) {
                 fetchNodes()
             }
             sendAnalyticsEventIfFirstTimeLogin(email)
@@ -1394,6 +1394,11 @@ class LoginViewModel @Inject constructor(
 
     fun setPendingToGetLinkWithSession() {
         _state.update { it.copy(isPendingToGetLinkWithSession = true) }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(isInSingleActivity: Boolean): LoginViewModel
     }
 
     companion object {
