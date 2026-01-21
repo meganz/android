@@ -24,6 +24,7 @@ import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
+import mega.privacy.android.data.database.dao.RecentSearchDao
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
 import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
@@ -41,6 +42,7 @@ import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
+import mega.privacy.android.data.database.entity.RecentSearchEntity
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
 import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
@@ -67,6 +69,7 @@ import timber.log.Timber
         LastPageViewedInPdfEntity::class,
         MediaPlaybackInfoEntity::class,
         HomeWidgetConfigurationEntity::class,
+        RecentSearchEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -106,6 +109,7 @@ import timber.log.Timber
         AutoMigration(109, 110),
         AutoMigration(112, 113),
         AutoMigration(113, 114),
+        AutoMigration(114, 115),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -140,6 +144,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun mediaPlaybackInfoDao(): MediaPlaybackInfoDao
 
     abstract fun homeWidgetConfigurationDao(): HomeWidgetConfigurationDao
+
+    abstract fun recentSearchDao(): RecentSearchDao
 
     companion object {
 

@@ -34,6 +34,7 @@ import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
+import mega.privacy.android.data.database.dao.RecentSearchDao
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import timber.log.Timber
 import java.io.File
@@ -242,4 +243,9 @@ internal object RoomDatabaseModule {
     @Provides
     fun provideHomeWidgetConfigurationDao(database: MegaDatabase): HomeWidgetConfigurationDao =
         database.homeWidgetConfigurationDao()
+
+    @Provides
+    @Singleton
+    internal fun provideRecentSearchDao(database: MegaDatabase): RecentSearchDao =
+        database.recentSearchDao()
 }

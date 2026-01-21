@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 114
+    const val DATABASE_VERSION = 115
 
     /**
      * Database Name
@@ -104,4 +104,9 @@ object MegaDatabaseConstant {
      * Table for home widget configuration
      */
     const val TABLE_HOME_WIDGET_CONFIGURATION = "home_widget_configuration"
+
+    /**
+     * Table for recent searches
+     */
+    const val TABLE_RECENT_SEARCH = "recent_search"
 }
