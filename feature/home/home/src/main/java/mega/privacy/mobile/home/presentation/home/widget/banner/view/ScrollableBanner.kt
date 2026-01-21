@@ -31,7 +31,7 @@ import mega.privacy.android.domain.entity.banner.PromotionalBanner as DomainProm
 @Composable
 fun ScrollableBanner(
     banners: List<DomainPromoBanner>,
-    onDismiss: (Int) -> Unit,
+    onDismiss: (Int, String) -> Unit,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -59,7 +59,7 @@ fun ScrollableBanner(
                     buttonText = promoBanner.buttonText,
                     showDismissButton = true,
                     onClick = { onClick(promoBanner.url) },
-                    onDismissClick = { onDismiss(promoBanner.id) },
+                    onDismissClick = { onDismiss(promoBanner.id, promoBanner.url) },
                 )
             }
         }

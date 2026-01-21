@@ -44,7 +44,7 @@ class ScrollableBannerTest {
             AndroidThemeForPreviews {
                 ScrollableBanner(
                     banners = listOf(banner1),
-                    onDismiss = {},
+                    onDismiss = { _, _ -> },
                     onClick = {},
                 )
             }
@@ -59,7 +59,7 @@ class ScrollableBannerTest {
             AndroidThemeForPreviews {
                 ScrollableBanner(
                     banners = listOf(banner1),
-                    onDismiss = {},
+                    onDismiss = { _, _ -> },
                     onClick = {},
                 )
             }
@@ -74,7 +74,7 @@ class ScrollableBannerTest {
             AndroidThemeForPreviews {
                 ScrollableBanner(
                     banners = listOf(banner1, banner2),
-                    onDismiss = {},
+                    onDismiss = { _, _ -> },
                     onClick = {},
                 )
             }
@@ -92,7 +92,7 @@ class ScrollableBannerTest {
             AndroidThemeForPreviews {
                 ScrollableBanner(
                     banners = listOf(banner1),
-                    onDismiss = {},
+                    onDismiss = { _, _ -> },
                     onClick = { url -> clickedUrl = url },
                 )
             }
@@ -109,7 +109,7 @@ class ScrollableBannerTest {
             AndroidThemeForPreviews {
                 ScrollableBanner(
                     banners = emptyList(),
-                    onDismiss = {},
+                    onDismiss = { _, _ -> },
                     onClick = {},
                 )
             }

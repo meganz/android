@@ -7,10 +7,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.mobile.analytics.event.PwmBannerCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferItBannerCloseButtonPressedEvent
+import mega.privacy.mobile.analytics.event.VpnBannerCloseButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.widget.banner.view.ScrollableBanner
 import javax.inject.Inject
 
@@ -38,7 +42,16 @@ class BannerWidget @Inject constructor() : HomeWidget {
         if (uiState.banners.isNotEmpty()) {
             ScrollableBanner(
                 banners = uiState.banners,
-                onDismiss = viewModel::dismissBanner,
+                onDismiss = { id, url ->
+                    if (BannerClickHandler.matchesPwmUrl(url)) {
+                        Analytics.tracker.trackEvent(PwmBannerCloseButtonPressedEvent)
+                    } else if (BannerClickHandler.matchesVpnUrl(url)) {
+                        Analytics.tracker.trackEvent(VpnBannerCloseButtonPressedEvent)
+                    } else {
+                        Analytics.tracker.trackEvent(TransferItBannerCloseButtonPressedEvent)
+                    }
+                    viewModel.dismissBanner(id)
+                },
                 onClick = { url ->
                     BannerClickHandler.handleBannerClick(
                         context = context,

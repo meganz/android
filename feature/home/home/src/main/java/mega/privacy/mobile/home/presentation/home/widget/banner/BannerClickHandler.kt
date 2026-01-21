@@ -9,6 +9,7 @@ import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
+import mega.privacy.mobile.analytics.event.TransferItSmartBannerItemSelectedEvent
 import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
 
 /**
@@ -40,6 +41,7 @@ object BannerClickHandler {
             }
 
             else -> {
+                Analytics.tracker.trackEvent(TransferItSmartBannerItemSelectedEvent)
                 navigationHandler.navigate(WebSiteNavKey(url))
             }
         }
@@ -70,11 +72,11 @@ object BannerClickHandler {
         }
     }
 
-    private fun matchesVpnUrl(link: String) =
+    fun matchesVpnUrl(link: String) =
         link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME))
                 || link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
 
-    private fun matchesPwmUrl(link: String) =
+    fun matchesPwmUrl(link: String) =
         link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME))
                 || link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
 
