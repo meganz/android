@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -33,7 +34,8 @@ data class PendingMessage(
     var nodeHandle: Long = -1,
     var fingerprint: String? = null,
     var name: String? = null,
-    val originalUriPath: UriPath = UriPath("")
+    val originalUriPath: UriPath = UriPath(""),
+    val pitagTrigger: PitagTrigger,
 ) {
     /**
      * True if it's a voice clip, false otherwise
@@ -46,7 +48,8 @@ data class PendingMessage(
         uriPath: UriPath,
         fingerprint: String?,
         name: String?,
-    ) : this() {
+        pitagTrigger: PitagTrigger,
+    ) : this(pitagTrigger = pitagTrigger) {
         this.chatId = chatId
         this.uploadTimestamp = uploadTimestamp
         this.uriPath = uriPath
@@ -64,7 +67,8 @@ data class PendingMessage(
         name: String?,
         nodeHandle: Long,
         state: Int,
-    ) : this() {
+        pitagTrigger: PitagTrigger,
+    ) : this(pitagTrigger = pitagTrigger) {
         this.id = id
         this.chatId = chatId
         this.uploadTimestamp = uploadTimestamp

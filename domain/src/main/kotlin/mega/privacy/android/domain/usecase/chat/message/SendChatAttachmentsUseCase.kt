@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.chat.message
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.file.DoesCacheHaveSufficientSpaceForUrisUseCase
@@ -46,6 +46,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     nodeHandle = -1,
                     fingerprint = null,
                     name = name,
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 ),
                 chatIds.asList()
             ).forEach { pendingMessageId ->

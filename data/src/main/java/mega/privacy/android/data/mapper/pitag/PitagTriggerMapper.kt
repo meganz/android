@@ -25,5 +25,6 @@ internal class PitagTriggerMapper @Inject constructor() {
         PitagTrigger.ShareFromApp -> MegaApiJava.PITAG_TRIGGER_SHARE_FROM_APP
         PitagTrigger.CameraCapture -> MegaApiJava.PITAG_TRIGGER_CAMERA_CAPTURE
         PitagTrigger.ExplorerExtension -> MegaApiJava.PITAG_TRIGGER_EXPLORER_EXTENSION
+        PitagTrigger.VoiceClip -> MegaApiJava.PITAG_TRIGGER_NOT_APPLICABLE
     }
 }

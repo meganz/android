@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.chat.PendingMessageEntity
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -37,6 +38,7 @@ internal class PendingMessageEntityMapperTest {
                 nodeHandle = 6543L,
                 fingerprint = "903456L",
                 name = "sample pending message",
+                pitagTrigger = PitagTrigger.Picker,
             )
             val expected = PendingMessageEntity(
                 chatId = savePendingMessageRequest.chatId,
@@ -50,7 +52,8 @@ internal class PendingMessageEntityMapperTest {
                 nodeHandle = savePendingMessageRequest.nodeHandle,
                 fingerprint = savePendingMessageRequest.fingerprint,
                 name = savePendingMessageRequest.name,
-                originalUriPath = savePendingMessageRequest.uriPath.value
+                originalUriPath = savePendingMessageRequest.uriPath.value,
+                pitagTrigger = savePendingMessageRequest.pitagTrigger,
             )
 
             val actual = underTest(savePendingMessageRequest)

@@ -13,4 +13,5 @@ enum class PitagTrigger {
     ShareFromApp,
     CameraCapture,
     ExplorerExtension,
+    VoiceClip,
 }

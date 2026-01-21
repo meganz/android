@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.file.FileResult
@@ -72,6 +71,7 @@ class CreatePendingAttachmentMessageUseCase @Inject constructor(
                 nodeId = nodeHandle.takeIf { it != -1L }?.let { NodeId(it) },
                 fileSize = size,
                 fileName = name ?: fileName,
+                pitagTrigger = pendingMessage.pitagTrigger,
             )
         }
     }

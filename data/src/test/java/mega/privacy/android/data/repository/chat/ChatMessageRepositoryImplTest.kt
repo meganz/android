@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessa
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
@@ -278,6 +279,7 @@ class ChatMessageRepositoryImplTest {
         val savePendingMessageRequest = mock<SavePendingMessageRequest> {
             on { state } doReturn mock()
             on { uriPath } doReturn UriPath("file")
+            on { pitagTrigger } doReturn PitagTrigger.CameraCapture
         }
         val pendingMessageEntity = mock<PendingMessageEntity>()
         whenever(pendingMessageEntityMapper(savePendingMessageRequest))
@@ -304,6 +306,7 @@ class ChatMessageRepositoryImplTest {
             nodeHandle = 123L,
             fingerprint = "fingerprint",
             name = "name",
+            pitagTrigger = PitagTrigger.Picker,
         )
         val savePendingMessageRequests = chatIds.associateWith {
             savePendingMessageRequest.copy(chatId = it)

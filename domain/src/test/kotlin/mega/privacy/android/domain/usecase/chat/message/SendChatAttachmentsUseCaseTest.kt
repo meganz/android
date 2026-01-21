@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.SavePendingMessageRequest
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
@@ -72,6 +73,7 @@ class SendChatAttachmentsUseCaseTest {
                 nodeHandle = -1,
                 fingerprint = null,
                 name = uris[uri],
+                pitagTrigger = PitagTrigger.NotApplicable,
             ),
             listOf(chatId)
         )

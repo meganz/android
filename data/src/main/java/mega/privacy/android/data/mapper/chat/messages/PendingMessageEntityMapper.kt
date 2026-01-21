@@ -29,7 +29,8 @@ class PendingMessageEntityMapper @Inject constructor() {
             nodeHandle = savePendingMessageRequest.nodeHandle,
             fingerprint = savePendingMessageRequest.fingerprint,
             name = savePendingMessageRequest.name,
-            originalUriPath = savePendingMessageRequest.uriPath.value
+            originalUriPath = savePendingMessageRequest.uriPath.value,
+            pitagTrigger = savePendingMessageRequest.pitagTrigger,
         )
     }
 
