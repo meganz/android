@@ -103,12 +103,16 @@ abstract class NodeSelectionModeModule {
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
             renameSelectionMenuItem: RenameSelectionMenuItem,
             leaveShareSelectionMenuItem: LeaveShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuItem,
             moveSelectionModeMenuItem,
             downloadSelectionMenuItem,
             renameSelectionMenuItem,
             leaveShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction,
+            sendToChatSelectionMenuItem
         )
 
         @Provides
