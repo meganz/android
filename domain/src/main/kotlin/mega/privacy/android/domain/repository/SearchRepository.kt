@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
@@ -69,4 +70,21 @@ interface SearchRepository {
      * get invalid handle
      */
     suspend fun getInvalidHandle(): NodeId
+
+    /**
+     * Save a recent search query
+     * @param query The search query to save
+     */
+    suspend fun saveRecentSearch(query: String)
+
+    /**
+     * Monitor recent searches sorted by timestamp descending (most recent first)
+     * @return Flow of recent search queries
+     */
+    fun monitorRecentSearches(): Flow<List<String>>
+
+    /**
+     * Clear all recent searches
+     */
+    suspend fun clearRecentSearches()
 }
