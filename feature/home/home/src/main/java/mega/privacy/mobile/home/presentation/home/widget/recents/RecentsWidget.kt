@@ -73,7 +73,10 @@ class RecentsWidget @Inject constructor() : HomeWidget {
         val viewModel = hiltViewModel<RecentsViewModel, RecentsViewModel.Factory> { factory ->
             factory.create(maxBucketCount = RecentsWidgetConstants.WIDGET_MAX_BUCKETS)
         }
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.RECENTS_BUCKET) }
+            )
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val coroutineScope = rememberCoroutineScope()
         val snackBarEventQueue = rememberSnackBarQueue()

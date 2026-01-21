@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
@@ -60,6 +61,8 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
+import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = CloudDriveViewModel.Factory::class)
@@ -415,8 +418,15 @@ class CloudDriveViewModel @AssistedInject constructor(
                     ViewType.GRID -> ViewType.LIST
                 }
                 setViewTypeUseCase(toggledViewType)
+                toggledViewType
             }.onFailure {
                 Timber.e(it, "Failed to change view type")
+            }.onSuccess { viewType ->
+                val event = when (viewType) {
+                    ViewType.LIST -> ViewModeListMenuItemEvent
+                    ViewType.GRID -> ViewModeGridMenuItemEvent
+                }
+                Analytics.tracker.trackEvent(event)
             }
         }
     }

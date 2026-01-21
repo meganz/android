@@ -1,8 +1,11 @@
 package mega.privacy.android.domain.entity.node
 
+import kotlinx.serialization.Serializable
+
 /**
  * Enum class containing all Node Source types available
  */
+@Serializable
 enum class NodeSourceType {
 
     /**

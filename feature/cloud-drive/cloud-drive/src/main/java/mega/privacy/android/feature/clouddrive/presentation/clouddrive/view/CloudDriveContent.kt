@@ -35,6 +35,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
@@ -53,6 +54,7 @@ import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -72,6 +74,17 @@ import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent
+import mega.privacy.mobile.analytics.event.SortButtonPressedEvent
+import mega.privacy.mobile.analytics.event.SortByDateAddedMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByDateModifiedMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByFavouriteMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByLabelMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByLinkCreationMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByNameMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortByShareCreationMenuItemEvent
+import mega.privacy.mobile.analytics.event.SortBySizeMenuItemEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,7 +102,9 @@ internal fun CloudDriveContent(
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+        creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
+    ),
     onPrepareScanDocument: () -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
@@ -216,7 +231,10 @@ internal fun CloudDriveContent(
                         .verticalScroll(rememberScrollState())
                         .padding(bottom = 56.dp),
                     isRootCloudDrive = uiState.isCloudDriveRoot,
-                    onAddItemsClicked = { onToggleShowUploadOptionsBottomSheet(true) },
+                    onAddItemsClicked = {
+                        Analytics.tracker.trackEvent(CloudDriveEmptyStateAddFilesPressedEvent)
+                        onToggleShowUploadOptionsBottomSheet(true)
+                    },
                     showAddItems = uiState.hasWritePermission
                 )
             }
@@ -237,10 +255,11 @@ internal fun CloudDriveContent(
                 isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 showHiddenNodes = uiState.showHiddenNodes,
                 onMenuClicked = {
+                    Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
                     navigationHandler.navigate(
                         NodeOptionsBottomSheetNavKey(
                             nodeHandle = it.id.longValue,
-                            nodeSourceType = uiState.nodeSourceType
+                            nodeSourceType = uiState.nodeSourceType,
                         )
                     )
                 },
@@ -248,7 +267,10 @@ internal fun CloudDriveContent(
                 onLongClicked = { onAction(ItemLongClicked(it)) },
                 sortConfiguration = uiState.selectedSortConfiguration,
                 isListView = isListView,
-                onSortOrderClick = { showSortBottomSheet = true },
+                onSortOrderClick = {
+                    Analytics.tracker.trackEvent(SortButtonPressedEvent)
+                    showSortBottomSheet = true
+                },
                 onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
                 showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
                 onEnterMediaDiscoveryClick = {
@@ -377,6 +399,7 @@ internal fun CloudDriveContent(
                 ),
                 onSortOptionSelected = { result ->
                     result?.let {
+                        it.sortOptionItem.trackAnalyticsEvent()
                         onSortNodes(
                             NodeSortConfiguration(
                                 sortOption = it.sortOptionItem,
@@ -392,4 +415,19 @@ internal fun CloudDriveContent(
             )
         }
     }
+}
+
+private fun NodeSortOption.trackAnalyticsEvent() {
+    val event = when (this) {
+        NodeSortOption.Name -> SortByNameMenuItemEvent
+        NodeSortOption.Favourite -> SortByFavouriteMenuItemEvent
+        NodeSortOption.Label -> SortByLabelMenuItemEvent
+        NodeSortOption.Created -> SortByDateAddedMenuItemEvent
+        NodeSortOption.Modified -> SortByDateModifiedMenuItemEvent
+        NodeSortOption.Size -> SortBySizeMenuItemEvent
+        NodeSortOption.ShareCreated -> SortByShareCreationMenuItemEvent
+        NodeSortOption.LinkCreated -> SortByLinkCreationMenuItemEvent
+    }
+
+    Analytics.tracker.trackEvent(event)
 }

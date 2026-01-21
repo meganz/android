@@ -29,7 +29,10 @@ import mega.privacy.android.navigation.megaActivityResultContract
  */
 @Composable
 fun rememberSingleNodeActionHandler(
-    viewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    viewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,
@@ -180,7 +183,10 @@ fun rememberSingleNodeActionHandler(
  */
 @Composable
 fun rememberMultiNodeActionHandler(
-    viewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    viewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     megaNavigator: MegaNavigator = rememberMegaNavigator(),
     navigationHandler: NavigationHandler? = null,

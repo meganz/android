@@ -13,6 +13,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -40,7 +41,10 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
         val snackbarHostState = LocalSnackBarHostState.current
         val context = LocalContext.current
         var hasShownSnackbar by rememberSaveable { mutableStateOf(false) }
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
+            )
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,

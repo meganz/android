@@ -27,6 +27,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
@@ -38,6 +39,7 @@ import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPaddi
 import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
@@ -55,6 +57,9 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
+import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
+import mega.privacy.mobile.analytics.event.CloudDriveSearchBarPressedEvent
 
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
@@ -70,7 +75,9 @@ internal fun DriveSyncScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
     cloudDriveViewModel: CloudDriveViewModel,
     viewModel: DriveSyncViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+        creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
+    ),
     scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
     initialTabIndex: Int = 0,
 ) {
@@ -115,6 +122,7 @@ internal fun DriveSyncScreen(
                         when {
                             selectedTabIndex == 0 && cloudDriveUiState.items.isNotEmpty() -> add(
                                 MenuActionWithClick(CommonAppBarAction.Search) {
+                                    Analytics.tracker.trackEvent(CloudDriveSearchBarPressedEvent)
                                     navigationHandler.navigate(cloudDriveUiState.searchNavKey)
                                 }
                             )
@@ -137,6 +145,9 @@ internal fun DriveSyncScreen(
                 multiNodeActionHandler = selectionModeActionHandler,
                 selectedNodes = cloudDriveUiState.selectedNodes,
                 isSelecting = cloudDriveUiState.isSelecting,
+                onMoreClicked = {
+                    Analytics.tracker.trackEvent(CloudDriveBottomToolBarMoreMenuItemEvent)
+                }
             )
         },
         floatingActionButton = {
@@ -144,7 +155,10 @@ internal fun DriveSyncScreen(
                 selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.isEmpty
             AddContentFab(
                 visible = showFab,
-                onClick = { showUploadOptionsBottomSheet = true }
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
+                    showUploadOptionsBottomSheet = true
+                }
             )
         },
     ) { paddingValues ->

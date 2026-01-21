@@ -69,7 +69,10 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun SharesScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     incomingSharesViewModel: IncomingSharesViewModel = hiltViewModel(),
     outgoingSharesViewModel: OutgoingSharesViewModel = hiltViewModel(),
     linksViewModel: LinksViewModel = hiltViewModel(),

@@ -69,6 +69,7 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
@@ -106,7 +107,10 @@ fun AlbumContentScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: AlbumContentViewModel = hiltViewModel(),
-    actionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    actionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val actionState by actionViewModel.uiState.collectAsStateWithLifecycle()

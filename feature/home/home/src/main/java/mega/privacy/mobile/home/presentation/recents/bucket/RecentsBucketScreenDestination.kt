@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
@@ -30,7 +31,10 @@ fun EntryProviderScope<NavKey>.recentsBucketScreen(
                     )
                 )
             }
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.RECENTS_BUCKET) }
+            )
         val selectionModeActionHandler = rememberMultiNodeActionHandler(
             navigationHandler = navigationHandler,
             viewModel = nodeOptionsActionViewModel,

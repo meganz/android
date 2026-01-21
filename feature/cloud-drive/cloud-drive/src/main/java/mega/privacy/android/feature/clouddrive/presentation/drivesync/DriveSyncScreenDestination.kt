@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -24,7 +25,10 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
                 factory.create(CloudDriveNavKey(highlightedNodeHandle = key.highlightedNodeHandle))
             }
         )
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
+            )
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,

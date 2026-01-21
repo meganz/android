@@ -52,6 +52,7 @@ fun NodeSelectionModeBottomBar(
     modifier: Modifier = Modifier,
     visibleActions: List<MenuActionWithIcon> = availableActions,
     onActionPressed: (MenuActionWithIcon) -> Unit = {},
+    onMoreClicked: () -> Unit = {},
 ) {
     var showMoreBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -64,6 +65,7 @@ fun NodeSelectionModeBottomBar(
             onActionPressed(action)
 
             if (action is NodeSelectionAction.More) {
+                onMoreClicked()
                 showMoreBottomSheet = true
                 return@SelectionModeBottomBar
             }

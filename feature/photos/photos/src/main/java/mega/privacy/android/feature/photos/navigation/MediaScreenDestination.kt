@@ -67,7 +67,10 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             .collectAsStateWithLifecycle(null)
         val mediaAlbumNavigationFlow by mediaAlbumNavigationFlow(LegacyPhotosSearchNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
@@ -173,7 +176,10 @@ fun EntryProviderScope<NavKey>.mediaSearchScreen(
     entry<MediaSearchNavKey> { args ->
         val photoDownloaderViewModel: PhotoDownloaderViewModel = hiltViewModel()
         val photosSearchViewModel: PhotosSearchViewModel = hiltViewModel()
-        val nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel()
+        val nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
         val state by photosSearchViewModel.state.collectAsStateWithLifecycle()
 
         HandleNodeOptionsActionResult(

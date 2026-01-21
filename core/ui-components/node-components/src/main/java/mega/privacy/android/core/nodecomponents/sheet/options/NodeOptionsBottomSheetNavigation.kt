@@ -2,11 +2,14 @@ package mega.privacy.android.core.nodecomponents.sheet.options
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
@@ -22,7 +25,7 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-    val partiallyExpand: Boolean = true
+    val partiallyExpand: Boolean = true,
 ) : NoSessionNavKey.Optional {
 
     companion object {
@@ -62,12 +65,20 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
             navigationHandler.back()
             return@entry
         }
-
+        val nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { factory -> factory.create(it.nodeSourceType) }
+            )
         val shareFolderResult by shareFolderDialogResult(ShareFolderDialogNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
 
         NodeOptionsBottomSheetRoute(
             navigationHandler = navigationHandler,
+            actionHandler = rememberSingleNodeActionHandler(
+                navigationHandler = navigationHandler,
+                viewModel = nodeOptionsActionViewModel,
+            ),
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             onDismiss = { navigationHandler.remove(it) },
             nodeId = it.nodeHandle,
             nodeSourceType = it.nodeSourceType,
@@ -108,7 +119,7 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                     NodeOptionsBottomSheetResult.AddToPlaylist(result)
                 )
             },
-            shareFolderDialogResult = shareFolderResult
+            shareFolderDialogResult = shareFolderResult,
         )
     }
 }

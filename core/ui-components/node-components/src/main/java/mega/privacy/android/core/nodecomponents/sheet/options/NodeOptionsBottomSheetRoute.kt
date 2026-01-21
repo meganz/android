@@ -96,7 +96,10 @@ internal fun NodeOptionsBottomSheetRoute(
     onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
     onRestoreSuccess: (RestoreSuccess.RestoreData) -> Unit = {},
     onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit = {},
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(nodeSourceType) }
+        ),
     actionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel

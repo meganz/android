@@ -5,6 +5,9 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation3.runtime.NavKey
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
@@ -23,6 +26,7 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
+import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
@@ -85,7 +89,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 /**
  * Node actions view model
@@ -107,8 +110,8 @@ import javax.inject.Inject
  * @property nodeContentUriIntentMapper
  * @property applicationScope
  */
-@HiltViewModel
-class NodeOptionsActionViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = NodeOptionsActionViewModel.Factory::class)
+class NodeOptionsActionViewModel @AssistedInject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
@@ -141,7 +144,9 @@ class NodeOptionsActionViewModel @Inject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
+    private val nodeOptionsActionEventSender: NodeOptionsActionEventSender,
     @ApplicationContext private val applicationContext: Context,
+    @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
 
     val uiState: StateFlow<NodeActionState>
@@ -665,6 +670,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     ) {
         val handler = singleNodeActionHandlers.find { it.canHandle(action) }
         if (handler != null) {
+            nodeOptionsActionEventSender(action, nodeSourceType)
             block(handler)
         } else {
             throw IllegalArgumentException("Action $action does not have a handler.")
@@ -684,6 +690,7 @@ class NodeOptionsActionViewModel @Inject constructor(
     ) {
         val handler = multipleNodesActionHandlers.find { it.canHandle(action) }
         if (handler != null) {
+            nodeOptionsActionEventSender(action, nodeSourceType)
             block(handler)
         } else {
             throw IllegalArgumentException("Action $action does not have a handler.")
@@ -882,5 +889,10 @@ class NodeOptionsActionViewModel @Inject constructor(
         uiState.update {
             it.copy(nodeNameCollisionsResult = triggered(result))
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(nodeSourceType: NodeSourceType?): NodeOptionsActionViewModel
     }
 }

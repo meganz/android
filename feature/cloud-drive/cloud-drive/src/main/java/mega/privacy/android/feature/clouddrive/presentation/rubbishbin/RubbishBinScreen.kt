@@ -71,7 +71,10 @@ internal fun RubbishBinScreen(
     viewModel: NewRubbishBinViewModel,
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(NodeSourceType.RUBBISH_BIN) }
+        ),
 ) {
     val context = LocalContext.current
     val onBackPressedDispatcher =

@@ -71,7 +71,10 @@ internal fun FavouritesContent(
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(NodeSourceType.FAVOURITES) }
+        ),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current

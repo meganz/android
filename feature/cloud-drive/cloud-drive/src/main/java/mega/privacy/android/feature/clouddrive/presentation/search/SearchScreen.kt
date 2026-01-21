@@ -35,6 +35,7 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -65,6 +66,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SearchFileTypeDropdownChipPressedEvent
+import mega.privacy.mobile.analytics.event.SearchLastModifiedDropdownChipPressedEvent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -139,6 +142,7 @@ fun SearchScreen(
             isListView = isListView,
             spanCount = spanCount,
             onFilterClicked = { filterType ->
+                filterType.trackAnalyticsEvent()
                 localKeyboardController?.hide()
                 selectedFilterType = filterType
             },
@@ -355,6 +359,20 @@ fun SearchContent(
                 isContactVerificationOn = uiState.isContactVerificationOn
             )
         }
+    }
+}
+
+private fun SearchFilterType.trackAnalyticsEvent() {
+    when (this) {
+        SearchFilterType.TYPE -> {
+            Analytics.tracker.trackEvent(SearchFileTypeDropdownChipPressedEvent)
+        }
+
+        SearchFilterType.LAST_MODIFIED -> {
+            Analytics.tracker.trackEvent(SearchLastModifiedDropdownChipPressedEvent)
+        }
+
+        SearchFilterType.DATE_ADDED -> return
     }
 }
 

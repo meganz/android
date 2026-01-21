@@ -16,6 +16,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
@@ -97,6 +99,7 @@ class CloudDriveViewModelTest {
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
+    private val mockTracker: AnalyticsTracker = mock()
 
     private lateinit var testScheduler: TestCoroutineScheduler
 
@@ -104,6 +107,7 @@ class CloudDriveViewModelTest {
     fun setUp() {
         testScheduler = TestCoroutineScheduler()
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        Analytics.initialise(mockTracker)
     }
 
     @After
@@ -130,7 +134,9 @@ class CloudDriveViewModelTest {
             getNodeAccessPermission,
             monitorSortCloudOrderUseCase,
             getFeatureFlagValueUseCase,
+            mockTracker
         )
+        Analytics.initialise(null)
     }
 
     private fun createViewModel(

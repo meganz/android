@@ -44,7 +44,9 @@ fun FavouritesScreen(
     navigationHandler: NavigationHandler,
     onTransfer: (TransferTriggerEvent) -> Unit,
     viewModel: FavouritesViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+        creationCallback = { it.create(NodeSourceType.FAVOURITES) }
+    ),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()

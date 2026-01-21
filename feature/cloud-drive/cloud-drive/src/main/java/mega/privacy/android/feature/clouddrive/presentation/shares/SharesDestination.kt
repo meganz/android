@@ -14,7 +14,10 @@ fun EntryProviderScope<NavKey>.shares(
     transferHandler: TransferHandler,
 ) {
     entry<SharesNavKey> {
-        val nodeOptionsActionViewModel = hiltViewModel<NodeOptionsActionViewModel>()
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
 
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,

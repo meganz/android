@@ -128,7 +128,10 @@ fun MediaMainRoute(
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
 ) {
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
@@ -333,7 +336,10 @@ fun MediaMainScreen(
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
-    nodeOptionsActionViewModel: NodeOptionsActionViewModel = hiltViewModel(),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
