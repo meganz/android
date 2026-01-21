@@ -13,6 +13,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Busines
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.NotificationTopicsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
@@ -145,5 +146,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideStartCameraUploadsAfterStorageStateEventInitializer(initialiser: StartCameraUploadsAfterStorageStateEventInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideOfflineSyncPostLoginInitialiser(initialiser: OfflineSyncPostLoginInitialiser): PostLoginInitialiser =
         initialiser
 }
