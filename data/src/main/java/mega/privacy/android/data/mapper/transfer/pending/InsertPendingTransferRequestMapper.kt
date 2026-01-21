@@ -22,6 +22,7 @@ internal class InsertPendingTransferRequestMapper @Inject constructor(
             alreadyTransferred = 0,
             state = PendingTransferState.NotSentToSdk,
             fileName = pendingTransfer.fileName,
+            pitagTrigger = pendingTransfer.pitagTrigger,
         )
     }
 }

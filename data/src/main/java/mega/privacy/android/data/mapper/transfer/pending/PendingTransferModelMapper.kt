@@ -33,6 +33,7 @@ internal class PendingTransferModelMapper @Inject constructor(
             alreadyTransferred = alreadyTransferred,
             state = state,
             fileName = fileName,
+            pitagTrigger = pitagTrigger,
         )
     }
 }

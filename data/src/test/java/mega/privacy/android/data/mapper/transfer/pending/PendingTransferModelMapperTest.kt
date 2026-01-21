@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.data.mapper.transfer.TransferAppDataMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -43,6 +44,7 @@ internal class PendingTransferModelMapperTest {
         alreadyTransferred = 0,
         state = PendingTransferState.NotSentToSdk,
         fileName = "renamed.txt",
+        pitagTrigger = PitagTrigger.ShareFromApp,
     )
 
     @BeforeAll
@@ -85,7 +87,8 @@ internal class PendingTransferModelMapperTest {
             { assertThat(pendingTransfer.startedFiles).isEqualTo(pendingTransferEntity.startedFiles) },
             { assertThat(pendingTransfer.alreadyTransferred).isEqualTo(pendingTransferEntity.alreadyTransferred) },
             { assertThat(pendingTransfer.state).isEqualTo(pendingTransferEntity.state) },
-            { assertThat(pendingTransfer.fileName).isEqualTo(pendingTransferEntity.fileName) }
+            { assertThat(pendingTransfer.fileName).isEqualTo(pendingTransferEntity.fileName) },
+            { assertThat(pendingTransfer.pitagTrigger).isEqualTo(pendingTransferEntity.pitagTrigger) },
         )
     }
 }

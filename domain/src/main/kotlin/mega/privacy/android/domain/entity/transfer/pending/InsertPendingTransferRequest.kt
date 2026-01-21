@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.transfer.pending
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -11,6 +12,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @param appData
  * @param isHighPriority
  * @param fileName The name of the file to be shown in completed Transfers. It can be used to rename uploaded nodes. Current file name will be used if not specified.
+ * @param pitagTrigger [PitagTrigger]
  */
 data class InsertPendingTransferRequest(
     val transferType: TransferType,
@@ -19,4 +21,5 @@ data class InsertPendingTransferRequest(
     val appData: List<TransferAppData> = emptyList(),
     val isHighPriority: Boolean,
     val fileName: String?,
+    val pitagTrigger: PitagTrigger,
 )
