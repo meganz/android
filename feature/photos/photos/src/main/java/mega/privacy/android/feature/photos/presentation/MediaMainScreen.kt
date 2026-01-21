@@ -5,6 +5,9 @@ package mega.privacy.android.feature.photos.presentation
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -828,6 +831,12 @@ fun MediaMainScreen(
 
     if (showTimelineFilter) {
         setNavigationItemVisibility(false)
+    }
+    AnimatedVisibility(
+        visible = showTimelineFilter,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = slideOutVertically(targetOffsetY = { it })
+    ) {
         TimelineFilterView(
             modifier = Modifier.fillMaxSize(),
             currentFilter = timelineFilterUiState,
