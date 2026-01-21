@@ -7,15 +7,22 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.mobile.analytics.event.RecentsEmptyStateUploadButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RecentsEmptyViewTest {
 
+    private val composeRule = createComposeRule()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     @Test
     fun `test that empty message is displayed`() {
@@ -61,6 +68,52 @@ class RecentsEmptyViewTest {
             .performClick()
 
         assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun `test that RecentsEmptyStateUploadButtonPressedEvent is tracked when upload button is clicked`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsEmptyView(
+                    onUploadClicked = {}
+                )
+            }
+        }
+
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithTag(RECENTS_UPLOAD_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(RecentsEmptyStateUploadButtonPressedEvent)
+        assertThat(analyticsRule.events).hasSize(1)
+    }
+
+    @Test
+    fun `test that RecentsEmptyStateUploadButtonPressedEvent is tracked before onUploadClicked is called`() {
+        var uploadClickedCalled = false
+        var wasEventTrackedBeforeCallback = false
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsEmptyView(
+                    onUploadClicked = {
+                        wasEventTrackedBeforeCallback = analyticsRule.events.contains(
+                            RecentsEmptyStateUploadButtonPressedEvent
+                        )
+                        uploadClickedCalled = true
+                    }
+                )
+            }
+        }
+
+        analyticsRule.events.clear()
+
+        composeRule.onNodeWithTag(RECENTS_UPLOAD_BUTTON_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        assertThat(uploadClickedCalled).isTrue()
+        assertThat(wasEventTrackedBeforeCallback).isTrue()
     }
 }
 

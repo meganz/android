@@ -25,6 +25,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
@@ -43,6 +44,8 @@ import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
 import mega.privacy.android.navigation.destination.RecentsScreenNavKey
+import mega.privacy.mobile.analytics.event.RecentsChildNodeMoreButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RecentsViewAllButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
 import mega.privacy.mobile.home.presentation.recents.RecentsViewModel
 import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants
@@ -211,6 +214,7 @@ fun RecentsView(
                                 }
                             },
                             onMenuClicked = {
+                                Analytics.tracker.trackEvent(RecentsChildNodeMoreButtonPressedEvent)
                                 item.firstNode?.let { node ->
                                     onMenuClicked(node, item.nodeSourceType)
                                 }
@@ -221,7 +225,10 @@ fun RecentsView(
 
                 if (uiState.recentActionItems.size >= RecentsWidgetConstants.WIDGET_MAX_BUCKETS) {
                     TextButton(
-                        onClick = onViewAllClicked,
+                        onClick = {
+                            Analytics.tracker.trackEvent(RecentsViewAllButtonPressedEvent)
+                            onViewAllClicked()
+                        },
                         modifier = Modifier.testTag(RECENTS_VIEW_ALL_BUTTON_TEST_TAG),
                         contentPadding = PaddingValues(
                             horizontal = 16.dp,

@@ -24,7 +24,9 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.mobile.analytics.event.RecentsEmptyStateUploadButtonPressedEvent
 
 // TODO: Add all strings to resources/transifex once confirmed
 @Composable
@@ -49,7 +51,10 @@ internal fun RecentsEmptyView(
                 modifier = Modifier.testTag(RECENTS_EMPTY_TEXT_TEST_TAG)
             )
             TextButton(
-                onClick = onUploadClicked,
+                onClick = {
+                    Analytics.tracker.trackEvent(RecentsEmptyStateUploadButtonPressedEvent)
+                    onUploadClicked()
+                },
                 modifier = Modifier
                     .defaultMinSize(minWidth = 30.dp)
                     .testTag(RECENTS_UPLOAD_BUTTON_TEST_TAG),

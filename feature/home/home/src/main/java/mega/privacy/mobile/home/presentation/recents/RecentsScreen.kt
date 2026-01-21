@@ -22,9 +22,11 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -32,6 +34,8 @@ import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
+import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
+import mega.privacy.mobile.analytics.event.RecentsScreenEvent
 import mega.privacy.mobile.home.presentation.home.widget.recents.mockRecentsUiItemList
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
@@ -56,11 +60,18 @@ fun RecentsScreen(
     var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
     var showOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(RecentsScreenEvent)
+    }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             MegaTopAppBar(
                 title = stringResource(R.string.section_recents),
-                navigationType = AppBarNavigationType.Back(onBack),
+                navigationType = AppBarNavigationType.Back {
+                    Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                    onBack()
+                },
                 actions = listOf(
                     MenuActionWithClick(CommonAppBarAction.More) {
                         showOptionsBottomSheet = true

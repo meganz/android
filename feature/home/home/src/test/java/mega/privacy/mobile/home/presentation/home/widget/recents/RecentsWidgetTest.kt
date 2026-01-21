@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.mobile.analytics.event.RecentsChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RECENTS_MENU_TEST_TAG
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.TITLE_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.RecentsWidgetConstants.WIDGET_MAX_BUCKETS
@@ -34,6 +36,7 @@ import mega.privacy.mobile.home.presentation.recents.view.RECENTS_LOADING_TEST_T
 import mega.privacy.mobile.home.presentation.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import java.time.Instant
@@ -42,8 +45,12 @@ import java.time.ZoneId
 @RunWith(AndroidJUnit4::class)
 class RecentsWidgetTest {
 
+    private val composeRule = createComposeRule()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     @Test
     fun `test that title is displayed`() {
@@ -1011,6 +1018,47 @@ class RecentsWidgetTest {
 
         composeRule.onNodeWithTag(RECENTS_LOADING_TEST_TAG)
             .assertExists()
+    }
+
+    @Test
+    fun `test that RecentsChildNodeMoreButtonPressedEvent is tracked when menu button is clicked`() {
+        val mockNode = createMockTypedFileNode(name = "Document.pdf")
+
+        val item = createMockRecentsUiItem(
+            title = RecentActionTitleText.SingleNode("Document.pdf"),
+            parentFolderName = LocalizedText.Literal("Cloud Drive"),
+            timestamp = System.currentTimeMillis() / 1000,
+            icon = IconPackR.drawable.ic_generic_medium_solid,
+            nodes = listOf(mockNode),
+            parentFolderSharesType = RecentActionsSharesType.NONE,
+        )
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsView(
+                    uiState = RecentsUiState(
+                        recentActionItems = listOf(item),
+                        isNodesLoading = false,
+                        isHiddenNodeSettingsLoading = false,
+                    ),
+                    onFileClicked = { _, _ -> },
+                    onMenuClicked = { _, _ -> },
+                    onWidgetOptionsClicked = {},
+                    onShowRecentActivity = {},
+                    onUploadClicked = {},
+                    onViewAllClicked = {}
+                )
+            }
+        }
+
+        composeRule.waitForIdle()
+        analyticsRule.events.clear()
+
+        composeRule.onAllNodesWithTag(MENU_TEST_TAG, true)[0]
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(RecentsChildNodeMoreButtonPressedEvent)
+        assertThat(analyticsRule.events).hasSize(1)
     }
 
     private fun createMockTypedFileNode(

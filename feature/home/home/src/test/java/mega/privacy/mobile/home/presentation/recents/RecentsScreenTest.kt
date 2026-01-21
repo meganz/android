@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
@@ -29,6 +30,7 @@ import mega.privacy.mobile.home.presentation.recents.view.RECENTS_LOADING_TEST_T
 import mega.privacy.mobile.home.presentation.recents.view.RECENTS_UPLOAD_BUTTON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import java.time.Instant
@@ -37,8 +39,12 @@ import java.time.ZoneId
 @RunWith(AndroidJUnit4::class)
 class RecentsScreenTest {
 
+    private val composeRule = createComposeRule()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    var composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     @Test
     fun `test that items are displayed when list is not empty`() {

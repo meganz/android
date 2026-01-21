@@ -44,6 +44,7 @@ dependencies {
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
