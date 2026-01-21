@@ -69,7 +69,7 @@ import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialo
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isValid
@@ -162,7 +162,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private val collapsingAppBar get() = activityChatContactBinding.collapsingAppBar
 
     private val callInProgress get() = contentContactProperties.callInProgress
-    private val viewModel by viewModels<ContactInfoViewModel>()
+    private val viewModel by viewModels<LegacyContactInfoViewModel>()
     private val startDownloadViewModel by viewModels<StartDownloadViewModel>()
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
@@ -877,7 +877,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Collecting Flows from ViewModel
      */
     private fun collectFlows() {
-        collectFlow(viewModel.uiState) { contactInfoUiState: ContactInfoUiState ->
+        collectFlow(viewModel.uiState) { contactInfoUiState: LegacyContactInfoUiState ->
             if (contactInfoUiState.isUserRemoved) {
                 finish()
             }
@@ -1021,7 +1021,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         startActivity(intent)
     }
 
-    private fun navigateToMeetingActivity(contactInfoUiState: ContactInfoUiState) {
+    private fun navigateToMeetingActivity(contactInfoUiState: LegacyContactInfoUiState) {
         val intentMeeting = Intent(this, MeetingActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             action = MeetingActivity.MEETING_ACTION_IN
@@ -1058,7 +1058,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         viewModel.joinCall(video)
     }
 
-    private fun handleOneOffEvents(contactInfoUiState: ContactInfoUiState) {
+    private fun handleOneOffEvents(contactInfoUiState: LegacyContactInfoUiState) {
         when {
             contactInfoUiState.shouldNavigateToChat -> {
                 viewModel.chatId?.let { navigateToChatActivity(it) }
@@ -1098,7 +1098,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun updateBasicInfo(contactInfoUiState: ContactInfoUiState) = with(contactInfoUiState) {
+    private fun updateBasicInfo(contactInfoUiState: LegacyContactInfoUiState) = with(contactInfoUiState) {
         contentContactProperties.emailText.text = contactInfoUiState.contactItem?.email
         collapsingAppBar.firstLineToolbar.text = primaryDisplayName
         contentContactProperties.nameText.apply {
@@ -1110,7 +1110,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         updateAvatar(contactInfoUiState.avatar)
     }
 
-    private fun updateUserStatusChanges(contactInfoUiState: ContactInfoUiState) {
+    private fun updateUserStatusChanges(contactInfoUiState: LegacyContactInfoUiState) {
         contactStateIcon =
             contactInfoUiState.userChatStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
         collapsingAppBar.secondLineToolbar.apply {
@@ -1478,9 +1478,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     /**
      * Updates the "Verify credentials" view.
      *
-     * @param state [ContactInfoUiState].
+     * @param state [LegacyContactInfoUiState].
      */
-    private fun updateVerifyCredentialsLayout(state: ContactInfoUiState) {
+    private fun updateVerifyCredentialsLayout(state: LegacyContactInfoUiState) {
         contentContactProperties.apply {
             if (!state.contactItem?.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
@@ -94,7 +94,7 @@ import javax.inject.Inject
  * @property getInSharesUseCase                 [GetInSharesUseCase]
  */
 @HiltViewModel
-class ContactInfoViewModel @Inject constructor(
+class LegacyContactInfoViewModel @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
@@ -130,13 +130,13 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorChatRetentionTimeUpdateUseCase: MonitorChatRetentionTimeUpdateUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ContactInfoUiState())
+    private val _uiState = MutableStateFlow(LegacyContactInfoUiState())
 
     private var monitorChatRetentionTimeUpdateJob: Job? = null
 
     /**
      * UI State ContactInfo
-     * Flow of [ContactInfoUiState]
+     * Flow of [LegacyContactInfoUiState]
      */
     val uiState = _uiState.asStateFlow()
 
@@ -650,9 +650,9 @@ class ContactInfoViewModel @Inject constructor(
      * Method handles sent message to chat click from UI
      *
      * returns if user is not online
-     * updates [ContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * updates [LegacyContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
      * creates chatroom exists else returns existing chat room
-     * updates [ContactInfoUiState.shouldNavigateToChat] to true
+     * updates [LegacyContactInfoUiState.shouldNavigateToChat] to true
      */
     fun sendMessageToChat() = viewModelScope.launch {
         if (!isOnline()) return@launch
@@ -687,7 +687,7 @@ class ContactInfoViewModel @Inject constructor(
      * Method handles chat notification click
      *
      * Creates chatroom if chatroom is not existing
-     * updates [ContactInfoUiState.isChatNotificationChange] to true
+     * updates [LegacyContactInfoUiState.isChatNotificationChange] to true
      */
     fun chatNotificationsClicked() = viewModelScope.launch {
         if (chatId == null || chatId == INVALID_CHAT_HANDLE) {
@@ -813,7 +813,7 @@ class ContactInfoViewModel @Inject constructor(
         _uiState.update { it.copy(leaveFolderNodeIds = null) }
     }
 
-    companion object {
+    companion object Companion {
         private const val INVALID_CHAT_HANDLE = -1L
         private const val INVALID_NODE_HANDLE = -1L
     }

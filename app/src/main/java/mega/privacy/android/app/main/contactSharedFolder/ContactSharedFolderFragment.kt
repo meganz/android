@@ -26,7 +26,7 @@ import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
+import mega.privacy.android.app.presentation.contactinfo.LegacyContactInfoViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartDownloadViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
 import mega.privacy.android.app.utils.Constants
@@ -55,7 +55,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private lateinit var listView: RecyclerView
 
     private val handler = Handler(Looper.getMainLooper())
-    private val viewModel by activityViewModels<ContactInfoViewModel>()
+    private val viewModel by activityViewModels<LegacyContactInfoViewModel>()
     private val startDownloadViewModel by activityViewModels<StartDownloadViewModel>()
     private val contactInfoActivity: ContactInfoActivity
         get() = (requireActivity() as ContactInfoActivity)

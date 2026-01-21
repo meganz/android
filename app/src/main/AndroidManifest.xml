@@ -709,7 +709,6 @@
             android:name=".presentation.meeting.WaitingRoomActivity"
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".presentation.contactinfo.ComposeContactInfoActivity" />
         <activity
             android:name=".presentation.photos.mediadiscovery.MediaDiscoveryActivity"
             android:windowSoftInputMode="adjustNothing" />

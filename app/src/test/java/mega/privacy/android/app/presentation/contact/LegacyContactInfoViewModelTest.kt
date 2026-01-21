@@ -14,7 +14,7 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.presentation.contactinfo.ContactInfoViewModel
+import mega.privacy.android.app.presentation.contactinfo.LegacyContactInfoViewModel
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
@@ -79,8 +79,8 @@ import kotlin.test.assertFalse
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ContactInfoViewModelTest {
-    private var underTest: ContactInfoViewModel = mock()
+class LegacyContactInfoViewModelTest {
+    private lateinit var underTest: LegacyContactInfoViewModel
     private var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private var isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private var setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase = mock()
@@ -183,7 +183,7 @@ class ContactInfoViewModelTest {
 
     private suspend fun initViewModel() {
         stubCommon()
-        underTest = ContactInfoViewModel(
+        underTest = LegacyContactInfoViewModel(
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             setChatVideoInDeviceUseCase = setChatVideoInDeviceUseCase,

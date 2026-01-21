@@ -17,7 +17,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -34,7 +34,7 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ContactInfoContent(
-    uiState: ContactInfoUiState,
+    uiState: LegacyContactInfoUiState,
     coroutineScope: CoroutineScope,
     modalSheetState: ModalBottomSheetState,
     updateNickNameDialogVisibility: (Boolean) -> Unit,
@@ -115,7 +115,7 @@ private fun PreviewContactInfoContent() {
     )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
-            uiState = ContactInfoUiState(
+            uiState = LegacyContactInfoUiState(
                 contactItem = ContactItem(
                     handle = 123456L,
                     email = "test@gmail.com",
@@ -180,7 +180,7 @@ private fun PreviewContactInfoContentWithChatRoom() {
     )
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         ContactInfoContent(
-            uiState = ContactInfoUiState(
+            uiState = LegacyContactInfoUiState(
                 contactItem = ContactItem(
                     handle = 123456L,
                     email = "test@gmail.com",

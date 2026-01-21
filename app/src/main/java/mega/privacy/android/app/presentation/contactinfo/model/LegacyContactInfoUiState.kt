@@ -45,7 +45,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property retentionTime                              The retention time.
  * @property leaveFolderNodeIds                         The list of node ids to be left
  */
-data class ContactInfoUiState(
+data class LegacyContactInfoUiState(
     val error: Int? = null,
     val userChatStatus: UserChatStatus = UserChatStatus.Invalid,
     val lastGreen: Int = 0,

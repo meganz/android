@@ -38,7 +38,7 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.meeting.listeners.IndividualCallVideoListener
 import mega.privacy.android.app.presentation.chat.model.AnswerCallResult
-import mega.privacy.android.app.presentation.contactinfo.model.ContactInfoUiState
+import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
 import mega.privacy.android.app.presentation.extensions.contacts.getMessage
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.GetPluralStringFromStringResMapper
@@ -2359,9 +2359,9 @@ class MeetingActivityViewModel @Inject constructor(
      * Method handles sent message to chat click from UI
      *
      * returns if user is not online
-     * updates [ContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * updates [LegacyContactInfoUiState.isStorageOverQuota] if storage state is [StorageState.PayWall]
      * creates chatroom exists else returns existing chat room
-     * updates [ContactInfoUiState.shouldNavigateToChat] to true
+     * updates [LegacyContactInfoUiState.shouldNavigateToChat] to true
      */
     fun sendMessageToChat() = viewModelScope.launch {
         if (!isOnline()) return@launch
