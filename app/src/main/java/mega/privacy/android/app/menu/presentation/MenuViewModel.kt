@@ -286,22 +286,18 @@ class MenuViewModel @Inject constructor(
 
     private fun refreshUserName() {
         viewModelScope.launch {
+            val name = runCatching { getUserFullNameUseCase(forceRefresh = true) }.getOrNull()
             _uiState.update {
-                it.copy(
-                    name = runCatching {
-                        getUserFullNameUseCase(
-                            forceRefresh = true,
-                        )
-                    }.getOrNull()
-                )
+                it.copy(name = name)
             }
         }
     }
 
     private fun refreshCurrentUserEmail() {
         viewModelScope.launch {
+            val email = runCatching { getCurrentUserEmail() }.getOrNull()
             _uiState.update {
-                it.copy(email = runCatching { getCurrentUserEmail() }.getOrNull())
+                it.copy(email = email)
             }
         }
     }

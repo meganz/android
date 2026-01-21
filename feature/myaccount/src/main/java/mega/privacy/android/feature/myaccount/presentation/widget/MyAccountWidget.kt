@@ -168,11 +168,14 @@ internal fun MyAccountWidget(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
+                val emojifiedName = remember(state.name) {
+                    state.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
+                }
                 // Avatar
                 MediumProfilePicture(
                     imageFile = state.avatarFile,
                     contentDescription = state.name,
-                    name = state.name ?: "",
+                    name = emojifiedName,
                     avatarColor = state.avatarColor
                 )
 
@@ -180,9 +183,6 @@ internal fun MyAccountWidget(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    val emojifiedName = remember(state.name) {
-                        state.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
-                    }
                     // User name
                     MegaText(
                         text = "${stringResource(R.string.general_hi)} $emojifiedName!",

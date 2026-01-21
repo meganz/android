@@ -183,7 +183,7 @@ fun MenuHomeScreenUi(
                         MediumProfilePicture(
                             imageFile = uiState.avatar,
                             contentDescription = uiState.name,
-                            name = uiState.name,
+                            name = emojifiedName,
                             avatarColor = uiState.avatarColor
                         )
                     },
