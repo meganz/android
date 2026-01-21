@@ -5,6 +5,7 @@ import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -23,7 +24,7 @@ import timber.log.Timber
 
 /**
  * Activity which allows create and manage a link of a node
- * @see[GetLinkFragment], [CopyrightFragment], [DecryptionKeyFragment], [LinkPasswordFragment].
+ * @see[GetLinkFragment], [DecryptionKeyFragment], [LinkPasswordFragment].
  *
  * Or the creation of multiple links @see[GetSeveralLinksFragment].
  */
@@ -142,11 +143,13 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                         if (!isShowing) show()
                     }
                 }
+
                 R.id.copyright -> supportActionBar?.hide()
                 R.id.decryption_key -> {
                     supportActionBar?.title =
                         getString(R.string.option_decryption_key)
                 }
+
                 R.id.password -> {
                     supportActionBar?.title = getString(
                         if (viewModelNode.getPasswordText()
@@ -155,6 +158,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                         else R.string.reset_password_label
                     )
                 }
+
                 R.id.main_get_several_links -> {
                     viewModelNode.setElevation(true)
                     supportActionBar?.apply {

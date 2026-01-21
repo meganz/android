@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.getlink
 
 import android.text.TextUtils.TruncateAt.MIDDLE
-import android.view.View
 import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -27,7 +26,6 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.rememberScaffoldState
@@ -58,23 +56,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.getLink.CopyrightFragment
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -94,12 +90,11 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 
 @Composable
 internal fun AlbumGetLinkScreen(
-    albumGetLinkViewModel: AlbumGetLinkViewModel = viewModel(),
-    getLinkViewModel: GetLinkViewModel = viewModel(),
-    createView: (Fragment) -> View,
     onBack: () -> Unit,
     onLearnMore: () -> Unit,
     onShareLink: (Album.UserAlbum?, String) -> Unit,
+    albumGetLinkViewModel: AlbumGetLinkViewModel = hiltViewModel(),
+    getLinkViewModel: GetLinkViewModel = hiltViewModel(),
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -249,17 +244,19 @@ internal fun AlbumGetLinkScreen(
     )
 
     if (state.showCopyright) {
-        Surface {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = {
-                    val fragment = CopyrightFragment().apply {
-                        arguments = bundleOf("back_press" to true)
-                    }
-                    createView(fragment)
-                },
-            )
-        }
+        CopyRightScreen(
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxSize(),
+            onAgree = {
+                getLinkViewModel.updateShowCopyRight(false)
+                getLinkViewModel.agreeCopyrightTerms()
+            },
+            onDisagree = {
+                getLinkViewModel.updateShowCopyRight(true)
+                onBack()
+            }
+        )
     }
 }
 

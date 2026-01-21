@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
 
 import android.text.TextUtils.TruncateAt.MIDDLE
-import android.view.View
 import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -55,24 +54,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.app.getLink.CopyrightFragment
 import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012
@@ -90,9 +87,8 @@ private typealias ImageDownloader = (photo: Photo, callback: (Boolean) -> Unit) 
 
 @Composable
 fun AlbumGetMultipleLinksScreen(
-    viewModel: AlbumGetMultipleLinksViewModel = viewModel(),
-    getLinkViewModel: GetLinkViewModel = viewModel(),
-    createView: (Fragment) -> View,
+    viewModel: AlbumGetMultipleLinksViewModel = hiltViewModel(),
+    getLinkViewModel: GetLinkViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onShareLinks: (List<AlbumLink>) -> Unit,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
@@ -192,17 +188,19 @@ fun AlbumGetMultipleLinksScreen(
     }
 
     if (state.showCopyright) {
-        Surface {
-            AndroidView(
-                modifier = Modifier.fillMaxSize(),
-                factory = {
-                    val fragment = CopyrightFragment().apply {
-                        arguments = bundleOf("back_press" to true)
-                    }
-                    createView(fragment)
-                },
-            )
-        }
+        CopyRightScreen(
+            modifier = Modifier
+                .systemBarsPadding()
+                .fillMaxSize(),
+            onAgree = {
+                getLinkViewModel.updateShowCopyRight(false)
+                getLinkViewModel.agreeCopyrightTerms()
+            },
+            onDisagree = {
+                getLinkViewModel.updateShowCopyRight(true)
+                onBack()
+            }
+        )
     }
 }
 

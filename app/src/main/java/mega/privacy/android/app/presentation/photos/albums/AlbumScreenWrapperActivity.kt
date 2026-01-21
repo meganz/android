@@ -20,7 +20,6 @@ import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
@@ -39,6 +38,7 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
+import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -127,7 +127,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             AlbumScreen.AlbumGetLinkScreen -> {
                 AlbumGetLinkScreen(
                     getLinkViewModel = getLinkViewModel,
-                    createView = ::showFragment,
                     onBack = ::finish,
                     onLearnMore = {
                         val intent = createAlbumDecryptionKeyScreen(this)
@@ -150,7 +149,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
             AlbumScreen.AlbumGetMultipleLinksScreen -> {
                 AlbumGetMultipleLinksScreen(
-                    createView = ::showFragment,
                     onBack = ::finish,
                     onShareLinks = { albumLinks ->
                         val linksString = albumLinks.joinToString(System.lineSeparator()) {

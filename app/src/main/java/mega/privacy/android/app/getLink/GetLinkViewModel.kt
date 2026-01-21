@@ -49,7 +49,7 @@ import javax.inject.Inject
 
 /**
  * View Model used for manage data related to get or manage a link.
- * It is shared by the fragments [GetLinkFragment], [DecryptionKeyFragment], [CopyrightFragment],
+ * It is shared by the fragments [GetLinkFragment], [DecryptionKeyFragment],
  * [LinkPasswordFragment] and their activity [GetLinkActivity].
  *
  * @property megaApi                        MegaApiAndroid instance to use.
@@ -236,7 +236,7 @@ class GetLinkViewModel @Inject constructor(
     }
 
     /**
-     * Checks if should show [CopyrightFragment].
+     * Checks if should show [mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen].
      *
      * @return True if should show it, false otherwise.
      */
@@ -247,7 +247,7 @@ class GetLinkViewModel @Inject constructor(
     }.getOrDefault(false)
 
     /**
-     * Updates the flag to show or not [CopyrightFragment] in DB.
+     * Updates the flag to show or not [mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen] in DB.
      */
     fun updateShowCopyRight(show: Boolean) {
         dbH.setShowCopyright(show)
