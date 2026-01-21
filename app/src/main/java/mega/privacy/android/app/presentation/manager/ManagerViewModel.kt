@@ -27,7 +27,6 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
-import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -274,7 +273,6 @@ class ManagerViewModel @Inject constructor(
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
     private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper,
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
-    private val legacyState: LegacyPsaGlobalState,
     private val getNoteToSelfChatUseCase: GetNoteToSelfChatUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val cloudDriveDeepLinkHandler: CloudDriveDeepLinkHandler,
@@ -1125,7 +1123,6 @@ class ManagerViewModel @Inject constructor(
      */
     fun dismissPsa(psaId: Int) = appScope.launch {
         dismissPsaUseCase(psaId)
-        legacyState.clearPsa()
     }
 
     /**

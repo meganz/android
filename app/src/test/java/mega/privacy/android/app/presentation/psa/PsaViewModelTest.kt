@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -77,7 +76,6 @@ class PsaViewModelTest {
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
             currentTimeProvider = { 0 },
-            legacyState = mock<LegacyPsaGlobalState>(),
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }

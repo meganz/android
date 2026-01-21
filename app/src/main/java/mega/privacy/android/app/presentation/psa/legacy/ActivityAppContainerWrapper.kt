@@ -26,7 +26,6 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContentView
@@ -34,6 +33,7 @@ import mega.privacy.android.app.presentation.psa.PsaViewModel
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -52,7 +52,6 @@ import javax.inject.Inject
 class ActivityAppContainerWrapper @Inject constructor(
     @ActivityContext private val context: Context,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
-    private val psaGlobalState: LegacyPsaGlobalState,
     private val passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
 ) : AppContainerWrapper, LifecycleEventObserver {
 
@@ -94,7 +93,7 @@ class ActivityAppContainerWrapper @Inject constructor(
 
                         if (!isLoginActivity) {
                             val viewModel: PsaViewModel = hiltViewModel()
-                            val psaState by psaGlobalState.state.collectAsStateWithLifecycle((context as LifecycleOwner))
+                            val psaState by viewModel.state.collectAsStateWithLifecycle((context as LifecycleOwner))
 
                             LaunchedEffect(psaState) {
                                 when (val current = psaState) {
@@ -134,16 +133,15 @@ class ActivityAppContainerWrapper @Inject constructor(
                                     {
                                         BusinessAccountContainer(content = it)
                                     },
-                                    {
+                                    { content ->
                                         PsaContentView(
                                             context = context,
                                             coroutineScope = rememberCoroutineScope(),
-                                            markAsSeen = {
-                                                viewModel.markAsSeen(it)
-                                                psaGlobalState.clearPsa()
+                                            markAsSeen = { psaId ->
+                                                viewModel.markAsSeen(psaId)
                                             },
                                             state = handledPsaState,
-                                            content = it,
+                                            content = content,
                                             containerModifier = Modifier
                                                 .navigationBarsPadding(),
                                             innerModifier = { it.padding(bottom = 16.dp) }

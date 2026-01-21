@@ -29,7 +29,6 @@ import mega.privacy.android.app.domain.usecase.FakeMonitorBackupFolder
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
-import mega.privacy.android.app.presentation.psa.legacy.LegacyPsaGlobalState
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
@@ -345,7 +344,6 @@ class ManagerViewModelTest {
     private val nodeVersionHistoryRemoveMessageMapper: NodeVersionHistoryRemoveMessageMapper =
         mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
-    private val legacyState = mock<LegacyPsaGlobalState>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val cloudDriveDeepLinkHandler: CloudDriveDeepLinkHandler = mock()
@@ -434,7 +432,6 @@ class ManagerViewModelTest {
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             getNoteToSelfChatUseCase = getNoteToSelfChatUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
-            legacyState = legacyState,
             appScope = appScope,
             cloudDriveDeepLinkHandler = cloudDriveDeepLinkHandler,
             getRubbishNodeUseCase = getRubbishBinNodeUseCase,
@@ -491,7 +488,6 @@ class ManagerViewModelTest {
             deleteNodeVersionsUseCase,
             getNoteToSelfChatUseCase,
             nodeVersionHistoryRemoveMessageMapper,
-            legacyState
         )
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
@@ -1244,7 +1240,6 @@ class ManagerViewModelTest {
         testScheduler.advanceUntilIdle()
 
         verify(dismissPsaUseCase).invoke(expected)
-        verify(legacyState).clearPsa()
     }
 
     @Test
