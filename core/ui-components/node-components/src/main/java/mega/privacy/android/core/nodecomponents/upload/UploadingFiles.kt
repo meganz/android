@@ -14,6 +14,7 @@ import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import java.io.IOException
@@ -23,6 +24,7 @@ fun UploadingFiles(
     nameCollisionLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,
     parentNodeId: NodeId,
     uris: List<Uri>,
+    pitagTrigger: PitagTrigger,
     onStartUpload: (TransferTriggerEvent) -> Unit,
     viewModel: UploadFileViewModel = hiltViewModel(),
 ) {
@@ -65,7 +67,11 @@ fun UploadingFiles(
 
     LaunchedEffect(uris) {
         if (uris.isNotEmpty()) {
-            viewModel.proceedUris(uris = uris, parentNodeId = parentNodeId)
+            viewModel.proceedUris(
+                uris = uris,
+                parentNodeId = parentNodeId,
+                pitagTrigger = pitagTrigger,
+            )
         }
     }
 }

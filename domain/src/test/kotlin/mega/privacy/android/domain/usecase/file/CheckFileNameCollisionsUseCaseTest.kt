@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
@@ -57,7 +58,7 @@ class CheckFileNameCollisionsUseCaseTest {
             whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(null)
             val entity = mock<DocumentEntity>()
             try {
-                underTest(listOf(entity), parentNodeId)
+                underTest(listOf(entity), parentNodeId, PitagTrigger.Picker)
             } catch (e: Exception) {
                 assertThat(e).isInstanceOf(NodeDoesNotExistsException::class.java)
             }
@@ -71,7 +72,7 @@ class CheckFileNameCollisionsUseCaseTest {
             whenever(getRootNodeUseCase()).thenReturn(null)
             val entity = mock<DocumentEntity>()
             try {
-                underTest(listOf(entity), parentNodeId)
+                underTest(listOf(entity), parentNodeId, PitagTrigger.Picker)
             } catch (e: Exception) {
                 assertThat(e).isInstanceOf(NodeDoesNotExistsException::class.java)
             }
@@ -90,7 +91,7 @@ class CheckFileNameCollisionsUseCaseTest {
             whenever(nodeRepository.getInvalidHandle()).thenReturn(1L)
             whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(parentNode)
             whenever(getChildNodeUseCase(parentNode.id, entity.name)).thenReturn(null)
-            val result = underTest(listOf(entity), parentNodeId)
+            val result = underTest(listOf(entity), parentNodeId, PitagTrigger.Picker)
             assertThat(result).isEmpty()
         }
 
@@ -123,13 +124,14 @@ class CheckFileNameCollisionsUseCaseTest {
                     childFileCount = 0,
                     childFolderCount = 0,
                     parentHandle = parentNodeId.longValue,
-                    path = UriPath("path")
+                    path = UriPath("path"),
+                    pitagTrigger = PitagTrigger.Picker
                 )
             )
             whenever(nodeRepository.getInvalidHandle()).thenReturn(1L)
             whenever(getNodeByHandleUseCase(parentNodeId.longValue)).thenReturn(parentNode)
             whenever(getChildNodeUseCase(parentNode.id, entity.name)).thenReturn(childNode)
-            val result = underTest(listOf(entity), parentNodeId)
+            val result = underTest(listOf(entity), parentNodeId, PitagTrigger.Picker)
             assertThat(result).isEqualTo(expect)
         }
 }

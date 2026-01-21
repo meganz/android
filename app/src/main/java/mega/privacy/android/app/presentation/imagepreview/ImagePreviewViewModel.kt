@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatImageFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -907,7 +908,8 @@ class ImagePreviewViewModel @Inject constructor(
                     size = currentImageNode.size,
                     lastModified = currentImageNode.modificationTime,
                     parentHandle = destinationId.longValue,
-                    path = UriPath(path)
+                    path = UriPath(path),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
                 val renameName = getNodeNameCollisionRenameNameUseCase(fileCollision)
                 _state.update { state ->

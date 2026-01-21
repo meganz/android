@@ -48,6 +48,7 @@ import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBo
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -72,6 +73,7 @@ internal fun HomeScreen(
     val megaNavigator = rememberMegaNavigator()
     val megaResultContract = rememberMegaResultContract()
     val rootFolderId = NodeId(-1L)
+    var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = LocalSnackBarHostState.current
@@ -79,6 +81,7 @@ internal fun HomeScreen(
     val uploadHandler = rememberUploadHandler(
         parentId = rootFolderId,
         onFilesSelected = { uris ->
+            pitagTrigger = PitagTrigger.Picker
             uploadUris = uris
         },
         megaNavigator = megaNavigator,
@@ -87,6 +90,7 @@ internal fun HomeScreen(
 
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
+            pitagTrigger = PitagTrigger.CameraCapture
             uploadUris = listOf(uri)
         },
         megaResultContract = megaResultContract
@@ -205,8 +209,10 @@ internal fun HomeScreen(
         nameCollisionLauncher = nameCollisionLauncher,
         parentNodeId = rootFolderId,
         uris = uploadUris,
+        pitagTrigger = pitagTrigger,
         onStartUpload = { transferTriggerEvent ->
             transferHandler.setTransferEvent(transferTriggerEvent)
+            pitagTrigger = PitagTrigger.NotApplicable
             uploadUris = emptyList()
         },
     )

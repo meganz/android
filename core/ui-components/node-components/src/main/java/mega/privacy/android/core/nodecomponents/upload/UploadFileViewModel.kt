@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -31,7 +32,7 @@ class UploadFileViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(UploadFileUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun proceedUris(uris: List<Uri>, parentNodeId: NodeId) {
+    fun proceedUris(uris: List<Uri>, parentNodeId: NodeId, pitagTrigger: PitagTrigger) {
         viewModelScope.launch {
             runCatching {
                 monitorStorageStateEventUseCase().value.storageState
@@ -51,7 +52,8 @@ class UploadFileViewModel @Inject constructor(
                 val entities = filePrepareUseCase(uris.map { UriPath(it.toString()) })
                 val collisions = checkFileNameCollisionsUseCase(
                     files = entities,
-                    parentNodeId = parentOrRootNodeId
+                    parentNodeId = parentOrRootNodeId,
+                    pitagTrigger = pitagTrigger,
                 )
                 // resolve name collisions and keep uploading files without collisions
                 if (collisions.isNotEmpty()) {

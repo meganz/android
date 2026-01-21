@@ -88,6 +88,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -719,7 +720,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                                         uri = UriPath(it.toUri().toString()),
                                     )
                                 }),
-                                parentNodeId = NodeId(parentHandle)
+                                parentNodeId = NodeId(parentHandle),
+                                pitagTrigger = PitagTrigger.CameraCapture,
                             )
                         }.onSuccess { fileCollisions ->
                             val collision = fileCollisions.firstOrNull()
@@ -780,7 +782,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
             runCatching {
                 checkFileNameCollisionsUseCase(
                     files = infos,
-                    parentNodeId = NodeId(parentNode.handle)
+                    parentNodeId = NodeId(parentNode.handle),
+                    pitagTrigger = PitagTrigger.Picker,
                 )
             }.onSuccess { collisions ->
                 dismissAlertDialogIfExists(statusDialog)

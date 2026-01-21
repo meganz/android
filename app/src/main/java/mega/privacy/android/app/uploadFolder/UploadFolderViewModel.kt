@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
@@ -363,7 +364,8 @@ class UploadFolderViewModel @Inject constructor(
                             numFolders = it.numberOfFolders,
                         )
                     },
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.Picker,
                 )
             }.onSuccess { fileCollisions ->
                 pendingUploads.addAll(files)

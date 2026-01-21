@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -343,7 +344,8 @@ class QRCodeViewModel @Inject constructor(
                             uri = UriPath(it.toUri().toString()),
                         )
                     }),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let { collision ->

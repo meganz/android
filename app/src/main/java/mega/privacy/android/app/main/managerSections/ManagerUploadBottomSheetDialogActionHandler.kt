@@ -44,6 +44,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogS
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
@@ -107,7 +108,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                         Timber.e(it, "Failed to take persistable URI permission")
                     }
                 }
-                managerActivity.handleFileUris(it)
+                managerActivity.handleFileUris(it, PitagTrigger.Picker)
             }
         }
 
@@ -196,7 +197,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         InAppCameraLauncher()
     ) {
         it?.let { uri ->
-            managerActivity.handleFileUris(listOf(uri))
+            managerActivity.handleFileUris(listOf(uri), PitagTrigger.CameraCapture)
         }
     }
 

@@ -74,6 +74,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -97,8 +98,9 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActio
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
-import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
+import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -119,7 +121,6 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Main ViewModel to handle all logic related to the [TextEditorActivity].
@@ -658,7 +659,8 @@ class TextEditorViewModel @Inject constructor(
                     size = 0L, // Not relevant for our use case
                     lastModified = System.currentTimeMillis(),
                     parentHandle = parentHandle,
-                    path = UriPath("") // Not relevant for our use case
+                    path = UriPath(""), // Not relevant for our use case
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
 
                 val uniqueFileName = getNodeNameCollisionRenameNameUseCase(nameCollision)
@@ -743,7 +745,8 @@ class TextEditorViewModel @Inject constructor(
                             uri = UriPath(it.toUri().toString()),
                         )
                     }),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let {
@@ -837,7 +840,8 @@ class TextEditorViewModel @Inject constructor(
                             uri = UriPath(tempFile.toUri().toString()),
                         )
                     ),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.NotApplicable,
                 )
             }.onSuccess { fileCollisions ->
                 fileCollisions.firstOrNull()?.let {

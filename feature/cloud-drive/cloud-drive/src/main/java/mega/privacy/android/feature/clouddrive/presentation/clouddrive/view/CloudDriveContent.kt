@@ -55,6 +55,7 @@ import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.R
@@ -114,12 +115,14 @@ internal fun CloudDriveContent(
     val snackbarHostState = LocalSnackBarHostState.current
     val megaResultContract = rememberMegaResultContract()
     val megaNavigator = rememberMegaNavigator()
+    var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
     var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     val uploadHandler = rememberUploadHandler(
         parentId = uiState.currentFolderId,
         onFilesSelected = { uris ->
+            pitagTrigger = PitagTrigger.Picker
             uploadUris = uris
         },
         megaNavigator = megaNavigator,
@@ -128,6 +131,7 @@ internal fun CloudDriveContent(
 
     val captureHandler = rememberCaptureHandler(
         onPhotoCaptured = { uri ->
+            pitagTrigger = PitagTrigger.CameraCapture
             uploadUris = listOf(uri)
         },
         megaResultContract = megaResultContract
@@ -323,8 +327,10 @@ internal fun CloudDriveContent(
             nameCollisionLauncher = nameCollisionLauncher,
             parentNodeId = uiState.currentFolderId,
             uris = uploadUris,
+            pitagTrigger = pitagTrigger,
             onStartUpload = { transferTriggerEvent ->
                 onTransfer(transferTriggerEvent)
+                pitagTrigger = PitagTrigger.NotApplicable
                 uploadUris = emptyList()
             },
         )

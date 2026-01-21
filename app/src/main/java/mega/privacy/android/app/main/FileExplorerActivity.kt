@@ -112,6 +112,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -1760,7 +1761,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 runCatching {
                     checkFileNameCollisionsUseCase(
                         files = documents,
-                        parentNodeId = NodeId(parentHandle)
+                        parentNodeId = NodeId(parentHandle),
+                        pitagTrigger = getPitagTrigger(),
                     )
                 }.onSuccess { collisions ->
                     dismissAlertDialogIfExists(statusDialog)
@@ -2079,7 +2081,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             uri = UriPath(it.toUri().toString()),
                         )
                     }),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    getPitagTrigger(),
                 )
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
@@ -2766,6 +2769,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun isDocumentScannerAction() =
         intent.action == ACTION_UPLOAD_SCAN_TO_CLOUD || intent.action == ACTION_UPLOAD_SCAN_TO_CHAT
+
+    private fun getPitagTrigger() =
+        if (isDocumentScannerAction()) PitagTrigger.Scanner else PitagTrigger.ShareFromApp
 
     companion object {
         private const val SHOULD_RESTART_SEARCH = "SHOULD_RESTART_SEARCH"

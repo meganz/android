@@ -290,6 +290,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -6086,7 +6087,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             runCatching {
                 checkFileNameCollisionsUseCase(
                     files = listOf(file.toDocumentEntity()),
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = PitagTrigger.CameraCapture,
                 )
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
@@ -6261,12 +6263,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    fun handleFileUris(uris: List<Uri>) {
+    fun handleFileUris(uris: List<Uri>, pitagTrigger: PitagTrigger) {
         lifecycleScope.launch {
             runCatching {
                 processFileDialog = showProcessFileDialog(this@ManagerActivity, intent)
                 val documents = viewModel.prepareFiles(uris)
-                onIntentProcessed(documents)
+                onIntentProcessed(documents, pitagTrigger)
             }.onFailure {
                 if (it is IOException) {
                     showSnackbar(SNACKBAR_TYPE, getString(R.string.error_not_enough_free_space))
@@ -6282,8 +6284,12 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * Handle processed upload intent.
      *
      * @param entities List<DocumentEntity> containing all the upload info.
+     * @param pitagTrigger [PitagTrigger]
      */
-    private suspend fun onIntentProcessed(entities: List<DocumentEntity>) {
+    private suspend fun onIntentProcessed(
+        entities: List<DocumentEntity>,
+        pitagTrigger: PitagTrigger,
+    ) {
         Timber.d("onIntentProcessed")
         val parentNode: MegaNode? = getCurrentParentNode(currentParentHandle, -1)
         if (parentNode == null) {
@@ -6318,7 +6324,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             runCatching {
                 checkFileNameCollisionsUseCase(
                     files = entities,
-                    parentNodeId = NodeId(parentHandle)
+                    parentNodeId = NodeId(parentHandle),
+                    pitagTrigger = pitagTrigger,
                 )
             }.onSuccess { collisions ->
                 dismissAlertDialogIfExists(statusDialog)

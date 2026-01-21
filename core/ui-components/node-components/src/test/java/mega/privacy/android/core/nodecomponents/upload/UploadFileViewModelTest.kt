@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -64,7 +65,7 @@ class UploadFileViewModelTest {
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
         val uiState = viewModel.uiState.value
         assertThat(uiState.overQuotaEvent).isInstanceOf(StateEvent.Triggered::class.java)
@@ -84,11 +85,11 @@ class UploadFileViewModelTest {
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
-        verify(checkFileNameCollisionsUseCase).invoke(entities, parentNodeId)
+        verify(checkFileNameCollisionsUseCase).invoke(entities, parentNodeId, PitagTrigger.Picker)
     }
 
     @Test
@@ -110,11 +111,11 @@ class UploadFileViewModelTest {
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(getRootNodeUseCase()).thenReturn(rootNode)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
-        verify(checkFileNameCollisionsUseCase).invoke(entities, rootNodeId)
+        verify(checkFileNameCollisionsUseCase).invoke(entities, rootNodeId, PitagTrigger.Picker)
     }
 
     @Test
@@ -132,11 +133,11 @@ class UploadFileViewModelTest {
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(getRootNodeUseCase()).thenReturn(null)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
-        verify(checkFileNameCollisionsUseCase).invoke(entities, NodeId(-1L))
+        verify(checkFileNameCollisionsUseCase).invoke(entities, NodeId(-1L), PitagTrigger.Picker)
     }
 
     @Test
@@ -160,15 +161,16 @@ class UploadFileViewModelTest {
                 parentHandle = 123L,
                 isFile = true,
                 renameName = null,
-                path = UriPath("/test.txt")
+                path = UriPath("/test.txt"),
+                pitagTrigger = PitagTrigger.Picker,
             )
         )
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
         val uiState = viewModel.uiState.value
         assertThat(uiState.nameCollisionEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -204,15 +206,16 @@ class UploadFileViewModelTest {
                 parentHandle = 123L,
                 isFile = true,
                 renameName = null,
-                path = UriPath("/test1.txt")
+                path = UriPath("/test1.txt"),
+                pitagTrigger = PitagTrigger.Picker,
             )
         )
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
         val uiState = viewModel.uiState.value
         assertThat(uiState.startUploadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -248,9 +251,9 @@ class UploadFileViewModelTest {
 
             whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
             whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-            whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+            whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-            viewModel.proceedUris(uris, parentNodeId)
+            viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
             val uiState = viewModel.uiState.value
             assertThat(uiState.startUploadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -280,9 +283,9 @@ class UploadFileViewModelTest {
 
             whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
             whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-            whenever(checkFileNameCollisionsUseCase(any(), any())).thenThrow(exception)
+            whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenThrow(exception)
 
-            viewModel.proceedUris(uris, parentNodeId)
+            viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
             val uiState = viewModel.uiState.value
             assertThat(uiState.uploadErrorEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -303,7 +306,8 @@ class UploadFileViewModelTest {
                     on { toString() } doReturn "content://com.example.provider/test.txt"
                 }
             ),
-            NodeId(123L)
+            NodeId(123L),
+            PitagTrigger.Picker,
         )
 
         // Verify event is triggered
@@ -332,13 +336,14 @@ class UploadFileViewModelTest {
                 parentHandle = 123L,
                 isFile = true,
                 renameName = null,
-                path = UriPath("/test.txt")
+                path = UriPath("/test.txt"),
+                pitagTrigger = PitagTrigger.Picker,
             )
         )
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
         viewModel.proceedUris(
             uris = listOf(
@@ -346,7 +351,8 @@ class UploadFileViewModelTest {
                     on { toString() } doReturn "content://com.example.provider/test.txt"
                 }
             ),
-            parentNodeId = NodeId(123L)
+            parentNodeId = NodeId(123L),
+            pitagTrigger = PitagTrigger.Picker,
         )
 
         // Verify event is triggered
@@ -372,7 +378,7 @@ class UploadFileViewModelTest {
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
         viewModel.proceedUris(
             listOf(
@@ -380,7 +386,8 @@ class UploadFileViewModelTest {
                     on { toString() } doReturn "content://com.example.provider/test.txt"
                 }
             ),
-            NodeId(123L)
+            NodeId(123L),
+            PitagTrigger.Picker,
         )
 
         // Verify event is triggered
@@ -407,12 +414,13 @@ class UploadFileViewModelTest {
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
         verify(filePrepareUseCase).invoke(emptyList())
-        verify(checkFileNameCollisionsUseCase).invoke(emptyList(), parentNodeId)
+        verify(checkFileNameCollisionsUseCase)
+            .invoke(emptyList(), parentNodeId, PitagTrigger.Picker)
     }
 
     @Test
@@ -429,11 +437,11 @@ class UploadFileViewModelTest {
 
         whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
         whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any())).thenReturn(collisions)
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
 
-        viewModel.proceedUris(uris, parentNodeId)
+        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
 
         verify(filePrepareUseCase).invoke(listOf(UriPath("content://com.example.provider/single.txt")))
-        verify(checkFileNameCollisionsUseCase).invoke(entities, parentNodeId)
+        verify(checkFileNameCollisionsUseCase).invoke(entities, parentNodeId, PitagTrigger.Picker)
     }
 }

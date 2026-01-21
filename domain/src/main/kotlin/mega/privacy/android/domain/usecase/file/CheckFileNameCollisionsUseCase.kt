@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.file
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.exception.node.NodeDoesNotExistsException
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
@@ -29,6 +30,7 @@ class CheckFileNameCollisionsUseCase @Inject constructor(
     suspend operator fun invoke(
         files: List<DocumentEntity>,
         parentNodeId: NodeId,
+        pitagTrigger: PitagTrigger,
     ): List<FileNameCollision> {
         val parentNode = getParentOrRootNode(parentNodeId.longValue)
             ?: throw NodeDoesNotExistsException()
@@ -46,7 +48,8 @@ class CheckFileNameCollisionsUseCase @Inject constructor(
                     childFileCount = entity.numFiles,
                     childFolderCount = entity.numFolders,
                     parentHandle = parentNodeId.longValue,
-                    path = entity.uri
+                    path = entity.uri,
+                    pitagTrigger = pitagTrigger,
                 )
             }
         }

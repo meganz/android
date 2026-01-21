@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.FileNameCollision
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import java.io.Serializable
 
@@ -50,6 +51,7 @@ sealed class NameCollisionUiEntity : Serializable {
         override val parentHandle: Long?,
         override val isFile: Boolean = true,
         override val renameName: String? = null,
+        val pitagTrigger: PitagTrigger,
     ) : NameCollisionUiEntity() {
 
         companion object {
@@ -71,7 +73,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 lastModified = collision.lastModified,
                 parentHandle = collision.parentHandle,
                 isFile = collision.isFile,
-                renameName = collision.renameName
+                renameName = collision.renameName,
+                pitagTrigger = collision.pitagTrigger,
             )
 
             /**
@@ -87,7 +90,8 @@ sealed class NameCollisionUiEntity : Serializable {
                 parentHandle = parentHandle ?: -1L,
                 isFile = isFile,
                 renameName = renameName,
-                path = UriPath(absolutePath)
+                path = UriPath(absolutePath),
+                pitagTrigger = pitagTrigger,
             )
         }
     }

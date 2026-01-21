@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.entity.node
 
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
@@ -17,5 +18,6 @@ data class FileNameCollision(
     override val parentHandle: Long,
     override val isFile: Boolean = true,
     override val renameName: String? = null,
+    override val pitagTrigger: PitagTrigger,
     val path: UriPath,
 ) : NameCollision
