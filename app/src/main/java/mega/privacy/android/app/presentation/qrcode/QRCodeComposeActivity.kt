@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.qrcode
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.settings.model.qrTargetPreference
 import mega.privacy.android.app.utils.Constants
@@ -125,7 +127,9 @@ class QRCodeComposeActivity : PasscodeActivity() {
     }
 
     private fun onViewContact(email: String) {
-        megaNavigator.openContactInfoActivity(this, email)
+        val i = Intent(this, ContactInfoActivity::class.java)
+        i.putExtra(Constants.NAME, email)
+        startActivity(i)
         finish()
     }
 

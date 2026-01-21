@@ -1,6 +1,7 @@
 package mega.privacy.android.app.contacts.list
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -25,6 +26,7 @@ import mega.privacy.android.app.contacts.list.dialog.ContactBottomSheetDialogFra
 import mega.privacy.android.app.databinding.FragmentContactListBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
 import mega.privacy.android.app.presentation.transfers.attach.createNodeAttachmentView
 import mega.privacy.android.app.utils.AlertDialogUtil.createForceAppUpdateDialog
@@ -210,7 +212,9 @@ class ContactListFragment : Fragment() {
     }
 
     private fun onContactInfoClick(userEmail: String) {
-        navigator.openContactInfoActivity(requireContext(), userEmail)
+        val i = Intent(context, ContactInfoActivity::class.java)
+        i.putExtra(Constants.NAME, userEmail)
+        requireContext().startActivity(i)
     }
 
     private fun onContactMoreClick(userHandle: Long) {

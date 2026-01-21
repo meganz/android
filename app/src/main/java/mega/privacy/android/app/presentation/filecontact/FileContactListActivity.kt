@@ -40,6 +40,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.OnSharedFolderUpdatedCallBack
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
@@ -554,7 +555,9 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             val user = listContacts?.get(position)?.user
             val contact = megaApi.getContact(user)
             if (contact?.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                megaNavigator.openContactInfoActivity(this, contact.email)
+                val i = Intent(this, ContactInfoActivity::class.java)
+                i.putExtra(Constants.NAME, contact.email)
+                startActivity(i)
             }
         }
     }

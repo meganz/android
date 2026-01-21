@@ -213,7 +213,9 @@ class FileInfoActivity : BaseActivity() {
                         viewModel.initiateChangePermission(listOf(it.contactItem.email))
                     },
                     onSharedWithContactMoreInfoClick = {
-                        megaNavigator.openContactInfoActivity(this, it.contactItem.email)
+                        val i = Intent(this, ContactInfoActivity::class.java)
+                        i.putExtra(Constants.NAME, it.contactItem.email)
+                        startActivity(i)
                     }
                 )
                 uiState.leaveFolderNodeIds?.let { nodeIds ->

@@ -9,6 +9,7 @@ import static mega.privacy.android.app.utils.Constants.EMAIL;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
 import static mega.privacy.android.app.utils.Constants.MESSAGE_ID;
+import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -18,6 +19,7 @@ import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +39,7 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaChatMessage;
@@ -290,7 +293,11 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
             }
 
             if (contactHandle != MEGACHAT_INVALID_HANDLE) {
-                megaNavigator.openContactInfoActivity(requireActivity(), contactEmail);
+                Intent intent = new Intent(requireActivity(), ContactInfoActivity.class);
+                intent.putExtra(NAME, contactEmail);
+                startActivity(
+                        intent
+                );
             }
         } else if (id == R.id.option_view) {
             Timber.d("View option");

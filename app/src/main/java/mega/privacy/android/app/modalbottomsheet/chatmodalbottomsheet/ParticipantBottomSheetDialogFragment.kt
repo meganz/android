@@ -16,6 +16,7 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.myAccount.MyAccountActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
@@ -265,10 +266,9 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
                 Timber.w("Cannot open contact info. Selected email is NULL")
                 return
             }
-            megaNavigator.openContactInfoActivity(
-                requireActivity(),
-                email
-            )
+            val i = Intent(context, ContactInfoActivity::class.java)
+            i.putExtra(Constants.NAME, email)
+            requireContext().startActivity(i)
         } else if (id == R.id.start_chat_group_participants_chat) {
             (requireActivity() as GroupChatInfoActivity).startConversation(participantHandle)
         } else if (id == R.id.contact_list_option_call_layout) {

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.filecontact
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.fileinfo.view.ShareContactOptionsContent
 import mega.privacy.android.app.presentation.fileinfo.view.ShareNonContactOptionsContent
 import mega.privacy.android.app.utils.AvatarUtil
@@ -157,7 +159,9 @@ class FileContactsListBottomSheetDialogFragment : BaseBottomSheetDialogFragment 
                                 allowChangePermission = node == null || !megaApi.isInVault(node),
                                 onInfoClicked = {
                                     email()?.let {
-                                        megaNavigator.openContactInfoActivity(requireActivity(), it)
+                                        val i = Intent(context, ContactInfoActivity::class.java)
+                                        i.putExtra(Constants.NAME, it)
+                                        context.startActivity(i)
                                     }
                                     dismissAllowingStateLoss()
                                 },

@@ -9,6 +9,7 @@ import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
+import static mega.privacy.android.app.utils.Constants.NAME;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -35,6 +36,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.myAccount.MyAccountActivity;
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity;
 import mega.privacy.android.app.presentation.meeting.ChatInfoViewModel;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView;
 import nz.mega.sdk.MegaApiAndroid;
@@ -251,7 +253,11 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.contact_info_group_participants_chat) {
-            megaNavigator.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
+            Intent intent = new Intent(requireActivity(), ContactInfoActivity.class);
+            intent.putExtra(NAME, chatC.getParticipantEmail(participantHandle));
+            startActivity(
+                    intent
+            );
         } else if (id == R.id.start_chat_group_participants_chat) {
             if (viewModel != null) {
                 viewModel.onSendMsgTap();
