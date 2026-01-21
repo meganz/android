@@ -8,9 +8,9 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -334,14 +335,16 @@ internal class ContactFileListViewModelTest {
     fun `test that state is updated correctly if a File is uploaded`() = runTest {
         val file = File("path")
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.Picker
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(file.absolutePath to null),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                pitagTrigger = pitagTrigger,
             )
         )
 
-        underTest.uploadFile(file, parentHandle)
+        underTest.uploadFile(file, parentHandle, pitagTrigger)
         underTest.state.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }

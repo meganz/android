@@ -28,6 +28,7 @@ import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotif
 import mega.privacy.android.data.worker.AreNotificationsEnabledUseCase
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -385,6 +386,7 @@ class QRCodeViewModelTest {
                 mapOf(file.absolutePath to null),
                 NodeId(parentHandle),
                 specificStartMessage = message,
+                pitagTrigger = PitagTrigger.NotApplicable,
             )
         )
         whenever(context.getString(any(), anyVararg())) doReturn message

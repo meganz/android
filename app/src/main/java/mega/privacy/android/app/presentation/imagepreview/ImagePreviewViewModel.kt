@@ -918,7 +918,8 @@ class ImagePreviewViewModel @Inject constructor(
                             TransferTriggerEvent.StartUpload.Files(
                                 pathsAndNames = mapOf(path to renameName),
                                 destinationId = destinationId,
-                                specificStartMessage = context.getString(sharedR.string.photo_editor_upload_message)
+                                specificStartMessage = context.getString(sharedR.string.photo_editor_upload_message),
+                                pitagTrigger = PitagTrigger.NotApplicable,
                             )
                         )
                     )

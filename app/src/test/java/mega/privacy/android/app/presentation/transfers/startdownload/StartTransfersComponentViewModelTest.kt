@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -199,7 +200,11 @@ class StartTransfersComponentViewModelTest {
         withStartMessage = false,
     )
     private val startUploadFilesEvent =
-        TransferTriggerEvent.StartUpload.Files(mapOf(DESTINATION to null), parentId)
+        TransferTriggerEvent.StartUpload.Files(
+            pathsAndNames = mapOf(DESTINATION to null),
+            destinationId = parentId,
+            pitagTrigger = PitagTrigger.Picker,
+        )
     private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
         DESTINATION,
         parentId,
@@ -208,7 +213,11 @@ class StartTransfersComponentViewModelTest {
     )
 
     private val startUploadEvent =
-        TransferTriggerEvent.StartUpload.Files(mapOf("foo" to null), NodeId(34678L))
+        TransferTriggerEvent.StartUpload.Files(
+            mapOf("foo" to null),
+            NodeId(34678L),
+            pitagTrigger = PitagTrigger.CameraCapture,
+        )
 
     @BeforeAll
     fun setup() {
@@ -579,7 +588,11 @@ class StartTransfersComponentViewModelTest {
             commonStub()
             whenever(shouldAskForResumeTransfersUseCase()).thenReturn(true)
             val triggerEvent =
-                TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri))
+                TransferTriggerEvent.StartChatUpload.Files(
+                    chatId = CHAT_ID,
+                    uris = listOf(uploadUri),
+                    pitagTrigger = PitagTrigger.Picker,
+                )
             underTest.startTransfer(triggerEvent)
             assertCurrentEventIsEqualTo(StartTransferEvent.PausedTransfers(triggerEvent))
         }
@@ -617,7 +630,11 @@ class StartTransfersComponentViewModelTest {
             commonStub()
 
             underTest.startTransfer(
-                TransferTriggerEvent.StartUpload.Files(mapOf(), parentId)
+                TransferTriggerEvent.StartUpload.Files(
+                    pathsAndNames = mapOf(),
+                    destinationId = parentId,
+                    pitagTrigger = PitagTrigger.Picker
+                )
             )
 
             assertCurrentEventIsEqualTo(StartTransferEvent.Message.TransferCancelled)
@@ -1655,8 +1672,16 @@ class StartTransfersComponentViewModelTest {
                 nodes = provideListOfNodes(),
                 withStartMessage = false,
             ),
-            TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, provideListOfUris()),
-            TransferTriggerEvent.StartUpload.Files(provideMapOfPathsAndNames(), parentId),
+            TransferTriggerEvent.StartChatUpload.Files(
+                chatId = CHAT_ID,
+                uris = provideListOfUris(),
+                pitagTrigger = PitagTrigger.Picker,
+            ),
+            TransferTriggerEvent.StartUpload.Files(
+                pathsAndNames = provideMapOfPathsAndNames(),
+                destinationId = parentId,
+                pitagTrigger = PitagTrigger.CameraCapture
+            ),
             TransferTriggerEvent.RetryTransfers(provideMapOfIdsAndEvents()),
         )
 
@@ -1704,7 +1729,11 @@ class StartTransfersComponentViewModelTest {
     )
 
     private fun provideStartChatUploadEvents() = listOf(
-        TransferTriggerEvent.StartChatUpload.Files(CHAT_ID, listOf(uploadUri)),
+        TransferTriggerEvent.StartChatUpload.Files(
+            chatId = CHAT_ID,
+            uris = listOf(uploadUri),
+            pitagTrigger = PitagTrigger.Picker,
+        ),
     )
 
     private fun provideStartUploadEvents() = listOf(

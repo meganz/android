@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -496,14 +497,17 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param file The file to upload.
      * @param destination The destination where the file will be uploaded.
+     * @param pitagTrigger [PitagTrigger]
      */
     fun uploadFile(
         file: File,
         destination: Long,
+        pitagTrigger: PitagTrigger,
     ) {
         uploadFiles(
             mapOf(file.absolutePath to uiState.value.documentsByUriPathValue[file.name]?.name),
-            NodeId(destination)
+            NodeId(destination),
+            pitagTrigger,
         )
     }
 
@@ -522,18 +526,24 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param destination The destination where the files will be uploaded.
      * @param collidedPaths The list of paths that have name collisions and should be excluded from the upload.
+     * @param pitagTrigger [PitagTrigger]
      */
-    fun uploadFiles(destination: Long, collidedPaths: List<String>) {
+    fun uploadFiles(
+        destination: Long,
+        collidedPaths: List<String>,
+        pitagTrigger: PitagTrigger,
+    ) {
         val namesByUriPathValues = uiState.value.documents.filterNot { document ->
             collidedPaths.any { it == document.uri.value }
         }.associate { it.uri.value to it.name }
 
-        uploadFiles(namesByUriPathValues, NodeId(destination))
+        uploadFiles(namesByUriPathValues, NodeId(destination), pitagTrigger)
     }
 
     private fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
+        pitagTrigger: PitagTrigger,
     ) {
         _uiState.update { state ->
             state.copy(
@@ -542,6 +552,7 @@ class FileExplorerViewModel @Inject constructor(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
                         waitNotificationPermissionResponseToStart = true,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )

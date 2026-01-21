@@ -21,6 +21,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.lists.MenuActionHeader
@@ -36,7 +37,7 @@ import timber.log.Timber
 fun ChatAttachFileBottomSheet(
     modifier: Modifier = Modifier,
     hideSheet: () -> Unit,
-    onAttachFiles: (List<UriPath>) -> Unit = {},
+    onAttachFiles: (List<UriPath>, PitagTrigger) -> Unit = { _, _ -> },
     onAttachNodes: (List<NodeId>) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -79,7 +80,8 @@ fun ChatAttachFileBottomSheet(
                     }
                 }
 
-                attachedFiles?.map { UriPath(it.toString()) }?.let(onAttachFiles)
+                attachedFiles?.map { UriPath(it.toString()) }
+                    ?.let { onAttachFiles(it, PitagTrigger.Picker) }
 
             }
             hideSheet()

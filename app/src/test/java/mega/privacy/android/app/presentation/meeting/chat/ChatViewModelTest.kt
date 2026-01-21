@@ -67,6 +67,7 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
@@ -152,6 +153,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueU
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatConversationUnmuteMenuToolbarEvent
 import nz.mega.sdk.MegaChatError
 import org.junit.jupiter.api.AfterEach
@@ -182,7 +184,6 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.util.stream.Stream
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Test class for [ChatViewModel]
@@ -2416,7 +2417,7 @@ internal class ChatViewModelTest {
             }
             underTest.state.test {
                 awaitItem() // Initial state doesn't matter
-                underTest.onAttachFiles(files)
+                underTest.onAttachFiles(files, PitagTrigger.Picker)
                 val actual = awaitItem().downloadEvent
                 assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
                 val content = (actual as StateEventWithContentTriggered).content

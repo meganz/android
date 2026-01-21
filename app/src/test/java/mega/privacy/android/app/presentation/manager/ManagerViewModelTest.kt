@@ -65,6 +65,7 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -1409,14 +1410,16 @@ class ManagerViewModelTest {
     fun `test that state is updated correctly if upload a File`() = runTest {
         val file = File("path")
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.Picker
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(file.absolutePath to null),
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                pitagTrigger = pitagTrigger,
             )
         )
 
-        underTest.uploadFile(file, parentHandle)
+        underTest.uploadFile(file, parentHandle, pitagTrigger)
         underTest.state.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }
@@ -1428,14 +1431,16 @@ class ManagerViewModelTest {
         val path = file.absolutePath
         val parentHandle = 123L
         val pathsAndNames = mapOf(path to path)
+        val pitagTrigger = PitagTrigger.Picker
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 pathsAndNames,
-                NodeId(parentHandle)
+                NodeId(parentHandle),
+                pitagTrigger = pitagTrigger,
             )
         )
 
-        underTest.uploadFiles(pathsAndNames, NodeId(parentHandle))
+        underTest.uploadFiles(pathsAndNames, NodeId(parentHandle), pitagTrigger)
         underTest.state.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }

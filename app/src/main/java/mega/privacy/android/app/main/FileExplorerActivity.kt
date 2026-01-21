@@ -1772,7 +1772,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
                     collisions.map { it.path.value }.let { collidedPaths ->
                         if (collidedPaths.size < documents.size) {
-                            viewModel.uploadFiles(parentHandle, collidedPaths)
+                            viewModel.uploadFiles(parentHandle, collidedPaths, getPitagTrigger())
                         }
                     }
                 }.onFailure {
@@ -2087,7 +2087,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: viewModel.uploadFile(file, parentHandle)
+                } ?: viewModel.uploadFile(file, parentHandle, getPitagTrigger())
             }.onFailure {
                 Timber.e(it, "Cannot check name collisions")
                 showSnackbar(getString(R.string.general_text_error))

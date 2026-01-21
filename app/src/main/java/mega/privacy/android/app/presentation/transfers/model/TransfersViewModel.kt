@@ -28,6 +28,7 @@ import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -390,13 +391,15 @@ class TransfersViewModel @AssistedInject constructor(
                             //No chat uploads retried, try general upload only.
                             return TransferTriggerEvent.StartUpload.Files(
                                 mapOf(path to failedTransfer.fileName),
-                                NodeId(parentHandle)
+                                NodeId(parentHandle),
+                                pitagTrigger = PitagTrigger.NotApplicable,
                             )
                         }
                     } else {
                         return TransferTriggerEvent.StartUpload.Files(
                             mapOf(path to failedTransfer.fileName),
-                            NodeId(parentHandle)
+                            NodeId(parentHandle),
+                            pitagTrigger = PitagTrigger.NotApplicable,
                         )
                     }
                 }

@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -1334,14 +1335,17 @@ class ManagerViewModel @Inject constructor(
      *
      * @param file The file to upload.
      * @param destination The destination where the file will be uploaded.
+     * @param pitagTrigger [PitagTrigger]
      */
     fun uploadFile(
         file: File,
         destination: Long,
+        pitagTrigger: PitagTrigger,
     ) {
         uploadFiles(
             mapOf(file.absolutePath to null),
-            NodeId(destination)
+            NodeId(destination),
+            pitagTrigger,
         )
     }
 
@@ -1354,6 +1358,7 @@ class ManagerViewModel @Inject constructor(
     fun uploadFiles(
         pathsAndNames: Map<String, String?>,
         destinationId: NodeId,
+        pitagTrigger: PitagTrigger,
     ) {
         _state.update { state ->
             state.copy(
@@ -1361,6 +1366,7 @@ class ManagerViewModel @Inject constructor(
                     TransferTriggerEvent.StartUpload.Files(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )

@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
@@ -34,6 +35,7 @@ import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
@@ -51,7 +53,6 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
@@ -155,7 +156,8 @@ class TransfersViewModelTest {
     )
     private val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
         mapOf(originalPath to null),
-        NodeId(failedUpload.parentHandle)
+        NodeId(failedUpload.parentHandle),
+        pitagTrigger = PitagTrigger.NotApplicable,
     )
 
     @BeforeEach
@@ -794,7 +796,8 @@ class TransfersViewModelTest {
             val chatData = chatAppData.mapNotNull { it as? TransferAppData.ChatUpload }
             val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
                 mapOf(originalPath to fileName),
-                NodeId(cancelledChatUpload.parentHandle)
+                NodeId(cancelledChatUpload.parentHandle),
+                pitagTrigger = PitagTrigger.NotApplicable,
             )
             val id = cancelledChatUpload.id ?: return@runTest
             val idAndEvent = mapOf(id to uploadStartEvent)

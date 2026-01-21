@@ -6093,7 +6093,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }.onSuccess { collisions ->
                 collisions.firstOrNull()?.let {
                     nameCollisionActivityLauncher.launch(arrayListOf(it))
-                } ?: viewModel.uploadFile(file, parentHandle)
+                } ?: viewModel.uploadFile(file, parentHandle, PitagTrigger.CameraCapture)
             }.onFailure { throwable: Throwable? ->
                 Timber.e(throwable)
                 showSnackbar(
@@ -6344,7 +6344,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         viewModel.uploadFiles(
                             pathsAndNames = sharesWithoutCollision.map { it.uri.value }
                                 .associateWith { null },
-                            destinationId = NodeId(parentNode.handle)
+                            destinationId = NodeId(parentNode.handle),
+                            pitagTrigger = pitagTrigger,
                         )
                     }
                 }

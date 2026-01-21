@@ -730,7 +730,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                             } else {
                                 viewModel.uploadFile(
                                     file = file,
-                                    destination = parentHandle
+                                    destination = parentHandle,
+                                    pitagTrigger = PitagTrigger.CameraCapture,
                                 )
                             }
                         }.onFailure {
@@ -798,7 +799,8 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                     viewModel.uploadFiles(
                         pathsAndNames = sharesWithoutCollision.map { it.uri.value }
                             .associateWith { null },
-                        destinationId = NodeId(parentNode.handle)
+                        destinationId = NodeId(parentNode.handle),
+                        pitagTrigger = PitagTrigger.Picker,
                     )
                 }
             }.onFailure {

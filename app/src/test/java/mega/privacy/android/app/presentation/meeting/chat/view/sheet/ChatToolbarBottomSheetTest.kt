@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.sheet
 
-import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.CompositionLocalProvider
@@ -14,8 +13,9 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
-import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.mobile.analytics.event.ChatConversationContactMenuItemEvent
 import mega.privacy.mobile.analytics.event.ChatConversationFileMenuItemEvent
@@ -43,7 +43,7 @@ internal class ChatToolbarBottomSheetTest {
     @get:Rule
     val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
-    private val onAttachFileClicked: (List<UriPath>) -> Unit = mock()
+    private val onAttachFileClicked: (List<UriPath>, PitagTrigger) -> Unit = mock()
     private val onPickLocation: () -> Unit = mock()
     private val onAttachScan: () -> Unit = mock()
 

@@ -73,7 +73,8 @@ class UploadFileViewModel @Inject constructor(
                             startUploadEvent = triggered(
                                 TransferTriggerEvent.StartUpload.Files(
                                     pathsAndNames = noCollisionPaths.associate { entity -> entity.uri.value to null },
-                                    destinationId = parentOrRootNodeId
+                                    destinationId = parentOrRootNodeId,
+                                    pitagTrigger = pitagTrigger,
                                 )
                             )
                         )

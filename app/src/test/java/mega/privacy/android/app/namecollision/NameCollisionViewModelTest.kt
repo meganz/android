@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
@@ -217,9 +218,12 @@ internal class NameCollisionViewModelTest {
             TransferTriggerEvent.StartUpload.CollidedFiles(
                 pathsAndNames = pathsAndNames,
                 destinationId = destinationId,
-                collisionChoice = choice
+                collisionChoice = choice,
+                pitagTrigger = PitagTrigger.NotApplicable,
             )
         )
+
+        initUnderTest()
 
         with(underTest) {
             uploadFiles(pathsAndNames, destinationId, choice)

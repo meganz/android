@@ -45,6 +45,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAttachContactActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.camera.CameraArg
@@ -82,7 +83,7 @@ fun ChatToolbarBottomSheet(
     onAttachContacts: (List<String>) -> Unit,
     navigateToFileModal: () -> Unit,
     modifier: Modifier = Modifier,
-    onAttachFiles: (List<UriPath>) -> Unit = {},
+    onAttachFiles: (List<UriPath>, PitagTrigger) -> Unit = { _, _ -> },
     onCameraPermissionDenied: () -> Unit = {},
     onAttachScan: () -> Unit = {},
     onDocumentScannerInitializationFailed: () -> Unit = {},
@@ -95,7 +96,7 @@ fun ChatToolbarBottomSheet(
         contract = ActivityResultContracts.PickMultipleVisualMedia()
     ) {
         if (it.isNotEmpty()) {
-            onAttachFiles(it.map { UriPath(it.toString()) })
+            onAttachFiles(it.map { UriPath(it.toString()) }, PitagTrigger.Picker)
         }
         hideSheet()
     }
@@ -117,7 +118,7 @@ fun ChatToolbarBottomSheet(
         contract = ActivityResultContracts.StartActivityForResult()
     ) {
         it.data?.data?.let { uri ->
-            onAttachFiles(listOf(UriPath(uri.toString())))
+            onAttachFiles(listOf(UriPath(uri.toString())), PitagTrigger.Scanner)
         }
         hideSheet()
     }
@@ -176,7 +177,7 @@ fun ChatToolbarBottomSheet(
         contract = InAppCameraLauncher()
     ) { uri ->
         uri?.let {
-            onAttachFiles(listOf(UriPath(it.toString())))
+            onAttachFiles(listOf(UriPath(it.toString())), PitagTrigger.CameraCapture)
         }
         closeModal()
     }
@@ -237,7 +238,7 @@ fun ChatToolbarBottomSheet(
                     )
                 )
                 it.fileUri?.toUri()?.let { uri ->
-                    onAttachFiles(listOf(UriPath(uri.toString())))
+                    onAttachFiles(listOf(UriPath(uri.toString())), PitagTrigger.Picker)
                     hideSheet()
                 }
             },

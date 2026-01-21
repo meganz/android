@@ -22,6 +22,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
@@ -216,17 +217,19 @@ internal class FileExplorerViewModelTest {
     fun `test that state is updated correctly if upload a File`() = runTest {
         val file = File("path")
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.ShareFromApp
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(file.absolutePath to null),
                 NodeId(parentHandle),
                 waitNotificationPermissionResponseToStart = true,
+                pitagTrigger = pitagTrigger,
             )
         )
 
         initViewModel()
 
-        underTest.uploadFile(file, parentHandle)
+        underTest.uploadFile(file, parentHandle, pitagTrigger)
         underTest.uiState.map { it.uploadEvent }.test {
             assertThat(awaitItem()).isEqualTo(expected)
         }
@@ -241,11 +244,13 @@ internal class FileExplorerViewModelTest {
         }
         val documents = listOf(DocumentEntity(fileName, 656L, 454L, uriPath))
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.Scanner
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri.toString() to fileName),
                 NodeId(parentHandle),
                 waitNotificationPermissionResponseToStart = true,
+                pitagTrigger = pitagTrigger,
             )
         )
 
@@ -253,7 +258,7 @@ internal class FileExplorerViewModelTest {
 
         with(underTest) {
             setDocuments(documents)
-            uploadFiles(parentHandle, emptyList())
+            uploadFiles(parentHandle, emptyList(), pitagTrigger)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
@@ -271,11 +276,13 @@ internal class FileExplorerViewModelTest {
             on { toString() } doReturn "/path/$fileName"
         }
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.Scanner
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri.toString() to renamedName),
                 NodeId(parentHandle),
                 waitNotificationPermissionResponseToStart = true,
+                pitagTrigger = pitagTrigger,
             )
         )
 
@@ -284,7 +291,7 @@ internal class FileExplorerViewModelTest {
         with(underTest) {
             setDocuments(documents)
 
-            uploadFiles(parentHandle, emptyList())
+            uploadFiles(parentHandle, emptyList(), pitagTrigger)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
@@ -305,11 +312,13 @@ internal class FileExplorerViewModelTest {
             DocumentEntity(fileName2, 656L, 454L, uriPath2)
         )
         val parentHandle = 123L
+        val pitagTrigger = PitagTrigger.ShareFromApp
         val expected = triggered(
             TransferTriggerEvent.StartUpload.Files(
                 mapOf(uri1.toString() to fileName1),
                 NodeId(parentHandle),
                 waitNotificationPermissionResponseToStart = true,
+                pitagTrigger = pitagTrigger,
             )
         )
         val collidedFiles = listOf(uriPath2.value)
@@ -318,7 +327,7 @@ internal class FileExplorerViewModelTest {
 
         with(underTest) {
             setDocuments(documents)
-            uploadFiles(parentHandle, collidedFiles)
+            uploadFiles(parentHandle, collidedFiles, pitagTrigger)
             uiState.map { it.uploadEvent }.test {
                 assertThat(awaitItem()).isEqualTo(expected)
             }

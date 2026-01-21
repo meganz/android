@@ -62,6 +62,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -1209,11 +1210,18 @@ class ChatViewModel @Inject constructor(
     /**
      * Attaches files.
      */
-    fun onAttachFiles(files: List<UriPath>) {
+    fun onAttachFiles(
+        files: List<UriPath>,
+        pitagTrigger: PitagTrigger,
+    ) {
         _state.update {
             it.copy(
                 downloadEvent = triggered(
-                    TransferTriggerEvent.StartChatUpload.Files(chatId, files)
+                    TransferTriggerEvent.StartChatUpload.Files(
+                        chatId,
+                        files,
+                        pitagTrigger = pitagTrigger,
+                    )
                 )
             )
         }

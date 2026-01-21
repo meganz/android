@@ -410,7 +410,8 @@ class UploadFolderViewModel @Inject constructor(
                         TransferTriggerEvent.StartUpload.Files(
                             pathsAndNames,
                             parentOrRootNodeId,
-                            waitNotificationPermissionResponseToStart = true
+                            waitNotificationPermissionResponseToStart = true,
+                            pitagTrigger = PitagTrigger.Picker,
                         )
                     )
                 )

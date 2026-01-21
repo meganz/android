@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.namecollision.NameCollisionChoice
 import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionResult
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -100,6 +101,7 @@ class NameCollisionViewModel @Inject constructor(
     var pendingFolderCollisions = 0
     private var allCollisionsProcessed = false
     var isCopyToOrigin = false
+    var pitagTrigger = PitagTrigger.NotApplicable
 
     init {
         viewModelScope.launch {
@@ -144,7 +146,7 @@ class NameCollisionViewModel @Inject constructor(
                 }
             }
         }.onFailure {
-            Timber.w("Fingerprint is null", it)
+            Timber.w(it, "Fingerprint is null")
         }
     }
 
@@ -154,6 +156,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param collision [NameCollision] to resolve.
      */
     fun setSingleData(collision: NameCollision) {
+        pitagTrigger = collision.pitagTrigger
         viewModelScope.launch {
             runCatching {
                 if (collision is NodeNameCollision.Default) {
@@ -196,6 +199,7 @@ class NameCollisionViewModel @Inject constructor(
      * @param collisions    ArrayList of [NameCollision] to resolve.
      */
     fun setData(collisions: List<NameCollision>) {
+        pitagTrigger = collisions.first().pitagTrigger
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
@@ -215,7 +219,7 @@ class NameCollisionViewModel @Inject constructor(
                     getPendingCollisions(reorderedCollisions)
                 }
             }.onFailure {
-                Timber.e("Exception setting data", it)
+                Timber.e(it, "Exception setting data")
                 currentCollision.value = null
             }
         }
@@ -750,6 +754,7 @@ class NameCollisionViewModel @Inject constructor(
                         pathsAndNames = pathsAndNames,
                         destinationId = destinationId,
                         collisionChoice = choice,
+                        pitagTrigger = pitagTrigger,
                     )
                 )
             )

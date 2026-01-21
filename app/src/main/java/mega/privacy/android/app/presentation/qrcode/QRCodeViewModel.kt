@@ -514,7 +514,8 @@ class QRCodeViewModel @Inject constructor(
                         specificStartMessage = context.getString(
                             sharedR.string.transfers_start_upload_profile_qr_code_message,
                             qrFile.name,
-                        )
+                        ),
+                        pitagTrigger = PitagTrigger.NotApplicable,
                     )
                 )
             )
