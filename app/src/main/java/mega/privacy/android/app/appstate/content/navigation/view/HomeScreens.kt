@@ -84,9 +84,13 @@ fun HomeScreens(
             }
 
             LaunchedEffect(currentState.isConnected) {
-                if (!currentState.isConnected && !isNetworkChangeHandled) {
-                    homeScreenStacks.switchTopLevel(Home)
-                    isNetworkChangeHandled = true
+                if (!currentState.isConnected) {
+                    if (!isNetworkChangeHandled) {
+                        homeScreenStacks.switchTopLevel(Home)
+                        isNetworkChangeHandled = true
+                    }
+                } else {
+                    isNetworkChangeHandled = false
                 }
             }
 

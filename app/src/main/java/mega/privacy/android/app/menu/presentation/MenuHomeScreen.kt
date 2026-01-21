@@ -139,15 +139,16 @@ fun MenuHomeScreenUi(
                             modifier = Modifier
                                 .size(48.dp)
                                 .testTag(NOTIFICATION_ICON),
+                            enabled = uiState.isConnectedToNetwork,
                             onClick = { navigateToFeature(NotificationsNavKey) }
                         ) {
                             MegaIcon(
                                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
-                                tint = IconColor.Primary,
+                                tint = if (uiState.isConnectedToNetwork) IconColor.Secondary else IconColor.Disabled,
                                 contentDescription = "Notification Icon",
                             )
                         }
-                        if (uiState.unreadNotificationsCount > 0) {
+                        if (uiState.unreadNotificationsCount > 0 && uiState.isConnectedToNetwork) {
                             NotificationBadge(
                                 uiState.unreadNotificationsCount,
                                 modifier = Modifier
@@ -191,7 +192,7 @@ fun MenuHomeScreenUi(
                     trailingElement = {
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                            tint = IconColor.Secondary,
+                            tint = if (uiState.isConnectedToNetwork) IconColor.Secondary else IconColor.Disabled,
                             contentDescription = "arrow right",
                         )
                     },
@@ -387,7 +388,7 @@ private fun MenuHomeScreenUiPreview(
             uiState = MenuUiState(
                 name = "John Doe",
                 email = "john.doe@example.com",
-                unreadNotificationsCount = if (showBadge) 2 else 0
+                unreadNotificationsCount = if (showBadge) 2 else 0,
             ),
             navigateToFeature = {},
             onLogoutClicked = {},

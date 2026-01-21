@@ -149,7 +149,7 @@ internal fun HomeScreen(
             )
         },
         floatingActionButton = {
-            if (state !is HomeUiState.Offline) {
+            if (state is HomeUiState.Data) {
                 AddContentFab(
                     visible = true,
                     onClick = {

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.MegaOutlinedButton
+import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -79,7 +79,7 @@ internal fun HomeOfflineScreen(
 
                 if (hasOfflineFiles) {
                     Spacer(modifier = Modifier.height(16.dp))
-                    MegaOutlinedButton(
+                    PrimaryFilledButton(
                         onClick = onViewOfflineFilesClick,
                         modifier = Modifier.testTag(HOME_OFFLINE_VIEW_FILES_BUTTON_TEST_TAG),
                         text = stringResource(sharedR.string.home_screen_no_network_view_offline_files_button),
