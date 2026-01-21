@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property fingerprint
  * @property name
  * @property originalUriPath original location of the file to be attached, useful in case of media compression, where [uriPath] is changed to a temporary file that will be deleted once uploaded
+ * @property pitagTrigger [PitagTrigger]
  * @constructor Create empty Pending message
  */
 data class PendingMessage(

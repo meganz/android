@@ -6,8 +6,9 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -39,7 +40,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.RuntimeException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class StartAllPendingUploadsUseCaseTest {
@@ -145,6 +145,7 @@ class StartAllPendingUploadsUseCaseTest {
                     on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
                     on { isHighPriority } doReturn (index == 2)
                     on { nodeIdentifier } doReturn pendingTransferNodeIdentifier
+                    on { pitagTrigger } doReturn PitagTrigger.Picker
                 }
             }
 
@@ -162,6 +163,8 @@ class StartAllPendingUploadsUseCaseTest {
                     appData = pendingTransfer.appData,
                     parentFolderId = pendingTransfer.nodeIdentifier.nodeId,
                     isHighPriority = pendingTransfer.isHighPriority,
+                    pitagTrigger = pendingTransfer.pitagTrigger,
+                    pitagTarget = PitagTarget.NotApplicable,
                 )
             }
         }
@@ -182,6 +185,8 @@ class StartAllPendingUploadsUseCaseTest {
                 appData = anyOrNull(),
                 parentFolderId = anyValueClass(),
                 isHighPriority = anyOrNull(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
         ) doReturn flowOf(transferEvent)
 
@@ -218,6 +223,8 @@ class StartAllPendingUploadsUseCaseTest {
                         appData = anyOrNull(),
                         parentFolderId = anyValueClass(),
                         isHighPriority = anyOrNull(),
+                        pitagTrigger = any(),
+                        pitagTarget = any(),
                     )
                 ) doReturn flow {
                     throw exception
@@ -287,6 +294,8 @@ class StartAllPendingUploadsUseCaseTest {
                     appData = anyOrNull(),
                     parentFolderId = anyValueClass(),
                     isHighPriority = anyOrNull(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
             ) doReturn flowOf(transferEvent)
 
@@ -307,6 +316,7 @@ class StartAllPendingUploadsUseCaseTest {
             on { appData } doReturn listOf(mock<TransferAppData.ChatUpload>())
             on { isHighPriority } doReturn false
             on { nodeIdentifier } doReturn pendingTransferNodeIdentifier
+            on { pitagTrigger } doReturn PitagTrigger.Picker
         }
     }
 

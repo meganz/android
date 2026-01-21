@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
@@ -294,6 +296,8 @@ interface TransferRepository {
      * should be deleted or not
      * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
      * queue or not
+     * @param pitagTrigger [PitagTrigger].
+     * @param pitagTarget [PitagTarget].
      *
      * @return a Flow of [TransferEvent]
      */
@@ -305,6 +309,8 @@ interface TransferRepository {
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ): Flow<TransferEvent>
 
     /**

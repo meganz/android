@@ -459,22 +459,27 @@ class FileExplorerViewModel @Inject constructor(
         chatIds: List<Long>,
         documents: List<DocumentEntity>,
         nodeIds: List<NodeId>,
+        pitagTrigger: PitagTrigger,
         toDoAfter: () -> Unit,
     ) {
         viewModelScope.launch {
             chatIds.forEach {
                 attachNodes(it, nodeIds)
             }
-            attachFiles(chatIds, documents)
+            attachFiles(chatIds, documents, pitagTrigger)
             toDoAfter()
         }
     }
 
-    private suspend fun attachFiles(chatIds: List<Long>, documents: List<DocumentEntity>) {
+    private suspend fun attachFiles(
+        chatIds: List<Long>,
+        documents: List<DocumentEntity>,
+        pitagTrigger: PitagTrigger,
+    ) {
         val filePathsWithNames = documents.associate { it.uri to it.name }
         runCatching {
             sendChatAttachmentsUseCase(
-                filePathsWithNames, chatIds = chatIds.toLongArray()
+                filePathsWithNames, chatIds = chatIds.toLongArray(), pitagTrigger = pitagTrigger,
             )
         }.onFailure {
             Timber.e(it, "Error attaching files")

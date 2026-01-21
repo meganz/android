@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.transfers.uploads
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.repository.TransferRepository
@@ -27,6 +29,7 @@ class StartUploadUseCase @Inject constructor(
      * @param isSourceTemporary Whether the temporary file or folder that is created for upload
      * should be deleted or not
      * @param shouldStartFirst Whether the file or folder should be placed on top of the upload
+     * @param pitagTrigger [PitagTrigger]
      * queue or not
      *
      * @return A flow of [TransferEvent]
@@ -39,6 +42,8 @@ class StartUploadUseCase @Inject constructor(
         appData: TransferAppData?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ): Flow<TransferEvent> =
         transferRepository.startUpload(
             localPath = localPath,
@@ -48,5 +53,7 @@ class StartUploadUseCase @Inject constructor(
             appData = listOfNotNull(appData),
             isSourceTemporary = isSourceTemporary,
             shouldStartFirst = shouldStartFirst,
+            pitagTrigger = pitagTrigger,
+            pitagTarget = pitagTarget,
         )
 }

@@ -33,6 +33,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -201,7 +202,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                     startChatUploads(
                         chatId = transferTriggerEvent.chatId,
                         uris = transferTriggerEvent.uris,
-                        isVoiceClip = transferTriggerEvent.isVoiceClip
+                        isVoiceClip = transferTriggerEvent.isVoiceClip,
+                        pitagTrigger = transferTriggerEvent.pitagTrigger,
                     )
                 }
 
@@ -318,7 +320,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                                 insertPendingUploadsForFilesUseCase(
                                     pathsAndNames = event.pathsAndNames,
                                     parentFolderId = event.destinationId,
-                                    isHighPriority = event.isHighPriority
+                                    isHighPriority = event.isHighPriority,
+                                    pitagTrigger = event.pitagTrigger,
                                 )
                             }.onSuccess {
                                 retryUploads = true
@@ -730,12 +733,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
         chatId: Long,
         uris: List<UriPath>,
         isVoiceClip: Boolean = false,
+        pitagTrigger: PitagTrigger,
     ) {
         runCatching { clearActiveTransfersIfFinishedUseCase() }
             .onFailure { Timber.e(it) }
         runCatching {
             sendChatAttachmentsUseCase(
-                uris.map { it }.associateWith { null }, isVoiceClip, chatId
+                uris.map { it }.associateWith { null },
+                isVoiceClip,
+                chatId,
+                pitagTrigger = pitagTrigger,
             )
         }.onSuccess {
             _uiState.updateEventAndClearProgress(null)
@@ -1084,7 +1091,8 @@ internal class StartTransfersComponentViewModel @Inject constructor(
             insertPendingUploadsForFilesUseCase(
                 pathsAndNames = pathsAndNames,
                 parentFolderId = destinationId,
-                isHighPriority = transferTriggerEvent.isHighPriority
+                isHighPriority = transferTriggerEvent.isHighPriority,
+                pitagTrigger = transferTriggerEvent.pitagTrigger,
             )
             monitorPendingTransfersUntilProcessed(transferTriggerEvent)
             startUploadsWorkerAndWaitUntilIsStartedUseCase()

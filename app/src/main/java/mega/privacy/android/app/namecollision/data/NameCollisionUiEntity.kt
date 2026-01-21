@@ -152,7 +152,7 @@ sealed class NameCollisionUiEntity : Serializable {
             isFile = isFile,
             serializedData = serializedNode,
             renameName = renameName,
-            type = NodeNameCollisionType.COPY
+            type = NodeNameCollisionType.COPY,
         )
     }
 
@@ -216,7 +216,7 @@ sealed class NameCollisionUiEntity : Serializable {
             serializedData = null,
             renameName = renameName,
             chatId = chatId,
-            messageId = messageId
+            messageId = messageId,
         )
     }
 
@@ -273,7 +273,7 @@ sealed class NameCollisionUiEntity : Serializable {
             isFile = isFile,
             serializedData = null,
             renameName = renameName,
-            type = NodeNameCollisionType.MOVE
+            type = NodeNameCollisionType.MOVE,
         )
     }
 }

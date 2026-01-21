@@ -75,6 +75,8 @@ internal class FileExplorerViewModelTest {
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val testDispatcher = StandardTestDispatcher()
 
+    private val pitagTrigger = PitagTrigger.ShareFromApp
+
     private fun initViewModel() {
         underTest = FileExplorerViewModel(
             ioDispatcher = testDispatcher,
@@ -158,7 +160,8 @@ internal class FileExplorerViewModelTest {
             emptyList(),
             emptyList(),
             emptyList(),
-            toDoAfter = toDoAfter
+            pitagTrigger = pitagTrigger,
+            toDoAfter = toDoAfter,
         )
 
         verify(toDoAfter).invoke()
@@ -176,13 +179,15 @@ internal class FileExplorerViewModelTest {
             chatIds = chatIds,
             documents = documents,
             nodeIds = emptyList(),
+            pitagTrigger = pitagTrigger,
             toDoAfter = {},
         )
 
         verify(sendChatAttachmentsUseCase).invoke(
             filesWithNames,
             false,
-            chatIds = chatIds.toLongArray()
+            chatIds = chatIds.toLongArray(),
+            pitagTrigger = pitagTrigger,
         )
     }
 
@@ -202,6 +207,7 @@ internal class FileExplorerViewModelTest {
             chatIds = chatIds,
             documents = emptyList(),
             nodeIds = nodeIds,
+            pitagTrigger = pitagTrigger,
             toDoAfter = {},
         )
 

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.uri.UriPath
  * @property nodeHandle
  * @property fingerprint
  * @property name
+ * @property pitagTrigger
  */
 data class SavePendingMessageRequest(
     val chatId: Long,

@@ -79,7 +79,7 @@ class CheckPublicNodesNameCollisionUseCase @Inject constructor(
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
         isFile = currentNode is FileNode,
         serializedData = currentNode.serializedData,
-        type = type
+        type = type,
     )
 
     private suspend fun getParentOrRootNode(parentHandle: Long) =

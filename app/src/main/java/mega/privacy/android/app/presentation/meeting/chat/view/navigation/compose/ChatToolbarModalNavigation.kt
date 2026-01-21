@@ -38,7 +38,9 @@ internal fun NavGraphBuilder.chatToolbarModal(
             },
             onSendGiphyMessage = viewModel::onSendGiphyMessage,
             closeModal = navController::popBackStack,
-            onAttachFiles = viewModel::onAttachFiles,
+            onAttachFiles = { files, pitagTrigger ->
+                viewModel.onAttachFiles(files, pitagTrigger)
+            },
             hideSheet = closeBottomSheets,
             navigateToFileModal = navController::navigateChatFileModal,
             isVisible = true,

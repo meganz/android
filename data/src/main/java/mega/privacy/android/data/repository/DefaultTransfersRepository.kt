@@ -165,6 +165,8 @@ internal class DefaultTransfersRepository @Inject constructor(
         appData: List<TransferAppData>?,
         isSourceTemporary: Boolean,
         shouldStartFirst: Boolean,
+        pitagTrigger: PitagTrigger,
+        pitagTarget: PitagTarget,
     ) = callbackFlow {
         val parentNode = megaApiGateway.getMegaNodeByHandle(parentNodeId.longValue)
         requireNotNull(parentNode)
@@ -177,9 +179,8 @@ internal class DefaultTransfersRepository @Inject constructor(
                 appData = appData,
                 isSourceTemporary = isSourceTemporary,
                 startFirst = shouldStartFirst,
-                //Pending to implement, value by default
-                pitagTrigger = PitagTrigger.NotApplicable,
-                pitagTarget = PitagTarget.NotApplicable,
+                pitagTrigger = pitagTrigger,
+                pitagTarget = pitagTarget,
             )
         }.onFailure { Timber.e(it) }.getOrNull()?.let { options ->
             Timber.d("Using startUpload with MegaUploadOptions")

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.chat.messages.AttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingFileAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.PendingVoiceClipMessage
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeWithPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.GetOrCreateMyChatsFilesFolderIdUseCase
@@ -97,19 +98,22 @@ class RetryPendingMessageUseCaseTest {
                 on { it.state } doReturn PendingMessageState.ERROR_UPLOADING
                 on { it.uriPath } doReturn uriPath
                 on { it.msgId } doReturn msgId
+                on { it.pitagTrigger } doReturn PitagTrigger.Picker
             }
             whenever(
                 startChatUploadsWithWorkerUseCase(
                     any(),
                     NodeId(any()),
-                    any()
+                    any(),
+                    any(),
                 )
             ) doReturn emptyFlow()
             whenever(getOrCreateMyChatsFilesFolderIdUseCase()) doReturn myChatFilesFolderId
 
             underTest(message)
 
-            verify(startChatUploadsWithWorkerUseCase).invoke(uriPath, myChatFilesFolderId, msgId)
+            verify(startChatUploadsWithWorkerUseCase)
+                .invoke(uriPath, myChatFilesFolderId, PitagTrigger.Picker, msgId)
         }
 
     @Test

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
 import mega.privacy.android.domain.usecase.transfers.shared.AbstractStartTransfersWithWorkerUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetChatPitagTargetUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import javax.inject.Inject
 
@@ -33,6 +35,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val updatePendingMessageUseCase: UpdatePendingMessageUseCase,
     private val getPendingMessageUseCase: GetPendingMessageUseCase,
+    private val getChatPitagTargetUseCase: GetChatPitagTargetUseCase,
     cancelCancelTokenUseCase: CancelCancelTokenUseCase,
 ) : AbstractStartTransfersWithWorkerUseCase(cancelCancelTokenUseCase) {
 
@@ -46,6 +49,7 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
     operator fun invoke(
         uriPath: UriPath,
         chatFilesFolderId: NodeId,
+        pitagTrigger: PitagTrigger,
         vararg pendingMessageIds: Long,
     ): Flow<TransferEvent> = flow {
         if (fileSystemRepository.isFolderContentUri(uriPath.value)
@@ -56,32 +60,40 @@ class StartChatUploadsWithWorkerUseCase @Inject constructor(
         val name = getPendingMessageUseCase(pendingMessageIds.first())?.name
 
         val appData = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
-        emitAll(startTransfersAndThenWorkerFlow(
-            doTransfers = {
-                if (chatAttachmentNeedsCompressionUseCase(uriPath)) {
-                    //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
-                    updatePendingMessageUseCase(
-                        updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
-                            UpdatePendingMessageStateRequest(
-                                pendingMessageId,
-                                PendingMessageState.COMPRESSING
-                            )
-                        }.toTypedArray()
-                    )
-                    emptyFlow()
-                } else {
-                    uploadFileUseCase(
-                        uriPath = uriPath,
-                        fileName = name,
-                        appData = appData,
-                        parentFolderId = chatFilesFolderId,
-                        isHighPriority = true,
-                    )
+        emitAll(
+            startTransfersAndThenWorkerFlow(
+                doTransfers = {
+                    if (chatAttachmentNeedsCompressionUseCase(uriPath)) {
+                        //if needs compression, skip the upload and update the state to COMPRESSING, it will be compressed and uploaded in the Worker
+                        updatePendingMessageUseCase(
+                            updatePendingMessageRequests = pendingMessageIds.map { pendingMessageId ->
+                                UpdatePendingMessageStateRequest(
+                                    pendingMessageId,
+                                    PendingMessageState.COMPRESSING
+                                )
+                            }.toTypedArray()
+                        )
+                        emptyFlow()
+                    } else {
+                        val pendingMessages = pendingMessageIds
+                            .map { id -> getPendingMessageUseCase(id) }
+                            .mapNotNull { it }
+                        val pitagTarget = getChatPitagTargetUseCase(pendingMessages)
+
+                        uploadFileUseCase(
+                            uriPath = uriPath,
+                            fileName = name,
+                            appData = appData,
+                            parentFolderId = chatFilesFolderId,
+                            isHighPriority = true,
+                            pitagTrigger = pitagTrigger,
+                            pitagTarget = pitagTarget,
+                        )
+                    }
+                },
+                startWorker = {
+                    startChatUploadsWorkerAndWaitUntilIsStartedUseCase()
                 }
-            },
-            startWorker = {
-                startChatUploadsWorkerAndWaitUntilIsStartedUseCase()
-            }
-        ))
+            ))
     }
 }

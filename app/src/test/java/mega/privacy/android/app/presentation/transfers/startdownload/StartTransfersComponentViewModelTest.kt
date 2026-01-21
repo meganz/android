@@ -203,7 +203,7 @@ class StartTransfersComponentViewModelTest {
         TransferTriggerEvent.StartUpload.Files(
             pathsAndNames = mapOf(DESTINATION to null),
             destinationId = parentId,
-            pitagTrigger = PitagTrigger.Picker,
+            pitagTrigger = PitagTrigger.NotApplicable,
         )
     private val startUploadTextFileEvent = TransferTriggerEvent.StartUpload.TextFile(
         DESTINATION,
@@ -393,6 +393,7 @@ class StartTransfersComponentViewModelTest {
             listOf(uploadUri).associateWith { null },
             false,
             CHAT_ID,
+            pitagTrigger = startEvent.pitagTrigger,
         )
     }
 
@@ -668,6 +669,7 @@ class StartTransfersComponentViewModelTest {
             mapOf(DESTINATION to null),
             parentId,
             startEvent.isHighPriority,
+            pitagTrigger = startEvent.pitagTrigger,
         )
     }
 
@@ -1246,6 +1248,7 @@ class StartTransfersComponentViewModelTest {
                     startUploadFilesEvent.pathsAndNames,
                     startUploadFilesEvent.destinationId,
                     startUploadFilesEvent.isHighPriority,
+                    PitagTrigger.NotApplicable,
                 )
 
                 verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)
@@ -1271,6 +1274,7 @@ class StartTransfersComponentViewModelTest {
                     startUploadFilesEvent.pathsAndNames,
                     startUploadFilesEvent.destinationId,
                     startUploadFilesEvent.isHighPriority,
+                    PitagTrigger.NotApplicable,
                 )
 
                 verify(deleteCompletedTransfersByIdUseCase)(retriedTransferIds)

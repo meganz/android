@@ -32,6 +32,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
         pathsAndNames: Map<String, String?>,
         parentFolderId: NodeId,
         isHighPriority: Boolean = false,
+        pitagTrigger: PitagTrigger,
     ) {
         val location = nodeRepository.getFullNodePathById(parentFolderId)
             ?: nodeRepository.getNodePathById(parentFolderId)
@@ -58,7 +59,7 @@ class InsertPendingUploadsForFilesUseCase @Inject constructor(
                     appData = appData,
                     isHighPriority = isHighPriority,
                     fileName = name,
-                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTrigger = pitagTrigger,
                 )
             }
         )

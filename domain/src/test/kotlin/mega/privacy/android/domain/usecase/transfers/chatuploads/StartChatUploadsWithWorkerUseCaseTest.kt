@@ -14,6 +14,8 @@ import mega.privacy.android.domain.entity.chat.PendingMessage
 import mega.privacy.android.domain.entity.chat.PendingMessageState
 import mega.privacy.android.domain.entity.chat.messages.pending.UpdatePendingMessageStateRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -23,6 +25,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.UpdatePendingMessageUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.GetPendingMessageUseCase
+import mega.privacy.android.domain.usecase.transfers.uploads.GetChatPitagTargetUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.UploadFileUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -53,6 +56,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
         mock<ChatAttachmentNeedsCompressionUseCase>()
     private val updatePendingMessageUseCase = mock<UpdatePendingMessageUseCase>()
     private val getPendingMessageUseCase = mock<GetPendingMessageUseCase>()
+    private val getChatPitagTargetUseCase = mock<GetChatPitagTargetUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -64,6 +68,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             updatePendingMessageUseCase = updatePendingMessageUseCase,
             getPendingMessageUseCase = getPendingMessageUseCase,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
+            getChatPitagTargetUseCase = getChatPitagTargetUseCase,
         )
     }
 
@@ -76,6 +81,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             fileSystemRepository,
             updatePendingMessageUseCase,
             getPendingMessageUseCase,
+            getChatPitagTargetUseCase,
             cancelCancelTokenUseCase,
         )
         commonStub()
@@ -92,13 +98,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that the file is send to upload files use case`() = runTest {
         val file = createFileUriPath()
-        underTest(file, NodeId(11L), 1L).test {
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+
+        underTest(file, NodeId(11L), PitagTrigger.Picker, 1L).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = UriPath(eq(file.value)),
                 fileName = anyOrNull(),
                 appData = any(),
                 parentFolderId = anyValueClass(),
                 any(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -107,13 +120,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that the file is send as high priority`() = runTest {
         val file = createFileUriPath()
-        underTest(file, NodeId(11L), 1L).test {
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+
+        underTest(file, NodeId(11L), PitagTrigger.Picker, 1L).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
                 fileName = anyOrNull(),
                 appData = any(),
                 parentFolderId = anyValueClass(),
-                isHighPriority = eq(true)
+                isHighPriority = eq(true),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -123,7 +143,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that a folder path throws FoldersNotAllowedAsChatUploadException`() = runTest {
         val folder = createFileUriPath()
         whenever(fileSystemRepository.isFolderPath(folder.value)) doReturn true
-        underTest(folder, NodeId(11L), 1L).test {
+        underTest(folder, NodeId(11L), PitagTrigger.Picker, 1L).test {
             val notStartedEvents = cancelAndConsumeRemainingEvents()
                 .mapNotNull { (it as? Event.Error)?.throwable }
                 .filterIsInstance<FoldersNotAllowedAsChatUploadException>()
@@ -135,7 +155,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
     fun `test that a folder content uri throws FoldersNotAllowedAsChatUploadException`() = runTest {
         val folder = createFileUriPath()
         whenever(fileSystemRepository.isFolderContentUri(folder.value)) doReturn true
-        underTest(folder, NodeId(11L), 1L).test {
+        underTest(folder, NodeId(11L), PitagTrigger.Picker, 1L).test {
             val notStartedEvents = cancelAndConsumeRemainingEvents()
                 .mapNotNull { (it as? Event.Error)?.throwable }
                 .filterIsInstance<FoldersNotAllowedAsChatUploadException>()
@@ -146,13 +166,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
     @Test
     fun `test that chatFilesFolderId is used as destination`() = runTest {
         val chatFilesFolderId = NodeId(11L)
-        underTest(createFileUriPath(), chatFilesFolderId, 1L).test {
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+
+        underTest(createFileUriPath(), chatFilesFolderId, PitagTrigger.Picker, 1L).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
                 fileName = anyOrNull(),
                 appData = any(),
                 parentFolderId = NodeId(eq(chatFilesFolderId.longValue)),
                 isHighPriority = any(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
             cancelAndConsumeRemainingEvents()
         }
@@ -163,13 +190,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val pendingMessageId = 1L
         val file = createFileUriPath()
         val expected = listOf(TransferAppData.ChatUpload(pendingMessageId))
-        underTest(file, NodeId(11L), pendingMessageId).test {
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+
+        underTest(file, NodeId(11L), PitagTrigger.Picker, pendingMessageId).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
                 fileName = anyOrNull(),
                 appData = eq(expected),
                 parentFolderId = anyValueClass(),
                 isHighPriority = any(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -181,13 +215,20 @@ class StartChatUploadsWithWorkerUseCaseTest {
             val pendingMessageIds = longArrayOf(1L, 2L, 3L)
             val file = createFileUriPath()
             val expected = pendingMessageIds.map { TransferAppData.ChatUpload(it) }
-            underTest(file, NodeId(11L), *pendingMessageIds).test {
+            val pendingMessage = mock<PendingMessage>()
+
+            whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+            whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+
+            underTest(file, NodeId(11L), PitagTrigger.Picker, *pendingMessageIds).test {
                 verify(uploadFileUseCase).invoke(
                     uriPath = anyValueClass(),
                     fileName = anyOrNull(),
                     appData = eq(expected),
                     parentFolderId = NodeId(any()),
                     isHighPriority = any(),
+                    pitagTrigger = any(),
+                    pitagTarget = any(),
                 )
                 cancelAndIgnoreRemainingEvents()
             }
@@ -195,6 +236,10 @@ class StartChatUploadsWithWorkerUseCaseTest {
 
     @Test
     fun `test that worker is started when start download finish correctly`() = runTest {
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
         mockFlow(
             flow {
                 emit(mock<TransferEvent.TransferStartEvent> {
@@ -203,13 +248,17 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 awaitCancellation()
             }
         )
-        underTest(createFileUriPath(), NodeId(11L), 1L).collect()
+        underTest(createFileUriPath(), NodeId(11L), PitagTrigger.Picker, 1L).collect()
         verify(startChatUploadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
 
     @Test
     fun `test that flow is not finished until the worker is started`() = runTest {
         var workerStarted = false
+        val pendingMessage = mock<PendingMessage>()
+
+        whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
         mockFlow(
             flow {
                 emit(mock<TransferEvent.TransferStartEvent> {
@@ -224,7 +273,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             ) {
                 workerStarted = true
             })
-        underTest(createFileUriPath(), NodeId(11L), 1L).test {
+        underTest(createFileUriPath(), NodeId(11L), PitagTrigger.Picker, 1L).test {
             awaitItem()
             awaitComplete()
             assertThat(workerStarted).isTrue()
@@ -238,7 +287,7 @@ class StartChatUploadsWithWorkerUseCaseTest {
             val file = createFileUriPath()
             val pendingMessageId = 1L
             whenever(chatAttachmentNeedsCompressionUseCase(anyValueClass())) doReturn true
-            underTest(file, NodeId(11L), pendingMessageId).test {
+            underTest(file, NodeId(11L), PitagTrigger.Picker, pendingMessageId).test {
                 verify(updatePendingMessageUseCase)
                     .invoke(
                         UpdatePendingMessageStateRequest(
@@ -258,14 +307,18 @@ class StartChatUploadsWithWorkerUseCaseTest {
         val pendingMessage = mock<PendingMessage> {
             on { name } doReturn pendingMessageName
         }
+
         whenever(getPendingMessageUseCase(1L)) doReturn pendingMessage
-        underTest(file, NodeId(11L), pendingMessageId).test {
+        whenever(getChatPitagTargetUseCase(listOf(pendingMessage))) doReturn PitagTarget.Chat1To1
+        underTest(file, NodeId(11L), PitagTrigger.Picker, pendingMessageId).test {
             verify(uploadFileUseCase).invoke(
                 uriPath = anyValueClass(),
                 fileName = eq(pendingMessageName),
                 appData = anyOrNull(),
                 parentFolderId = anyValueClass(),
                 isHighPriority = eq(true),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -285,6 +338,8 @@ class StartChatUploadsWithWorkerUseCaseTest {
                 appData = anyOrNull(),
                 parentFolderId = anyValueClass(),
                 isHighPriority = any(),
+                pitagTrigger = any(),
+                pitagTarget = any(),
             )
         ).thenReturn(flow)
     }

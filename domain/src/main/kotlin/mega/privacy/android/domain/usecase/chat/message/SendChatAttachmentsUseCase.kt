@@ -7,7 +7,6 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.repository.chat.ChatMessageRepository
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
-import mega.privacy.android.domain.usecase.file.DoesCacheHaveSufficientSpaceForUrisUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartChatUploadsWorkerUseCase
 import javax.inject.Inject
 
@@ -18,7 +17,6 @@ class SendChatAttachmentsUseCase @Inject constructor(
     private val startChatUploadsWorkerUseCase: StartChatUploadsWorkerUseCase,
     private val chatMessageRepository: ChatMessageRepository,
     private val deviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
-    private val doesCacheHaveSufficientSpaceForUrisUseCase: DoesCacheHaveSufficientSpaceForUrisUseCase,
 ) {
     /**
      * Invoke
@@ -31,6 +29,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
         urisWithNames: Map<UriPath, String?>,
         isVoiceClip: Boolean = false,
         vararg chatIds: Long,
+        pitagTrigger: PitagTrigger,
     ) {
         urisWithNames.forEach { (uriPath, name) ->
             chatMessageRepository.savePendingMessages(
@@ -46,7 +45,7 @@ class SendChatAttachmentsUseCase @Inject constructor(
                     nodeHandle = -1,
                     fingerprint = null,
                     name = name,
-                    pitagTrigger = PitagTrigger.NotApplicable,
+                    pitagTrigger = pitagTrigger,
                 ),
                 chatIds.asList()
             ).forEach { pendingMessageId ->

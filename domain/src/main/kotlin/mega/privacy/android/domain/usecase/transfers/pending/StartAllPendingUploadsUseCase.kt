@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.pending
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
@@ -30,6 +31,8 @@ class StartAllPendingUploadsUseCase @Inject constructor(
             fileName = pendingTransfer.fileName,
             appData = pendingTransfer.appData,
             parentFolderId = pendingTransfer.nodeIdentifier.nodeId,
-            isHighPriority = pendingTransfer.isHighPriority
+            isHighPriority = pendingTransfer.isHighPriority,
+            pitagTrigger = pendingTransfer.pitagTrigger,
+            pitagTarget = PitagTarget.NotApplicable,
         )
 }

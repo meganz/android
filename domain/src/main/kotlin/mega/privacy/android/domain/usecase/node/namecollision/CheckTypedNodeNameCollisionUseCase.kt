@@ -63,6 +63,6 @@ class CheckTypedNodeNameCollisionUseCase @Inject constructor(
         childFolderCount = (parent as? FolderNode)?.childFolderCount ?: 0,
         childFileCount = (parent as? FolderNode)?.childFileCount ?: 0,
         lastModified = if (currentNode is FileNode) currentNode.modificationTime else currentNode.creationTime,
-        isFile = currentNode is FileNode
+        isFile = currentNode is FileNode,
     )
 }

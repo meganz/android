@@ -1616,7 +1616,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         val nodeIds = nodeHandles.map { NodeId(it) }
         checkNotificationsPermission(this)
         viewModel.uploadFilesToChat(
-            chatIds, documentsToShare ?: emptyList(), nodeIds,
+            chatIds, documentsToShare, nodeIds, getPitagTrigger(),
             toDoAfter = {
                 navigateToChat()
             }

@@ -37,6 +37,8 @@ import mega.privacy.android.data.model.RequestEvent
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.times
 import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
@@ -213,6 +215,8 @@ class DefaultTransfersRepositoryTest {
                 appData = appData,
                 isSourceTemporary = false,
                 shouldStartFirst = false,
+                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTarget = PitagTarget.NotApplicable,
             )
 
         private val appData = listOf(TransferAppData.CameraUpload)

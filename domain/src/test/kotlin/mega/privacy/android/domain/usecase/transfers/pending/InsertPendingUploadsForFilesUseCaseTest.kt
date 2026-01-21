@@ -31,6 +31,8 @@ class InsertPendingUploadsForFilesUseCaseTest {
     private val timeSystemRepository = mock<TimeSystemRepository>()
     private val nodeRepository = mock<NodeRepository>()
 
+    private val pitagTrigger = PitagTrigger.Picker
+
     @BeforeAll
     fun setUp() {
         underTest = InsertPendingUploadsForFilesUseCase(
@@ -92,14 +94,15 @@ class InsertPendingUploadsForFilesUseCaseTest {
                 appData = appData,
                 isHighPriority = isHighPriority,
                 fileName = name,
-                pitagTrigger = PitagTrigger.NotApplicable,
+                pitagTrigger = pitagTrigger,
             )
         }
 
         underTest(
-            pathsAndNames,
-            parentFolderId,
-            isHighPriority,
+            pathsAndNames = pathsAndNames,
+            parentFolderId = parentFolderId,
+            isHighPriority = isHighPriority,
+            pitagTrigger = pitagTrigger,
         )
 
         verify(transferRepository).insertPendingTransfers(expected)

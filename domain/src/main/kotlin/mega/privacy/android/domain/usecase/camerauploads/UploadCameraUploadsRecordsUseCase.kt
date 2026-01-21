@@ -28,6 +28,8 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTarget
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -318,6 +320,8 @@ class UploadCameraUploadsRecordsUseCase @Inject constructor(
                             appData = TransferAppData.CameraUpload,
                             isSourceTemporary = false,
                             shouldStartFirst = false,
+                            pitagTrigger = PitagTrigger.Camera,
+                            pitagTarget = PitagTarget.NotApplicable,
                         ).collect { transferEvent ->
                             when (transferEvent) {
                                 is TransferEvent.TransferStartEvent -> {
