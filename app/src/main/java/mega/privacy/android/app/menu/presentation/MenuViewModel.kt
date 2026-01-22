@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -98,17 +101,25 @@ class MenuViewModel @Inject constructor(
 
     private fun setMyAccountItems() {
         viewModelScope.launch {
-            val isAchievementsEnabled =
-                runCatching { isAchievementsEnabledUseCase() }.getOrNull() == true
-            val myAccountItems: Map<Int, NavDrawerItem.Account> =
-                filterMyAccountItems(isAchievementsEnabled)
-            _uiState.update {
-                it.copy(myAccountItems = myAccountItems)
+            combine(
+                flow { emit(isAchievementsEnabledUseCase()) }.catch { emit(false) },
+                monitorAccountDetailUseCase().map { it.levelDetail?.accountType }
+                    .catch { emit(null) }
+                    .distinctUntilChanged()
+            ) { isAchievementsEnabled, accountType ->
+                filterMyAccountItems(isAchievementsEnabled, accountType ?: AccountType.FREE)
+            }.collect { myAccountItems ->
+                _uiState.update {
+                    it.copy(myAccountItems = myAccountItems)
+                }
             }
         }
     }
 
-    private fun filterMyAccountItems(isAchievementsEnabled: Boolean): Map<Int, NavDrawerItem.Account> =
+    private fun filterMyAccountItems(
+        isAchievementsEnabled: Boolean,
+        accountType: AccountType?,
+    ): Map<Int, NavDrawerItem.Account> =
         menuItems
             .filterValues { it is NavDrawerItem.Account && (it !is AchievementsItem || isAchievementsEnabled) }
             .mapValues {
@@ -120,7 +131,7 @@ class MenuViewModel @Inject constructor(
                             icon = item.icon,
                             title = item.title,
                             subTitle = currentPlanSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = if (accountType != null && accountType != AccountType.PRO_FLEXI && accountType != AccountType.BUSINESS) item.actionLabel else 0
                         )
                     }
 

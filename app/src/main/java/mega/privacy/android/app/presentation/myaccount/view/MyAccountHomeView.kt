@@ -476,7 +476,8 @@ private fun AccountInfoSection(
 
     var showChangeApiServerDialog by rememberSaveable { mutableStateOf(false) }
     var showChangeSFUIdDialog by rememberSaveable { mutableStateOf(false) }
-    val isUpgradeButtonEnabled = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not()
+    val isUpgradeButtonEnabled =
+        uiState.accountType != null && (uiState.isBusinessAccount || uiState.isProFlexiAccount).not()
 
     Column(
         modifier = modifier

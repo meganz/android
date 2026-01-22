@@ -296,15 +296,17 @@ private fun AccountItem(
             )
         },
         trailingElement = {
-            item.actionLabel?.let {
-                PrimaryFilledButton(
-                    modifier = Modifier
-                        .wrapContentSize(),
-                    text = stringResource(id = it),
-                    isLoading = false,
-                    enabled = enable,
-                    onClick = onNavigate,
-                )
+            item.actionLabel?.let { actionLabelResId ->
+                if (actionLabelResId > 0) {
+                    PrimaryFilledButton(
+                        modifier = Modifier
+                            .wrapContentSize(),
+                        text = stringResource(id = actionLabelResId),
+                        isLoading = false,
+                        enabled = true,
+                        onClick = onNavigate,
+                    )
+                }
             } ?: MegaIcon(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
                 tint = if (enable) IconColor.Secondary else IconColor.Disabled,

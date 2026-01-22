@@ -133,6 +133,7 @@ class MenuViewModelTest {
         monitorConnectivityUseCase.stub {
             on { invoke() }.thenReturn(flowOf(false))
         }
+        whenever(isAchievementsEnabledUseCase()).doReturn(false)
         initUnderTest()
 
         val initialState = underTest.uiState.value
@@ -150,6 +151,7 @@ class MenuViewModelTest {
             monitorConnectivityUseCase.stub {
                 on { invoke() }.thenReturn(flowOf(true))
             }
+            stubDefaultDependencies()
 
             val accountItem = NavDrawerItem.Account(
                 destination = TestDestination,
@@ -175,11 +177,14 @@ class MenuViewModelTest {
 
             initUnderTest(menuItems = menuItems)
 
-            val state = underTest.uiState.value
-            assertThat(state.myAccountItems).hasSize(1)
-            assertThat(state.privacySuiteItems).hasSize(1)
-            assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
-            assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.myAccountItems).hasSize(1)
+                assertThat(state.privacySuiteItems).hasSize(1)
+                assertThat(state.myAccountItems[1]?.title).isEqualTo(R.string.ok)
+                assertThat(state.privacySuiteItems[2]?.title).isEqualTo(R.string.cancel)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @ParameterizedTest(name = "isConnected: {0}")
@@ -549,7 +554,7 @@ class MenuViewModelTest {
         whenever(getMyAvatarFileUseCase(false)).thenReturn(null)
 
         monitorAccountDetailUseCase.stub {
-            on { invoke() }.thenReturn(flow { awaitCancellation() })
+            on { invoke() }.thenReturn(flow { emit(AccountDetail()) })
         }
 
         whenever(getMyAvatarColorUseCase()).thenReturn(0)
@@ -837,10 +842,10 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that achievements item is not included when IsAchievementsEnabled returns null`() =
+    fun `test that achievements item is not included when IsAchievementsEnabled returns false`() =
         runTest {
             stubDefaultDependencies()
-            whenever(isAchievementsEnabledUseCase()).thenReturn(null)
+            whenever(isAchievementsEnabledUseCase()).thenReturn(false)
 
             val menuItems = mapOf(
                 10 to CurrentPlanItem,
