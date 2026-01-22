@@ -29,6 +29,7 @@ dependencies {
     implementation(project(":core:ui-components:shared-components"))
     implementation(project(":core:formatter"))
     implementation(project(":third-party-lib:twemoji"))
+    implementation(project(":core:analytics:analytics-tracker"))
 
 
     implementation(androidx.bundles.compose.bom)
