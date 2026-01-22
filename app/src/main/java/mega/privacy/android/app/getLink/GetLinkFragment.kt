@@ -33,6 +33,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
@@ -462,6 +463,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         if (!isSwitchClick) {
             binding.decryptedKeySwitch.isChecked = !binding.decryptedKeySwitch.isChecked
         }
+        viewModel.onSendDecryptedKeySeparatelyTrackEvent(isChecked = binding.decryptedKeySwitch.isChecked)
 
         if (binding.decryptedKeySwitch.isChecked
             && !viewModel.getLinkWithPassword().isNullOrEmpty()
@@ -505,6 +507,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         }
 
         if (isSwitchClick && hasExpiration) {
+            viewModel.onExpiryDateTrackEvent(isChecked = false)
             binding.expiryDateSetText.apply {
                 isVisible = false
                 text = null
@@ -520,12 +523,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      * Shows a warning for free users to upgrade to Pro.
      */
     private fun showUpgradeToProWarning() {
+        viewModel.onUpgradeToProAlertDisplayedTrackEvent()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.upgrade_pro))
             .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
             .setCancelable(false)
             .setPositiveButton(getString(R.string.button_plans_almost_full_warning)) { _, _ ->
                 (requireActivity() as BaseActivity).apply {
+                    viewModel.onUpgradeToProPlanOptionsTrackEvent(isPositiveButton = true)
                     navigateToUpgradeAccount()
                     finish()
                 }
@@ -533,6 +538,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             .setNegativeButton(
                 getString(R.string.verify_account_not_now_button)
             ) { _, _ ->
+                viewModel.onUpgradeToProPlanOptionsTrackEvent(isPositiveButton = false)
             }
             .create()
             .show()
@@ -566,6 +572,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun setPasswordProtectionClick() {
         if (viewModel.isPro()) {
+            viewModel.onSetPasswordTrackEvent()
             checkIfShouldHidePassword()
             findNavController().navigate(GetLinkFragmentDirections.setPassword(false))
         } else {

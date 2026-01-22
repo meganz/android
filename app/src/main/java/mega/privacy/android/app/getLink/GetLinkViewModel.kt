@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
@@ -46,6 +47,26 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 
 /**
  * View Model used for manage data related to get or manage a link.
@@ -167,8 +188,8 @@ class GetLinkViewModel @Inject constructor(
                     if (isFirstTime) {
                         copyLink(true)
                     }
-                }.onFailure {
-                    Timber.e(it)
+                }.onFailure { error ->
+                    Timber.e(error)
                 }
             }
         }
@@ -185,9 +206,10 @@ class GetLinkViewModel @Inject constructor(
                 runCatching {
                     exportNodeUseCase(NodeId(it.handle), expiryDate)
                 }.onSuccess {
+                    onExpiryDateTrackEvent(isChecked = true)
                     updateLink(node?.handle)
-                }.onFailure {
-                    Timber.e(it)
+                }.onFailure { error ->
+                    Timber.e(error)
                 }
             }
         }
@@ -232,6 +254,15 @@ class GetLinkViewModel @Inject constructor(
      */
     fun removeLinkWithPassword() {
         resetLinkWithPassword()
+        this.node?.isFolder?.apply {
+            val event = when {
+                this -> LinkRemovePasswordFolderButtonPressedEvent
+                else -> LinkRemovePasswordFileButtonPressedEvent
+            }
+
+            Analytics.tracker.trackEvent(event)
+        }
+
         updateLink()
     }
 
@@ -381,6 +412,14 @@ class GetLinkViewModel @Inject constructor(
      * @param password Password to encrypt the link.
      */
     fun encryptLink(password: String) {
+        this.node?.isFolder?.apply {
+            val event = when {
+                this -> LinkConfirmPasswordFolderButtonPressedEvent
+                else -> LinkConfirmPasswordFileButtonPressedEvent
+            }
+            Analytics.tracker.trackEvent(event)
+        }
+
         viewModelScope.launch {
             runCatching {
                 encryptLinkWithPasswordUseCase(node?.publicLink.orEmpty(), password)
@@ -479,5 +518,87 @@ class GetLinkViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * On expiry date track event
+     *
+     * @param isChecked True, if switch is enabled. False, if it is disabled
+     */
+    fun onExpiryDateTrackEvent(isChecked: Boolean) {
+        this.node?.isFolder?.let { isFolder ->
+            Analytics.tracker.trackEvent(
+                when {
+                    isFolder && isChecked -> LinkSetExpiryDateFolderButtonPressedEnabledEvent
+                    isFolder && !isChecked -> LinkSetExpiryDateFolderButtonPressedDisabledEvent
+                    !isFolder && isChecked -> LinkSetExpiryDateFileButtonPressedEnabledEvent
+                    else -> LinkSetExpiryDateFileButtonPressedDisabledEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On send decrypted key separately track event
+     *
+     * @param isChecked True, if switch is enabled. False, if it is disabled
+     */
+    fun onSendDecryptedKeySeparatelyTrackEvent(isChecked: Boolean) {
+        this.node?.isFolder?.let { isFolder ->
+            Analytics.tracker.trackEvent(
+                when {
+                    isFolder && isChecked -> LinkSendDecryptionKeyFolderButtonEnabledEvent
+                    isFolder && !isChecked -> LinkSendDecryptionKeyFolderButtonDisabledEvent
+                    !isFolder && isChecked -> LinkSendDecryptionKeyFileButtonEnabledEvent
+                    else -> LinkSendDecryptionKeyFileButtonDisabledEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On set password track event
+     */
+    fun onSetPasswordTrackEvent() {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this -> LinkSetPasswordFolderButtonPressedEvent
+                    else -> LinkSetPasswordFileButtonPressedEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On upgrade to Pro alert displayed track event
+     */
+    fun onUpgradeToProAlertDisplayedTrackEvent() {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this -> LinkUpgradeToProFeatureFolderDialogEvent
+                    else -> LinkUpgradeToProFeatureFileDialogEvent
+                }
+            )
+        }
+    }
+
+    /**
+     * On upgrade to Pro plan options track event
+     *
+     * @param isPositiveButton True, if "See plan" is clicked. False if "Not now" is clicked.
+     */
+    fun onUpgradeToProPlanOptionsTrackEvent(isPositiveButton: Boolean) {
+        this.node?.isFolder?.apply {
+            Analytics.tracker.trackEvent(
+                when {
+                    this && isPositiveButton -> LinkProFeatureSeePlanFolderButtonPressedEvent
+                    this && !isPositiveButton -> LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
+                    !this && isPositiveButton -> LinkProFeatureSeePlanFileButtonPressedEvent
+                    else -> LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
+                }
+            )
+        }
     }
 }
