@@ -300,12 +300,14 @@ fun EntryProviderScope<NavKey>.albumDecryptionKey(
 
 fun EntryProviderScope<NavKey>.cameraUploadsProgressRoute(
     onNavigateUp: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     entry<CameraUploadsProgressNavKey> { args ->
         CameraUploadsProgressRoute(
             modifier = modifier,
-            onNavigateUp = onNavigateUp
+            onNavigateUp = onNavigateUp,
+            onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings
         )
     }
 }

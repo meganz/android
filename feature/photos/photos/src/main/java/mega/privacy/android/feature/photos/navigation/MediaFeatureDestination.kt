@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 
 class MediaFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -28,7 +29,12 @@ class MediaFeatureDestination : FeatureDestination {
             albumDecryptionKey(navigationHandler = navigationHandler)
             cameraUploadsProgressRoute(
                 modifier = Modifier.fillMaxSize(),
-                onNavigateUp = navigationHandler::back
+                onNavigateUp = navigationHandler::back,
+                onNavigateToCameraUploadsSettings = {
+                    navigationHandler.navigate(
+                        destination = LegacySettingsCameraUploadsActivityNavKey()
+                    )
+                }
             )
         }
 }

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.photos.presentation.cuprogress.action.CameraUploadsProgressAction
 import mega.privacy.android.feature.transfers.components.TEST_TAG_CAMERA_UPLOADS_ACTIVE_TRANSFER_ITEM
 import mega.privacy.android.feature.transfers.components.TEST_TAG_CAMERA_UPLOADS_IN_QUEUE_TRANSFER_ITEM
 import mega.privacy.android.shared.resources.R as SharedR
@@ -221,6 +223,18 @@ class CameraUploadsProgressScreenTest {
         }
     }
 
+    @Test
+    fun `test that the settings action is successfully clicked`() {
+        composeRuleScope {
+            val onSettingActionClick = mock<() -> Unit>()
+            setScreen(onSettingActionClick = onSettingActionClick)
+
+            onNodeWithTag(CameraUploadsProgressAction.SettingOptionsMenuAction.testTag).performClick()
+
+            verify(onSettingActionClick).invoke()
+        }
+    }
+
     private fun composeRuleScope(block: ComposeContentTestRule.() -> Unit) {
         with(composeRule) {
             block()
@@ -236,13 +250,15 @@ class CameraUploadsProgressScreenTest {
         },
         onNavigateUp: () -> Unit = {},
         addTransfer: (transfer: InProgressTransfer) -> Unit = {},
+        onSettingActionClick: () -> Unit = {},
     ) {
         setContent {
             CameraUploadsProgressScreen(
                 uiState = uiState,
                 cameraUploadsTransferItemUiState = cameraUploadsTransferItemUiState,
                 onNavigateUp = onNavigateUp,
-                addTransfer = addTransfer
+                addTransfer = addTransfer,
+                onSettingActionClick = onSettingActionClick
             )
         }
     }

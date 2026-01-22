@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.photos.CameraUploadsTransferType
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.feature.photos.presentation.cuprogress.action.CameraUploadsProgressAction
 import mega.privacy.android.feature.transfers.components.CameraUploadsActiveTransferItem
 import mega.privacy.android.feature.transfers.components.CameraUploadsInQueueTransferItem
 import mega.privacy.android.icon.pack.R as IconPackR
@@ -52,6 +53,7 @@ import java.math.BigInteger
 @Composable
 internal fun CameraUploadsProgressRoute(
     onNavigateUp: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CameraUploadsProgressViewModel = hiltViewModel(),
 ) {
@@ -62,7 +64,8 @@ internal fun CameraUploadsProgressRoute(
         uiState = uiState,
         cameraUploadsTransferItemUiState = viewModel::getTransferItemUiState,
         onNavigateUp = onNavigateUp,
-        addTransfer = viewModel::addTransfer
+        addTransfer = viewModel::addTransfer,
+        onSettingActionClick = onNavigateToCameraUploadsSettings
     )
 }
 
@@ -72,6 +75,7 @@ internal fun CameraUploadsProgressScreen(
     cameraUploadsTransferItemUiState: (id: Int) -> StateFlow<CameraUploadsTransferItemUiState>,
     onNavigateUp: () -> Unit,
     addTransfer: (transfer: InProgressTransfer) -> Unit,
+    onSettingActionClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffold(
@@ -85,7 +89,9 @@ internal fun CameraUploadsProgressScreen(
                     uiState.pendingCount,
                     uiState.pendingCount,
                 ).takeIf { uiState.pendingCount > 0 },
-                navigationType = AppBarNavigationType.Back(onNavigationIconClicked = onNavigateUp)
+                navigationType = AppBarNavigationType.Back(onNavigationIconClicked = onNavigateUp),
+                actions = listOf(CameraUploadsProgressAction.SettingOptionsMenuAction),
+                onActionPressed = { onSettingActionClick() }
             )
         }
     ) { paddingValues ->
@@ -277,7 +283,8 @@ private fun CameraUploadsProgressScreenLoadingPreview() {
             uiState = CameraUploadsProgressUiState(isLoading = true),
             onNavigateUp = {},
             cameraUploadsTransferItemUiState = { MutableStateFlow(CameraUploadsTransferItemUiState()) },
-            addTransfer = {}
+            addTransfer = {},
+            onSettingActionClick = {}
         )
     }
 }
@@ -290,7 +297,8 @@ private fun CameraUploadsProgressScreenEmptyPreview() {
             uiState = CameraUploadsProgressUiState(isLoading = false),
             onNavigateUp = {},
             cameraUploadsTransferItemUiState = { MutableStateFlow(CameraUploadsTransferItemUiState()) },
-            addTransfer = {}
+            addTransfer = {},
+            onSettingActionClick = {}
         )
     }
 }
@@ -340,7 +348,8 @@ private fun CameraUploadsProgressScreenPreview() {
             ),
             onNavigateUp = {},
             cameraUploadsTransferItemUiState = { MutableStateFlow(CameraUploadsTransferItemUiState()) },
-            addTransfer = {}
+            addTransfer = {},
+            onSettingActionClick = {}
         )
     }
 }
