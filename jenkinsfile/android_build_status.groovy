@@ -249,7 +249,7 @@ pipeline {
                                 util.useGitLab() {
                                     String htmlOutput = "mr-file-changes.html"
                                     try {
-                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput"
+                                        sh "./gradlew --no-daemon checkMergeRequestFileChanges --html-output $htmlOutput --current-branch=${env.GIT_BRANCH} --target-branch=${env.GITLAB_OA_TARGET_BRANCH}"
                                     } finally {
                                         MERGE_REQUEST_FILE_CHANGES_MESSAGE = getHtmlReport(htmlOutput, "")
                                     }

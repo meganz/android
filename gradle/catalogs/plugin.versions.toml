@@ -12,7 +12,7 @@ kotlin = "2.1.0"
 navigation = "2.7.7"
 paparazzi = "1.3.2"
 ksp = "2.1.0-1.0.28"
-megagradle = "0.80.20251217010251"
+megagradle = "0.81.20260122031325"
 jfrog-artifactory = "5.2.0"
 serialisation = "2.1.0"
 
