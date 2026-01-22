@@ -34,5 +34,6 @@ class PitagTriggerMapperTest {
         Arguments.of(PitagTrigger.ShareFromApp, MegaApiJava.PITAG_TRIGGER_SHARE_FROM_APP),
         Arguments.of(PitagTrigger.CameraCapture, MegaApiJava.PITAG_TRIGGER_CAMERA_CAPTURE),
         Arguments.of(PitagTrigger.ExplorerExtension, MegaApiJava.PITAG_TRIGGER_EXPLORER_EXTENSION),
+        Arguments.of(PitagTrigger.VoiceClip, MegaApiJava.PITAG_TRIGGER_VOICE_RECORDER),
     )
 }
