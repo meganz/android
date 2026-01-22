@@ -5030,4 +5030,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Les Téléversements de l’appareil photo sont activés</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Cet emplacement n’existe plus.</string>
+    <string name="invalid_link">Lien invalide. Veuillez réessayer ou en demander un nouveau.</string>
 </resources>

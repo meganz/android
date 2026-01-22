@@ -4818,4 +4818,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Kamera-Uploads aktiviert</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Dieser Speicherort existiert nicht mehr.</string>
+    <string name="invalid_link">Ungültiger Link. Bitte versuchen Sie es erneut oder fordern Sie einen neuen Link an.</string>
 </resources>

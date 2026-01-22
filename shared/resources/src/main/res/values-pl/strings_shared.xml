@@ -447,9 +447,9 @@
     <!-- Sync settings section title-->
     <string name="settings_section_sync">Sync</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
-    <string name="transfers_scanning_folders_dialog_creating_folders_title">Tworzenie folderów...</string>
+    <string name="transfers_scanning_folders_dialog_creating_folders_title">Tworzenie folderów&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Rozpoczęcie transferów...</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Rozpoczęcie transferów&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Nie zamykaj aplikacji. Jeśli zamkniesz, przelewy, które jeszcze nie są w kolejce, zostaną utracone.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
@@ -484,7 +484,7 @@
         <item quantity="other">Znaleziono %1$s i %2$d pliki.</item>
     </plurals>
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
-    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Anulowanie transferów...</string>
+    <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Anulowanie transferów&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
     <string name="report_issue_error_minimum_characters">Zapytania muszą zawierać co najmniej 10 znaków</string>
     <!-- placeholder message for report issue-->
@@ -889,7 +889,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Wgrywanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% wgrywanie...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% wgrywanie&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Nieaktywny</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -989,7 +989,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Masz już konto MEGA? [A]Zaloguj się[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Ładowanie pliku...</string>
+    <string name="transfers_fake_preview_text">Ładowanie pliku&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Anuluj podgląd?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -2088,26 +2088,20 @@
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
     <string name="album_decryption_key_title">Klucz deszyfrujący</string>
     <string name="album_decryption_key_description">Nasz system szyfrowania bez wiedzy wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub folderu. Łącze z tym kluczem jest tworzone domyślnie, ale możesz wyeksportować klucz deszyfrujący osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="search_placeholder_folder">Szukaj w %s</string>
+    <string name="search_placeholder_cloud_drive">Wyszukaj w dysku w chmurze</string>
+    <string name="search_placeholder_rubbish_bin">Wyszukaj w koszu na śmieci</string>
+    <string name="search_placeholder_incoming_shares">Szukaj w przychodzących udostępnieniach</string>
+    <string name="search_placeholder_outgoing_shares">Szukaj w udostępnieniach wychodzących</string>
+    <string name="search_placeholder_links">Szukaj w linkach</string>
+    <string name="search_placeholder_favourites">Szukaj w Ulubionych</string>
+    <string name="search_placeholder_documents">Wyszukaj w dokumentach</string>
+    <string name="search_placeholder_audios">Szukaj w nagraniach</string>
+    <string name="search_placeholder_videos">Szukaj w filmach</string>
+    <string name="search_placeholder_backups">Szukaj w kopiach zapasowych</string>
+    <string name="copyright_screen_title">Ostrzeżenie dotyczące praw autorskich dla wszystkich użytkowników</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA respektuje prawa autorskie innych osób i wymaga tego samego od pozostałych użytkowników MEGA.</string>
+    <string name="copyright_screen_description_second_paragraph">Korzystanie z usługi MEGA Cloud w celu naruszania praw autorskich jest ściśle zabronione. Nie wolno przesyłać, pobierać, przechowywać, udostępniać, wyświetlać, transmitować ani w inny sposób rozpowszechniać plików, danych lub treści, które naruszają prawa autorskie lub inne prawa własności intelektualnej jakiejkolwiek osoby lub podmiotu.</string>
+    <string name="copyright_action_agree">Zgadzam się</string>
+    <string name="copyright_action_disagree">Niezgadzam się</string>
 </resources>

@@ -1987,26 +1987,20 @@
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
     <string name="album_decryption_key_title">Decoderingssleutel</string>
     <string name="album_decryption_key_description">Ons zero-knowledge coderingssysteem vereist een unieke sleutel die automatisch voor dit bestand of deze map wordt gegenereerd. Standaard wordt een link met deze sleutel aangemaakt, maar u kunt de decoderingssleutel apart exporteren voor een extra beveiligingslaag.</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="search_placeholder_folder">Zoeken in %s</string>
+    <string name="search_placeholder_cloud_drive">Zoeken in Cloud schijf</string>
+    <string name="search_placeholder_rubbish_bin">Zoeken in Prullenbak</string>
+    <string name="search_placeholder_incoming_shares">Zoeken in binnenkomende gedeeld</string>
+    <string name="search_placeholder_outgoing_shares">Zoeken in Uitgaande gedeeld</string>
+    <string name="search_placeholder_links">Zoeken in Links</string>
+    <string name="search_placeholder_favourites">Zoeken in Favorieten</string>
+    <string name="search_placeholder_documents">Zoeken in Documenten</string>
+    <string name="search_placeholder_audios">Zoeken in Audios</string>
+    <string name="search_placeholder_videos">Zoeken in Video\’s</string>
+    <string name="search_placeholder_backups">Zoeken in Backups</string>
+    <string name="copyright_screen_title">Auteursrechtwaarschuwing voor alle gebruikers</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA respecteert de auteursrechten van anderen en vereist dat gebruikers van de MEGA Cloud-service zich houden aan de auteursrechtwetgeving.</string>
+    <string name="copyright_screen_description_second_paragraph">Het is ten strengste verboden om de MEGA Cloud-service te gebruiken voor het schenden van auteursrechten. U mag geen bestanden, gegevens of inhoud uploaden, downloaden, opslaan, delen, weergeven, streamen, distribueren, e-mailen, linken naar, verzenden of op andere wijze beschikbaar stellen die inbreuk maken op auteursrechten of andere eigendomsrechten van een persoon of entiteit.</string>
+    <string name="copyright_action_agree">Instemmen</string>
+    <string name="copyright_action_disagree">Niet instemmen</string>
 </resources>

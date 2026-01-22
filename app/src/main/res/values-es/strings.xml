@@ -5030,4 +5030,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Subidas de la cámara activadas</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Esta ubicación ya no existe.</string>
+    <string name="invalid_link">Enlace inválido. Por favor, inténtalo de nuevo o solicita uno nuevo.</string>
 </resources>

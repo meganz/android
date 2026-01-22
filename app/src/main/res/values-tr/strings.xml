@@ -1028,11 +1028,11 @@
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">Duraklatıldı</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_queued">Kuyrukta</string>
+    <string name="transfer_queued">Sıraya alındı</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
     <string name="transfer_completing">Tamamlanıyor</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
-    <string name="transfer_retrying">Tekrar deneniyor</string>
+    <string name="transfer_retrying">Yeniden deneniyor</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">%2$d dosyadan %1$d tanesi yükleniyor</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -3384,8 +3384,8 @@
     </plurals>
     <!-- Delete albums confirmation description. -->
     <plurals name="photos_album_delete_confirmation_description">
-        <item quantity="one">Albüm silinecek ancak içeriği Zaman akışınızda kalacaktır.</item>
-        <item quantity="other">Albümler silinecek ancak içerikleri Zaman akışınızda kalacaktır.</item>
+        <item quantity="one">Albüm silinecek ancak içeriği Zaman çizelgenizde kalacaktır.</item>
+        <item quantity="other">Albümler silinecek ancak içerikleri Zaman çizelgenizde kalacaktır.</item>
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Daha az gör</string>

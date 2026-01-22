@@ -5,7 +5,7 @@
     <!-- Sync text for the the button to begin sync-->
     <string name="sync_button_label">동기화</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요</string>
+    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -115,7 +115,7 @@
     <!-- Sync stalled issue reason is no file issue detailed description-->
     <string name="sync_stalled_issue_file_issue_detail">한 개의 항목에 문제를 해결하기 위해 당신의 결정이 필요합니다</string>
     <!-- Sync stalled issue reason is delete or move detailed description-->
-    <string name="sync_stalled_issue_delete_or_move_detail">다른 프로세스가 완료되기를 기다리는 중입니다.</string>
+    <string name="sync_stalled_issue_delete_or_move_detail">다른 프로세스가 완료되기를 기다리는 중</string>
     <!-- Sync stalled issue reason is upload issue detailed description-->
     <string name="sync_stalled_issue_upload_issue_detail">대상 폴더에 도달할 수 없음</string>
     <!-- Sync stalled issue reason is download issue detailed description-->
@@ -123,7 +123,7 @@
     <!-- Sync stalled issue reason is can not create folder detailed description-->
     <string name="sync_stalled_issue_cannot_create_folder_detail">폴더 접근을 막는 로컬 오류 발생</string>
     <!-- Sync stalled issue reason is can not perform deletion detailed description-->
-    <string name="sync_stalled_issue_cannot_perform_deletion_detail">폴더 접근을 막는 파일시스템 오류</string>
+    <string name="sync_stalled_issue_cannot_perform_deletion_detail">폴더 접근을 막는 파일시스템 오류.</string>
     <!-- Sync stalled issue reason is can not support tree depth detailed description-->
     <string name="sync_stalled_issue_cannot_support_tree_depth_detail">대상이 폴더 구조의 너무 깊은 곳에 있습니다.\n대상을 64단계 이하의 위치로 이동하세요.</string>
     <!-- Sync stalled issue reason is Folder Matched Against File detailed description-->
@@ -135,11 +135,12 @@
     <!-- Sync stalled issue reason is Name clash detailed description-->
     <string name="sync_stalled_issue_name_clash_detail">동기화의 한쪽에서 같은 이름을 다신 여러 항목이 있지만 동기화의 다른 쪽에서 같은 하나의 항목이 될 것입니다</string>
     <!-- Sync notification title description sync monitoring-->
-    <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA에서 이동 또는 이름 변경을 감지하였지만, 로컬에 반영할 수 없었습니다</string>
+    <string name="sync_stalled_issues_move_or_rename_message_mega">MEGA에서 이동 또는 이름 변경을 감지하였지만, 로컬에 반영할 수 없었습니다.</string>
     <!-- Sync notification title description sync monitoring-->
     <string name="sync_stalled_issues_move_or_rename_message_local">로컬에서 이동 또는 이름 변경을 감지하였지만, MEGA에 반영할 수 없었습니다.</string>
     <!-- Sync stalled issue delete or move scanning detail-->
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">파일이 이동되거나 삭제되었는지 확인하기 위해 스캔이 완료되기를 기다리는 중입니다.</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">일부 폴더는 MEGA 앱이 로컬 폴더에 대한 접근 권한을 상실하여 동기화하거나 백업할 수 없습니다. 재개를 탭하여 영향 받은 각 폴더의 권한을 다시 추가하세요.</string>
+    <string name="sync">동기화</string>
 </resources>

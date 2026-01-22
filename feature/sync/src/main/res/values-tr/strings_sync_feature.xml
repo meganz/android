@@ -146,4 +146,5 @@
     <string name="sync_stalled_issue_delete_or_move_scanning_detail">Dosyanın taşınıp taşınmadığını veya silinip silinmediğini belirlemek için taramanın bitmesi bekleniyor.</string>
     <!-- Sync change root path title-->
     <string name="sync_change_root_uri_warning_title">Bazı klasörler senkronize edilemez veya yedeklenemez çünkü MEGA uygulaması, yerel klasörlere erişim izinlerini kaybetti. Her etkilenen klasör için izinleri yeniden eklemek üzere Devam ettir’e dokunun.</string>
+    <string name="sync">Senkronizasyon</string>
 </resources>

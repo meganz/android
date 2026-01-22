@@ -5030,4 +5030,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Încărcări cameră sunt activată</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Această locație nu mai există.</string>
+    <string name="invalid_link">Link invalid. Vă rugăm să încercați din nou sau să solicitați un alt link.</string>
 </resources>

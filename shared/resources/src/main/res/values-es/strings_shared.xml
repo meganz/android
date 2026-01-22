@@ -1889,7 +1889,7 @@
         <item quantity="other">%1$s para los primeros %2$d meses</item>
     </plurals>
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s durante el primer año</item>
+        <item quantity="one">%1$s durante el primer %2$d año</item>
         <item quantity="many">%1$s durante los primeros %2$d años</item>
         <item quantity="other">%1$s durante los primeros %2$d años</item>
     </plurals>
@@ -1966,26 +1966,4 @@
     <string name="timeline_tab_cu_permission_warning_banner_action">Actualizar permisos</string>
     <string name="timeline_tab_cu_permission_warning_banner_description">Para guardar todos tus recuerdos, MEGA necesita acceso completo a tu biblioteca de fotos.</string>
     <string name="timeline_tab_cu_battery_level_warning_banner_description">El nivel de batería es demasiado bajo. Carga el dispositivo para iniciar las subidas de la cámara.</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

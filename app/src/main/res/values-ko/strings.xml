@@ -155,7 +155,7 @@
     <!-- Last name of the user -->
     <string name="lastname_text">성</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
-    <string name="top">[B]내가 암호를 잊으면, 내 데이터를 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기</string>
+    <string name="top">[B]내가 암호를 잊으면, 내 데이터를 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기.</string>
     <!-- warning dialog -->
     <string name="create_account_no_terms">이용 약관에 동의하여야 합니다</string>
     <!-- warning dialog, for user do not tick checkbox of understanding the danger of losing password -->
@@ -511,7 +511,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">잘못된 코드. 다시 시도하거나 재발송하세요.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">당신의 휴대 전화 번호는 인증되었습니다.</string>
+    <string name="verify_account_successfully">당신의 휴대 전화 번호는 인증되었습니다</string>
     <!-- settings option -->
     <string name="settings_camera_upload_on">카메라 업로드 활성화</string>
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
@@ -665,7 +665,7 @@
     <!-- Title of the alert dialog to inform the user that have to check the email -->
     <string name="email_verification_title">이메일 주소 인증</string>
     <!-- Text of the alert dialog to inform the user that have to check the email -->
-    <string name="email_verification_text">진행하려면 이메일 수신함을 확인하세요</string>
+    <string name="email_verification_text">진행하려면 이메일 수신함을 확인하세요.</string>
     <!-- Text to inform the user when an error occurs -->
     <string name="general_text_error">오류가 발생했습니다, 다시 시도하세요</string>
     <!-- Alert to inform the user that have to be logged in to perform the action -->
@@ -729,7 +729,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호입니다. 다시 시도하세요.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.io로 연락주세요.</string>
+    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. support&#64;mega.io로 연락주세요</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1103,7 +1103,7 @@
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">프로필 사진이 업데이트되었습니다</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar_image_not_available">오류. 선택한 이미지가 존재하지 않습니다.</string>
+    <string name="error_changing_user_avatar_image_not_available">오류. 선택한 이미지가 존재하지 않습니다</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar">프로필 사진 변경 중 오류</string>
     <!-- Message when an user avatar has been deleted successfully -->
@@ -1681,9 +1681,9 @@
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s 대화가 보관되었습니다</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">오류. %s 대화는 보관되지 않았습니다</string>
+    <string name="error_archive_chat">오류. %s 대화는 보관되지 않았습니다. 다시 시도하세요.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s 대화가 보관 해제되었습니다.</string>
+    <string name="success_unarchive_chat">%s 대화가 보관 해제되었습니다</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">오류. %s 대화는 보관 해제되지 않았습니다. 다시 시도하세요.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
@@ -2343,7 +2343,7 @@
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning. Placeholder is for include the time left (including units) in MEGA red color -->
     <string name="over_disk_quota_paywall_deletion_warning">[B]업그레이드까지 [M]%s[/M] 남았습니다[/B]. 이후, 당신의 데이터는 삭제 대상이 됩니다.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no data available -->
-    <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]업그레이드해야 합니다[/B]. 당신의 데이터는 현재 삭제 대상입니다</string>
+    <string name="over_disk_quota_paywall_deletion_warning_no_data">[B]업그레이드해야 합니다[/B]. 당신의 데이터는 현재 삭제 대상입니다.</string>
     <!-- Text of deletion alert of the Over Disk Quota Paywall warning if no time left. “save” here means safeguard, protect, and not write to disk. -->
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]데이터를 지키려면 즉시 조치하세요.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -2781,7 +2781,7 @@
     <!-- the content of tips when the user uses the meeting first time-->
     <string name="tip_invite_more_participants">회의에 더 많은 참여자를 초대합니다. 초대하려면 위로 올리세요.</string>
     <!-- the content of snack bar when the user be the new moderator-->
-    <string name="be_new_moderator">당신은 새로운 주최자입니다.</string>
+    <string name="be_new_moderator">당신은 새로운 주최자입니다</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">현재 회의에 참여하려면 탭 하세요.</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
@@ -2957,11 +2957,11 @@
     <!-- Label for the high option on setting to set up the quality of image files uploaded to the chat -->
     <string name="high_image_quality">원본</string>
     <!-- Text for the high option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="high_image_quality_text">항상 원본 크기 이미지 전송</string>
+    <string name="high_image_quality_text">항상 원본 크기 이미지 전송.</string>
     <!-- Label for the optimised option on setting to set up the quality of image files uploaded to the chat -->
     <string name="optimised_image_quality">최적화</string>
     <!-- Text for the optimised option on setting to set up the quality of image files uploaded to the chat -->
-    <string name="optimised_image_quality_text">항상 최적화된 이미지 전송</string>
+    <string name="optimised_image_quality_text">항상 최적화된 이미지 전송.</string>
     <!-- Message shown when one participant joined the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_joined_call">%1$s님 참여함</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
@@ -3095,7 +3095,7 @@
     <!-- Accessibility Label for the submit button on the report issue screen-->
     <string name="settings_help_report_issue_submit_menu_action">제출</string>
     <!-- Error message when submit issue failed-->
-    <string name="settings_help_report_issue_error">무언가 잘못됐습니다. 나중에 다시 시도하세요. 그래도 문제를 제출할 수 없다면, %s에 연락하여 도움을 받으세요,</string>
+    <string name="settings_help_report_issue_error">무언가 잘못됐습니다. 나중에 다시 시도하세요. 그래도 문제를 제출할 수 없다면, %s에 연락하여 도움을 받으세요.</string>
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">당신의 보고를 받았습니다. 문제를 확인해보고 알려드리겠습니다.</string>
     <!-- Message shown during log file upload-->
@@ -3295,7 +3295,7 @@
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
     <string name="cloud_drive_media_discovery_banner_ok">예, 알겠습니다</string>
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
-    <string name="scheduled_meetings_share_meeting_link_panel_title">링크가 있는 누구나 회의에 참여하고 대화를 볼 수 있습니다</string>
+    <string name="scheduled_meetings_share_meeting_link_panel_title">링크가 있는 누구나 회의에 참여하고 대화를 볼 수 있습니다.</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">사진첩 %d개 삭제됨</item>
@@ -3339,7 +3339,7 @@
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">이어서 볼까요?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s은/는 %2$s부터 재개됩니다</string>
+    <string name="video_playback_position_dialog_message">%1$s은/는 %2$s부터 재개됩니다.</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">재개</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
@@ -4221,7 +4221,7 @@
     <!-- Title of option to set waiting room in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_waiting_room_label">대기실</string>
     <!-- Subtitle of option to set a waiting room in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_waiting_room_description">호스트가 승인한 참여자만 회의에 참여할 수 있습니다</string>
+    <string name="meetings_schedule_meeting_waiting_room_description">주최자가 승인한 참여자만 회의에 참여할 수 있습니다.</string>
     <!-- Text of the warning when the user enables allow non-hosts add participants and waiting room, informing that participants added by non-hosts won't be sent to the waiting room -->
     <string name="meetings_schedule_meeting_waiting_room_warning">통화 중에 호스트가 아닌 사람으로부터 추가된 참여자들은 대기실에 보내질 수 없습니다.</string>
     <!-- when user tries to share file/folder to one of un verified contact or contact not verified by MEGA below warning message will be visible to the user-->
@@ -4282,7 +4282,7 @@
     <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s 님이 “%2$s”에 참여하려고 대기 중입니다.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="other">%1$d명의 참여자가 “%2$s”에 참여하려고 대기 중입니다</item>
+        <item quantity="other">%1$d명의 참여자가 “%2$s”에 참여하려고 대기 중입니다.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">캡처</string>
@@ -4391,7 +4391,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">모두 통화</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
     <string name="chat_attach_location_deny_permission">당신은 MEGA가 당신의 위치에 접근하는 것을 거부하였습니다. 위치를 공유하려면, MEGA가 할 수 있도록 권한을 허용하세요.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
@@ -4443,7 +4443,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, support&#64;mega.io으로 연락하세요.</string>
+    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, support&#64;mega.io으로 연락하세요</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>

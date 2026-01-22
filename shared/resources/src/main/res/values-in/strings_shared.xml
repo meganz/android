@@ -1770,26 +1770,35 @@
     <string name="invalid_chat_link_error_message">Percakapan ini tidak lagi tersedia</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Cari&#8230;</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="payment_ads_free_intro_title">Ingin MEGA tanpa iklan?</string>
+    <string name="payment_ads_free_intro_description">Tingkatkan ke paket Pro dengan penyimpanan yang lebih besar dan lebih banyak lagi. Paket Pro kami mulai dari hanya %1$s per bulan.</string>
+    <string name="hidden_nodes_description_hide_files_folders_feature">Anda dapat menyembunyikan file dan folder sensitif untuk menjaga privasi hanya dalam satu langkah mudah.</string>
+    <string name="hidden_nodes_description_control_visibility">Hanya anda yang dapat menampilkan file tersembunyi, baik satu per satu atau dengan menampilkan sementara item tersembunyi dari pengaturan.</string>
+    <string name="hidden_nodes_description_visible_shared_files">Tampilkan item tersembunyi dengan gambar miniaturnya yang dikaburkan, sehingga anda dapat mengidentifikasinya tanpa memperlihatkan isinya.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">Tautan ini tidak akan tersedia untuk umum lagi</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">Batalkan pembagian %1$d folder ini?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">Sedang mencoba transfer kembali, lihat tab Aktif untuk melihat perkembangannya</item>
+    </plurals>
+    <string name="camera_update_device_charging_not_met_banner_description">Unggahan hanya terjadi saat perangkat anda sedang diisi daya. Anda dapat mengubah pengaturan ini di Pengaturan.</string>
+    <string name="camera_update_low_battery_banner_description">Pengunggahan dihentikan sementara karena baterai lemah. Isi daya perangkat anda untuk melanjutkan.</string>
+    <string name="camera_update_network_requirement_not_met_banner_description">Unggahan kamera dijeda, sambungkan ke Wi-Fi atau izinkan data seluler</string>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s untuk %3$s</string>
+    <string name="campaign_name_black_friday">Penawaran Black Friday: diskon %1$d%%</string>
+    <string name="campaign_name_cyber_monday">Penawaran Cyber Monday: diskon %1$d%%</string>
+    <string name="campaign_name_special_offer">Penawaran khusus: diskon %1$d%%</string>
+    <plurals name="label_first_time_in_months_full">
+        <item quantity="other">%1$s untuk %2$d bulan pertama</item>
+    </plurals>
+    <plurals name="label_first_time_in_years_full">
+        <item quantity="other">%1$s untuk %2$d tahun pertama</item>
+    </plurals>
+    <string name="account_upgrade_account_label_save_at_least">Hemat setidaknya 16% untuk paket tahunan</string>
+    <string name="general_invalid_string">Tidak boleh kosong</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;VPN, berlaku selamanya</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;Pass, berlaku selamanya</string>
 </resources>

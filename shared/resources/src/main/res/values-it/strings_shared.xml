@@ -1906,26 +1906,4 @@
     <string name="invalid_chat_link_error_message">Questa conversazione non è più disponibile</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Cerca&#8230;</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
 </resources>

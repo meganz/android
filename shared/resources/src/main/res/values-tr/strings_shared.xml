@@ -1989,26 +1989,20 @@
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
     <string name="album_decryption_key_title">Şifre çözme anahtarı</string>
     <string name="album_decryption_key_description">Sıfır bilgi şifreleme sistemimiz, bu dosya veya klasör için otomatik olarak oluşturulan benzersiz bir anahtar gerektirir. Varsayılan olarak bu anahtarla bir bağlantı oluşturulur, ancak ek bir güvenlik katmanı için şifre çözme anahtarını ayrı olarak dışa aktarabilirsiniz.</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="search_placeholder_folder">%s içerisinde ara</string>
+    <string name="search_placeholder_cloud_drive">Bulut depolamada ara</string>
+    <string name="search_placeholder_rubbish_bin">Çöp kutusunda ara</string>
+    <string name="search_placeholder_incoming_shares">Gelen paylaşımlarda ara</string>
+    <string name="search_placeholder_outgoing_shares">Giden paylaşımlarda ara</string>
+    <string name="search_placeholder_links">Bağlantılarda ara</string>
+    <string name="search_placeholder_favourites">Favorilerde ara</string>
+    <string name="search_placeholder_documents">Belgelerde ara</string>
+    <string name="search_placeholder_audios">Seslerde ara</string>
+    <string name="search_placeholder_videos">Videolarda ara</string>
+    <string name="search_placeholder_backups">Yedeklemelerde ara</string>
+    <string name="copyright_screen_title">Tüm kullanıcılara telif hakkı uyarısı</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA, başkalarının telif haklarına saygı duyar ve MEGA Bulut hizmeti kullanıcılarının telif hakkı yasalarına uymasını şart koşar.</string>
+    <string name="copyright_screen_description_second_paragraph">Telif haklarını ihlal etmek için MEGA Bulut hizmetini kullanmanız kesinlikle yasaktır. Herhangi bir kişi veya kuruluşun telif hakkını veya diğer mülkiyet haklarını ihlal eden herhangi bir dosya, veri veya içeriği yükleyemez, indiremez, depolayamaz, paylaşamaz, görüntüleyemez, yayınlayamaz, dağıtamaz, e-posta ile gönderemez, bağlantı veremez, iletemez veya başka bir şekilde kullanıma sunamazsınız.</string>
+    <string name="copyright_action_agree">Kabul ediyorum</string>
+    <string name="copyright_action_disagree">Kabul etmiyorum</string>
 </resources>

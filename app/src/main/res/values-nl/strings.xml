@@ -41,7 +41,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Laden</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Toevoegen</string>
+    <string name="general_importing">Toevoegen&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Doorsturen</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -1112,7 +1112,7 @@
     <string name="download_show_info">Informatie weergeven</string>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="one">Link creatie mislukt. Probeer later nogmaals</item>
+        <item quantity="one">Mislukt om link te creëren. Probeer later nogmaals</item>
         <item quantity="other">Mislukt om sommige links te creëren. Probeer later nogmaals.</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
@@ -1240,7 +1240,7 @@
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">Uitnodiging verstuurd</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
-    <string name="invalid_email_to_invite">Email address is malformed</string>
+    <string name="invalid_email_to_invite">Het e-mailadres is onjuist opgemaakt</string>
     <!-- info paragraph about the completed achievement install megasync -->
     <string name="result_paragraph_info_achievement_install_desktop">U heeft %1$s extra opslagruimte voor het installeren van onze desktop applicatie ontvangen</string>
     <!-- info paragraph about the completed achievement install mobile app -->
@@ -3310,7 +3310,7 @@
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Bedankt voor uw Pro&#160;III jaarlijkse abonnement</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
-    <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan ​​dat non-hosts deelnemers kan toevoegen</string>
+    <string name="chat_group_chat_info_allow_non_host_participants_option">Toestaan dat non-hosts deelnemers kunnen toevoegen</string>
     <!-- Title of gif album. -->
     <string name="photos_album_title_gif">GIF</string>
     <!-- Title of raw album. -->
@@ -3343,7 +3343,7 @@
     <string name="photos_album_selection_title">Voeg items toe naar “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">%1$d Items naar “%2$s” toegevoegd</item>
+        <item quantity="one">%1$d Item naar “%2$s” toegevoegd</item>
         <item quantity="other">%1$d Items naar “%2$s” toegevoegd</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
@@ -4151,7 +4151,7 @@
     <!-- Text of setting password to link -->
     <string name="general_set_password">Wachtwoord instellen</string>
     <!-- Text when link of file gets updated after setting password to copy link again-->
-    <string name="general_link_updated_copy_again">Link bijgewerkt. Nogmaals kopiëren</string>
+    <string name="general_link_updated_copy_again">Link bijgewerkt. Nogmaals kopiëren.</string>
     <!-- Album import link label -->
     <string name="album_import_link">Album link</string>
     <!-- Album import error access title -->
@@ -4458,8 +4458,8 @@
     <string name="meetings_waiting_room_admit_users_to_call_dialog_see_waiting_room_button">Zie wachtkamer</string>
     <!-- Description text in the dialog to admit participants to the call. The placeholder indicates the number of participants who are in the waiting room. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_dialog_message">
-        <item quantity="one">%1$d wacht op de de aansluiting van de oproep.</item>
-        <item quantity="other">%1$d deelnemers wachten op aansluiting van de oproep.</item>
+        <item quantity="one">%1$d deelnemer wacht op de aansluiting van de oproep.</item>
+        <item quantity="other">%1$d deelnemers wachten op de aansluiting van de oproep.</item>
     </plurals>
     <!-- Description text in the dialog to deny a participant entry into the call. The placeholder indicates the name of the participant -->
     <string name="meetings_waiting_room_deny_user_to_call_dialog_message">%1$s de toegang weigeren?</string>
@@ -4591,7 +4591,7 @@
     <!-- Label of the button to call all absent participants from the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_call_all_button">Iedereen bellen</string>
     <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
-    <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen</string>
+    <string name="chat_attach_pick_from_camera_deny_permission">MEGA heeft toegang tot uw camera nodig om foto\’s en video\’s vast te leggen.</string>
     <!-- Warning shown if user denies the location permission when trying to pick a location -->
     <string name="chat_attach_location_deny_permission">U heeft MEGA toegang tot uw locatie geweigerd. Als u uw locatie wilt delen, geef MEGA toestemming om dat te doen.</string>
     <!-- Title for the confirmation dialog shown when the user is starting a large download -->
@@ -4645,7 +4645,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Het uploaden is gepauzeerd omdat de batterij lager is dan %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.io.</string>
+    <string name="photos_camera_uploads_general_issue">Het uploaden van de camera werkt niet meer. Probeer camera-uploads opnieuw in te schakelen om het probleem op te lossen. Als het probleem zich blijft voordoen, neem contact op met support&#64;mega.io</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="one">Camera uploads zijn in behandeling,%1$d bestand in wachtrij</item>
@@ -4789,7 +4789,7 @@
     <string name="meetings_one_participant_raised_their_hand_message">%1$s heeft de hand opgestoken</string>
     <!-- The snackbar message two or more participants raised their hands -->
     <plurals name="meetings_other_participants_raised_their_hands_message">
-        <item quantity="one">%1$s en %2$d anderen staken hun hand op</item>
+        <item quantity="one">%1$s en %2$d andere stak hun hand op</item>
         <item quantity="other">%1$s en %2$d anderen staken hun hand op</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
@@ -4816,4 +4816,6 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Camera Uploads ingeschakeld</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Deze locatie bestaat niet langer.</string>
+    <string name="dialog_taken_down_folder_description">Deze map is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
+    <string name="dialog_taken_down_file_description">Dit bestand is verwijderd in overeenstemming met ons [A]Beleid voor verwijderingsrichtlijnen[/A]. U kunt bezwaar maken tegen deze verwijdering als u van mening bent dat wij een fout hebben gemaakt.</string>
 </resources>

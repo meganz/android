@@ -1842,26 +1842,29 @@
     <string name="external_checkout_information_title">MEGA에서 나가는 중</string>
     <string name="external_checkout_show_next_time">이것을 다음에 보여주세요</string>
     <string name="external_checkout_information_description">외부 웹사이트(%1$s)를 열려고 합니다. MEGA는 거래와 고객 지원에 책임이 있습니다.</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="search_placeholder_folder">%s에서 찾기</string>
+    <string name="search_placeholder_cloud_drive">클라우드 드라이브에서 찾기</string>
+    <string name="search_placeholder_rubbish_bin">휴지통에서 찾기</string>
+    <string name="search_placeholder_incoming_shares">들어오는 공유에서 찾기</string>
+    <string name="search_placeholder_outgoing_shares">나가는 공유에서 찾기</string>
+    <string name="search_placeholder_links">링크에서 찾기</string>
+    <string name="search_placeholder_favourites">즐겨찾기에서 찾기</string>
+    <string name="search_placeholder_documents">문서에서 찾기</string>
+    <string name="search_placeholder_audios">오디오에서 찾기</string>
+    <string name="search_placeholder_videos">동영상에서 찾기</string>
+    <string name="search_placeholder_backups">백업에서 찾기</string>
+    <string name="copyright_screen_title">모든 이용자에게 저작권 경고</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA는 다른 사람들의 저작권을 존중하며 MEGA 클라우드 서비스의 이용자들이 저작권법을 따를 것을 요구합니다.</string>
+    <string name="copyright_screen_description_second_paragraph">당신은 MEGA 클라우드 서비스를 저작권을 침해할 목적으로 절대 이용할 수 없습니다. 당신은 어떤 사람 또는 주체의 저작권 또는 지적 재산권을 침해하는 파일, 데이터 또는 콘텐츠를 업로드, 다운로드, 저장, 공유, 게시, 스트림, 배포, 이메일, 링크, 전송 또는 어떠한 방식으로 이용 가능하게 해서는 안 됩니다.</string>
+    <string name="copyright_action_agree">동의</string>
+    <string name="copyright_action_disagree">동의하지 않음</string>
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">%1$d개의 공유된 폴더에서 나갈 수 없었습니다</item>
+    </plurals>
+    <plurals name="confirmation_leave_share_folder">
+        <item quantity="other">이 폴더를 나가면, 다시는 볼 수 없습니다.</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">전송 다시 시도 중, 진행 상황은 활성 탭을 보세요</item>
+    </plurals>
 </resources>

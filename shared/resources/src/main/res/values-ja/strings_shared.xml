@@ -1938,26 +1938,20 @@
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
     <string name="album_decryption_key_title">復号化キー</string>
     <string name="album_decryption_key_description">当社のゼロ知識暗号化システムでは、このファイルかフォルダに対して自動的に生成される一意のキーが必要です。このキーを有するリンクはデフォルトで作成されますが、セキュリティの層を追加するために、復号キーを個別にエクスポートできます。</string>
-    <!-- Placeholder text for search bar when searching in a specific folder. %s will be replaced with the folder name. -->
-    <string name="search_placeholder_folder">Search in %s</string>
-    <!-- Placeholder text for search bar when searching in Cloud drive section -->
-    <string name="search_placeholder_cloud_drive">Search in Cloud drive</string>
-    <!-- Placeholder text for search bar when searching in Rubbish bin section -->
-    <string name="search_placeholder_rubbish_bin">Search in Rubbish bin</string>
-    <!-- Placeholder text for search bar when searching in Incoming shares section -->
-    <string name="search_placeholder_incoming_shares">Search in Incoming shares</string>
-    <!-- Placeholder text for search bar when searching in Outgoing shares section -->
-    <string name="search_placeholder_outgoing_shares">Search in Outgoing shares</string>
-    <!-- Placeholder text for search bar when searching in Links section -->
-    <string name="search_placeholder_links">Search in Links</string>
-    <!-- Placeholder text for search bar when searching in Favourites section -->
-    <string name="search_placeholder_favourites">Search in Favourites</string>
-    <!-- Placeholder text for search bar when searching in Documents section -->
-    <string name="search_placeholder_documents">Search in Documents</string>
-    <!-- Placeholder text for search bar when searching in Audio section -->
-    <string name="search_placeholder_audios">Search in Audios</string>
-    <!-- Placeholder text for search bar when searching in Videos section -->
-    <string name="search_placeholder_videos">Search in Videos</string>
-    <!-- Placeholder text for search bar when searching in Backups section -->
-    <string name="search_placeholder_backups">Search in Backups</string>
+    <string name="search_placeholder_folder">%s内を検索</string>
+    <string name="search_placeholder_cloud_drive">クラウドドライブ内を検索</string>
+    <string name="search_placeholder_rubbish_bin">ごみ箱の中を検索</string>
+    <string name="search_placeholder_incoming_shares">共有アイテム（受信）を検索</string>
+    <string name="search_placeholder_outgoing_shares">共有アイテム（送信）を検索</string>
+    <string name="search_placeholder_links">リンク内を検索</string>
+    <string name="search_placeholder_favourites">お気に入り内を検索</string>
+    <string name="search_placeholder_documents">ドキュメント内を検索</string>
+    <string name="search_placeholder_audios">オーディオ内を検索</string>
+    <string name="search_placeholder_videos">動画内を検索</string>
+    <string name="search_placeholder_backups">バックアップ内を検索</string>
+    <string name="copyright_screen_title">全ユーザー様への著作権警告</string>
+    <string name="copyright_screen_description_first_paragraph">MEGAは他人の著作権を尊重し、MEGAクラウドサービスのユーザー様が著作権に関する法律に従うことを義務づけています。</string>
+    <string name="copyright_screen_description_second_paragraph">MEGAクラウドサービスを使用して著作権を侵害することは厳しく禁止されています。あなたは、個人または団体の著作権またはその他の財産権を侵害するファイル、データ、またはコンテンツをアップロード、ダウンロード、保存、共有、表示、ストリーム配信、配布、メールで送信、リンク、送信、またはその他の方法で利用可能にすることはできません。</string>
+    <string name="copyright_action_agree">同意する</string>
+    <string name="copyright_action_disagree">同意しない</string>
 </resources>

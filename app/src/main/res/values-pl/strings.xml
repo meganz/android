@@ -41,7 +41,7 @@
     <!-- The title of progress dialog when loading web content -->
     <string name="general_loading">Trwa ładowanie</string>
     <!-- state while importing the file -->
-    <string name="general_importing">Dodawanie</string>
+    <string name="general_importing">Dodawanie&#8230;</string>
     <!-- state while importing the file -->
     <string name="general_forwarding">Przekierowanie</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
@@ -71,7 +71,7 @@
     <!-- Select country page title -->
     <string name="action_search_country">Wybierz swój region</string>
     <!-- Alternative text or description text for the “Play” button -->
-    <string name="action_play">Play</string>
+    <string name="action_play">Graj</string>
     <!-- Search button -->
     <string name="action_pause">Wstrzymaj</string>
     <!-- Menu item -->
@@ -93,7 +93,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Subskrypcja została anulowana</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Anulowanie Twojej subksrypcji nie powiodło się. Skontaktuj się z nami support&#64;mega.io</string>
+    <string name="cancel_subscription_error">Anulowanie Twojej subksrypcji nie powiodło się. Skontaktuj się z nami support&#64;mega.io.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Zamknij pozostałe sesje</string>
     <!-- Message after kill all opened sessions -->
@@ -5240,4 +5240,6 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Przesyłanie z kamery odblokowane</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Ta lokalizacja już nie istnieje.</string>
+    <string name="dialog_taken_down_folder_description">Ten folder został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz wnieść sprzeciw wobec tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
+    <string name="dialog_taken_down_file_description">Ten plik został usunięty zgodnie z naszą [A]Polityką wytycznych dotyczących usuwania treści[/A]. Możesz odwołać się od tego usunięcia, jeśli uważasz, że popełniliśmy błąd.</string>
 </resources>
