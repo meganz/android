@@ -1801,4 +1801,6 @@
     <string name="general_invalid_string">Tidak boleh kosong</string>
     <string name="mega_vpn_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;VPN, berlaku selamanya</string>
     <string name="mega_pass_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;Pass, berlaku selamanya</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

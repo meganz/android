@@ -114,6 +114,7 @@ interface IconPackInterface {
                 val ArchiveArrowUp: ImageVector
                 val ArrowDownCircle: ImageVector
                 val ArrowLeft: ImageVector
+                val ArrowUpLeft: ImageVector
                 val ArrowsUpDown: ImageVector
                 val ArrowsUpDownCircle: ImageVector
                 val ArrowUpCircle: ImageVector

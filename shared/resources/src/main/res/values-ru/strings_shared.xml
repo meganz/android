@@ -2086,4 +2086,6 @@
     <string name="home_screen_no_network_view_offline_files_button">Просмотреть файлы локально</string>
     <string name="timeline_tab_cu_permission_warning_banner_action">Обновить разрешения</string>
     <string name="timeline_tab_cu_permission_warning_banner_description">Чтобы мы не пропустили все ваши воспоминания, MEGA нужен полный доступ к галерее.</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

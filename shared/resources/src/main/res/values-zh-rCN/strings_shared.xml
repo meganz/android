@@ -1894,4 +1894,6 @@
     <plurals name="album_photos_selection_success_message">
         <item quantity="other">已添加%1$d个项目到“%2$s”</item>
     </plurals>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

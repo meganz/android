@@ -1867,4 +1867,6 @@
     <plurals name="transfers_retry_feedback_snackbar_message">
         <item quantity="other">전송 다시 시도 중, 진행 상황은 활성 탭을 보세요</item>
     </plurals>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

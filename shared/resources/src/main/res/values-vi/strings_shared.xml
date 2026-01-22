@@ -1792,4 +1792,6 @@
     <string name="invalid_chat_link_error_message">Cuộc trò chuyện này không còn tồn tại nữa</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Tìm kiếm&#8230;</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

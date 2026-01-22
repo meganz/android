@@ -1988,4 +1988,6 @@
         <item quantity="many">%1$d éléments ajoutés à « %2$s »</item>
         <item quantity="other">%1$d éléments ajoutés à « %2$s »</item>
     </plurals>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

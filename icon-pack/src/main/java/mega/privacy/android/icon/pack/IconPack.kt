@@ -15,6 +15,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArchiveImag
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowLeftImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowUpCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowUpLeftImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowsUpDownCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineArrowsUpDownImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineBellImageVector
@@ -193,6 +194,9 @@ public object IconPack : IconPackInterface {
 
                 override val ArrowUpCircle: ImageVector by lazy {
                         createMediumThinOutlineArrowUpCircleImageVector() }
+
+                override val ArrowUpLeft: ImageVector by lazy {
+                        createMediumThinOutlineArrowUpLeftImageVector() }
 
                 override val ArrowsUpDown: ImageVector by lazy {
                         createMediumThinOutlineArrowsUpDownImageVector() }

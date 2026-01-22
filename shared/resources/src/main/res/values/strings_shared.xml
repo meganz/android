@@ -2088,4 +2088,6 @@
     <string name="copyright_action_agree">Agree</string>
     <!-- Copyright action button to disagree -->
     <string name="copyright_action_disagree">Disagree</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

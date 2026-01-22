@@ -1969,4 +1969,6 @@
     <string name="album_content_remove_multiple_links_dialog_description">Persoanele cu care ai partajat aceste linkuri vor pierde accesul la albumele</string>
     <string name="delete_album_singular_confirmation_dialog_title">Ștergi albumul?</string>
     <string name="delete_albums_multiple_confirmation_dialog_title">Ștergi albumele?</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

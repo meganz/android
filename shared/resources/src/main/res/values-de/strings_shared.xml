@@ -1933,4 +1933,6 @@
         <item quantity="one">%1$d Element zu „%2$s“ hinzugefügt</item>
         <item quantity="other">%1$d Elemente zu „%2$s“ hinzugefügt</item>
     </plurals>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

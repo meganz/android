@@ -2003,4 +2003,6 @@
     <string name="copyright_screen_description_second_paragraph">Het is ten strengste verboden om de MEGA Cloud-service te gebruiken voor het schenden van auteursrechten. U mag geen bestanden, gegevens of inhoud uploaden, downloaden, opslaan, delen, weergeven, streamen, distribueren, e-mailen, linken naar, verzenden of op andere wijze beschikbaar stellen die inbreuk maken op auteursrechten of andere eigendomsrechten van een persoon of entiteit.</string>
     <string name="copyright_action_agree">Instemmen</string>
     <string name="copyright_action_disagree">Niet instemmen</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>

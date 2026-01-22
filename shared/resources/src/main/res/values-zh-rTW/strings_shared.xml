@@ -1886,4 +1886,6 @@
     <string name="external_checkout_show_next_time">下次提醒</string>
     <string name="general_action_save">儲存</string>
     <string name="album_cover_selected_success_message">已更新相簿封面</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
 </resources>
