@@ -4,11 +4,12 @@
 
     <application tools:node="merge">
         <activity
-            android:name=".presentation.login.LoginActivity"
+            android:name=".appstate.MegaActivity"
             android:configChanges="screenSize"
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:launchMode="singleTask"
             tools:node="replace" />
         <service
             android:name="mega.privacy.android.app.featuretoggle.FeatureFlagTileService"

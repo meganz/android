@@ -168,7 +168,6 @@
         <meta-data
             android:name="com.google.android.gms.ads.flag.OPTIMIZE_AD_LOADING"
             android:value="true" />
-
         <activity
             android:name="mega.privacy.android.app.appstate.RerouteActivity"
             android:exported="true" />
@@ -178,18 +177,18 @@
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            android:launchMode="singleTask"/>
-        <activity
-            android:name=".presentation.login.LoginActivity"
-            android:configChanges="screenSize"
-            android:exported="true"
-            android:theme="@style/Theme.Mega.Starting"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.login.LoginActivity"
+            android:configChanges="screenSize"
+            android:exported="true"
+            android:theme="@style/Theme.Mega.Starting"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"/>
         <activity
             android:name=".activities.WebViewActivity"
             android:configChanges="orientation|screenSize"
