@@ -2,7 +2,6 @@ package mega.privacy.mobile.home.presentation.home
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -172,10 +171,13 @@ internal fun HomeScreen(
                         .fillMaxSize()
                         .padding(paddingValues.excludingBottomPadding()),
                     contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     items(state.widgets, key = { it.identifier }) { it ->
-                        it.content(Modifier, navigationHandler, transferHandler)
+                        it.content(
+                            Modifier.padding(bottom = 16.dp),
+                            navigationHandler,
+                            transferHandler
+                        )
                     }
                 }
             }
