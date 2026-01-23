@@ -18,9 +18,10 @@ class MoveSelectionMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
     ): Boolean =
-        selectedNodes.none { it.isIncomingShare }
+        hasNodeAccessPermission
+                && selectedNodes.none { it.isIncomingShare }
                 && noNodeInBackups
 
-    override val showAsActionOrder: Int?
+    override val showAsActionOrder: Int
         get() = 160
 }

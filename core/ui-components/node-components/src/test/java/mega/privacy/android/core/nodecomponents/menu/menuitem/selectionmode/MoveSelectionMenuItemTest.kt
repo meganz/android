@@ -78,19 +78,20 @@ class MoveSelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay returns false when mixed incoming and non-incoming share nodes`() = runTest {
-        val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
+    fun `test shouldDisplay returns false when mixed incoming and non-incoming share nodes`() =
+        runTest {
+            val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
 
-        val result = moveMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode, mockIncomingShareNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = true,
-            noNodeTakenDown = true
-        )
+            val result = moveMenuItem.shouldDisplay(
+                hasNodeAccessPermission = true,
+                selectedNodes = listOf(mockFileNode, mockIncomingShareNode),
+                canBeMovedToTarget = true,
+                noNodeInBackups = true,
+                noNodeTakenDown = true
+            )
 
-        assertThat(result).isFalse()
-    }
+            assertThat(result).isFalse()
+        }
 
     @Test
     fun `test shouldDisplay returns false when node is in backups`() = runTest {
@@ -108,11 +109,9 @@ class MoveSelectionMenuItemTest {
     }
 
     @Test
-    fun `test shouldDisplay ignores other parameters like access permission and canBeMovedToTarget`() = runTest {
+    fun `test shouldDisplay returns false when no permission`() = runTest {
         val moveMenuItem = MoveSelectionMenuItem(mock<MoveMenuAction>())
-
-        // Test that it ignores hasNodeAccessPermission and canBeMovedToTarget
-        val result1 = moveMenuItem.shouldDisplay(
+        val result = moveMenuItem.shouldDisplay(
             hasNodeAccessPermission = false,
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
@@ -120,15 +119,6 @@ class MoveSelectionMenuItemTest {
             noNodeTakenDown = true
         )
 
-        val result2 = moveMenuItem.shouldDisplay(
-            hasNodeAccessPermission = true,
-            selectedNodes = listOf(mockFileNode),
-            canBeMovedToTarget = true,
-            noNodeInBackups = false,
-            noNodeTakenDown = true
-        )
-
-        assertThat(result1).isTrue() // Should be true because no incoming shares and not in backups
-        assertThat(result2).isFalse() // Should be false because in backups
+        assertThat(result).isFalse()
     }
 }
