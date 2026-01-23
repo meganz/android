@@ -30,6 +30,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -39,6 +40,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -59,6 +61,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.SharesScreenEvent
 
 
 /**
@@ -148,6 +151,10 @@ internal fun SharesScreen(
 
     BackHandler(enabled = isInSelectionMode) {
         deselectAllItems()
+    }
+
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(SharesScreenEvent)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(

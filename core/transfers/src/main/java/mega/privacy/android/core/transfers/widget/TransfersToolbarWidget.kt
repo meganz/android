@@ -9,8 +9,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetViewAnimated
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.mobile.analytics.event.TransfersToolbarWidgetPressedEvent
 
 /**
  * Widget to show current transfers progress in the toolbar
@@ -34,6 +36,7 @@ fun TransfersToolbarWidget(
             modifier = modifier,
             onClick = {
                 if (state.isUserLoggedIn) {
+                    Analytics.tracker.trackEvent(TransfersToolbarWidgetPressedEvent)
                     onNavigate(TransfersNavKey())
                 }
             },

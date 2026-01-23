@@ -35,6 +35,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
@@ -60,6 +61,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchBarPressedEvent
+import mega.privacy.mobile.analytics.event.DriveSyncScreenEvent
 
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
@@ -95,6 +97,10 @@ internal fun DriveSyncScreen(
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
         cloudDriveViewModel.processAction(DeselectAllItems)
+    }
+
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(DriveSyncScreenEvent)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(

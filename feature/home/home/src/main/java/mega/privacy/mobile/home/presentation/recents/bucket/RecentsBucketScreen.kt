@@ -26,6 +26,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R as NodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
@@ -36,6 +37,7 @@ import mega.privacy.android.core.nodecomponents.list.NodeListView
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -43,6 +45,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_MEDIA_GRID_LOADING_TEST_TAG
@@ -68,6 +71,10 @@ fun RecentsBucketScreen(
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val listState = rememberLazyListState()
     val snackbarQueue = rememberSnackBarQueue()
+
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(RecentsBucketScreenEvent)
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {

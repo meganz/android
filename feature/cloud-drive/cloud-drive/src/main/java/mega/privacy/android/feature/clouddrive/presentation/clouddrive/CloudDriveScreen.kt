@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.systemBarsIgnoringBottom
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -41,6 +42,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveParentNodeMoreButtonPressedEvent
+import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
 
 /**
  * Cloud Drive Screen, used to display contents of a folder
@@ -75,6 +77,10 @@ fun CloudDriveScreen(
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
+    }
+
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(CloudDriveScreenEvent)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
