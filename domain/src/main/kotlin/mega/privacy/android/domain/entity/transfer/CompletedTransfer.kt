@@ -20,10 +20,12 @@ import java.io.File
  * @property parentHandle  the parent handle of the file transferred
  * @property timestamp represents the time when the transfer is completed
  * @property appData The application data associated with this transfer
+ * @property uniqueId The unique identifier of the transfer
+ * @property totalBytes Total bytes of the transfer
  */
 data class CompletedTransfer(
     val id: Int? = null,
-    val fileName: String,
+    override val fileName: String,
     val type: TransferType,
     val state: TransferState,
     val size: String,
@@ -36,8 +38,18 @@ data class CompletedTransfer(
     val errorCode: Int?,
     val originalPath: String,
     val parentHandle: Long,
-    val appData: List<TransferAppData>?,
-) {
+    override val appData: List<TransferAppData>,
+    override val uniqueId: Long = 0L,
+    override val totalBytes: Long = 0L,
+) : ActiveTransfer {
+    override val isFinished = true
+    override val isFolderTransfer = false
+    override val isAlreadyTransferred = false
+    override val isPaused = false
+    override val localPath = originalPath
+    override val tag = 0
+    override val transferType = type
+
     /**
      * Whether the transfer is a download to the local storage and the download location is a content URI.
      */
@@ -55,6 +67,6 @@ data class CompletedTransfer(
     /**
      * Whether the transfer was cancelled.
      */
-    val isCancelled
+    override val isCancelled
         get() = state == TransferState.STATE_CANCELLED
 }

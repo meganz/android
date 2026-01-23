@@ -17,11 +17,11 @@ internal class CompletedTransferModelMapper @Inject constructor(
     private val transferAppDataMapper: TransferAppDataMapper,
 ) {
     operator fun invoke(entity: CompletedTransferEntity): CompletedTransfer {
-        val appData = entity.appData?.let { transferAppDataMapper(it) }
+        val appData = entity.appData?.let { transferAppDataMapper(it) } ?: emptyList()
         return CompletedTransfer(
             id = entity.id,
             fileName = entity.fileName,
-            type = transferTypeMapper(entity.type, appData ?: emptyList()),
+            type = transferTypeMapper(entity.type, appData),
             state = transferStateMapper(entity.state),
             size = entity.size,
             handle = entity.handle,
@@ -36,6 +36,8 @@ internal class CompletedTransferModelMapper @Inject constructor(
             originalPath = entity.originalPath,
             parentHandle = entity.parentHandle,
             appData = appData,
+            uniqueId = entity.uniqueId,
+            totalBytes = entity.totalBytes,
         )
     }
 

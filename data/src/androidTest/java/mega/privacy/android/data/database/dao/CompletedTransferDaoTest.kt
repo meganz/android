@@ -317,6 +317,8 @@ class CompletedTransferDaoTest {
             errorCode = null,
             originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
             parentHandle = 11622336899311L,
-            appData = "appData"
+            appData = "appData",
+            uniqueId = 123456789L,
+            totalBytes = 3744000L,
         )
 }

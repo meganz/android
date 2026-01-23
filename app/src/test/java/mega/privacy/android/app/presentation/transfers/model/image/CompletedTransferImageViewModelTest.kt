@@ -8,8 +8,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -246,7 +246,7 @@ class CompletedTransferImageViewModelTest {
         error = "",
         originalPath = localPath,
         parentHandle = -1,
-        appData = null,
+        appData = emptyList(),
         displayPath = null,
         errorCode = null,
     )

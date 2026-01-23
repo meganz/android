@@ -48,6 +48,8 @@ class CompletedTransferPendingTransferMapper @Inject constructor(
         timestamp = deviceGateway.now,
         state = TransferState.STATE_FAILED,
         type = pendingTransfer.transferType,
+        uniqueId = pendingTransfer.transferUniqueId ?: 0L,
+        totalBytes = sizeInBytes,
     )
 
     private suspend fun isOffline(pendingTransfer: PendingTransfer) =

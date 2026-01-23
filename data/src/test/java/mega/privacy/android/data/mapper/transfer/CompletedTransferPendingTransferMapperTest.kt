@@ -76,6 +76,8 @@ class CompletedTransferPendingTransferMapperTest {
         whenever(deviceGateway.now) doReturn (now)
         whenever(stringWrapper.getSizeString(size)) doReturn (sizeString)
         whenever(fileGateway.getOfflineFilesRootPath()) doReturn offlinePath
+        val uniqueId = 987654321L
+        whenever(pendingTransfer.transferUniqueId) doReturn uniqueId
         val actual = underTest(pendingTransfer, size, exception)
         assertAll(
             { assertThat(actual.fileName).isEqualTo(fileName) },
@@ -88,7 +90,9 @@ class CompletedTransferPendingTransferMapperTest {
             { assertThat(actual.timestamp).isEqualTo(now) },
             { assertThat(actual.error).isEqualTo(exceptionMessage) },
             { assertThat(actual.originalPath).isEqualTo(fullPath) },
-            { assertThat(actual.appData).isEqualTo(appData) }
+            { assertThat(actual.appData).isEqualTo(appData) },
+            { assertThat(actual.uniqueId).isEqualTo(uniqueId) },
+            { assertThat(actual.totalBytes).isEqualTo(size) }
         )
     }
 }

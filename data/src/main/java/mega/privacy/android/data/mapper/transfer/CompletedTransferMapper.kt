@@ -72,6 +72,8 @@ class CompletedTransferMapper @Inject constructor(
             appData = transfer.appData,
             displayPath = getDisplayPath(transfer, isOffline).takeUnless { it.isNullOrEmpty() }
                 ?: transferPath,
+            uniqueId = transfer.uniqueId,
+            totalBytes = transfer.totalBytes,
         )
     }
 

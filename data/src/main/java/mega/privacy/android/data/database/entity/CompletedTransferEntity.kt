@@ -23,6 +23,8 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
  * @property errorCode
  * @property originalPath
  * @property parentHandle
+ * @property uniqueId The unique identifier of the transfer
+ * @property totalBytes Total bytes of the transfer
  *
  */
 @Entity(
@@ -50,4 +52,6 @@ internal data class CompletedTransferEntity(
     @ColumnInfo(name = "transferoriginalpath") val originalPath: String,
     @ColumnInfo(name = "transferparenthandle") val parentHandle: Long,
     @ColumnInfo(name = "transferappdata") val appData: String?,
+    @ColumnInfo(name = "transferuniqueid", defaultValue = "0") val uniqueId: Long,
+    @ColumnInfo(name = "transfertotalbytes", defaultValue = "0") val totalBytes: Long,
 )

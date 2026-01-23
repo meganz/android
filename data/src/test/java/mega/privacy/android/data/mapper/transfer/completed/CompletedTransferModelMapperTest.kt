@@ -77,6 +77,8 @@ internal class CompletedTransferModelMapperTest {
         originalPath = "/data/user/0/mega.privacy.android.app/cache/cu/53132573053997.2023-03-24 00.13.20_1.jpg",
         parentHandle = 11622336899311L,
         appData = transferAppData.second,
+        uniqueId = 123456789L,
+        totalBytes = 3744000L,
     )
 
     @Test
@@ -97,6 +99,8 @@ internal class CompletedTransferModelMapperTest {
             originalPath = entity.originalPath,
             parentHandle = entity.parentHandle,
             appData = transferAppData.first,
+            uniqueId = entity.uniqueId,
+            totalBytes = entity.totalBytes,
         )
 
         Truth.assertThat(underTest(entity)).isEqualTo(expected)

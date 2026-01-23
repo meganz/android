@@ -96,6 +96,8 @@ class CompletedTransferMapperTest {
         assertThat(actual.timestamp).isEqualTo(now)
         assertThat(actual.originalPath).isEqualTo(transfer.localPath)
         assertThat(actual.parentHandle).isEqualTo(transfer.parentHandle)
+        assertThat(actual.uniqueId).isEqualTo(transfer.uniqueId)
+        assertThat(actual.totalBytes).isEqualTo(transfer.totalBytes)
     }
 
     @Test
@@ -349,6 +351,7 @@ class CompletedTransferMapperTest {
         isForeignOverQuota: Boolean = false,
     ): Transfer {
         return mock {
+            on { it.uniqueId }.thenReturn(87965L)
             on { it.transferType }.thenReturn(transferType ?: TransferType.GENERAL_UPLOAD)
             on { it.transferredBytes }.thenReturn(Random.nextLong())
             on { it.totalBytes }.thenReturn(Random.nextLong())
