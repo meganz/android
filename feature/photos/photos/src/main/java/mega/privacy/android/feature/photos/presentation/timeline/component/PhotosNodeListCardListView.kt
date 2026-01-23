@@ -115,7 +115,7 @@ internal fun PhotosNodeListCardListView(
                             .align(Alignment.BottomEnd)
                             .padding(16.dp)
                             .testTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_PHOTO_COUNT_TAG),
-                        onClick = {},
+                        onClick = { onClick(photo) },
                         selected = false,
                         text = "+${photo.photosCount}",
                         style = SelectionChipStyle,

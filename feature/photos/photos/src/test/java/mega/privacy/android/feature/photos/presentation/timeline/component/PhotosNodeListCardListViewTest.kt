@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
@@ -21,6 +22,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
@@ -171,6 +173,31 @@ class PhotosNodeListCardListViewTest {
             setView(photos = photos)
 
             onNodeWithTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_PHOTO_COUNT_TAG).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun `test that the photo counter for days is successfully clicked`() {
+        val photo = mock<PhotoUiState.Image>()
+        val photos = persistentListOf(
+            PhotosNodeListCard.Days(
+                date = "2 September",
+                photoItem = PhotoNodeListCardItem(
+                    photo = photo,
+                    isMarkedSensitive = false
+                ),
+                photosCount = 10
+            )
+        )
+        composeRuleScope {
+            val onClick = mock<(photo: PhotosNodeListCard) -> Unit>()
+            setView(photos = photos, onClick = onClick)
+
+            onNodeWithTag("fast_scroll_lazy_column:lazy_column_content", useUnmergedTree = true)
+                .performScrollToNode(hasTestTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_PHOTO_COUNT_TAG))
+                .performClick()
+
+            verify(onClick).invoke(photos.first())
         }
     }
 
