@@ -61,6 +61,7 @@ import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.app.appstate.global.util.show
+import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
 import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginNavKey
@@ -113,6 +114,9 @@ class MegaActivity : ComponentActivity() {
 
     @Inject
     lateinit var navigationResultManager: NavigationResultManager
+
+    @Inject
+    lateinit var inAppUpdateHandler: InAppUpdateHandler
 
     private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
 
@@ -193,6 +197,29 @@ class MegaActivity : ComponentActivity() {
         super.attachBaseContext(SupportedLanguageContextWrapper.wrap(newBase))
     }
 
+    override fun onResume() {
+        super.onResume()
+        checkForInAppUpdateInstallStatus()
+    }
+
+    private fun checkForAppUpdates() {
+        lifecycleScope.launch {
+            runCatching {
+                inAppUpdateHandler.checkForAppUpdates()
+            }.onFailure { exception ->
+                Timber.e(exception, "InAppUpdate: Failed to check for app updates")
+            }
+        }
+    }
+
+    private fun checkForInAppUpdateInstallStatus() {
+        lifecycleScope.launch {
+            runCatching {
+                inAppUpdateHandler.checkForInAppUpdateInstallStatus()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         var keepSplashScreen by mutableStateOf(true)
@@ -265,6 +292,14 @@ class MegaActivity : ComponentActivity() {
                     }
                     navigationHandler.onNetworkChange(globalState.isConnected)
                     navigationHandler.onLoginChange(authStatus)
+                }
+
+                // Check for app updates when user logs in
+                val currentSession = (globalState as? GlobalState.LoggedIn)?.session
+                LaunchedEffect(currentSession) {
+                    currentSession?.let {
+                        checkForAppUpdates()
+                    }
                 }
 
                 LaunchedEffect(rootNodeState) {
