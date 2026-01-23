@@ -134,7 +134,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -282,8 +281,6 @@ class ManagerViewModelTest {
     private val saveContactByEmailUseCase = mock<SaveContactByEmailUseCase>()
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val deleteOldestCompletedTransfersUseCase =
-        mock<DeleteOldestCompletedTransfersUseCase>()
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getIncomingContactRequestUseCase = mock<GetIncomingContactRequestsUseCase>()
@@ -380,7 +377,6 @@ class ManagerViewModelTest {
             saveContactByEmailUseCase = saveContactByEmailUseCase,
             createShareKeyUseCase = createShareKeyUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
-            deleteOldestCompletedTransfersUseCase = deleteOldestCompletedTransfersUseCase,
             getIncomingContactRequestsUseCase = getIncomingContactRequestUseCase,
             monitorMyAccountUpdateUseCase = mock {
                 on { invoke() }.thenReturn(monitorMyAccountUpdateFakeFlow)
@@ -451,7 +447,6 @@ class ManagerViewModelTest {
             stopCameraUploadsUseCase,
             saveContactByEmailUseCase,
             createShareKeyUseCase,
-            deleteOldestCompletedTransfersUseCase,
             restoreNodesUseCase,
             checkNodesNameCollisionUseCase,
             moveNodesToRubbishUseCase,
@@ -718,13 +713,6 @@ class ManagerViewModelTest {
                 )
                 cancelAndIgnoreRemainingEvents()
             }
-        }
-
-    @Test
-    fun `test that deletion of oldest completed transfers is triggered on init`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-            verify(deleteOldestCompletedTransfersUseCase).invoke()
         }
 
     @Test

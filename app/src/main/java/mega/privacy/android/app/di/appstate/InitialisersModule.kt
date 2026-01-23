@@ -11,10 +11,11 @@ import mega.privacy.android.app.appstate.global.initialisation.initialisers.Post
 import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.NotificationTopicsInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
@@ -151,5 +152,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideOfflineSyncPostLoginInitialiser(initialiser: OfflineSyncPostLoginInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideDeleteOldestCompletedTransfersInitializer(initialiser: DeleteOldestCompletedTransfersInitializer): PostLoginInitialiser =
         initialiser
 }

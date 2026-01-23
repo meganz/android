@@ -124,7 +124,6 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.transfers.completed.DeleteOldestCompletedTransfersUseCase
 import mega.privacy.android.feature.clouddrive.navigation.CloudDriveDeepLinkHandler
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncStalledIssuesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
@@ -227,7 +226,6 @@ class ManagerViewModel @Inject constructor(
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
-    private val deleteOldestCompletedTransfersUseCase: DeleteOldestCompletedTransfersUseCase,
     private val getIncomingContactRequestsUseCase: GetIncomingContactRequestsUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
@@ -389,9 +387,6 @@ class ManagerViewModel @Inject constructor(
                     setShouldAlertUserAboutSecurityUpgrade(true)
                 }
             }
-        }
-        viewModelScope.launch {
-            deleteOldestCompletedTransfersUseCase()
         }
         viewModelScope.launch {
             monitorUpdatePushNotificationSettingsUseCase().collect {
