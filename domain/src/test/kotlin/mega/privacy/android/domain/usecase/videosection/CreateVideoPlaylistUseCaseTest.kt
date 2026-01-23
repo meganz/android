@@ -84,7 +84,7 @@ class CreateVideoPlaylistUseCaseTest {
     fun `test that playlist is not created when InvalidCharacters exception is thrown`() = runTest {
         val title = "My<Playlist>"
         whenever(validatePlaylistNameUseCase(any())).thenThrow(
-            PlaylistNameValidationException.InvalidCharacters
+            PlaylistNameValidationException.InvalidCharacters("<")
         )
 
         assertThrows<PlaylistNameValidationException.InvalidCharacters> {

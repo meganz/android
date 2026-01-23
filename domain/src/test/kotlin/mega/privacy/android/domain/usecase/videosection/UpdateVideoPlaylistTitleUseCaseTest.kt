@@ -88,7 +88,7 @@ class UpdateVideoPlaylistTitleUseCaseTest {
             val playlistId = NodeId(1L)
             val newTitle = "My<Playlist>"
             whenever(validatePlaylistNameUseCase(any())).thenThrow(
-                PlaylistNameValidationException.InvalidCharacters
+                PlaylistNameValidationException.InvalidCharacters("<")
             )
 
             assertThrows<PlaylistNameValidationException.InvalidCharacters> {

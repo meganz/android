@@ -8,6 +8,6 @@ sealed class PlaylistNameValidationException(message: String) : Exception(messag
 
     data object Exists : PlaylistNameValidationException("Playlist name already exists")
 
-    data object InvalidCharacters :
+    data class InvalidCharacters(val chars: String) :
         PlaylistNameValidationException("Playlist name contains invalid characters")
 }

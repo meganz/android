@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.triggered
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
@@ -30,8 +31,10 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoPlaylistItemView
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
@@ -52,9 +55,11 @@ fun VideoPlaylistsTabRoute(
     viewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val videoPlaylistEditState by viewModel.videoPlaylistEditState.collectAsStateWithLifecycle()
 
     VideoPlaylistsTabScreen(
         uiState = uiState,
+        videoPlaylistEditState = videoPlaylistEditState,
         showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
         modifier = modifier,
         onSortNodes = viewModel::setCloudSortOrder,
@@ -63,6 +68,11 @@ fun VideoPlaylistsTabRoute(
         onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
         onDeleteButtonClicked = viewModel::removeVideoPlaylists,
         onRemovedDialogDismiss = dismissVideoPlaylistRemovedDialog,
+        showRenameVideoPlaylistDialog = viewModel::showUpdateVideoPlaylistDialog,
+        updatedVideoPlaylistTitle = viewModel::updateVideoPlaylistTitle,
+        resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
+        resetShowRenameVideoPlaylistDialog = viewModel::resetUpdateVideoPlaylistDialogEvent,
+        resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
         onNavigateToDetail = {
             navigateToVideoPlaylistDetail(VideoPlaylistDetailNavKey(it.id.longValue, it.type))
         }
@@ -73,6 +83,7 @@ fun VideoPlaylistsTabRoute(
 @Composable
 internal fun VideoPlaylistsTabScreen(
     uiState: VideoPlaylistsTabUiState,
+    videoPlaylistEditState: VideoPlaylistEditState,
     showVideoPlaylistRemovedDialog: Boolean,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
@@ -82,6 +93,11 @@ internal fun VideoPlaylistsTabScreen(
     onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
     onRemovedDialogDismiss: () -> Unit = {},
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
+    showRenameVideoPlaylistDialog: () -> Unit = {},
+    updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+    resetErrorMessage: () -> Unit = {},
+    resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+    resetUpdateTitleSuccessEvent: () -> Unit = {},
     onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
@@ -128,6 +144,16 @@ internal fun VideoPlaylistsTabScreen(
                     }
                 }
             )
+
+            EventEffect(
+                event = videoPlaylistEditState.updateTitleSuccessEvent,
+                onConsumed = resetUpdateTitleSuccessEvent,
+                action = {
+                    resetShowRenameVideoPlaylistDialog()
+                    selectedVideoPlaylist = null
+                }
+            )
+
             if (uiState.videoPlaylistEntities.isEmpty()) {
                 MegaEmptyView(
                     modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_EMPTY_VIEW_TEST_TAG),
@@ -240,10 +266,7 @@ internal fun VideoPlaylistsTabScreen(
                         sheetState = playlistBottomSheetState,
                         onActionClicked = { action ->
                             when (action) {
-                                is VideoPlaylistRenameMenuAction -> {
-                                    //TODO rename functionality will be finished in another ticket
-                                }
-
+                                is VideoPlaylistRenameMenuAction -> showRenameVideoPlaylistDialog()
                                 is VideoPlaylistsTrashMenuAction -> {
                                     showRemovedDialog = true
                                     showPlaylistBottomSheet = false
@@ -255,6 +278,28 @@ internal fun VideoPlaylistsTabScreen(
                             selectedVideoPlaylist = null
                         },
                         modifier = Modifier
+                    )
+                }
+
+                if (videoPlaylistEditState.updateVideoPlaylistDialogEvent == triggered) {
+                    EditVideoPlaylistDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        handle = selectedVideoPlaylist?.id?.longValue ?: -1,
+                        title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                        positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                        onConfirm = { handle, title ->
+                            updatedVideoPlaylistTitle(NodeId(handle), title)
+                            showPlaylistBottomSheet = false
+                        },
+                        resetErrorMessage = resetErrorMessage,
+                        onDismiss = {
+                            selectedVideoPlaylist = null
+                            resetShowRenameVideoPlaylistDialog()
+                        },
+                        initialInputText = { selectedVideoPlaylist?.title ?: "" },
+                        errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
                     )
                 }
             }
@@ -309,3 +354,9 @@ const val VIDEO_PLAYLISTS_TAB_SORT_BOTTOM_SHEET_TEST_TAG = "video_playlists_tab:
  */
 const val VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlists_tab:dialog_delete_video_playlist"
+
+/**
+ * Test tag for RenameVideoPlaylistDialog
+ */
+const val VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlists_tab:dialog_rename_video_playlist"

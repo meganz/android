@@ -24,13 +24,17 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
+import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -48,12 +52,17 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
+    private val videoPlaylistTitleValidationErrorMessageMapper: VideoPlaylistTitleValidationErrorMessageMapper,
+    private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
 ) : ViewModel() {
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
     private val playlistsRemovedFlow =
         MutableStateFlow<StateEventWithContent<List<String>>>(consumed())
     private val queryFlow = MutableStateFlow<String?>(null)
+
+    internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
+        field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
 
     private val sortOrder: StateFlow<SortOrder> by lazy {
         monitorSortCloudOrderUseCase()
@@ -195,6 +204,61 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal fun searchQuery(queryString: String?) {
         if (queryFlow.value != queryString) {
             queryFlow.update { queryString }
+        }
+    }
+
+    internal fun updateVideoPlaylistTitle(playlistID: NodeId, newTitle: String) {
+        viewModelScope.launch {
+            val title = newTitle.trim()
+            runCatching {
+                updateVideoPlaylistTitleUseCase(playlistID, title)
+            }.onSuccess { title ->
+                Timber.d("Updated video playlist title: $title")
+                videoPlaylistEditState.update { it.copy(updateTitleSuccessEvent = triggered) }
+                queryFlow.emit(queryFlow.value)
+            }.onFailure { exception ->
+                Timber.e(exception)
+                if (exception is PlaylistNameValidationException) {
+                    val errorMessage = videoPlaylistTitleValidationErrorMessageMapper(exception)
+                    videoPlaylistEditState.update {
+                        it.copy(
+                            editVideoPlaylistErrorMessage = errorMessage
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun resetUpdateTitleSuccessEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                updateTitleSuccessEvent = consumed
+            )
+        }
+    }
+
+    internal fun resetEditVideoPlaylistErrorMessage() {
+        videoPlaylistEditState.update {
+            it.copy(
+                editVideoPlaylistErrorMessage = null
+            )
+        }
+    }
+
+    internal fun showUpdateVideoPlaylistDialog() {
+        videoPlaylistEditState.update {
+            it.copy(
+                updateVideoPlaylistDialogEvent = triggered
+            )
+        }
+    }
+
+    internal fun resetUpdateVideoPlaylistDialogEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                updateVideoPlaylistDialogEvent = consumed
+            )
         }
     }
 }

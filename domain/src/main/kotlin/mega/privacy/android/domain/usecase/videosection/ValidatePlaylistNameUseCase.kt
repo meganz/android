@@ -25,8 +25,15 @@ class ValidatePlaylistNameUseCase @Inject constructor(
         val titles = videoSectionRepository.getVideoPlaylistTitles()
         when {
             title in titles -> throw PlaylistNameValidationException.Exists
-            "[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title) ->
-                throw PlaylistNameValidationException.InvalidCharacters
+            title.hasSpecialCharacters() ->
+                throw PlaylistNameValidationException.InvalidCharacters(SPECIAL_CHARACTERS)
         }
+    }
+
+    private fun String.hasSpecialCharacters() =
+        SPECIAL_CHARACTERS.toRegex().containsMatchIn(this)
+
+    companion object {
+        private const val SPECIAL_CHARACTERS = "[\\\\*/:<>?\"|]"
     }
 }

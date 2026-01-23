@@ -7,6 +7,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
@@ -26,6 +28,7 @@ class VideoPlaylistsScreenTest {
 
     private fun setComposeContent(
         uiState: VideoPlaylistsTabUiState = VideoPlaylistsTabUiState.Data(),
+        videoPlaylistEditState: VideoPlaylistEditState = VideoPlaylistEditState(),
         showVideoPlaylistRemovedDialog: Boolean = false,
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         modifier: Modifier = Modifier,
@@ -35,11 +38,17 @@ class VideoPlaylistsScreenTest {
         onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
         onRemovedDialogDismiss: () -> Unit = {},
         snackBarQueue: SnackbarEventQueue = mock(),
-        onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit = {}
+        showRenameVideoPlaylistDialog: () -> Unit = {},
+        updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+        resetErrorMessage: () -> Unit = {},
+        resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+        resetUpdateTitleSuccessEvent: () -> Unit = {},
+        onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
                 uiState = uiState,
+                videoPlaylistEditState = videoPlaylistEditState,
                 showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
                 onSortNodes = onSortNodes,
                 modifier = modifier,
@@ -49,6 +58,11 @@ class VideoPlaylistsScreenTest {
                 onDeleteButtonClicked = onDeleteButtonClicked,
                 onRemovedDialogDismiss = onRemovedDialogDismiss,
                 snackBarQueue = snackBarQueue,
+                showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
+                updatedVideoPlaylistTitle = updatedVideoPlaylistTitle,
+                resetErrorMessage = resetErrorMessage,
+                resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+                resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
                 onNavigateToDetail = onNavigateToDetail
             )
         }
@@ -133,6 +147,36 @@ class VideoPlaylistsScreenTest {
         )
 
         VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is displayed when updateVideoPlaylistDialogEvent is triggered`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            videoPlaylistEditState = VideoPlaylistEditState(
+                updateVideoPlaylistDialogEvent = triggered
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is not displayed when updateVideoPlaylistDialogEvent is consumed`() {
+        val video = createVideoPlaylistUiEntity(1L)
+        setComposeContent(
+            uiState = VideoPlaylistsTabUiState.Data(
+                videoPlaylistEntities = listOf(video)
+            ),
+            videoPlaylistEditState = VideoPlaylistEditState(
+                updateVideoPlaylistDialogEvent = consumed
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
     }
 
     private fun String.assertIsDisplayedWithTag() =
