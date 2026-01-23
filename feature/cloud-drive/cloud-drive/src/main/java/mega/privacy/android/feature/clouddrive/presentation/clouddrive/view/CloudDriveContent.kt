@@ -298,7 +298,8 @@ internal fun CloudDriveContent(
             navigationHandler.navigate(
                 CloudDriveNavKey(
                     nodeHandle = node.id.longValue,
-                    nodeName = node.name
+                    nodeName = node.name,
+                    nodeSourceType = uiState.nodeSourceType
                 )
             )
         }
@@ -371,7 +372,8 @@ internal fun CloudDriveContent(
                             navigationHandler.navigate(
                                 CloudDriveNavKey(
                                     nodeHandle = folderId.longValue,
-                                    isNewFolder = true
+                                    isNewFolder = true,
+                                    nodeSourceType = uiState.nodeSourceType
                                 )
                             )
                         } else {
