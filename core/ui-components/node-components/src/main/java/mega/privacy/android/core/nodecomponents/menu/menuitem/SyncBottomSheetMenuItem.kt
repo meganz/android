@@ -30,7 +30,7 @@ class SyncBottomSheetMenuItem @Inject constructor(
                 !node.isTakenDown &&
                 !node.isSynced &&
                 !node.isUserAttributeFolder() &&
-                node.isNotS4Container()
+                node.isNotS4Container() && node.isNodeKeyDecrypted
 
     private suspend fun TypedFolderNode.isUserAttributeFolder(): Boolean {
         val isCameraUploadsFolder = this.id.longValue == getCameraUploadsFolderHandleUseCase()

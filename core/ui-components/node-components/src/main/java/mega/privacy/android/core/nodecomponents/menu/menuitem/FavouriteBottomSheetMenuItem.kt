@@ -25,7 +25,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
             && node.isFavourite.not()
-            && isInBackups.not()
+            && isInBackups.not() && node.isNodeKeyDecrypted
 
     override val groupId = 3
 }

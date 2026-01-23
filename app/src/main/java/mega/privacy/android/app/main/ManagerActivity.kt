@@ -3125,7 +3125,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                 getString(sharedR.string.general_drive)
                             viewModel.setIsFirstNavigationLevel(true)
                         } else {
-                            supportActionBar?.title = parentNode.name
+                            supportActionBar?.title =
+                                if (parentNode.isNodeKeyDecrypted) parentNode.name else {
+                                    if (parentNode.isFolder)
+                                        resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder) else resources.getQuantityString(
+                                        R.plurals.cloud_drive_undecrypted_file,
+                                        1
+                                    )
+                                }
                             viewModel.setIsFirstNavigationLevel(false)
                         }
                     } else {

@@ -464,7 +464,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     offlineSwitch.isChecked = state.isAvailableOffline
                 }
                 optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
-                optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
+                optionFavourite.visibility =
+                    if (isTakenDown || nodeInfo.typedNode.isNodeKeyDecrypted.not()) View.GONE else View.VISIBLE
                 optionHideLayout.visibility =
                     if (!hideHiddenActions
                         && mode != SHARED_ITEMS_MODE
@@ -572,7 +573,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 viewLifecycleOwner.lifecycleScope.launch {
-                    if (mode == CLOUD_DRIVE_MODE && !isTakenDown && state.isOnline && state.isSyncActionAllowed && state.legacyNodeWrapper.typedNode.isNotS4Container()) {
+                    if (mode == CLOUD_DRIVE_MODE && !isTakenDown && state.isOnline && state.isSyncActionAllowed && state.legacyNodeWrapper.typedNode.isNotS4Container() && state.legacyNodeWrapper.typedNode.isNodeKeyDecrypted) {
                         optionSync.visibility = View.VISIBLE
                         separatorSync.visibility = View.VISIBLE
                         optionSync.setOnClickListener {
@@ -1024,7 +1025,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         text = when {
             // Triggered if the Bottom Sheet is accessed from Device Center
             nodeDeviceCenterInformation != null -> nodeDeviceCenterInformation.name
-            !megaNode.isNodeKeyDecrypted && nodeController.nodeComesFromIncoming(megaNode) -> {
+            !megaNode.isNodeKeyDecrypted -> {
                 if (megaNode.isFolder)
                     resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder) else resources.getQuantityString(
                     R.plurals.cloud_drive_undecrypted_file,
@@ -1348,6 +1349,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val optionOpenWith = contentView.findViewById<TextView>(R.id.open_with_option)
             val optionSendChat = contentView.findViewById<TextView>(R.id.send_chat_option)
             val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
+            val optionHideLayout = contentView.findViewById<LinearLayout>(R.id.option_hide_layout)
 
             val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
             val separatorSync = contentView.findViewById<View>(R.id.separator_sync)
@@ -1416,6 +1418,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
                 if (optionLabel.isVisible) {
                     optionLabel.visibility = View.GONE
+                }
+
+                if (optionHideLayout.isVisible) {
+                    optionHideLayout.visibility = View.GONE
                 }
             }
             optionSync.visibility = View.GONE
