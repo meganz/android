@@ -10,6 +10,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -66,7 +68,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.FilterMediaSource
@@ -714,7 +715,12 @@ fun MediaMainScreen(
             MegaScrollableTabRow(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues.excludingBottomPadding()),
+                    .padding(
+                        PaddingValues(
+                            top = paddingValues.calculateTopPadding(),
+                            end = paddingValues.calculateEndPadding(layoutDirection = LocalLayoutDirection.current)
+                        )
+                    ),
                 beyondViewportPageCount = 1,
                 hideTabs = selectionModeType == MediaSelectionModeType.Timeline || selectionModeType == MediaSelectionModeType.Albums || selectionModeType == MediaSelectionModeType.Videos || shouldHideTabs,
                 pagerScrollEnabled = true,
