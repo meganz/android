@@ -81,7 +81,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         node: TypedNode,
         isConnected: Boolean,
     ): Boolean {
-        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups)
+        if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups || !node.isNodeKeyDecrypted)
             return false
 
         if (!isHidingActionAllowedUseCase(node.id))

@@ -83,6 +83,7 @@ class HideBottomSheetMenuItemTest {
         whenever(isHidingActionAllowedUseCase(nodeId)) doReturn true
         val node = mock<TypedNode> {
             on { id } doReturn nodeId
+            on { isNodeKeyDecrypted } doReturn true
         }
 
         val result = hideBottomSheetMenuItem.shouldDisplay(
@@ -103,6 +104,27 @@ class HideBottomSheetMenuItemTest {
         val node = mock<TypedNode> {
             on { id } doReturn nodeId
             on { isMarkedSensitive } doReturn true
+        }
+
+        val result = hideBottomSheetMenuItem.shouldDisplay(
+            isNodeInRubbish = false,
+            accessPermission = AccessPermission.OWNER,
+            isInBackups = false,
+            node = node,
+            isConnected = true
+        )
+
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when node is not decrypted`() = runTest {
+        whenever(monitorAccountDetailUseCase()) doReturn flowOf(accountDetail)
+        whenever(isHidingActionAllowedUseCase(nodeId)) doReturn true
+        val node = mock<TypedNode> {
+            on { id } doReturn nodeId
+            on { isMarkedSensitive } doReturn false
+            on { isNodeKeyDecrypted } doReturn false
         }
 
         val result = hideBottomSheetMenuItem.shouldDisplay(
