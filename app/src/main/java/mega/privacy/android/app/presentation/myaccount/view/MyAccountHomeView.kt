@@ -67,6 +67,7 @@ import androidx.navigation.NavController
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
@@ -107,6 +108,7 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRAN
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_SECTION
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -138,6 +140,11 @@ import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+import mega.privacy.mobile.analytics.event.AccountScreenEvent
+import mega.privacy.mobile.analytics.event.MyAccountAchievementsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountBackupRecoverySectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountContactsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountStorageTransferSectionTappedEvent
 
 internal object Constants {
     const val AVATAR_SIZE = 60
@@ -186,6 +193,9 @@ fun MyAccountHomeView(
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
+    LaunchedOnceEffect {
+        Analytics.tracker.trackEvent(AccountScreenEvent)
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -512,7 +522,10 @@ private fun AccountInfoSection(
             usedTransferStatus = uiState.usedTransferStatus,
             showTransfer = uiState.accountType != AccountType.FREE,
             showProgressBar = (uiState.isBusinessAccount || uiState.isProFlexiAccount).not(),
-            onUsageMeterClick = uiActions::onClickUsageMeter
+            onUsageMeterClick = {
+                Analytics.tracker.trackEvent(MyAccountStorageTransferSectionTappedEvent)
+                uiActions.onClickUsageMeter()
+            }
         )
 
         if (shouldShowPaymentInfo(uiState)) {
@@ -581,7 +594,10 @@ private fun AccountInfoSection(
             title = R.string.action_export_master_key,
             description = stringResource(id = R.string.backup_recovery_key_subtitle),
             isIconMode = false,
-            onClickListener = uiActions::onBackupRecoveryKey,
+            onClickListener = {
+                Analytics.tracker.trackEvent(MyAccountBackupRecoverySectionTappedEvent)
+                uiActions.onBackupRecoveryKey()
+            },
             testTag = BACKUP_RECOVERY_KEY,
             withDivider = true,
         )
@@ -593,7 +609,10 @@ private fun AccountInfoSection(
                 pluralStringResource(id = R.plurals.my_account_connections, count = it, it)
             } ?: stringResource(id = R.string.recovering_info),
             isIconMode = true,
-            onClickListener = uiActions::onClickContacts,
+            onClickListener = {
+                Analytics.tracker.trackEvent(MyAccountContactsSectionTappedEvent)
+                uiActions.onClickContacts()
+            },
             testTag = CONTACTS,
             withDivider = true,
         )
@@ -604,7 +623,10 @@ private fun AccountInfoSection(
                 title = sharedR.string.general_section_achievements,
                 description = stringResource(id = R.string.achievements_subtitle),
                 isIconMode = true,
-                onClickListener = uiActions::onClickAchievements,
+                onClickListener = {
+                    Analytics.tracker.trackEvent(MyAccountAchievementsSectionTappedEvent)
+                    uiActions.onClickAchievements()
+                },
                 testTag = ACHIEVEMENTS,
                 withDivider = true,
             )

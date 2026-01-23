@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.feature.payment.model.AccountTypeInt
@@ -24,6 +25,7 @@ import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.payment.toSource
 import mega.privacy.mobile.analytics.event.AdFreeDialogUpgradeAccountPlanPageBuyButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AdsUpgradeAccountPlanPageBuyButtonPressedEvent
+import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.BuyProIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIEvent
 import mega.privacy.mobile.analytics.event.BuyProIIIEvent
@@ -49,7 +51,7 @@ fun ChooseAccountRoute(
     val megaNavigator = rememberMegaNavigator()
     val activity = LocalActivity.current
 
-    LaunchedEffect(Unit) {
+    LaunchedOnceEffect(Unit) {
         Analytics.tracker.trackEvent(UpgradeAccountPlanScreenEvent)
     }
 
@@ -142,7 +144,10 @@ fun ChooseAccountRoute(
         isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
         userAgeComplianceStatus = uiState.userAgeComplianceStatus,
         clearExternalPurchaseError = billingViewModel::clearExternalPurchaseError,
-        onBack = onBack,
+        onBack = {
+            Analytics.tracker.trackEvent(BackButtonPressedEvent)
+            onBack()
+        },
         showExternalCheckoutInformation = uiState.showExternalCheckoutInformation,
         onSetExternalCheckoutInformationPreference = chooseAccountViewModel::setExternalCheckoutInformationPreference
     )

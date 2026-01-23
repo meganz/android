@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.myaccount
 
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
@@ -19,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidTest
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.fromPluralId
@@ -43,6 +46,7 @@ import mega.privacy.android.app.presentation.myaccount.view.Constants.NAME_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PAYMENT_ALERT_INFO
 import mega.privacy.android.app.presentation.myaccount.view.Constants.PHONE_NUMBER_TEXT
 import mega.privacy.android.app.presentation.myaccount.view.Constants.UPGRADE_BUTTON
+import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_METER_BUSINESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_STORAGE_PROGRESS
 import mega.privacy.android.app.presentation.myaccount.view.Constants.USAGE_TRANSFER_PROGRESS
@@ -64,8 +68,14 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.AccountScreenEvent
+import mega.privacy.mobile.analytics.event.MyAccountAchievementsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountBackupRecoverySectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountContactsSectionTappedEvent
+import mega.privacy.mobile.analytics.event.MyAccountStorageTransferSectionTappedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 import kotlin.random.Random
@@ -74,8 +84,12 @@ import kotlin.random.Random
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
 class MyAccountHomeViewTest {
-    @get:Rule
+    private val analyticsRule = AnalyticsTestRule()
+
     val composeTestRule = createComposeRule()
+
+    @get:Rule
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeTestRule)
 
     private lateinit var navController: TestNavHostController
 
@@ -542,6 +556,7 @@ class MyAccountHomeViewTest {
 
         composeTestRule.onNodeWithTag(EXPIRED_BUSINESS_BANNER).assertIsDisplayed()
     }
+
     @Test
     fun `test that payment alert should not be shown when due is more than 7 days`() {
         val eightDaysInSeconds = 691200
@@ -598,6 +613,83 @@ class MyAccountHomeViewTest {
 
         assertThat(maxWidth)
             .isAtMost(maxScreenWidth - CONTAINER_LEFT_MARGIN - AVATAR_SIZE.dp - HEADER_LEFT_MARGIN - HEADER_RIGHT_MARGIN)
+    }
+
+    @Test
+    fun `test that AccountScreenEvent is tracked when screen loads`() {
+        initMyAccountWithDefaults()
+
+        composeTestRule.waitForIdle()
+        assertThat(analyticsRule.events).contains(AccountScreenEvent)
+    }
+
+    @Test
+    fun `test that MyAccountStorageTransferSectionTappedEvent is tracked when usage meter is clicked`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                accountType = PRO_I,
+                accountTypeNameResource = defaultAccountNameResource
+            )
+        )
+
+        composeTestRule.waitForIdle()
+        analyticsRule.events.clear()
+        composeTestRule.onNodeWithTag(USAGE_METER, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(MyAccountStorageTransferSectionTappedEvent)
+    }
+
+    @Test
+    fun `test that MyAccountBackupRecoverySectionTappedEvent is tracked when backup recovery key is clicked`() {
+        initMyAccountWithDefaults()
+
+        composeTestRule.waitForIdle()
+        analyticsRule.events.clear()
+        // Use performSemanticsAction to directly trigger the click action on the clickable parent
+        composeTestRule.onNodeWithTag(BACKUP_RECOVERY_KEY, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(MyAccountBackupRecoverySectionTappedEvent)
+    }
+
+    @Test
+    fun `test that MyAccountContactsSectionTappedEvent is tracked when contacts section is clicked`() {
+        initMyAccountWithDefaults()
+
+        composeTestRule.waitForIdle()
+        analyticsRule.events.clear()
+        // Use performSemanticsAction to directly trigger the click action on the clickable parent
+        composeTestRule.onNodeWithTag(CONTACTS, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(MyAccountContactsSectionTappedEvent)
+    }
+
+    @Test
+    fun `test that MyAccountAchievementsSectionTappedEvent is tracked when achievements section is clicked`() {
+        initMyAccountWithDefaults(
+            MyAccountHomeUIState(
+                isAchievementsAvailable = true,
+                accountTypeNameResource = defaultAccountNameResource
+            )
+        )
+
+        composeTestRule.waitForIdle()
+        analyticsRule.events.clear()
+        // Use performSemanticsAction to directly trigger the click action on the clickable parent
+        composeTestRule.onNodeWithTag(ACHIEVEMENTS, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(analyticsRule.events).contains(MyAccountAchievementsSectionTappedEvent)
     }
 
     private fun verifyAccountTypeSection(

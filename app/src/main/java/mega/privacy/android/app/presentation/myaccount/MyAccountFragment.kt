@@ -13,8 +13,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -40,7 +38,6 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.mobile.analytics.event.AccountScreenEvent
 import mega.privacy.mobile.analytics.event.UpgradeMyAccountEvent
 import javax.inject.Inject
 
@@ -120,8 +117,6 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
      */
     override fun onResume() {
         super.onResume()
-        Analytics.tracker.trackEvent(AccountScreenEvent)
-        Firebase.crashlytics.log("Screen: ${AccountScreenEvent.eventName}")
         viewModel.refreshAccountInfo()
     }
 

@@ -29,8 +29,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -94,6 +94,7 @@ fun NewChooseAccountScreen(
     onInAppCheckoutClick: (Subscription) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
+    onBack: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
     billingUIState: BillingUIState = BillingUIState(),
@@ -104,7 +105,6 @@ fun NewChooseAccountScreen(
     isExternalCheckoutDefault: Boolean = false,
     onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
     clearExternalPurchaseError: () -> Unit = {},
-    onBack: () -> Unit,
     showExternalCheckoutInformation: Boolean = true,
     onSetExternalCheckoutInformationPreference: (Boolean) -> Unit = {},
 ) {
@@ -679,6 +679,28 @@ internal fun NewChooseAccountScreenPreview(
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = false,
+            onInAppCheckoutClick = { },
+            onFreePlanClicked = {},
+            maybeLaterClicked = {},
+            onBack = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun UpgradeAccountScreenPreview(
+    @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
+) {
+    AndroidTheme(isSystemInDarkTheme()) {
+        NewChooseAccountScreen(
+            uiState = state,
+            accountStorageUiState = AccountStorageUIState(
+                baseStorage = 15L * 1024 * 1024 * 1024,
+                totalStorage = 100L * 1024 * 1024 * 1024,
+            ),
+            isNewCreationAccount = false,
+            isUpgradeAccount = true,
             onInAppCheckoutClick = { },
             onFreePlanClicked = {},
             maybeLaterClicked = {},
