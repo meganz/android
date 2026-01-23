@@ -14,6 +14,6 @@ class SaveRecentSearchUseCase @Inject constructor(
      *
      * @param query The search query to save
      */
-    suspend operator fun invoke(query: String) = searchRepository.saveRecentSearch(query)
+    suspend operator fun invoke(query: String) = searchRepository.saveRecentSearch(query.trim())
 }
 

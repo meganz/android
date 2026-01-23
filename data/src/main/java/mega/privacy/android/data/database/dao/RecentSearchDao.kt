@@ -34,16 +34,31 @@ internal interface RecentSearchDao {
 
     /**
      * Stores search query after cleaning up most recent search
-     * This prevents storing duplicate recents during slow typing
+     * This prevents storing duplicate recents during slow typing or deletion
+     * Only applies prefix cleanup if the most recent search was within RECENT_SEARCH_TIME_WINDOW_MS
      */
     @Transaction
     suspend fun insertRecentSearchWithPrefixCleanup(entity: RecentSearchEntity) {
         val mostRecent = getMostRecentSearch()
-        if (mostRecent != null &&
-            entity.searchQuery.lowercase().startsWith(mostRecent.searchQuery.lowercase()) &&
-            entity.searchQuery != mostRecent.searchQuery
-        ) {
-            deleteSearchByQuery(mostRecent.searchQuery)
+        if (mostRecent != null && entity.searchQuery != mostRecent.searchQuery) {
+            val timeDifference = entity.timestamp - mostRecent.timestamp
+
+            // Only apply prefix cleanup if the most recent search was very recent, e.g. user is typing
+            if (timeDifference in 0..RECENT_SEARCH_TIME_WINDOW_MS) {
+                val newQueryLower = entity.searchQuery.lowercase()
+                val mostRecentLower = mostRecent.searchQuery.lowercase()
+
+                when {
+                    // New query is shorter and is a prefix of most recent - keep the longer one, skip saving
+                    mostRecentLower.startsWith(newQueryLower) -> {
+                        return // Don't save the shorter query
+                    }
+                    // New query is longer and contains most recent as prefix - replace shorter with longer
+                    newQueryLower.startsWith(mostRecentLower) -> {
+                        deleteSearchByQuery(mostRecent.searchQuery)
+                    }
+                }
+            }
         }
         insertOrUpdateRecentSearch(entity)
         if (getSearchCount() > MAX_RECENT_SEARCHES) {
@@ -53,6 +68,7 @@ internal interface RecentSearchDao {
 
     companion object {
         const val MAX_RECENT_SEARCHES = 10
+        const val RECENT_SEARCH_TIME_WINDOW_MS = 5_000L // 5 seconds
     }
 }
 

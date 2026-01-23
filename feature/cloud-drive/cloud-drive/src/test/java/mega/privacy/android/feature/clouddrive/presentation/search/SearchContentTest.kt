@@ -29,7 +29,9 @@ class SearchContentTest {
     @Test
     fun `test that pre-search view is displayed when search has not been performed`() {
         setupComposeContent(
-            uiState = SearchUiState()
+            uiState = SearchUiState(
+                recentSearches = listOf("query1", "query2")
+            )
         )
 
         composeRule.onNodeWithTag(SEARCH_CONTENT_PRE_SEARCH_TAG).assertIsDisplayed()
@@ -113,6 +115,8 @@ class SearchContentTest {
                     onLongClicked = {},
                     onSortOrderClick = {},
                     onChangeViewTypeClicked = {},
+                    onRecentSearchClicked = { _, _ -> },
+                    onClearRecentSearches = {},
                 )
             }
         }

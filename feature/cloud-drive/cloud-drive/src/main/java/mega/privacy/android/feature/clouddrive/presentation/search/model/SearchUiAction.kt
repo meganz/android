@@ -31,4 +31,8 @@ sealed interface SearchUiAction {
     data object NavigateToFolderEventConsumed : SearchUiAction
 
     data object NavigateBackEventConsumed : SearchUiAction
+
+    data class SelectRecentSearch(val query: String) : SearchUiAction
+
+    data object ClearRecentSearches : SearchUiAction
 }

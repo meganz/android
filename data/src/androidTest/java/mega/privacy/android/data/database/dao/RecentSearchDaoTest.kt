@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.dao.RecentSearchDao.Companion.MAX_RECENT_SEARCHES
+import mega.privacy.android.data.database.dao.RecentSearchDao.Companion.RECENT_SEARCH_TIME_WINDOW_MS
 import mega.privacy.android.data.database.entity.RecentSearchEntity
 import org.junit.After
 import org.junit.Before
@@ -264,6 +265,42 @@ class RecentSearchDaoTest {
         assertThat(searches).hasSize(1)
         assertThat(searches[0].searchQuery).isEqualTo("my video folder")
     }
+
+    @Test
+    fun test_that_insertRecentSearchWithPrefixCleanup_skips_saving_when_new_query_is_shorter_prefix() =
+        runTest {
+            val baseTime = System.currentTimeMillis()
+            recentSearchDao.insertOrUpdateRecentSearch(
+                RecentSearchEntity("my video folder", baseTime)
+            )
+
+            recentSearchDao.insertRecentSearchWithPrefixCleanup(
+                RecentSearchEntity("my video", baseTime + 2000L)
+            )
+
+            val searches = recentSearchDao.monitorRecentSearches().first()
+            assertThat(searches).hasSize(1)
+            assertThat(searches[0].searchQuery).isEqualTo("my video folder")
+            assertThat(searches[0].timestamp).isEqualTo(baseTime)
+        }
+
+    @Test
+    fun test_that_insertRecentSearchWithPrefixCleanup_saves_when_most_recent_is_older_than_time_window() =
+        runTest {
+            val baseTime = System.currentTimeMillis()
+            recentSearchDao.insertOrUpdateRecentSearch(
+                RecentSearchEntity("my video folder", baseTime)
+            )
+
+            recentSearchDao.insertRecentSearchWithPrefixCleanup(
+                RecentSearchEntity("my video", baseTime + RECENT_SEARCH_TIME_WINDOW_MS + 1000L)
+            )
+
+            val searches = recentSearchDao.monitorRecentSearches().first()
+            assertThat(searches).hasSize(2)
+            assertThat(searches.find { it.searchQuery == "my video folder" }).isNotNull()
+            assertThat(searches.find { it.searchQuery == "my video" }).isNotNull()
+        }
 
     @Test
     fun test_that_insertRecentSearchWithPrefixCleanup_limits_to_max_searches() = runTest {

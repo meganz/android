@@ -29,7 +29,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
      */
     SearchRevamp(
         "Enable search revamp in phase-2 single activity",
-        false,
+        true,
     ),
 
     CameraUploadsPausedWarningBanner(

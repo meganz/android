@@ -45,6 +45,9 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.search.ClearRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.MonitorRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.SaveRecentSearchUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -80,6 +83,9 @@ class SearchViewModel @AssistedInject constructor(
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper,
     private val searchPlaceholderMapper: SearchPlaceholderMapper,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
+    private val saveRecentSearchUseCase: SaveRecentSearchUseCase,
+    private val monitorRecentSearchesUseCase: MonitorRecentSearchesUseCase,
+    private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -104,6 +110,7 @@ class SearchViewModel @AssistedInject constructor(
         monitorHiddenNodeSettings()
         monitorNodeUpdates()
         updateSearchPlaceholder()
+        monitorRecentSearches()
     }
 
     fun processAction(action: SearchUiAction) {
@@ -119,6 +126,8 @@ class SearchViewModel @AssistedInject constructor(
             is SearchUiAction.DeselectAllItems -> deselectAllItems()
             is SearchUiAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is SearchUiAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+            is SearchUiAction.SelectRecentSearch -> onSelectRecentSearch(action.query)
+            is SearchUiAction.ClearRecentSearches -> onClearRecentSearches()
         }
     }
 
@@ -178,6 +187,7 @@ class SearchViewModel @AssistedInject constructor(
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
                 )
             }
+            saveRecentSearchUseCase(query)
         }.onFailure { throwable ->
             if (throwable !is CancellationException) {
                 _uiState.update { state ->
@@ -470,6 +480,39 @@ class SearchViewModel @AssistedInject constructor(
             _uiState.update {
                 it.copy(placeholderText = placeholder)
             }
+        }
+    }
+
+    /**
+     * Monitor recent searches and update state
+     */
+    private fun monitorRecentSearches() {
+        viewModelScope.launch {
+            monitorRecentSearchesUseCase()
+                .catch { Timber.e(it) }
+                .collect { recentSearches ->
+                    _uiState.update { state ->
+                        state.copy(recentSearches = recentSearches)
+                    }
+                }
+        }
+    }
+
+    /**
+     * Handle select recent search action
+     */
+    private fun onSelectRecentSearch(query: String) {
+        updateSearchText(query)
+    }
+
+    /**
+     * Handle clear recent searches action
+     */
+    private fun onClearRecentSearches() {
+        viewModelScope.launch {
+            runCatching {
+                clearRecentSearchesUseCase()
+            }.onFailure { Timber.e(it) }
         }
     }
 

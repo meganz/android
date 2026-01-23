@@ -1,12 +1,12 @@
 package mega.privacy.android.feature.clouddrive.presentation.search
 
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,6 +58,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Nod
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchFilterType
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiAction
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
+import mega.privacy.android.feature.clouddrive.presentation.search.view.RecentSearchesView
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterBottomSheetContent
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
@@ -167,6 +168,19 @@ fun SearchScreen(
             },
             onChangeViewTypeClicked = {
                 viewModel.processAction(SearchUiAction.ChangeViewTypeClicked)
+            },
+            onRecentSearchClicked = { query, openKeyboard ->
+                viewModel.processAction(SearchUiAction.SelectRecentSearch(query))
+                coroutineScope.launch {
+                    if (openKeyboard) {
+                        localKeyboardController?.show()
+                    } else {
+                        localFocusManager.clearFocus()
+                    }
+                }
+            },
+            onClearRecentSearches = {
+                viewModel.processAction(SearchUiAction.ClearRecentSearches)
             },
         )
     }
@@ -290,6 +304,8 @@ fun SearchContent(
     onLongClicked: (NodeUiItem<TypedNode>) -> Unit,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
+    onRecentSearchClicked: (String, Boolean) -> Unit,
+    onClearRecentSearches: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -309,13 +325,16 @@ fun SearchContent(
 
         when {
             uiState.isPreSearch -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 100.dp)
-                        .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
-                ) {
-
+                if (uiState.recentSearches.isNotEmpty()) {
+                    RecentSearchesView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .imePadding()
+                            .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
+                        queries = uiState.recentSearches,
+                        onClicked = onRecentSearchClicked,
+                        onClearAllClicked = onClearRecentSearches,
+                    )
                 }
             }
 
@@ -391,6 +410,8 @@ private fun SearchContentPreSearchPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
+            onRecentSearchClicked = { _, _ -> },
+            onClearRecentSearches = {},
         )
     }
 }
@@ -414,6 +435,8 @@ private fun SearchContentEmptyPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
+            onRecentSearchClicked = { _, _ -> },
+            onClearRecentSearches = {},
         )
     }
 }
@@ -436,6 +459,8 @@ private fun SearchContentLoadingPreview() {
             onLongClicked = {},
             onSortOrderClick = {},
             onChangeViewTypeClicked = {},
+            onRecentSearchClicked = { _, _ -> },
+            onClearRecentSearches = {},
         )
     }
 }

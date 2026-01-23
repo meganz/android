@@ -37,6 +37,9 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.search.ClearRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.MonitorRecentSearchesUseCase
+import mega.privacy.android.domain.usecase.search.SaveRecentSearchUseCase
 import mega.privacy.android.domain.usecase.search.SearchUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -58,6 +61,7 @@ import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -82,6 +86,9 @@ class SearchViewModelTest {
     private val nodeSourceTypeToSearchTargetMapper: NodeSourceTypeToSearchTargetMapper = mock()
     private val searchPlaceholderMapper: SearchPlaceholderMapper = mock()
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase = mock()
+    private val saveRecentSearchUseCase: SaveRecentSearchUseCase = mock()
+    private val monitorRecentSearchesUseCase: MonitorRecentSearchesUseCase = mock()
+    private val clearRecentSearchesUseCase: ClearRecentSearchesUseCase = mock()
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val parentHandle = 123L
     private val args = SearchViewModel.Args(
@@ -96,7 +103,10 @@ class SearchViewModelTest {
             cancelCancelTokenUseCase,
             nodeUiItemMapper,
             monitorNodeUpdatesByIdUseCase,
-            nodeSourceTypeToSearchTargetMapper
+            nodeSourceTypeToSearchTargetMapper,
+            saveRecentSearchUseCase,
+            monitorRecentSearchesUseCase,
+            clearRecentSearchesUseCase
         )
     }
 
@@ -119,6 +129,9 @@ class SearchViewModelTest {
         nodeSourceTypeToSearchTargetMapper = nodeSourceTypeToSearchTargetMapper,
         searchPlaceholderMapper = searchPlaceholderMapper,
         getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
+        saveRecentSearchUseCase = saveRecentSearchUseCase,
+        monitorRecentSearchesUseCase = monitorRecentSearchesUseCase,
+        clearRecentSearchesUseCase = clearRecentSearchesUseCase,
     )
 
     private fun setupTestData(
@@ -167,6 +180,7 @@ class SearchViewModelTest {
                 )
             ).thenReturn(LocalizedText.StringRes(sharedR.string.search_bar_placeholder_text))
         }
+        whenever(monitorRecentSearchesUseCase()).thenReturn(flowOf(emptyList()))
     }
 
     @Test
@@ -1400,4 +1414,132 @@ class SearchViewModelTest {
             }
         }
 
+    @Test
+    fun `test that monitorRecentSearches updates UI state with recent searches`() = runTest {
+        val recentSearches = listOf("query1", "query2", "query3")
+        setupTestData(emptyList())
+        reset(monitorRecentSearchesUseCase)
+        whenever(monitorRecentSearchesUseCase()).thenReturn(flowOf(recentSearches))
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        verify(monitorRecentSearchesUseCase).invoke()
+        assertThat(underTest.uiState.value.recentSearches).isEqualTo(recentSearches)
+    }
+
+    @Test
+    fun `test that SelectRecentSearch action updates search text and triggers search`() = runTest {
+        val query = "recent query"
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("file.txt")
+        }
+        whenever(
+            searchUseCase(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any(),
+            )
+        ).thenReturn(listOf(typedFileNode))
+        setupTestData(listOf(typedFileNode))
+
+        val underTest = createViewModel()
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.SelectRecentSearch(query))
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.searchText).isEqualTo(query)
+        }
+
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        verify(searchUseCase).invoke(
+            parentHandle = any(),
+            nodeSourceType = any(),
+            searchParameters = any(),
+            isSingleActivityEnabled = any()
+        )
+    }
+
+    @Test
+    fun `test that ClearRecentSearches action calls clearRecentSearchesUseCase`() = runTest {
+        setupTestData(emptyList())
+
+        val underTest = createViewModel()
+        advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.ClearRecentSearches)
+        advanceUntilIdle()
+
+        verify(clearRecentSearchesUseCase).invoke()
+    }
+
+    @Test
+    fun `test that saveRecentSearchUseCase is called after successful search`() = runTest {
+        val query = "test query"
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("file.txt")
+        }
+        whenever(
+            searchUseCase(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any(),
+            )
+        ).thenReturn(listOf(typedFileNode))
+        setupTestData(listOf(typedFileNode))
+
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText(query))
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        verify(saveRecentSearchUseCase).invoke(query)
+    }
+
+    @Test
+    fun `test that saveRecentSearchUseCase is not called when search fails`() = runTest {
+        val query = "test query"
+        setupTestData(emptyList())
+        reset(searchUseCase, saveRecentSearchUseCase)
+        whenever(
+            searchUseCase(
+                parentHandle = any(),
+                nodeSourceType = any(),
+                searchParameters = any(),
+                isSingleActivityEnabled = any(),
+            )
+        ).thenThrow(RuntimeException("Search failed"))
+
+        val underTest = createViewModel()
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        underTest.processAction(SearchUiAction.UpdateSearchText(query))
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        verify(saveRecentSearchUseCase, never()).invoke(any())
+    }
+
+    @Test
+    fun `test that saveRecentSearchUseCase is not called for empty query`() = runTest {
+        val query = ""
+        setupTestData(emptyList())
+
+        val underTest = createViewModel()
+        underTest.processAction(SearchUiAction.UpdateSearchText(query))
+        advanceTimeBy(SearchViewModel.SEARCH_DEBOUNCE_MS + 100)
+        advanceUntilIdle()
+
+        verify(saveRecentSearchUseCase, times(0)).invoke(any())
+    }
 }

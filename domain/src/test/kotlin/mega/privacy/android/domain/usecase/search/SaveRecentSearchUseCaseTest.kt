@@ -31,5 +31,11 @@ class SaveRecentSearchUseCaseTest {
         underTest(query)
         verify(searchRepository).saveRecentSearch(query)
     }
+
+    @Test
+    fun `test that query is trimmed`() = runTest {
+        underTest(" test query ")
+        verify(searchRepository).saveRecentSearch("test query")
+    }
 }
 

@@ -41,7 +41,8 @@ data class SearchUiState(
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val navigateBack: StateEvent = consumed,
-    val placeholderText: LocalizedText = LocalizedText.Literal("")
+    val placeholderText: LocalizedText = LocalizedText.Literal(""),
+    val recentSearches: List<String> = emptyList(),
 ) {
     /**
      * True if nodes or hidden node settings are loading
