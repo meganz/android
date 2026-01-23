@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.entity.PendingTransferEntity
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransferNodeIdentifier
@@ -253,7 +254,8 @@ class PendingTransferDaoTest {
         alreadyTransferred = 0,
         state = state,
         nodeIdentifier = PendingTransferNodeIdentifier.CloudDriveNode(NodeId(45L)),
-        fileName = "file.txt"
+        fileName = "file.txt",
+        pitagTrigger = PitagTrigger.Picker,
     )
 
 }
