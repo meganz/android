@@ -13,13 +13,12 @@ import mega.privacy.android.app.presentation.achievements.AchievementsFeatureAct
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.utils.Constants.MEGA_PASS_PACKAGE_NAME
 import mega.privacy.android.app.utils.Constants.MEGA_VPN_PACKAGE_NAME
-import mega.privacy.android.app.utils.ConstantsUrl.megaPwmUrl
-import mega.privacy.android.app.utils.ConstantsUrl.megaVpnUrl
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_APP_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase.Companion.MEGA_NZ_DOMAIN_NAME
 import mega.privacy.android.domain.usecase.link.GetSessionLinkUseCase.Companion.SESSION_STRING
 import mega.privacy.mobile.analytics.event.PwmSmartBannerItemSelectedEvent
+import mega.privacy.mobile.analytics.event.TransferItSmartBannerItemSelectedEvent
 import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
 
 /**
@@ -28,6 +27,92 @@ import mega.privacy.mobile.analytics.event.VpnSmartBannerItemSelectedEvent
  */
 class BannerClickHandler(private val fragment: HomepageFragment) :
     BannerAdapter.ClickBannerCallback {
+
+    companion object {
+        /**
+         * MEGA domain patterns for URL matching
+         */
+        private val MEGA_DOMAIN_PATTERNS = arrayOf(
+            "mega\\.co\\.nz",
+            "mega\\.nz",
+            "mega\\.io",
+            "mega\\.app",
+            "megaad\\.co\\.nz",
+            "megaad\\.nz",
+            "megaad\\.io",
+            "megaad\\.app",
+        )
+
+        /**
+         * Internal VPN URL matching implementation
+         */
+        private fun matchesVpnUrl(link: String): Boolean {
+            // Check existing specific domains
+            if (link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME)) ||
+                link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
+            ) {
+                return true
+            }
+
+            // Check all MEGA domain variations for subdomain format (vpn.domain.*)
+            val vpnSubdomainPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+                "^https://vpn\\.$domain.*"
+            }
+
+            // Check all MEGA domain variations for path format (domain.*/vpn)
+            val vpnPathPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+                "^https://$domain/vpn.*"
+            }
+
+            return vpnSubdomainPatterns.any { pattern -> link.matches(pattern.toRegex()) } ||
+                    vpnPathPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+        }
+
+        /**
+         * Internal PWM URL matching implementation
+         */
+        private fun matchesPwmUrl(link: String): Boolean {
+            // Check existing specific domains
+            if (link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME)) ||
+                link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
+            ) {
+                return true
+            }
+
+            // Check all MEGA domain variations for subdomain format (pwm.domain.*)
+            val pwmSubdomainPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+                "^https://pwm\\.$domain.*"
+            }
+
+            // Check all MEGA domain variations for path format (domain.*/pass)
+            val pwmPathPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+                "^https://$domain/pass.*"
+            }
+
+            return pwmSubdomainPatterns.any { pattern -> link.matches(pattern.toRegex()) } ||
+                    pwmPathPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+        }
+
+        /**
+         * Internal Transfer-it URL matching implementation
+         */
+        private fun matchesTransferItUrl(link: String): Boolean {
+            val transferItPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+                "^https://$domain/transfer-it.*"
+            }
+            return transferItPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+        }
+
+        /**
+         * Helper method to generate VPN URL
+         */
+        private fun megaVpnUrl(domainName: String) = "https://vpn.$domainName"
+
+        /**
+         * Helper method to generate PWM URL
+         */
+        private fun megaPwmUrl(domainName: String) = "https://pwm.$domainName"
+    }
 
     override fun actOnActionLink(link: String) {
         val context = fragment.requireContext()
@@ -60,6 +145,11 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
                 openInSpecificApp(context, link, MEGA_PASS_PACKAGE_NAME)
             }
 
+            matchesTransferItUrl(link) -> {
+                Analytics.tracker.trackEvent(TransferItSmartBannerItemSelectedEvent)
+                context.launchUrl(link)
+            }
+
             else -> {
                 context.launchUrl(link)
             }
@@ -70,7 +160,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
         if (url.contains(SESSION_STRING)) {
             val start = url.indexOf(SESSION_STRING)
             if (start != -1) {
-                val path = url.substring(start + SESSION_STRING.length);
+                val path = url.substring(start + SESSION_STRING.length)
                 if (!isTextEmpty(path)) {
                     MegaApplication.getInstance().megaApi.getSessionTransferURL(
                         path,
@@ -95,7 +185,7 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
                         "market://details?id=$packageName".toUri()
                     )
                 )
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
@@ -121,12 +211,4 @@ class BannerClickHandler(private val fragment: HomepageFragment) :
     private fun matchesTextEditorUrl(link: String) =
         link == "https://$MEGA_NZ_DOMAIN_NAME/newText"
                 || link == "https://$MEGA_APP_DOMAIN_NAME/newText"
-
-    private fun matchesVpnUrl(link: String) =
-        link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME))
-                || link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
-
-    private fun matchesPwmUrl(link: String) =
-        link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME))
-                || link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
 }

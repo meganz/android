@@ -42,6 +42,7 @@ dependencies {
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
 
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(project(":core:analytics:analytics-test"))
