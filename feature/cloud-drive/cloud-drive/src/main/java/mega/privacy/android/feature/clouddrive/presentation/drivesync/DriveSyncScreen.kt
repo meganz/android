@@ -61,7 +61,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchBarPressedEvent
+import mega.privacy.mobile.analytics.event.CloudDriveTabEvent
 import mega.privacy.mobile.analytics.event.DriveSyncScreenEvent
+import mega.privacy.mobile.analytics.event.SyncsTabEvent
 
 /**
  * Drive Sync Screen, shown in the Drive bottom navigation tab
@@ -243,6 +245,10 @@ internal fun DriveSyncScreen(
             initialSelectedIndex = initialTabIndex,
             onTabSelected = {
                 selectedTabIndex = it
+                when (selectedTabIndex) {
+                    0 -> Analytics.tracker.trackEvent(CloudDriveTabEvent)
+                    1 -> Analytics.tracker.trackEvent(SyncsTabEvent)
+                }
                 true
             }
         )

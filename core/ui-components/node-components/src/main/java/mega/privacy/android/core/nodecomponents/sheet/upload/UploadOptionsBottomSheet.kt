@@ -17,8 +17,10 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.mobile.analytics.event.CloudDriveCaptureMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveNewFolderMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveNewTextFileMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.CloudDriveScanDocumentMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveUploadFolderMenuToolbarEvent
 
@@ -73,6 +75,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.FileScan,
         testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveScanDocumentMenuToolbarEvent)
             onScanDocumentClicked()
             onDismissSheet()
         },
@@ -82,6 +85,7 @@ fun UploadOptionsBottomSheet(
         icon = IconPack.Medium.Thin.Outline.Camera,
         testTag = TEST_TAG_CAPTURE_ACTION,
         onClick = {
+            Analytics.tracker.trackEvent(CloudDriveCaptureMenuToolbarEvent)
             onCaptureClicked()
             onDismissSheet()
         },

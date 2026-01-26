@@ -390,13 +390,13 @@ class PendingBackStackNavigationHandlerTest {
         }
 
     @Test
-    fun `test that if session is added, but there is no pending destinations, the default landing screen is added`() =
+    fun `test that if session is added, but there is no pending destinations, nothing is added`() =
         runTest {
             underTest.onRootNodeChange(RootNodeState(exists = false))
             assertThat(backStack.pending).isEmpty()
             underTest.onRootNodeChange(RootNodeState(exists = true))
 
-            assertThat(backStack.lastOrNull()).isEqualTo(DefaultLandingScreen)
+            assertThat(backStack).isEmpty()
         }
 
     @Test
@@ -408,7 +408,7 @@ class PendingBackStackNavigationHandlerTest {
 
             underTest.onRootNodeChange(RootNodeState(exists = true))
 
-            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination2, Destination3)
+            assertThat(backStack).containsExactly(Destination2, Destination3)
         }
 
     @Test

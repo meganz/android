@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -163,7 +164,7 @@ class PendingBackStackNavigationHandler(
         this.hasRootNode = rootNodeState.exists
 
         if (this.hasRootNode) {
-            backstack.removeAll { it is NoNodeNavKey }
+            backstack.removeAll { it is FetchingContentNavKey }
             if (isPasscodeLocked) {
                 showPasscodeScreen()
             } else {
@@ -284,7 +285,8 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun navigateToPendingScreens() {
-        val pending = listOf(defaultLandingScreen).union(backstack.pending)
+        if (backstack.pending.isEmpty()) return
+        val pending = backstack.pending
         backstack.pending = emptyList()
         navigate(pending.toList())
     }
