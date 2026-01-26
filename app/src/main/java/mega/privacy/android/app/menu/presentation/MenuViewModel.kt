@@ -141,7 +141,8 @@ class MenuViewModel @Inject constructor(
                             icon = item.icon,
                             title = item.title,
                             subTitle = storageSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = item.actionLabel,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 
@@ -151,7 +152,8 @@ class MenuViewModel @Inject constructor(
                             icon = item.icon,
                             title = item.title,
                             subTitle = rubbishBinSubtitleFlow,
-                            actionLabel = item.actionLabel
+                            actionLabel = item.actionLabel,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 

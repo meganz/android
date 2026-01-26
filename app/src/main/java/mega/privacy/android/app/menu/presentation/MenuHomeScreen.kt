@@ -58,6 +58,7 @@ import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
@@ -79,6 +80,10 @@ import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+import mega.privacy.mobile.analytics.event.MyAccountProfileNavigationItemEvent
+import mega.privacy.mobile.analytics.event.NotificationsEntryButtonPressedEvent
+import mega.privacy.mobile.analytics.event.PrivacySuiteCollapsedEvent
+import mega.privacy.mobile.analytics.event.PrivacySuiteExpandedEvent
 import mega.privacy.mobile.navigation.snowflake.NavigationBadge
 
 @Composable
@@ -140,7 +145,10 @@ fun MenuHomeScreenUi(
                                 .size(48.dp)
                                 .testTag(NOTIFICATION_ICON),
                             enabled = uiState.isConnectedToNetwork,
-                            onClick = { navigateToFeature(NotificationsNavKey) }
+                            onClick = {
+                                navigateToFeature(NotificationsNavKey)
+                                Analytics.tracker.trackEvent(NotificationsEntryButtonPressedEvent)
+                            }
                         ) {
                             MegaIcon(
                                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Bell),
@@ -198,6 +206,7 @@ fun MenuHomeScreenUi(
                     },
                     onClickListener = {
                         navigateToFeature(MyAccountNavKey())
+                        Analytics.tracker.trackEvent(MyAccountProfileNavigationItemEvent)
                     }
                 )
             }
@@ -210,6 +219,7 @@ fun MenuHomeScreenUi(
                     enable = uiState.isConnectedToNetwork || item.availableOffline,
                     onNavigate = {
                         navigateToFeature(item.destination)
+                        item.analyticsEventIdentifier?.let { Analytics.tracker.trackEvent(it) }
                     }
                 )
             }
@@ -225,11 +235,14 @@ fun MenuHomeScreenUi(
                         isPrivacySuiteExpanded = !isPrivacySuiteExpanded
 
                         // Scroll to bottom only when expanding
-                        if (!wasExpanded) {
+                        if (wasExpanded) {
+                            Analytics.tracker.trackEvent(PrivacySuiteCollapsedEvent)
+                        } else {
                             val itemCount = listState.layoutInfo.totalItemsCount
                             if (itemCount > 0) {
                                 listState.animateScrollToItem(itemCount - 1)
                             }
+                            Analytics.tracker.trackEvent(PrivacySuiteExpandedEvent)
                         }
                     }
                 })
@@ -391,6 +404,7 @@ private fun MenuHomeScreenUiPreview(
                 name = "John Doe",
                 email = "john.doe@example.com",
                 unreadNotificationsCount = if (showBadge) 2 else 0,
+                analyticsEventIdentifier = null,
             ),
             navigateToFeature = {},
             onLogoutClicked = {},

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 import java.io.File
 
 data class MenuUiState(
@@ -19,4 +20,5 @@ data class MenuUiState(
     val showLogoutConfirmationEvent: StateEvent = consumed,
     val isLoggingOut: Boolean = false,
     val unreadNotificationsCount: Int = 0,
+    val analyticsEventIdentifier: NavigationEventIdentifier? = null,
 )

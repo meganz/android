@@ -20,36 +20,52 @@ import mega.privacy.android.navigation.destination.SharesNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MyMenuAchievementsNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuChatNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuContactsNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuDeviceCentreNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuOfflineFilesNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuRubbishBinNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuSettingsNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuSharedItemsNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuStorageNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuTransfersNavigationItemEvent
+import mega.privacy.mobile.analytics.event.MyMenuUpgradeNavigationItemEvent
 
 object CurrentPlanItem : NavDrawerItem.Account(
     destination = UpgradeAccountNavKey(),
     icon = IconPack.Medium.Thin.Outline.Shield,
     title = sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label,
-    actionLabel = sharedR.string.general_upgrade_button
+    actionLabel = sharedR.string.general_upgrade_button,
+    analyticsEventIdentifier = MyMenuUpgradeNavigationItemEvent,
 )
 
 object StorageItem : NavDrawerItem.Account(
     destination = MyAccountNavKey(action = Constants.ACTION_OPEN_USAGE_METER_FROM_MENU),
     icon = IconPack.Medium.Thin.Outline.HardDrive,
-    title = sharedR.string.account_cancel_account_screen_plan_storage
+    title = sharedR.string.account_cancel_account_screen_plan_storage,
+    analyticsEventIdentifier = MyMenuStorageNavigationItemEvent,
 )
 
 object ContactsItem : NavDrawerItem.Account(
     destination = ContactsNavKey(ContactsNavKey.NavType.List),
     icon = IconPack.Medium.Thin.Outline.UserSquare,
     title = sharedR.string.general_section_contacts,
+    analyticsEventIdentifier = MyMenuContactsNavigationItemEvent,
 )
 
 object AchievementsItem : NavDrawerItem.Account(
     destination = AchievementNavKey,
     icon = IconPack.Medium.Thin.Outline.Rocket,
     title = sharedR.string.general_section_achievements,
+    analyticsEventIdentifier = MyMenuAchievementsNavigationItemEvent,
 )
 
 object SharedItemsItem : NavDrawerItem.Account(
     destination = SharesNavKey,
     icon = IconPack.Medium.Thin.Outline.FolderUsers,
-    title = sharedR.string.video_section_videos_location_option_shared_items
+    title = sharedR.string.video_section_videos_location_option_shared_items,
+    analyticsEventIdentifier = MyMenuSharedItemsNavigationItemEvent,
 )
 
 class ChatItem(
@@ -70,37 +86,43 @@ class ChatItem(
         } else {
             null
         }
-    }
+    },
+    analyticsEventIdentifier = MyMenuChatNavigationItemEvent,
 )
 
 object DeviceCentreItem : NavDrawerItem.Account(
     destination = DeviceCenterNavKey,
     icon = IconPack.Medium.Thin.Outline.Devices,
-    title = sharedR.string.general_section_device_centre
+    title = sharedR.string.general_section_device_centre,
+    analyticsEventIdentifier = MyMenuDeviceCentreNavigationItemEvent,
 )
 
 object TransfersItem : NavDrawerItem.Account(
     destination = TransfersNavKey(),
     icon = IconPack.Medium.Thin.Outline.ArrowsUpDownCircle,
     title = sharedR.string.general_section_transfers,
-    availableOffline = true
+    availableOffline = true,
+    analyticsEventIdentifier = MyMenuTransfersNavigationItemEvent,
 )
 
 object OfflineFilesItem : NavDrawerItem.Account(
     destination = OfflineNavKey(),
     icon = IconPack.Medium.Thin.Outline.CloudOff,
     title = sharedR.string.general_section_offline_files,
-    availableOffline = true
+    availableOffline = true,
+    analyticsEventIdentifier = MyMenuOfflineFilesNavigationItemEvent,
 )
 
 object RubbishBinItem : NavDrawerItem.Account(
     destination = RubbishBinNavKey(),
     icon = IconPack.Medium.Thin.Outline.Trash,
-    title = sharedR.string.general_section_rubbish_bin
+    title = sharedR.string.general_section_rubbish_bin,
+    analyticsEventIdentifier = MyMenuRubbishBinNavigationItemEvent,
 )
 
 object SettingsItem : NavDrawerItem.Account(
     destination = LegacySettingsNavKey(null),
     icon = IconPack.Medium.Thin.Outline.GearSix,
-    title = sharedR.string.general_settings
+    title = sharedR.string.general_settings,
+    analyticsEventIdentifier = MyMenuSettingsNavigationItemEvent,
 )

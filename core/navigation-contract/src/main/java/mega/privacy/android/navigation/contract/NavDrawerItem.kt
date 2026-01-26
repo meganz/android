@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.mobile.analytics.core.event.identifier.NavigationEventIdentifier
 
 /**
  * Sealed interface representing different types of navigation drawer items.
@@ -13,6 +14,7 @@ sealed interface NavDrawerItem {
     val icon: ImageVector
     val title: Int
     val availableOffline: Boolean
+    val analyticsEventIdentifier: NavigationEventIdentifier?
 
     /**
      * Standard navigation drawer item for account-related features.
@@ -32,6 +34,7 @@ sealed interface NavDrawerItem {
         val badge: Flow<MainNavItemBadge?>? = null,
         @StringRes val actionLabel: Int? = null,
         override val availableOffline: Boolean = false,
+        override val analyticsEventIdentifier: NavigationEventIdentifier? = null,
     ) : NavDrawerItem
 
     /**
@@ -50,7 +53,8 @@ sealed interface NavDrawerItem {
         @StringRes val subTitle: Int,
         val link: String,
         val appPackage: String? = null,
-        override val availableOffline: Boolean = false
+        override val availableOffline: Boolean = false,
+        override val analyticsEventIdentifier: NavigationEventIdentifier? = null,
     ) : NavDrawerItem
 }
 
