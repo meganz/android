@@ -2090,4 +2090,8 @@
     <string name="copyright_action_disagree">Disagree</string>
     <!-- Text for clear all button, shown in search screen -->
     <string name="general_clear_all">Clear all</string>
+    <!--Message to show when an item has been removed from Offline Screen-->
+    <string name="offline_remove_singular_item_success_message">1 item removed</string>
+    <!--Message to show when multiple items has been removed from Offline Screen-->
+    <string name="offline_remove_multiple_item_success_message">%d items removed</string>
 </resources>

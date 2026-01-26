@@ -40,7 +40,6 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
@@ -54,7 +53,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
-import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -234,15 +233,6 @@ internal fun OfflineScreen(
                             // Clear search query when exiting search mode and
                             // reset to the original search result
                             onSearch("")
-                        }
-                    },
-                    actions = buildList {
-                        if (uiState.nodeId != -1) {
-                            add(
-                                MenuActionWithClick(CommonAppBarAction.More) {
-                                    // Todo implement NodeOptionsBottomSheet
-                                }
-                            )
                         }
                     }
                 )
@@ -524,7 +514,7 @@ private fun OfflineContent(
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
                         isFolderNode = node.offlineFileInformation.isFolder,
-                        isVideoNode = false, // TODO: Add video detection
+                        isVideoNode = node.offlineFileInformation.fileTypeInfo is VideoFileTypeInfo,
                         highlightText = uiState.searchQuery ?: "",
                         isHighlighted = node.isHighlighted,
                         label = null,

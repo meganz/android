@@ -34,6 +34,7 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 
@@ -348,8 +349,14 @@ class OfflineViewModel @AssistedInject constructor(
             }.onFailure {
                 Timber.e(it)
             }.onSuccess {
-                // Todo waiting for snackbar message from content team
-                snackbarEventQueue.queueMessage("${handles.size} items removed")
+                if (handles.size > 1) {
+                    snackbarEventQueue.queueMessage(
+                        sharedR.string.offline_remove_multiple_item_success_message,
+                        handles.size
+                    )
+                } else {
+                    snackbarEventQueue.queueMessage(sharedR.string.offline_remove_singular_item_success_message)
+                }
             }
         }
     }
