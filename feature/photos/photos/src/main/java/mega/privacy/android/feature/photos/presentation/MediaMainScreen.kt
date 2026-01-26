@@ -727,6 +727,9 @@ fun MediaMainScreen(
                 initialSelectedIndex = currentTabIndex,
                 onTabSelected = { index ->
                     currentTabIndex = index
+                    tabEntries.getOrNull(index)?.let { selectedTab ->
+                        Analytics.tracker.trackEvent(selectedTab.analyticsInfo)
+                    }
                     true
                 },
                 cells = {
