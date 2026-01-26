@@ -17,4 +17,7 @@ internal interface ActiveTransferGroupDao {
 
     @Query("DELETE FROM $TABLE_ACTIVE_TRANSFER_ACTION_GROUPS WHERE group_id = :groupId")
     suspend fun deleteActiveTransfersGroupById(groupId: Int)
+
+    @Query("SELECT * FROM $TABLE_ACTIVE_TRANSFER_ACTION_GROUPS")
+    suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroupEntity>
 }

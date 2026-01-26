@@ -139,15 +139,15 @@ interface MegaLocalRoomGateway {
      *
      * @param size the limit size of the list. If null, the limit does not apply and gets all.
      */
-    fun getCompletedTransfers(size: Int? = null): Flow<List<CompletedTransfer>>
+    suspend fun getCompletedTransfers(): List<CompletedTransfer>
 
     /**
-     * Get completed transfers by states
+     * Monitor completed transfers by states
      *
      * @param limit the limit size of the list.
      * @param transferStates the transfer states to filter the completed transfers
      */
-    fun getCompletedTransfersByStateWithLimit(
+    fun monitorCompletedTransfersByStateWithLimit(
         limit: Int = MAX_COMPLETED_TRANSFERS,
         vararg transferStates: TransferState,
     ): Flow<List<CompletedTransfer>>
@@ -288,6 +288,11 @@ interface MegaLocalRoomGateway {
      * Delete the [ActiveTransferActionGroup] by [groupId]
      */
     suspend fun deleteActiveTransferGroup(groupId: Int)
+
+    /**
+     * Get all active transfer groups
+     */
+    suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup>
 
     /**
      * Insert a list of [CameraUploadsRecord] or replace the record if already exists

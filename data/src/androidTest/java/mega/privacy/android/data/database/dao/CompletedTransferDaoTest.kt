@@ -253,7 +253,7 @@ class CompletedTransferDaoTest {
         }
 
     @Test
-    fun test_that_getCompletedTransfersByStateWithLimit_returns_correct_transfers_with_limit() =
+    fun test_that_monitorCompletedTransfersByStateWithLimit_returns_correct_transfers_with_limit() =
         runTest {
             // Create transfers with different states and timestamps
             val state1Transfers = (1..10).map {
@@ -285,7 +285,8 @@ class CompletedTransferDaoTest {
             val states = listOf(1, 2)
             val limit = 5
             val result =
-                completedTransferDao.getCompletedTransfersByStateWithLimit(states, limit).first()
+                completedTransferDao.monitorCompletedTransfersByStateWithLimit(states, limit)
+                    .first()
 
             // Verify result
             assertThat(result.size).isEqualTo(limit)

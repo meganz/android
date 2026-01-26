@@ -96,7 +96,6 @@ import kotlin.time.Instant
  * @param transferMapper [TransferEventMapper]
  * @param appEventGateway [AppEventGateway]
  * @param localStorageGateway [MegaLocalStorageGateway]
- * @param parentRecursiveAppDataCache cache to store transfer app data that needs to be used recursively in children
  */
 @OptIn(ExperimentalTime::class)
 @Singleton
@@ -453,8 +452,11 @@ internal class DefaultTransfersRepository @Inject constructor(
         limit: Int,
         vararg states: TransferState,
     ): Flow<List<CompletedTransfer>> =
-        megaLocalRoomGateway.getCompletedTransfersByStateWithLimit(limit, *states)
+        megaLocalRoomGateway.monitorCompletedTransfersByStateWithLimit(limit, *states)
             .flowOn(ioDispatcher)
+
+    override suspend fun getCompletedTransfers() =
+        megaLocalRoomGateway.getCompletedTransfers()
 
     override suspend fun addCompletedTransfers(finishEvents: List<TransferEvent.TransferFinishEvent>) {
         withContext(ioDispatcher) {
@@ -874,6 +876,10 @@ internal class DefaultTransfersRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getActiveTransferGroup(id)
         }
+
+    override suspend fun getActiveTransferGroups() =
+        megaLocalRoomGateway.getActiveTransferGroups()
+
 
     override suspend fun broadcastTransferTagToCancel(transferTag: Int?) {
         withContext(ioDispatcher) {

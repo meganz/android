@@ -216,6 +216,12 @@ interface TransferRepository {
     ): Flow<List<CompletedTransfer>>
 
     /**
+     * Get completed transfers
+     */
+    suspend fun getCompletedTransfers(): List<CompletedTransfer>
+
+
+    /**
      * Add a list of completed transfer to local storage. Please note that completed transfers are pruned to prevent them from growing without limit.
      *
      * @param finishEvents
@@ -626,6 +632,13 @@ interface TransferRepository {
      * @return [ActiveTransferActionGroup] with this [id] or null if it's not found
      */
     suspend fun getActiveTransferGroupById(id: Int): ActiveTransferActionGroup?
+
+    /**
+     * Get all active transfer groups
+     *
+     * @return List of [ActiveTransferActionGroup]
+     */
+    suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup>
 
     /**
      * Broadcast transfer tag to cancel. Null it no transfer to cancel.

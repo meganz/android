@@ -3,7 +3,6 @@ package mega.privacy.android.data.facade
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
@@ -229,42 +228,14 @@ internal class MegaLocalRoomFacadeTest {
     }
 
     @Test
-    fun `test that getAllCompletedTransfers returns a list of completed transfers ordered by timestamp descendant`() =
+    fun `test that getAllCompletedTransfers returns all completed transfers`() =
         runTest {
-            val completedTransferEntities = listOf<CompletedTransferEntity>(
-                mock(), mock(), mock(),
-            )
-            val completedTransfers = listOf<CompletedTransfer>(
-                mock { on { timestamp }.thenReturn(1684228012974) },
-                mock { on { timestamp }.thenReturn(1684228012975) },
-                mock { on { timestamp }.thenReturn(1684228012973) },
-            )
-
-            whenever(completedTransferDao.getAllCompletedTransfers())
-                .thenReturn(flowOf(completedTransferEntities))
-            completedTransferEntities.forEachIndexed { index, completedTransferEntity ->
-                whenever(completedTransferModelMapper(completedTransferEntity)).thenReturn(
-                    completedTransfers[index]
-                )
-            }
-
-            val expected =
-                listOf(completedTransfers[1], completedTransfers[0], completedTransfers[2])
-
-            assertThat(underTest.getCompletedTransfers().single()).isEqualTo(expected)
-        }
-
-
-    @Test
-    fun `test that getAllCompletedTransfers returns a list of completed transfers with size max elements`() =
-        runTest {
-            val expectedSize = 2
             val completedTransferEntities = listOf<CompletedTransferEntity>(
                 mock(), mock(), mock(), mock()
             )
 
             whenever(completedTransferDao.getAllCompletedTransfers()).thenReturn(
-                flowOf(completedTransferEntities)
+                completedTransferEntities
             )
             completedTransferEntities.forEach { entity ->
                 val completedTransfer = mock<CompletedTransfer> {
@@ -273,28 +244,7 @@ internal class MegaLocalRoomFacadeTest {
                 whenever(completedTransferModelMapper(entity)).thenReturn(completedTransfer)
             }
 
-            assertThat(underTest.getCompletedTransfers(expectedSize).single().size)
-                .isEqualTo(expectedSize)
-        }
-
-    @Test
-    fun `test that getAllCompletedTransfers returns all completed transfers if the size parameter is null`() =
-        runTest {
-            val completedTransferEntities = listOf<CompletedTransferEntity>(
-                mock(), mock(), mock(), mock()
-            )
-
-            whenever(completedTransferDao.getAllCompletedTransfers()).thenReturn(
-                flowOf(completedTransferEntities)
-            )
-            completedTransferEntities.forEach { entity ->
-                val completedTransfer = mock<CompletedTransfer> {
-                    on { timestamp }.thenReturn(1684228012974)
-                }
-                whenever(completedTransferModelMapper(entity)).thenReturn(completedTransfer)
-            }
-
-            assertThat(underTest.getCompletedTransfers().single().size)
+            assertThat(underTest.getCompletedTransfers().size)
                 .isEqualTo(completedTransferEntities.size)
         }
 

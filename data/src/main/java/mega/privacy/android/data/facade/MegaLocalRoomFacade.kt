@@ -198,20 +198,15 @@ internal class MegaLocalRoomFacade @Inject constructor(
         return entities.map { contactModelMapper(it) }
     }
 
-    override fun getCompletedTransfers(size: Int?) =
+    override suspend fun getCompletedTransfers() =
         completedTransferDao.get().getAllCompletedTransfers()
-            .map { list ->
-                list.map { completedTransferModelMapper(it) }
-                    .toMutableList()
-                    .apply { sortWith(compareByDescending { it.timestamp }) }
-                    .let { if (size != null) it.take(size) else it }
-            }
+            .map(completedTransferModelMapper::invoke)
 
-    override fun getCompletedTransfersByStateWithLimit(
+    override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
         vararg transferStates: TransferState,
     ) =
-        completedTransferDao.get().getCompletedTransfersByStateWithLimit(
+        completedTransferDao.get().monitorCompletedTransfersByStateWithLimit(
             transferStates.map(transferStateIntMapper::invoke),
             limit
         ).map { it.map(completedTransferModelMapper::invoke) }
@@ -332,6 +327,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun deleteActiveTransferGroup(groupId: Int) {
         activeTransferGroupDao.get().deleteActiveTransfersGroupById(groupId)
     }
+
+    override suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup> =
+        activeTransferGroupDao.get().getActiveTransferGroups()
 
     override suspend fun insertOrUpdateCameraUploadsRecords(records: List<CameraUploadsRecord>) =
         cameraUploadsRecordDao.get().insertOrUpdateCameraUploadsRecords(
@@ -688,7 +686,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
             entities.map { homeWidgetConfigurationMapper(it) }
         }
 
-    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String){
+    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String) {
         homeWidgetConfigurationDao.get().deleteWidgetConfigurationById(widgetIdentifier)
     }
 
