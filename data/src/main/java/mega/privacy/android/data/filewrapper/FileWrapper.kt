@@ -26,6 +26,7 @@ class FileWrapper(
     private val deleteFolderIfEmptyFunction: () -> Boolean,
     private val setModificationTimeFunction: (newTime: Long) -> Boolean,
     private val renameFunction: (newName: String) -> FileWrapper?,
+    private val renameOverwriteFunction: (parentUriString: String, newName: String, override: Boolean) -> FileWrapper?,
     private val createNestedPathFunction: (
         children: List<String>,
         createIfMissing: Boolean,
@@ -131,6 +132,19 @@ class FileWrapper(
     fun rename(newName: String): FileWrapper? = runCatching { renameFunction(newName) }
         .onFailure { Timber.e(it) }
         .getOrNull()
+
+    /**
+     * Rename the file or folder.
+     * @param parentUriString The uri of the parent file.
+     * @param newName the new name of the file or folder
+     * @param override True if it is required to override an existing file, false otherwise.
+     * @return the [FileWrapper] of the renamed file or folder, or null if the operation failed
+     */
+    @Keep
+    fun renameOverwrite(parentUriString: String, newName: String, override: Boolean): FileWrapper? =
+        runCatching { renameOverwriteFunction(parentUriString, newName, override) }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
 
 
     /**

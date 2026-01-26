@@ -712,7 +712,7 @@ internal class FileFacade @Inject constructor(
             }
         } else {
             val fileName = getFileNameIfHasNameCollision(destination, source.name)
-            val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+            val fileNameWithoutExtension = fileName.removeFileExtension()
             val mimeType = getMimeTypeFromExtension(source.extension)
             val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
             newFile?.uri?.let { newUri ->
@@ -733,7 +733,7 @@ internal class FileFacade @Inject constructor(
         destination: DocumentFile,
     ) {
         val fileName = getFileNameIfHasNameCollision(destination, name)
-        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val fileNameWithoutExtension = fileName.removeFileExtension()
         val mimeType = context.contentResolver.getType(source)
             ?: getMimeTypeFromFileName(fileName)
         val newFile = destination.createFile(mimeType, fileNameWithoutExtension)
@@ -749,7 +749,7 @@ internal class FileFacade @Inject constructor(
     private fun getFileNameIfHasNameCollision(folder: DocumentFile, fileName: String): String {
         val files = folder.listFiles()
         if (files.find { it.name == fileName } == null) return fileName
-        val fileNameWithoutExtension = fileName.substringBeforeLast(".")
+        val fileNameWithoutExtension = fileName.removeFileExtension()
         val extension = fileName.substringAfterLast(".", "")
         for (i in 1..Int.MAX_VALUE) {
             val newFileName = if (extension.isNotEmpty()) {
@@ -1047,14 +1047,47 @@ internal class FileFacade @Inject constructor(
         return updateResult > 0
     }
 
-    override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? {
-        val documentFile = getDocumentFileFromUri(uriPath.toUri())
-        return if (documentFile?.renameTo(newName) == true) {
+    override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? =
+        renameFileSync(getDocumentFileFromUri(uriPath.toUri()), newName)
+
+    private fun renameFileSync(documentFile: DocumentFile?, newName: String): UriPath? =
+        if (documentFile?.renameTo(newName) == true) {
             UriPath(documentFile.uri.toString())
         } else {
             null
         }
+
+    override fun renameFileOverwriteSync(
+        uriPath: UriPath,
+        parentUriPath: UriPath,
+        newName: String,
+        overwrite: Boolean,
+    ): UriPath? {
+        val documentFile = getDocumentFileFromUri(uriPath.toUri()) ?: return null
+        val displayName = newName.removeFileExtension()
+        val newDocumentFile = getDocumentFileFromUri(parentUriPath.toUri())?.let {
+            if (documentFile.isFile) {
+                it.createFile(getMimeTypeFromFileName(newName), displayName)
+            } else {
+                it.createDirectory(newName)
+            }
+        }
+        val fileDoesNotExist = newDocumentFile?.name?.removeFileExtension() == displayName
+
+        newDocumentFile?.delete()
+
+        return when {
+            fileDoesNotExist -> renameFileSync(documentFile, newName)
+            overwrite -> {
+                documentFile.parentFile?.findFile(newName)?.delete()
+                renameFileSync(documentFile, newName)
+            }
+
+            else -> null
+        }
     }
+
+    private fun String.removeFileExtension() = this.substringBeforeLast(".")
 
     private fun isMediaDocumentUri() = "com.android.providers.media.documents"
 

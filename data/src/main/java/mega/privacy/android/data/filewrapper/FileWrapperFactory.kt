@@ -56,6 +56,14 @@ internal class FileWrapperFactory(
                             invoke(it)
                         }
                     },
+                    renameOverwriteFunction = { parentUriString, newName, overwrite ->
+                        fileGateway.renameFileOverwriteSync(
+                            uriPath = uriPath,
+                            parentUriPath = UriPath(parentUriString),
+                            newName = newName,
+                            overwrite = overwrite
+                        )?.let { invoke(it) }
+                    },
                     getChildByNameFunction = { name ->
                         fileGateway.getChildByName(uriPath, name)?.value
                     },

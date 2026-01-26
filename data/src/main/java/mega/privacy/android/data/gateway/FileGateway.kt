@@ -575,6 +575,17 @@ interface FileGateway {
     fun renameFileSync(uriPath: UriPath, newName: String): UriPath?
 
     /**
+     * Renames a file or folder with overwrite flag
+     * @return the new [UriPath] of the renamed file, null if the file wasn't renamed
+     */
+    fun renameFileOverwriteSync(
+        uriPath: UriPath,
+        parentUriPath: UriPath,
+        newName: String,
+        overwrite: Boolean,
+    ): UriPath?
+
+    /**
      * Returns device model or SD Card based on file location
      */
     suspend fun getFileStorageTypeName(path: String?): FileStorageType

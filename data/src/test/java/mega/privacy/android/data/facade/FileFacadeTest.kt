@@ -50,6 +50,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 import java.io.File
@@ -856,6 +857,108 @@ internal class FileFacadeTest {
 
         underTest.renameFileSync(uriPath, newName)
         verify(doc).renameTo(newName)
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that renameFileOverwriteSync renames the document if file does not exist`(
+        overwrite: Boolean,
+    ): Unit = mockStatic(Uri::class.java).use {
+        mockStatic(MimeTypeMap::class.java).use {
+            val displayName = "renamed"
+            val extension = "txt"
+            val newName = "$displayName.$extension"
+            val uriString = "content://foo"
+            val finalUri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+                on { toString() } doReturn uriString
+            }
+            val doc = mock<DocumentFile> {
+                on { isFile } doReturn true
+                on { renameTo(newName) } doReturn true
+                on { uri } doReturn finalUri
+            }
+            val parentDoc = mock<DocumentFile>()
+            val newDocumentFile = mock<DocumentFile> {
+                on { name } doReturn newName
+                on { delete() } doReturn true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val parentUri = stubGetDocumentFileFromUri(parentDoc)
+            val uriPath = UriPath(uriString)
+            val parentUriPath = UriPath("content://parent")
+            val mimeTypeMap = mock<MimeTypeMap>()
+            val mimeType = "text/plain"
+
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(Uri.parse(parentUriPath.value)) doReturn parentUri
+            whenever(MimeTypeMap.getSingleton()) doReturn mimeTypeMap
+            whenever(mimeTypeMap.getMimeTypeFromExtension(extension)) doReturn mimeType
+            whenever(parentDoc.createFile(mimeType, displayName)) doReturn newDocumentFile
+
+            assertThat(
+                underTest.renameFileOverwriteSync(uriPath, parentUriPath, newName, overwrite)
+            ).isEqualTo(uriPath)
+
+            verify(doc).renameTo(newName)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that renameFileOverwriteSync renames the document if file does exist and overwrite is true`(
+        overwrite: Boolean,
+    ): Unit = mockStatic(Uri::class.java).use {
+        mockStatic(MimeTypeMap::class.java).use {
+            val displayName = "renamed"
+            val newName = "$displayName.txt"
+            val existingFile = mock<DocumentFile> {
+                on { delete() } doReturn true
+            }
+            val parentDoc = mock<DocumentFile> {
+                on { findFile(newName) } doReturn existingFile
+            }
+            val uriString = "content://foo"
+            val finalUri = mock<Uri> {
+                on { this.scheme } doReturn "content"
+                on { toString() } doReturn uriString
+            }
+            val doc = mock<DocumentFile> {
+                on { isFile } doReturn true
+                on { renameTo(newName) } doReturn true
+                on { uri } doReturn finalUri
+            }
+            val newDocumentFile = mock<DocumentFile> {
+                on { name } doReturn "other name"
+                on { delete() } doReturn true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val parentUri = stubGetDocumentFileFromUri(parentDoc)
+            val uriPath = UriPath(uriString)
+            val parentUriPath = UriPath("content://parent")
+            val mimeTypeMap = mock<MimeTypeMap>()
+            val mimeType = "text/plain"
+
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(Uri.parse(parentUriPath.value)) doReturn parentUri
+            whenever(MimeTypeMap.getSingleton()) doReturn mimeTypeMap
+            whenever(mimeTypeMap.getMimeTypeFromExtension("txt")) doReturn mimeType
+            whenever(parentDoc.createFile(mimeType, displayName)) doReturn newDocumentFile
+
+            val actual =
+                underTest.renameFileOverwriteSync(uriPath, parentUriPath, newName, overwrite)
+
+            verify(newDocumentFile).delete()
+
+            if (overwrite) {
+                assertThat(actual).isEqualTo(uriPath)
+                verify(doc).renameTo(newName)
+            } else {
+                assertThat(actual).isNull()
+                verify(doc).isFile
+                verifyNoMoreInteractions(doc)
+            }
+        }
     }
 
     @Test
