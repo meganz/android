@@ -9,6 +9,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
@@ -18,6 +19,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.decodeBase64
@@ -126,6 +129,8 @@ internal class DefaultPhotosRepository @Inject constructor(
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
+
+    private val monitorPhotosMutex = Mutex()
 
     private var page = 0L
 
@@ -245,7 +250,9 @@ internal class DefaultPhotosRepository @Inject constructor(
     override fun monitorPhotos(): Flow<List<Photo>> {
         Timber.d("DefaultPhotosRepository::monitorPhotos")
         initialize()
-        return photosFlow.filterNotNull()
+        return photosFlow
+            .filterNotNull()
+            .distinctUntilChanged()
     }
 
     private fun initialize() {
@@ -273,10 +280,11 @@ internal class DefaultPhotosRepository @Inject constructor(
     private fun populateNodes() {
         populateNodesJob?.cancel()
         populateNodesJob = appScope.launch {
-            val (imageNodes, videoNodes) = fetchNodes()
-
-            updatePhotos(imageNodes, videoNodes)
-            updateImageNodes(imageNodes, videoNodes)
+            monitorPhotosMutex.withLock {
+                val (imageNodes, videoNodes) = fetchNodes()
+                updatePhotos(imageNodes, videoNodes)
+                updateImageNodes(imageNodes, videoNodes)
+            }
         }
     }
 
@@ -317,100 +325,144 @@ internal class DefaultPhotosRepository @Inject constructor(
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
     }
 
-    private fun updatePhotos(
+    private suspend fun updatePhotos(
         imageNodes: List<MegaNode>,
         videoNodes: List<MegaNode>,
-    ) = appScope.launch {
-        val photos = awaitAll(
-            async { imageNodes.map { mapMegaNodeToImage(it) } },
-            async { videoNodes.map { mapMegaNodeToVideo(it) } },
-        ).flatten()
+    ) {
+        withContext(ioDispatcher) {
+            val photos = awaitAll(
+                async { imageNodes.map { mapMegaNodeToImage(it) } },
+                async { videoNodes.map { mapMegaNodeToVideo(it) } },
+            ).flatten()
 
-        withContext(photosDispatcher) {
-            photosCache.clear()
-            photosCache.putAll(photos.associateBy { NodeId(it.id) })
-
-            val newPhotos = photosCache.values.toList()
-            photosFlow.update { newPhotos }
+            withContext(photosDispatcher) {
+                photos.forEach { photosCache[NodeId(it.id)] = it }
+                photosFlow.value = photosCache.values.toList()
+            }
         }
     }
 
-    private fun updateImageNodes(
+    private suspend fun updateImageNodes(
         imageNodes: List<MegaNode>,
         videoNodes: List<MegaNode>,
-    ) = appScope.launch {
-        val nodes = (imageNodes + videoNodes).map { node ->
-            imageNodeMapper(
-                megaNode = node,
-                requireSerializedData = true,
-                offline = offlineNodesCache[node.handle.toString()],
-                numVersion = megaApiFacade::getNumVersions
-            )
-        }
+    ) {
+        withContext(ioDispatcher) {
+            val nodes = (imageNodes + videoNodes).map { node ->
+                imageNodeMapper(
+                    megaNode = node,
+                    requireSerializedData = true,
+                    offline = offlineNodesCache[node.handle.toString()],
+                    numVersion = megaApiFacade::getNumVersions
+                )
+            }
 
-        withContext(imageNodesDispatcher) {
-            imageNodesCache.clear()
-            imageNodesCache.putAll(nodes.associateBy { it.id })
-
-            val newNodes = imageNodesCache.values.toList()
-            imageNodesFlow.update { newNodes }
+            withContext(imageNodesDispatcher) {
+                nodes.forEach { imageNodesCache[it.id] = it }
+                imageNodesFlow.value = imageNodesCache.values.toList()
+            }
         }
     }
 
     private fun monitorNodeUpdates() {
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = nodeRepository.monitorNodeUpdates()
-            .onEach(::handleNodeUpdate)
+            .onEach {
+                monitorPhotosMutex.withLock {
+                    handleNodeUpdate(nodeUpdate = it)
+                }
+            }
             .launchIn(appScope)
     }
 
     private suspend fun handleNodeUpdate(nodeUpdate: NodeUpdate) {
+        val nodesToUpdate = mutableListOf<Node>()
+        val nodesToRemove = mutableListOf<NodeId>()
+        var shouldRefreshSensitiveContent = false
         for ((node, changes) in nodeUpdate.changes) {
             if (node is FolderNode && changes.contains(NodeChanges.Sensitive)) {
-                refreshSensitivePhotos()
-                refreshSensitiveImageNodes()
+                shouldRefreshSensitiveContent = true
             } else {
                 val isPotentialNode = constraints.all { it(node) }
-
-                refreshPhotos(node, isPotentialNode)
-                refreshImageNodes(node, isPotentialNode)
+                if (!isPotentialNode) {
+                    nodesToRemove += node.id
+                } else {
+                    nodesToUpdate += node
+                }
             }
         }
-
-        withContext(photosDispatcher) {
-            val newPhotos = photosCache.values.toList()
-            photosFlow.update { newPhotos }
-        }
-
-        withContext(imageNodesDispatcher) {
-            val newNodes = imageNodesCache.values.toList()
-            imageNodesFlow.update { newNodes }
+        handlePhotosUpdate(
+            nodesToUpdate = nodesToUpdate,
+            nodesToRemove = nodesToRemove,
+            shouldRefreshSensitiveContent = shouldRefreshSensitiveContent
+        )
+        handleImageNodesUpdate(
+            nodesToUpdate = nodesToUpdate,
+            nodesToRemove = nodesToRemove,
+            shouldRefreshSensitiveContent = shouldRefreshSensitiveContent
+        )
+        if (shouldRefreshSensitiveContent) {
+            refreshSensitivePhotos()
+            refreshSensitiveImageNodes()
         }
     }
 
-    private suspend fun refreshPhotos(
-        node: Node,
-        isPotentialNode: Boolean,
-    ) = withContext(photosDispatcher) {
-        if (!isPotentialNode) {
-            photosCache.remove(node.id)
-            return@withContext
-        }
+    private suspend fun handlePhotosUpdate(
+        nodesToUpdate: List<Node>,
+        nodesToRemove: List<NodeId>,
+        shouldRefreshSensitiveContent: Boolean,
+    ) {
+        var photosChanged = false
+        withContext(photosDispatcher) {
+            nodesToRemove.forEach {
+                photosChanged = photosCache.remove(it) != null || photosChanged
+            }
 
-        val photo = getMegaNode(nodeId = node.id)?.let { megaNode ->
-            if (isImageNodeValid(megaNode)) {
-                mapMegaNodeToImage(megaNode)
-            } else if (isVideoNodeValid(megaNode)) {
-                mapMegaNodeToVideo(megaNode)
-            } else {
-                null
+            nodesToUpdate.forEach { node ->
+                val photo = getMegaNode(nodeId = node.id)?.let { megaNode ->
+                    when {
+                        isImageNodeValid(megaNode) -> mapMegaNodeToImage(megaNode)
+                        isVideoNodeValid(megaNode) -> mapMegaNodeToVideo(megaNode)
+                        else -> null
+                    }
+                }
+                if (photo == null) {
+                    photosChanged = photosCache.remove(node.id) != null || photosChanged
+                } else {
+                    photosCache[NodeId(photo.id)] = photo
+                    photosChanged = true
+                }
+            }
+
+            if (photosChanged && !shouldRefreshSensitiveContent) {
+                photosFlow.value = photosCache.values.toList()
             }
         }
+    }
 
-        if (photo == null) {
-            photosCache.remove(node.id)
-        } else {
-            photosCache[NodeId(photo.id)] = photo
+    private suspend fun handleImageNodesUpdate(
+        nodesToUpdate: List<Node>,
+        nodesToRemove: List<NodeId>,
+        shouldRefreshSensitiveContent: Boolean,
+    ) {
+        var imageNodesChanged = false
+        withContext(imageNodesDispatcher) {
+            nodesToRemove.forEach {
+                imageNodesChanged = imageNodesCache.remove(it) != null || imageNodesChanged
+            }
+
+            nodesToUpdate.forEach { node ->
+                val imageNode = fetchImageNode(nodeId = node.id)
+                if (imageNode == null) {
+                    imageNodesChanged = imageNodesCache.remove(node.id) != null || imageNodesChanged
+                } else {
+                    imageNodesCache[imageNode.id] = imageNode
+                    imageNodesChanged = true
+                }
+            }
+
+            if (imageNodesChanged && !shouldRefreshSensitiveContent) {
+                imageNodesFlow.value = imageNodesCache.values.toList()
+            }
         }
     }
 
@@ -429,23 +481,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         photosCache.clear()
         photosCache.putAll(photos.associateBy { NodeId(it.id) })
-    }
-
-    private suspend fun refreshImageNodes(
-        node: Node,
-        isPotentialNode: Boolean,
-    ) = withContext(imageNodesDispatcher) {
-        if (!isPotentialNode) {
-            imageNodesCache.remove(node.id)
-            return@withContext
-        }
-
-        val imageNode = fetchImageNode(nodeId = node.id)
-        if (imageNode == null) {
-            imageNodesCache.remove(node.id)
-        } else {
-            imageNodesCache[imageNode.id] = imageNode
-        }
+        photosFlow.value = photosCache.values.toList()
     }
 
     private suspend fun refreshSensitiveImageNodes() = withContext(imageNodesDispatcher) {
@@ -455,6 +491,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         imageNodesCache.clear()
         imageNodesCache.putAll(imageNodes.associateBy { it.id })
+        imageNodesFlow.value = imageNodesCache.values.toList()
     }
 
     override fun monitorImageNodes(): Flow<List<ImageNode>> = imageNodesFlow
