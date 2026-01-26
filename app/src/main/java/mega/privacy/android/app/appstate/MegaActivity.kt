@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -318,16 +320,19 @@ class MegaActivity : ComponentActivity() {
                 val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
                 AndroidTheme(isDark = globalState.themeMode.isDarkMode()) {
-                    Box(modifier = Modifier.pointerInput(Unit) {
-                        awaitEachGesture {
-                            do {
-                                val event = awaitPointerEvent()
-                                if (event.type == PointerEventType.Press) {
-                                    presenceViewModel.signalPresence()
+                    Box(
+                        modifier = Modifier
+                            .semantics { testTagsAsResourceId = true }
+                            .pointerInput(Unit) {
+                                awaitEachGesture {
+                                    do {
+                                        val event = awaitPointerEvent()
+                                        if (event.type == PointerEventType.Press) {
+                                            presenceViewModel.signalPresence()
+                                        }
+                                    } while (event.changes.any { it.pressed })
                                 }
-                            } while (event.changes.any { it.pressed })
-                        }
-                    }) {
+                            }) {
                         when (val graphstate = navGraphState) {
                             is NavigationGraphState.Loading -> {}
                             is NavigationGraphState.Data -> {
