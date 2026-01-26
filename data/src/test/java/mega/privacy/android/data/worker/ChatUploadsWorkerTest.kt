@@ -156,6 +156,7 @@ class ChatUploadsWorkerTest {
             notificationSamplePeriod = 0L,
             loginMutex = mock(),
             displayPathFromUriCache = displayPathFromUriCache,
+            deleteActiveTransferGroupUseCase = mock(),
         )
     }
 

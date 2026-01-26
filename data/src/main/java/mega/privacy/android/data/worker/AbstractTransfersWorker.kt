@@ -34,6 +34,7 @@ import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
@@ -61,6 +62,7 @@ abstract class AbstractTransfersWorker(
     private val foregroundSetter: ForegroundSetter?,
     private val notificationSamplePeriod: Long?,
     private val displayPathFromUriCache: HashMap<String, String>,
+    private val deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
 
@@ -169,8 +171,11 @@ abstract class AbstractTransfersWorker(
         transferTotals.actionGroups.filter { it.finished() && !alreadyFinishedGroups.contains(it.groupId) }
             .also { finishedGroups ->
                 alreadyFinishedGroups.addAll(finishedGroups.map { it.groupId })
-                finishedGroups.forEach {
-                    showActionGroupFinishedNotification(it)
+                finishedGroups.forEach { group ->
+                    showActionGroupFinishedNotification(group)
+                    runCatching {
+                        deleteActiveTransferGroupUseCase(group.groupId)
+                    }.onFailure { Timber.e(it) }
                 }
             }
     }

@@ -29,6 +29,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
@@ -56,6 +57,7 @@ class UploadsWorker @AssistedInject constructor(
     foregroundSetter: ForegroundSetter? = null,
     notificationSamplePeriod: Long? = null,
     private val startAllPendingUploadsUseCase: StartAllPendingUploadsUseCase,
+    deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex loginMutex: Mutex,
     private val transfersProgressNotificationSummaryBuilder: TransfersProgressNotificationSummaryBuilder,
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
@@ -79,6 +81,7 @@ class UploadsWorker @AssistedInject constructor(
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
     displayPathFromUriCache = displayPathFromUriCache,
+    deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL
     override val updateNotificationId = UPLOAD_NOTIFICATION_ID

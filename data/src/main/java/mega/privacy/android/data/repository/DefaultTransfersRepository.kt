@@ -880,6 +880,10 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getActiveTransferGroups() =
         megaLocalRoomGateway.getActiveTransferGroups()
 
+    override suspend fun deleteActiveTransferGroup(id: Int) {
+        megaLocalRoomGateway.deleteActiveTransferGroup(id)
+    }
+
 
     override suspend fun broadcastTransferTagToCancel(transferTag: Int?) {
         withContext(ioDispatcher) {

@@ -49,7 +49,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -145,6 +144,7 @@ class DownloadsWorkerTest {
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             loginMutex = mock(),
             displayPathFromUriCache = displayPathFromUriCache,
+            deleteActiveTransferGroupUseCase = mock(),
         )
     }
 

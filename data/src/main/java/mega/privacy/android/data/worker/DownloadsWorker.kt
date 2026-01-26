@@ -30,6 +30,7 @@ import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
@@ -61,6 +62,7 @@ class DownloadsWorker @AssistedInject constructor(
     notificationSamplePeriod: Long? = null,
     private val monitorActiveAndPendingTransfersUseCase: MonitorActiveAndPendingTransfersUseCase,
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
+    deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex loginMutex: Mutex,
     @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
 ) : AbstractTransfersWorker(
@@ -80,6 +82,7 @@ class DownloadsWorker @AssistedInject constructor(
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
     displayPathFromUriCache = displayPathFromUriCache,
+    deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
 
     override val finalNotificationId = DOWNLOAD_FINAL_NOTIFICATION_ID

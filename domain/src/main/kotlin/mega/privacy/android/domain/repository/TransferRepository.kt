@@ -641,6 +641,11 @@ interface TransferRepository {
     suspend fun getActiveTransferGroups(): List<ActiveTransferActionGroup>
 
     /**
+     * Delete an active transfers group by id
+     */
+    suspend fun deleteActiveTransferGroup(id: Int)
+
+    /**
      * Broadcast transfer tag to cancel. Null it no transfer to cancel.
      */
     suspend fun broadcastTransferTagToCancel(transferTag: Int?)

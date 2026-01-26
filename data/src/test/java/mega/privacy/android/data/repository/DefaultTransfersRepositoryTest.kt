@@ -1830,6 +1830,14 @@ class DefaultTransfersRepositoryTest {
         assertThat(underTest.getActiveTransferGroupById(groupId)).isEqualTo(expected)
     }
 
+    @Test
+    fun `test that delete Active Transfer Group invokes room gateway`() = runTest {
+        val groupId = 454234
+        underTest.deleteActiveTransferGroup(groupId)
+
+        verify(megaLocalRoomGateway).deleteActiveTransferGroup(groupId)
+    }
+
     @ParameterizedTest(name = " when tag is {0}")
     @ValueSource(ints = [123])
     @NullSource
