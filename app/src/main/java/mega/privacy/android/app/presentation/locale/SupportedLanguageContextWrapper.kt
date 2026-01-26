@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.locale
 
 import android.content.Context
 import android.content.ContextWrapper
-import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
 
@@ -48,33 +47,23 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
             if (context == null) {
                 return SupportedLanguageContextWrapper(null)
             }
-
             /**
-             * On Android 13+ (API 33+), per-app language preferences are handled by the system.
-             * No manual locale filtering is needed - just wrap the context without modification.
-             *
-             * On Android 12 and below, filter unsupported locales to prevent a bug where
-             * selecting a non-supported locale and then a supported locale causes the order of locales
+             * Fix a bug where having multiple locales in system settings causes the order of locales
              * to get randomly flipped, resulting in mixed language resources.
              */
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                // Android 12 and below: Apply locale filtering
-                val configuration = context.resources.configuration
-                val userLocales = configuration.locales
-                val supportedLocaleList = getSupportedLocales(userLocales)
-                val resolvedLocale = supportedLocaleList.firstOrNull() ?: Locale("en")
+            val configuration = context.resources.configuration
+            val userLocales = configuration.locales
+            val supportedLocaleList = getSupportedLocales(userLocales)
+            val resolvedLocale = supportedLocaleList.firstOrNull() ?: Locale("en")
 
-                Locale.setDefault(resolvedLocale)
+            Locale.setDefault(resolvedLocale)
 
-                // Create a new configuration with the resolved locale
-                val newConfig = android.content.res.Configuration(configuration)
-                newConfig.setLocales(LocaleList(resolvedLocale))
+            // Create a new configuration with the resolved locale
+            val newConfig = android.content.res.Configuration(configuration)
+            newConfig.setLocales(LocaleList(resolvedLocale))
 
-                val newContext = context.createConfigurationContext(newConfig)
-                return SupportedLanguageContextWrapper(newContext)
-            }
-            // Android 13+: Let the system handle locales via per-app language preferences
-            return SupportedLanguageContextWrapper(context)
+            val newContext = context.createConfigurationContext(newConfig)
+            return SupportedLanguageContextWrapper(newContext)
         }
 
         private fun getSupportedLocales(
