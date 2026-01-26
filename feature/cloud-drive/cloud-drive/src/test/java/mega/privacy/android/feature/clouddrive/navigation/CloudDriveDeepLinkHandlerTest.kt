@@ -162,9 +162,11 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey()
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey()
                 )
             )
             verifyNoInteractions(snackbarEventQueue)
@@ -192,9 +194,11 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey()
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey()
                 )
             )
             verifyNoInteractions(snackbarEventQueue)
@@ -233,13 +237,15 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey(),
-                    listOf(
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey(),
+                    destinations = listOf(
                         CloudDriveNavKey(nodeHandle = parentId.longValue),
                         CloudDriveNavKey(nodeHandle = nodeId.longValue),
-                    ),
+                    )
                 )
             ).inOrder()
             verifyNoInteractions(snackbarEventQueue)
@@ -281,10 +287,12 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey(),
-                    listOf(
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey(),
+                    destinations = listOf(
                         CloudDriveNavKey(
                             nodeHandle = parentId.longValue,
                             highlightedNodeHandle = nodeId.longValue
@@ -332,10 +340,12 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey(),
-                    listOf(
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey(),
+                    destinations = listOf(
                         CloudDriveNavKey(nodeHandle = grandParentId.longValue),
                         CloudDriveNavKey(
                             nodeHandle = parentId.longValue,
@@ -380,10 +390,12 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey(),
-                    listOf(CloudDriveNavKey(nodeHandle = 123L)),
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey(),
+                    destinations = listOf(CloudDriveNavKey(nodeHandle = 123L))
                 )
             )
             verifyNoInteractions(snackbarEventQueue)
@@ -438,9 +450,11 @@ class CloudDriveDeepLinkHandlerTest {
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
 
         if (isLoggedIn) {
+            val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
             assertThat(actual).containsExactly(
-                HomeScreensNavKey(
-                    DriveSyncNavKey(),
+                createExpectedHomeScreensNavKey(
+                    actual = actualHomeScreensNavKey,
+                    root = DriveSyncNavKey()
                 ),
                 previewNavKey
             )
@@ -478,8 +492,12 @@ class CloudDriveDeepLinkHandlerTest {
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
 
+        val actualHomeScreensNavKey = actual?.firstOrNull() as? HomeScreensNavKey
         assertThat(actual).containsExactly(
-            HomeScreensNavKey(DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue))
+            createExpectedHomeScreensNavKey(
+                actual = actualHomeScreensNavKey,
+                root = DriveSyncNavKey(highlightedNodeHandle = nodeId.longValue)
+            )
         )
         verifyNoInteractions(snackbarEventQueue)
     }
@@ -764,6 +782,31 @@ class CloudDriveDeepLinkHandlerTest {
     ): TypedFolderNode = mock<DefaultTypedFolderNode> {
         whenever(it.id).thenReturn(NodeId(id))
         whenever(it.parentId).thenReturn(parentId)
+    }
+
+    /**
+     * Extracts the timestamp from a HomeScreensNavKey using reflection
+     */
+    private fun HomeScreensNavKey.getTimestamp(): Long {
+        val field = HomeScreensNavKey::class.java.getDeclaredField("timestamp")
+        field.isAccessible = true
+        return field.get(this) as Long
+    }
+
+    /**
+     * Creates a HomeScreensNavKey with the same structure as the actual result but with the timestamp from actual
+     */
+    private fun createExpectedHomeScreensNavKey(
+        actual: HomeScreensNavKey?,
+        root: DriveSyncNavKey,
+        destinations: List<CloudDriveNavKey>? = null,
+    ): HomeScreensNavKey {
+        val timestamp = actual?.getTimestamp() ?: 0L
+        return HomeScreensNavKey(
+            root = root,
+            destinations = destinations,
+            timestamp = timestamp
+        )
     }
 
     private val rootId = NodeId(1L)

@@ -28,6 +28,7 @@ import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -76,7 +77,7 @@ fun HomeScreens(
 
         is MainNavState.Data -> {
             val homeScreenStacks = rememberTopLevelBackStack(currentState.initialDestination)
-            LaunchedEffect(key) {
+            LaunchedOnceEffect(key) {
                 key.root?.let {
                     homeScreenStacks.switchTopLevel(it)
                     key.destinations?.let { destinations -> homeScreenStacks.addAll(destinations) }
