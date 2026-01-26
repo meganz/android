@@ -206,6 +206,151 @@ class MenuViewModelTest {
         }
 
     @Test
+    fun `test that refresh methods are called with forceRefresh false when connectivity is false`() =
+        runTest {
+            stubDefaultDependencies()
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(false))
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for connectivity flow to process
+            underTest.uiState.test {
+                awaitItem()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are called with forceRefresh = true on init
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getCurrentUserEmail).invoke(true)
+            // Verify refresh methods are also called with forceRefresh = false when connectivity is false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(false)
+        }
+
+    @Test
+    fun `test that refresh methods are not called when connectivity is true`() = runTest {
+        stubDefaultDependencies()
+        monitorConnectivityUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(true))
+        }
+
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+        whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+
+        initUnderTest()
+
+        // Wait for connectivity flow to process
+        underTest.uiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Verify refresh methods are called with forceRefresh = true only on init
+        verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+        verify(getCurrentUserEmail).invoke(true)
+        // Verify they are NOT called with forceRefresh = false when connectivity is true
+        verify(getUserFullNameUseCase, times(0)).invoke(forceRefresh = false)
+        verify(getCurrentUserEmail, times(0)).invoke(false)
+    }
+
+    @Test
+    fun `test that refresh methods are called when connectivity changes from true to false`() =
+        runTest {
+            stubDefaultDependencies()
+            val connectivityFlow = MutableStateFlow(true)
+
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(connectivityFlow)
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for initial state
+            underTest.uiState.test {
+                awaitItem()
+            }
+
+            // Verify initial calls with forceRefresh = true
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getCurrentUserEmail).invoke(true)
+            // Verify no calls with forceRefresh = false yet
+            verify(getUserFullNameUseCase, times(0)).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail, times(0)).invoke(false)
+
+            // Change connectivity to false
+            connectivityFlow.emit(false)
+
+            // Wait for state update
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isConnectedToNetwork).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are now called with forceRefresh = false when connectivity becomes false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(false)
+        }
+
+    @Test
+    fun `test that refresh methods are not called when connectivity changes from false to true`() =
+        runTest {
+            stubDefaultDependencies()
+            val connectivityFlow = MutableStateFlow(false)
+
+            monitorConnectivityUseCase.stub {
+                on { invoke() }.thenReturn(connectivityFlow)
+            }
+
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            whenever(getUserFullNameUseCase(forceRefresh = false)).thenReturn("Test User")
+            whenever(getCurrentUserEmail(true)).thenReturn("test@example.com")
+            whenever(getCurrentUserEmail(false)).thenReturn("test@example.com")
+
+            initUnderTest()
+
+            // Wait for initial state (connectivity is false, so refresh methods are called)
+            underTest.uiState.test {
+                awaitItem()
+            }
+
+            // Verify initial calls: once with forceRefresh = true and once with forceRefresh = false
+            verify(getUserFullNameUseCase).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail).invoke(true)
+            verify(getCurrentUserEmail).invoke(false)
+
+            // Change connectivity to true
+            connectivityFlow.emit(true)
+
+            // Wait for state update
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isConnectedToNetwork).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            // Verify refresh methods are NOT called again when connectivity becomes true
+            // Total calls should still be 1 for each forceRefresh value
+            verify(getUserFullNameUseCase, times(1)).invoke(forceRefresh = true)
+            verify(getUserFullNameUseCase, times(1)).invoke(forceRefresh = false)
+            verify(getCurrentUserEmail, times(1)).invoke(true)
+            verify(getCurrentUserEmail, times(1)).invoke(false)
+        }
+
+    @Test
     fun `test that avatar color is fetched and updates state`() = runTest {
         stubDefaultDependencies()
         val expectedColor = -16711936 // Green color value

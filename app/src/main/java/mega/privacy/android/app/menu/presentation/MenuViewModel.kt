@@ -291,24 +291,29 @@ class MenuViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(isConnectedToNetwork = isConnected)
                     }
+                    if (!isConnected) {
+                        refreshCurrentUserEmail(false)
+                        refreshUserName(false)
+                    }
                 }
         }
     }
 
-    private fun refreshUserName() {
+    private fun refreshUserName(forceRefresh: Boolean = true) {
         viewModelScope.launch {
-            val name = runCatching { getUserFullNameUseCase(forceRefresh = true) }.getOrNull()
+            val name =
+                runCatching { getUserFullNameUseCase(forceRefresh = forceRefresh) }.getOrNull()
             _uiState.update {
-                it.copy(name = name)
+                it.copy(name = name ?: it.name)
             }
         }
     }
 
-    private fun refreshCurrentUserEmail() {
+    private fun refreshCurrentUserEmail(forceRefresh: Boolean = true) {
         viewModelScope.launch {
-            val email = runCatching { getCurrentUserEmail() }.getOrNull()
+            val email = runCatching { getCurrentUserEmail(forceRefresh) }.getOrNull()
             _uiState.update {
-                it.copy(email = email)
+                it.copy(email = email ?: it.email)
             }
         }
     }
