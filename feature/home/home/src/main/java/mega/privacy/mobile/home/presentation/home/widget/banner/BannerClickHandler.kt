@@ -40,8 +40,13 @@ object BannerClickHandler {
                 openInSpecificApp(context, url, MEGA_PASS_PACKAGE_NAME)
             }
 
-            else -> {
+            matchesTransferItUrl(url) -> {
                 Analytics.tracker.trackEvent(TransferItSmartBannerItemSelectedEvent)
+                navigationHandler.navigate(WebSiteNavKey(url))
+            }
+
+            else -> {
+                // Fallback for other MEGA URLs
                 navigationHandler.navigate(WebSiteNavKey(url))
             }
         }
@@ -61,7 +66,7 @@ object BannerClickHandler {
                         "market://details?id=$packageName".toUri()
                     )
                 )
-            } catch (exception: Exception) {
+            } catch (_: Exception) {
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
@@ -72,13 +77,73 @@ object BannerClickHandler {
         }
     }
 
-    fun matchesVpnUrl(link: String) =
-        link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME))
-                || link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
+    /**
+     * MEGA domain patterns for URL matching
+     */
+    private val MEGA_DOMAIN_PATTERNS = arrayOf(
+        "mega\\.co\\.nz",
+        "mega\\.nz",
+        "mega\\.io",
+        "mega\\.app",
+        "megaad\\.co\\.nz",
+        "megaad\\.nz",
+        "megaad\\.io",
+        "megaad\\.app"
+    )
 
-    fun matchesPwmUrl(link: String) =
-        link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME))
-                || link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
+    fun matchesVpnUrl(link: String): Boolean {
+        // Check existing specific domains
+        if (link.startsWith(megaVpnUrl(MEGA_NZ_DOMAIN_NAME)) ||
+            link.startsWith(megaVpnUrl(MEGA_APP_DOMAIN_NAME))
+        ) {
+            return true
+        }
+
+        // Check all MEGA domain variations for subdomain format (vpn.domain.*)
+        val vpnSubdomainPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+            "^https://vpn\\.$domain.*"
+        }
+
+        // Check all MEGA domain variations for path format (domain.*/vpn)
+        val vpnPathPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+            "^https://$domain/vpn.*"
+        }
+
+        return vpnSubdomainPatterns.any { pattern -> link.matches(pattern.toRegex()) } ||
+                vpnPathPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+    }
+
+    fun matchesPwmUrl(link: String): Boolean {
+        // Check existing specific domains
+        if (link.startsWith(megaPwmUrl(MEGA_NZ_DOMAIN_NAME)) ||
+            link.startsWith(megaPwmUrl(MEGA_APP_DOMAIN_NAME))
+        ) {
+            return true
+        }
+
+        // Check all MEGA domain variations for subdomain format (pwm.domain.*)
+        val pwmSubdomainPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+            "^https://pwm\\.$domain.*"
+        }
+
+        // Check all MEGA domain variations for path format (domain.*/pass)
+        val pwmPathPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+            "^https://$domain/pass.*"
+        }
+
+        return pwmSubdomainPatterns.any { pattern -> link.matches(pattern.toRegex()) } ||
+                pwmPathPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+    }
+
+    /**
+     * Check if URL matches Transfer-it patterns
+     */
+    fun matchesTransferItUrl(link: String): Boolean {
+        val transferItPatterns = MEGA_DOMAIN_PATTERNS.map { domain ->
+            "^https://$domain/transfer-it.*"
+        }
+        return transferItPatterns.any { pattern -> link.matches(pattern.toRegex()) }
+    }
 
     /**
      * Url for VPN
