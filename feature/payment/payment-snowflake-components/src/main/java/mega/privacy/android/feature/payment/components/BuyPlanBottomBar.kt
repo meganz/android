@@ -58,6 +58,7 @@ fun BuyPlanBottomBar(
     onClick: (Boolean) -> Unit = {},
     inAppCheckoutText: String,
     externalCheckoutText: String,
+    isLoadingExternalCheckout: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -79,6 +80,8 @@ fun BuyPlanBottomBar(
                         .fillMaxWidth()
                         .testTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON),
                     text = externalCheckoutText,
+                    isLoading = isLoadingExternalCheckout,
+                    enabled = !isLoadingExternalCheckout,
                     onClick = { onClick(true) },
                 )
                 SecondaryFilledButton(
@@ -88,6 +91,7 @@ fun BuyPlanBottomBar(
                         .fillMaxWidth()
                         .testTag(TEST_TAG_BUY_BUTTON),
                     text = inAppCheckoutText,
+                    enabled = !isLoadingExternalCheckout,
                     onClick = { onClick(false) },
                 )
             } else {
@@ -98,6 +102,7 @@ fun BuyPlanBottomBar(
                         .fillMaxWidth()
                         .testTag(TEST_TAG_BUY_BUTTON),
                     text = inAppCheckoutText,
+                    enabled = !isLoadingExternalCheckout,
                     onClick = { onClick(false) },
                 )
                 SecondaryFilledButton(
@@ -107,6 +112,8 @@ fun BuyPlanBottomBar(
                         .fillMaxWidth()
                         .testTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON),
                     text = externalCheckoutText,
+                    isLoading = isLoadingExternalCheckout,
+                    enabled = !isLoadingExternalCheckout,
                     onClick = { onClick(true) },
                 )
             }

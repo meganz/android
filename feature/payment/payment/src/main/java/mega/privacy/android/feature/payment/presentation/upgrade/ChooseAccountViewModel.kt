@@ -20,12 +20,10 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.feature.payment.usecase.GetExternalCheckoutInformationPreferenceUseCase
-import mega.privacy.android.feature.payment.usecase.SetExternalCheckoutInformationPreferenceUseCase
 import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
@@ -47,12 +45,10 @@ class ChooseAccountViewModel @Inject constructor(
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
+    private val isExternalContentLinkSupportedUseCase: IsExternalContentLinkSupportedUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val ageSignalUseCase: AgeSignalUseCase,
-    private val getExternalCheckoutInformationPreferenceUseCase: GetExternalCheckoutInformationPreferenceUseCase,
-    private val setExternalCheckoutInformationPreferenceUseCase: SetExternalCheckoutInformationPreferenceUseCase,
-    private val getDomainNameUseCase: GetDomainNameUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -112,9 +108,10 @@ class ChooseAccountViewModel @Inject constructor(
                 val isExternalCheckoutEnabled =
                     getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers)
                 val isExternalCheckoutDefault = getFeatureFlagValueUseCase(ABTestFeatures.ande)
+                val isExternalContentLinkSupportedUseCase = isExternalContentLinkSupportedUseCase()
                 _state.update {
                     it.copy(
-                        isExternalCheckoutEnabled = isExternalCheckoutEnabled,
+                        isExternalCheckoutEnabled = isExternalCheckoutEnabled && isExternalContentLinkSupportedUseCase,
                         isExternalCheckoutDefault = isExternalCheckoutDefault,
                     )
                 }
@@ -140,47 +137,6 @@ class ChooseAccountViewModel @Inject constructor(
             loadCurrentSubscriptionPlan()
         }
         refreshPricing()
-        loadExternalCheckoutInformationPreference()
-        initializeDomainUrl()
-    }
-
-    /**
-     * Initialize domain URL in state
-     */
-    private fun initializeDomainUrl() {
-        val domainName = getDomainNameUseCase()
-        val domainUrl = "https://$domainName"
-        _state.update { it.copy(domainUrl = domainUrl) }
-    }
-
-    /**
-     * Load external checkout information preference
-     */
-    private fun loadExternalCheckoutInformationPreference() {
-        viewModelScope.launch {
-            runCatching {
-                val showInformation = getExternalCheckoutInformationPreferenceUseCase()
-                _state.update { it.copy(showExternalCheckoutInformation = showInformation) }
-            }.onFailure {
-                Timber.e(it, "Failed to load external checkout information preference")
-            }
-        }
-    }
-
-    /**
-     * Set external checkout information preference
-     *
-     * @param showInformation Whether to show the information bottom sheet next time
-     */
-    fun setExternalCheckoutInformationPreference(showInformation: Boolean) {
-        viewModelScope.launch {
-            runCatching {
-                setExternalCheckoutInformationPreferenceUseCase(showInformation)
-                _state.update { it.copy(showExternalCheckoutInformation = showInformation) }
-            }.onFailure {
-                Timber.e(it, "Failed to save external checkout information preference")
-            }
-        }
     }
 
     /**

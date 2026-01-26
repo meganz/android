@@ -189,4 +189,73 @@ internal class GeneratePurchaseUrlUseCaseTest {
         assertThat(urlCaptor.firstValue).isEqualTo(inputUrl)
         assertThat(urlCaptor.firstValue).contains(appVersion)
     }
+
+    @Test
+    fun `test that URL includes external_transaction_token parameter when provided`() = runTest {
+        val productId = "propay_1"
+        val externalTransactionToken = "token123"
+        val appVersion = "15.21"
+        val appInfo = AppInfo(appVersion = appVersion, sdkVersion = null)
+        val inputUrl = "$productId/uao=Android app Ver $appVersion?external_transaction_token=$externalTransactionToken"
+        val sessionTransferUrl =
+            "https://mega.nz/#$productId/uao=Android app Ver $appVersion?external_transaction_token=$externalTransactionToken&session=abc123"
+
+        whenever(environmentRepository.getAppInfo()).thenReturn(appInfo)
+        wheneverBlocking { getSessionTransferURLUseCase(any()) }.thenReturn(sessionTransferUrl)
+
+        val result = underTest(productId, null, externalTransactionToken)
+
+        assertThat(result).isEqualTo(sessionTransferUrl)
+        val urlCaptor = argumentCaptor<String>()
+        verify(getSessionTransferURLUseCase).invoke(urlCaptor.capture())
+        assertThat(urlCaptor.firstValue).isEqualTo(inputUrl)
+        assertThat(urlCaptor.firstValue).contains("external_transaction_token=$externalTransactionToken")
+    }
+
+    @Test
+    fun `test that URL includes both months and external_transaction_token when both are provided`() =
+        runTest {
+            val productId = "propay_2"
+            val months = 12
+            val externalTransactionToken = "token456"
+            val appVersion = "15.21"
+            val appInfo = AppInfo(appVersion = appVersion, sdkVersion = null)
+            val inputUrl =
+                "$productId/uao=Android app Ver $appVersion?m=$months&external_transaction_token=$externalTransactionToken"
+            val sessionTransferUrl =
+                "https://mega.nz/#$productId/uao=Android app Ver $appVersion?m=$months&external_transaction_token=$externalTransactionToken&session=def456"
+
+            whenever(environmentRepository.getAppInfo()).thenReturn(appInfo)
+            wheneverBlocking { getSessionTransferURLUseCase(any()) }.thenReturn(sessionTransferUrl)
+
+            val result = underTest(productId, months, externalTransactionToken)
+
+            assertThat(result).isEqualTo(sessionTransferUrl)
+            val urlCaptor = argumentCaptor<String>()
+            verify(getSessionTransferURLUseCase).invoke(urlCaptor.capture())
+            assertThat(urlCaptor.firstValue).isEqualTo(inputUrl)
+            assertThat(urlCaptor.firstValue).contains("?m=$months&external_transaction_token=$externalTransactionToken")
+        }
+
+    @Test
+    fun `test that URL handles empty string token correctly`() = runTest {
+        val productId = "propay_1"
+        val externalTransactionToken = ""
+        val appVersion = "15.21"
+        val appInfo = AppInfo(appVersion = appVersion, sdkVersion = null)
+        val inputUrl = "$productId/uao=Android app Ver $appVersion?external_transaction_token="
+        val sessionTransferUrl =
+            "https://mega.nz/#$productId/uao=Android app Ver $appVersion?external_transaction_token=&session=abc123"
+
+        whenever(environmentRepository.getAppInfo()).thenReturn(appInfo)
+        wheneverBlocking { getSessionTransferURLUseCase(any()) }.thenReturn(sessionTransferUrl)
+
+        val result = underTest(productId, null, externalTransactionToken)
+
+        assertThat(result).isEqualTo(sessionTransferUrl)
+        val urlCaptor = argumentCaptor<String>()
+        verify(getSessionTransferURLUseCase).invoke(urlCaptor.capture())
+        assertThat(urlCaptor.firstValue).isEqualTo(inputUrl)
+        assertThat(urlCaptor.firstValue).contains("external_transaction_token=")
+    }
 }

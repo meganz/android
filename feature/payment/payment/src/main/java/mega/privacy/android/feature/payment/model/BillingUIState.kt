@@ -7,4 +7,5 @@ import de.palm.composestateevents.consumed
 data class BillingUIState(
     val generalError: StateEvent = consumed,
     val onExternalPurchaseClick: StateEventWithContent<String> = consumed(),
+    val isLoadingExternalCheckout: Boolean = false,
 )

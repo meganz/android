@@ -138,7 +138,9 @@ fun ChooseAccountRoute(
                 planType = subscription.accountType,
                 isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
             )
-            billingViewModel.onExternalPurchaseClick(subscription, monthly)
+            activity?.let {
+                billingViewModel.onExternalPurchaseClick(it, subscription, monthly)
+            }
         },
         isExternalCheckoutEnabled = uiState.isExternalCheckoutEnabled,
         isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
@@ -148,8 +150,6 @@ fun ChooseAccountRoute(
             Analytics.tracker.trackEvent(BackButtonPressedEvent)
             onBack()
         },
-        showExternalCheckoutInformation = uiState.showExternalCheckoutInformation,
-        onSetExternalCheckoutInformationPreference = chooseAccountViewModel::setExternalCheckoutInformationPreference
     )
 }
 

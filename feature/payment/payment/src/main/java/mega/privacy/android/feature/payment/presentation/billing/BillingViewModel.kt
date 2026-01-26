@@ -15,15 +15,20 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
+import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
 import mega.privacy.android.domain.usecase.billing.QueryPurchase
+import mega.privacy.android.feature.payment.domain.LaunchExternalContentLinkUseCase
 import mega.privacy.android.feature.payment.domain.LaunchPurchaseFlowUseCase
 import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.extensions.toWebClientProductId
 import mega.privacy.android.feature.payment.usecase.GeneratePurchaseUrlUseCase
 import timber.log.Timber
 import javax.inject.Inject
+import androidx.core.net.toUri
+import mega.privacy.android.feature.payment.domain.CreateExternalContentLinkTokenUseCase
+import mega.privacy.android.domain.entity.billing.ExternalContentLinkResult
 
 /**
  * Billing view model
@@ -35,6 +40,8 @@ class BillingViewModel @Inject constructor(
     private val queryPurchase: QueryPurchase,
     private val launchPurchaseFlowUseCase: LaunchPurchaseFlowUseCase,
     private val generatePurchaseUrlUseCase: GeneratePurchaseUrlUseCase,
+    private val createExternalContentLinkTokenUseCase: CreateExternalContentLinkTokenUseCase,
+    private val launchExternalContentLinkUseCase: LaunchExternalContentLinkUseCase,
     monitorBillingEventUseCase: MonitorBillingEventUseCase,
 ) : ViewModel() {
 
@@ -150,26 +157,83 @@ class BillingViewModel @Inject constructor(
     /**
      * Handles external purchase click by generating a purchase URL and updating the UI state.
      *
-     * This method generates a purchase URL for external checkout based on the subscription
-     * and billing period (monthly or yearly). The generated URL is set in [uiState]
-     * as a triggered event that can be observed by the UI to launch the external purchase flow.
+     * This method follows the Google Play Billing Library's external content links integration:
+     * 1. First checks if external content links billing program is available
+     * 2. If available, generates the external website URL and uses launchExternalContentLink API
+     * 3. If successful, triggers the URL launch event
+     * 4. Otherwise, falls back to generating a purchase URL using the existing method
+     *
+     * The generated URL is set in [uiState] as a triggered event that can be observed
+     * by the UI to launch the external purchase flow.
      * If URL generation fails, an error is set in [uiState.generalError] which can be
      * observed by the UI to show user feedback.
      *
+     * @param activity The activity to launch from (required for external content links API)
      * @param subscription The subscription to purchase, containing account type information
      * @param monthly True if the billing period is monthly (1 month), false if yearly (12 months)
      */
-    fun onExternalPurchaseClick(subscription: Subscription, monthly: Boolean) {
+    fun onExternalPurchaseClick(
+        activity: Activity,
+        subscription: Subscription,
+        monthly: Boolean,
+    ) {
+        // Show loading indicator on button and disable it immediately when clicked
+        _uiState.update {
+            it.copy(isLoadingExternalCheckout = true)
+        }
+
         viewModelScope.launch {
             runCatching {
+                val externalTransactionToken = createExternalContentLinkTokenUseCase()
+
+                // Log warning if token is null but external content links are available
+                if (externalTransactionToken == null) {
+                    Timber.Forest.w("External transaction token is null but external content links are available")
+                }
+
+                // Generate the external website URL first
                 val externalCheckoutUrl = generatePurchaseUrlUseCase(
-                    subscription.accountType.toWebClientProductId(),
-                    if (monthly) 1 else 12
+                    productId = subscription.accountType.toWebClientProductId(),
+                    months = if (monthly) 1 else 12,
+                    externalTransactionToken = externalTransactionToken
                 )
-                _uiState.update {
-                    it.copy(
-                        onExternalPurchaseClick = triggered(content = externalCheckoutUrl)
-                    )
+
+                // Use Google Play Billing Library's external content links API
+                val linkUri = externalCheckoutUrl.toUri()
+                val result = launchExternalContentLinkUseCase(
+                    activity = activity,
+                    linkUri = linkUri,
+                )
+
+                when (result) {
+                    is ExternalContentLinkResult.Success -> {
+                        // Operation succeeded (token obtained and link approved)
+                        // Launch the URL with the token (using CALLER_WILL_LAUNCH_LINK mode)
+                        Timber.Forest.d("External content link operation succeeded, launching URL")
+                        _uiState.update {
+                            it.copy(
+                                onExternalPurchaseClick = triggered(content = externalCheckoutUrl),
+                                isLoadingExternalCheckout = false
+                            )
+                        }
+                        // External checkout launched - purchase completion will be handled via billing events
+                    }
+
+                    is ExternalContentLinkResult.Cancelled -> {
+                        // User cancelled the operation
+                        Timber.Forest.d("User cancelled external content link operation")
+                        _uiState.update {
+                            it.copy(isLoadingExternalCheckout = false)
+                        }
+                    }
+
+                    is ExternalContentLinkResult.Failed -> {
+                        // Operation failed - hide loading state and show error
+                        Timber.Forest.w(
+                            "External content link operation failed: ${result.errorMessage}"
+                        )
+                        onGeneralError()
+                    }
                 }
             }.onFailure { exception ->
                 Timber.Forest.e(exception, "Failed to launch purchase flow")
@@ -180,7 +244,10 @@ class BillingViewModel @Inject constructor(
 
     fun onGeneralError() {
         _uiState.update {
-            it.copy(generalError = triggered)
+            it.copy(
+                generalError = triggered,
+                isLoadingExternalCheckout = false
+            )
         }
     }
 }

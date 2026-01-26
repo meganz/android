@@ -11,6 +11,7 @@ import javax.inject.Inject
  * - Product ID for the subscription plan
  * - User agent override (UAO) parameter with app version information
  * - Optional months parameter for billing period
+ * - Optional external transaction token from Google Play Billing
  *
  * @param environmentRepository Repository to access app environment information
  * @param getSessionTransferURLUseCase Use case to generate session transfer URLs
@@ -25,12 +26,24 @@ class GeneratePurchaseUrlUseCase @Inject constructor(
      *
      * @param productId The product ID for the subscription (e.g., "propay_1", "propay_2")
      * @param months Optional billing period in months (1 for monthly, 12 for yearly, null if not specified)
+     * @param externalTransactionToken Optional external transaction token from Google Play Billing
      * @return The complete URL for external purchase checkout
      */
-    suspend operator fun invoke(productId: String, months: Int?): String {
+    suspend operator fun invoke(
+        productId: String,
+        months: Int?,
+        externalTransactionToken: String? = null,
+    ): String {
         val uao = getUao()
-        val monthsQueryParam = months?.let { "?m=$it" } ?: ""
-        return getSessionTransferURLUseCase("$productId/uao=$uao$monthsQueryParam")
+        val queryParams = buildString {
+            val params = mutableListOf<String>()
+            months?.let { params.add("m=$it") }
+            externalTransactionToken?.let { params.add("external_transaction_token=$it") }
+            if (params.isNotEmpty()) {
+                append("?${params.joinToString("&")}")
+            }
+        }
+        return getSessionTransferURLUseCase("$productId/uao=$uao$queryParams")
     }
 
     /**

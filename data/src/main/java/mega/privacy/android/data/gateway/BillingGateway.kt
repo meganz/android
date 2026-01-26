@@ -1,9 +1,11 @@
 package mega.privacy.android.data.gateway
 
 import android.app.Activity
+import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
+import mega.privacy.android.domain.entity.billing.ExternalContentLinkResult
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.exception.ProductNotFoundException
 
@@ -41,4 +43,31 @@ internal interface BillingGateway {
      */
     @Throws(ProductNotFoundException::class)
     suspend fun launchPurchaseFlow(activity: Activity, productId: String, offerId: String?)
+
+    /**
+     * Check if external content links billing program is available.
+     *
+     * @return [Boolean] true if external content links are available, false otherwise
+     */
+    suspend fun isExternalContentLinkAvailable(): Boolean
+
+    /**
+     * Create billing program reporting details to get external transaction token.
+     *
+     * @return [String]? The external transaction token, or null if not available
+     */
+    suspend fun createExternalContentLinkReportingDetails(): String?
+
+    /**
+     * Launch external link using Google Play Billing Library's external content links API.
+     *
+     * @param activity The activity to launch from
+     * @param linkUri The URI of the external website
+     * @return [ExternalContentLinkResult] The result of the operation (Success, Cancelled, or Failed)
+     */
+    suspend fun launchExternalContentLink(
+        activity: Activity,
+        linkUri: Uri,
+    ): ExternalContentLinkResult
 }
+

@@ -1,6 +1,8 @@
 package mega.privacy.android.data.repository
 
 import android.app.Activity
+import android.net.Uri
+import mega.privacy.android.domain.entity.billing.ExternalContentLinkResult
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 
 /**
@@ -19,4 +21,16 @@ interface AndroidBillingRepository {
         productId: String,
         offerId: String?,
     )
+
+    /**
+     * Launch external link using Google Play Billing Library's external content links API.
+     *
+     * @param activity The activity to launch from
+     * @param linkUri The URI of the external website
+     * @return [ExternalContentLinkResult] The result of the operation (Success, Cancelled, or Failed)
+     */
+    suspend fun launchExternalContentLink(
+        activity: Activity,
+        linkUri: Uri,
+    ): ExternalContentLinkResult
 }

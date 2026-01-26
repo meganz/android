@@ -267,7 +267,6 @@ class NewChooseAccountScreenTest {
             isUpgradeAccount = true,
             isExternalCheckoutEnabled = true,
             isExternalCheckoutDefault = true,
-            showExternalCheckoutInformation = false,
             onExternalCheckoutClick = { _, _ -> externalCheckoutClicked = true },
             onBuyPlanClick = { inAppCheckoutClicked = true }
         )
@@ -334,7 +333,6 @@ class NewChooseAccountScreenTest {
             isUpgradeAccount = true,
             isExternalCheckoutEnabled = true,
             isExternalCheckoutDefault = false,
-            showExternalCheckoutInformation = false,
             onExternalCheckoutClick = { subscription, _ -> clickedSubscription = subscription }
         )
 
@@ -534,7 +532,6 @@ class NewChooseAccountScreenTest {
         billingUIState: BillingUIState = BillingUIState(),
         clearExternalPurchaseError: () -> Unit = {},
         userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
-        showExternalCheckoutInformation: Boolean = false,
         uiState: ChooseAccountState = ChooseAccountState(
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
@@ -553,8 +550,7 @@ class NewChooseAccountScreenTest {
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
             isExternalCheckoutDefault = isExternalCheckoutDefault,
             onExternalCheckoutClick = onExternalCheckoutClick,
-            userAgeComplianceStatus = userAgeComplianceStatus,
-            showExternalCheckoutInformation = showExternalCheckoutInformation,
+            userAgeComplianceStatus = userAgeComplianceStatus
         )
     }
 }

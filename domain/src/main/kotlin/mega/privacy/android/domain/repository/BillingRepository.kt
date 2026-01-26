@@ -100,4 +100,19 @@ interface BillingRepository {
         subscriptionId: String,
         canContact: Int,
     )
+
+    /**
+     * Check if external content links billing program is available.
+     *
+     * @return [Boolean] true if external content links are available, false otherwise
+     */
+    suspend fun isExternalContentLinkAvailable(): Boolean
+
+    /**
+     * Create billing program reporting details to get external transaction token.
+     *
+     * @return [String]? The external transaction token, or null if not available
+     */
+    suspend fun createExternalContentLinkReportingDetails(): String?
 }
+
