@@ -1548,7 +1548,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="other">กู้คืนแล้ว %d%d รายการ แต่ไม่สำเร็จ 1 รายการ กรุณาลองใหม่ภายหลัง</item>
+        <item quantity="other">กู้คืนแล้ว %d รายการ แต่ไม่สำเร็จ 1 รายการ กรุณาลองใหม่ภายหลัง</item>
     </plurals>
     <!-- category in sort by action to sort by name -->
     <string name="action_sort_by_name">ชื่อ</string>
@@ -1840,4 +1840,110 @@
     <string name="invalid_chat_link_error_message">การสนทนานี้ไม่สามารถใช้งานได้อีกต่อไป</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">ค้นหา&#8230;</string>
+    <string name="payment_ads_free_intro_title">ต้องการใช้งาน MEGA แบบไร้โฆษณารบกวนหรือไม่</string>
+    <string name="payment_ads_free_intro_description">อัปเกรดเป็นแผน Pro เพื่อรับพื้นที่จัดเก็บข้อมูลจุใจและสิทธิประโยชน์อื่นอีกมากมาย แผน Pro ของเราเริ่มต้นเพียง %1$s ต่อเดือน</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="other">ลิงก์นี้จะไม่เปิดเป็นสาธารณะอีกต่อไป</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="other">ต้องการยกเลิกการแชร์โฟลเดอร์ %1$d รายการนี้ใช่ไหม</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="other">กำลังลองถ่ายโอนอีกครั้ง กรุณาดูความคืบหน้าที่แท็บกำลังดำเนินการ</item>
+    </plurals>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s สำหรับระยะเวลา %3$s</string>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">ต้องการลบอัลบั้มหรือไม่</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">ต้องการลบลิงก์หรือไม่</item>
+    </plurals>
+    <string name="timeline_tab_filter_apply_filter_button">ใช้ตัวกรอง</string>
+    <string name="general_invite_contact">เชิญผู้ติดต่อ</string>
+    <string name="contact_found_dialog_title">พบรายชื่อผู้ติดต่อ</string>
+    <string name="album_content_action_remove_favourites">ลบออกจากรายการโปรด</string>
+    <string name="context_empty_cloud_drive_title">ยังไม่มีข้อมูลในพื้นที่จัดเก็บส่วนตัวของคุณ</string>
+    <string name="open_link_account_confirmation_error">คุณเข้าสู่ระบบด้วยบัญชี MEGA บัญชีอื่นอยู่ กรุณาออกจากระบบก่อน แล้วจึงเปิดลิงก์ยืนยันบัญชีอีกครั้ง</string>
+    <string name="general_invalid_link">ลิงก์ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งหรือขอรับลิงก์ใหม่</string>
+    <string name="can_only_join_one_call_error_message">หากต้องการเข้าร่วมการโทรนี้ คุณต้องวางสายจากการสนทนาปัจจุบันก่อน</string>
+    <string name="album_content_remove_link_dialog_title">ต้องการลบลิงก์หรือไม่</string>
+    <string name="album_content_remove_multiple_links_dialog_title">ต้องการลบลิงก์เหล่านี้หรือไม่</string>
+    <string name="album_content_remove_link_dialog_description">คนที่คุณแชร์ลิงก์นี้ให้จะไม่สามารถเข้าถึงอัลบั้มได้อีกต่อไป</string>
+    <string name="album_content_remove_multiple_links_dialog_description">คนที่คุณแชร์ลิงก์เหล่านี้ให้จะไม่สามารถเข้าถึงอัลบั้มได้อีกต่อไป</string>
+    <string name="delete_album_singular_confirmation_dialog_title">ต้องการลบอัลบั้มหรือไม่</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">ต้องการลบอัลบั้มเหล่านี้หรือไม่</string>
+    <string name="delete_album_singular_confirmation_dialog_description">ไฟล์ภายในอัลบั้มนี้จะไม่ถูกลบไปด้วย</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">ไฟล์ภายในอัลบั้มเหล่านี้จะไม่ถูกลบไปด้วย</string>
+    <string name="external_checkout_information_title">กำลังออกจากแอป MEGA</string>
+    <string name="external_checkout_information_description">คุณกำลังจะเปิดเว็บไซต์ภายนอก (%1$s) ทั้งนี้ MEGA จะเป็นผู้รับผิดชอบดูแลธุรกรรมและการสนับสนุนลูกค้า</string>
+    <string name="external_checkout_show_next_time">แสดงข้อความนี้ในครั้งต่อไป</string>
+    <string name="general_action_save">บันทึก</string>
+    <string name="album_cover_selected_success_message">อัปเดตปกอัลบั้มเรียบร้อยแล้ว</string>
+    <string name="general_action_filter">ตัวกรอง</string>
+    <string name="timeline_photos_source_all_locations">ทุกตำแหน่งที่ตั้ง</string>
+    <string name="album_photos_selection_limit_dialog_title">ไม่สามารถเลือกรายการเพิ่มได้อีก</string>
+    <string name="album_photos_selection_limit_dialog_description">คุณสามารถเพิ่มรายการลงในอัลบั้มได้สูงสุดครั้งละ %d รายการเท่านั้น</string>
+    <string name="album_photos_selection_empty_state_no_media_found">ไม่พบไฟล์สื่อ</string>
+    <string name="album_photos_selection_screen_title">เพิ่มรายการลงใน “%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="other">เพิ่ม %1$d รายการลงใน “%2$s“ เรียบร้อยแล้ว</item>
+    </plurals>
+    <string name="albums_multiple_delete_success_message">ลบ %d อัลบั้มเรียบร้อยแล้ว</string>
+    <string name="home_screen_no_network_desc">คุณกำลังออฟไลน์\nหากคุณตั้งค่าไฟล์ให้ใช้งานแบบบันทึกออฟไลน์ได้ คุณจะยังสามารถเข้าถึงไฟล์เหล่านั้นได้โดยไม่ต้องเชื่อมต่ออินเทอร์เน็ต</string>
+    <string name="home_screen_no_network_desc_with_offline_files">คุณกำลังออฟไลน์\nรายการที่คุณบันทึกออฟไลน์ไว้ยังคงสามารถใช้งานได้</string>
+    <string name="home_screen_no_network_view_offline_files_button">ดูไฟล์ออฟไลน์</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">อัปเดตสิทธิ์การอนุญาต</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">เพื่อให้แน่ใจว่าเราจะเก็บทุกความทรงจำของคุณไว้ครบถ้วน MEGA จำเป็นต้องใช้สิทธิ์เข้าถึงคลังรูปภาพของคุณแบบเต็มที่</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">แบตเตอรี่ต่ำเกินไป กรุณาชาร์จอุปกรณ์เพื่อเริ่มการอัปโหลดจากกล้อง</string>
+    <string name="media_main_screen_camera_uploads_updated">อัปเดตการอัปโหลดจากกล้องเรียบร้อยแล้ว</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">การอัปโหลดจากกล้องเป็นปัจจุบันแล้ว</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">ใช้โควตาการถ่ายโอนเกินกำหนด</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">ใช้พื้นที่จัดเก็บเกินโควตา</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">หยุดชั่วคราว</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">อยู่ในคิว</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">ใกล้เสร็จสมบูรณ์</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">กำลังลองอีกครั้ง</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">คีย์ถอดรหัส</string>
+    <string name="album_decryption_key_description">ระบบการเข้ารหัสด้วยวิธีซีโร่-นอว์เลจของเราจำเป็นต้องใช้คีย์เฉพาะที่สร้างขึ้นอัตโนมัติสำหรับไฟล์หรือโฟลเดอร์นี้ โดยปกติระบบจะสร้างลิงก์พร้อมคีย์นี้ให้ แต่คุณสามารถเลือกส่งออกคีย์ถอดรหัสแยกต่างหากเพื่อเพิ่มความปลอดภัยอีกชั้นหนึ่งได้</string>
+    <string name="search_placeholder_folder">ค้นหาใน %s</string>
+    <string name="search_placeholder_cloud_drive">ค้นหาในคลาวด์ไดร์ฟ</string>
+    <string name="search_placeholder_rubbish_bin">ค้นหาในถังขยะ</string>
+    <string name="search_placeholder_incoming_shares">ค้นหาในรายการที่แชร์เข้ามา</string>
+    <string name="search_placeholder_outgoing_shares">ค้นหาในรายการที่แชร์ออกไป</string>
+    <string name="search_placeholder_links">ค้นหาในลิงก์</string>
+    <string name="search_placeholder_favourites">ค้นหาในรายการโปรด</string>
+    <string name="search_placeholder_documents">ค้นหาในเอกสาร</string>
+    <string name="search_placeholder_audios">ค้นหาในไฟล์เสียง</string>
+    <string name="search_placeholder_videos">ค้นหาในวิดีโอ</string>
+    <string name="search_placeholder_backups">ค้นหาในข้อมูลสำรอง</string>
+    <string name="copyright_screen_title">คำเตือนเรื่องลิขสิทธิ์สำหรับผู้ใช้ทุกคน</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA เคารพในลิขสิทธิ์ของผู้อื่น และกำหนดให้ผู้ใช้บริการ MEGA คลาวด์ ต้องปฏิบัติตามกฎหมายลิขสิทธิ์</string>
+    <string name="copyright_screen_description_second_paragraph">ห้ามมิให้คุณใช้บริการ MEGA คลาวด์เพื่อละเมิดลิขสิทธิ์โดยเด็ดขาด คุณต้องไม่อัปโหลด ดาวน์โหลด จัดเก็บ แชร์ แสดง สตรีม แจกจ่าย ส่งอีเมล สร้างลิงก์ ส่งต่อ หรือเผยแพร่ไฟล์ ข้อมูล หรือคอนเทนต์ใด ๆ ที่ละเมิดลิขสิทธิ์หรือสิทธิในทรัพย์สินอื่นใดของบุคคลหรือนิติบุคคล</string>
+    <string name="copyright_action_agree">ยอมรับ</string>
+    <string name="copyright_action_disagree">ไม่ยอมรับ</string>
+    <string name="general_clear_all">ล้างทั้งหมด</string>
 </resources>

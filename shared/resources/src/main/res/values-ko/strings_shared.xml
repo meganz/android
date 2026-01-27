@@ -1867,4 +1867,80 @@
     <plurals name="transfers_retry_feedback_snackbar_message">
         <item quantity="other">전송 다시 시도 중, 진행 상황은 활성 탭을 보세요</item>
     </plurals>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">사진첩을 삭제할까요?</item>
+    </plurals>
+    <plurals name="delete_album_confirmation_dialog_description">
+        <item quantity="other">사진첩이 삭제되지만 내용물은 연표에 남아있게 됩니다.</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">링크를 삭제할까요?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_description">
+        <item quantity="other">이 링크를 공유받은 사람들이 사진첩에 접속할 수 없게 됩니다.</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_positive_button">
+        <item quantity="other">링크 제거</item>
+    </plurals>
+    <string name="album_content_remove_link_dialog_title">링크를 제거할까요?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">링크를 제거할까요?</string>
+    <string name="album_content_remove_link_dialog_description">이 링크를 공유받은 사람들이 사진첩에 접속할 수 없게 됩니다</string>
+    <string name="album_content_remove_multiple_links_dialog_description">이 링크를 공유받은 사람들이 사진첩에 접속할 수 없게 됩니다</string>
+    <string name="delete_album_singular_confirmation_dialog_title">사진첩을 삭제할까요?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">사진첩을 삭제할까요?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">사진첩의 내용물은 삭제되지 않습니다</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">사진첩의 내용물은 삭제되지 않습니다</string>
+    <string name="general_action_save">저장</string>
+    <string name="album_cover_selected_success_message">사진첩 표지 변경됨</string>
+    <string name="general_action_filter">필터</string>
+    <string name="timeline_photos_source_all_locations">모든 위치</string>
+    <string name="album_photos_selection_limit_dialog_title">더 선택할 수 없음</string>
+    <string name="album_photos_selection_limit_dialog_description">한번에 사진첩에 추가할 수 있는 항목은 %d개입니다.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">발견된 미디어 없음</string>
+    <string name="album_photos_selection_screen_title">“%s”에 항목 추가</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="other">“%2$s”에 %1$d개의 항목 추가함</item>
+    </plurals>
+    <string name="albums_multiple_delete_success_message">사진첩 %d개 삭제됨</string>
+    <string name="home_screen_no_network_desc">오프라인 상태입니다.\n파일을 오프라인에서 이용 가능하게 했다면, 연결이 없어도 접근 가능합니다.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">오프라인 상태입니다.\n오프라인으로 이용하기 위해 저장한 항목들은 여전히 이용 가능합니다.</string>
+    <string name="home_screen_no_network_view_offline_files_button">오프라인 파일 보기</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">권한 변경</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">당신의 추억을 잃지 않게 하기 위해, MEGA는 당신의 사진 라이브러리에 대한 전체 접근 권한이 필요합니다.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">배터리 수준이 너무 낮습니다. 카메라 업로드를 시작하려면 장치를 충전하세요.</string>
+    <string name="media_main_screen_camera_uploads_updated">카메라 업로드 변경됨</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">카메라 업로드가 최신 상태입니다</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">전송 할당량 초과됨</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">저장소 할당량 초과됨</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">일시정지됨</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">대기 중</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">완료 중</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">재시도 중</string>
+    <string name="label_file_speed_byte">%1$sB/s</string>
+    <string name="label_file_speed_kilo_byte">%1$sKB/s</string>
+    <string name="label_file_speed_mega_byte">%1$sMB/s</string>
+    <string name="label_file_speed_giga_byte">%1$sGB/s</string>
+    <string name="label_file_speed_tera_byte">%1$sTB/s</string>
+    <string name="label_file_size_byte">%1$sB</string>
+    <string name="label_file_size_kilo_byte">%1$sKB</string>
+    <string name="label_file_size_mega_byte">%1$sMB</string>
+    <string name="label_file_size_giga_byte">%1$sGB</string>
+    <string name="label_file_size_tera_byte">%1$sTB</string>
+    <string name="label_file_size_peta_byte">%1$sPB</string>
+    <string name="label_file_size_exa_byte">%1$sEB</string>
+    <string name="label_file_upload_speed_byte">%1$sB/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$sKB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$sMB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$sGB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$sTB/s</string>
+    <string name="label_file_upload_size_byte">%1$sB</string>
+    <string name="label_file_upload_size_kilo_byte">%1$sKB</string>
+    <string name="label_file_upload_size_mega_byte">%1$sMB</string>
+    <string name="label_file_upload_size_giga_byte">%1$sGB</string>
+    <string name="label_file_upload_size_tera_byte">%1$sTB</string>
+    <string name="label_file_upload_size_peta_byte">%1$sPB</string>
+    <string name="label_file_upload_size_exa_byte">%1$sEB</string>
+    <string name="album_decryption_key_title">복호화 키</string>
+    <string name="album_decryption_key_description">우리의 영지식 암호화 시스템은 이 파일 또는 폴더를 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키에 대한 링크는 자동으로 생성되지만, 보안을 위해 복호화 키를 별도로 내보낼 수 있습니다.</string>
+    <string name="general_clear_all">모두 지우기</string>
 </resources>

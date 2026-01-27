@@ -1033,7 +1033,7 @@
     <!-- Notification content for upload final notification in case of a single file upload. -->
     <string name="transfers_notification_title_single_upload">“%1$s” yüklendi</string>
     <!-- Title of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
-    <string name="general_sync_warning_lost_wifi_title">Bağlantı kesilmesi nedeniyle senkronizasyon duraklatıldı</string>
+    <string name="general_sync_warning_lost_wifi_title">Bağlantı kesilmesi nedeniyle senkronizasyon duraklatıldı.</string>
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Devam etmek için Wi-Fi’ye yeniden bağlanın.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
@@ -2005,4 +2005,7 @@
     <string name="copyright_screen_description_second_paragraph">Telif haklarını ihlal etmek için MEGA Bulut hizmetini kullanmanız kesinlikle yasaktır. Herhangi bir kişi veya kuruluşun telif hakkını veya diğer mülkiyet haklarını ihlal eden herhangi bir dosya, veri veya içeriği yükleyemez, indiremez, depolayamaz, paylaşamaz, görüntüleyemez, yayınlayamaz, dağıtamaz, e-posta ile gönderemez, bağlantı veremez, iletemez veya başka bir şekilde kullanıma sunamazsınız.</string>
     <string name="copyright_action_agree">Kabul ediyorum</string>
     <string name="copyright_action_disagree">Kabul etmiyorum</string>
+    <string name="general_clear_all">Tümünü temizle</string>
+    <string name="offline_remove_singular_item_success_message">1 öğe kaldırıldı</string>
+    <string name="offline_remove_multiple_item_success_message">%d öğe kaldırıldı</string>
 </resources>

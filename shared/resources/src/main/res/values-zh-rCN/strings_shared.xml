@@ -1894,4 +1894,20 @@
     <plurals name="album_photos_selection_success_message">
         <item quantity="other">已添加%1$d个项目到“%2$s”</item>
     </plurals>
+    <string name="search_placeholder_folder">在%s中搜索</string>
+    <string name="search_placeholder_cloud_drive">在云盘中搜索</string>
+    <string name="search_placeholder_rubbish_bin">在垃圾桶中搜索</string>
+    <string name="search_placeholder_incoming_shares">在分享给您的文件夹中搜索</string>
+    <string name="search_placeholder_outgoing_shares">在您分享的文件夹中搜索</string>
+    <string name="search_placeholder_links">在链接中搜索</string>
+    <string name="search_placeholder_favourites">在收藏夹中搜索</string>
+    <string name="search_placeholder_documents">在文档中搜索</string>
+    <string name="search_placeholder_audios">在音频中搜索</string>
+    <string name="search_placeholder_videos">在视频中搜索</string>
+    <string name="search_placeholder_backups">在备份中搜索</string>
+    <string name="copyright_screen_title">致所有用户的版权警告</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA尊重他人的版权，并要求MEGA云服务的用户遵守版权法。</string>
+    <string name="copyright_screen_description_second_paragraph">严禁使用MEGA云端服务侵犯版权。您不得上传、下载、存储、共享、展示、串流、散布、发送电子邮件、链接、传输或以其他方式提供任何侵犯任何个人或实体的任何版权或其他专有权利的任何文件、数据或内容。</string>
+    <string name="copyright_action_agree">同意</string>
+    <string name="copyright_action_disagree">不同意</string>
 </resources>

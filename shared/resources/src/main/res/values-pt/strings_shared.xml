@@ -1946,4 +1946,22 @@
     <string name="invalid_chat_link_error_message">Já não é possível acessar este chat</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Pesquisar&#8230;</string>
+    <string name="search_placeholder_folder">Pesquisar em %s</string>
+    <string name="search_placeholder_cloud_drive">Pesquisar na Nuvem de arquivos</string>
+    <string name="search_placeholder_rubbish_bin">Pesquisar na Lixeira</string>
+    <string name="search_placeholder_incoming_shares">Pesquisar nos itens compartilhados comigo</string>
+    <string name="search_placeholder_outgoing_shares">Pesquisar nos itens compartilhados por mim</string>
+    <string name="search_placeholder_links">Pesquisar nos links</string>
+    <string name="search_placeholder_favourites">Pesquisar nos favoritos</string>
+    <string name="search_placeholder_documents">Pesquisar nos documentos</string>
+    <string name="search_placeholder_audios">Pesquisar nos audios</string>
+    <string name="search_placeholder_videos">Pesquisar nos vídeos</string>
+    <string name="search_placeholder_backups">Pesquisar nos backups</string>
+    <string name="copyright_screen_title">Aviso de direitos autorais a todos os usuários</string>
+    <string name="copyright_screen_description_first_paragraph">O MEGA respeita os direitos autorais de terceiros e exige que os usuários do serviço de armazenamento em nuvem do MEGA cumpram as leis de direitos autorais.</string>
+    <string name="copyright_screen_description_second_paragraph">Está terminantemente proibido usar o serviço de armazenamento em nuvem do MEGA para infringir direitos autorais. Você não pode fazer upload, download, armazenar, compartilhar, visualizar, fazer streaming, distribuir, enviar por e-mail, criar um link, difundir ou disponibilizar quaisquer arquivos, dados ou conteúdos que infrinjam os direitos de autor ou outros direitos de propriedade de qualquer pessoa ou entidade.</string>
+    <string name="payment_ads_free_intro_title">Quer usar o MEGA sem anúncios?</string>
+    <string name="payment_ads_free_intro_description">Faça upgrade a um plano Pro com um amplo espaço de armazenamento e mais vantagens. Os nossos planos Pro custam a partir de %1$s por mês.</string>
+    <string name="copyright_action_agree">Concordo</string>
+    <string name="copyright_action_disagree">Discordo</string>
 </resources>

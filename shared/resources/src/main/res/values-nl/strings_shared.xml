@@ -433,7 +433,7 @@
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Mappen creëren&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
-    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Overdrachten starten...</string>
+    <string name="transfers_scanning_folders_dialog_starting_transfers_title">Overdrachten starten&#8230;</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
     <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">Sluit de applicatie niet. Als u sluit, gaan overdrachten die nog niet in de wachtrij staan verloren.</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
@@ -1954,7 +1954,7 @@
     <string name="timeline_tab_cu_permission_warning_banner_description">Om ervoor te zorgen dat we geen van uw herinneringen missen, heeft MEGA volledige toegang nodig tot uw fotobibliotheek.</string>
     <string name="timeline_tab_cu_battery_level_warning_banner_description">Batterijniveau te laag. Laad het apparaat op om camera-uploads te starten.</string>
     <string name="media_main_screen_camera_uploads_updated">Camera-uploads bijgewerkt</string>
-    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera-uploads zijn up-to-date.</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Camera-uploads zijn up-to-date</string>
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">Overdrachtstegoed overschreden</string>
     <string name="camera_uploads_progress_screen_label_storage_over_quota">Opslagtegoed overschreden</string>
     <string name="camera_uploads_progress_screen_label_transfer_paused">Gepauzeerd</string>
@@ -2003,4 +2003,7 @@
     <string name="copyright_screen_description_second_paragraph">Het is ten strengste verboden om de MEGA Cloud-service te gebruiken voor het schenden van auteursrechten. U mag geen bestanden, gegevens of inhoud uploaden, downloaden, opslaan, delen, weergeven, streamen, distribueren, e-mailen, linken naar, verzenden of op andere wijze beschikbaar stellen die inbreuk maken op auteursrechten of andere eigendomsrechten van een persoon of entiteit.</string>
     <string name="copyright_action_agree">Instemmen</string>
     <string name="copyright_action_disagree">Niet instemmen</string>
+    <string name="general_clear_all">Alles wissen</string>
+    <string name="offline_remove_singular_item_success_message">1 item verwijderd</string>
+    <string name="offline_remove_multiple_item_success_message">%d items verwijderd</string>
 </resources>

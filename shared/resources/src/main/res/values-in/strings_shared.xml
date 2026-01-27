@@ -1801,4 +1801,21 @@
     <string name="general_invalid_string">Tidak boleh kosong</string>
     <string name="mega_vpn_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;VPN, berlaku selamanya</string>
     <string name="mega_pass_achievement_awarded_storage_text_permanent">Dapatkan %1$s penyimpanan gratis saat anda memulai uji coba gratis MEGA&#160;Pass, berlaku selamanya</string>
+    <string name="search_placeholder_folder">Cari di %s</string>
+    <string name="search_placeholder_cloud_drive">Cari di Cloud drive</string>
+    <string name="search_placeholder_rubbish_bin">Cari di Sampah</string>
+    <string name="search_placeholder_incoming_shares">Cari di Berbagi masuk</string>
+    <string name="search_placeholder_outgoing_shares">Cari di Berbagi keluar</string>
+    <string name="search_placeholder_links">Cari di Tautan</string>
+    <string name="search_placeholder_favourites">Cari di Favorit</string>
+    <string name="search_placeholder_documents">Cari di Dokumen</string>
+    <string name="search_placeholder_audios">Cari di Audio</string>
+    <string name="search_placeholder_videos">Cari di Video</string>
+    <string name="search_placeholder_backups">Cari di Cadangan</string>
+    <string name="copyright_screen_title">Peringatan hak cipta ke semua pengguna</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA menghormati hak cipta orang lain dan mewajibkan pengguna layanan MEGA Cloud untuk mentaati hukum hak cipta.</string>
+    <string name="copyright_screen_description_second_paragraph">Anda dilarang menggunakan layanan MEGA Cloud service untuk melanggar hak cipta. Anda tidak dapat mengunggah, mengunduh, menyimpan, membagikan, menampilkan, menayangkan, mendistribusikan, email, tautan, transmisi atau membuat file, data, atau konten tersedia yang melanggar hak cipta atau hak lainnya dari seseorang atau entitas.</string>
+    <string name="copyright_action_agree">Setuju</string>
+    <string name="copyright_action_disagree">Tidak setuju</string>
+    <string name="general_clear_all">Hapus semua</string>
 </resources>

@@ -2104,4 +2104,7 @@
     <string name="copyright_screen_description_second_paragraph">Korzystanie z usługi MEGA Cloud w celu naruszania praw autorskich jest ściśle zabronione. Nie wolno przesyłać, pobierać, przechowywać, udostępniać, wyświetlać, transmitować ani w inny sposób rozpowszechniać plików, danych lub treści, które naruszają prawa autorskie lub inne prawa własności intelektualnej jakiejkolwiek osoby lub podmiotu.</string>
     <string name="copyright_action_agree">Zgadzam się</string>
     <string name="copyright_action_disagree">Niezgadzam się</string>
+    <string name="general_clear_all">Wyczyść wszystko</string>
+    <string name="offline_remove_singular_item_success_message">Usunięto 1 element</string>
+    <string name="offline_remove_multiple_item_success_message">Usunięto %d przedmiotów</string>
 </resources>

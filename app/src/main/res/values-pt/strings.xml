@@ -1123,13 +1123,13 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Aviso de direitos autorais a todos os usuários</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">O MEGA respeita os direitos autorais de terceiros e exige que os usuários do serviço de nuvem MEGA cumpram as leis de direitos autorais.</string>
+    <string name="copyright_alert_first_paragraph">O MEGA respeita os direitos autorais de terceiros e exige que os usuários do serviço de armazenamento em nuvem do MEGA cumpram as leis de direitos autorais.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Você está estritamente proibido de usar o serviço de nuvem do MEGA para infringir direitos autorais. Você não pode fazer upload, download, armazenar, compartilhar, visualizar, fazer streaming, distribuir, enviar por e-mail, criar um link, difundir ou disponibilizar quaisquer arquivos, dados ou conteúdos que infinjam os direitos de autor ou outros direitos de propriedade de qualquer pessoa ou entidade.</string>
+    <string name="copyright_alert_second_paragraph">Está terminantemente proibido usar o serviço de armazenamento em nuvem do MEGA para infringir direitos autorais. Você não pode fazer upload, download, armazenar, compartilhar, visualizar, fazer streaming, distribuir, enviar por e-mail, criar um link, difundir ou disponibilizar quaisquer arquivos, dados ou conteúdos que infrinjam os direitos de autor ou outros direitos de propriedade de qualquer pessoa ou entidade.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Concordo</string>
     <!-- text of the Disagree button -->
-    <string name="copyright_alert_disagree_button">Não concordo</string>
+    <string name="copyright_alert_disagree_button">Discordo</string>
     <!-- Hint how to cancel the download -->
     <string name="download_show_info">Mostrar informações</string>
     <!-- Error message when creating public links of nodes. Plural. -->

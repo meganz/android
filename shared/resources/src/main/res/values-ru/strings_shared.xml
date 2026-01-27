@@ -2086,4 +2086,20 @@
     <string name="home_screen_no_network_view_offline_files_button">Просмотреть файлы локально</string>
     <string name="timeline_tab_cu_permission_warning_banner_action">Обновить разрешения</string>
     <string name="timeline_tab_cu_permission_warning_banner_description">Чтобы мы не пропустили все ваши воспоминания, MEGA нужен полный доступ к галерее.</string>
+    <string name="search_placeholder_folder">Поиск в %s</string>
+    <string name="search_placeholder_cloud_drive">Поиск в Облачном диске</string>
+    <string name="search_placeholder_rubbish_bin">Поиск в Корзине</string>
+    <string name="search_placeholder_incoming_shares">Поиск во входящих элементах</string>
+    <string name="search_placeholder_outgoing_shares">Поиск в исходящих элементах</string>
+    <string name="search_placeholder_links">Поиск в ссылках</string>
+    <string name="search_placeholder_favourites">Поиск в Избранном</string>
+    <string name="search_placeholder_documents">Поиск в Документах</string>
+    <string name="search_placeholder_audios">Поиск в Аудио</string>
+    <string name="search_placeholder_videos">Поиск в Видео</string>
+    <string name="search_placeholder_backups">Поиск в резервных копиях</string>
+    <string name="copyright_screen_title">Предупреждение о защите авторских прав для всех пользователей</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA уважает авторские права других лиц и требует, чтобы пользователи облачного сервиса MEGA соблюдали законы об авторском праве.</string>
+    <string name="copyright_screen_description_second_paragraph">Запрещается использовать облачную службу MEGA для нарушения авторских прав. Вы не можете загружать, скачивать, хранить, обмениваться, показывать, транслировать, распространять, отправлять по электронной почте, делиться ссылкой или иным образом предоставлять любые файлы, данные или контент, которые нарушают любые авторские или другие имущественные права любого лица или организации.</string>
+    <string name="copyright_action_agree">Соглашаюсь</string>
+    <string name="copyright_action_disagree">Не соглашаюсь</string>
 </resources>

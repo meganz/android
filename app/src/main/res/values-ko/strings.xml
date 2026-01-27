@@ -1013,11 +1013,11 @@
     <!-- Text shown in playlist subtitle item when a file is reproducing but it is paused -->
     <string name="transfer_paused">일시정지됨</string>
     <!-- Possible state of a transfer -->
-    <string name="transfer_queued">대기열</string>
+    <string name="transfer_queued">대기 중</string>
     <!-- Possible state of a transfer. When the transfer is finishing -->
-    <string name="transfer_completing">완료중</string>
+    <string name="transfer_completing">완료 중</string>
     <!-- Possible state of a transfer. When the transfer is retrying -->
-    <string name="transfer_retrying">재시도중</string>
+    <string name="transfer_retrying">재시도 중</string>
     <!-- Text of the notification shown when the upload service is running: e.g. Uploading files: 1 of 10 -->
     <string name="upload_service_notification">파일 업로드 중: %2$d 중 %1$d</string>
     <!-- Text of the notification shown when the upload service is paused: e.g. Uploading files: 1 of 10 (paused)-->
@@ -1363,7 +1363,7 @@
     <!-- Title of the received requests tab. Capital letters -->
     <string name="tab_received_requests">받은 요청</string>
     <!-- Title dialog overquota error -->
-    <string name="overquota_alert_title">저장소 할당량 초과</string>
+    <string name="overquota_alert_title">저장소 할당량 초과됨</string>
     <!-- error message shown when an account confirmation link or reset password link is invalid for unknown reasons -->
     <string name="invalid_link">유효하지 않은 링크. 다시 시도하거나 새 것을 요청하세요.</string>
     <!-- error message shown on the link password dialog if the password typed in was wrong -->
@@ -2325,9 +2325,9 @@
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">실패</string>
     <!-- Label indicating transfer over quota -->
-    <string name="label_transfer_over_quota">전송 할당량 초과</string>
+    <string name="label_transfer_over_quota">전송 할당량 초과됨</string>
     <!-- Label indicating storage over quota -->
-    <string name="label_storage_over_quota">저장소 할당량 초과</string>
+    <string name="label_storage_over_quota">저장소 할당량 초과됨</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">클라우드 드라이브에서 파일을 찾을 수 없습니다.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -3379,7 +3379,7 @@
     <!-- Select album cover -->
     <string name="photos_album_select_cover">사진첩 표지 선택</string>
     <!-- Album cover updated -->
-    <string name="photos_album_cover_updated">사진첩 표지 업데이트됨</string>
+    <string name="photos_album_cover_updated">사진첩 표지 변경됨</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] [B]%2$s부터 %3$s까지[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$d is the placeholder for the period of days (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Every 2 days effective 26 January 2023 from 13:00 to 13:30 -->

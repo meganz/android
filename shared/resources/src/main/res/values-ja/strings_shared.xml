@@ -1954,4 +1954,7 @@
     <string name="copyright_screen_description_second_paragraph">MEGAクラウドサービスを使用して著作権を侵害することは厳しく禁止されています。あなたは、個人または団体の著作権またはその他の財産権を侵害するファイル、データ、またはコンテンツをアップロード、ダウンロード、保存、共有、表示、ストリーム配信、配布、メールで送信、リンク、送信、またはその他の方法で利用可能にすることはできません。</string>
     <string name="copyright_action_agree">同意する</string>
     <string name="copyright_action_disagree">同意しない</string>
+    <string name="general_clear_all">すべてクリア</string>
+    <string name="offline_remove_singular_item_success_message">1項目を削除しました</string>
+    <string name="offline_remove_multiple_item_success_message">%d 項目を削除しました</string>
 </resources>

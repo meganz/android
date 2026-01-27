@@ -1906,4 +1906,35 @@
     <string name="invalid_chat_link_error_message">Questa conversazione non è più disponibile</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Cerca&#8230;</string>
+    <string name="payment_ads_free_intro_title">Vuoi MEGA senza pubblicità?</string>
+    <string name="payment_ads_free_intro_description">Effettua l\’upgrade a un piano Pro con maggior spazio di archiviazione e molto altro. I nostri piano Pro sono disponibili a partire da %1$s al mese.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Questo link non sarà più pubblico e disponibile.</item>
+        <item quantity="many">Questi link non saranno più pubblici e disponibili.</item>
+        <item quantity="other">Questi link non saranno più pubblici e disponibili.</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Fermare la condivisione di questa cartella?</item>
+        <item quantity="many">Fermare la condivisione di queste %1$d cartelle?</item>
+        <item quantity="other">Fermare la condivisione di queste %1$d cartelle?</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="one">Riprovando il trasferimento, vedi la sezione Attivi per il progresso</item>
+        <item quantity="many">Riprovando i trasferimenti, vedi la sezione Attivi per il progresso</item>
+        <item quantity="other">Riprovando i trasferimenti, vedi la sezione Attivi per il progresso</item>
+    </plurals>
+    <string name="camera_update_network_requirement_not_met_banner_description">I Caricamenti da fotocamera sono in pausa, connettiti al Wi-Fi o permetti il caricamento utilizzando i dati mobili</string>
+    <string name="preview_not_available_undecrypted_files">Anteprima non disponibile per i file non decriptati</string>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Eliminare l\’album?</item>
+        <item quantity="many">Eliminare gli album?</item>
+        <item quantity="other">Eliminare gli album?</item>
+    </plurals>
+    <string name="external_checkout_button_text">Acquista sul nostro sito web (risparmia fino al %1$.0f%%)</string>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Rimuovere il link?</item>
+        <item quantity="many">Rimuovere i link?</item>
+        <item quantity="other">Rimuovere i link?</item>
+    </plurals>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">Per assicurarci di non perdere i tuoi ricordi, MEGA ha bisogno di accedere alla tua galleria. [A]Tocca per cambiare i permessi.[/A]</string>
 </resources>
