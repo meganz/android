@@ -44,7 +44,6 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -55,21 +54,10 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.photos.extensions.toTrackingEvent
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
@@ -81,10 +69,12 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
+import mega.privacy.android.feature.photos.presentation.component.MediaBottomBar
 import mega.privacy.android.feature.photos.presentation.effects.MediaMainEffects
 import mega.privacy.android.feature.photos.presentation.effects.MediaNodeActionEffects
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModelHandler
+import mega.privacy.android.feature.photos.presentation.handler.timelineActionsHandler
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
@@ -101,7 +91,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Timel
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
@@ -117,8 +106,6 @@ import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavK
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
-import mega.privacy.android.feature.photos.extensions.toTrackingEvent
-import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
 @SuppressLint("ComposeViewModelForwarding")
 @Composable
@@ -262,7 +249,6 @@ fun MediaMainRoute(
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         selectedPhotosInTypedNode = { timelineViewModel.selectedPhotosInTypedNode },
-        actionHandler = selectionModeActionHandler::invoke,
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
                 mediaSource = timelineFilterUiState.mediaSource,
@@ -326,7 +312,6 @@ fun MediaMainScreen(
     multiNodeActionHandler: MultiNodeActionHandler,
     navigationHandler: NavigationHandler,
     timelineFilterUiState: TimelineFilterUiState,
-    actionHandler: (MenuAction, List<TypedNode>) -> Unit,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
@@ -630,78 +615,39 @@ fun MediaMainScreen(
             }
         },
         bottomBar = {
-            SelectionModeBottomBar(
-                visible = selectionModeType == MediaSelectionModeType.Timeline,
-                actions = timelineTabActionUiState.selectionModeItem.bottomBarActions,
-                onActionPressed = {
-                    it.toTrackingEvent()?.let { event ->
-                        Analytics.tracker.trackEvent(event)
-                    }
-                    when (it) {
-                        TimelineSelectionMenuAction.Download -> {
-                            actionHandler(
-                                DownloadMenuAction(),
-                                selectedPhotosInTypedNode()
-                            )
-                            onClearTimelinePhotosSelection()
-                        }
-
-                        TimelineSelectionMenuAction.ShareLink -> {
-                            actionHandler(
-                                GetLinkMenuAction(),
-                                selectedPhotosInTypedNode()
-                            )
-                            onClearTimelinePhotosSelection()
-                        }
-
-                        TimelineSelectionMenuAction.SendToChat -> {
-                            actionHandler(
-                                SendToChatMenuAction(),
-                                selectedPhotosInTypedNode()
-                            )
-                            onClearTimelinePhotosSelection()
-                        }
-
-                        TimelineSelectionMenuAction.Share -> {
-                            actionHandler(
-                                ShareMenuAction(),
-                                selectedPhotosInTypedNode()
-                            )
-                            onClearTimelinePhotosSelection()
-                        }
-
-                        TimelineSelectionMenuAction.MoveToRubbishBin -> {
-                            actionHandler(
-                                TrashMenuAction(),
-                                selectedPhotosInTypedNode()
-                            )
-                            onClearTimelinePhotosSelection()
-                        }
-
-                        TimelineSelectionMenuAction.More -> {
-                            showBottomSheetActions = true
-                        }
-                    }
-                }
-            )
-
-            NodeSelectionModeBottomBar(
-                availableActions = nodeActionUiState.availableActions,
-                visibleActions = nodeActionUiState.visibleActions,
-                visible = nodeActionUiState.visibleActions.isNotEmpty() && selectionModeType == MediaSelectionModeType.Videos,
-                multiNodeActionHandler = multiNodeActionHandler,
-                selectedNodes = selectedVideoNodes,
-                isSelecting = false,
-            )
-
-            SelectionModeBottomBar(
-                actions = listOf(
+            MediaBottomBar(
+                selectionModeType = selectionModeType,
+                nodeActionUiState = nodeActionUiState,
+                timelineActions = timelineTabActionUiState.selectionModeItem.bottomBarActions,
+                albumsActions = listOf(
                     AlbumSelectionAction.ManageLink,
                     AlbumSelectionAction.Delete
                 ),
-                visible = albumsTabUiState.selectedUserAlbums.isNotEmpty(),
-                actionsEnabled = true,
-                onActionPressed = albumsTabViewModel::handleSelectionAction
+                selectedVideoNodes = selectedVideoNodes,
+                multiNodeActionHandler = multiNodeActionHandler,
+                onActionPressed = { mode, action ->
+                    when (mode) {
+                        MediaSelectionModeType.Timeline -> {
+                            action.toTrackingEvent()?.let { event ->
+                                Analytics.tracker.trackEvent(event)
+                            }
+                            timelineActionsHandler(
+                                action = action,
+                                selectedPhotosInTypedNode = selectedPhotosInTypedNode,
+                                actionHandler = multiNodeActionHandler::invoke,
+                                onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
+                                onShowBottomSheet = { showBottomSheetActions = true },
+                                onNavigateToAddToAlbum = onNavigateToAddToAlbum
+                            )
+                        }
+
+                        MediaSelectionModeType.Albums -> {
+                            albumsTabViewModel.handleSelectionAction(action)
+                        }
+
+                        else -> Unit
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -835,60 +781,14 @@ fun MediaMainScreen(
                 action.toTrackingEvent()?.let { event ->
                     Analytics.tracker.trackEvent(event)
                 }
-                when (action) {
-                    TimelineSelectionMenuAction.RemoveLink -> {
-                        actionHandler(
-                            RemoveLinkMenuAction(),
-                            selectedPhotosInTypedNode()
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    TimelineSelectionMenuAction.Hide -> {
-                        Analytics.tracker.trackEvent(TimelineHideNodeMenuItemEvent)
-                        actionHandler(
-                            HideMenuAction(),
-                            selectedPhotosInTypedNode()
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    TimelineSelectionMenuAction.Unhide -> {
-                        actionHandler(
-                            UnhideMenuAction(),
-                            selectedPhotosInTypedNode()
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    TimelineSelectionMenuAction.Move -> {
-                        actionHandler(
-                            MoveMenuAction(),
-                            selectedPhotosInTypedNode()
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    TimelineSelectionMenuAction.Copy -> {
-                        actionHandler(
-                            CopyMenuAction(),
-                            selectedPhotosInTypedNode()
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    TimelineSelectionMenuAction.AddToAlbum -> {
-                        onNavigateToAddToAlbum(
-                            LegacyAddToAlbumActivityNavKey(
-                                photoIds = selectedPhotosInTypedNode().map { it.id.longValue },
-                                viewType = 0
-                            )
-                        )
-                        onClearTimelinePhotosSelection()
-                    }
-
-                    else -> Unit
-                }
+                timelineActionsHandler(
+                    action = action,
+                    selectedPhotosInTypedNode = selectedPhotosInTypedNode,
+                    actionHandler = multiNodeActionHandler::invoke,
+                    onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
+                    onShowBottomSheet = { showBottomSheetActions = true },
+                    onNavigateToAddToAlbum = onNavigateToAddToAlbum
+                )
             }
         )
     }
@@ -1002,7 +902,6 @@ private fun PhotosMainScreenPreview() {
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             selectedTimePeriod = PhotoModificationTimePeriod.All,
             selectedPhotosInTypedNode = { emptyList() },
-            actionHandler = { _, _ -> },
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},

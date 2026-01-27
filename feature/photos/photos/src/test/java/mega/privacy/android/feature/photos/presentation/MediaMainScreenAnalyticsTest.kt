@@ -1,16 +1,10 @@
 package mega.privacy.android.feature.photos.presentation
 
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTouchInput
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
@@ -23,9 +17,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.domain.usecase.photos.DownloadPhotoUseCase
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.downloader.DownloadPhotoViewModel
-import mega.privacy.android.feature.photos.mapper.PhotoMapper
+import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
+import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
@@ -33,17 +29,10 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylists
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSelectionModeActionUiState
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
-import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_IMAGE_NODE_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAlbumsTabEvent
@@ -151,7 +140,6 @@ class MediaMainScreenAnalyticsTest {
                     multiNodeActionHandler = mock<MultiNodeActionHandler>(),
                     navigationHandler = mock(),
                     timelineFilterUiState = TimelineFilterUiState(),
-                    actionHandler = { _, _ -> },
                     setEnableCUPage = {},
                     onTimelineGridSizeChange = {},
                     onTimelineSortOptionChange = {},
