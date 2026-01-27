@@ -1112,7 +1112,7 @@
     <string name="download_show_info">Informatie weergeven</string>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
-        <item quantity="one">Mislukt om link te creëren. Probeer later nogmaals</item>
+        <item quantity="one">Mislukt om link te creëren. Probeer later nogmaals.</item>
         <item quantity="other">Mislukt om sommige links te creëren. Probeer later nogmaals.</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
@@ -1645,7 +1645,7 @@
     <!-- Subtitle of screen verify Two-Factor Authentication for disabling Two-Factor Authentication -->
     <string name="verify_2fa_subtitle_diable_2fa">Uitschakelen</string>
     <!-- When the user tries to disable Two-Factor Authentication and some error ocurr in the process -->
-    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van twee-staps authenticatie. Probeer nogmaals</string>
+    <string name="error_disable_2fa">Een fout heeft opgetreden tijdens het uitschakelen van twee-staps authenticatie. Probeer nogmaals.</string>
     <!-- When the user tries to enable Two-Factor Authentication and some error ocurr in the process -->
     <string name="error_enable_2fa">Een fout heeft opgetreden tijdens het inschakelen van twee-staps authenticatie. Probeer nogmaals.</string>
     <!-- Title of the dialog shown when a new account is created to suggest user enable Two-Factor Authentication -->
@@ -2439,9 +2439,9 @@
     <!-- Option in bottom sheet dialog for removing the associated phone number of current account. -->
     <string name="title_remove_phone_number">Verwijder telefoon nummer</string>
     <!-- Message showing to explain what will happen when the operation of -->
-    <string name="modify_phone_number_message">Met deze bewerking wordt uw huidige telefoonnummer verwijderd en wordt het proces gestart om een ​​nieuw telefoonnummer aan uw account te koppelen.</string>
+    <string name="modify_phone_number_message">Met deze bewerking wordt uw huidige telefoonnummer verwijderd en wordt het proces gestart om een nieuw telefoonnummer aan uw account te koppelen.</string>
     <!-- Message for action to remove the registered phone number. -->
-    <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een ​​telefoonnummer toe te voegen, moet u dit verifiëren.</string>
+    <string name="remove_phone_number_message">Hiermee wordt uw gekoppelde telefoonnummer uit uw account verwijderd. Als u er later voor kiest om een telefoonnummer toe te voegen, moet u dit verifiëren.</string>
     <!-- Text of an action button indicating something was successful and it can checks it by pressing it -->
     <string name="action_see">Weergeven</string>
     <!-- The label under the button of opening all-documents screen. The space is reduced, so please translate this string as short as possible. -->
@@ -2972,11 +2972,11 @@
     <!-- Title for subscription dialog that shows before delete account -->
     <string name="title_platform_subscription">%1s abonnement</string>
     <!-- Message for dialog that subscription is from android platform and shows before delete account -->
-    <string name="message_android_platform_subscription">U heeft een actief MEGA abonnement bij %1$s. U moet het wel apart opzeggen via %2$s, aangezien MEGA het niet voor u kan opzeggen. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_android_platform_subscription">U heeft een actief MEGA abonnement bij %1$s. U moet het wel apart opzeggen via %2$s, aangezien MEGA het niet voor u kan opzeggen. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Message for dialog that subscription is from other platform and shows before delete account  -->
-    <string name="message_other_platform_subscription">U heeft een actief MEGA-abonnement. Het wordt automatisch geannuleerd nadat het account is verwijderd. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_other_platform_subscription">U heeft een actief MEGA-abonnement. Het wordt automatisch geannuleerd nadat het account is verwijderd. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Message for dialog that subscription is from iTunes platform and shows before delete account  -->
-    <string name="message_itunes_platform_subscription">U heeft een actief MEGA-abonnement bij Apple. U moet het apart van uw iTunes-account annuleren, omdat MEGA het niet voor u kan annuleren. Bezoek ons ​​Helpcentrum voor meer informatie.</string>
+    <string name="message_itunes_platform_subscription">U heeft een actief MEGA-abonnement bij Apple. U moet het apart van uw iTunes-account annuleren, omdat MEGA het niet voor u kan annuleren. Bezoek ons Helpcentrum voor meer informatie.</string>
     <!-- Text for button of subscription dialog that shows before delete account -->
     <string name="button_visit_platform">Bezoek %1s</string>
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
@@ -4209,8 +4209,8 @@
     <string name="album_import_enter_album_name">Voer een albumnaam in</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where all user can access link-->
     <plurals name="cloud_drive_subtitle_links_access_user">
-        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden.</item>
-        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden.</item>
+        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden</item>
+        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
     <string name="general_save_to_cloud_drive">Opslaan op de Cloud schijf</string>

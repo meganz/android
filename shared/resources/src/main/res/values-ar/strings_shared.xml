@@ -2034,6 +2034,4 @@
     <string name="invalid_chat_link_error_message">هذه المحادثة لم تعد متوفرة</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">بحث&#8230;</string>
-    <!-- Text for clear all button, shown in search screen -->
-    <string name="general_clear_all">Clear all</string>
 </resources>

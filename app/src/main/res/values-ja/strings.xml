@@ -4507,7 +4507,7 @@
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">参加できません</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">この通話では100&#160;人の参加者のみをサポートできます。この制限を解除するには、主催者様にご依頼ください。</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">この通話では100 人の参加者のみをサポートできます。この制限を解除するには、主催者様にご依頼ください。</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">はい、わかりました。</string>
     <!-- The snackbar message of hidden nodes operation -->

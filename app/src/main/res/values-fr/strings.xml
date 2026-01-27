@@ -1125,13 +1125,13 @@
     <!-- text_copyright_alert_first_paragraph -->
     <string name="copyright_alert_first_paragraph">MEGA respecte le droit d’auteur d’autrui et exige que les utilisateurs du service nuagique de MEGA se conforment aux lois sur le droit d’auteur.</string>
     <!-- text_copyright_alert_second_paragraph -->
-    <string name="copyright_alert_second_paragraph">Il vous est strictement interdit d’utiliser le service nuagique de MEGA pour enfreindre le droit d’auteur. Vous ne pouvez pas téléverser, télécharger, stocker, partager, afficher, diffuser en continu, distribuer, envoyer par courriel, créer de liens vers, transmettre ou proposer de quelque façon des fichiers, des données ou du contenu qui enfreignent le droit d’auteur ou autre droit de propriété de quelque personne ou entité.</string>
+    <string name="copyright_alert_second_paragraph">Il vous est strictement interdit d\’utiliser le service MEGA Cloud pour enfreindre les droits d\’auteur. Vous ne pouvez pas téléverser, télécharger, stocker, partager, afficher, diffuser, distribuer, envoyer par e-mail, créer un lien vers, transmettre ou rendre disponible, de quelque manière que ce soit, tout fichier, toute donnée ou tout contenu qui enfreint les droits d\’auteur ou d\’autres droits de propriété intellectuelle de toute personne ou entité.</string>
     <!-- text of the Agree button -->
     <string name="copyright_alert_agree_button">Accepter</string>
     <!-- text of the Disagree button -->
-    <string name="copyright_alert_disagree_button">Ne pas accepter</string>
+    <string name="copyright_alert_disagree_button">Refuser</string>
     <!-- Hint how to cancel the download -->
-    <string name="download_show_info">Afficher les renseignements</string>
+    <string name="download_show_info">Afficher les informations</string>
     <!-- Error message when creating public links of nodes. Plural. -->
     <plurals name="context_link_export_error">
         <item quantity="one">Échec de création du lien. Veuillez réessayer plus tard.</item>

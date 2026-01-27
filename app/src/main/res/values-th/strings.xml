@@ -4602,4 +4602,7 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">เปิดใช้งานอัปโหลดจากกล้อง</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">ตำแหน่งที่ตั้งนี้ไม่มีอยู่แล้ว</string>
+    <string name="invalid_link">ลิงก์ไม่ถูกต้อง กรุณาลองใหม่อีกครั้งหรือขอรับลิงก์ใหม่</string>
+    <string name="dialog_taken_down_folder_description">โฟลเดอร์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
+    <string name="dialog_taken_down_file_description">ไฟล์นี้ถูกลบเนื้อหาตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา หากคุณเชื่อว่าเป็นข้อผิดพลาด คุณสามารถยื่นคำโต้แย้งได้</string>
 </resources>
