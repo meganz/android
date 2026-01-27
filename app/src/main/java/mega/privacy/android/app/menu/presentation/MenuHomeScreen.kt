@@ -11,6 +11,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -70,10 +71,10 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVA
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.android.navigation.contract.extension.systemBarsWithRail
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
@@ -168,14 +169,15 @@ fun MenuHomeScreenUi(
                 },
                 navigationType = AppBarNavigationType.None
             )
-        }
+        },
+        contentWindowInsets = WindowInsets.systemBarsWithRail(),
     ) { paddingValues ->
         LazyColumn(
             state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            contentPadding = paddingValues.excludingBottomPadding(),
+            contentPadding = paddingValues,
         )
         {
             item(key = "${uiState.name} ${uiState.email} ${uiState.lastModifiedTime}") {

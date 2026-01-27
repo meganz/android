@@ -18,3 +18,17 @@ fun PaddingValues.excludingBottomPadding(): PaddingValues {
         end = calculateEndPadding(layoutDirection)
     )
 }
+
+
+/**
+ * Extension function to exclude top padding from PaddingValues
+ */
+@Composable
+fun PaddingValues.excludeTopPadding(): PaddingValues {
+    val layoutDirection = LocalLayoutDirection.current
+    return PaddingValues(
+        bottom = calculateBottomPadding(),
+        start = calculateStartPadding(layoutDirection),
+        end = calculateEndPadding(layoutDirection)
+    )
+}

@@ -48,6 +48,7 @@ import mega.privacy.android.navigation.contract.NavigationUiController
 import mega.privacy.android.navigation.contract.PreferredSlot
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
+import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.navigation.snowflake.item.MainNavigationIcon
 import mega.privacy.mobile.navigation.snowflake.model.NavigationAnimationConfig
@@ -108,7 +109,10 @@ fun MainNavigationScaffold(
         isNavigationVisible = isNavigationVisible,
         animationConfig = animationConfig,
         content = {
-            CompositionLocalProvider(LocalBottomNavigationVisible provides isNavigationVisible) {
+            CompositionLocalProvider(
+                LocalBottomNavigationVisible provides isNavigationVisible,
+                LocalNavigationRailVisible provides (navSuiteType == NavigationSuiteType.NavigationRail)
+            ) {
                 navContent(navUiController)
             }
         }

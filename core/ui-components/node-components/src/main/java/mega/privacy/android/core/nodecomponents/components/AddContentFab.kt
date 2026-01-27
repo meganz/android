@@ -1,10 +1,5 @@
 package mega.privacy.android.core.nodecomponents.components
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -35,11 +30,7 @@ fun AddContentFab(
         MegaFab(
             onClick = onClick,
             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-            modifier = modifier.windowInsetsPadding(
-                WindowInsets.systemBars.only(
-                    WindowInsetsSides.Horizontal
-                )
-            )
+            modifier = modifier
         )
     }
 

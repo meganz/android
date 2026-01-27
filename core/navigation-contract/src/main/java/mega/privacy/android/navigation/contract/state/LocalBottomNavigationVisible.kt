@@ -7,3 +7,7 @@ import androidx.compose.runtime.compositionLocalOf
  */
 val LocalBottomNavigationVisible = compositionLocalOf { false }
 
+/**
+ * CompositionLocal providing the current visibility state of the navigation rail.
+ */
+val LocalNavigationRailVisible = compositionLocalOf { false }
