@@ -261,6 +261,7 @@ fun MenuHomeScreenUi(
                     ) {
                         uiState.privacySuiteItems.values.forEach { item ->
                             PrivacySuiteItem(
+                                enabled = uiState.isConnectedToNetwork,
                                 item = item,
                                 onNavigate = {
                                     item.appPackage?.let { appPackage ->
@@ -279,7 +280,10 @@ fun MenuHomeScreenUi(
             }
 
             item {
-                LogoutButton(uiState.isLoggingOut) {
+                LogoutButton(
+                    enabled = uiState.isConnectedToNetwork,
+                    isLoggingOut = uiState.isLoggingOut
+                ) {
                     onLogoutClicked()
                 }
             }
@@ -318,7 +322,7 @@ private fun AccountItem(
                             .wrapContentSize(),
                         text = stringResource(id = actionLabelResId),
                         isLoading = false,
-                        enabled = true,
+                        enabled = enable,
                         onClick = onNavigate,
                     )
                 }
@@ -352,6 +356,7 @@ private fun PrivacySuiteHeader(isExpanded: Boolean, onClick: () -> Unit) {
 
 @Composable
 private fun PrivacySuiteItem(
+    enabled: Boolean,
     item: NavDrawerItem.PrivacySuite,
     onNavigate: () -> Unit,
 ) {
@@ -364,14 +369,15 @@ private fun PrivacySuiteItem(
         leadingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(item.icon),
-                tint = IconColor.Primary,
                 contentDescription = null
             )
         },
+        enable = enabled,
+        enableClick = enabled,
         trailingElement = {
             MegaIcon(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ExternalLink),
-                tint = IconColor.Secondary,
+                tint = if (enabled) IconColor.Secondary else IconColor.Disabled,
                 contentDescription = null,
             )
         },
@@ -381,10 +387,12 @@ private fun PrivacySuiteItem(
 
 @Composable
 private fun LogoutButton(
+    enabled: Boolean,
     isLoggingOut: Boolean,
     onLogoutClicked: () -> Unit,
 ) {
     SecondaryFilledButton(
+        enabled = enabled,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp)
