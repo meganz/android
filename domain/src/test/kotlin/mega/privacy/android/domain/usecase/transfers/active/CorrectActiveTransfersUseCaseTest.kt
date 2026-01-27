@@ -31,6 +31,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -49,7 +50,8 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val fileSystemRepository = mock<FileSystemRepository>()
     private val isUserLoggedInUseCase = mock<IsUserLoggedInUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
-
+    private val updateActiveTransfersUseCase =
+        mock<UpdateActiveTransfersUseCase>()
 
     private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
@@ -63,6 +65,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             fileSystemRepository = fileSystemRepository,
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
+            updateActiveTransfersUseCase = updateActiveTransfersUseCase
         )
     }
 
@@ -77,6 +80,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             rootNodeExistsUseCase,
             *mockedActiveTransfers.toTypedArray(),
             *mockedTransfers.toTypedArray(),
+            updateActiveTransfersUseCase,
         )
         whenever(
             transferRepository.monitorPendingTransfersByTypeAndState(
@@ -508,5 +512,24 @@ internal class CorrectActiveTransfersUseCaseTest {
         verifyNoInteractions(fileSystemRepository)
         verifyNoInteractions(getInProgressTransfersUseCase)
         verifyNoInteractions(updatePendingTransferStateUseCase)
+    }
+
+    @ParameterizedTest
+    @EnumSource(TransferType::class)
+    @NullSource
+    fun `test that updateActiveTransfersUseCase is called before getCurrentActiveTransfers`(
+        transferType: TransferType?,
+    ) = runTest {
+        whenever(getInProgressTransfersUseCase()).thenReturn(emptyList())
+
+        underTest(transferType)
+
+        val inOrder = inOrder(updateActiveTransfersUseCase, transferRepository)
+        inOrder.verify(updateActiveTransfersUseCase).invoke()
+        if (transferType == null) {
+            inOrder.verify(transferRepository).getCurrentActiveTransfers()
+        } else {
+            inOrder.verify(transferRepository).getCurrentActiveTransfersByType(transferType)
+        }
     }
 }

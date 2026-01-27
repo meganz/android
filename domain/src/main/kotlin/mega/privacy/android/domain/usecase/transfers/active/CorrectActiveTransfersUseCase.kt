@@ -27,6 +27,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
     private val fileSystemRepository: FileSystemRepository,
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val updateActiveTransfersUseCase: UpdateActiveTransfersUseCase,
 ) {
     /**
      * Invoke.
@@ -36,6 +37,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         if (!(isUserLoggedInUseCase() && rootNodeExistsUseCase())) {
             return
         }
+        updateActiveTransfersUseCase()
         val activeTransfers = if (transferType == null) {
             transferRepository.getCurrentActiveTransfers()
         } else {

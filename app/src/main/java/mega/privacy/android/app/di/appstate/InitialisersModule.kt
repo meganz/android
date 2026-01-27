@@ -11,6 +11,7 @@ import mega.privacy.android.app.appstate.global.initialisation.initialisers.Post
 import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.CleanTransferGroupsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
@@ -157,5 +158,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideDeleteOldestCompletedTransfersInitializer(initialiser: DeleteOldestCompletedTransfersInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideCleanTransferGroupsInitialiser(initialiser: CleanTransferGroupsInitialiser): PostLoginInitialiser =
         initialiser
 }
