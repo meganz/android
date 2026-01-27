@@ -117,6 +117,7 @@ import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavK
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.feature.photos.extensions.toTrackingEvent
 import mega.privacy.mobile.analytics.event.TimelineHideNodeMenuItemEvent
 
 @SuppressLint("ComposeViewModelForwarding")
@@ -633,6 +634,9 @@ fun MediaMainScreen(
                 visible = selectionModeType == MediaSelectionModeType.Timeline,
                 actions = timelineTabActionUiState.selectionModeItem.bottomBarActions,
                 onActionPressed = {
+                    it.toTrackingEvent()?.let { event ->
+                        Analytics.tracker.trackEvent(event)
+                    }
                     when (it) {
                         TimelineSelectionMenuAction.Download -> {
                             actionHandler(
@@ -828,6 +832,9 @@ fun MediaMainScreen(
             actions = timelineTabActionUiState.selectionModeItem.bottomSheetActions,
             onDismissRequest = { showBottomSheetActions = false },
             onActionPressed = { action ->
+                action.toTrackingEvent()?.let { event ->
+                    Analytics.tracker.trackEvent(event)
+                }
                 when (action) {
                     TimelineSelectionMenuAction.RemoveLink -> {
                         actionHandler(

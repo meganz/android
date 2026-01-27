@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
@@ -29,6 +30,7 @@ internal fun TimelineTabActionBottomSheet(
         actions.forEach { action ->
             NodeActionListTile(
                 modifier = Modifier
+                    .testTag(action.testTag)
                     .fillMaxWidth()
                     .wrapContentHeight(),
                 menuAction = action,
