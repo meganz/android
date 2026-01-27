@@ -21,6 +21,7 @@ internal fun EnterAlbumNameDialog(
     modifier: Modifier = Modifier,
     name: String = "",
     errorText: String? = null,
+    defaultSuggestion: () -> String = { "" },
 ) {
     var albumName by rememberSaveable { mutableStateOf(name) }
 
@@ -32,7 +33,8 @@ internal fun EnterAlbumNameDialog(
         inputValue = albumName,
         onPositiveButtonClicked = {
             resetErrorMessage()
-            onConfirm(albumName)
+            val finalName = albumName.trim().ifBlank { defaultSuggestion().trim() }
+            onConfirm(finalName)
         },
         onNegativeButtonClicked = {
             resetErrorMessage()
@@ -46,7 +48,8 @@ internal fun EnterAlbumNameDialog(
             resetErrorMessage()
             onDismiss()
         },
-        errorText = errorText
+        errorText = errorText,
+        placeholder = defaultSuggestion()
     )
 }
 

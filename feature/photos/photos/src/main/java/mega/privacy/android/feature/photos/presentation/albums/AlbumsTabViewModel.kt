@@ -17,6 +17,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
@@ -36,6 +37,7 @@ class AlbumsTabViewModel @Inject constructor(
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
@@ -162,6 +164,12 @@ class AlbumsTabViewModel @Inject constructor(
 
             clearAlbumsSelection()
         }
+    }
+
+    internal fun getPresetNewAlbumName(defaultName: String): String {
+        val userAlbumNames = uiState.value.albums
+            .mapNotNull { (it.mediaAlbum as? MediaAlbum.User)?.title }
+        return getNextDefaultAlbumNameUseCase(defaultName, userAlbumNames)
     }
 
     internal fun resetNavigationEvent() {

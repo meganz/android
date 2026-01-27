@@ -2094,4 +2094,6 @@
     <string name="offline_remove_singular_item_success_message">1 item removed</string>
     <!--Message to show when multiple items has been removed from Offline Screen-->
     <string name="offline_remove_multiple_item_success_message">%d items removed</string>
+    <!-- Placeholder to display when creating a New Album. If no name is entered, the placeholder will become the album name -->
+    <string name="create_new_album_input_album_name_placeholder">New album</string>
 </resources>

@@ -61,7 +61,8 @@ fun AlbumsTabRoute(
         resetAddNewAlbumSuccess = viewModel::resetAddNewAlbumSuccess,
         resetNavigationEvent = viewModel::resetNavigationEvent,
         resetDeleteAlbumsConfirmationEvent = viewModel::resetDeleteAlbumsConfirmationEvent,
-        onAlbumSelectionToggle = viewModel::toggleAlbumSelection
+        onAlbumSelectionToggle = viewModel::toggleAlbumSelection,
+        getPresetNewAlbumName = viewModel::getPresetNewAlbumName
     )
 }
 
@@ -80,6 +81,7 @@ internal fun AlbumsTabScreen(
     resetNavigationEvent: () -> Unit = {},
     resetDeleteAlbumsConfirmationEvent: () -> Unit = {},
     onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {},
+    getPresetNewAlbumName: (String) -> String = { "" },
 ) {
     val placeholder = if (isSystemInDarkTheme()) {
         painterResource(R.drawable.ic_album_cover_d)
@@ -157,13 +159,16 @@ internal fun AlbumsTabScreen(
         }
 
         if (showNewAlbumDialogEvent == triggered) {
+            val defaultAlbumName =
+                stringResource(sharedR.string.create_new_album_input_album_name_placeholder)
             EnterAlbumNameDialog(
                 modifier = Modifier.testTag(ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG),
                 onDismiss = resetNewAlbumDialogEvent,
                 onConfirm = addNewAlbum,
                 resetErrorMessage = resetErrorMessage,
                 errorText = (uiState.addNewAlbumErrorMessage as? StateEventWithContentTriggered)?.content,
-                positiveButtonText = stringResource(sharedR.string.media_add_new_album_dialog_positive_button)
+                positiveButtonText = stringResource(sharedR.string.media_add_new_album_dialog_positive_button),
+                defaultSuggestion = { getPresetNewAlbumName(defaultAlbumName) }
             )
         }
 
