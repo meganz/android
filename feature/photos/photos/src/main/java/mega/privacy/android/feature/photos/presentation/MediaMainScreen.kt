@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,30 +36,21 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
-import mega.android.core.ui.components.toolbar.AppBarNavigationType
-import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.extensions.toTrackingEvent
-import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -70,6 +59,7 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.component.MediaBottomBar
+import mega.privacy.android.feature.photos.presentation.component.MediaTopBar
 import mega.privacy.android.feature.photos.presentation.effects.MediaMainEffects
 import mega.privacy.android.feature.photos.presentation.effects.MediaNodeActionEffects
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
@@ -78,7 +68,6 @@ import mega.privacy.android.feature.photos.presentation.handler.timelineActionsH
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
-import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTabAppBar
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
@@ -86,7 +75,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions.Companion.toLegacySort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
-import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
@@ -94,14 +82,10 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineF
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
-import mega.privacy.android.feature.photos.presentation.videos.view.VideosTabToolbar
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
-import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
-import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -345,39 +329,15 @@ fun MediaMainScreen(
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
     var showTimelineFilter by rememberSaveable { mutableStateOf(false) }
-    val areAllTimelinePhotosSelected by remember(
-        timelineTabUiState.selectedPhotoCount,
-        timelineTabUiState.displayedPhotos
-    ) {
-        derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
-    }
-    val areAllAlbumsSelected by remember(
-        albumsTabUiState.selectedUserAlbums,
-        albumsTabUiState.albums
-    ) {
-        derivedStateOf { albumsTabViewModel.areAllAlbumsSelected() }
-    }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
-    val shouldShowTimelineActions by remember(
-        selectedTimePeriod,
-        mediaCameraUploadUiState.enableCameraUploadPageShowing
-    ) {
-        derivedStateOf {
-            selectedTimePeriod == PhotoModificationTimePeriod.All && !mediaCameraUploadUiState.enableCameraUploadPageShowing
-        }
-    }
 
-    var isVideosTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     var selectedVideoCount by rememberSaveable { mutableIntStateOf(0) }
-    var areAllVideosSelected by rememberSaveable { mutableStateOf(false) }
     var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
     var shouldHideTabs by remember { mutableStateOf(false) }
 
     var selectedPlaylistCount by rememberSaveable { mutableIntStateOf(0) }
-    var areAllPlaylistsSelected by rememberSaveable { mutableStateOf(false) }
-    var isPlaylistsTabSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
@@ -387,20 +347,6 @@ fun MediaMainScreen(
         if (showTimelineFilter) {
             showTimelineFilter = false
             setNavigationItemVisibility(true)
-        }
-    }
-
-    BackHandler(isVideosTabSearchBarVisible) {
-        if (isVideosTabSearchBarVisible) {
-            isVideosTabSearchBarVisible = false
-            onUpdateVideosSearchQuery(null)
-        }
-    }
-
-    BackHandler(isPlaylistsTabSearchBarVisible) {
-        if (isPlaylistsTabSearchBarVisible) {
-            isPlaylistsTabSearchBarVisible = false
-            onUpdatePlaylistSearchQuery(null)
         }
     }
 
@@ -414,7 +360,6 @@ fun MediaMainScreen(
             if (selectedVideoCount != videosTabUiState.selectedTypedNodes.size) {
                 selectedVideoNodes = videosTabUiState.selectedTypedNodes
                 selectedVideoCount = videosTabUiState.selectedTypedNodes.size
-                areAllVideosSelected = selectedVideoCount == videosTabUiState.allVideoEntities.size
                 updateSelectionModeAvailableActions(
                     videosTabUiState.selectedTypedNodes.toSet(),
                     NodeSourceType.CLOUD_DRIVE
@@ -430,8 +375,6 @@ fun MediaMainScreen(
             }
             if (selectedPlaylistCount != playlistsTabUiState.selectedPlaylists.size) {
                 selectedPlaylistCount = playlistsTabUiState.selectedPlaylists.size
-                areAllPlaylistsSelected =
-                    selectedPlaylistCount == playlistsTabUiState.videoPlaylistEntities.size
             }
         }
     }
@@ -445,174 +388,42 @@ fun MediaMainScreen(
             )
         },
         topBar = {
-            when {
-                selectionModeType == MediaSelectionModeType.Timeline -> {
-                    NodeSelectionModeAppBar(
-                        count = timelineTabUiState.selectedPhotoCount,
-                        isAllSelected = areAllTimelinePhotosSelected,
-                        isSelecting = false,
-                        onSelectAllClicked = onAllTimelinePhotosSelected,
-                        onCancelSelectionClicked = onClearTimelinePhotosSelection
+            MediaTopBar(
+                currentTabIndex = currentTabIndex,
+                selectionModeType = selectionModeType,
+                mediaMainUiState = mediaMainUiState,
+                albumsTabUiState = albumsTabUiState,
+                timelineTabUiState = timelineTabUiState,
+                timelineTabActionUiState = timelineTabActionUiState,
+                timelineFilterUiState = timelineFilterUiState,
+                mediaCameraUploadUiState = mediaCameraUploadUiState,
+                videosTabUiState = videosTabUiState,
+                playlistsTabUiState = playlistsTabUiState,
+                selectedTimePeriod = selectedTimePeriod,
+                videosTabQuery = videosTabQuery,
+                playlistsTabQuery = playlistsTabQuery,
+                onAllTimelinePhotosSelected = onAllTimelinePhotosSelected,
+                onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
+                areAllAlbumsSelected = albumsTabViewModel::areAllAlbumsSelected,
+                onAllAlbumsSelected = albumsTabViewModel::selectAllAlbums,
+                onClearAlbumsSelection = albumsTabViewModel::clearAlbumsSelection,
+                onAllVideosSelected = onSelectAllVideos,
+                onClearVideosSelection = onClearVideosSelection,
+                onUpdateVideosSearchQuery = onUpdateVideosSearchQuery,
+                onAllPlaylistsSelected = onSelectAllPlaylists,
+                onClearPlaylistsSelection = onClearPlaylistsSelection,
+                onUpdatePlaylistSearchQuery = onUpdatePlaylistSearchQuery,
+                removePlaylist = { showVideoPlaylistRemovedDialog = true },
+                onNavigateToCameraUploadsSettings = {
+                    onNavigateToCameraUploadsSettings(
+                        LegacySettingsCameraUploadsActivityNavKey()
                     )
-                }
-
-                selectionModeType == MediaSelectionModeType.Albums -> {
-                    NodeSelectionModeAppBar(
-                        count = albumsTabUiState.selectedUserAlbumsCount,
-                        isAllSelected = areAllAlbumsSelected,
-                        isSelecting = false,
-                        onSelectAllClicked = albumsTabViewModel::selectAllAlbums,
-                        onCancelSelectionClicked = albumsTabViewModel::clearAlbumsSelection
-                    )
-                }
-
-                isVideosTabSearchBarVisible || selectionModeType == MediaSelectionModeType.Videos ->
-                    VideosTabToolbar(
-                        count = selectedVideoCount,
-                        isAllSelected = areAllVideosSelected,
-                        isSelectionMode = selectionModeType == MediaSelectionModeType.Videos,
-                        onSelectAllClicked = onSelectAllVideos,
-                        onCancelSelectionClicked = onClearVideosSelection,
-                        searchQuery = videosTabQuery,
-                        updateSearchQuery = onUpdateVideosSearchQuery,
-                        onSearchingModeChanged = { isSearching ->
-                            if (!isSearching) {
-                                isVideosTabSearchBarVisible = false
-                                onUpdateVideosSearchQuery(null)
-                            }
-                        }
-                    )
-
-                isPlaylistsTabSearchBarVisible || selectionModeType == MediaSelectionModeType.Playlists -> {
-                    VideoPlaylistsTabAppBar(
-                        count = selectedPlaylistCount,
-                        isAllSelected = areAllPlaylistsSelected,
-                        onSelectAllClicked = onSelectAllPlaylists,
-                        onCancelSelectionClicked = onClearPlaylistsSelection,
-                        removePlaylist = {
-                            showVideoPlaylistRemovedDialog = true
-                        },
-                        isSelectionMode = selectionModeType == MediaSelectionModeType.Playlists,
-                        searchQuery = playlistsTabQuery,
-                        updateSearchQuery = onUpdatePlaylistSearchQuery,
-                        onSearchingModeChanged = { isSearching ->
-                            if (!isSearching) {
-                                isPlaylistsTabSearchBarVisible = false
-                                onUpdatePlaylistSearchQuery(null)
-                            }
-                        }
-                    )
-                }
-
-                else -> MegaTopAppBar(
-                    navigationType = AppBarNavigationType.None,
-                    title = stringResource(sharedResR.string.media_feature_title),
-                    subtitle = when {
-                        currentTabIndex == MediaScreen.Timeline.ordinal -> {
-                            when (mediaCameraUploadUiState.status) {
-                                is CUStatusUiState.UpToDate -> {
-                                    stringResource(id = sharedResR.string.media_main_screen_camera_uploads_up_to_date_toolbar_subtitle)
-                                }
-
-                                is CUStatusUiState.Sync -> {
-                                    stringResource(id = sharedResR.string.camera_uploads_banner_checking_uploads_text)
-                                }
-
-                                is CUStatusUiState.UploadInProgress -> {
-                                    pluralStringResource(
-                                        id = sharedResR.plurals.camera_uploads_tranfer_top_bar_subtitle,
-                                        count = mediaCameraUploadUiState.status.pending,
-                                        mediaCameraUploadUiState.status.pending,
-                                    )
-                                }
-
-                                is CUStatusUiState.UploadComplete -> {
-                                    stringResource(id = sharedResR.string.camera_uploads_banner_complete_title)
-                                }
-
-                                else -> null
-                            }
-                        }
-
-                        else -> null
-                    },
-                    trailingIcons = {
-                        if (currentTabIndex == MediaScreen.Timeline.ordinal) {
-                            val isFilterApplied =
-                                timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
-                            if (isFilterApplied) {
-                                MegaIcon(
-                                    modifier = Modifier
-                                        .clickable { showTimelineFilter = true }
-                                        .padding(end = 24.dp),
-                                    imageVector = IconPack.Medium.Thin.Outline.Filter,
-                                    tint = IconColor.Primary
-                                )
-                            }
-
-                            CameraUploadStatusToolbarAction(
-                                modifier = Modifier.padding(end = 14.dp),
-                                cameraUploadsStatus = mediaCameraUploadUiState.status,
-                                onNavigateToCameraUploadsSettings = {
-                                    onNavigateToCameraUploadsSettings(
-                                        LegacySettingsCameraUploadsActivityNavKey()
-                                    )
-                                },
-                                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
-                            )
-                        }
-                    },
-                    actions = buildList {
-                        add(
-                            MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
-                                when (currentTabIndex) {
-                                    MediaScreen.Videos.ordinal ->
-                                        isVideosTabSearchBarVisible = true
-
-                                    MediaScreen.Playlists.ordinal ->
-                                        isPlaylistsTabSearchBarVisible = true
-
-                                    else -> if (mediaMainUiState.isMediaRevampPhase2Enabled) {
-                                        navigateToMediaSearch(MediaSearchNavKey)
-                                    } else {
-                                        navigateToMediaSearch(LegacyPhotosSearchNavKey)
-                                    }
-                                }
-                            }
-                        )
-
-                        // Menu actions for timeline tab
-                        if (currentTabIndex == MediaScreen.Timeline.ordinal && shouldShowTimelineActions) {
-                            add(
-                                MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
-                                    showTimelineFilter = true
-                                }
-                            )
-
-                            if (timelineTabActionUiState.normalModeItem.enableSort) {
-                                add(
-                                    MenuActionWithClick(menuAction = MediaAppBarAction.SortBy) {
-                                        showTimelineSortDialog = true
-                                    }
-                                )
-                            }
-
-                            if (mediaCameraUploadUiState.status !is CUStatusUiState.Disabled) {
-                                add(
-                                    MenuActionWithClick(
-                                        menuAction = MediaAppBarAction.CameraUploadsSettings,
-                                        onClick = {
-                                            onNavigateToCameraUploadsSettings(
-                                                LegacySettingsCameraUploadsActivityNavKey()
-                                            )
-                                        }
-                                    )
-                                )
-                            }
-                        }
-                    }
-                )
-            }
+                },
+                onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
+                navigateToMediaSearch = navigateToMediaSearch,
+                onFilterActionClick = { showTimelineFilter = true },
+                onSortActionClick = { showTimelineSortDialog = true }
+            )
         },
         bottomBar = {
             MediaBottomBar(
