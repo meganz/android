@@ -19,11 +19,9 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.media.SystemAlbum
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
@@ -667,31 +665,28 @@ class AlbumContentViewModelTest {
         }
 
     @Test
-    fun `test that handleBottomSheetAction with ManageLink action calls manageLink`() = runTest {
-        val albumId = AlbumId(123L)
-        val mockUserAlbum = mock<MediaAlbum.User> {
-            on { id }.thenReturn(albumId)
-        }
-        val mockAlbumUiState = mock<AlbumUiState> {
-            on { mediaAlbum }.thenReturn(mockUserAlbum)
-            on { title }.thenReturn(LocalizedText.Literal("Album"))
-            on { cover }.thenReturn(null)
-        }
-        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
-        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
-        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf())
-        whenever(observeAlbumPhotosRemovingProgress(any())).thenReturn(flowOf())
+    fun `test that handleBottomSheetAction with ManageLink action calls manageLinkEvent`() =
+        runTest {
+            createViewModel()
 
-        createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+            underTest.handleAction(AlbumContentSelectionAction.ManageLink)
 
-        underTest.handleAction(AlbumContentSelectionAction.ManageLink)
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.manageLinkEvent).isNotEqualTo(consumed())
+            underTest.state.test {
+                assertThat(awaitItem().manageLinkEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
         }
-    }
+
+    @Test
+    fun `test that handleBottomSheetAction with ShareLink action calls manageLinkEvent`() =
+        runTest {
+            createViewModel()
+
+            underTest.handleAction(AlbumContentSelectionAction.ShareLink)
+
+            underTest.state.test {
+                assertThat(awaitItem().manageLinkEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
 
     @Test
     fun `test that handleBottomSheetAction with RemoveLink action calls showRemoveLinkConfirmation`() =

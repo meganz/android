@@ -53,7 +53,7 @@ fun NodeActionListTile(
     NodeActionListTile(
         text = menuAction.getDescription(),
         icon = menuAction.getIconPainter(),
-        modifier = modifier,
+        modifier = modifier.testTag(menuAction.testTag),
         isDestructive = isDestructive,
         onActionClicked = onActionClicked,
         divider = null,

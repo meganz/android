@@ -69,7 +69,6 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
@@ -566,8 +565,14 @@ internal fun AlbumContentScreen(
                 if (uiState.photos.isNotEmpty()) {
                     add(AlbumContentSelectionAction.SelectAlbumCover)
                 }
-                add(AlbumContentSelectionAction.ManageLink)
-                add(AlbumContentSelectionAction.RemoveLink)
+                uiState.uiAlbum?.let { album ->
+                    if (album.isExported) {
+                        add(AlbumContentSelectionAction.ManageLink)
+                        add(AlbumContentSelectionAction.RemoveLink)
+                    } else {
+                        add(AlbumContentSelectionAction.ShareLink)
+                    }
+                }
                 add(AlbumContentSelectionAction.Delete)
             }
         )

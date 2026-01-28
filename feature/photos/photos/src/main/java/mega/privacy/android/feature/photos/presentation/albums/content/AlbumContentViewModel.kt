@@ -740,7 +740,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                         }
                     }
 
-                    is AlbumContentSelectionAction.ManageLink -> {
+                    is AlbumContentSelectionAction.ManageLink, is AlbumContentSelectionAction.ShareLink -> {
                         _state.update {
                             it.copy(manageLinkEvent = triggered(getManageLinkEvent()))
                         }

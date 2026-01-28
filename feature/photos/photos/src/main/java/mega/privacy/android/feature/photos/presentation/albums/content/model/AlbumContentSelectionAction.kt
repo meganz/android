@@ -69,14 +69,25 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
     }
 
     data object Share : AlbumContentSelectionAction {
-        override val testTag: String = "album_content_selection_action:manage_link"
+        override val testTag: String = "album_content_selection_action:share"
+
+        @Composable
+        override fun getDescription() = stringResource(sharedR.string.general_share)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
+    }
+
+    data object ShareLink : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:share_link"
 
         @Composable
         override fun getDescription() = pluralStringResource(sharedR.plurals.label_share_links, 1)
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Link01)
     }
 
     data object ManageLink : AlbumContentSelectionAction {

@@ -695,21 +695,162 @@ class AlbumContentScreenComposeTest {
     private fun createMockAlbumUiState(
         title: String = "Test Album",
         albumId: Long = 1L,
+        isExported: Boolean = false,
     ): AlbumUiState {
         val mediaAlbum = MediaAlbum.User(
             id = AlbumId(albumId),
             title = title,
             creationTime = 0L,
             modificationTime = 0L,
-            isExported = false,
+            isExported = isExported,
             cover = null
         )
         return AlbumUiState(
             mediaAlbum = mediaAlbum,
             title = LocalizedText.Literal(title),
-            isExported = false,
+            isExported = isExported,
             cover = null
         )
+    }
+
+    @Test
+    fun `test that SelectAlbumCover is visible when photos are not empty`() {
+        val photos = listOf(
+            createMockPhoto(id = 1L),
+            createMockPhoto(id = 2L)
+        )
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = photos.toImmutableList(),
+            selectedPhotos = persistentSetOf()
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.More.testTag)
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(
+                AlbumContentSelectionAction.SelectAlbumCover.testTag,
+                useUnmergedTree = true
+            )
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that SelectAlbumCover is not visible when photos are empty`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf()
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.More.testTag)
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(
+                AlbumContentSelectionAction.SelectAlbumCover.testTag,
+                useUnmergedTree = true
+            )
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that ShareLink is visible when album is not exported`() {
+        val photos = listOf(createMockPhoto(id = 1L))
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(isExported = false),
+            photos = photos.toImmutableList(),
+            selectedPhotos = persistentSetOf()
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.More.testTag)
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.ShareLink.testTag, useUnmergedTree = true)
+            .assertExists()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.ManageLink.testTag, useUnmergedTree = true)
+            .assertDoesNotExist()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.RemoveLink.testTag, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that ManageLink is visible when album is exported`() {
+        val photos = listOf(createMockPhoto(id = 1L))
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(isExported = true),
+            photos = photos.toImmutableList(),
+            selectedPhotos = persistentSetOf()
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.More.testTag)
+            .performClick()
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_MORE_OPTIONS_BOTTOM_SHEET)
+            .assertIsDisplayed()
+
+        composeTestRule.mainClock.advanceTimeBy(500)
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.ShareLink.testTag, useUnmergedTree = true)
+            .assertDoesNotExist()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.ManageLink.testTag, useUnmergedTree = true)
+            .assertExists()
+
+        composeTestRule
+            .onNodeWithTag(AlbumContentSelectionAction.RemoveLink.testTag, useUnmergedTree = true)
+            .assertExists()
     }
 }
 
