@@ -821,7 +821,7 @@ class DefaultTransfersRepositoryTest {
     fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
         runTest {
             val activeTransfer = mock<ActiveTransfer>()
-            underTest.insertOrUpdateActiveTransfer(activeTransfer)
+            underTest.putActiveTransfer(activeTransfer)
             verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
         }
 
@@ -1072,24 +1072,6 @@ class DefaultTransfersRepositoryTest {
             reset(transfer)
         }
 
-        @Test
-        fun `test that getActiveTransferByUniqueId gateway result is returned when getActiveTransferByUniqueId is called`() =
-            runTest {
-                val expected = mock<ActiveTransfer>()
-                whenever(megaLocalRoomGateway.getActiveTransferByUniqueId(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByUniqueId(1)
-                assertThat(actual).isEqualTo(expected)
-            }
-
-        @Test
-        fun `test that getActiveTransferByTag gateway result is returned when getActiveTransferByTag is called`() =
-            runTest {
-                val expected = mock<ActiveTransfer>()
-                whenever(megaLocalRoomGateway.getActiveTransferByTag(1)).thenReturn(expected)
-                val actual = underTest.getActiveTransferByTag(1)
-                assertThat(actual).isEqualTo(expected)
-            }
-
         @ParameterizedTest
         @EnumSource(TransferType::class)
         fun `test that getActiveTransfersByType gateway result is returned when getActiveTransfersByType is called`(
@@ -1100,7 +1082,7 @@ class DefaultTransfersRepositoryTest {
                 val flow = flowOf(expected)
                 whenever(megaLocalRoomGateway.getActiveTransfersByType(transferType))
                     .thenReturn(flow)
-                val actual = underTest.getActiveTransfersByType(transferType).first()
+                val actual = underTest.monitorActiveTransfersByType(transferType).first()
                 assertThat(actual).isEqualTo(expected)
             }
 
@@ -1113,7 +1095,7 @@ class DefaultTransfersRepositoryTest {
                 val expected = mock<List<ActiveTransfer>>()
                 whenever(megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType))
                     .thenReturn(expected)
-                val actual = underTest.getCurrentActiveTransfersByType(transferType)
+                val actual = underTest.getActiveTransfersByType(transferType)
                 assertThat(actual).isEqualTo(expected)
             }
 
@@ -1123,7 +1105,7 @@ class DefaultTransfersRepositoryTest {
                 val expected = mock<List<ActiveTransfer>>()
                 whenever(megaLocalRoomGateway.getCurrentActiveTransfers())
                     .thenReturn(expected)
-                val actual = underTest.getCurrentActiveTransfers()
+                val actual = underTest.getActiveTransfers()
                 assertThat(actual).isEqualTo(expected)
             }
 
@@ -1131,7 +1113,7 @@ class DefaultTransfersRepositoryTest {
         fun `test that insertOrUpdateActiveTransfer gateway is called when insertOrUpdateActiveTransfer is called`() =
             runTest {
                 val activeTransfer = mock<ActiveTransfer>()
-                underTest.insertOrUpdateActiveTransfer(activeTransfer)
+                underTest.putActiveTransfer(activeTransfer)
                 verify(megaLocalRoomGateway).insertOrUpdateActiveTransfer(activeTransfer)
             }
 
@@ -1139,18 +1121,9 @@ class DefaultTransfersRepositoryTest {
         fun `test that insertOrUpdateActiveTransfers gateway is called when insertOrUpdateActiveTransfers is called`() =
             runTest {
                 val activeTransfers = mock<List<ActiveTransfer>>()
-                underTest.insertOrUpdateActiveTransfers(activeTransfers)
+                underTest.putActiveTransfers(activeTransfers)
                 verify(megaLocalRoomGateway).insertOrUpdateActiveTransfers(activeTransfers)
             }
-
-        @ParameterizedTest
-        @EnumSource(TransferType::class)
-        fun `test that deleteAllActiveTransfersByType gateway is called when deleteAllActiveTransfersByType is called`(
-            transferType: TransferType,
-        ) = runTest {
-            underTest.deleteAllActiveTransfersByType(transferType)
-            verify(megaLocalRoomGateway).deleteAllActiveTransfersByType(transferType)
-        }
 
         @Test
         fun `test that deleteAllActiveTransfers gateway is called when deleteAllActiveTransfers is called`() =
@@ -1182,7 +1155,7 @@ class DefaultTransfersRepositoryTest {
                 .thenReturn(flow)
             whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
-            val actual = underTest.getActiveTransferTotalsByType(transferType).first()
+            val actual = underTest.monitorActiveTransferTotalsByType(transferType).first()
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -1217,7 +1190,7 @@ class DefaultTransfersRepositoryTest {
                     previousActionGroups = actionGroups //this comes from first emission
                 )
             ) doReturn secondActiveTransferTotals
-            underTest.getActiveTransferTotalsByType(transferType).test {
+            underTest.monitorActiveTransferTotalsByType(transferType).test {
                 assertThat(awaitItem()).isEqualTo(firstActiveTransferTotals)
                 flow.emit(secondList)
                 assertThat(awaitItem()).isEqualTo(secondActiveTransferTotals)
@@ -1250,7 +1223,7 @@ class DefaultTransfersRepositoryTest {
                     mapOf(transfer.uniqueId to transfer.transferredBytes)
                 },
                 callToTest = {
-                    underTest.updateTransferredBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
                 }
             )
         }
@@ -1269,8 +1242,8 @@ class DefaultTransfersRepositoryTest {
                     val transferZero = mock<Transfer>()
                     stubActiveTransfer(transferZero, transferType, transferredBytes = 0L)
 
-                    underTest.updateTransferredBytes(listOf(transfer))
-                    underTest.updateTransferredBytes(listOf(transferZero))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transferZero))
                 }
             )
         }
@@ -1292,14 +1265,14 @@ class DefaultTransfersRepositoryTest {
             whenever(activeTransferTotalsMapper(eq(transferType), eq(list), any(), anyOrNull()))
                 .thenReturn(expected)
 
-            underTest.getActiveTransferTotalsByType(transferType).test {
+            underTest.monitorActiveTransferTotalsByType(transferType).test {
                 awaitItem() //initial
-                underTest.updateTransferredBytes(listOf(transfer))
+                underTest.updateActiveTransfersBytes(listOf(transfer))
                 val actual = awaitItem()
                 assertThat(actual).isEqualTo(expected)
                 cancelAndIgnoreRemainingEvents()
             }
-            underTest.deleteAllActiveTransfersByType(transferType)
+            underTest.deleteAllActiveTransfers()
         }
 
         @ParameterizedTest
@@ -1320,8 +1293,8 @@ class DefaultTransfersRepositoryTest {
                         transferredBytes = transfer.transferredBytes - 1
                     )
 
-                    underTest.updateTransferredBytes(listOf(transfer))
-                    underTest.updateTransferredBytes(listOf(transferZero))
+                    underTest.updateActiveTransfersBytes(listOf(transfer))
+                    underTest.updateActiveTransfersBytes(listOf(transferZero))
                 }
             )
         }
@@ -1353,7 +1326,7 @@ class DefaultTransfersRepositoryTest {
             )
 
             // test deleteAllActiveTransfersByType so we also clear the cached values
-            underTest.deleteAllActiveTransfersByType(transferType)
+            underTest.deleteAllActiveTransfers()
             underTest.getCurrentActiveTransferTotalsByType(transferType)
             //here we check that the mapper is called with the proper expectedMap
             verify(activeTransferTotalsMapper).invoke(

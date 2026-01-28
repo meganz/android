@@ -30,7 +30,7 @@ class UpdateActiveTransfersUseCase @Inject constructor(
         transferRepository.deleteAllActiveTransfers()
         val activeTransfers = inProgressTransfers + activeFromCompleted
         if (activeTransfers.isNotEmpty()) {
-            transferRepository.insertOrUpdateActiveTransfers(activeTransfers)
+            transferRepository.putActiveTransfers(activeTransfers)
         }
     }
 }

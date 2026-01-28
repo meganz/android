@@ -14,7 +14,7 @@ class UpdateActiveTransfersAndCleanGroupsUseCase @Inject constructor(
 ) {
     suspend operator fun invoke() {
         updateActiveTransfersUseCase() //ensure active transfers are updated
-        val activeTransfers = transferRepository.getCurrentActiveTransfers()
+        val activeTransfers = transferRepository.getActiveTransfers()
         transferRepository.getActiveTransferGroups().forEach { group ->
             group.groupId?.let { groupId ->
                 if (activeTransfers.none { it.getTransferGroup()?.groupId == groupId.toLong() }) {

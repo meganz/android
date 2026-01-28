@@ -39,9 +39,9 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         }
         updateActiveTransfersUseCase()
         val activeTransfers = if (transferType == null) {
-            transferRepository.getCurrentActiveTransfers()
+            transferRepository.getActiveTransfers()
         } else {
-            transferRepository.getCurrentActiveTransfersByType(transferType)
+            transferRepository.getActiveTransfersByType(transferType)
         }
         val inProgressTransfers = getInProgressTransfersUseCase()
             .filterNot { transfer ->
@@ -51,7 +51,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             }
 
         //update transferred bytes for each transfer
-        transferRepository.updateTransferredBytes(inProgressTransfers)
+        transferRepository.updateActiveTransfersBytes(inProgressTransfers)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
         val notInProgressActiveTransfersUniqueIds = activeTransfers
@@ -91,7 +91,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             }.takeUnless { it.isEmpty() }?.let { transfers ->
                 transferRepository.updateInProgressTransfers(transfers)
             }
-            transferRepository.insertOrUpdateActiveTransfers(inProgressNotInActiveTransfers)
+            transferRepository.putActiveTransfers(inProgressNotInActiveTransfers)
         }
 
         val pendingTransfersWaitingSdkScanning = if (transferType == null) {

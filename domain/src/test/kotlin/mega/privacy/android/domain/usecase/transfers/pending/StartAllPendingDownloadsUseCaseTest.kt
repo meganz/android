@@ -382,7 +382,7 @@ class StartAllPendingDownloadsUseCaseTest {
         }
 
         verify(transferRepository)
-            .insertOrUpdateActiveTransfer(transfer)
+            .putActiveTransfer(transfer)
     }
 
     private fun stubNotSentPendingTransfers(vararg pendingTransfers: List<PendingTransfer>) {

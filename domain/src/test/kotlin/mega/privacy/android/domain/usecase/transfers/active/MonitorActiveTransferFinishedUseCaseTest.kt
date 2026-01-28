@@ -41,7 +41,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 6, 7, 0)
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(7)
@@ -55,7 +55,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 0, 6, 0, 0, 7, 0)
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(5)
@@ -71,7 +71,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = createTotals(5, 6, 7)
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             awaitComplete()
@@ -84,7 +84,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
         type: TransferType,
     ) = runTest {
         val flow = createTotals(0, 5, 6, 7)
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             awaitComplete()
@@ -100,7 +100,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
             mockTotal(0, 5),
             mockTotal(0)
         )
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             awaitComplete()
@@ -116,7 +116,7 @@ class MonitorActiveTransferFinishedUseCaseTest {
             mockTotal(1, 5),
             mockTotal(0, 5)
         )
-        whenever(transferRepository.getActiveTransferTotalsByType(any())) doReturn flow.asFlow()
+        whenever(transferRepository.monitorActiveTransferTotalsByType(any())) doReturn flow.asFlow()
 
         underTest(type).test {
             assertThat(awaitItem()).isEqualTo(1)

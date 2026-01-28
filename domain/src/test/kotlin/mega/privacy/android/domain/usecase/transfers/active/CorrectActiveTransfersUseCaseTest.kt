@@ -88,9 +88,9 @@ internal class CorrectActiveTransfersUseCaseTest {
                 any()
             )
         ) doReturn flowOf(emptyList())
-        whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+        whenever(transferRepository.getActiveTransfersByType(any()))
             .thenReturn(emptyList())
-        whenever(transferRepository.getCurrentActiveTransfers())
+        whenever(transferRepository.getActiveTransfers())
             .thenReturn(emptyList())
         whenever(transferRepository.getPendingTransfersByTypeAndState(any(), any()))
             .thenReturn(emptyList())
@@ -122,7 +122,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
@@ -145,7 +145,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
@@ -169,7 +169,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubActiveTransfers(true)
             stubTransfers()
             val inProgress = subSetTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
@@ -186,11 +186,11 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubTransfers()
             val alreadyInDataBase = subSetActiveTransfers()
             val notInDataBase = mockedActiveTransfers - alreadyInDataBase.toSet()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(alreadyInDataBase)
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).insertOrUpdateActiveTransfers(argThat { it ->
+            verify(transferRepository).putActiveTransfers(argThat { it ->
                 it.map { it.tag } == notInDataBase.map { it.tag }
             })
         }
@@ -200,7 +200,7 @@ internal class CorrectActiveTransfersUseCaseTest {
         runTest {
             stubActiveTransfers(false)
             stubTransfers()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(mockedActiveTransfers)
             val inProgress = subSetTransfers()
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
@@ -224,7 +224,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             stubTransfers()
             val alreadyInDataBase = subSetActiveTransfers()
             val notInDataBase = mockedActiveTransfers - alreadyInDataBase.toSet()
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(alreadyInDataBase)
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
             underTest(TransferType.GENERAL_UPLOAD)
@@ -250,7 +250,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isStreamingTransfer }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
 
@@ -275,7 +275,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isFolderTransfer }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
 
@@ -300,7 +300,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isBackgroundTransfer() }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
 
@@ -325,7 +325,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             val notInDataBase = mockedTransfers.filterNot { it.isPreviewDownload() }
 
-            whenever(transferRepository.getCurrentActiveTransfersByType(any()))
+            whenever(transferRepository.getActiveTransfersByType(any()))
                 .thenReturn(emptyList())
             whenever(getInProgressTransfersUseCase()).thenReturn(mockedTransfers)
 
@@ -443,7 +443,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             underTest.invoke(TransferType.CHAT_UPLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
     @Test
@@ -463,7 +463,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             underTest.invoke(TransferType.DOWNLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
     @Test
@@ -483,7 +483,7 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             underTest.invoke(TransferType.DOWNLOAD)
 
-            verify(transferRepository).updateTransferredBytes(eq(transfers))
+            verify(transferRepository).updateActiveTransfersBytes(eq(transfers))
         }
 
     @ParameterizedTest
@@ -527,9 +527,9 @@ internal class CorrectActiveTransfersUseCaseTest {
         val inOrder = inOrder(updateActiveTransfersUseCase, transferRepository)
         inOrder.verify(updateActiveTransfersUseCase).invoke()
         if (transferType == null) {
-            inOrder.verify(transferRepository).getCurrentActiveTransfers()
+            inOrder.verify(transferRepository).getActiveTransfers()
         } else {
-            inOrder.verify(transferRepository).getCurrentActiveTransfersByType(transferType)
+            inOrder.verify(transferRepository).getActiveTransfersByType(transferType)
         }
     }
 }

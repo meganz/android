@@ -320,55 +320,37 @@ interface TransferRepository {
     ): Flow<TransferEvent>
 
     /**
-     * Get active transfer by uniqueId
-     */
-    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransfer?
-
-    /**
-     * Get active transfer by tag
-     *
-     * Make you sure you use this only for getting the parent folder Transfer using
-     * Transfer.folderTransferTag, otherwise it may lead to unexpected results.
-     */
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
-
-    /**
      * Get active transfers by type
      * @return a flow of all active transfers list
      */
-    fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
+    fun monitorActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
 
     /**
      * Get current active transfers by type
      * @return A list of all active transfers of this type
      */
-    suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
+    suspend fun getActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
 
     /**
      * Get current active transfers
      * @return all active transfers list
      */
-    suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
+    suspend fun getActiveTransfers(): List<ActiveTransfer>
 
     /**
-     * Insert a new active transfer or replace it if there's already an active transfer with the same tag
+     * Insert a new active transfer or replace it if there's already an active transfer with the same uniqueId
      */
-    suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
+    suspend fun putActiveTransfer(activeTransfer: ActiveTransfer)
 
     /**
-     * Insert (or replace  if there's already an active transfer with the same tag) a list of active transfers
+     * Insert (or replace  if there's already an active transfer with the same uniqueId) a list of active transfers
      */
-    suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
+    suspend fun putActiveTransfers(activeTransfers: List<ActiveTransfer>)
 
     /**
-     * Set or update the transferred bytes counter of this transfer
+     * Set or update the transfers if they are not already finished or has bigger progress
      */
-    suspend fun updateTransferredBytes(transfers: List<Transfer>)
-
-    /**
-     * Delete all active transfer of this type
-     */
-    suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
+    suspend fun updateActiveTransfersBytes(transfers: List<Transfer>)
 
     /**
      * Delete all active transfer
@@ -386,7 +368,7 @@ interface TransferRepository {
      * Get active transfer totals by type
      * @return a flow of active transfer totals
      */
-    fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
+    fun monitorActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals>
 
     /**
      * Get the current active transfer totals by type

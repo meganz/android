@@ -52,7 +52,7 @@ class UpdateActiveTransfersUseCaseTest {
             underTest()
 
             verify(transferRepository).deleteAllActiveTransfers()
-            verify(transferRepository, never()).insertOrUpdateActiveTransfers(any())
+            verify(transferRepository, never()).putActiveTransfers(any())
         }
 
     @Test
@@ -70,7 +70,7 @@ class UpdateActiveTransfersUseCaseTest {
         underTest()
 
         verify(transferRepository).deleteAllActiveTransfers()
-        verify(transferRepository).insertOrUpdateActiveTransfers(
+        verify(transferRepository).putActiveTransfers(
             argThat { this.size == 2 && this.containsAll(inProgressTransfers) }
         )
     }
@@ -102,7 +102,7 @@ class UpdateActiveTransfersUseCaseTest {
         underTest()
 
         verify(transferRepository).deleteAllActiveTransfers()
-        verify(transferRepository).insertOrUpdateActiveTransfers(
+        verify(transferRepository).putActiveTransfers(
             argThat { transfers ->
                 transfers.size == 2 &&
                         transfers.containsAll(completedTransfers)
@@ -140,7 +140,7 @@ class UpdateActiveTransfersUseCaseTest {
         underTest()
 
         verify(transferRepository).deleteAllActiveTransfers()
-        verify(transferRepository).insertOrUpdateActiveTransfers(
+        verify(transferRepository).putActiveTransfers(
             argThat { transfers ->
                 transfers.size == 2 && !transfers.contains(completedTransfer3)
             }
@@ -171,7 +171,7 @@ class UpdateActiveTransfersUseCaseTest {
             underTest()
 
             verify(transferRepository).deleteAllActiveTransfers()
-            verify(transferRepository).insertOrUpdateActiveTransfers(
+            verify(transferRepository).putActiveTransfers(
                 argThat { transfers ->
                     transfers.size == 2 &&
                             transfers.contains(inProgressTransfer) &&
@@ -190,6 +190,6 @@ class UpdateActiveTransfersUseCaseTest {
 
         val inOrder = org.mockito.kotlin.inOrder(transferRepository)
         inOrder.verify(transferRepository).deleteAllActiveTransfers()
-        inOrder.verify(transferRepository).insertOrUpdateActiveTransfers(any())
+        inOrder.verify(transferRepository).putActiveTransfers(any())
     }
 }

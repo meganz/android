@@ -530,41 +530,33 @@ internal class DefaultTransfersRepository @Inject constructor(
             workInfos.any { it.state.isFinished }
         }
 
-    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getActiveTransferByUniqueId(uniqueId)
-    }
-
-    override suspend fun getActiveTransferByTag(tag: Int) = withContext(ioDispatcher) {
-        megaLocalRoomGateway.getActiveTransferByTag(tag)
-    }
-
-    override fun getActiveTransfersByType(transferType: TransferType) =
+    override fun monitorActiveTransfersByType(transferType: TransferType) =
         megaLocalRoomGateway
             .getActiveTransfersByType(transferType)
             .flowOn(ioDispatcher)
             .cancellable()
 
-    override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
+    override suspend fun getActiveTransfersByType(transferType: TransferType) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getCurrentActiveTransfersByType(transferType)
         }
 
-    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
+    override suspend fun getActiveTransfers(): List<ActiveTransfer> =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.getCurrentActiveTransfers()
         }
 
-    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
+    override suspend fun putActiveTransfer(activeTransfer: ActiveTransfer) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.insertOrUpdateActiveTransfer(activeTransfer)
         }
 
-    override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
+    override suspend fun putActiveTransfers(activeTransfers: List<ActiveTransfer>) =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.insertOrUpdateActiveTransfers(activeTransfers)
         }
 
-    override suspend fun updateTransferredBytes(transfers: List<Transfer>) =
+    override suspend fun updateActiveTransfersBytes(transfers: List<Transfer>) =
         withContext(ioDispatcher) {
             val grouped = transfers
                 .filterNot { it.transferredBytes == 0L }
@@ -611,12 +603,6 @@ internal class DefaultTransfersRepository @Inject constructor(
             )
         }
 
-    override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
-        withContext(ioDispatcher) {
-            megaLocalRoomGateway.deleteAllActiveTransfersByType(transferType)
-            transferredBytesFlow(transferType).value = mapOf()
-        }
-
     override suspend fun deleteAllActiveTransfers() =
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllActiveTransfers()
@@ -632,7 +618,7 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaLocalRoomGateway.setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
     }
 
-    override fun getActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
+    override fun monitorActiveTransferTotalsByType(transferType: TransferType): Flow<ActiveTransferTotals> =
         flow {
             val transferredBytesFlow = transferredBytesFlow(transferType)
             emitAll(

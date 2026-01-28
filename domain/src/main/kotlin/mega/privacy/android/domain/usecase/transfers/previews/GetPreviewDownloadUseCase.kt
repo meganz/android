@@ -14,7 +14,7 @@ class GetPreviewDownloadUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
 ) {
     suspend operator fun invoke(node: TypedNode): Transfer? =
-        transferRepository.getCurrentActiveTransfersByType(TransferType.DOWNLOAD)
+        transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)
             .filter { activeTransfer ->
                 activeTransfer.isPreviewDownload() && activeTransfer.fileName == node.name
             }

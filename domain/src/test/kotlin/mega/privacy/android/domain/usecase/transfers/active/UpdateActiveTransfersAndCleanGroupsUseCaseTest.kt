@@ -41,14 +41,14 @@ class UpdateActiveTransfersAndCleanGroupsUseCaseTest {
 
     @Test
     fun `test that active transfers are updated before using them`() = runTest {
-        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(emptyList())
+        whenever(transferRepository.getActiveTransfers()).thenReturn(emptyList())
         whenever(transferRepository.getActiveTransferGroups()).thenReturn(emptyList())
 
         underTest()
 
         val inOrder = inOrder(updateActiveTransfersUseCase, transferRepository)
         inOrder.verify(updateActiveTransfersUseCase).invoke()
-        inOrder.verify(transferRepository).getCurrentActiveTransfers()
+        inOrder.verify(transferRepository).getActiveTransfers()
     }
 
     @Test
@@ -70,7 +70,7 @@ class UpdateActiveTransfersAndCleanGroupsUseCaseTest {
             on { groupId } doReturn groupId2
         }
 
-        whenever(transferRepository.getCurrentActiveTransfers())
+        whenever(transferRepository.getActiveTransfers())
             .thenReturn(listOf(activeTransfer1, activeTransfer2))
         whenever(transferRepository.getActiveTransferGroups())
             .thenReturn(listOf(activeTransferGroup1, activeTransferGroup2))
@@ -96,7 +96,7 @@ class UpdateActiveTransfersAndCleanGroupsUseCaseTest {
             on { groupId } doReturn groupId2
         }
 
-        whenever(transferRepository.getCurrentActiveTransfers())
+        whenever(transferRepository.getActiveTransfers())
             .thenReturn(listOf(activeTransfer))
         whenever(transferRepository.getActiveTransferGroups())
             .thenReturn(listOf(activeTransferGroup1, activeTransferGroup2))
@@ -119,7 +119,7 @@ class UpdateActiveTransfersAndCleanGroupsUseCaseTest {
             on { groupId } doReturn groupId2
         }
 
-        whenever(transferRepository.getCurrentActiveTransfers()).thenReturn(emptyList())
+        whenever(transferRepository.getActiveTransfers()).thenReturn(emptyList())
         whenever(transferRepository.getActiveTransferGroups())
             .thenReturn(listOf(activeTransferGroup1, activeTransferGroup2))
 

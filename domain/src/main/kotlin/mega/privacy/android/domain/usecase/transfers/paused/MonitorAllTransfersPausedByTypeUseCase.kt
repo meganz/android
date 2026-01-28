@@ -53,7 +53,7 @@ class MonitorAllTransfersPausedByTypeUseCase @Inject constructor(
         }
 
         else -> {
-            transferRepository.getActiveTransferTotalsByType(type).map { it.allPaused() }
+            transferRepository.monitorActiveTransferTotalsByType(type).map { it.allPaused() }
         }
     }
 

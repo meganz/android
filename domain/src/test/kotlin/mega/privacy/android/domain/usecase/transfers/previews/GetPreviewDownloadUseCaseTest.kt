@@ -72,7 +72,7 @@ class GetPreviewDownloadUseCaseTest {
         val previewDownloads = activeDownloads
             .filter { it.isPreviewDownload() && it.fileName == fileName }
 
-        whenever(transferRepository.getCurrentActiveTransfersByType(TransferType.DOWNLOAD)) doReturn activeDownloads
+        whenever(transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)) doReturn activeDownloads
         previewDownloads.forEach { activeDownload ->
             val expected = if (activeDownload.uniqueId == foundActiveTransferId) {
                 expectedTransfer
@@ -112,7 +112,7 @@ class GetPreviewDownloadUseCaseTest {
         val previewDownloads = activeDownloads
             .filter { it.isPreviewDownload() && it.fileName == fileName }
 
-        whenever(transferRepository.getCurrentActiveTransfersByType(TransferType.DOWNLOAD)) doReturn activeDownloads
+        whenever(transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)) doReturn activeDownloads
         previewDownloads.forEach { activeDownload ->
             val expected = if (activeDownload.uniqueId == foundActiveTransferId) {
                 transfer
@@ -128,7 +128,7 @@ class GetPreviewDownloadUseCaseTest {
 
     @Test
     fun `test that null is returned if there are no download transfers`() = runTest {
-        whenever(transferRepository.getCurrentActiveTransfersByType(TransferType.DOWNLOAD)) doReturn emptyList()
+        whenever(transferRepository.getActiveTransfersByType(TransferType.DOWNLOAD)) doReturn emptyList()
 
         assertThat(underTest.invoke(node)).isNull()
     }

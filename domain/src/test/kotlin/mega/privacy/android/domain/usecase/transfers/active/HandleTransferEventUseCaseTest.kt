@@ -63,7 +63,7 @@ class HandleTransferEventUseCaseTest {
         transferEvent: TransferEvent,
     ) = runTest {
         underTest.invoke(transferEvent)
-        verify(transferRepository).insertOrUpdateActiveTransfers(eq(listOf(transferEvent.transfer)))
+        verify(transferRepository).putActiveTransfers(eq(listOf(transferEvent.transfer)))
     }
 
     @Test
@@ -87,7 +87,7 @@ class HandleTransferEventUseCaseTest {
                 mockTransferEvent<TransferEvent.TransferFinishEvent>(TransferType.DOWNLOAD, 3),
             )
             underTest.invoke(events = (events1 + events2 + events3).toTypedArray())
-            verify(transferRepository).insertOrUpdateActiveTransfers(
+            verify(transferRepository).putActiveTransfers(
                 eq(
                     listOf(
                         events1.last().transfer,
@@ -110,9 +110,9 @@ class HandleTransferEventUseCaseTest {
         underTest.invoke(transferEvent)
 
         if (expected.isEmpty()) {
-            verify(transferRepository, never()).updateTransferredBytes(expected)
+            verify(transferRepository, never()).updateActiveTransfersBytes(expected)
         } else {
-            verify(transferRepository).updateTransferredBytes(expected)
+            verify(transferRepository).updateActiveTransfersBytes(expected)
         }
     }
 

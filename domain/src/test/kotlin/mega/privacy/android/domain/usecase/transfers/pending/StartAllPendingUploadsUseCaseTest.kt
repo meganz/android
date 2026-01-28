@@ -305,7 +305,7 @@ class StartAllPendingUploadsUseCaseTest {
             }
 
             verify(transferRepository)
-                .insertOrUpdateActiveTransfer(transfer)
+                .putActiveTransfer(transfer)
         }
 
 
