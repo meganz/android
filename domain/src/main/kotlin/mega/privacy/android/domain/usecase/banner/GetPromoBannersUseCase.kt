@@ -13,7 +13,9 @@ class GetPromoBannersUseCase @Inject constructor(
      * Get Promotional banners
      */
     suspend operator fun invoke(): List<PromotionalBanner> {
-        return getBannersUseCase().map { banner ->
+        return getBannersUseCase().filter {
+            it.variant == 1
+        }.map { banner ->
             PromotionalBanner(
                 id = banner.id,
                 title = banner.title,

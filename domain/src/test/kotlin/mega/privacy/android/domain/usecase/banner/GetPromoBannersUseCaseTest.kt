@@ -93,4 +93,75 @@ internal class GetPromoBannersUseCaseTest {
 
         assertThat(actual).isEmpty()
     }
+
+    @Test
+    fun `test that invoke filters banners by variant 1 only`() = runTest {
+        val bannersWithDifferentVariants = listOf(
+            Banner(
+                id = 1,
+                title = "Variant 1 Banner",
+                description = "Description",
+                image = "banner1.jpg",
+                backgroundImage = "bg1.jpg",
+                imageLocation = "https://images.example.com",
+                url = "https://test1.com",
+                buttonText = "Click Me",
+                variant = 1
+            ),
+            Banner(
+                id = 2,
+                title = "Variant 2 Banner",
+                description = "Description",
+                image = "banner2.jpg",
+                backgroundImage = "bg2.jpg",
+                imageLocation = "https://images.example.com",
+                url = "https://test2.com",
+                buttonText = "Click Me",
+                variant = 2
+            ),
+            Banner(
+                id = 3,
+                title = "Variant 0 Banner",
+                description = "Description",
+                image = "banner3.jpg",
+                backgroundImage = "bg3.jpg",
+                imageLocation = "https://images.example.com",
+                url = "https://test3.com",
+                buttonText = "Click Me",
+                variant = 0
+            )
+        )
+
+        whenever(getBannersUseCase()).thenReturn(bannersWithDifferentVariants)
+
+        val actual = underTest()
+
+        assertThat(actual).hasSize(1)
+        assertThat(actual[0].id).isEqualTo(1)
+        assertThat(actual[0].title).isEqualTo("Variant 1 Banner")
+    }
+
+    @Test
+    fun `test that invoke constructs image URLs correctly`() = runTest {
+        val banner = listOf(
+            Banner(
+                id = 1,
+                title = "Test Banner",
+                description = "Description",
+                image = "banner.jpg",
+                backgroundImage = "background.jpg",
+                imageLocation = "https://cdn.example.com/images",
+                url = "https://test.com",
+                buttonText = "Test",
+                variant = 1
+            )
+        )
+
+        whenever(getBannersUseCase()).thenReturn(banner)
+
+        val actual = underTest()
+        assertThat(actual[0].image).isEqualTo("https://cdn.example.com/images/banner.jpg")
+        assertThat(actual[0].backgroundImage).isEqualTo("https://cdn.example.com/images/background.jpg")
+        assertThat(actual[0].imageLocation).isEqualTo("https://cdn.example.com/images")
+    }
 }
