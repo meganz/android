@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.requeststatus
+package mega.privacy.android.core.sharedcomponents.requeststatus
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule

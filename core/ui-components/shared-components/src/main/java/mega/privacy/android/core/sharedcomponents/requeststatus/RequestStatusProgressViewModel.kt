@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.requeststatus
+package mega.privacy.android.core.sharedcomponents.requeststatus
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.requeststatus.model.RequestStatusProgressUiState
+import mega.privacy.android.core.sharedcomponents.requeststatus.model.RequestStatusProgressUiState
 import mega.privacy.android.domain.usecase.requeststatus.MonitorRequestStatusProgressEventUseCase
 import timber.log.Timber
 import javax.inject.Inject

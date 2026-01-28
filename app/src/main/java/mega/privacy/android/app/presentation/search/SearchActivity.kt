@@ -27,6 +27,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
@@ -44,7 +45,6 @@ import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.BackupsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
@@ -58,7 +58,6 @@ import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.qrcode.findActivity
-import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
@@ -73,6 +72,8 @@ import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -305,7 +306,8 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
                                 modifier = Modifier
                                     .constrainAs(requestStatusProgressBar) {
                                         bottom.linkTo(parent.bottom)
-                                    }
+                                    },
+                                viewModel = hiltViewModel()
                             )
                         }
                     }

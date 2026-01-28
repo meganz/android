@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.requeststatus
+package mega.privacy.android.core.sharedcomponents.requeststatus
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat

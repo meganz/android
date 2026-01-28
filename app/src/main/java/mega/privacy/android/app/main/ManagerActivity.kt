@@ -74,6 +74,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commitNow
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.coroutineScope
@@ -205,7 +206,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
-import mega.privacy.android.app.presentation.requeststatus.RequestStatusProgressContainer
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinFragment
 import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
@@ -1166,7 +1167,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 OriginalTheme(isDark = isDark) {
-                    RequestStatusProgressContainer()
+                    RequestStatusProgressContainer(
+                        viewModel = hiltViewModel()
+                    )
                 }
             }
         }

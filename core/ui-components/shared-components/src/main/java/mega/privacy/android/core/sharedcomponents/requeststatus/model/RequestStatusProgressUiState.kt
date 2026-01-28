@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.requeststatus.model
+package mega.privacy.android.core.sharedcomponents.requeststatus.model
 
 import mega.privacy.android.domain.entity.Progress
 

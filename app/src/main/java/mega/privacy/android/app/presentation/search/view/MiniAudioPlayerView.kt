@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.search.view
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MiniAudioPlayerBinding
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
+import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
+import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 
 
 /**
@@ -76,11 +78,16 @@ fun MiniAudioPlayerView(modifier: Modifier, lifecycle: Lifecycle) {
  *
  * Instead we keep a fixed-height container and animate its vertical offset,
  * collapsing the height only after the slide-out animation completes.
+ *
+ * @param modifier Modifier
+ * @param lifecycleOwner LifecycleOwner
+ * @param onVisibilityChanged Callback invoked when visibility changes, receives the new visibility state
  */
 @Composable
 fun MiniAudioPlayerView(
     modifier: Modifier = Modifier,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    onVisibilityChanged: ((Boolean) -> Unit)? = null,
 ) {
     val miniPlayerHeight = dimensionResource(R.dimen.audio_player_mini_controller_height)
 
@@ -100,6 +107,7 @@ fun MiniAudioPlayerView(
 
     // Height is full when visible OR animating, 0 when completely hidden
     val containerHeight = if (isFullyHidden) 0.dp else miniPlayerHeight
+    val isNavigationRailVisible = LocalNavigationRailVisible.current
 
     var audioPlayerController by remember {
         mutableStateOf<MiniAudioPlayerController?>(null)
@@ -107,6 +115,9 @@ fun MiniAudioPlayerView(
 
     Box(
         modifier = modifier
+            .conditional(!isFullyHidden && isNavigationRailVisible) {
+                navigationBarsPadding()
+            }
             .height(containerHeight)
             .clipToBounds(),
         contentAlignment = Alignment.BottomCenter,
@@ -141,6 +152,7 @@ fun MiniAudioPlayerView(
                 isFullyHidden = false
             }
             isVisible = visible
+            onVisibilityChanged?.invoke(visible)
         }
     }
 }
