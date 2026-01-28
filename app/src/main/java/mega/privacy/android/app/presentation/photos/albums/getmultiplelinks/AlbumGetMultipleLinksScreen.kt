@@ -65,11 +65,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkViewModel
-import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.presentation.albums.copyright.CopyRightScreen
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_012

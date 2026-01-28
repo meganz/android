@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -257,7 +256,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setAskBeforeLargeDownloads(askForConfirmation: Boolean) =
         megaLocalStorageGateway.setAskBeforeLargeDownloads(askForConfirmation)
 
-    override suspend fun setShowCopyright() {
+    override suspend fun setShowCopyright() = withContext(ioDispatcher) {
         if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")
             megaLocalStorageGateway.setShowCopyright(true)
@@ -267,6 +266,9 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun setShowCopyright(show: Boolean) = withContext(ioDispatcher) {
+        megaLocalStorageGateway.setShowCopyright(show)
+    }
 
     override suspend fun isUseHttpsPreferenceEnabled(): Boolean = withContext(ioDispatcher) {
         databaseHandler.get().useHttpsOnly.toBoolean()

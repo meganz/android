@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
-import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -29,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

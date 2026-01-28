@@ -169,6 +169,12 @@ interface SettingsRepository {
     suspend fun setShowCopyright()
 
     /**
+     * Set the show copyright flag directly
+     * @param show true to show copyright, false to hide it
+     */
+    suspend fun setShowCopyright(show: Boolean)
+
+    /**
      * Is use https preference set
      *
      * @return true if set

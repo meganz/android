@@ -16,11 +16,9 @@ import androidx.fragment.app.FragmentContainerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
-import mega.privacy.android.app.getLink.GetLinkViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
@@ -39,6 +37,8 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkScreen
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkViewModel
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -62,7 +62,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
         AlbumScreen.valueOf(intent.getStringExtra(ALBUM_SCREEN) ?: "")
     }
 
-    private val getLinkViewModel: GetLinkViewModel by viewModels()
 
     @Inject
     lateinit var imagePreviewProvider: ImagePreviewProvider
@@ -126,7 +125,6 @@ class AlbumScreenWrapperActivity : BaseActivity() {
 
             AlbumScreen.AlbumGetLinkScreen -> {
                 AlbumGetLinkScreen(
-                    getLinkViewModel = getLinkViewModel,
                     onBack = ::finish,
                     onLearnMore = {
                         val intent = createAlbumDecryptionKeyScreen(this)
@@ -295,8 +293,8 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             hasSensitiveElement: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetLinkScreen.name)
-            putExtra(ALBUM_ID, albumId.id)
-            putExtra(HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
+            putExtra(AlbumGetLinkViewModel.ALBUM_ID, albumId.id)
+            putExtra(AlbumGetLinkViewModel.HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
         }
 
         fun createAlbumGetMultipleLinksScreen(

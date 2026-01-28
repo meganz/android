@@ -1,8 +1,8 @@
 package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
 
-import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
 
 /**
  * View State for the Get Multiple Links

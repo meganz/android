@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.photos.albums.getlink
+package mega.privacy.android.feature.photos.presentation.albums.getlink
 
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 
@@ -10,6 +10,7 @@ data class AlbumGetLinkState(
     val exitScreen: Boolean = false,
     val showCopyright: Boolean = false,
     val showSharingSensitiveWarning: Boolean = false,
+    val copyrightAgreed: Boolean = false,
 )
 
 data class AlbumSummary(
