@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.domain.usecase.transfers.active.UpdateActiveTransfersAndCleanGroupsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
@@ -34,6 +36,8 @@ class DeleteOldestCompletedTransfersWorkerTest {
     private val context = mock<Context>()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val workProgressUpdater = mock<ProgressUpdater>()
+    private val updateActiveTransfersAndCleanGroupsUseCase =
+        mock<UpdateActiveTransfersAndCleanGroupsUseCase>()
 
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
@@ -67,7 +71,8 @@ class DeleteOldestCompletedTransfersWorkerTest {
                     { _, _ -> }, workExecutor
                 )
             ),
-            megaLocalRoomGateway
+            megaLocalRoomGateway,
+            updateActiveTransfersAndCleanGroupsUseCase,
         )
     }
 
@@ -77,6 +82,7 @@ class DeleteOldestCompletedTransfersWorkerTest {
             context,
             workProgressUpdater,
             megaLocalRoomGateway,
+            updateActiveTransfersAndCleanGroupsUseCase,
         )
     }
 
@@ -93,4 +99,21 @@ class DeleteOldestCompletedTransfersWorkerTest {
             underTest.doWork()
             verify(megaLocalRoomGateway).deleteOldestCompletedTransfers()
         }
+
+    @Test
+    fun `test that delete oldest completed transfers use case is invoked`() =
+        runTest {
+            underTest.doWork()
+            verify(updateActiveTransfersAndCleanGroupsUseCase).invoke()
+        }
+
+    @Test
+    fun `test that exception is caught when delete oldest completed transfers fails`() = runTest {
+        whenever(updateActiveTransfersAndCleanGroupsUseCase()).thenThrow(RuntimeException("Test exception"))
+
+        // Should not throw exception
+        underTest.doWork()
+
+        verify(updateActiveTransfersAndCleanGroupsUseCase).invoke()
+    }
 }
