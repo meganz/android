@@ -339,7 +339,8 @@ internal class BillingFacade @Inject constructor(
             printPurchaseList += "purchase obfuscated id ${purchase.accountIdentifiers?.obfuscatedAccountId}, "
             printPurchaseList += "purchase original json ${purchase.originalJson}, "
             printPurchaseList += "purchase signature ${purchase.signature} /n"
-            (purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId ||
+            (purchase.accountIdentifiers?.obfuscatedAccountId.isNullOrEmpty() ||
+                    purchase.accountIdentifiers?.obfuscatedAccountId == obfuscatedAccountId ||
                     purchase.accountIdentifiers?.obfuscatedAccountId == newObfuscatedAccountId)
                     && verifyValidSignature(purchase.originalJson, purchase.signature)
         }
