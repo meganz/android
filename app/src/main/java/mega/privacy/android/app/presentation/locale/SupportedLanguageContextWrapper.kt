@@ -44,26 +44,23 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
          * @return wrapped context
          */
         fun wrap(context: Context?): SupportedLanguageContextWrapper {
-            if (context == null) {
-                return SupportedLanguageContextWrapper(null)
-            }
             /**
-             * Fix a bug where having multiple locales in system settings causes the order of locales
-             * to get randomly flipped, resulting in mixed language resources.
-             */
-            val configuration = context.resources.configuration
-            val userLocales = configuration.locales
-            val supportedLocaleList = getSupportedLocales(userLocales)
-            val resolvedLocale = supportedLocaleList.firstOrNull() ?: Locale("en")
+             * When selecting a non supported locale and then a supported locale in the language settings
+             * causes a strange error in which the order of the two locales get randomly flipped.
+             * This causes some resources to be loaded in the supported language and others in the
+             * default language. I don't know what causes that to happen, but this code removes
+             * unsupported locales from the configuration as a measure to prevent the strange behaviour.
+             **/
+            context?.resources?.configuration?.let { configuration ->
+                val userLocales = configuration.locales
+                val supportedLocaleList = getSupportedLocales(userLocales)
+                val resolvedLocale = supportedLocaleList.firstOrNull() ?: Locale("en")
 
-            Locale.setDefault(resolvedLocale)
+                Locale.setDefault(resolvedLocale)
+                configuration.setLocales(LocaleList(resolvedLocale))
+            }
 
-            // Create a new configuration with the resolved locale
-            val newConfig = android.content.res.Configuration(configuration)
-            newConfig.setLocales(LocaleList(resolvedLocale))
-
-            val newContext = context.createConfigurationContext(newConfig)
-            return SupportedLanguageContextWrapper(newContext)
+            return SupportedLanguageContextWrapper(context)
         }
 
         private fun getSupportedLocales(
