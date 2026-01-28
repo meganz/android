@@ -142,7 +142,6 @@ private fun SyncNewFolderScreenScaffold(
 
     MegaScaffold(
         scaffoldState = scaffoldState,
-        shouldAddSnackBarPadding = false,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             MegaAppBar(

@@ -140,7 +140,6 @@ internal fun DeviceCenterScreen(
 
     MegaScaffold(
         scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
-        shouldAddSnackBarPadding = false,
         contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             DeviceCenterAppBar(
