@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.getlink
 
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 
 data class AlbumGetLinkState(
@@ -11,6 +12,7 @@ data class AlbumGetLinkState(
     val showCopyright: Boolean = false,
     val showSharingSensitiveWarning: Boolean = false,
     val copyrightAgreed: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.System,
 )
 
 data class AlbumSummary(

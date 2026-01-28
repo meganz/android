@@ -16,6 +16,7 @@ import mega.privacy.android.domain.entity.photos.AlbumIdLink
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
@@ -33,6 +34,7 @@ class AlbumGetLinkViewModelTest {
     private val exportAlbumsUseCase: ExportAlbumsUseCase = mock()
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
     private val setShowCopyrightUseCase: SetShowCopyrightUseCase = mock()
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
 
     @Test
     fun `test that fetch link works correctly`() = runTest {
@@ -56,7 +58,8 @@ class AlbumGetLinkViewModelTest {
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             setShowCopyrightUseCase = setShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            monitorThemeModeUseCase = monitorThemeModeUseCase
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))
@@ -102,7 +105,8 @@ class AlbumGetLinkViewModelTest {
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
             setShowCopyrightUseCase = setShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            monitorThemeModeUseCase = monitorThemeModeUseCase
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))

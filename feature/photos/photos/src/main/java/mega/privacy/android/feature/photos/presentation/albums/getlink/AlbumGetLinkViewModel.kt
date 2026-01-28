@@ -23,6 +23,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
@@ -42,9 +43,25 @@ class AlbumGetLinkViewModel @Inject constructor(
     private val setShowCopyrightUseCase: SetShowCopyrightUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetLinkState())
     val stateFlow = state.asStateFlow()
+
+    init {
+        monitorThemeMode()
+    }
+
+    private fun monitorThemeMode() {
+        monitorThemeModeUseCase()
+            .catch { Timber.e(it) }
+            .onEach { themeMode ->
+                state.update {
+                    it.copy(themeMode = themeMode)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
 
     fun initialize() {
         viewModelScope.launch {

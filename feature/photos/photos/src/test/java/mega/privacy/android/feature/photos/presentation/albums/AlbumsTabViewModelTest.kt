@@ -11,6 +11,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -47,7 +48,7 @@ internal class AlbumsTabViewModelTest {
     private val removeAlbumsUseCase: RemoveAlbumsUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
-
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -70,7 +71,8 @@ internal class AlbumsTabViewModelTest {
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase
         )
     }
 
@@ -152,7 +154,8 @@ internal class AlbumsTabViewModelTest {
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase
         )
 
         underTest.uiState.test {

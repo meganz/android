@@ -11,11 +11,13 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -38,12 +40,25 @@ class AlbumsTabViewModel @Inject constructor(
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
 
     init {
+        monitorThemeMode()
         monitorAlbums()
+    }
+
+    private fun monitorThemeMode() {
+        monitorThemeModeUseCase()
+            .catch { Timber.e(it) }
+            .onEach {
+                uiState.update {
+                    it.copy(themeMode = it.themeMode)
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun monitorAlbums() {

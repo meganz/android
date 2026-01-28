@@ -2,7 +2,6 @@ package mega.privacy.android.feature.photos.presentation.albums
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,6 +24,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.R
@@ -83,7 +83,7 @@ internal fun AlbumsTabScreen(
     onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {},
     getPresetNewAlbumName: (String) -> String = { "" },
 ) {
-    val placeholder = if (isSystemInDarkTheme()) {
+    val placeholder = if (uiState.themeMode.isDarkMode()) {
         painterResource(R.drawable.ic_album_cover_d)
     } else {
         painterResource(R.drawable.ic_album_cover)

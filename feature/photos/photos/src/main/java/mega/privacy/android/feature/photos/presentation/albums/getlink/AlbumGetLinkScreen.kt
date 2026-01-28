@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -67,6 +66,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.LinkFormatter
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.R
@@ -218,6 +218,7 @@ fun AlbumGetLinkScreen(
                 modifier = Modifier.padding(innerPaddings),
                 albumSummary = state.albumSummary,
                 isSeparateKeyEnabled = state.isSeparateKeyEnabled,
+                isSystemInDarkTheme = state.themeMode.isDarkMode(),
                 link = state.link,
                 onDownloadImage = albumGetLinkViewModel::downloadImage,
                 onLearnMore = onLearnMore,
@@ -266,6 +267,7 @@ fun AlbumGetLinkScreen(
 private fun AlbumGetLinkContent(
     albumSummary: AlbumSummary?,
     isSeparateKeyEnabled: Boolean,
+    isSystemInDarkTheme: Boolean,
     link: String,
     onDownloadImage: ImageDownloader,
     onLearnMore: () -> Unit,
@@ -284,6 +286,7 @@ private fun AlbumGetLinkContent(
                 modifier = Modifier.padding(end = 16.dp, bottom = 16.dp),
                 albumSummary = albumSummary,
                 onDownloadImage = onDownloadImage,
+                isSystemInDarkTheme = isSystemInDarkTheme,
             )
 
             SubtleDivider(modifier = Modifier.fillMaxWidth())
@@ -334,6 +337,7 @@ private fun AlbumGetLinkContent(
 private fun AlbumSummarySection(
     albumSummary: AlbumSummary?,
     onDownloadImage: ImageDownloader,
+    isSystemInDarkTheme: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val album = albumSummary?.album
@@ -346,6 +350,7 @@ private fun AlbumSummarySection(
             AlbumCoverImage(
                 cover = album?.cover,
                 onDownloadImage = onDownloadImage,
+                isSystemInDarkTheme = isSystemInDarkTheme,
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -378,9 +383,10 @@ private fun AlbumSummarySection(
 private fun AlbumCoverImage(
     cover: Photo?,
     onDownloadImage: ImageDownloader,
+    isSystemInDarkTheme: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    val placeholder = if (isSystemInDarkTheme()) {
+    val placeholder = if (isSystemInDarkTheme) {
         painterResource(R.drawable.ic_album_cover_d)
     } else {
         painterResource(R.drawable.ic_album_cover)
