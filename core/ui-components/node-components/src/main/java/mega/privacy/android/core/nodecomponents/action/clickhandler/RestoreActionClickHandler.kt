@@ -66,6 +66,9 @@ class RestoreActionClickHandler @Inject constructor(
                             provider.viewModel.dismiss()
                         }
                         if (result.noConflictNodes.isNotEmpty()) {
+                            // Early dismiss selection bottom sheet
+                            provider.viewModel.dismiss()
+
                             val restoreResult = restoreNodesUseCase(result.noConflictNodes)
                             val message = restoreNodeResultMapper(restoreResult)
 
@@ -79,11 +82,9 @@ class RestoreActionClickHandler @Inject constructor(
                                     )
                                 } ?: run {
                                     provider.postMessage(message)
-                                    provider.viewModel.dismiss()
                                 }
                             } else {
                                 provider.postMessage(message)
-                                provider.viewModel.dismiss()
                             }
                         }
                     }.onFailure { throwable ->

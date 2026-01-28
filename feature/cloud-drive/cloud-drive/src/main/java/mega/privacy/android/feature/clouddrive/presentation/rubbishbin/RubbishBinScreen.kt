@@ -293,6 +293,13 @@ internal fun RubbishBinScreen(
         )
     }
 
+    EventEffect(
+        event = nodeActionState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss
+    ) {
+        viewModel.clearAllSelectedNodes()
+    }
+
     // Show clear rubbish bin confirmation dialog
     if (showClearRubbishBinDialog) {
         ClearRubbishBinDialog(

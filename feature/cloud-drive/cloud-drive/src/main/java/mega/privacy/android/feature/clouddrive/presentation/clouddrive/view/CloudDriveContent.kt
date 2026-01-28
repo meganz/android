@@ -177,7 +177,6 @@ internal fun CloudDriveContent(
         onAction(CloudDriveAction.DeselectAllItems)
     }
 
-
     EventEffect(
         event = nodeActionState.dismissEvent,
         onConsumed = nodeOptionsActionViewModel::resetDismiss
