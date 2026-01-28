@@ -285,10 +285,15 @@ class PendingBackStackNavigationHandler(
     }
 
     private fun navigateToPendingScreens() {
-        if (backstack.pending.isEmpty()) return
-        val pending = backstack.pending
+        val pending = mutableListOf<NavKey>().apply {
+            if (backstack.isEmpty()) {
+                add(defaultLandingScreen)
+            }
+        }.union(backstack.pending)
         backstack.pending = emptyList()
-        navigate(pending.toList())
+        if (pending.isNotEmpty()) {
+            navigate(pending.toList())
+        }
     }
 
     private fun logBackStack(callingFunction: String) {
