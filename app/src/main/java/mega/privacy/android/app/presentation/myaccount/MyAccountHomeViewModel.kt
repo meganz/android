@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.myaccount.model.MyAccountHomeUIState
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionStatus
@@ -68,11 +69,19 @@ class MyAccountHomeViewModel @Inject constructor(
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase,
     private val accountTypeNameMapper: AccountTypeNameMapper,
+    private val accountTypeIconMapper: AccountTypeIconMapper,
     private val avatarContentMapper: AvatarContentMapper,
     private val isAchievementsEnabledUseCase: IsAchievementsEnabledUseCase,
 ) : ViewModel() {
     private val _uiState =
-        MutableStateFlow(MyAccountHomeUIState(accountTypeNameResource = accountTypeNameMapper(null)))
+        MutableStateFlow(
+            MyAccountHomeUIState(
+                accountTypeNameResource = accountTypeNameMapper(null),
+                accountTypeIcon = accountTypeIconMapper(
+                    accountType = null
+                )
+            )
+        )
 
     /**
      * My Account Home Fragment Ui State
@@ -221,7 +230,10 @@ class MyAccountHomeViewModel @Inject constructor(
                         isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
                         isProFlexiAccount = accountDetails.accountTypeIdentifier == AccountType.PRO_FLEXI,
                         isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
-                        accountTypeNameResource = accountTypeNameMapper(accountDetails.accountTypeIdentifier)
+                        accountTypeNameResource = accountTypeNameMapper(accountDetails.accountTypeIdentifier),
+                        accountTypeIcon = accountTypeIconMapper(
+                            accountType = accountDetails.accountTypeIdentifier
+                        )
                     )
                 }
 

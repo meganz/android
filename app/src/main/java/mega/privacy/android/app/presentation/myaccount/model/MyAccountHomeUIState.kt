@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.myaccount.model
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -8,6 +9,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
+import mega.privacy.android.icon.pack.IconPack
 
 /**
  * My account home fragment ui state
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.entity.transfer.UsedTransferStatus
  * @property navigateToAchievements
  * @property userMessage
  * @property accountTypeNameResource
+ * @property accountTypeIcon
  * @property avatarContent
  */
 data class MyAccountHomeUIState(
@@ -47,6 +50,7 @@ data class MyAccountHomeUIState(
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
     val accountType: AccountType? = null,
+    val accountTypeIcon: ImageVector = IconPack.Medium.Thin.Outline.Shield,
     val isBusinessAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
     val isProFlexiAccount: Boolean = false,

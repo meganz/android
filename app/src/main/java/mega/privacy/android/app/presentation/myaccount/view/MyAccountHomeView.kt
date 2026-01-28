@@ -43,6 +43,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -502,6 +503,7 @@ private fun AccountInfoSection(
                 .padding(start = 14.dp, end = 14.dp, top = 12.dp, bottom = 8.dp),
             accountDescription = uiState.accountTypeNameResource,
             showUpgradeButton = isUpgradeButtonEnabled,
+            icon = uiState.accountTypeIcon,
             onButtonClickListener = {
                 uiActions.onUpgradeAccount()
             }
@@ -677,6 +679,7 @@ internal fun AccountTypeSection(
     @StringRes accountDescription: Int,
     showUpgradeButton: Boolean,
     onButtonClickListener: () -> Unit,
+    icon: ImageVector,
     modifier: Modifier = Modifier,
 ) {
 
@@ -696,7 +699,7 @@ internal fun AccountTypeSection(
                     bottom.linkTo(parent.bottom, 25.dp)
                     start.linkTo(parent.start, 16.dp)
                 },
-            painter = painterResource(id = R.drawable.ic_account_type),
+            painter = rememberVectorPainter(icon),
             contentDescription = stringResource(id = accountDescription),
         )
 

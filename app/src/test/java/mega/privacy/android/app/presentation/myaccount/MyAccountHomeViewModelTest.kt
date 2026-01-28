@@ -13,8 +13,10 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -133,6 +135,7 @@ class MyAccountHomeViewModelTest {
             getMyAvatarFileUseCase,
             getUsedTransferStatusUseCase,
             accountTypeNameMapper = AccountTypeNameMapper(),
+            accountTypeIconMapper = AccountTypeIconMapper(),
             avatarContentMapper,
             isAchievementsEnabledUseCase
         )
@@ -438,5 +441,109 @@ class MyAccountHomeViewModelTest {
         @JvmField
         @RegisterExtension
         val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to ShieldLite for PRO_LITE account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_LITE)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.ShieldLite)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield01 for PRO_I account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_I)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield02 for PRO_II account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_II)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to Shield03 for PRO_III account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_III)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for FREE account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.FREE)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for BUSINESS account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.BUSINESS)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield for PRO_FLEXI account on init`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = AccountType.PRO_FLEXI)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
+    }
+
+    @Test
+    fun `test that accountTypeIcon is set to default Shield when accountType is null`() = runTest {
+        val userAccount = TEST_USER_ACCOUNT.copy(accountTypeIdentifier = null)
+        initViewModel(accountDetailsValue = userAccount)
+
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.accountTypeIcon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+        }
     }
 }

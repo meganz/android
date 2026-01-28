@@ -24,6 +24,7 @@ import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.domain.entity.AccountType
@@ -57,6 +58,7 @@ class MenuViewModel @Inject constructor(
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase,
     private val accountTypeNameMapper: AccountTypeNameMapper,
+    private val accountTypeIconMapper: AccountTypeIconMapper,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val fileSizeStringMapper: FileSizeStringMapper,
     private val getUserFullNameUseCase: GetUserFullNameUseCase,
@@ -128,7 +130,9 @@ class MenuViewModel @Inject constructor(
                     is CurrentPlanItem -> {
                         NavDrawerItem.Account(
                             destination = item.destination,
-                            icon = item.icon,
+                            icon = accountTypeIconMapper(
+                                accountType = accountType
+                            ),
                             title = item.title,
                             subTitle = currentPlanSubtitleFlow,
                             actionLabel = if (accountType != null && accountType != AccountType.PRO_FLEXI && accountType != AccountType.BUSINESS) item.actionLabel else 0

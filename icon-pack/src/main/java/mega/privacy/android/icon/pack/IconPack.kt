@@ -104,8 +104,12 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineScreenshotI
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSearchLargeImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSearchSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShareNetworkImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShield01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShield02ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShield03ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldInfoImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineShieldLiteImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlashCircleImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersHorizontal01ImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineSlidersVertical02ImageVector
@@ -453,8 +457,20 @@ public object IconPack : IconPackInterface {
                 override val Shield: ImageVector by lazy {
                         createMediumThinOutlineShieldImageVector() }
 
+                override val Shield01: ImageVector by lazy {
+                        createMediumThinOutlineShield01ImageVector() }
+
+                override val Shield02: ImageVector by lazy {
+                        createMediumThinOutlineShield02ImageVector() }
+
+                override val Shield03: ImageVector by lazy {
+                        createMediumThinOutlineShield03ImageVector() }
+
                 override val ShieldInfo: ImageVector by lazy {
                         createMediumThinOutlineShieldInfoImageVector() }
+
+                override val ShieldLite: ImageVector by lazy {
+                        createMediumThinOutlineShieldLiteImageVector() }
 
                 override val SlashCircle: ImageVector by lazy {
                         createMediumThinOutlineSlashCircleImageVector() }

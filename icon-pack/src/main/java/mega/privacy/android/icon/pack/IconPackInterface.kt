@@ -206,6 +206,10 @@ interface IconPackInterface {
                 val SearchSmall: ImageVector
                 val ShareNetwork: ImageVector
                 val Shield: ImageVector
+                val ShieldLite: ImageVector
+                val Shield01: ImageVector
+                val Shield02: ImageVector
+                val Shield03: ImageVector
                 val ShieldInfo: ImageVector
                 val SlashCircle: ImageVector
                 val SlidersHorizontal01: ImageVector

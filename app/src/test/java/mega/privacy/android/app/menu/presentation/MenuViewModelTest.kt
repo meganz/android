@@ -24,6 +24,7 @@ import mega.privacy.android.app.menu.navigation.AchievementsItem
 import mega.privacy.android.app.menu.navigation.CurrentPlanItem
 import mega.privacy.android.app.menu.navigation.RubbishBinItem
 import mega.privacy.android.app.menu.navigation.StorageItem
+import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -80,6 +82,7 @@ class MenuViewModelTest {
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFileUseCase = mock<GetMyAvatarFileUseCase>()
     private val accountTypeNameMapper = mock<AccountTypeNameMapper>()
+    private val accountTypeIconMapper = AccountTypeIconMapper()
     private val getStringFromStringResMapper = mock<GetStringFromStringResMapper>()
     private val fileSizeStringMapper = mock<FileSizeStringMapper>()
     private val getUserFullNameUseCase = mock<GetUserFullNameUseCase>()
@@ -731,6 +734,7 @@ class MenuViewModelTest {
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             accountTypeNameMapper = accountTypeNameMapper,
+            accountTypeIconMapper = accountTypeIconMapper,
             getStringFromStringResMapper = getStringFromStringResMapper,
             fileSizeStringMapper = fileSizeStringMapper,
             getUserFullNameUseCase = getUserFullNameUseCase,
@@ -1482,4 +1486,239 @@ class MenuViewModelTest {
         verify(getRubbishNodeUseCase).invoke()
         verify(monitorNodeUpdatesUseCase).invoke()
     }
+
+    @Test
+    fun `test that current plan item icon is set to ShieldLite for PRO_LITE account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_LITE)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.ShieldLite)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield01 for PRO_I account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_I)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield02 for PRO_II account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_II)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield03 for PRO_III account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_III)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for FREE account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.FREE)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for PRO_FLEXI account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.PRO_FLEXI)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield for BUSINESS account`() = runTest {
+        stubDefaultDependencies()
+
+        val accountDetail = createAccountDetail(accountType = AccountType.BUSINESS)
+
+        monitorAccountDetailUseCase.stub {
+            on { invoke() }.thenReturn(flowOf(accountDetail))
+        }
+
+        val menuItems = mapOf(10 to CurrentPlanItem)
+
+        initUnderTest(menuItems = menuItems)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            val currentPlanItem = state.myAccountItems[10]
+            assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that current plan item icon is set to Shield when account type is null`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetail = createAccountDetail(levelDetail = null)
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(flowOf(accountDetail))
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                val currentPlanItem = state.myAccountItems[10]
+                assertThat(currentPlanItem?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that current plan item icon updates when account type changes from FREE to PRO_I`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetailFlow =
+                MutableStateFlow(createAccountDetail(accountType = AccountType.FREE))
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(accountDetailFlow)
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(CurrentPlanItem.icon)
+
+                // Update account type to PRO_I
+                accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_I))
+
+                val updatedState = awaitItem()
+                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield01)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that current plan item icon updates when account type changes from PRO_II to PRO_III`() =
+        runTest {
+            stubDefaultDependencies()
+
+            val accountDetailFlow =
+                MutableStateFlow(createAccountDetail(accountType = AccountType.PRO_II))
+
+            monitorAccountDetailUseCase.stub {
+                on { invoke() }.thenReturn(accountDetailFlow)
+            }
+
+            val menuItems = mapOf(10 to CurrentPlanItem)
+
+            initUnderTest(menuItems = menuItems)
+
+            underTest.uiState.test {
+                val initialState = awaitItem()
+                assertThat(initialState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield02)
+
+                // Update account type to PRO_III
+                accountDetailFlow.emit(createAccountDetail(accountType = AccountType.PRO_III))
+
+                val updatedState = awaitItem()
+                assertThat(updatedState.myAccountItems[10]?.icon).isEqualTo(IconPack.Medium.Thin.Outline.Shield03)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 } 
