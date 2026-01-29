@@ -10,8 +10,8 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -180,7 +180,7 @@ class RecentsUiItemMapperTest {
         assertThat((result.title as RecentActionTitleText.UndecryptedFiles).count).isEqualTo(1)
         assertThat(result.parentFolderName).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result.parentFolderName as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.shared_items_verify_credentials_undecrypted_folder)
+            .isEqualTo(sharedR.string.shared_items_verify_credentials_undecrypted_folder)
     }
 
     @Test
@@ -211,7 +211,7 @@ class RecentsUiItemMapperTest {
 
         assertThat(result.parentFolderName).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result.parentFolderName as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.section_cloud_drive)
+            .isEqualTo(sharedR.string.video_section_videos_location_option_cloud_drive)
     }
 
     @Test
@@ -301,7 +301,7 @@ class RecentsUiItemMapperTest {
 
         assertThat(result.updatedByText).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result.updatedByText as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.update_action_bucket)
+            .isEqualTo(sharedR.string.update_action_bucket)
         assertThat(result.userName).isEqualTo("John Doe")
     }
 
@@ -320,7 +320,7 @@ class RecentsUiItemMapperTest {
 
         assertThat(result.updatedByText).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result.updatedByText as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.create_action_bucket)
+            .isEqualTo(sharedR.string.create_action_bucket)
         assertThat(result.userName).isEqualTo("Jane Doe")
     }
 

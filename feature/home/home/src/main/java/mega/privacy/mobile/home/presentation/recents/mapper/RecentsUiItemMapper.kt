@@ -5,8 +5,8 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.recents.model.RecentActionTitleText
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import javax.inject.Inject
@@ -98,9 +98,9 @@ class RecentActionUiItemMapper @Inject constructor(
 
     private fun getUpdatedByText(item: RecentActionBucket) = if (!item.currentUserIsOwner) {
         val stringResId = if (item.isUpdate) {
-            R.string.update_action_bucket
+            sharedR.string.update_action_bucket
         } else {
-            R.string.create_action_bucket
+            sharedR.string.create_action_bucket
         }
         LocalizedText.StringRes(stringResId, listOf(item.userName))
     } else {

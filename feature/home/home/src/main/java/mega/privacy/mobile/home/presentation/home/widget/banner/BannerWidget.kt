@@ -8,10 +8,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.PwmBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.TransferItBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.VpnBannerCloseButtonPressedEvent
@@ -27,7 +27,7 @@ class BannerWidget @Inject constructor() : HomeWidget {
     override val defaultOrder: Int = 2
     override val canDelete: Boolean = false
 
-    override suspend fun getWidgetName() = LocalizedText.StringRes(R.string.section_banners)
+    override suspend fun getWidgetName() = LocalizedText.StringRes(sharedR.string.section_banners)
 
     @Composable
     override fun DisplayWidget(

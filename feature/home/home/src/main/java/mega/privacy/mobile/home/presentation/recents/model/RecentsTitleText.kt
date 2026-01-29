@@ -3,7 +3,7 @@ package mega.privacy.mobile.home.presentation.recents.model
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import mega.privacy.android.feature.home.R
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Represents different types of recent action titles that can be resolved to localized strings
@@ -73,7 +73,7 @@ fun RecentActionTitleText.text(): String {
 
         is RecentActionTitleText.MediaBucketImagesOnly -> {
             pluralStringResource(
-                R.plurals.title_media_bucket_only_images,
+                sharedR.plurals.title_media_bucket_only_images,
                 numImages,
                 numImages
             )
@@ -81,7 +81,7 @@ fun RecentActionTitleText.text(): String {
 
         is RecentActionTitleText.MediaBucketVideosOnly -> {
             pluralStringResource(
-                R.plurals.title_media_bucket_only_videos,
+                sharedR.plurals.title_media_bucket_only_videos,
                 numVideos,
                 numVideos
             )
@@ -89,11 +89,11 @@ fun RecentActionTitleText.text(): String {
 
         is RecentActionTitleText.MediaBucketMixed -> {
             pluralStringResource(
-                R.plurals.title_media_bucket_images_and_videos,
+                sharedR.plurals.title_media_bucket_images_and_videos,
                 numImages,
                 numImages
             ) + pluralStringResource(
-                R.plurals.title_media_bucket_images_and_videos_2,
+                sharedR.plurals.title_media_bucket_images_and_videos_2,
                 numVideos,
                 numVideos
             )
@@ -101,7 +101,7 @@ fun RecentActionTitleText.text(): String {
 
         is RecentActionTitleText.RegularBucket -> {
             stringResource(
-                R.string.title_bucket,
+                sharedR.string.title_bucket,
                 nodeName,
                 additionalCount
             )
@@ -109,7 +109,7 @@ fun RecentActionTitleText.text(): String {
 
         is RecentActionTitleText.UndecryptedFiles -> {
             pluralStringResource(
-                R.plurals.cloud_drive_undecrypted_file,
+                sharedR.plurals.cloud_drive_undecrypted_file,
                 count
             )
         }

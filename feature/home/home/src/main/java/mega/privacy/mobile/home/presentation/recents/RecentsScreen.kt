@@ -30,7 +30,7 @@ import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
@@ -67,7 +67,7 @@ fun RecentsScreen(
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             MegaTopAppBar(
-                title = stringResource(R.string.section_recents),
+                title = stringResource(sharedR.string.section_recents),
                 navigationType = AppBarNavigationType.Back {
                     Analytics.tracker.trackEvent(BackButtonPressedEvent)
                     onBack()

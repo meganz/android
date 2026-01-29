@@ -5,7 +5,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,7 +32,7 @@ class RecentsParentFolderNameMapperTest {
 
         assertThat(result).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.section_cloud_drive)
+            .isEqualTo(sharedR.string.video_section_videos_location_option_cloud_drive)
     }
 
     @Test
@@ -61,7 +61,7 @@ class RecentsParentFolderNameMapperTest {
 
         assertThat(result).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.shared_items_verify_credentials_undecrypted_folder)
+            .isEqualTo(sharedR.string.shared_items_verify_credentials_undecrypted_folder)
     }
 
     @Test
@@ -76,7 +76,7 @@ class RecentsParentFolderNameMapperTest {
         // Even if folder name is "Cloud Drive", when not decrypted, it should return undecrypted string
         assertThat(result).isInstanceOf(LocalizedText.StringRes::class.java)
         assertThat((result as LocalizedText.StringRes).resId)
-            .isEqualTo(R.string.shared_items_verify_credentials_undecrypted_folder)
+            .isEqualTo(sharedR.string.shared_items_verify_credentials_undecrypted_folder)
     }
 
     @Test

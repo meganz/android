@@ -16,11 +16,12 @@ import mega.android.core.ui.components.surface.ThemedSurface
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.feature.home.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import mega.privacy.android.shared.resources.R as sharedR
+
 
 @Composable
 internal fun RecentDateHeader(
@@ -66,11 +67,11 @@ internal fun FormatRecentsDate(
 
     return when (timestampDate) {
         todayDate -> {
-            stringResource(R.string.label_today)
+            stringResource(sharedR.string.search_dropdown_chip_filter_type_date_today)
         }
 
         yesterdayDate -> {
-            stringResource(R.string.label_yesterday)
+            stringResource(sharedR.string.label_yesterday)
         }
 
         else -> {

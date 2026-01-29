@@ -18,7 +18,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
-import mega.privacy.android.feature.home.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.icon.pack.IconPack
 
 @Composable
@@ -33,7 +33,7 @@ internal fun RecentsWidgetHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         MegaText(
-            stringResource(R.string.section_recents),
+            stringResource(sharedR.string.section_recents),
             style = AppTheme.typography.titleMedium.copy(
                 fontSize = 18.sp
             ),

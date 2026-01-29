@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.feature.home.R
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -44,6 +43,7 @@ import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
 import mega.privacy.android.navigation.destination.RecentsScreenNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.RecentsViewAllButtonPressedEvent
 import mega.privacy.mobile.home.presentation.home.widget.recents.view.RecentsWidgetHeader
@@ -65,7 +65,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
     override val identifier: String = "RecentsWidgetProvider"
     override val defaultOrder: Int = 3
     override val canDelete: Boolean = false
-    override suspend fun getWidgetName() = LocalizedText.StringRes(R.string.section_recents)
+    override suspend fun getWidgetName() = LocalizedText.StringRes(sharedR.string.section_recents)
 
     @Composable
     override fun DisplayWidget(
@@ -396,7 +396,7 @@ internal fun mockRecentsUiItemList() = listOf(
         icon = IconPackR.drawable.ic_generic_medium_solid,
         isUpdate = true,
         updatedByText = LocalizedText.StringRes(
-            R.string.update_action_bucket,
+            sharedR.string.update_action_bucket,
             listOf("John Doe")
         ),
         userName = "John Doe",
@@ -408,7 +408,7 @@ internal fun mockRecentsUiItemList() = listOf(
         icon = IconPackR.drawable.ic_generic_medium_solid,
         isUpdate = true,
         updatedByText = LocalizedText.StringRes(
-            R.string.update_action_bucket,
+            sharedR.string.update_action_bucket,
             listOf("John Doe")
         ),
         userName = "John Doe",

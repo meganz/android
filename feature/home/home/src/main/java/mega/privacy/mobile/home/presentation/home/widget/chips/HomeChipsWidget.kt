@@ -17,7 +17,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.feature.home.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -26,7 +26,6 @@ import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChatChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.FavouritesChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineChipButtonPressedEvent
@@ -65,7 +64,7 @@ private fun HomeChips(
         Spacer(Modifier.size(8.dp)) // Total 16dp with spacedBy
 
         MegaChip(
-            content = stringResource(R.string.favourites_category_title),
+            content = stringResource(sharedR.string.video_section_title_favourite_playlist),
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Heart),
             onClick = {
@@ -83,7 +82,7 @@ private fun HomeChips(
             },
         )
         MegaChip(
-            content = stringResource(R.string.section_saved_for_offline_new),
+            content = stringResource(sharedR.string.section_saved_for_offline_new),
             selected = false,
             leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.ArrowDownCircle),
             onClick = {
