@@ -46,11 +46,9 @@ class PendingBackStackNavigationHandler(
 
     override fun back() {
         Timber.d("PendingBackStackNavigationHandler::back")
-        if (backstack.size == 1 && backstack.last() != defaultLandingScreen) {
-            backstack.removeLastOrNull()
+        backstack.removeLastOrNull()
+        if (backstack.isEmpty()) {
             navigate(defaultLandingScreen)
-        } else {
-            backstack.removeLastOrNull()
         }
         logBackStack("back")
     }
