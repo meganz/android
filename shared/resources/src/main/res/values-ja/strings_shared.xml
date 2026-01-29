@@ -1957,4 +1957,29 @@
     <string name="general_clear_all">すべてクリア</string>
     <string name="offline_remove_singular_item_success_message">1項目を削除しました</string>
     <string name="offline_remove_multiple_item_success_message">%d 項目を削除しました</string>
+    <string name="create_new_album_input_album_name_placeholder">新規アルバム</string>
+    <string name="album_send_decryption_key_separately_title">復号キーを別送する</string>
+    <string name="album_send_decryption_key_separately_description">リンクと復号キーを別々に出力します。</string>
+    <string name="general_learn_more">詳細</string>
+    <string name="album_get_link_link_section_title">リンク</string>
+    <string name="album_get_link_requesting_link_placeholder">処理中&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">キー</string>
+    <string name="album_get_link_copy_link_action">リンクをコピー</string>
+    <string name="album_get_link_copy_key_action">キーをコピー</string>
+    <string name="album_get_link_copy_key_success_message">キーをクリップボードにコピーしました</string>
+    <string name="album_get_link_share_link_dialog_title">復号キーも共有しますか？</string>
+    <string name="album_get_link_share_link_dialog_description">復号キーが出力されました。リンクと一緒に共有されます。</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">リンクのみ共有</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">リンクとキーを共有</string>
+    <string name="album_get_link_share_link_with_key">リンク: %1$s\n\nキー: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">このアルバムには非表示の項目が含まれています。アルバムを共有すると、共有相手には非表示項目も見えるようになります。なお、お客様のクラウドドライブ上では非表示のまま維持されます。</string>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="other">リンクを共有</item>
+    </plurals>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="other">リンクをクリップボードにコピーしました</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="other">%1$d項目</item>
+    </plurals>
 </resources>

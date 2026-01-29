@@ -2048,4 +2048,35 @@
     <string name="general_clear_all">Tout effacer</string>
     <string name="offline_remove_singular_item_success_message">1 élément supprimé</string>
     <string name="offline_remove_multiple_item_success_message">%d éléments supprimés</string>
+    <string name="create_new_album_input_album_name_placeholder">Nouvel album</string>
+    <string name="album_send_decryption_key_separately_title">Envoyer la clé de déchiffrement séparément</string>
+    <string name="album_send_decryption_key_separately_description">Envoyer le lien et la clé de déchiffrement séparément.</string>
+    <string name="general_learn_more">En savoir plus</string>
+    <string name="album_get_link_link_section_title">Lien</string>
+    <string name="album_get_link_requesting_link_placeholder">En cours de traitement&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Clé</string>
+    <string name="album_get_link_copy_link_action">Copier le lien</string>
+    <string name="album_get_link_copy_key_action">Copier la clé</string>
+    <string name="album_get_link_copy_key_success_message">Clé copiée dans le presse-papiers</string>
+    <string name="album_get_link_share_link_dialog_title">Partager aussi la clé de déchiffrement ?</string>
+    <string name="album_get_link_share_link_dialog_description">La clé de déchiffrement a été exportée et sera partagée avec le lien.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Ne partager que le lien</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Partager le lien et la clé</string>
+    <string name="album_get_link_share_link_with_key">Lien&#160;: %1$s\n\nClé&#160;: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Des éléments cachés sont présents dans cet album. Partager l’album implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre disque Cloud.</string>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Partager le lien</item>
+        <item quantity="many">Partager le lien</item>
+        <item quantity="other">Partager le lien</item>
+    </plurals>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Lien copié dans le presse-papiers</item>
+        <item quantity="many">Liens copiés dans le presse-papiers</item>
+        <item quantity="other">Liens copiés dans le presse-papiers</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d élément</item>
+        <item quantity="many">%1$d éléments</item>
+        <item quantity="other">%1$d éléments</item>
+    </plurals>
 </resources>

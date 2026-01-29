@@ -2088,4 +2088,57 @@
     <string name="copyright_action_agree">Agree</string>
     <!-- Copyright action button to disagree -->
     <string name="copyright_action_disagree">Disagree</string>
+    <!-- Text for clear all button, shown in search screen -->
+    <string name="general_clear_all">Clear all</string>
+    <!--Message to show when an item has been removed from Offline Screen-->
+    <string name="offline_remove_singular_item_success_message">1 item removed</string>
+    <!--Message to show when multiple items has been removed from Offline Screen-->
+    <string name="offline_remove_multiple_item_success_message">%d items removed</string>
+    <!-- Placeholder to display when creating a New Album. If no name is entered, the placeholder will become the album name -->
+    <string name="create_new_album_input_album_name_placeholder">New album</string>
+    <!-- Title for the option to send decryption key separately. Displayed as a toggle option in the album get link screen. -->
+    <string name="album_send_decryption_key_separately_title">Send decryption key separately</string>
+    <!-- Description explaining the benefit of sending decryption key separately. Shown below the toggle option title. -->
+    <string name="album_send_decryption_key_separately_description">Export link and decryption key separately.</string>
+    <!-- "Learn more" link text. Clickable text that navigates to more information about sending decryption key separately. -->
+    <string name="general_learn_more">Learn more</string>
+    <!-- Section title for the link display area in the album get link screen -->
+    <string name="album_get_link_link_section_title">Link</string>
+    <!-- Placeholder text shown while the album link is being requested/generated -->
+    <string name="album_get_link_requesting_link_placeholder">Processing&#8230;</string>
+    <!-- Section title for the decryption key display area. Only shown when "send decryption key separately" is enabled. -->
+    <string name="album_get_link_decryption_key_section_title">Key</string>
+    <!-- Button text to copy the album link to clipboard -->
+    <string name="album_get_link_copy_link_action">Copy link</string>
+    <!-- Button text to copy the decryption key to clipboard. Only shown when "send decryption key separately" is enabled. -->
+    <string name="album_get_link_copy_key_action">Copy key</string>
+    <!-- Success message shown when the decryption key is successfully copied to clipboard -->
+    <string name="album_get_link_copy_key_success_message">Key copied to clipboard</string>
+    <!-- Dialog title when user chooses to share link with separate decryption key option enabled -->
+    <string name="album_get_link_share_link_dialog_title">Share the decryption key too?</string>
+    <!-- Dialog description explaining the choice between sharing only the link or sharing both link and key. Shown when user tries to share with separate key option enabled. -->
+    <string name="album_get_link_share_link_dialog_description">The decryption key has been exported and will be shared with the link.</string>
+    <!-- Button text in share dialog to share only the link (without the key) -->
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Share link only</string>
+    <!-- Button text in share dialog to share both the link and the decryption key together -->
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Share link and key</string>
+    <!-- Format string for sharing link with key. %1$s is the link, %2$s is the decryption key. Used when sharing both link and key together. -->
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
+    <!-- Warning dialog description shown when the album contains hidden items. Explains that sharing will make hidden items visible to recipients. -->
+    <string name="album_has_hidden_nodes_dialog_description">There are hidden items in this album. Sharing the album will mean that the hidden items are visible to those you share with. The items will still be hidden in your Cloud drive.</string>
+    <!-- Title text for the action to get album link(s). Used in the top app bar. -->
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Share link</item>
+        <item quantity="other">Share links</item>
+    </plurals>
+    <!-- Success message to show when links are copied successfully to clipboard -->
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link copied to clipboard</item>
+        <item quantity="other">Links copied to clipboard</item>
+    </plurals>
+    <!-- General number of items template. %1$d represents the number of items. Used to display item count in album summary. -->
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
 </resources>

@@ -1037,7 +1037,7 @@
     <!-- Text of the warning banner displayed when Syncs are paused due to lost Wi-Fi conditions -->
     <string name="general_sync_warning_lost_wifi_text">Devam etmek için Wi-Fi’ye yeniden bağlanın.</string>
     <!-- Subtitle of link unavailable reasons, shown in folder and file link screen -->
-    <string name="general_link_unavailable_subtitle">Bu durum, şu nedenlerden kaynaklanıyor olabilir:</string>
+    <string name="general_link_unavailable_subtitle">Bunun nedenleri şunlar olabilir:</string>
     <!-- Bullet point shown when link is unavailable due to invalid URL -->
     <string name="general_link_unavailable_invalid_url">Geçersiz URL - erişmeye çalıştığınız bağlantı mevcut değil</string>
     <!-- Bullet point shown when link is unavailable due to expiration -->
@@ -1679,7 +1679,7 @@
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">Yeni fotoğraf ve videolar, çekildikten sonra burada görünecektir</string>
     <!--Title for the Camera Uploads transfer top bar -->
-    <string name="camera_uploads_tranfer_top_bar_title">İlerleme</string>
+    <string name="camera_uploads_tranfer_top_bar_title">Durum</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
         <item quantity="one">Yükleniyor: %1$d öğe kaldı</item>
@@ -2008,4 +2008,5 @@
     <string name="general_clear_all">Tümünü temizle</string>
     <string name="offline_remove_singular_item_success_message">1 öğe kaldırıldı</string>
     <string name="offline_remove_multiple_item_success_message">%d öğe kaldırıldı</string>
+    <string name="create_new_album_input_album_name_placeholder">Yeni albüm</string>
 </resources>
