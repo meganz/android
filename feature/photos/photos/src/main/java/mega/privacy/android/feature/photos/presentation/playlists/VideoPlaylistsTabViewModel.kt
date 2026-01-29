@@ -215,7 +215,6 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             }.onSuccess { title ->
                 Timber.d("Updated video playlist title: $title")
                 videoPlaylistEditState.update { it.copy(updateTitleSuccessEvent = triggered) }
-                queryFlow.emit(queryFlow.value)
             }.onFailure { exception ->
                 Timber.e(exception)
                 if (exception is PlaylistNameValidationException) {
@@ -249,7 +248,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal fun showUpdateVideoPlaylistDialog() {
         videoPlaylistEditState.update {
             it.copy(
-                updateVideoPlaylistDialogEvent = triggered
+                showUpdateVideoPlaylistDialog = true
             )
         }
     }
@@ -257,7 +256,7 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal fun resetUpdateVideoPlaylistDialogEvent() {
         videoPlaylistEditState.update {
             it.copy(
-                updateVideoPlaylistDialogEvent = consumed
+                showUpdateVideoPlaylistDialog = false
             )
         }
     }

@@ -5,8 +5,11 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
@@ -25,6 +28,12 @@ class VideoPlaylistDetailScreenTest {
 
     private fun setComposeContent(
         uiState: VideoPlaylistDetailUiState = VideoPlaylistDetailUiState.Data(),
+        showRenameVideoPlaylistDialog: () -> Unit = {},
+        videoPlaylistEditState: VideoPlaylistEditState = VideoPlaylistEditState(),
+        updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+        resetErrorMessage: () -> Unit = {},
+        resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+        resetUpdateTitleSuccessEvent: () -> Unit = {},
         onBack: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -33,6 +42,12 @@ class VideoPlaylistDetailScreenTest {
                 uiState = uiState,
                 onBack = onBack,
                 modifier = modifier,
+                showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
+                videoPlaylistEditState = videoPlaylistEditState,
+                updatedVideoPlaylistTitle = updatedVideoPlaylistTitle,
+                resetErrorMessage = resetErrorMessage,
+                resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+                resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
             )
         }
     }
@@ -120,6 +135,38 @@ class VideoPlaylistDetailScreenTest {
         ).assertIsNotDisplayedWithTag()
     }
 
+    @Test
+    fun `test that VideoPlaylistBottomSheet is displayed when More action is clicked`() {
+        setComposeContent()
+
+        NodeSelectionAction.More.testTag.apply {
+            assertIsDisplayedWithTag()
+            getNodeWithTag().performClick()
+        }
+
+        VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is displayed when showUpdateVideoPlaylistDialog is true`() {
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                showUpdateVideoPlaylistDialog = true
+            )
+        )
+
+        VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that RenameVideoPlaylistDialog is not displayed when showUpdateVideoPlaylistDialog is false`() {
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState()
+        )
+
+        VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
     private fun String.assertIsDisplayedWithTag() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
 
@@ -135,4 +182,7 @@ class VideoPlaylistDetailScreenTest {
         onEach {
             it.assertIsNotDisplayedWithTag()
         }
+
+    private fun String.getNodeWithTag() =
+        composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true)
 }

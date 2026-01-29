@@ -7,8 +7,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -19,17 +23,26 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideoPlaylistDetailHeaderView
+import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.shared.resources.R as sharedR
@@ -40,8 +53,15 @@ fun VideoPlaylistDetailRoute(
     viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val videoPlaylistEditState by viewModel.videoPlaylistEditState.collectAsStateWithLifecycle()
     VideoPlaylistDetailScreen(
         uiState = uiState,
+        videoPlaylistEditState = videoPlaylistEditState,
+        showRenameVideoPlaylistDialog = viewModel::showUpdateVideoPlaylistDialog,
+        updatedVideoPlaylistTitle = viewModel::updateVideoPlaylistTitle,
+        resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
+        resetShowRenameVideoPlaylistDialog = viewModel::resetUpdateVideoPlaylistDialogEvent,
+        resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
         onBack = navigationHandler::back
     )
 }
@@ -50,10 +70,18 @@ fun VideoPlaylistDetailRoute(
 @Composable
 fun VideoPlaylistDetailScreen(
     uiState: VideoPlaylistDetailUiState,
+    videoPlaylistEditState: VideoPlaylistEditState,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    showRenameVideoPlaylistDialog: () -> Unit = {},
+    updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
+    resetErrorMessage: () -> Unit = {},
+    resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+    resetUpdateTitleSuccessEvent: () -> Unit = {},
 ) {
     val lazyListState = rememberLazyListState()
+    var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -66,7 +94,12 @@ fun VideoPlaylistDetailScreen(
                 navigationType = AppBarNavigationType.Back(onBack),
                 title = (uiState as? VideoPlaylistDetailUiState.Data)?.playlistDetail?.uiEntity?.title
                     ?: "",
-                actions = emptyList()
+                actions = listOf(
+                    MenuActionWithClick(
+                        menuAction = NodeSelectionAction.More,
+                        onClick = { showPlaylistBottomSheet = true }
+                    )
+                )
             )
         }
     ) { innerPadding ->
@@ -80,6 +113,14 @@ fun VideoPlaylistDetailScreen(
             )
 
             is VideoPlaylistDetailUiState.Data -> {
+                EventEffect(
+                    event = videoPlaylistEditState.updateTitleSuccessEvent,
+                    onConsumed = resetUpdateTitleSuccessEvent,
+                    action = {
+                        resetShowRenameVideoPlaylistDialog()
+                    }
+                )
+
                 val playlistDetail = uiState.playlistDetail
                 if (playlistDetail == null || playlistDetail.videos.isEmpty()
                 ) {
@@ -139,6 +180,49 @@ fun VideoPlaylistDetailScreen(
                         }
                     }
                 }
+
+                if (showPlaylistBottomSheet) {
+                    VideoPlaylistBottomSheet(
+                        actions = listOf(
+                            VideoPlaylistRenameMenuAction(),
+                            VideoPlaylistsTrashMenuAction()
+                        ),
+                        sheetState = playlistBottomSheetState,
+                        onActionClicked = { action ->
+                            when (action) {
+                                is VideoPlaylistRenameMenuAction -> showRenameVideoPlaylistDialog()
+                                is VideoPlaylistsTrashMenuAction -> {
+                                    //TODO Will implement in another ticket
+                                }
+                            }
+                        },
+                        onDismissRequest = {
+                            showPlaylistBottomSheet = false
+                        },
+                        modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG)
+                    )
+                }
+
+                if (videoPlaylistEditState.showUpdateVideoPlaylistDialog) {
+                    EditVideoPlaylistDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        handle = playlistDetail?.uiEntity?.id?.longValue ?: -1L,
+                        title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                        positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                        onConfirm = { handle, title ->
+                            updatedVideoPlaylistTitle(NodeId(handle), title)
+                            showPlaylistBottomSheet = false
+                        },
+                        resetErrorMessage = resetErrorMessage,
+                        onDismiss = {
+                            resetShowRenameVideoPlaylistDialog()
+                        },
+                        initialInputText = { playlistDetail?.uiEntity?.title ?: "" },
+                        errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
+                    )
+                }
             }
         }
     }
@@ -189,3 +273,14 @@ const val VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG =
  * Test tag for the video playlist detail app bar
  */
 const val VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG = "video_playlists_detail:view_app_bar"
+
+/**
+ * Test tag for RenameVideoPlaylistDialog
+ */
+const val VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_rename_video_playlist"
+
+/**
+ * Test tag for VideoPlaylistBottomSheet
+ */
+const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG = "video_playlist_detail:bottom_sheet"

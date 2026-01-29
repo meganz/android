@@ -2,6 +2,8 @@ package mega.privacy.android.feature.photos.presentation.playlists.detail
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,10 +20,13 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
+import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
+import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
@@ -53,6 +58,9 @@ class VideoPlaylistDetailViewModelTest {
         mock<MonitorVideoPlaylistSetsUpdateUseCase>()
     private val videoPlaylistDetailUiEntityMapper = mock<VideoPlaylistDetailUiEntityMapper>()
     private val getVideoPlaylistByIdUseCase = mock<GetVideoPlaylistByIdUseCase>()
+    private val videoPlaylistTitleValidationErrorMessageMapper =
+        mock<VideoPlaylistTitleValidationErrorMessageMapper>()
+    private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
 
     private val testId = NodeId(123456L)
     private val testType = PlaylistType.User
@@ -73,6 +81,8 @@ class VideoPlaylistDetailViewModelTest {
             monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
             videoPlaylistDetailUiEntityMapper = videoPlaylistDetailUiEntityMapper,
             getVideoPlaylistByIdUseCase = getVideoPlaylistByIdUseCase,
+            videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
+            updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
             playlistHandle = testId.longValue,
             type = testType
         )
@@ -84,7 +94,9 @@ class VideoPlaylistDetailViewModelTest {
             monitorNodeUpdatesUseCase,
             monitorVideoPlaylistSetsUpdateUseCase,
             videoPlaylistDetailUiEntityMapper,
-            getVideoPlaylistByIdUseCase
+            getVideoPlaylistByIdUseCase,
+            videoPlaylistTitleValidationErrorMessageMapper,
+            updateVideoPlaylistTitleUseCase
         )
     }
 
@@ -249,6 +261,151 @@ class VideoPlaylistDetailViewModelTest {
         whenever(videoPlaylistDetailUiEntityMapper(videoPlaylist)).thenReturn(detailEntity)
     }
 
+    @Test
+    fun `test that updateVideoPlaylistTitle updates title successfully`() = runTest {
+        val playlistId = NodeId(1L)
+        val newTitle = "New Title"
+        val trimmedTitle = newTitle.trim()
+        whenever(updateVideoPlaylistTitleUseCase(playlistId, trimmedTitle)).thenReturn(trimmedTitle)
+
+        underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+        underTest.videoPlaylistEditState.test {
+            verify(updateVideoPlaylistTitleUseCase).invoke(playlistId, trimmedTitle)
+            val actual = awaitItem()
+            assertThat(actual.editVideoPlaylistErrorMessage).isNull()
+            assertThat(actual.updateTitleSuccessEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that resetUpdateTitleSuccessEvent reset the updateTitleSuccessEvent`() = runTest {
+        val playlistId = NodeId(1L)
+        val newTitle = "New Title"
+        val trimmedTitle = newTitle.trim()
+        whenever(updateVideoPlaylistTitleUseCase(playlistId, trimmedTitle)).thenReturn(trimmedTitle)
+
+        underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+        underTest.videoPlaylistEditState.test {
+            assertThat(awaitItem().updateTitleSuccessEvent).isEqualTo(triggered)
+
+            underTest.resetUpdateTitleSuccessEvent()
+            assertThat(awaitItem().updateTitleSuccessEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that updateVideoPlaylistTitle sets error message when Empty exception is thrown`() =
+        runTest {
+            val playlistId = NodeId(1L)
+            val newTitle = "   "
+            val errorMessage = "Error message"
+            whenever(updateVideoPlaylistTitleUseCase(any(), any())).thenAnswer {
+                throw PlaylistNameValidationException.Empty
+            }
+            whenever(
+                videoPlaylistTitleValidationErrorMessageMapper(
+                    PlaylistNameValidationException.Empty
+                )
+            ).thenReturn(errorMessage)
+
+            underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(underTest.videoPlaylistEditState.value.editVideoPlaylistErrorMessage)
+                    .isEqualTo(errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateVideoPlaylistTitle sets error message when Exists exception is thrown`() =
+        runTest {
+            val playlistId = NodeId(1L)
+            val newTitle = "Existing Title"
+            val errorMessage = "Error message"
+            whenever(updateVideoPlaylistTitleUseCase(any(), any())).thenAnswer {
+                throw PlaylistNameValidationException.Exists
+            }
+            whenever(
+                videoPlaylistTitleValidationErrorMessageMapper(
+                    PlaylistNameValidationException.Exists
+                )
+            ).thenReturn(errorMessage)
+
+            underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(underTest.videoPlaylistEditState.value.editVideoPlaylistErrorMessage)
+                    .isEqualTo(errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateVideoPlaylistTitle sets error message when InvalidCharacters exception is thrown`() =
+        runTest {
+            val playlistId = NodeId(1L)
+            val newTitle = "Invalid<Title>"
+            val errorMessage = "Error message"
+            val exception = PlaylistNameValidationException.InvalidCharacters("<>")
+            whenever(updateVideoPlaylistTitleUseCase(any(), any())).thenAnswer {
+                throw exception
+            }
+            whenever(
+                videoPlaylistTitleValidationErrorMessageMapper(exception)
+            ).thenReturn(errorMessage)
+
+            underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(underTest.videoPlaylistEditState.value.editVideoPlaylistErrorMessage)
+                    .isEqualTo(errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetEditVideoPlaylistErrorMessage clears error message`() = runTest {
+        val playlistId = NodeId(1L)
+        val newTitle = "   "
+        val errorMessage = "Error message"
+        whenever(updateVideoPlaylistTitleUseCase(any(), any())).thenAnswer {
+            throw PlaylistNameValidationException.Empty
+        }
+        whenever(
+            videoPlaylistTitleValidationErrorMessageMapper(
+                PlaylistNameValidationException.Empty
+            )
+        ).thenReturn(errorMessage)
+
+        underTest.updateVideoPlaylistTitle(playlistId, newTitle)
+
+        underTest.videoPlaylistEditState.test {
+            assertThat(underTest.videoPlaylistEditState.value.editVideoPlaylistErrorMessage)
+                .isEqualTo(errorMessage)
+
+            underTest.resetEditVideoPlaylistErrorMessage()
+            assertThat(underTest.videoPlaylistEditState.value.editVideoPlaylistErrorMessage).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that resetUpdateVideoPlaylistDialogEvent updated correctly`() = runTest {
+        underTest.videoPlaylistEditState.test {
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+
+            underTest.showUpdateVideoPlaylistDialog()
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isTrue()
+
+            underTest.resetUpdateVideoPlaylistDialogEvent()
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun createVideoUiEntity(
         handle: Long,
         parentHandle: Long = 50L,
@@ -290,7 +447,7 @@ class VideoPlaylistDetailViewModelTest {
     )
 
     private fun createVideoPlaylist(
-        playlistUiEntity: VideoPlaylistUiEntity
+        playlistUiEntity: VideoPlaylistUiEntity,
     ) =
         UserVideoPlaylist(
             id = playlistUiEntity.id,

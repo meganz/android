@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.triggered
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
@@ -281,7 +280,7 @@ internal fun VideoPlaylistsTabScreen(
                     )
                 }
 
-                if (videoPlaylistEditState.updateVideoPlaylistDialogEvent == triggered) {
+                if (videoPlaylistEditState.showUpdateVideoPlaylistDialog) {
                     EditVideoPlaylistDialog(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG

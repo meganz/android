@@ -548,15 +548,13 @@ class VideoPlaylistsTabViewModelTest {
     @Test
     fun `test that resetUpdateVideoPlaylistDialogEvent updated correctly`() = runTest {
         underTest.videoPlaylistEditState.test {
-            assertThat(awaitItem().updateVideoPlaylistDialogEvent)
-                .isEqualTo(consumed)
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
 
             underTest.showUpdateVideoPlaylistDialog()
-            assertThat(awaitItem().updateVideoPlaylistDialogEvent).isEqualTo(triggered)
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isTrue()
 
             underTest.resetUpdateVideoPlaylistDialogEvent()
-            assertThat(awaitItem().updateVideoPlaylistDialogEvent)
-                .isEqualTo(consumed)
+            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

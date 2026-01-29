@@ -7,8 +7,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
@@ -150,14 +148,14 @@ class VideoPlaylistsScreenTest {
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is displayed when updateVideoPlaylistDialogEvent is triggered`() {
+    fun `test that RenameVideoPlaylistDialog is displayed when showUpdateVideoPlaylistDialog is true`() {
         val video = createVideoPlaylistUiEntity(1L)
         setComposeContent(
             uiState = VideoPlaylistsTabUiState.Data(
                 videoPlaylistEntities = listOf(video)
             ),
             videoPlaylistEditState = VideoPlaylistEditState(
-                updateVideoPlaylistDialogEvent = triggered
+                showUpdateVideoPlaylistDialog = true
             )
         )
 
@@ -165,15 +163,13 @@ class VideoPlaylistsScreenTest {
     }
 
     @Test
-    fun `test that RenameVideoPlaylistDialog is not displayed when updateVideoPlaylistDialogEvent is consumed`() {
+    fun `test that RenameVideoPlaylistDialog is not displayed when showUpdateVideoPlaylistDialog is false`() {
         val video = createVideoPlaylistUiEntity(1L)
         setComposeContent(
             uiState = VideoPlaylistsTabUiState.Data(
                 videoPlaylistEntities = listOf(video)
             ),
-            videoPlaylistEditState = VideoPlaylistEditState(
-                updateVideoPlaylistDialogEvent = consumed
-            )
+            videoPlaylistEditState = VideoPlaylistEditState()
         )
 
         VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
