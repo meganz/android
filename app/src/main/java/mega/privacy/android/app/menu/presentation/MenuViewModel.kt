@@ -81,15 +81,11 @@ class MenuViewModel @Inject constructor(
         .filterValues { it is NavDrawerItem.PrivacySuite }
         .mapValues { it.value as NavDrawerItem.PrivacySuite }
 
-    private val _uiState = MutableStateFlow(
-        MenuUiState(
-            privacySuiteItems = privacySuiteItems
-        )
-    )
+    private val _uiState = MutableStateFlow(MenuUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        setMyAccountItems()
+        setMenuItems()
         monitorConnectivity()
         monitorUserDataAndAvatar()
         refreshAccountStorageDetails()
@@ -101,7 +97,7 @@ class MenuViewModel @Inject constructor(
         monitorNodeUpdatesForRubbishBin()
     }
 
-    private fun setMyAccountItems() {
+    private fun setMenuItems() {
         viewModelScope.launch {
             combine(
                 flow { emit(isAchievementsEnabledUseCase()) }.catch { emit(false) },
@@ -112,7 +108,7 @@ class MenuViewModel @Inject constructor(
                 filterMyAccountItems(isAchievementsEnabled, accountType ?: AccountType.FREE)
             }.collect { myAccountItems ->
                 _uiState.update {
-                    it.copy(myAccountItems = myAccountItems)
+                    it.copy(myAccountItems = myAccountItems, privacySuiteItems = privacySuiteItems)
                 }
             }
         }
