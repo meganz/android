@@ -61,7 +61,7 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destination: NavKey) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destination")
-        if (destination === backstack.lastOrNull()) {
+        if (destination == backstack.lastOrNull()) {
             Timber.d("Destination is already on the backstack")
             return
         }

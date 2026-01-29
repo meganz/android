@@ -1,6 +1,7 @@
 package mega.privacy.android.app.appstate.content.navigation.view
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +17,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -170,7 +170,7 @@ fun HomeScreens(
                                     }
                                 )
                                 RequestStatusProgressContainer(
-                                    viewModel = hiltViewModel(LocalContext.current as ComponentActivity),
+                                    viewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
                                     modifier = Modifier
                                         .conditional(!isMiniPlayerVisible && LocalNavigationRailVisible.current) {
                                             navigationBarsPadding()
@@ -186,16 +186,16 @@ fun HomeScreens(
 }
 
 @Serializable
-private data object FallbackKey : NavKey
+private class FallbackKey : NavKey
 
 private fun fallback(
     unknownKey: NavKey,
     outerNavigationHandler: NavigationHandler,
     innerNavigationHandler: NavigationHandler,
 ) = NavEntry<NavKey>(
-    key = FallbackKey
+    key = FallbackKey(),
 ) {
-    LaunchedEffect(unknownKey) {
+    LaunchedOnceEffect {
         outerNavigationHandler.navigate(unknownKey)
         innerNavigationHandler.back()
     }
