@@ -1,6 +1,17 @@
 package mega.privacy.android.core.nodecomponents.sheet.upload
 
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -38,78 +49,86 @@ fun UploadOptionsBottomSheet(
     onNewTextFileClicked: () -> Unit,
     onDismissSheet: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    ),
-) = MegaModalBottomSheet(
-    bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
-    onDismissRequest = onDismissSheet,
-    modifier = modifier
-        .statusBarsPadding()
-        .semantics { testTagsAsResourceId = true }
-        .testTag(TEST_TAG_UPLOAD_OPTIONS_SHEET),
-    sheetState = sheetState,
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
 ) {
-    UploadOptionItem(
-        text = stringResource(id = R.string.upload_files),
-        icon = IconPack.Medium.Thin.Outline.FileUpload,
-        testTag = TEST_TAG_UPLOAD_FILES_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveUploadFilesMenuToolbarEvent)
-            onUploadFilesClicked()
-            onDismissSheet()
-        },
-    )
-    UploadOptionItem(
-        text = stringResource(id = R.string.upload_folder),
-        icon = IconPack.Medium.Thin.Outline.FolderArrow,
-        testTag = TEST_TAG_UPLOAD_FOLDER_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveUploadFolderMenuToolbarEvent)
-            onUploadFolderClicked()
-            onDismissSheet()
-        },
-    )
-    UploadOptionItem(
-        text = stringResource(id = R.string.menu_scan_document),
-        icon = IconPack.Medium.Thin.Outline.FileScan,
-        testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveScanDocumentMenuToolbarEvent)
-            onScanDocumentClicked()
-            onDismissSheet()
-        },
-    )
-    UploadOptionItem(
-        text = stringResource(id = R.string.menu_take_picture),
-        icon = IconPack.Medium.Thin.Outline.Camera,
-        testTag = TEST_TAG_CAPTURE_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveCaptureMenuToolbarEvent)
-            onCaptureClicked()
-            onDismissSheet()
-        },
-    )
-    UploadOptionItem(
-        text = stringResource(id = R.string.menu_new_folder),
-        icon = IconPack.Medium.Thin.Outline.FolderPlus01,
-        testTag = TEST_TAG_NEW_FOLDER_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveNewFolderMenuToolbarEvent)
-            onNewFolderClicked()
-            onDismissSheet()
-        },
-    )
-    UploadOptionItem(
-        text = stringResource(id = R.string.action_create_txt),
-        icon = IconPack.Medium.Thin.Outline.FilePlus02,
-        testTag = TEST_TAG_NEW_TEXT_FILE_ACTION,
-        onClick = {
-            Analytics.tracker.trackEvent(CloudDriveNewTextFileMenuToolbarEvent)
-            onNewTextFileClicked()
-            onDismissSheet()
-        },
-    )
+    MegaModalBottomSheet(
+        bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+        onDismissRequest = onDismissSheet,
+        modifier = modifier
+            .statusBarsPadding()
+            .semantics { testTagsAsResourceId = true }
+            .testTag(TEST_TAG_UPLOAD_OPTIONS_SHEET),
+        sheetState = sheetState,
+        windowInsets = WindowInsets.navigationBars
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .verticalScroll(rememberScrollState())
+        ) {
+            UploadOptionItem(
+                text = stringResource(id = R.string.upload_files),
+                icon = IconPack.Medium.Thin.Outline.FileUpload,
+                testTag = TEST_TAG_UPLOAD_FILES_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveUploadFilesMenuToolbarEvent)
+                    onUploadFilesClicked()
+                    onDismissSheet()
+                },
+            )
+            UploadOptionItem(
+                text = stringResource(id = R.string.upload_folder),
+                icon = IconPack.Medium.Thin.Outline.FolderArrow,
+                testTag = TEST_TAG_UPLOAD_FOLDER_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveUploadFolderMenuToolbarEvent)
+                    onUploadFolderClicked()
+                    onDismissSheet()
+                },
+            )
+            UploadOptionItem(
+                text = stringResource(id = R.string.menu_scan_document),
+                icon = IconPack.Medium.Thin.Outline.FileScan,
+                testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveScanDocumentMenuToolbarEvent)
+                    onScanDocumentClicked()
+                    onDismissSheet()
+                },
+            )
+            UploadOptionItem(
+                text = stringResource(id = R.string.menu_take_picture),
+                icon = IconPack.Medium.Thin.Outline.Camera,
+                testTag = TEST_TAG_CAPTURE_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveCaptureMenuToolbarEvent)
+                    onCaptureClicked()
+                    onDismissSheet()
+                },
+            )
+            UploadOptionItem(
+                text = stringResource(id = R.string.menu_new_folder),
+                icon = IconPack.Medium.Thin.Outline.FolderPlus01,
+                testTag = TEST_TAG_NEW_FOLDER_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveNewFolderMenuToolbarEvent)
+                    onNewFolderClicked()
+                    onDismissSheet()
+                },
+            )
+            UploadOptionItem(
+                text = stringResource(id = R.string.action_create_txt),
+                icon = IconPack.Medium.Thin.Outline.FilePlus02,
+                testTag = TEST_TAG_NEW_TEXT_FILE_ACTION,
+                onClick = {
+                    Analytics.tracker.trackEvent(CloudDriveNewTextFileMenuToolbarEvent)
+                    onNewTextFileClicked()
+                    onDismissSheet()
+                },
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -130,9 +149,13 @@ private fun CreateNewNodeBottomSheetPreview() {
 }
 
 internal const val TEST_TAG_UPLOAD_OPTIONS_SHEET = "home_fab_options_panel"
-internal const val TEST_TAG_UPLOAD_FILES_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:upload_files_action"
-internal const val TEST_TAG_UPLOAD_FOLDER_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:upload_folder_action"
-internal const val TEST_TAG_SCAN_DOCUMENT_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:scan_document_action"
+internal const val TEST_TAG_UPLOAD_FILES_ACTION =
+    "$TEST_TAG_UPLOAD_OPTIONS_SHEET:upload_files_action"
+internal const val TEST_TAG_UPLOAD_FOLDER_ACTION =
+    "$TEST_TAG_UPLOAD_OPTIONS_SHEET:upload_folder_action"
+internal const val TEST_TAG_SCAN_DOCUMENT_ACTION =
+    "$TEST_TAG_UPLOAD_OPTIONS_SHEET:scan_document_action"
 internal const val TEST_TAG_CAPTURE_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:capture_action"
 internal const val TEST_TAG_NEW_FOLDER_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:new_folder_action"
-internal const val TEST_TAG_NEW_TEXT_FILE_ACTION = "$TEST_TAG_UPLOAD_OPTIONS_SHEET:new_text_file_action"
+internal const val TEST_TAG_NEW_TEXT_FILE_ACTION =
+    "$TEST_TAG_UPLOAD_OPTIONS_SHEET:new_text_file_action"
