@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.home.widget.banner.view
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -101,6 +102,58 @@ class ScrollableBannerTest {
         composeRule.onNodeWithText(banner1.buttonText).performClick()
 
         assertThat(clickedUrl).isEqualTo(banner1.url)
+    }
+
+    @Test
+    fun `test that clickable modifier on HomeBanner works correctly`() {
+        var clickCount = 0
+        var clickedUrl: String? = null
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    banners = listOf(banner1),
+                    onDismiss = { _, _ -> },
+                    onClick = { url ->
+                        clickCount++
+                        clickedUrl = url
+                    },
+                )
+            }
+        }
+        composeRule.onNodeWithText(banner1.title).performClick()
+
+        assertThat(clickedUrl).isEqualTo(banner1.url)
+        assertThat(clickCount).isEqualTo(1) // This might reveal the double-click issue if it exists
+    }
+
+    @Test
+    fun `test that dismiss button triggers onDismiss instead of onClick`() {
+        var dismissedBannerId: Int? = null
+        var dismissedBannerUrl: String? = null
+        var clickedUrl: String? = null
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    banners = listOf(banner1),
+                    onDismiss = { id, url ->
+                        dismissedBannerId = id
+                        dismissedBannerUrl = url
+                    },
+                    onClick = { url -> clickedUrl = url },
+                )
+            }
+        }
+
+        // Click on the dismiss button using content description
+        composeRule.onNodeWithContentDescription("Dismiss").performClick()
+
+        assertThat(dismissedBannerId).isEqualTo(banner1.id)
+        assertThat(dismissedBannerUrl).isEqualTo(banner1.url)
+
+        // Verify onClick was NOT called
+        assertThat(clickedUrl).isNull()
     }
 
     @Test

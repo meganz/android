@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.home.widget.banner.view
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -52,7 +53,11 @@ fun ScrollableBanner(
                 key = { it.id }
             ) { promoBanner ->
                 HomeBanner(
-                    modifier = Modifier.width(cardWidth),
+                    modifier = Modifier
+                        .width(cardWidth)
+                        .clickable {
+                            onClick(promoBanner.url)
+                        },
                     backgroundImageUrl = promoBanner.backgroundImage.takeIf { it.isNotEmpty() },
                     imageUrl = promoBanner.image.takeIf { it.isNotEmpty() },
                     title = promoBanner.title,
