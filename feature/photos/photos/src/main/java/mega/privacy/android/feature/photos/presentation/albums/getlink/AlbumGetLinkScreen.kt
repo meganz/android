@@ -84,7 +84,10 @@ fun AlbumGetLinkScreen(
     onLearnMore: () -> Unit,
     onShareLink: (Album.UserAlbum?, String) -> Unit,
     modifier: Modifier = Modifier,
-    albumGetLinkViewModel: AlbumGetLinkViewModel = hiltViewModel(),
+    albumGetLinkViewModel: AlbumGetLinkViewModel =
+        hiltViewModel<AlbumGetLinkViewModel, AlbumGetLinkViewModel.Factory> {
+            it.create(null, null)
+        },
 ) {
     val state by albumGetLinkViewModel.stateFlow.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -506,7 +509,7 @@ private fun LinkSection(
 @Composable
 private fun DecryptionKeySection(
     link: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val key = LinkFormatter.extractDecryptionKey(link)
 

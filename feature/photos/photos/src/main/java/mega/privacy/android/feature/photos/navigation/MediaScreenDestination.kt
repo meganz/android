@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.navigation
 
+import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,6 +29,8 @@ import mega.privacy.android.feature.photos.presentation.albums.content.AlbumCont
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.coverselection.AlbumCoverSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkScreen
+import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkViewModel
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
@@ -40,6 +44,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
+import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -311,3 +316,37 @@ fun EntryProviderScope<NavKey>.cameraUploadsProgressRoute(
         )
     }
 }
+
+fun EntryProviderScope<NavKey>.albumGetLink(
+    navigationHandler: NavigationHandler
+) {
+    entry<AlbumGetLinkNavKey> { args ->
+        val context = LocalContext.current
+        val albumGetLinkViewModel =
+            hiltViewModel<AlbumGetLinkViewModel, AlbumGetLinkViewModel.Factory> {
+                it.create(args.albumId, args.hasSensitiveContent)
+            }
+        AlbumGetLinkScreen(
+            albumGetLinkViewModel = albumGetLinkViewModel,
+            onBack = navigationHandler::back,
+            onLearnMore = {
+                navigationHandler.navigate(AlbumDecryptionKeyNavKey)
+            },
+            onShareLink = { album, link ->
+                with(context) {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, album?.title.orEmpty())
+                        putExtra(Intent.EXTRA_TEXT, link)
+                    }
+                    val shareIntent = Intent.createChooser(
+                        intent,
+                        getString(sharedR.string.general_share)
+                    )
+                    startActivity(shareIntent)
+                }
+            },
+        )
+    }
+}
+

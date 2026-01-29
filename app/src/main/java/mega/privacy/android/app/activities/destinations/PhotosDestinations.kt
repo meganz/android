@@ -30,7 +30,6 @@ import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
-import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -91,29 +90,6 @@ fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
                 // Immediately pop this destination from the back stack
                 removeDestination()
             }
-        }
-    }
-}
-
-fun EntryProviderScope<NavKey>.legacyAlbumGetLink(
-    removeDestination: () -> Unit,
-) {
-    entry<AlbumGetLinkNavKey>(
-        metadata = transparentMetadata()
-    ) { args ->
-        val context = LocalContext.current
-
-        LaunchedEffect(Unit) {
-            val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
-                context = context,
-                albumId = AlbumId(args.albumId),
-                hasSensitiveElement = args.hasSensitiveContent,
-            )
-
-            context.startActivity(intent)
-
-            // Immediately pop this destination from the back stack
-            removeDestination()
         }
     }
 }

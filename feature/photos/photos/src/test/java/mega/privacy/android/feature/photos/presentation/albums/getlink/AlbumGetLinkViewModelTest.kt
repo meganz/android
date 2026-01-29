@@ -59,7 +59,9 @@ class AlbumGetLinkViewModelTest {
             setShowCopyrightUseCase = setShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumId = 1L,
+            hasSensitiveElement = false
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))
@@ -106,7 +108,9 @@ class AlbumGetLinkViewModelTest {
             setShowCopyrightUseCase = setShowCopyrightUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumId = 1L,
+            hasSensitiveElement = false
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))

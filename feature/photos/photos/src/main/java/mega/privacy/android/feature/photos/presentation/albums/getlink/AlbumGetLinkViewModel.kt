@@ -3,6 +3,9 @@ package mega.privacy.android.feature.photos.presentation.albums.getlink
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +35,8 @@ import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
-@HiltViewModel
-class AlbumGetLinkViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AlbumGetLinkViewModel.Factory::class)
+class AlbumGetLinkViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbumUseCase: GetUserAlbum,
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
@@ -44,6 +47,8 @@ class AlbumGetLinkViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    @Assisted private val albumId: Long?,
+    @Assisted private val hasSensitiveElement: Boolean?,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetLinkState())
     val stateFlow = state.asStateFlow()
@@ -67,7 +72,7 @@ class AlbumGetLinkViewModel @Inject constructor(
         viewModelScope.launch {
             val showCopyright = shouldShowCopyrightUseCase()
             val hasSensitiveElement =
-                savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: false
+                savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: hasSensitiveElement ?: false
             if (!showCopyright && !hasSensitiveElement) {
                 fetchAlbum()
             }
@@ -95,7 +100,7 @@ class AlbumGetLinkViewModel @Inject constructor(
     }
 
     fun fetchAlbum() =
-        savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
+        savedStateHandle.getStateFlow(ALBUM_ID, albumId)
             .filterNotNull()
             .map(::getAlbumSummary)
             .onEach(::updateLink)
@@ -175,6 +180,11 @@ class AlbumGetLinkViewModel @Inject constructor(
         state.update {
             it.copy(copyrightAgreed = true)
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(albumId: Long?, hasSensitiveElement: Boolean?): AlbumGetLinkViewModel
     }
 
     companion object {
