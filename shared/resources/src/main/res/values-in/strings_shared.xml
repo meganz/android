@@ -1859,4 +1859,18 @@
         <item quantity="one">[Undecrypted file]</item>
         <item quantity="other">[Undecrypted files]</item>
     </plurals>
+    <!-- Account type names -->
+    <string name="free_account">Free</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="business_label">Business</string>
+    <string name="recovering_info">Loading&#8230;</string>
+    <!-- Widget -->
+    <string name="section_my_account">My Account</string>
+    <string name="storage_usage_format">%1$s of %2$s used</string>
+    <!-- General Hi -->
+    <string name="general_hi">Hi</string>
 </resources>

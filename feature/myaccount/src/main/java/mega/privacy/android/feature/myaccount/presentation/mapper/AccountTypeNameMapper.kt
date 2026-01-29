@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.myaccount.presentation.mapper
 
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.feature.myaccount.R
+import mega.privacy.android.shared.resources.R
 import javax.inject.Inject
 
 /**

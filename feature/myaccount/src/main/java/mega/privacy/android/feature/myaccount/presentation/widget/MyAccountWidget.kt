@@ -34,11 +34,11 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.feature.myaccount.R
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
 import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 
 /**

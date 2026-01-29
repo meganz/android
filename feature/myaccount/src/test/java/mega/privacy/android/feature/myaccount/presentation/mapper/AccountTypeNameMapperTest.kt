@@ -2,7 +2,7 @@ package mega.privacy.android.feature.myaccount.presentation.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.feature.myaccount.R
+import mega.privacy.android.shared.resources.R
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
