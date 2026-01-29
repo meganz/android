@@ -1,15 +1,14 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.view
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -22,13 +21,14 @@ fun SearchTopAppBar(
     onSearchTextChanged: (String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
     var isExiting by remember { mutableStateOf(false) }
     val localFocusManager = LocalFocusManager.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
 
     MegaSearchTopAppBar(
-        modifier = modifier.padding(end = 8.dp),
+        modifier = modifier,
         query = searchText,
         title = "",
         navigationType = AppBarNavigationType.Back(onBack),
@@ -48,7 +48,8 @@ fun SearchTopAppBar(
                 isExiting = true
                 onBack()
             }
-        }
+        },
+        focusRequester = focusRequester
     )
 }
 

@@ -15,10 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -95,6 +97,7 @@ fun SearchScreen(
     val coroutineScope = rememberCoroutineScope()
     val localKeyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
@@ -115,6 +118,7 @@ fun SearchScreen(
                         viewModel.processAction(SearchUiAction.UpdateSearchText(it))
                     },
                     onBack = navigationHandler::back,
+                    focusRequester = focusRequester
                 )
             }
         },
@@ -169,7 +173,7 @@ fun SearchScreen(
                 viewModel.processAction(SearchUiAction.SelectRecentSearch(query))
                 coroutineScope.launch {
                     if (openKeyboard) {
-                        localKeyboardController?.show()
+                        focusRequester.requestFocus()
                     } else {
                         localFocusManager.clearFocus()
                     }
