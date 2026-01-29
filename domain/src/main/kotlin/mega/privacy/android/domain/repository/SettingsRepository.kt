@@ -175,21 +175,6 @@ interface SettingsRepository {
     suspend fun setShowCopyright(show: Boolean)
 
     /**
-     * Is use https preference set
-     *
-     * @return true if set
-     * @return true if set
-     */
-    suspend fun isUseHttpsPreferenceEnabled(): Boolean
-
-    /**
-     * Set use https preference
-     *
-     * @param enabled
-     */
-    suspend fun setUseHttpsPreference(enabled: Boolean)
-
-    /**
      * Gets chat image quality.
      *
      * @return Chat image quality.

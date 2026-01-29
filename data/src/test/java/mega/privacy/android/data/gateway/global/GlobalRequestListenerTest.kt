@@ -15,7 +15,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
@@ -76,7 +75,6 @@ class GlobalRequestListenerTest {
         mock<UpdatePushNotificationSettingsUseCase>()
     private val shouldShowRichLinkWarningUseCase = mock<ShouldShowRichLinkWarningUseCase>()
     private val isRichPreviewsEnabledUseCase = mock<IsRichPreviewsEnabledUseCase>()
-    private val isUseHttpsEnabledUseCase = mock<IsUseHttpsEnabledUseCase>()
     private val setUseHttpsUseCase = mock<SetUseHttpsUseCase>()
     private val resetAccountDetailsTimeStampUseCase = mock<ResetAccountDetailsTimeStampUseCase>()
     private val broadcastSslVerificationFailedUseCase =
@@ -118,7 +116,6 @@ class GlobalRequestListenerTest {
             updatePushNotificationSettingsUseCase = updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase = shouldShowRichLinkWarningUseCase,
             isRichPreviewsEnabledUseCase = isRichPreviewsEnabledUseCase,
-            isUseHttpsEnabledUseCase = isUseHttpsEnabledUseCase,
             setUseHttpsUseCase = setUseHttpsUseCase,
             resetAccountDetailsTimeStampUseCase = resetAccountDetailsTimeStampUseCase,
             broadcastSslVerificationFailedUseCase = broadcastSslVerificationFailedUseCase,
@@ -138,7 +135,6 @@ class GlobalRequestListenerTest {
             setupDeviceNameUseCase, broadcastBusinessAccountExpiredUseCase,
             loginMutex, updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase, isRichPreviewsEnabledUseCase,
-            isUseHttpsEnabledUseCase, setUseHttpsUseCase,
             resetAccountDetailsTimeStampUseCase, broadcastSslVerificationFailedUseCase,
             setLoggedOutFromAnotherLocationUseCase, setIsUnverifiedBusinessAccountUseCase
         )
@@ -326,7 +322,6 @@ class GlobalRequestListenerTest {
             val error = mock<MegaError> {
                 on { errorCode } doReturn MegaError.API_OK
             }
-            whenever(isUseHttpsEnabledUseCase.invoke()).doReturn(true)
 
             underTest.onRequestFinish(api, request, error)
             advanceUntilIdle()

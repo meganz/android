@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.ConnectivityState
@@ -129,7 +130,11 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     override fun isConnectedToInternet() = monitorConnectivity.value.connected
 
-    override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
+    override suspend fun setUseHttps(enabled: Boolean) {
+        withContext(ioDispatcher) {
+            megaApi.setUseHttpsOnly(enabled)
+        }
+    }
 
     override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
 

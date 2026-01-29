@@ -35,7 +35,7 @@ interface NetworkRepository {
      *
      * @param enabled
      */
-    fun setUseHttps(enabled: Boolean)
+    suspend fun setUseHttps(enabled: Boolean)
 
     /**
      * Is Metered Connection

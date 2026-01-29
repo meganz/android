@@ -13,7 +13,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.IsUseHttpsEnabledUseCase
 import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
@@ -56,7 +55,6 @@ import javax.inject.Inject
  * @property updatePushNotificationSettingsUseCase
  * @property shouldShowRichLinkWarningUseCase
  * @property isRichPreviewsEnabledUseCase
- * @property isUseHttpsEnabledUseCase
  * @property setUseHttpsUseCase
  * @property resetAccountDetailsTimeStampUseCase
  */
@@ -76,7 +74,6 @@ class BackgroundRequestListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
-    private val isUseHttpsEnabledUseCase: IsUseHttpsEnabledUseCase,
     private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
@@ -184,7 +181,7 @@ class BackgroundRequestListener @Inject constructor(
 
             broadcastFetchNodesFinishUseCase()
             runCatching {
-                setUseHttpsUseCase(isUseHttpsEnabledUseCase())
+                setUseHttpsUseCase(true)
                 resetAccountDetailsTimeStampUseCase()
             }.onFailure {
                 Timber.e(it)

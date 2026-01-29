@@ -4,31 +4,20 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.NetworkRepository
-import mega.privacy.android.domain.repository.SettingsRepository
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
 @ExperimentalCoroutinesApi
-class DefaultSetUseHttpsTest {
+class SetUseHttpsUseCaseTest {
     private lateinit var underTest: SetUseHttpsUseCase
-
-    private val settingsRepository = mock<SettingsRepository>()
 
     private val networkRepository = mock<NetworkRepository>()
 
     @Before
     fun setUp() {
-        underTest = SetUseHttpsUseCase(settingsRepository = settingsRepository,
-            networkRepository = networkRepository)
-    }
-
-    @Test
-    fun `test that preference is updated`() = runTest {
-        underTest(true)
-
-        verify(settingsRepository).setUseHttpsPreference(true)
+        underTest = SetUseHttpsUseCase(networkRepository = networkRepository)
     }
 
     @Test

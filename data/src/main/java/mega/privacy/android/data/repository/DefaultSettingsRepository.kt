@@ -270,14 +270,6 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setShowCopyright(show)
     }
 
-    override suspend fun isUseHttpsPreferenceEnabled(): Boolean = withContext(ioDispatcher) {
-        databaseHandler.get().useHttpsOnly.toBoolean()
-    }
-
-    override suspend fun setUseHttpsPreference(enabled: Boolean) = withContext(ioDispatcher) {
-        databaseHandler.get().setUseHttpsOnly(enabled)
-    }
-
     override fun getChatImageQuality(): Flow<ChatImageQuality> =
         chatPreferencesGateway.getChatImageQualityPreference()
 
