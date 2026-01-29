@@ -2046,4 +2046,30 @@
     <string name="general_clear_all">Șterge toate</string>
     <string name="offline_remove_singular_item_success_message">1 element eliminat</string>
     <string name="offline_remove_multiple_item_success_message">%d elemente șterse</string>
+    <string name="create_new_album_input_album_name_placeholder">Album nou</string>
+    <string name="album_send_decryption_key_separately_title">Trimite separat cheia de decriptare</string>
+    <string name="album_send_decryption_key_separately_description">Exportă linkul și cheia de decriptare separat.</string>
+    <string name="general_learn_more">Aflați mai multe</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">Se procesează&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Cheie</string>
+    <string name="album_get_link_copy_link_action">Copiază linkul</string>
+    <string name="album_get_link_copy_key_action">Copiază cheia</string>
+    <string name="album_get_link_copy_key_success_message">Cheie copiată în clipboard</string>
+    <string name="album_get_link_share_link_dialog_title">Partajează și cheia de decriptare?</string>
+    <string name="album_get_link_share_link_dialog_description">Cheia de decriptare a fost exportată și va fi partajată cu linkul.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Partajează numai linkul</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Partajează linkul și cheia</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nParolă: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Există elemente ascunse în acest album. Împărtășirea albumului înseamnă că elementele ascunse sunt vizibile pentru persoanele cu care îl partajați. Elementele vor rămâne ascunse în Unitatea cloud.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link copiat în clipboard</item>
+        <item quantity="few">Link-uri copiate în clipboard</item>
+        <item quantity="other">Link-uri copiate în clipboard</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d element</item>
+        <item quantity="few">%1$d elemente</item>
+        <item quantity="other">%1$d de elemente</item>
+    </plurals>
 </resources>

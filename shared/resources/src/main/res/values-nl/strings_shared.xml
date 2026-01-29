@@ -2006,4 +2006,32 @@
     <string name="general_clear_all">Alles wissen</string>
     <string name="offline_remove_singular_item_success_message">1 item verwijderd</string>
     <string name="offline_remove_multiple_item_success_message">%d items verwijderd</string>
+    <string name="create_new_album_input_album_name_placeholder">Nieuw album</string>
+    <string name="album_send_decryption_key_separately_title">Verzend de decryptiesleutel apart</string>
+    <string name="album_send_decryption_key_separately_description">Exporteer de link en de decryptiesleutel apart.</string>
+    <string name="general_learn_more">Meer leren</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">Verwerken&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Sleutel</string>
+    <string name="album_get_link_copy_link_action">Link kopiëren</string>
+    <string name="album_get_link_copy_key_action">Link kopiëren</string>
+    <string name="album_get_link_copy_key_success_message">Sleutel gekopierd naar klembord</string>
+    <string name="album_get_link_share_link_dialog_title">Wilt u de decoderingssleutel ook delen?</string>
+    <string name="album_get_link_share_link_dialog_description">De decryptiesleutel is geëxporteerd en wordt via de link gedeeld.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Link alleen delen</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Link en sleutel delen</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nKey: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Dit album bevat verborgen items. Door het album te delen, worden de verborgen items zichtbaar voor de personen met wie u het deelt. De items blijven echter verborgen in uw cloudopslag.</string>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Link delen</item>
+        <item quantity="other">Links delen</item>
+    </plurals>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link gekopieerd naar klembord</item>
+        <item quantity="other">Links gekopieerd naar klembord</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$ditem</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
 </resources>

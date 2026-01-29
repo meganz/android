@@ -2107,4 +2107,38 @@
     <string name="general_clear_all">Wyczyść wszystko</string>
     <string name="offline_remove_singular_item_success_message">Usunięto 1 element</string>
     <string name="offline_remove_multiple_item_success_message">Usunięto %d przedmiotów</string>
+    <string name="create_new_album_input_album_name_placeholder">Nowy album</string>
+    <string name="album_send_decryption_key_separately_title">Wyślij klucz odszyfrowywania oddzielnie</string>
+    <string name="album_send_decryption_key_separately_description">Osobno wyeksportuj link i klucz deszyfrujący.</string>
+    <string name="general_learn_more">Dowiedz się więcej</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">Przetwarzanie&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Klucz</string>
+    <string name="album_get_link_copy_link_action">Skopiuj link</string>
+    <string name="album_get_link_copy_key_action">Skopiuj klucz</string>
+    <string name="album_get_link_copy_key_success_message">Klucz skopiowany do schowka</string>
+    <string name="album_get_link_share_link_dialog_title">Udostępnić też klucz deszyfrujący?</string>
+    <string name="album_get_link_share_link_dialog_description">Klucz deszyfrujący został wyeksportowany i zostanie udostępniony wraz z linkiem.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Tylko link do udostępnienia</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Udostępnij link i klucz</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nKlucz: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">W tym albumie znajdują się ukryte elementy. Udostępnianie albumu oznacza, że ukryte elementy będą widoczne dla tych, którym udostępniasz. Elementy będą nadal ukryte na Dysk w chmurze.</string>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Udostępnij link</item>
+        <item quantity="few">Udostępnij linki</item>
+        <item quantity="many">Udostępnij linki</item>
+        <item quantity="other">Udostępnij linki</item>
+    </plurals>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link skopiowany do schowka</item>
+        <item quantity="few">Linki skopiowane do schowka</item>
+        <item quantity="many">Linki skopiowane do schowka</item>
+        <item quantity="other">Linki skopiowane do schowka</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d element</item>
+        <item quantity="few">%1$d elementy</item>
+        <item quantity="many">%1$d elementy</item>
+        <item quantity="other">%1$d elementy</item>
+    </plurals>
 </resources>

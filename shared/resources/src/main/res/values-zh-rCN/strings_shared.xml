@@ -1910,4 +1910,6 @@
     <string name="copyright_screen_description_second_paragraph">严禁使用MEGA云端服务侵犯版权。您不得上传、下载、存储、共享、展示、串流、散布、发送电子邮件、链接、传输或以其他方式提供任何侵犯任何个人或实体的任何版权或其他专有权利的任何文件、数据或内容。</string>
     <string name="copyright_action_agree">同意</string>
     <string name="copyright_action_disagree">不同意</string>
+    <string name="offline_remove_singular_item_success_message">1个项目已移除</string>
+    <string name="offline_remove_multiple_item_success_message">%d个项目已移除</string>
 </resources>

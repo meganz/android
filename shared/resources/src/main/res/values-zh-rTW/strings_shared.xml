@@ -1941,4 +1941,20 @@
     <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
     <string name="album_decryption_key_title">解密金鑰</string>
     <string name="album_decryption_key_description">我們的零知識加密系統需要一個為該檔案或資料夾自動產生的唯一金鑰。預設情況下會建立一個包含此金鑰的連結，但您可以單獨匯出解密金鑰以增加一層安全性。</string>
+    <string name="offline_remove_singular_item_success_message">已移除1個項目</string>
+    <string name="offline_remove_multiple_item_success_message">已移除%d個項目</string>
+    <string name="create_new_album_input_album_name_placeholder">新相簿</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">為了確保我們不會遺失您的所有美好回憶，MEGA需要您的相簿完整存取權限。</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">電池電量過低。請為裝置充電以開始上傳照片。</string>
+    <string name="media_main_screen_camera_uploads_updated">已更新相機上傳</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">相機上傳內容已是最新的</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">已超出傳輸配額</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">已超出儲存配額</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">已暫停</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">已佇列</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">正在完成</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">正在重試</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/秒</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/秒</string>
+    <string name="album_send_decryption_key_separately_title">單獨傳送解密金鑰</string>
 </resources>

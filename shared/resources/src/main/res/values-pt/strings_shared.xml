@@ -1964,4 +1964,6 @@
     <string name="payment_ads_free_intro_description">Faça upgrade a um plano Pro com um amplo espaço de armazenamento e mais vantagens. Os nossos planos Pro custam a partir de %1$s por mês.</string>
     <string name="copyright_action_agree">Concordo</string>
     <string name="copyright_action_disagree">Discordo</string>
+    <string name="offline_remove_singular_item_success_message">1 item foi removido</string>
+    <string name="offline_remove_multiple_item_success_message">%d itens foram removidos</string>
 </resources>

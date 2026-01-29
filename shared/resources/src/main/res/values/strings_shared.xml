@@ -2129,7 +2129,7 @@
     <!-- Title text for the action to get album link(s). Used in the top app bar. -->
     <plurals name="album_get_link_screen_title">
         <item quantity="one">Share link</item>
-        <item quantity="other">Share link</item>
+        <item quantity="other">Share links</item>
     </plurals>
     <!-- Success message to show when links are copied successfully to clipboard -->
     <plurals name="album_link_copied_success_message">
