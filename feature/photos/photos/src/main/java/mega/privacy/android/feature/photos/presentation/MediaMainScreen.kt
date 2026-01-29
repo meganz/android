@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -383,6 +384,7 @@ fun MediaMainScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             AddContentFab(
+                modifier = Modifier.testTag(MEDIA_ALBUMS_FAB_TAG),
                 visible = currentTabIndex == MediaScreen.Albums.ordinal && selectionModeType == MediaSelectionModeType.None,
                 onClick = viewModel::showNewAlbumDialog
             )
@@ -767,3 +769,5 @@ private fun PhotosMainScreenPreview() {
         )
     }
 }
+
+internal const val MEDIA_ALBUMS_FAB_TAG = "media_screen_albums_tab:add_content_fab"

@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -162,6 +163,7 @@ internal fun HomeScreen(
         floatingActionButton = {
             if (state is HomeUiState.Data) {
                 AddContentFab(
+                    modifier = Modifier.testTag(HOME_FAB_TAG),
                     visible = true,
                     onClick = {
                         Analytics.tracker.trackEvent(HomeFabOptionsButtonPressedEvent)
@@ -242,3 +244,5 @@ internal fun HomeScreen(
         )
     }
 }
+
+internal const val HOME_FAB_TAG = "home_screen:add_content_fab"

@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -51,6 +53,7 @@ import mega.privacy.mobile.analytics.event.CloudDriveScreenEvent
  * @param onTransfer Callback to handle transfer events
  * @param viewModel ViewModel for managing the state of the Cloud Drive screen
  */
+@SuppressLint("ComposeModifierMissing")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CloudDriveScreen(
@@ -151,6 +154,7 @@ fun CloudDriveScreen(
         },
         floatingActionButton = {
             AddContentFab(
+                modifier = Modifier.testTag(CLOUD_DRIVE_FAB_TAG),
                 visible = uiState.hasWritePermission && !uiState.isInSelectionMode && !uiState.isEmpty,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -187,3 +191,5 @@ fun CloudDriveScreen(
         viewModel = scanDocumentViewModel
     )
 }
+
+internal const val CLOUD_DRIVE_FAB_TAG = "cloud_drive_screen:add_content_fab"
