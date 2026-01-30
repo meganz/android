@@ -158,13 +158,14 @@ private fun MegaNavigationSuite(
         orderedItems.forEach { navItem ->
             val selected = isSelected(navItem.destination)
             item(
+                modifier = Modifier.testTag(navItem.testTag),
                 icon = {
                     mainNavItemIcon(
                         navItem.getIcon(selected),
                         stringResource(navItem.label),
                         Modifier
                             .size(24.dp)
-                            .testTag(navItem.testTag),
+                            .testTag("${navItem.testTag}:icon"),
                     )
                 },
                 badge = navItem.badge?.composeLet { badge ->
@@ -177,7 +178,12 @@ private fun MegaNavigationSuite(
                         }.testTag("${navItem.testTag}:badge")
                     )
                 },
-                label = { Text(text = stringResource(navItem.label)) },
+                label = {
+                    Text(
+                        text = stringResource(navItem.label),
+                        modifier = Modifier.testTag("${navItem.testTag}:label")
+                    )
+                },
                 selected = selected,
                 onClick = {
                     navItem.analyticsEventIdentifier?.let { Analytics.tracker.trackEvent(it) }
