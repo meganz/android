@@ -1,10 +1,11 @@
 package mega.privacy.android.feature.myaccount.presentation.widget
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
@@ -51,23 +52,26 @@ class MyAccountWidgetTest {
 
     // Helper method to assert widget basic display
     private fun assertWidgetIsDisplayed() {
-        composeTestRule.onRoot()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_TEST_TAG, useUnmergedTree = true)
             .assertExists()
             .assertIsDisplayed()
     }
 
     // Helper method to assert greeting text
     private fun assertGreetingText(expectedName: String) {
-        composeTestRule.onNodeWithText("${composeTestRule.activity.getString(R.string.general_hi)} $expectedName!")
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG, useUnmergedTree = true)
             .assertExists()
             .assertIsDisplayed()
+            .assert(hasText("${composeTestRule.activity.getString(R.string.general_hi)} $expectedName!"))
+
     }
 
     // Helper method to assert account type text
     private fun assertAccountTypeText(accountTypeResource: Int) {
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(accountTypeResource))
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG, useUnmergedTree = true)
             .assertExists()
             .assertIsDisplayed()
+            .assert(hasText(composeTestRule.activity.getString(accountTypeResource)))
     }
 
     // Helper method to verify widget with specific quota level displays correctly
@@ -95,9 +99,17 @@ class MyAccountWidgetTest {
     fun `test that loading state shows shimmer view`() {
         setWidgetContent(MyAccountWidgetUiState(isLoading = true))
 
-        // When loading, the actual content should not be displayed
-        // Instead, shimmer effects should be visible
-        assertWidgetIsDisplayed()
+        // When loading, shimmer should be visible
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_SHIMMER_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+
+        // Content elements should not exist when loading
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG, useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG, useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG, useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG, useUnmergedTree = true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG, useUnmergedTree = true).assertDoesNotExist()
     }
 
     @Test
@@ -130,10 +142,13 @@ class MyAccountWidgetTest {
         setWidgetContent(testState)
 
         // Widget should still be displayed even with null name
-        // The greeting will be "Hi !" since name is null and becomes empty string
-        composeTestRule.onNodeWithText("${composeTestRule.activity.getString(R.string.general_hi)} !")
+        assertWidgetIsDisplayed()
+
+        // User name element should still exist
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG, useUnmergedTree = true)
             .assertExists()
             .assertIsDisplayed()
+            .assert(hasText("${composeTestRule.activity.getString(R.string.general_hi)} !"))
 
         // Account type should still be shown
         assertAccountTypeText(R.string.free_account)
@@ -150,6 +165,10 @@ class MyAccountWidgetTest {
 
         // User name should be shown with greeting
         assertGreetingText("Test User")
+
+        // Account type element should not exist when resource is zero
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 
     @Test
@@ -176,8 +195,9 @@ class MyAccountWidgetTest {
             onClick = { clickTriggered = true }
         )
 
-        // Perform click
-        composeTestRule.onRoot().performClick()
+        // Perform click using test tag
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_TEST_TAG, useUnmergedTree = true)
+            .performClick()
 
         // Verify callback was triggered
         assertTrue("onClick callback should be triggered", clickTriggered)
@@ -187,9 +207,10 @@ class MyAccountWidgetTest {
     fun `test that chevron icon is displayed`() {
         setWidgetContent(createBasicState())
 
-        // The chevron icon should be visible but doesn't have a content description
-        // So we verify the widget structure is complete
-        assertWidgetIsDisplayed()
+        // Verify chevron icon using test tag
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -253,10 +274,29 @@ class MyAccountWidgetTest {
     }
 
     @Test
-    fun `test that shimmer view is displayed when loading`() {
-        setWidgetContent(MyAccountWidgetUiState(isLoading = true))
+    fun `test that avatar is displayed in loaded state`() {
+        setWidgetContent(createBasicState())
 
-        // When loading, content should still be displayed (but as shimmer)
-        assertWidgetIsDisplayed()
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that storage usage text is displayed`() {
+        setWidgetContent(createBasicState())
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that progress bar is displayed`() {
+        setWidgetContent(createBasicState())
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
     }
 }

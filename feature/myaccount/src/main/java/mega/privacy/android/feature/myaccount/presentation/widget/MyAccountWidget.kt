@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
@@ -49,7 +50,8 @@ private fun MyAccountWidgetShimmerView() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 12.dp), // Match the actual widget padding
+            .padding(all = 12.dp) // Match the actual widget padding
+            .testTag(MY_ACCOUNT_WIDGET_SHIMMER_TEST_TAG),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Avatar shimmer
@@ -155,6 +157,7 @@ internal fun MyAccountWidget(
     CardSurface(
         modifier = modifier
             .padding(horizontal = 16.dp)
+            .testTag(MY_ACCOUNT_WIDGET_TEST_TAG)
             .clickable { onClick() },
         surfaceColor = SurfaceColor.Surface1
     ) {
@@ -173,6 +176,7 @@ internal fun MyAccountWidget(
                 }
                 // Avatar
                 MediumProfilePicture(
+                    modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
                     imageFile = state.avatarFile,
                     contentDescription = state.name,
                     name = emojifiedName,
@@ -187,7 +191,9 @@ internal fun MyAccountWidget(
                     MegaText(
                         text = "${stringResource(R.string.general_hi)} $emojifiedName!",
                         style = AppTheme.typography.titleMedium,
-                        modifier = Modifier.height(24.dp),
+                        modifier = Modifier
+                            .height(24.dp)
+                            .testTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG),
                         maxLines = 1
                     )
 
@@ -196,7 +202,9 @@ internal fun MyAccountWidget(
                         MegaText(
                             text = stringResource(state.accountTypeNameResource),
                             style = AppTheme.typography.bodyMedium,
-                            modifier = Modifier.height(20.dp)
+                            modifier = Modifier
+                                .height(20.dp)
+                                .testTag(MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG)
                         )
                     }
 
@@ -209,13 +217,16 @@ internal fun MyAccountWidget(
                         ),
                         textColor = TextColor.Secondary,
                         style = AppTheme.typography.bodySmall,
-                        modifier = Modifier.height(20.dp)
+                        modifier = Modifier
+                            .height(20.dp)
+                            .testTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG)
                     )
 
                     Spacer(modifier = Modifier.height(2.dp))
 
                     // Horizontal progress bar
                     MyAccountHorizontalProgressBar(
+                        modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG),
                         level = state.storageQuotaLevel,
                         progress = state.usedStoragePercentage.toFloat()
                     )
@@ -225,6 +236,7 @@ internal fun MyAccountWidget(
 
                 // Chevron arrow
                 MegaIcon(
+                    modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG),
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
                     tint = IconColor.Secondary,
                     contentDescription = null
@@ -233,6 +245,15 @@ internal fun MyAccountWidget(
         }
     }
 }
+
+internal const val MY_ACCOUNT_WIDGET_TEST_TAG = "my_account_widget"
+internal const val MY_ACCOUNT_WIDGET_SHIMMER_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:shimmer"
+internal const val MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:avatar"
+internal const val MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:user_name"
+internal const val MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:account_type"
+internal const val MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:storage_usage"
+internal const val MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:progress_bar"
+internal const val MY_ACCOUNT_WIDGET_CHEVRON_TEST_TAG = "${MY_ACCOUNT_WIDGET_TEST_TAG}:chevron"
 
 @CombinedThemePreviews
 @Composable
