@@ -180,7 +180,10 @@ internal fun DriveSyncScreen(
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(sharedR.string.general_section_cloud_drive)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.general_section_cloud_drive),
+                        testTag = DRIVE_SYNCS_CLOUD_DRIVE_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     CloudDriveContent(
                         isTabContent = true,
@@ -201,7 +204,10 @@ internal fun DriveSyncScreen(
                     )
                 }
                 addTextTabWithProvidedScrollableModifier(
-                    tabItem = TabItems(stringResource(sharedR.string.general_syncs)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.general_syncs),
+                        testTag = DRIVE_SYNCS_SYNCS_TAB_TAG
+                    ),
                 ) {
                     SyncListRoute(
                         applyRevampStyles = true,
@@ -270,3 +276,5 @@ internal fun DriveSyncScreen(
 }
 
 internal const val DRIVE_SYNCS_FAB_TAG = "drive_syncs_screen:add_content_fab"
+internal const val DRIVE_SYNCS_CLOUD_DRIVE_TAB_TAG = "drive_syncs_screen:cloud_drive_tab"
+internal const val DRIVE_SYNCS_SYNCS_TAB_TAG = "drive_syncs_screen:syncs_tab"

@@ -134,6 +134,7 @@ private fun MegaNavigationSuite(
         layoutType = navSuiteType,
         colors = scaffoldColors,
         modifier = Modifier
+            .testTag(if (navSuiteType == NavigationSuiteType.NavigationBar) MAIN_NAVIGATION_BAR_TEST_TAG else MAIN_NAVIGATION_RAIL_TEST_TAG)
             .drawWithContent {
                 drawContent()
                 val strokeWidth = 1.dp.toPx()
@@ -309,6 +310,9 @@ private const val ContentLayoutIdTag = "content"
 
 internal val WindowAdaptiveInfoDefault
     @Composable get() = currentWindowAdaptiveInfo()
+
+internal const val MAIN_NAVIGATION_BAR_TEST_TAG = "main_navigation:navigation_bar"
+internal const val MAIN_NAVIGATION_RAIL_TEST_TAG = "main_navigation:navigation_rail"
 
 
 @CombinedThemePreviews
