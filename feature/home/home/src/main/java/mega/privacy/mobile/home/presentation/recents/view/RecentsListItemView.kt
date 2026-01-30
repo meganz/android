@@ -216,18 +216,16 @@ fun RecentsListItemView(
                         .testTag(FOLDER_NAME_TEST_TAG),
                 )
 
-                MegaIcon(
-                    imageVector = if (showVersion) {
-                        IconPack.Small.Thin.Outline.ClockRotate
-                    } else {
-                        IconPack.Small.Thin.Outline.ArrowUp
-                    },
-                    tint = IconColor.Secondary,
-                    contentDescription = "Version",
-                    modifier = Modifier
-                        .size(16.dp)
-                        .testTag(ACTION_ICON_TEST_TAG)
-                )
+                if (showVersion) {
+                    MegaIcon(
+                        imageVector = IconPack.Small.Thin.Outline.ClockRotate,
+                        tint = IconColor.Secondary,
+                        contentDescription = "Version",
+                        modifier = Modifier
+                            .size(16.dp)
+                            .testTag(VERSION_ICON_TEST_TAG)
+                    )
+                }
             }
         }
 
@@ -255,8 +253,7 @@ internal const val LABEL_TEST_TAG = "recent_action_list_item_view:label"
 internal const val FAVORITE_TEST_TAG = "recent_action_list_item_view:favorite"
 internal const val FOLDER_NAME_TEST_TAG = "recent_action_list_item_view:folder_name"
 internal const val SHARES_ICON_TEST_TAG = "recent_action_list_item_view:shares_icon"
-internal const val ACTION_ICON_TEST_TAG = "recent_action_list_item_view:action_icon"
-internal const val TIME_TEST_TAG = "recent_action_list_item_view:time"
+internal const val VERSION_ICON_TEST_TAG = "recent_action_list_item_view:version_icon"
 internal const val MENU_TEST_TAG = "recent_action_list_item_view:menu"
 internal const val MEDIA_BUCKET_MENU_TEST_TAG = "recent_action_list_item_view:media_bucket_menu"
 
@@ -284,6 +281,7 @@ private fun RecentsListItemView2Preview() {
             icon = IconPackR.drawable.ic_video_medium_solid,
             shareIcon = IconPackR.drawable.ic_folder_users_small_solid,
             parentFolderName = "Tech Share",
+            showVersion = true,
             onItemClicked = {},
             onMenuClicked = {}
         )

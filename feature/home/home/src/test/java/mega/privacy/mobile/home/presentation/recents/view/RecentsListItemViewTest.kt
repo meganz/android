@@ -1,6 +1,5 @@
 package mega.privacy.mobile.home.presentation.recents.view
 
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -43,7 +42,7 @@ class RecentsListItemViewTest {
         composeRule.onNodeWithTag(FIRST_LINE_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(FOLDER_NAME_TEST_TAG, true).assertExists()
         composeRule.onNodeWithTag(ICON_TEST_TAG, true).assertExists()
-        composeRule.onNodeWithTag(ACTION_ICON_TEST_TAG, true).assertExists()
+        composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).assertDoesNotExist()
         composeRule.onNodeWithTag(MENU_TEST_TAG, true).assertExists()
     }
 
@@ -134,7 +133,7 @@ class RecentsListItemViewTest {
             }
         }
 
-        composeRule.onNodeWithTag(ACTION_ICON_TEST_TAG, true).assertExists()
+        composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).assertExists()
     }
 
     @Test
@@ -188,7 +187,7 @@ class RecentsListItemViewTest {
         }
 
         composeRule.onNodeWithTag(ICON_TEST_TAG, true).assertExists()
-        composeRule.onNodeWithTag(ACTION_ICON_TEST_TAG, true).assertExists()
+        composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).assertDoesNotExist()
         composeRule.onNodeWithTag(MENU_TEST_TAG, true).assertExists()
     }
 
@@ -262,5 +261,22 @@ class RecentsListItemViewTest {
         }
 
         composeRule.onNodeWithTag(SECOND_LINE_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that versio history icon is shown when showVersion is true`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsListItemView(
+                    title = title,
+                    parentFolderName = parentFolderName,
+                    showVersion = true,
+                    onItemClicked = {},
+                    onMenuClicked = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(VERSION_ICON_TEST_TAG, true).assertExists()
     }
 }

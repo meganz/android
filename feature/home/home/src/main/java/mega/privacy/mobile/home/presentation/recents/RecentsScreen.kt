@@ -31,10 +31,10 @@ import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.RecentsScreenEvent
 import mega.privacy.mobile.home.presentation.home.widget.recents.mockRecentsUiItemList
@@ -135,6 +135,7 @@ fun RecentsScreen(
         onShowRecentActivity = viewModel::showRecentActivity,
         onHideRecentActivity = {
             viewModel.hideRecentActivity()
+            onBack()
             coroutineScope.launch {
                 snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
             }

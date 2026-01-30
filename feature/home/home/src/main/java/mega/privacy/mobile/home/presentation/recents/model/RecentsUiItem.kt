@@ -1,6 +1,7 @@
 package mega.privacy.mobile.home.presentation.recents.model
 
 import androidx.annotation.DrawableRes
+import androidx.compose.runtime.Immutable
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.RecentActionBucket
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * @property nodeLabel The node label
  * @property bucket The recent action bucket
  */
+@Immutable
 data class RecentsUiItem(
     val title: RecentActionTitleText,
     @DrawableRes val icon: Int,
