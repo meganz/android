@@ -47,12 +47,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.passcode.PasscodeUnlockViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUIType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeUnlockState
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.shared.original.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasscodeField
@@ -113,7 +113,7 @@ internal fun PasscodeView(
                 is PasscodeUnlockState.Loading -> {}
                 is PasscodeUnlockState.Data -> {
                     val context = LocalContext.current
-                    var showBiometricPrompt: Boolean by remember {
+                    var showBiometricPrompt: Boolean by remember(currentState.passcodeType) {
                         mutableStateOf(
                             biometricPreferenceIsEnabled(uiState) && biometricAuthIsAvailable(
                                 context
