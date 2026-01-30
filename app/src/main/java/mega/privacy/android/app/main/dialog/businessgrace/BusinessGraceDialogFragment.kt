@@ -76,7 +76,7 @@ internal class BusinessGraceDialogFragment : DialogFragment() {
 }
 
 @Composable
-private fun BusinessGraceView(modifier: Modifier = Modifier, onDismissRequest: () -> Unit = {}) {
+fun BusinessGraceView(modifier: Modifier = Modifier, onDismissRequest: () -> Unit = {}) {
     Dialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(

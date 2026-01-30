@@ -3,6 +3,7 @@ package mega.privacy.android.app.activities.destinations
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.activities.navigation.fileInfoScreen
+import mega.privacy.android.app.businessExpiredAlertLegacyDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -98,5 +99,6 @@ class LegacyCoreActivityFeatureGraph(
             )
             legacyImagePreview(navigationHandler::back)
             contactAttachmentLegacyDestination(navigationHandler::remove)
+            businessExpiredAlertLegacyDestination(navigationHandler::back)
         }
 }

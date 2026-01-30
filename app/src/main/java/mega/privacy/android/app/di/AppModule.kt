@@ -27,6 +27,7 @@ import mega.privacy.android.app.myAccount.navigation.MyAccountDeepLinkHandler
 import mega.privacy.android.app.nav.MegaActivityResultContractImpl
 import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.business.BusinessAccountExpiredDialogDestinations
+import mega.privacy.android.app.presentation.business.BusinessGraceDialogDestinations
 import mega.privacy.android.app.presentation.contact.link.dialog.ContactLinkDialogDestinations
 import mega.privacy.android.app.presentation.twofactorauthentication.Enable2FADialogDestinations
 import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
@@ -197,6 +198,7 @@ internal class AppModule {
             OverQuotaDialogDestinations,
             PurchaseResultDialogDestinations,
             BusinessAccountExpiredDialogDestinations,
+            BusinessGraceDialogDestinations,
             SecurityUpgradeDialogDestinations,
             FreePlanParticipantsLimitDialogDestination,
             Enable2FADialogDestinations

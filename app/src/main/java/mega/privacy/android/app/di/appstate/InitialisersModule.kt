@@ -11,6 +11,7 @@ import mega.privacy.android.app.appstate.global.initialisation.initialisers.Post
 import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBusinessStatusInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
@@ -82,6 +83,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideBusinessAccountExpiredInitialiser(initialiser: BusinessAccountExpiredInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideCheckBusinessStatusInitialiser(initialiser: CheckBusinessStatusInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides

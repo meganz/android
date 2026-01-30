@@ -363,3 +363,6 @@ data class ContactAttachmentNavKey(
     val chatId: Long,
     val messageId: Long,
 ) : NavKey
+
+@Serializable
+data object BusinessExpiredAlertNavKey : NavKey
