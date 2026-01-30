@@ -70,8 +70,13 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Enabl
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.mobile.analytics.event.MediaScreenAllFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
 import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -480,7 +485,10 @@ private fun PhotoModificationTimePeriodSelector(
         ) {
             PhotoModificationTimePeriod.entries.forEachIndexed { index, timePeriod ->
                 MegaChip(
-                    onClick = { onPhotoTimePeriodSelected(timePeriod) },
+                    onClick = {
+                        trackTimePeriodSelection(timePeriod)
+                        onPhotoTimePeriodSelected(timePeriod)
+                    },
                     selected = selectedTimePeriod == timePeriod,
                     text = stringResource(id = timePeriod.stringResId),
                     style = SelectionChipStyle,
@@ -532,6 +540,26 @@ private fun getVideoPermissionByVersion() =
     } else {
         READ_EXTERNAL_STORAGE
     }
+
+private fun trackTimePeriodSelection(timePeriod: PhotoModificationTimePeriod) {
+    when (timePeriod) {
+        PhotoModificationTimePeriod.Years -> Analytics.tracker.trackEvent(
+            MediaScreenYearsFilterSelectedEvent
+        )
+
+        PhotoModificationTimePeriod.Months -> Analytics.tracker.trackEvent(
+            MediaScreenMonthsFilterSelectedEvent
+        )
+
+        PhotoModificationTimePeriod.Days -> Analytics.tracker.trackEvent(
+            MediaScreenDaysFilterSelectedEvent
+        )
+
+        PhotoModificationTimePeriod.All -> Analytics.tracker.trackEvent(
+            MediaScreenAllFilterSelectedEvent
+        )
+    }
+}
 
 @CombinedThemePreviews
 @Composable

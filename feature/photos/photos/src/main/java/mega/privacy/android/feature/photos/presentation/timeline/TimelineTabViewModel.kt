@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -37,6 +39,7 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
+import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
@@ -46,8 +49,10 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModi
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel
 class TimelineTabViewModel @Inject constructor(
@@ -67,11 +72,11 @@ class TimelineTabViewModel @Inject constructor(
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
 
     /**
-     * We need to hoist the state here in the ViewModel class because we want to preserve
-     * the selection even after a navigation occurs.
+     * We need to hoist the state here in the ViewModel class because we want to preserve the
+     * selection even after a navigation occurs.
      *
-     * We don't need to put this in [TimelineTabUiState] because there is no need to
-     * rebuild the uiState when this property changes.
+     * We don't need to put this in [TimelineTabUiState] because there is no need to rebuild the
+     * uiState when this property changes.
      */
     internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
     private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
@@ -255,10 +260,28 @@ class TimelineTabViewModel @Inject constructor(
         mediaSource: FilterMediaSource,
     ) {
         gridSizeFlow.update { size }
+        trackGridSizeSelection(size)
         updateSortActionEnablement(
             isEnableCameraUploadPageShowing = isEnableCameraUploadPageShowing,
             mediaSource = mediaSource
         )
+    }
+
+    /** Track analytics for grid size selection */
+    private fun trackGridSizeSelection(gridSize: TimelineGridSize) {
+        when (gridSize) {
+            TimelineGridSize.Compact -> {
+                Analytics.tracker.trackEvent(MediaScreenGridSizeCompactSelectedEvent)
+            }
+
+            TimelineGridSize.Default -> {
+                Analytics.tracker.trackEvent(MediaScreenGridSizeDefaultSelectedEvent)
+            }
+
+            TimelineGridSize.Large -> {
+                Analytics.tracker.trackEvent(MediaScreenGridSizeLargeSelectedEvent)
+            }
+        }
     }
 
     internal fun updateSortActionBasedOnCUPageEnablement(
@@ -332,7 +355,8 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal fun onSelectAllPhotos() {
-        val notAddedIds = uiState.value.displayedPhotos
+        val notAddedIds = uiState.value
+            .displayedPhotos
             .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
             .filter { it.node.photo.id !in selectedPhotoIdsFlow.value }
             .map { it.node.photo.id }

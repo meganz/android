@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.extensions.toTrackingEvent
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
+import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -417,14 +418,28 @@ fun MediaMainScreen(
                 onUpdatePlaylistSearchQuery = onUpdatePlaylistSearchQuery,
                 removePlaylist = { showVideoPlaylistRemovedDialog = true },
                 onNavigateToCameraUploadsSettings = {
+                    MediaAppBarAction.CameraUploadsSettings.toTrackingEvent()
+                        ?.let { Analytics.tracker.trackEvent(it) }
                     onNavigateToCameraUploadsSettings(
                         LegacySettingsCameraUploadsActivityNavKey()
                     )
                 },
                 onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
-                navigateToMediaSearch = navigateToMediaSearch,
-                onFilterActionClick = { showTimelineFilter = true },
-                onSortActionClick = { showTimelineSortDialog = true }
+                navigateToMediaSearch = { key ->
+                    MediaAppBarAction.Search.toTrackingEvent()
+                        ?.let { Analytics.tracker.trackEvent(it) }
+                    navigateToMediaSearch(key)
+                },
+                onFilterActionClick = {
+                    MediaAppBarAction.FilterSecondary.toTrackingEvent()
+                        ?.let { Analytics.tracker.trackEvent(it) }
+                    showTimelineFilter = true
+                },
+                onSortActionClick = {
+                    MediaAppBarAction.SortBy.toTrackingEvent()
+                        ?.let { Analytics.tracker.trackEvent(it) }
+                    showTimelineSortDialog = true
+                }
             )
         },
         bottomBar = {

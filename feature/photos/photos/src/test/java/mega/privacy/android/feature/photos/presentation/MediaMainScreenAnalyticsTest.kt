@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.downloader.DownloadPhotoViewModel
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
+import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
@@ -28,6 +30,7 @@ import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionMo
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSelectionModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
@@ -37,10 +40,14 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAlbumsTabEvent
 import mega.privacy.mobile.analytics.event.MediaScreenDownloadButtonPressedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.MediaScreenLinkButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenRespondButtonPressedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSearchMenuToolbarEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSettingsMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.MediaScreenShareButtonPressedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.MediaScreenTimelineTabEvent
 import mega.privacy.mobile.analytics.event.MediaScreenTrashButtonPressedEvent
 import org.junit.Rule
@@ -50,9 +57,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
 
-/**
- * Test class for MediaMainScreen analytics tracking
- */
+/** Test class for MediaMainScreen analytics tracking */
 @Config(sdk = [33])
 @RunWith(AndroidJUnit4::class)
 class MediaMainScreenAnalyticsTest {
@@ -76,7 +81,9 @@ class MediaMainScreenAnalyticsTest {
                 MediaMainViewModel::class.java -> mediaMainViewModel as T
                 AlbumsTabViewModel::class.java -> albumsTabViewModel as T
                 DownloadPhotoViewModel::class.java -> downloadPhotoViewModel as T
-                else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+                else -> throw IllegalArgumentException(
+                    "Unknown ViewModel class: ${modelClass.name}"
+                )
             }
         }
     }
@@ -97,13 +104,12 @@ class MediaMainScreenAnalyticsTest {
         whenever(mediaMainViewModel.uiState).thenReturn(
             MutableStateFlow(
                 MediaMainUiState(
-                    isMediaRevampPhase2Enabled = false  // Only Timeline and Albums tabs to avoid Hilt dependencies
+                    isMediaRevampPhase2Enabled = false // Only Timeline and Albums tabs to avoid Hilt dependencies
                 )
             )
         )
-        whenever(albumsTabViewModel.uiState).thenReturn(
-            MutableStateFlow(AlbumsTabUiState())
-        )
+        whenever(albumsTabViewModel.uiState)
+            .thenReturn(MutableStateFlow(AlbumsTabUiState()))
     }
 
     private fun setupViewModelStore() {
@@ -120,6 +126,7 @@ class MediaMainScreenAnalyticsTest {
         timelineTabUiState: TimelineTabUiState = TimelineTabUiState(),
         selectedPhotosInTypedNode: () -> List<TypedNode> = { emptyList() },
         onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
+        mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(
@@ -130,7 +137,7 @@ class MediaMainScreenAnalyticsTest {
                     albumsTabUiState = AlbumsTabUiState(),
                     timelineTabUiState = timelineTabUiState,
                     timelineTabActionUiState = timelineTabActionUiState,
-                    mediaCameraUploadUiState = MediaCameraUploadUiState(),
+                    mediaCameraUploadUiState = mediaCameraUploadUiState,
                     videosTabUiState = VideosTabUiState.Loading,
                     playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
                     nodeActionUiState = NodeActionState(),
@@ -187,8 +194,7 @@ class MediaMainScreenAnalyticsTest {
             timelineTabActionUiState = timelineTabActionUiState
         )
 
-        composeTestRule.onNodeWithTag(action.testTag)
-            .performClick()
+        composeTestRule.onNodeWithTag(action.testTag).performClick()
 
         assertThat(analyticsRule.events).contains(expectedEvent)
     }
@@ -208,9 +214,8 @@ class MediaMainScreenAnalyticsTest {
     fun `test that albums tab selected event is tracked when albums tab is selected`() {
         setComposeContent()
 
-        composeTestRule.onNodeWithText(
-            context.getString(sharedResR.string.media_albums_tab_title)
-        ).performClick()
+        composeTestRule.onNodeWithText(context.getString(sharedResR.string.media_albums_tab_title))
+            .performClick()
 
         assertThat(analyticsRule.events).contains(MediaScreenAlbumsTabEvent)
     }
@@ -261,5 +266,58 @@ class MediaMainScreenAnalyticsTest {
             action = TimelineSelectionMenuAction.More,
             expectedEvent = MediaScreenMoreButtonPressedEvent
         )
+    }
+
+    @Test
+    fun `test that search button pressed event is tracked when search action is clicked`() {
+        setComposeContent()
+
+        composeTestRule.onNodeWithTag(MediaAppBarAction.Search.testTag).performClick()
+
+        assertThat(analyticsRule.events).contains(MediaScreenSearchMenuToolbarEvent)
+    }
+
+    @Test
+    fun `test that filter button pressed event is tracked when filter action is clicked`() {
+        val timelineTabActionUiState = TimelineTabActionUiState(
+            normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false)
+        )
+        setComposeContent(timelineTabActionUiState = timelineTabActionUiState)
+
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+        composeTestRule.onNodeWithTag(MediaAppBarAction.FilterSecondary.testTag).performClick()
+
+        assertThat(analyticsRule.events).contains(MediaScreenFilterMenuToolbarEvent)
+    }
+
+    @Test
+    fun `test that sort button pressed event is tracked when sort action is clicked`() {
+        val timelineTabActionUiState = TimelineTabActionUiState(
+            normalModeItem = TimelineTabNormalModeActionUiState(enableSort = true)
+        )
+        setComposeContent(timelineTabActionUiState = timelineTabActionUiState)
+
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+        composeTestRule.onNodeWithTag(MediaAppBarAction.SortBy.testTag).performClick()
+
+        assertThat(analyticsRule.events).contains(MediaScreenSortByMenuToolbarEvent)
+    }
+
+    @Test
+    fun `test that camera uploads settings button pressed event is tracked when camera uploads settings action is clicked`() {
+        val mediaCameraUploadUiState = MediaCameraUploadUiState(status = CUStatusUiState.UpToDate)
+        val timelineTabActionUiState = TimelineTabActionUiState(
+            normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false)
+        )
+        setComposeContent(
+            timelineTabActionUiState = timelineTabActionUiState,
+            mediaCameraUploadUiState = mediaCameraUploadUiState
+        )
+
+        composeTestRule.onNodeWithContentDescription("More options").performClick()
+        composeTestRule.onNodeWithTag(MediaAppBarAction.CameraUploadsSettings.testTag)
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(MediaScreenSettingsMenuToolbarEvent)
     }
 }

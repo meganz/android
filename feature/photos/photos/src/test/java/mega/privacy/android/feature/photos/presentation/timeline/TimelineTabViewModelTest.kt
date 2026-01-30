@@ -6,6 +6,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
@@ -74,11 +76,13 @@ class TimelineTabViewModelTest {
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase = mock()
+    private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
 
     @BeforeEach
     fun setup() = runTest {
+        Analytics.initialise(analyticsTracker)
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
         whenever(getNodeListByIdsUseCase(nodeIds = any())) doReturn emptyList()
         underTest = TimelineTabViewModel(
@@ -96,6 +100,7 @@ class TimelineTabViewModelTest {
 
     @AfterEach
     fun tearDown() {
+        Analytics.initialise(null)
         reset(
             monitorTimelinePhotosUseCase,
             photoUiStateMapper,
@@ -105,7 +110,8 @@ class TimelineTabViewModelTest {
             setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase,
-            getNodeListByIdsUseCase
+            getNodeListByIdsUseCase,
+            analyticsTracker
         )
     }
 

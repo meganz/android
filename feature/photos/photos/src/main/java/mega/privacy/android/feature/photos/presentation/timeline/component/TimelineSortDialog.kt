@@ -15,8 +15,11 @@ import mega.android.core.ui.components.dialogs.BasicRadioDialog
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MediaScreenSortByNewestSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenSortByOldestSelectedEvent
 
 @Composable
 internal fun TimelineSortDialog(
@@ -26,7 +29,8 @@ internal fun TimelineSortDialog(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val selectedOption by remember(selected) {
+    val selectedOption by
+    remember(selected) {
         mutableStateOf(
             BasicDialogRadioOption(
                 ordinal = selected.ordinal,
@@ -39,26 +43,43 @@ internal fun TimelineSortDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         title = SpannableText(stringResource(sharedR.string.timeline_tab_sort_by_text)),
-        options = TimelineTabSortOptions.entries.map {
-            BasicDialogRadioOption(
-                ordinal = it.ordinal,
-                text = context.getString(it.nameResId)
-            )
-        }.toImmutableList(),
+        options =
+            TimelineTabSortOptions.entries
+                .map {
+                    BasicDialogRadioOption(
+                        ordinal = it.ordinal,
+                        text = context.getString(it.nameResId)
+                    )
+                }
+                .toImmutableList(),
         selectedOption = selectedOption,
         onOptionSelected = { basicDialogRadioOption ->
-            onOptionSelected(
+            val selectedSortOption =
                 TimelineTabSortOptions.entries.first {
                     it.ordinal == basicDialogRadioOption.ordinal
                 }
-            )
+            // Track analytics for sort option selection
+            when (selectedSortOption) {
+                TimelineTabSortOptions.Newest -> {
+                    Analytics.tracker.trackEvent(MediaScreenSortByNewestSelectedEvent)
+                }
+
+                TimelineTabSortOptions.Oldest -> {
+                    Analytics.tracker.trackEvent(MediaScreenSortByOldestSelectedEvent)
+                }
+            }
+            onOptionSelected(selectedSortOption)
         },
-        buttons = persistentListOf(
-            BasicDialogButton(
-                text = stringResource(id = sharedR.string.general_dialog_cancel_button),
-                onClick = onDismissRequest
+        buttons =
+            persistentListOf(
+                BasicDialogButton(
+                    text =
+                        stringResource(
+                            id = sharedR.string.general_dialog_cancel_button
+                        ),
+                    onClick = onDismissRequest
+                )
             )
-        )
     )
 }
 

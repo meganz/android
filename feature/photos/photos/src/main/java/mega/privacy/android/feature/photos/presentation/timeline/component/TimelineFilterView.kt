@@ -30,9 +30,16 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.components.TimelineFilterViewContent
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.mobile.analytics.event.MediaScreenFilterAllLocationsSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterAllMediaSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterCameraUploadsSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterCloudDriveSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterImagesSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenFilterVideosSelectedEvent
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.icon.pack.IconPack
@@ -69,13 +76,19 @@ internal fun TimelineFilterView(
             MediaTypeSectionBody(
                 modifier = Modifier.fillMaxWidth(),
                 selected = selectedMediaType,
-                onSelected = { selectedMediaType = it }
+                onSelected = {
+                    trackFilterMediaTypeSelection(it)
+                    selectedMediaType = it
+                }
             )
 
             MediaSourceSectionBody(
                 modifier = Modifier.fillMaxWidth(),
                 selected = selectedMediaSource,
-                onSelected = { selectedMediaSource = it }
+                onSelected = {
+                    trackFilterMediaSourceSelection(it)
+                    selectedMediaSource = it
+                }
             )
 
             FlexibleLineListItem(
@@ -177,6 +190,33 @@ private fun MediaSourceSectionBody(
                 onClickListener = { onSelected(mediaSource) },
             )
         }
+    }
+}
+
+private fun trackFilterMediaTypeSelection(mediaType: FilterMediaType) {
+    when (mediaType) {
+        FilterMediaType.ALL_MEDIA -> Analytics.tracker.trackEvent(
+            MediaScreenFilterAllMediaSelectedEvent
+        )
+
+        FilterMediaType.IMAGES -> Analytics.tracker.trackEvent(MediaScreenFilterImagesSelectedEvent)
+        FilterMediaType.VIDEOS -> Analytics.tracker.trackEvent(MediaScreenFilterVideosSelectedEvent)
+    }
+}
+
+private fun trackFilterMediaSourceSelection(mediaSource: FilterMediaSource) {
+    when (mediaSource) {
+        FilterMediaSource.AllPhotos -> Analytics.tracker.trackEvent(
+            MediaScreenFilterAllLocationsSelectedEvent
+        )
+
+        FilterMediaSource.CloudDrive -> Analytics.tracker.trackEvent(
+            MediaScreenFilterCloudDriveSelectedEvent
+        )
+
+        FilterMediaSource.CameraUpload -> Analytics.tracker.trackEvent(
+            MediaScreenFilterCameraUploadsSelectedEvent
+        )
     }
 }
 

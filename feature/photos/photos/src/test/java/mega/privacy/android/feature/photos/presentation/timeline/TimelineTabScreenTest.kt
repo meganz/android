@@ -13,6 +13,8 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.FilterMediaSource
@@ -27,6 +29,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.ENABL
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,6 +47,17 @@ class TimelineTabScreenTest {
     val composeRule = createComposeRule()
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
+    private val analyticsTracker = mock<AnalyticsTracker>()
+
+    @Before
+    fun setUp() {
+        Analytics.initialise(analyticsTracker)
+    }
+
+    @After
+    fun tearDown() {
+        Analytics.initialise(null)
+    }
 
     @Test
     fun `test that by default the sort dialog is not displayed`() {
