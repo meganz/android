@@ -1946,47 +1946,73 @@
     <string name="copyright_action_agree">ยอมรับ</string>
     <string name="copyright_action_disagree">ไม่ยอมรับ</string>
     <string name="general_clear_all">ล้างทั้งหมด</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <string name="create_new_album_input_album_name_placeholder">อัลบั้มใหม่</string>
+    <string name="album_send_decryption_key_separately_title">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
+    <string name="album_send_decryption_key_separately_description">ส่งออกลิงก์และคีย์ถอดรหัสลับแยกต่างหาก</string>
+    <string name="general_learn_more">เรียนรู้เพิ่มเติม</string>
+    <string name="album_get_link_link_section_title">ลิงก์</string>
+    <string name="album_get_link_requesting_link_placeholder">กำลังประมวลผล&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">คีย์</string>
+    <string name="album_get_link_copy_link_action">คัดลอกลิงก์</string>
+    <string name="album_get_link_copy_key_action">คัดลอกคีย์</string>
+    <string name="album_get_link_copy_key_success_message">คัดลอกคีย์ไปไว้ที่คลิปบอร์ดแล้ว</string>
+    <string name="album_get_link_share_link_dialog_title">แชร์คีย์ถอดรหัสลับนี้ด้วยหรือไม่</string>
+    <string name="album_get_link_share_link_dialog_description">ส่งออกคีย์ถอดรหัสลับแล้วและจะแชร์ไปพร้อมกับลิงก์ด้วย</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">แชร์แค่ลิงก์อย่างเดียว</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">แชร์ทั้งลิงก์และคีย์ด้วย</string>
+    <string name="album_get_link_share_link_with_key">ลิงก์: %1$s\n\nคีย์: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">อัลบั้มนี้มีรายการบางอย่างที่ซ่อนไว้ การแชร์อัลบั้มนี้จะทำให้ผู้ที่คุณแชร์ด้วยสามารถเห็นเนื้อหาที่ซ่อนอยู่ได้ แต่เนื้อหาเหล่านี้จะยังคงซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="other">คัดลอกลิงก์ไปที่คลิปบอร์ดแล้ว</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="other">%1$d รายการ</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">ออฟไลน์</string>
+    <string name="title_bucket">%1$s และอื่น ๆ อีก %2$d รายการ</string>
+    <string name="create_action_bucket">[A]สร้างโดย [/A]%s</string>
+    <string name="update_action_bucket">[A]อัปเดตโดย [/A]%s</string>
+    <string name="label_yesterday">เมื่อวาน</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ไม่ได้ถอดรหัส]</string>
+    <string name="section_recents">ล่าสุด</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="other">%d รูปภาพ</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="other">%d วิดีโอ</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="other">%1$d รูปภาพ&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="other">และ %1$d วิดีโอ</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="other">[ไฟล์ยังไม่ได้ถอดรหัส]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="other">แชร์ลิงก์</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

@@ -16,9 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -28,7 +30,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.mobile.analytics.event.RecentsEmptyStateUploadButtonPressedEvent
 
-// TODO: Add all strings to resources/transifex once confirmed
 @Composable
 internal fun RecentsEmptyView(
     modifier: Modifier = Modifier,
@@ -45,7 +46,7 @@ internal fun RecentsEmptyView(
                 .weight(1f),
         ) {
             MegaText(
-                text = "All your recent file and folder activity will appear here",
+                text = stringResource(sharedR.string.home_recents_empty_text_description),
                 style = AppTheme.typography.titleSmall,
                 textColor = TextColor.Secondary,
                 modifier = Modifier.testTag(RECENTS_EMPTY_TEXT_TEST_TAG)
@@ -64,7 +65,7 @@ internal fun RecentsEmptyView(
                 )
             ) {
                 MegaText(
-                    text = "Upload",
+                    text = stringResource(sharedR.string.home_recents_empty_button_upload),
                     style = AppTheme.typography.labelLarge.copy(
                         textDecoration = TextDecoration.Underline
                     ),
@@ -75,7 +76,7 @@ internal fun RecentsEmptyView(
         Spacer(modifier = Modifier.width(16.dp))
         Image(
             painter = painterResource(IconPackR.drawable.ic_recents),
-            contentDescription = "Empty",
+            contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
         )

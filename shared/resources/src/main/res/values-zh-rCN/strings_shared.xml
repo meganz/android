@@ -1912,47 +1912,86 @@
     <string name="copyright_action_disagree">不同意</string>
     <string name="offline_remove_singular_item_success_message">1个项目已移除</string>
     <string name="offline_remove_multiple_item_success_message">%d个项目已移除</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <string name="media_main_screen_camera_uploads_updated">相机上传已更新</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">已超出传输流量上限</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">已超出存储空间上限</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">已暂停</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">已在队列中</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">正在完成</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">正在重试</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">解密密钥</string>
+    <string name="album_decryption_key_description">我们的零知识加密系统需要为此文件或文件夹自动生成唯一密钥。 默认情况下会创建带有此密钥的链接，您也可以单独导出解密密钥进而增加安全性。</string>
+    <string name="create_new_album_input_album_name_placeholder">新建相册</string>
+    <string name="album_send_decryption_key_separately_title">单独发送解密密钥</string>
+    <string name="album_send_decryption_key_separately_description">单独导出链接和解密密钥。</string>
+    <string name="general_learn_more">了解更多</string>
+    <string name="album_get_link_link_section_title">链接</string>
+    <string name="album_get_link_requesting_link_placeholder">正在处理&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">密钥</string>
+    <string name="album_get_link_copy_link_action">复制链接</string>
+    <string name="album_get_link_copy_key_action">复制密钥</string>
+    <string name="album_get_link_copy_key_success_message">已复制密钥到剪贴板</string>
+    <string name="album_get_link_share_link_dialog_title">同时共享解密密钥？</string>
+    <string name="album_get_link_share_link_dialog_description">解密密钥已导出并将与链接一起共享。</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">仅共享链接</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">共享链接和密钥</string>
+    <string name="album_get_link_share_link_with_key">链接：%1$s\n\n密钥：%2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">此相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="other">已复制链接到剪贴板</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="other">%1$d个项目</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">离线</string>
+    <string name="title_bucket">%1$s和%2$d及另外</string>
+    <string name="create_action_bucket">由%s[A]创建[/A]</string>
+    <string name="update_action_bucket">由%s[A]更新[/A]</string>
+    <string name="label_yesterday">昨天</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密的文件夹]</string>
+    <string name="section_recents">近期</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="other">%d个图片</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="other">%d个视频</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="other">%1$d个图片&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="other">和%1$d个视频</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="other">[文件未解密]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="other">分享链接</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

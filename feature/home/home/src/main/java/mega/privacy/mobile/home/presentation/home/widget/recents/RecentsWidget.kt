@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -144,7 +145,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onHideRecentActivity = {
                 viewModel.hideRecentActivity()
                 coroutineScope.launch {
-                    snackBarEventQueue.queueMessage("Your recent activity has been hidden") // TODO: Localize
+                    snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
                 }
             },
         )
@@ -235,7 +236,7 @@ fun RecentsView(
                         )
                     ) {
                         MegaText(
-                            text = "View all", // TODO: localize
+                            text = stringResource(sharedR.string.home_recents_button_view_all),
                             style = AppTheme.typography.titleSmall.copy(
                                 textDecoration = TextDecoration.Underline,
                                 fontWeight = FontWeight.W500

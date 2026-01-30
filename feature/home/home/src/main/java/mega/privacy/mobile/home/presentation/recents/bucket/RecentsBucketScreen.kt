@@ -14,9 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
@@ -68,6 +71,7 @@ fun RecentsBucketScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val listState = rememberLazyListState()
     val snackbarQueue = rememberSnackBarQueue()
@@ -93,7 +97,10 @@ fun RecentsBucketScreen(
                         uiState.fileCount,
                         uiState.fileCount
                     ),
-                    subtitle = "Added to ${uiState.parentFolderName.text}", // TODO localize,
+                    subtitle = stringResource(
+                        sharedR.string.home_recents_bucket_subtitle_added_to,
+                        uiState.parentFolderName.text
+                    ),
                     navigationType = AppBarNavigationType.Back(onBack),
                     actions = emptyList(),
                     trailingIcons = { TransfersToolbarWidget(onNavigate) }
@@ -141,7 +148,7 @@ fun RecentsBucketScreen(
         LaunchedEffect(uiState.isEmpty) {
             if (uiState.isEmpty) {
                 onBack()
-                snackbarQueue.queueMessage("These file are no longer available") // TODO localize
+                snackbarQueue.queueMessage(context.getString(sharedR.string.home_recents_bucket_snackbar_files_unavailable))
             }
         }
 

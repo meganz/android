@@ -1818,47 +1818,101 @@
     <string name="copyright_action_agree">Setuju</string>
     <string name="copyright_action_disagree">Tidak setuju</string>
     <string name="general_clear_all">Hapus semua</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">Hapus album?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">Hapus tautan?</item>
+    </plurals>
+    <string name="general_action_save">Simpan</string>
+    <string name="album_cover_selected_success_message">Sampul album diperbarui</string>
+    <string name="general_action_filter">Filter</string>
+    <string name="timeline_photos_source_all_locations">Semua Lokasi</string>
+    <string name="album_photos_selection_limit_dialog_title">Tidak dapat memilih lebih banyak</string>
+    <string name="album_photos_selection_screen_title">Tambahkan item ke “%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="other">Menambahkan %1$d barang ke “%2$s”</item>
+    </plurals>
+    <string name="media_main_screen_camera_uploads_updated">Unggahan kamera diperbarui</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Kuota transfer telah terlewati</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Kuota penyimpanan terlewati</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Berhenti sementara</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">Dimasukan antrian</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Menyelesaikan</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Mencoba kembali</string>
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s EB</string>
+    <string name="album_decryption_key_title">Kunci dekripsi</string>
+    <string name="album_decryption_key_description">Sistem enkripsi tanpa pengetahuan kami memerlukan kunci unik yang dibuat secara otomatis untuk file atau folder ini. Tautan dengan kunci ini dibuat secara default, tetapi anda dapat mengekspor kunci dekripsi secara terpisah untuk lapisan keamanan tambahan.</string>
+    <string name="create_new_album_input_album_name_placeholder">Album baru</string>
+    <string name="album_send_decryption_key_separately_title">Kirim kunci dekripsi secara terpisah</string>
+    <string name="album_send_decryption_key_separately_description">Ekspor tautan dan kunci dekripsi secara terpisah.</string>
+    <string name="general_learn_more">Pelajari lebih lanjut</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">Sedang memproses&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Kunci</string>
+    <string name="album_get_link_copy_link_action">Salin tautan</string>
+    <string name="album_get_link_copy_key_action">Salin kunci</string>
+    <string name="album_get_link_copy_key_success_message">Kunci Disalin ke Papan Klip</string>
+    <string name="album_get_link_share_link_dialog_title">Bagikan kunci dekripsi juga?</string>
+    <string name="album_get_link_share_link_dialog_description">Kunci dekripsi telah diekspor dan akan dibagikan dengan tautan.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Bagikan tautan saja</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Bagikan tautan dan kunci</string>
+    <string name="album_get_link_share_link_with_key">Tautan: %1$s\n\nKunci: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Ada item tersembunyi di album ini. Berbagi album berarti bahwa item tersembunyi terlihat oleh orang-orang yang anda bagikan. Item masih akan disembunyikan di drive Cloud anda.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="other">Tautan disalin ke papan klip</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="other">%1$d barang</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">Tidak Aktif</string>
+    <string name="title_bucket">%1$s dan %2$d lebih</string>
+    <string name="create_action_bucket">[A]dibuat oleh [/A]%s</string>
+    <string name="update_action_bucket">[A]diperbarui oleh [/A]%s</string>
+    <string name="label_yesterday">Kemarin</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Folder tidak terdekripsi]</string>
+    <string name="section_recents">Baru-baru ini</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="other">%d gambar</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="other">%d video</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="other">%1$d gambar&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="other">dan %1$d video</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="other">[File tidak terdekripsi]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="other">Bagikan link</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

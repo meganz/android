@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -14,8 +15,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
-// TODO: Add all strings to resources/transifex once confirmed
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun RecentsOptionsBottomSheet(
@@ -67,14 +68,14 @@ internal fun RecentsOptionsBottomSheetContent(
 ) {
     if (isHideRecentsEnabled) {
         NodeActionListTile(
-            text = "Show recent activity",
+            text = stringResource(sharedR.string.home_recents_options_menu_show_activity),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye),
             onActionClicked = onShowRecentActivity,
             modifier = Modifier.testTag(SHOW_RECENT_MENU_ITEM_TEST_TAG)
         )
     } else {
         NodeActionListTile(
-            text = "Hide recent activity",
+            text = stringResource(sharedR.string.home_recents_options_menu_hide_activity),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.EyeOff),
             onActionClicked = onHideRecentActivity,
             modifier = Modifier.testTag(HIDE_RECENT_MENU_ITEM_TEST_TAG)

@@ -1937,47 +1937,119 @@
         <item quantity="other">Rimuovere i link?</item>
     </plurals>
     <string name="camera_upload_no_full_access_banner_change_permissions_description">Per assicurarci di non perdere i tuoi ricordi, MEGA ha bisogno di accedere alla tua galleria. [A]Tocca per cambiare i permessi.[/A]</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
-    <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+    <string name="general_invalid_link">Link non valido. Per favore, riprova o richiedine un altro.</string>
+    <string name="general_action_save">Salva</string>
+    <string name="album_cover_selected_success_message">Copertina dell\’album aggiornata</string>
+    <string name="general_action_filter">Filtro</string>
+    <string name="timeline_photos_source_all_locations">Tutte le posizioni</string>
+    <string name="album_photos_selection_limit_dialog_title">Impossibile selezionare di più</string>
+    <string name="album_photos_selection_screen_title">Aggiungi oggetti a “%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">%1$d oggetto aggiunto a “%2$s”</item>
+        <item quantity="many">%1$d di oggetti aggiunti a “%2$s”</item>
+        <item quantity="other">%1$d oggetti aggiunti a “%2$s”</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
+    <string name="media_main_screen_camera_uploads_updated">Caricamenti da fotocamera aggiornati</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Quota di trasferimento superata</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Quota di archiviazione superata</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">In pausa</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">In coda</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Completando</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Ritentando</string>
+    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s EB</string>
+    <string name="album_decryption_key_title">Chiave di decrittazione</string>
+    <string name="album_decryption_key_description">Il nostro sistema di criptazione a conoscenza zero necessita di una chiave unica generata automaticamente per questo file o questa cartella. Un link con questa chiave viene creato in modo predefinito, ma puoi esportare la chiave di decriptazione separatamente per uno strato aggiuntivo di sicurezza.</string>
+    <string name="copyright_screen_title">Avviso di copyright a tutti gli utenti</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA rispetta il copyright degli altri e ha bisogno che gli utenti di MEGA Cloud drive accettino e rispettino le leggi riguardo il copyright.</string>
+    <string name="copyright_screen_description_second_paragraph">Ti è severamente proibito utilizzare il servizio cloud di MEGA per infrangere il copyright. Non potresti caricare, scaricare, archiviare, condividere, mostrare, streammare, distribuire, inviare per e-mail, linkare, trasmettere o in qualunque altro modo rendere disponibile qualsiasi file, dato o contenuto che infrange il copyright o altri diritti di proprietà di qualsiasi persona o ente.</string>
+    <string name="copyright_action_agree">Accetta</string>
+    <string name="copyright_action_disagree">Rifiuta</string>
+    <string name="create_new_album_input_album_name_placeholder">Nuovo album</string>
+    <string name="album_send_decryption_key_separately_title">Invia la chiave di decriptazione separatamente</string>
+    <string name="album_send_decryption_key_separately_description">Esporta il link e la chiave di decriptazione separatamente.</string>
+    <string name="general_learn_more">Scopri di più</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">In corso&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Chiave</string>
+    <string name="album_get_link_copy_link_action">Copia link</string>
+    <string name="album_get_link_copy_key_action">Copia chiave</string>
+    <string name="album_get_link_copy_key_success_message">Chiave copiata negli appunti</string>
+    <string name="album_get_link_share_link_dialog_title">Condividere anche la chiave di decriptazione?</string>
+    <string name="album_get_link_share_link_dialog_description">La chiave di decriptazione è stata esportata e sarà condivisa con il link.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Condividi solo il link</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Condividi il link e la chiave</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nChiave: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Ci sono oggetti nascosti in questo album. Condividere l\’album significa che gli oggetti nascosti saranno visibili alle persone con cui condividi. Gli oggetti saranno comunque nascosti nel tuo Cloud drive.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link copiato negli appunti</item>
+        <item quantity="many">Link copiati negli appunti</item>
+        <item quantity="other">Link copiati negli appunti</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d oggetto</item>
+        <item quantity="many">%1$d oggetti</item>
+        <item quantity="other">%1$d oggetti</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">Offline</string>
+    <string name="title_bucket">%1$s e altri %2$d</string>
+    <string name="create_action_bucket">[A]creato da[/A] %s</string>
+    <string name="update_action_bucket">[A]aggiornato da[/A] %s</string>
+    <string name="label_yesterday">Ieri</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Cartella non decriptata]</string>
+    <string name="section_recents">Recenti</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d immagine</item>
+        <item quantity="many">%d di immagini</item>
+        <item quantity="other">%d immagini</item>
+    </plurals>
     <plurals name="title_media_bucket_only_videos">
         <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="many">%d di video</item>
+        <item quantity="other">%d video</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d immagine&#160;</item>
+        <item quantity="many">%1$d de immagini&#160;</item>
+        <item quantity="other">%1$d immagini&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="one">e %1$d video</item>
+        <item quantity="many">e %1$d di video</item>
+        <item quantity="other">e %1$d video</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="one">[File non decriptato]</item>
+        <item quantity="many">[File non decriptati]</item>
+        <item quantity="other">[File non decriptati]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Condividi link</item>
+        <item quantity="many">Condividi link</item>
+        <item quantity="other">Condividi link</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

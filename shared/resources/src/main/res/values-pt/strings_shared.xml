@@ -1966,47 +1966,123 @@
     <string name="copyright_action_disagree">Discordo</string>
     <string name="offline_remove_singular_item_success_message">1 item foi removido</string>
     <string name="offline_remove_multiple_item_success_message">%d itens foram removidos</string>
-    <!-- Offline text, used in Chips -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="one">Deletar o álbum?</item>
+        <item quantity="many">Deletar os álbuns?</item>
+        <item quantity="other">Deletar os álbuns?</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="one">Remover o link?</item>
+        <item quantity="many">Remover os links?</item>
+        <item quantity="other">Remover os links?</item>
+    </plurals>
+    <string name="general_action_save">Salvar</string>
+    <string name="album_cover_selected_success_message">A capa do álbum foi atualizada</string>
+    <string name="general_action_filter">Filtro</string>
+    <string name="timeline_photos_source_all_locations">Todos os locais</string>
+    <string name="album_photos_selection_limit_dialog_title">Não foi possível selecionar mais</string>
+    <string name="album_photos_selection_screen_title">Adicionar itens a “%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="one">%1$d item foi adicionado a “%2$s”</item>
+        <item quantity="many">%1$d de itens foram adicionados a “%2$s”</item>
+        <item quantity="other">%1$d itens foram adicionados a “%2$s”</item>
+    </plurals>
+    <string name="media_main_screen_camera_uploads_updated">Uploads da câmera atualizados</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Cota de transferência excedida</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Cota de armazenamento excedida</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Pausado</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">Em fila</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Finalizando</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Tentando novamente</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">Chave de decodificação</string>
+    <string name="album_decryption_key_description">Nosso sistema de criptografia de conhecimento zero requer uma chave exclusiva, gerada automaticamente para este arquivo ou para esta pasta. Um link com esta chave será criado de maneira predeterminada, mas você pode exportar a chave de decodificação separadamente, para assim garantir uma camada adicional de segurança.</string>
+    <string name="create_new_album_input_album_name_placeholder">Novo álbum</string>
+    <string name="album_send_decryption_key_separately_title">Enviar a chave de decodificação separadamente</string>
+    <string name="album_send_decryption_key_separately_description">Exportar o link e a chave de decodificação por separado.</string>
+    <string name="general_learn_more">Mais informações</string>
+    <string name="album_get_link_link_section_title">Link</string>
+    <string name="album_get_link_requesting_link_placeholder">Processando&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Chave</string>
+    <string name="album_get_link_copy_link_action">Copiar link</string>
+    <string name="album_get_link_copy_key_action">Copiar a chave</string>
+    <string name="album_get_link_copy_key_success_message">Chave copiada para a área de transferência</string>
+    <string name="album_get_link_share_link_dialog_title">Também compartilhar a chave de decodificação?</string>
+    <string name="album_get_link_share_link_dialog_description">A chave de decodificação foi exportada e será compartilhada junto com o link.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Compartilhar somente o link</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Compartilhar o link e a chave</string>
+    <string name="album_get_link_share_link_with_key">Link: %1$s\n\nChave: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Há itens ocultos neste álbum. Ao compartilhar o álbum, os itens ocultos ficarão visíveis para as pessoas com as quais você o compartilhar, mas vão permanecer ocultos na sua Nuvem de arquivos.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Link copiado para a área de transferência</item>
+        <item quantity="many">Links copiados para a área de transferência</item>
+        <item quantity="other">Links copiados para a área de transferência</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d item</item>
+        <item quantity="many">%1$d itens</item>
+        <item quantity="other">%1$d itens</item>
+    </plurals>
     <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <string name="title_bucket">%1$s e mais %2$d</string>
+    <string name="create_action_bucket">[A]criado por [/A]%s</string>
+    <string name="update_action_bucket">[A]atualizado por [/A]%s</string>
+    <string name="label_yesterday">Ontem</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Pasta não decodificada]</string>
+    <string name="section_recents">Atividades recentes</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="one">%d imagem</item>
+        <item quantity="many">%d de imagens</item>
+        <item quantity="other">%d imagens</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="one">%d vídeo</item>
+        <item quantity="many">%d de vídeos</item>
+        <item quantity="other">%d vídeos</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d imagem&#160;</item>
+        <item quantity="many">%1$d de imagens&#160;</item>
+        <item quantity="other">%1$d imagens&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="one">e %1$d vídeo</item>
+        <item quantity="many">e %1$d de vídeos</item>
+        <item quantity="other">e %1$d vídeos</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="one">[Arquivo não decodificado]</item>
+        <item quantity="many">[Arquivos não decodificados]</item>
+        <item quantity="other">[Arquivos não decodificados]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Compartilhar link</item>
+        <item quantity="many">Compartilhar links</item>
+        <item quantity="other">Compartilhar links</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

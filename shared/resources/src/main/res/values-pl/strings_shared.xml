@@ -2108,47 +2108,6 @@
     <string name="offline_remove_singular_item_success_message">Usunięto 1 element</string>
     <string name="offline_remove_multiple_item_success_message">Usunięto %d przedmiotów</string>
     <string name="create_new_album_input_album_name_placeholder">Nowy album</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
-    <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
-    </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
-    <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
-    </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
-    <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
-    </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
-    <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
-    </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
-    <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
-    </plurals>
     <string name="album_send_decryption_key_separately_title">Wyślij klucz odszyfrowywania oddzielnie</string>
     <string name="album_send_decryption_key_separately_description">Osobno wyeksportuj link i klucz deszyfrujący.</string>
     <string name="general_learn_more">Dowiedz się więcej</string>
@@ -2165,10 +2124,10 @@
     <string name="album_get_link_share_link_with_key">Link: %1$s\n\nKlucz: %2$s</string>
     <string name="album_has_hidden_nodes_dialog_description">W tym albumie znajdują się ukryte elementy. Udostępnianie albumu oznacza, że ukryte elementy będą widoczne dla tych, którym udostępniasz. Elementy będą nadal ukryte na Dysk w chmurze.</string>
     <plurals name="album_get_link_screen_title">
-        <item quantity="one">Udostępnij link</item>
-        <item quantity="few">Udostępnij linki</item>
-        <item quantity="many">Udostępnij linki</item>
-        <item quantity="other">Udostępnij linki</item>
+        <item quantity="one">Udostępniony link</item>
+        <item quantity="few">Udostępnione linki</item>
+        <item quantity="many">Udostępnione linki</item>
+        <item quantity="other">Udostępnione linki</item>
     </plurals>
     <plurals name="album_link_copied_success_message">
         <item quantity="one">Link skopiowany do schowka</item>
@@ -2182,6 +2141,63 @@
         <item quantity="many">%1$d elementy</item>
         <item quantity="other">%1$d elementy</item>
     </plurals>
+    <string name="section_saved_for_offline_new">Lokalne</string>
+    <string name="title_bucket">%1$s i %2$d więcej</string>
+    <string name="create_action_bucket">[A]utworzony przez [/A]%s</string>
+    <string name="update_action_bucket">[A]zaktualizowane przez [/A]%s</string>
+    <string name="label_yesterday">Przedwczoraj</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Katalog niezaszyfrowany]</string>
+    <string name="section_recents">Niedawne</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="one">%d zdjęcie</item>
+        <item quantity="few">%d zdjęć</item>
+        <item quantity="many">%d zdjęć</item>
+        <item quantity="other">%d zdjęć</item>
+    </plurals>
+    <plurals name="title_media_bucket_only_videos">
+        <item quantity="one">%d film</item>
+        <item quantity="few">%d filmów</item>
+        <item quantity="many">%d filmów</item>
+        <item quantity="other">%d filmów</item>
+    </plurals>
+    <plurals name="title_media_bucket_images_and_videos">
+        <item quantity="one">%1$d obraz&#160;</item>
+        <item quantity="few">%1$d obrazy&#160;</item>
+        <item quantity="many">%1$d obrazów&#160;</item>
+        <item quantity="other">%1$d obrazów&#160;</item>
+    </plurals>
+    <plurals name="title_media_bucket_images_and_videos_2">
+        <item quantity="one">i %1$d film</item>
+        <item quantity="few">i %1$d filmów</item>
+        <item quantity="many">i %1$d filmów</item>
+        <item quantity="other">i %1$d filmów</item>
+    </plurals>
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="one">[Nierozszyfrowany plik]</item>
+        <item quantity="few">[Nierozszyfrowane pliki]</item>
+        <item quantity="many">[Nierozszyfrowane pliki]</item>
+        <item quantity="other">[Nierozszyfrowane pliki]</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

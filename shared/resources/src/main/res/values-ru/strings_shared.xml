@@ -2036,7 +2036,7 @@
     <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Загрузки из камеры синхронизированы</string>
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">Превышен лимит передачи данных</string>
     <string name="camera_uploads_progress_screen_label_storage_over_quota">Превышен лимит хранения данных</string>
-    <string name="camera_uploads_progress_screen_label_transfer_paused">Приостановлено</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">На паузе</string>
     <string name="camera_uploads_progress_screen_label_transfer_queued">В очереди</string>
     <string name="camera_uploads_progress_screen_label_transfer_completing">Завершение</string>
     <string name="camera_uploads_progress_screen_label_transfer_retrying">Повторная попытка</string>
@@ -2102,47 +2102,97 @@
     <string name="copyright_screen_description_second_paragraph">Запрещается использовать облачную службу MEGA для нарушения авторских прав. Вы не можете загружать, скачивать, хранить, обмениваться, показывать, транслировать, распространять, отправлять по электронной почте, делиться ссылкой или иным образом предоставлять любые файлы, данные или контент, которые нарушают любые авторские или другие имущественные права любого лица или организации.</string>
     <string name="copyright_action_agree">Соглашаюсь</string>
     <string name="copyright_action_disagree">Не соглашаюсь</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <string name="create_new_album_input_album_name_placeholder">Новый альбом</string>
+    <string name="album_send_decryption_key_separately_title">Отправить ключ дешифрования отдельно</string>
+    <string name="album_send_decryption_key_separately_description">Отдельно экспортировать ссылку и ключ дешифрования.</string>
+    <string name="general_learn_more">Узнать больше</string>
+    <string name="album_get_link_link_section_title">Ссылка</string>
+    <string name="album_get_link_requesting_link_placeholder">Обработка&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Ключ</string>
+    <string name="album_get_link_copy_link_action">Копировать ссылку</string>
+    <string name="album_get_link_copy_key_action">Копировать ключ</string>
+    <string name="album_get_link_copy_key_success_message">Ключ скопирован в буфер обмена</string>
+    <string name="album_get_link_share_link_dialog_title">Поделиться ключом дешифрования тоже?</string>
+    <string name="album_get_link_share_link_dialog_description">Ключ дешифрования экспортирован и будет передан вместе со ссылкой.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Поделиться только ссылкой</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Поделиться ссылкой и ключом</string>
+    <string name="album_get_link_share_link_with_key">Ссылка: %1$s\n\nКлюч: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">В этом альбоме есть скрытые элементы. Если вы поделитесь альбомом, скрытые элементы будут видны тем, с кем вы делитесь. Эти элементы по-прежнему будут скрыты на вашем Облачном диске.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="one">Ссылка скопирована в буфер обмена</item>
+        <item quantity="few">Ссылки скопированы в буфер обмена</item>
+        <item quantity="many">Ссылки скопированы в буфер обмена</item>
+        <item quantity="other">Ссылки скопированы в буфер обмена</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="one">%1$d элемент</item>
+        <item quantity="few">%1$d элемента</item>
+        <item quantity="many">%1$d элементов</item>
+        <item quantity="other">%1$d элементов</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">Локальные</string>
+    <string name="title_bucket">%1$s и ещё %2$d</string>
+    <string name="create_action_bucket">[A]создан пользователем [/A]%s</string>
+    <string name="update_action_bucket">[A]обновлён пользователем [/A]%s</string>
+    <string name="label_yesterday">Вчера</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Нерасшифрованная папка]</string>
+    <string name="section_recents">Недавние</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="one">%d изображение</item>
+        <item quantity="few">%d изображения</item>
+        <item quantity="many">%d изображений</item>
+        <item quantity="other">%d изображений</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="one">%d видео</item>
+        <item quantity="few">%d видео</item>
+        <item quantity="many">%d видео</item>
+        <item quantity="other">%d видео</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="one">%1$d изображение&#160;</item>
+        <item quantity="few">%1$d изображения&#160;</item>
+        <item quantity="many">%1$d изображений&#160;</item>
+        <item quantity="other">%1$d изображений&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="one">и %1$d видео</item>
+        <item quantity="few">и %1$d видео</item>
+        <item quantity="many">и %1$d видео</item>
+        <item quantity="other">и %1$d видео</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="one">[Нерасшифрованный файл]</item>
+        <item quantity="few">[Нерасшифрованные файлы]</item>
+        <item quantity="many">[Нерасшифрованные файлы]</item>
+        <item quantity="other">[Нерасшифрованные файлы]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="one">Поделиться ссылкой</item>
+        <item quantity="few">Поделиться ссылками</item>
+        <item quantity="many">Поделиться ссылками</item>
+        <item quantity="other">Поделиться ссылками</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

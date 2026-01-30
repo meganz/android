@@ -2034,47 +2034,161 @@
     <string name="invalid_chat_link_error_message">هذه المحادثة لم تعد متوفرة</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">بحث&#8230;</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="zero">هل تريد حذف الألبوم؟</item>
+        <item quantity="one">هل تريد حذف الألبوم؟</item>
+        <item quantity="two">هل تريد حذف الألبومين؟</item>
+        <item quantity="few">هل تريد حذف الألبومات؟</item>
+        <item quantity="many">هل تريد حذف الألبومات؟</item>
+        <item quantity="other">هل تريد حذف الألبومات؟</item>
+    </plurals>
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="zero">إزالة الرابط؟</item>
+        <item quantity="one">إزالة الرابط؟</item>
+        <item quantity="two">إزالة الروابط؟</item>
+        <item quantity="few">إزالة الروابط؟</item>
+        <item quantity="many">إزالة الروابط؟</item>
+        <item quantity="other">إزالة الروابط؟</item>
+    </plurals>
+    <string name="general_action_save">احفظ</string>
+    <string name="album_cover_selected_success_message">تم تحديث غلاف الألبوم</string>
+    <string name="general_action_filter">فلتر</string>
+    <string name="timeline_photos_source_all_locations">جميع المواقع</string>
+    <string name="album_photos_selection_limit_dialog_title">لا يمكن تحديد المزيد</string>
+    <string name="album_photos_selection_screen_title">إضافة عناصر إلى ”%s“</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="zero">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="one">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="two">تمت إضافة %1$d عنصرين إلى ”%2$s“</item>
+        <item quantity="few">تمت إضافة %1$d عناصر إلى ”%2$s“</item>
+        <item quantity="many">تمت إضافة %1$d عنصراً إلى ”%2$s“</item>
+        <item quantity="other">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+    </plurals>
+    <string name="media_main_screen_camera_uploads_updated">تم تحديث ترفيعات الكاميرا</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">تم تجاوز حجم التراسل المتاح</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">تم تجاوز مساحة التخزين المتاحة</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">متوقف مؤقتاً</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">في قائمة الانتظار</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">مكتمل</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">إعادة المحاولة</string>
+    <string name="label_file_size_peta_byte">%1$s بيتابايت PB&#160;</string>
+    <string name="label_file_size_exa_byte">%1$s اكسابايت EB&#160;</string>
+    <string name="label_file_upload_size_peta_byte">%1$s بيتابايت PB&#160;</string>
+    <string name="label_file_upload_size_exa_byte">%1$s اكسابايت EB&#160;</string>
+    <string name="album_decryption_key_title">مفتاح فك التشفير</string>
+    <string name="album_decryption_key_description">يتطلب نظام تشفير المعرفة الصفرية الخاص بنا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف أو المجلد. يتم إنشاء رابط بهذا المفتاح تلقائياً ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
+    <string name="copyright_screen_title">تحذير حقوق النشر لكل المستخدمين</string>
+    <string name="copyright_screen_description_first_paragraph">تحترم ميغا MEGA حقوق التأليف والنشر للآخرين وتطلب من مستخدمي خدمات سحابة ميغا MEGA بالالتزام بقوانين حقوق النشر.</string>
+    <string name="copyright_screen_description_second_paragraph">لقد تم منعك منعاً باتاً من استخدام خدمة سحابة ميغا MEGA لانتهاك حقوق الطبع والنشر. لا يجوز لك ترفيع أو تنزيل أو تخزين أو مشاركة أو عرض أو بث أو توزيع أو إرسال بريد إلكتروني أو رابط أو نقل أو إتاحة أي ملفات أو بيانات أو محتوى ينتهك أي حقوق طبع ونشر أو حقوق ملكية أخرى لأي شخص أو كيان.</string>
+    <string name="copyright_action_agree">موافق</string>
+    <string name="copyright_action_disagree">غير موافق</string>
+    <string name="create_new_album_input_album_name_placeholder">ألبوم جديد</string>
+    <string name="album_send_decryption_key_separately_title">أرسل مفتاح فك التشفير بشكل منفصل</string>
+    <string name="album_send_decryption_key_separately_description">قم بتصدير رابط ومفتاح فك التشفير بشكل منفصل.</string>
+    <string name="general_learn_more">أعرف أكثر</string>
+    <string name="album_get_link_link_section_title">رابط</string>
+    <string name="album_get_link_requesting_link_placeholder">قيد المعالجة&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">مفتاح</string>
+    <string name="album_get_link_copy_link_action">نسخ الرابط</string>
+    <string name="album_get_link_copy_key_action">نسخ المفتاح</string>
+    <string name="album_get_link_copy_key_success_message">تم نسخ المفتاح إلى الحافظة</string>
+    <string name="album_get_link_share_link_dialog_title">مشاركة مفتاح فك التشفير أيضا؟</string>
+    <string name="album_get_link_share_link_dialog_description">تم تصدير مفتاح فك التشفير وستتم مشاركته مع الرابط</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">شارك الرابط فقط</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">شارك الرابط مع المفتاح</string>
+    <string name="album_get_link_share_link_with_key">رابط: %1$s\n\nمفتاح: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">هناك عناصر مخفية في هذا الألبوم. تعني مشاركة الألبوم أن العناصر المخفية مرئية لأولئك الذين تشاركهم معهم. ستظل العناصر مخفية في السواقة السحابية الخاص بك.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="zero">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="one">تم نسخ الرابط إلى الحافظة</item>
+        <item quantity="two">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="few">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="many">تم نسخ الروابط إلى الحافظة</item>
+        <item quantity="other">تم نسخ الروابط إلى الحافظة</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="zero">%1$d عنصر</item>
+        <item quantity="one">%1$d عنصر</item>
+        <item quantity="two">%1$d عنصرين</item>
+        <item quantity="few">%1$d عناصر</item>
+        <item quantity="many">%1$d عنصر</item>
+        <item quantity="other">%1$d عنصر</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">غير متصل بالانترنت</string>
+    <string name="title_bucket">%1$s و %2$d مزيد</string>
+    <string name="create_action_bucket">[A]انشأ من قبل [/A]%s</string>
+    <string name="update_action_bucket">[A]تم التحديث بواسطة [/A]%s</string>
+    <string name="label_yesterday">الأمس</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[مجلد غير مشفر]</string>
+    <string name="section_recents">مؤخراً</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+        <item quantity="zero">%d صورة</item>
+        <item quantity="one">%d صورة</item>
+        <item quantity="two">%d صورتين</item>
+        <item quantity="few">%d صور</item>
+        <item quantity="many">%d صورة</item>
+        <item quantity="other">%d صورة</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
-        <item quantity="other">%d videos</item>
+        <item quantity="zero">%d مقطع فيديو</item>
+        <item quantity="one">%d مقطع فيديو</item>
+        <item quantity="two">%d مقطعي فيديو</item>
+        <item quantity="few">%d مقاطع فيديو</item>
+        <item quantity="many">%d مقطع فيديو</item>
+        <item quantity="other">%d مقطع فيديو</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="zero">%1$d صورة&#160;</item>
+        <item quantity="one">%1$d صورة&#160;</item>
+        <item quantity="two">%1$d صورتان&#160;</item>
+        <item quantity="few">%1$d صور&#160;</item>
+        <item quantity="many">%1$d صورة&#160;</item>
+        <item quantity="other">%1$d صورة&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="zero">و %1$d مقطع فيديو</item>
+        <item quantity="one">و %1$d مقطع فيديو</item>
+        <item quantity="two">و %1$d مقطعي فيديو</item>
+        <item quantity="few">و %1$d مقاطع فيديو</item>
+        <item quantity="many">و %1$d مقطع فيديو</item>
+        <item quantity="other">و %1$d مقطع فيديو</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="zero">[ملف غير مشفر]</item>
+        <item quantity="one">[ملف غير مشفر]</item>
+        <item quantity="two">[ملفين غير مشفرين]</item>
+        <item quantity="few">[ملفات غير مشفرة]</item>
+        <item quantity="many">[ملفات غير مشفرة]</item>
+        <item quantity="other">[ملفات غير مشفرة]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="zero">شارك الرابط</item>
+        <item quantity="one">شارك الرابط</item>
+        <item quantity="two">شارك الروابط</item>
+        <item quantity="few">شارك الروابط</item>
+        <item quantity="many">شارك الروابط</item>
+        <item quantity="other">شارك الروابط</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

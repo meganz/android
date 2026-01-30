@@ -1792,47 +1792,106 @@
     <string name="invalid_chat_link_error_message">Cuộc trò chuyện này không còn tồn tại nữa</string>
     <!-- Placeholder of the Search Bar -->
     <string name="search_bar_placeholder_text">Tìm kiếm&#8230;</string>
-    <!-- Offline text, used in Chips -->
-    <string name="section_saved_for_offline_new">Offline</string>
-    <!-- Recent Actions bucket title -->
-    <string name="title_bucket">%1$s and %2$d more</string>
-    <!-- Recent Actions bucket created by text -->
-    <string name="create_action_bucket">[A]created by [/A]%s</string>
-    <!-- Recent Actions bucket updated by text -->
-    <string name="update_action_bucket">[A]updated by [/A]%s</string>
-    <!-- Yesterday label text -->
-    <string name="label_yesterday">Yesterday</string>
-    <!-- Label for undecrypted folder in shared items when user credentials are not verified -->
-    <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
-    <!-- Label to reference a recents section -->
-    <string name="section_recents">Recents</string>
-    <!-- Label to reference Banner section -->
-    <string name="section_banners">Banners</string>
-    <!-- Title of a media recents bucket that only contains some images -->
-    <plurals name="title_media_bucket_only_images">
-        <item quantity="one">%d image</item>
-        <item quantity="other">%d images</item>
+    <plurals name="delete_album_confirmation_dialog_title">
+        <item quantity="other">Xóa albums?</item>
     </plurals>
-    <!-- Title of a media recents bucket that only contains some videos -->
+    <plurals name="album_content_remove_links_dialog_title">
+        <item quantity="other">Loại bỏ các đường liên kết?</item>
+    </plurals>
+    <string name="general_action_save">Lưu</string>
+    <string name="album_cover_selected_success_message">Đã cập nhật ảnh bìa album</string>
+    <string name="general_action_filter">Lọc</string>
+    <string name="timeline_photos_source_all_locations">Tất cả các vị trí</string>
+    <string name="album_photos_selection_limit_dialog_title">Không thể chọn thêm được</string>
+    <string name="album_photos_selection_screen_title">Thêm mục vào “%s”</string>
+    <plurals name="album_photos_selection_success_message">
+        <item quantity="other">Đã thêm %1$d mục vào “%2$s”</item>
+    </plurals>
+    <string name="media_main_screen_camera_uploads_updated">Đăng tải camêra đã được cập nhật</string>
+    <string name="camera_uploads_progress_screen_label_transfer_over_quota">Vượt mức băng thông truyền tải</string>
+    <string name="camera_uploads_progress_screen_label_storage_over_quota">Vượt mức giới hạn lưu trữ</string>
+    <string name="camera_uploads_progress_screen_label_transfer_paused">Đã tạm dừng</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">Chờ tới lượt</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">Đang hoàn tất</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">Đang thử lại</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
+    <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
+    <string name="label_file_upload_size_exa_byte">%1$s&#160;EB</string>
+    <string name="album_decryption_key_title">Chìa khóa giải mã</string>
+    <string name="album_decryption_key_description">Mô hình mã hóa vô kiến thức của chúng tôi tự động yêu cầu phải tạo ra một chìa khóa cho tệp tin hoặc thư mục này. Đường liên kết với chìa khóa này được tạo theo cài đặt mặc định, nhưng bạn có thể xuất chìa khóa giải mã ra riêng để tăng thêm một lớp bảo mật bổ sung.</string>
+    <string name="copyright_screen_title">Cảnh báo bản quyền cho tất cả người dùng</string>
+    <string name="copyright_screen_description_first_paragraph">MEGA tôn trọng luật bản quyền của tất cả đơn vị và yêu cầu người sử dụng dịch vụ MEGA Cloud nên tuân theo theo quy định của pháp luật về quyền tác giả.</string>
+    <string name="copyright_screen_description_second_paragraph">Quý vị bị nghiêm cấm sử dụng dịch vụ MEGA Cloud để vi phạm bản quyền. Quý vị không được tải lên, tải xuống, lưu trữ, chia sẻ, trình bày, phát trực tuyến, phân phối, gửi bằng email, tạo đường liên kết đến nội dung, truyền tải hoặc cung cấp bất kỳ tệp tin, dữ liệu hoặc nội dung nào có vi phạm bất kỳ bản quyền hoặc quyền sở hữu nào khác của bất kỳ cá nhân hoặc tổ chức nào.</string>
+    <string name="copyright_action_agree">Đồng ý</string>
+    <string name="copyright_action_disagree">Không chấp thuận</string>
+    <string name="create_new_album_input_album_name_placeholder">Album mới</string>
+    <string name="album_send_decryption_key_separately_title">Gửi chìa khóa giải mã ra riêng</string>
+    <string name="album_send_decryption_key_separately_description">Xuất đường liên kết và chìa khóa giải mã ra riêng rẽ.</string>
+    <string name="general_learn_more">Tìm hiểu thêm</string>
+    <string name="album_get_link_link_section_title">Đường liên kết</string>
+    <string name="album_get_link_requesting_link_placeholder">Đang xử lý&#8230;</string>
+    <string name="album_get_link_decryption_key_section_title">Chìa khóa</string>
+    <string name="album_get_link_copy_link_action">Sao chép đường liên kết</string>
+    <string name="album_get_link_copy_key_action">Sao chép chìa khóa</string>
+    <string name="album_get_link_copy_key_success_message">Chìa khóa đã được ghi vào bảng nhớ tạm</string>
+    <string name="album_get_link_share_link_dialog_title">Có muốn chia sẻ chìa khóa giải mã luôn không?</string>
+    <string name="album_get_link_share_link_dialog_description">Chìa khóa giải mã đã được xuất ra và sẽ được chia sẻ với đường liên kết.</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">Chỉ chia sẻ đường liên kết</string>
+    <string name="album_get_link_share_link_dialog_share_action_link_key">Chia sẻ đường liên kết và chìa khóa</string>
+    <string name="album_get_link_share_link_with_key">Liên kết: %1$s\n\nChìa khóa: %2$s</string>
+    <string name="album_has_hidden_nodes_dialog_description">Có các mục ẩn trong album này. Việc thực&#160;hiện chia&#160;sẻ album sẽ làm các mục ẩn hiển&#160;thị cho những người bạn chia&#160;sẻ. Các mục vẫn sẽ được ẩn đi trong Ổ&#160;Mây của bạn.</string>
+    <plurals name="album_link_copied_success_message">
+        <item quantity="other">Các đường liên kết đã được ghi vào bảng nhớ tạm</item>
+    </plurals>
+    <plurals name="general_num_items_template">
+        <item quantity="other">%1$d mục</item>
+    </plurals>
+    <string name="section_saved_for_offline_new">Ngoại Tuyến</string>
+    <string name="title_bucket">%1$s và %2$d mục nữa</string>
+    <string name="create_action_bucket">[A]tạo bởi [/A]%s</string>
+    <string name="update_action_bucket">[A]tải lên bởi [/A]%s</string>
+    <string name="label_yesterday">Hôm qua</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[thư mục chưa giải mã]</string>
+    <string name="section_recents">Gần Đây</string>
+    <plurals name="title_media_bucket_only_images">
+        <item quantity="other">%d hình ảnh</item>
+    </plurals>
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="one">%d video</item>
         <item quantity="other">%d videos</item>
     </plurals>
-    <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d image&#160;</item>
-        <item quantity="other">%1$d images&#160;</item>
+        <item quantity="other">%1$d hình ảnh&#160;</item>
     </plurals>
-    <!-- Second part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="one">and %1$d video</item>
-        <item quantity="other">and %1$d videos</item>
+        <item quantity="other">và %1$d videos</item>
     </plurals>
-    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="other">[tệp tin chưa giải mã]</item>
     </plurals>
+    <plurals name="album_get_link_screen_title">
+        <item quantity="other">Chia sẻ đường liên kết</item>
+    </plurals>
+    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
+    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
+    <!-- Button text to view all recents in recents widget -->
+    <string name="home_recents_button_view_all">View all</string>
+    <!-- Menu option to show recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
+    <!-- Menu option to hide recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
+    <!-- Description text shown in empty recents view -->
+    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
+    <!-- Button text to upload files in empty recents view -->
+    <string name="home_recents_empty_button_upload">Upload</string>
+    <!-- Description text shown when recents activity is hidden -->
+    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
+    <!-- Button text to show activity when recents activity is hidden -->
+    <string name="home_recents_hidden_button_show_activity">Show activity</string>
+    <!-- Subtitle text in recents bucket screen showing where files were added -->
+    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
+    <!-- Snackbar message shown when files in recents bucket are no longer available -->
+    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <!-- Account type names -->
     <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>

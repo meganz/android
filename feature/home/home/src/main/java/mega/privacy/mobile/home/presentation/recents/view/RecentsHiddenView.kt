@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -24,7 +26,6 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as IconPackR
 
-// TODO: Add all strings to resources/transifex once confirmed
 @Composable
 internal fun RecentsHiddenView(
     modifier: Modifier = Modifier,
@@ -41,7 +42,7 @@ internal fun RecentsHiddenView(
                 .weight(1f),
         ) {
             MegaText(
-                text = "Recents activity hidden",
+                text = stringResource(sharedR.string.home_recents_hidden_text_description),
                 style = AppTheme.typography.titleSmall,
                 textColor = TextColor.Secondary,
                 modifier = Modifier.testTag(RECENTS_HIDDEN_TEXT_TEST_TAG)
@@ -55,7 +56,7 @@ internal fun RecentsHiddenView(
                 )
             ) {
                 MegaText(
-                    text = "Show activity",
+                    text = stringResource(sharedR.string.home_recents_hidden_button_show_activity),
                     style = AppTheme.typography.labelLarge.copy(
                         textDecoration = TextDecoration.Underline
                     )
