@@ -2082,20 +2082,6 @@
         <item quantity="many">Compartir enlaces</item>
         <item quantity="other">Compartir enlaces</item>
     </plurals>
-    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
-    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
-    <!-- Button text to view all recents in recents widget -->
-    <string name="home_recents_button_view_all">View all</string>
-    <!-- Menu option to show recent activity in recents options bottom sheet -->
-    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
-    <!-- Description text shown in empty recents view -->
-    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
-    <!-- Description text shown when recents activity is hidden -->
-    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
-    <!-- Subtitle text in recents bucket screen showing where files were added -->
-    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
-    <!-- Snackbar message shown when files in recents bucket are no longer available -->
-    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <string name="free_account">Gratis</string>
     <string name="business_label">Business</string>
     <string name="section_banners">Banners</string>
@@ -2111,20 +2097,14 @@
     <string name="home_recents_options_menu_hide_activity">Ocultar actividad reciente</string>
     <string name="home_recents_empty_button_upload">Subir</string>
     <string name="home_recents_hidden_button_show_activity">Mostrar actividad</string>
-    <!-- Shares screen: Incoming shared folders tab title. -->
-    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
-    <!-- Shares screen: Outgoing shared folders tab title. -->
-    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
-    <!-- Shares screen: Files with link tab title. -->
-    <string name="shares_screen_links_shares_tab_title">Links</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
-    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
-    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
-    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
-    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
-    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="shares_screen_incoming_shares_tab_title">Conmigo</string>
+    <string name="shares_screen_outgoing_shares_tab_title">Por mí</string>
+    <string name="shares_screen_links_shares_tab_title">Enlaces</string>
+    <string name="shares_screen_incoming_empty">[B]No hay [/B][A]carpetas compartidas entrantes[/A]</string>
+    <string name="shares_screen_outgoing_empty">[B]No hay [/B][A]carpetas compartidas por mí[/A]</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s está siendo compartida por un contacto que no has verificado. Para más seguridad, te recomendamos que verifiques sus credenciales en Contactos. Toca los tres puntos junto al contacto que deseas verificar y toca Información.</string>
+    <string name="homepage_favourites_empty_hint">[B]No[/B] [B]hay[/B] [A]favoritos[/A]</string>
+    <string name="general_create_label">Crear</string>
+    <string name="general_new_text_file">Nuevo archivo de texto</string>
+    <string name="general_new_folder">Nueva carpeta</string>
 </resources>

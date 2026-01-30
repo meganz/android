@@ -2063,20 +2063,6 @@
         <item quantity="one">Bağlantıyı paylaş</item>
         <item quantity="other">Bağlantıları paylaş</item>
     </plurals>
-    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
-    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
-    <!-- Button text to view all recents in recents widget -->
-    <string name="home_recents_button_view_all">View all</string>
-    <!-- Menu option to show recent activity in recents options bottom sheet -->
-    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
-    <!-- Description text shown in empty recents view -->
-    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
-    <!-- Description text shown when recents activity is hidden -->
-    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
-    <!-- Subtitle text in recents bucket screen showing where files were added -->
-    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
-    <!-- Snackbar message shown when files in recents bucket are no longer available -->
-    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
     <string name="section_banners">Banner’lar</string>
     <string name="free_account">Ücretsiz</string>
     <string name="prolite_account">Pro Lite</string>
@@ -2091,20 +2077,14 @@
     <string name="home_recents_options_menu_hide_activity">Son etkinliği gizle</string>
     <string name="home_recents_empty_button_upload">Yükle</string>
     <string name="home_recents_hidden_button_show_activity">Etkinliği göster</string>
-    <!-- Shares screen: Incoming shared folders tab title. -->
-    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
-    <!-- Shares screen: Outgoing shared folders tab title. -->
-    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
-    <!-- Shares screen: Files with link tab title. -->
-    <string name="shares_screen_links_shares_tab_title">Links</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
-    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
-    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
-    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
-    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
-    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="shares_screen_incoming_shares_tab_title">Gelen</string>
+    <string name="shares_screen_outgoing_shares_tab_title">Giden</string>
+    <string name="shares_screen_links_shares_tab_title">Bağlantılar</string>
+    <string name="shares_screen_incoming_empty">[B]Gelen paylaşımlı klasör [/B][A]yok[/A]</string>
+    <string name="shares_screen_outgoing_empty">[B]Giden paylaşımlı klasör [/B][A]yok[/A]</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s, doğrulamadığınız bir kişi tarafından paylaşıldı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi’ye dokunun.</string>
+    <string name="homepage_favourites_empty_hint">[B]Favorilerde[/B] [A]bir şey[/A] [B]bulunamadı[/B]</string>
+    <string name="general_create_label">Oluştur</string>
+    <string name="general_new_text_file">Yeni metin dosyası</string>
+    <string name="general_new_folder">Yeni klasör</string>
 </resources>

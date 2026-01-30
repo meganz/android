@@ -2232,4 +2232,14 @@
     <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <!-- General create label. In can be used for any action which implies a new creation. E.g.: A new folder, a new file, a new album. -->
+    <string name="general_create_label">Create</string>
+    <!-- General new text file text. In can be used for any screen or dialog in which a new text file is being created. -->
+    <string name="general_new_text_file">New text file</string>
+    <!-- General new folder text. In can be used for any screen or dialog in which a new folder is being created. -->
+    <string name="general_new_folder">New folder</string>
+    <!-- General invalid dot name warning. In can be used for any screen or dialog in which a name is requested. E.g.: New file, folder or album creation. -->
+    <string name="general_invalid_dot_name_warning">The name “.” is not valid</string>
+    <!-- General invalid double dot name warning. In can be used for any screen or dialog in which a name is requested. E.g.: New file, folder or album creation. -->
+    <string name="general_invalid_double_dot_name_warning">The name “..” is not valid</string>
 </resources>

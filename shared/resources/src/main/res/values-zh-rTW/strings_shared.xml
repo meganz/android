@@ -2002,50 +2002,19 @@
     <plurals name="album_get_link_screen_title">
         <item quantity="other">共享連結</item>
     </plurals>
-    <!-- Snackbar message shown when recent activity is hidden in recents widget -->
-    <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
-    <!-- Button text to view all recents in recents widget -->
-    <string name="home_recents_button_view_all">View all</string>
-    <!-- Menu option to show recent activity in recents options bottom sheet -->
-    <string name="home_recents_options_menu_show_activity">Show recent activity</string>
-    <!-- Description text shown in empty recents view -->
-    <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
-    <!-- Description text shown when recents activity is hidden -->
-    <string name="home_recents_hidden_text_description">Recents activity hidden</string>
-    <!-- Subtitle text in recents bucket screen showing where files were added -->
-    <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
-    <!-- Snackbar message shown when files in recents bucket are no longer available -->
-    <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
-    <string name="prolite_account">Pro Lite</string>
-    <string name="pro1_account">Pro I</string>
-    <string name="pro2_account">Pro II</string>
-    <string name="pro3_account">Pro III</string>
-    <string name="pro_flexi_account">Pro Flexi</string>
-    <string name="recovering_info">Loading&#8230;</string>
-    <!-- Widget -->
-    <string name="section_my_account">My Account</string>
-    <string name="storage_usage_format">%1$s of %2$s used</string>
-    <!-- General Hi -->
-    <string name="general_hi">Hi</string>
     <string name="free_account">免費</string>
     <string name="business_label">商業</string>
     <string name="home_recents_options_menu_hide_activity">隱藏近期動態</string>
     <string name="home_recents_empty_button_upload">上傳</string>
     <string name="home_recents_hidden_button_show_activity">顯示動態</string>
-    <!-- Shares screen: Incoming shared folders tab title. -->
-    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
-    <!-- Shares screen: Outgoing shared folders tab title. -->
-    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
-    <!-- Shares screen: Files with link tab title. -->
-    <string name="shares_screen_links_shares_tab_title">Links</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
-    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
-    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
-    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
-    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
-    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="shares_screen_incoming_shares_tab_title">傳入</string>
+    <string name="shares_screen_outgoing_shares_tab_title">傳出</string>
+    <string name="shares_screen_links_shares_tab_title">連結</string>
+    <string name="shares_screen_incoming_empty">[B]沒有人[/B][A]共享資料夾給你[/A]</string>
+    <string name="shares_screen_outgoing_empty">[B]沒有[/B][A]共享資料夾給別人[/A]</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未驗證的聯絡人共享。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。 點選您要驗證的聯絡人旁邊的三個小圓點，然後點選資訊。</string>
+    <string name="homepage_favourites_empty_hint">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
+    <string name="general_create_label">建立</string>
+    <string name="general_new_text_file">新的文字檔案</string>
+    <string name="general_new_folder">新資料夾</string>
 </resources>

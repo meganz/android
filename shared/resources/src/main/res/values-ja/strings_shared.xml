@@ -2026,20 +2026,16 @@
     <string name="home_recents_hidden_text_description">最近のアクティビティは非表示</string>
     <string name="home_recents_bucket_subtitle_added_to">%sに追加</string>
     <string name="home_recents_bucket_snackbar_files_unavailable">これらのファイルは利用できなくなりました</string>
-    <!-- Shares screen: Incoming shared folders tab title. -->
-    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
-    <!-- Shares screen: Outgoing shared folders tab title. -->
-    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
-    <!-- Shares screen: Files with link tab title. -->
-    <string name="shares_screen_links_shares_tab_title">Links</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
-    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
-    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
-    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
-    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
-    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
-    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
+    <string name="shares_screen_incoming_shares_tab_title">受信</string>
+    <string name="shares_screen_outgoing_shares_tab_title">送信</string>
+    <string name="shares_screen_links_shares_tab_title">リンク</string>
+    <string name="shares_screen_incoming_empty">[A]受信共有フォルダ[/A]は[B]ありません[/B]</string>
+    <string name="shares_screen_outgoing_empty">[A]送信共有フォルダ[/A]は[B]ありません[/B]</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%sは、あなたが認証していない連絡先によって共有されています。セキュリティをさらに強化するために、連絡先で認証情報を認証することをお勧めします。認証したい連絡先の横にある三点をタップして、「情報」をタップします。</string>
+    <string name="homepage_favourites_empty_hint">[B][/B][A]お気に入り[/A][B]が見つかりません[/B]</string>
+    <string name="general_create_label">作成</string>
+    <string name="general_new_text_file">新規テキストファイル</string>
+    <string name="general_new_folder">新規フォルダ</string>
+    <string name="general_invalid_dot_name_warning">「.」という名前は無効です</string>
+    <string name="general_invalid_double_dot_name_warning">「..」という名前は無効です</string>
 </resources>

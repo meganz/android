@@ -721,7 +721,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">암호 확인</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">처리중&#8230;</string>
+    <string name="link_request_status">처리 중&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">링크 관리</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -2485,7 +2485,7 @@
     <!-- Title option to send separated the link and decryption key -->
     <string name="option_send_decryption_key_separately">복호화 키 따로 보내기</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">링크와 복호화 키를 따로 내보내기.</string>
+    <string name="explanation_send_decryption_key_separately">링크와 복호화 키를 따로 내보냅니다.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">더 알아보기</string>
     <!-- Label key referring to a link decryption key -->
