@@ -52,7 +52,7 @@ internal fun mapStartScreenOption(screen: StartScreen) = when (screen) {
     StartScreen.SharedItems -> {
         StartScreenOption(
             startScreen = screen,
-            title = R.string.title_shared_items,
+            title = sharedR.string.video_section_videos_location_option_shared_items,
             icon = IconPack.Medium.Thin.Outline.FolderUsers,
         )
     }

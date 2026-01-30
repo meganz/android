@@ -51,6 +51,7 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.TEST_TAG_APP
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import java.text.NumberFormat
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -89,8 +90,8 @@ internal fun SharesScreen(
 
         SharesTab.OUTGOING_TAB -> outgoingUiState.currentNodeName
         SharesTab.LINKS_TAB -> linksUiState.parentNode?.name
-        else -> stringResource(R.string.title_shared_items)
-    } ?: stringResource(R.string.title_shared_items)
+        else -> stringResource(SharedR.string.video_section_videos_location_option_shared_items)
+    } ?: stringResource(SharedR.string.video_section_videos_location_option_shared_items)
     val isShowMore = when (uiState.currentTab) {
         SharesTab.INCOMING_TAB -> !incomingUiState.isInRootLevel
         SharesTab.OUTGOING_TAB -> !outgoingUiState.isInRootLevel
@@ -258,9 +259,9 @@ internal fun SharesScreen(
 
 private val SharesTab.stringRes: Int
     get() = when (this) {
-        SharesTab.INCOMING_TAB -> R.string.tab_incoming_shares
-        SharesTab.OUTGOING_TAB -> R.string.tab_outgoing_shares
-        SharesTab.LINKS_TAB -> R.string.tab_links_shares
+        SharesTab.INCOMING_TAB -> SharedR.string.shares_screen_incoming_shares_tab_title
+        SharesTab.OUTGOING_TAB -> SharedR.string.shares_screen_outgoing_shares_tab_title
+        SharesTab.LINKS_TAB -> SharedR.string.shares_screen_links_shares_tab_title
         else -> throw IllegalArgumentException("Invalid SharesTab")
     }
 

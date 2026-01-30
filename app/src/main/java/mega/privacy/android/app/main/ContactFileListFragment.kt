@@ -60,6 +60,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.St
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -380,7 +381,8 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 emptyTextView!!.visibility = View.VISIBLE
                 listView!!.visibility = View.GONE
                 emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
-                var textToShow = String.format(context.getString(R.string.context_empty_incoming))
+                var textToShow =
+                    String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
                 try {
                     textToShow = textToShow.replace(
                         "[A]", "<font color=\'"
@@ -498,7 +500,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
                 } else {
                     emptyImageView!!.setImageResource(iconPackR.drawable.ic_empty_folder_glass)
                     var textToShow =
-                        String.format(context.getString(R.string.context_empty_incoming))
+                        String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
                     try {
                         textToShow = textToShow.replace(
                             "[A]", "<font color=\'"
@@ -714,7 +716,8 @@ class ContactFileListFragment : ContactFileBaseFragment() {
             emptyTextView!!.visibility = View.VISIBLE
 
             emptyImageView!!.setImageResource(iconPackR.drawable.ic_folder_arrow_up_glass)
-            var textToShow = String.format(context.getString(R.string.context_empty_incoming))
+            var textToShow =
+                String.format(context.getString(SharedR.string.shares_screen_incoming_empty))
             try {
                 textToShow = textToShow.replace(
                     "[A]", "<font color=\'"

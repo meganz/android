@@ -1010,15 +1010,15 @@ object MegaNodeUtil {
                         }
                         app.getString(
                             R.string.location_label, parentNodeName,
-                            app.getString(R.string.tab_incoming_shares)
+                            app.getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                         )
                     } else {
-                        app.getString(R.string.tab_incoming_shares)
+                        app.getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                     }
                 }
 
                 parent == null -> {
-                    app.getString(R.string.tab_incoming_shares)
+                    app.getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                 }
 
                 inCloudDrive -> {
@@ -1049,7 +1049,7 @@ object MegaNodeUtil {
                 else -> {
                     app.getString(
                         R.string.location_label, parent.name,
-                        app.getString(R.string.tab_incoming_shares)
+                        app.getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                     )
                 }
             }

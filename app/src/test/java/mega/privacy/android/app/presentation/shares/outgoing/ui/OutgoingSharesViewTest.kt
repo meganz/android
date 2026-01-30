@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
@@ -40,7 +39,7 @@ class OutgoingSharesViewTest {
                 uiState = uiState,
                 emptyState = Pair(
                     iconPackR.drawable.ic_folder_arrow_down_glass,
-                    R.string.context_empty_outgoing
+                    sharedResR.string.shares_screen_outgoing_empty
                 ),
                 onToggleAppBarElevation = {},
                 onItemClick = {},
@@ -73,7 +72,7 @@ class OutgoingSharesViewTest {
                 uiState = uiState,
                 emptyState = Pair(
                     iconPackR.drawable.ic_folder_arrow_down_glass,
-                    R.string.context_empty_outgoing
+                    sharedResR.string.shares_screen_outgoing_empty
                 ),
                 onToggleAppBarElevation = {},
                 onItemClick = {},

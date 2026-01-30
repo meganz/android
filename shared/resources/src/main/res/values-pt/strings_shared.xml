@@ -1852,9 +1852,9 @@
     <string name="external_checkout_button_text">Comprar no nosso site (economize até %1$.0f%%)</string>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
-        <item quantity="one">As pessoas com as quais você compartilhou esse link perderão o acesso ao álbum.</item>
-        <item quantity="many">As pessoas com as quais você compartilhou esses links perderão o acesso aos álbuns.</item>
-        <item quantity="other">As pessoas com as quais você compartilhou esses links perderão o acesso aos álbuns.</item>
+        <item quantity="one">As pessoas com as quais você compartilhou este link já não terão acesso ao álbum.</item>
+        <item quantity="many">As pessoas com as quais você compartilhou estes links já não terão acesso aos álbuns.</item>
+        <item quantity="other">As pessoas com as quais você compartilhou estes links já não terão acesso aos álbuns.</item>
     </plurals>
     <!-- Remove button for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_positive_button">
@@ -2069,32 +2069,60 @@
     <string name="home_recents_button_view_all">View all</string>
     <!-- Menu option to show recent activity in recents options bottom sheet -->
     <string name="home_recents_options_menu_show_activity">Show recent activity</string>
-    <!-- Menu option to hide recent activity in recents options bottom sheet -->
-    <string name="home_recents_options_menu_hide_activity">Hide recent activity</string>
     <!-- Description text shown in empty recents view -->
     <string name="home_recents_empty_text_description">All your recent file and folder activity will appear here</string>
-    <!-- Button text to upload files in empty recents view -->
+    <string name="free_account">Grátis</string>
+    <string name="business_label">Business</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="one">Este link já não estará disponível.</item>
+        <item quantity="many">Estes links já não estarão disponíveis</item>
+        <item quantity="other">Estes links já não estarão disponíveis</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="one">Deixar de compartilhar esta pasta?</item>
+        <item quantity="many">Deixar de compartilhar estas pastas?</item>
+        <item quantity="other">Deixar de compartilhar estas pastas?</item>
+    </plurals>
+    <string name="general_invalid_link">Link inválido. Por favor, tente novamente ou solicite um novo link.</string>
+    <string name="can_only_join_one_call_error_message">Para participar dessa chamada, você precisa finalizar a sua chamada atual</string>
+    <string name="home_recents_options_menu_hide_activity">Ocultar atividade recente</string>
     <string name="home_recents_empty_button_upload">Upload</string>
     <!-- Description text shown when recents activity is hidden -->
     <string name="home_recents_hidden_text_description">Recents activity hidden</string>
-    <!-- Button text to show activity when recents activity is hidden -->
-    <string name="home_recents_hidden_button_show_activity">Show activity</string>
     <!-- Subtitle text in recents bucket screen showing where files were added -->
     <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
     <!-- Snackbar message shown when files in recents bucket are no longer available -->
     <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
-    <!-- Account type names -->
-    <string name="free_account">Free</string>
     <string name="prolite_account">Pro Lite</string>
     <string name="pro1_account">Pro I</string>
     <string name="pro2_account">Pro II</string>
     <string name="pro3_account">Pro III</string>
     <string name="pro_flexi_account">Pro Flexi</string>
-    <string name="business_label">Business</string>
     <string name="recovering_info">Loading&#8230;</string>
     <!-- Widget -->
     <string name="section_my_account">My Account</string>
     <string name="storage_usage_format">%1$s of %2$s used</string>
     <!-- General Hi -->
     <string name="general_hi">Hi</string>
+    <string name="home_recents_hidden_button_show_activity">Mostrar atividade</string>
+    <string name="album_content_remove_link_dialog_title">Remover link?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Remover links?</string>
+    <string name="album_content_remove_link_dialog_description">As pessoas com as quais você tiver compartilhado este link já não terão acesso ao álbum</string>
+    <string name="album_content_remove_multiple_links_dialog_description">As pessoas com as quais você compartilhou estes links já não terão acesso aos álbuns</string>
+    <!-- Shares screen: Incoming shared folders tab title. -->
+    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
+    <!-- Shares screen: Outgoing shared folders tab title. -->
+    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
+    <!-- Shares screen: Files with link tab title. -->
+    <string name="shares_screen_links_shares_tab_title">Links</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
+    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
+    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
+    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

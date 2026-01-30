@@ -46,7 +46,6 @@ import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.navigation.getSearchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesContent
 import mega.privacy.android.feature.clouddrive.presentation.shares.incomingshares.IncomingSharesViewModel
@@ -179,7 +178,7 @@ internal fun SharesScreen(
                     navigationType = AppBarNavigationType.Back {
                         navigationHandler.back()
                     },
-                    title = stringResource(R.string.title_shared_items),
+                    title = stringResource(sharedR.string.video_section_videos_location_option_shared_items),
                     trailingIcons = {
                         TransfersToolbarWidget(navigationHandler::navigate)
                     },
@@ -217,7 +216,7 @@ internal fun SharesScreen(
             pagerScrollEnabled = !isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_incoming_shares)),
+                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_incoming_shares_tab_title)),
                 ) { _, modifier ->
                     IncomingSharesContent(
                         modifier = modifier,
@@ -240,7 +239,7 @@ internal fun SharesScreen(
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_outgoing_shares)),
+                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_outgoing_shares_tab_title)),
                 ) { _, modifier ->
                     OutgoingSharesContent(
                         modifier = modifier,
@@ -262,7 +261,7 @@ internal fun SharesScreen(
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(R.string.tab_links_shares)),
+                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_links_shares_tab_title)),
                 ) { _, modifier ->
                     LinksContent(
                         modifier = modifier,

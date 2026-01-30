@@ -43,6 +43,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -173,7 +174,8 @@ class FavouriteFolderFragment : Fragment() {
                         adapter.submitList(childrenState.children)
                     } else if (childrenState is ChildrenNodesLoadState.Empty) {
                         setToolbarText(
-                            childrenState.title ?: getString(R.string.favourites_category_title)
+                            childrenState.title
+                                ?: getString(SharedR.string.system_album_favourites_title)
                         )
                     }
                 }

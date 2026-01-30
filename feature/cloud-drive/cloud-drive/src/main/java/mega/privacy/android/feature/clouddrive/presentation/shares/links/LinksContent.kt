@@ -34,12 +34,12 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.links.model.LinksUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as SharedR
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +90,7 @@ fun LinksContent(
             uiState.isEmpty -> {
                 MegaEmptyView(
                     imagePainter = painterResource(iconPackR.drawable.ic_link_glass),
-                    text = stringResource(R.string.context_empty_links_section)
+                    text = stringResource(SharedR.string.shares_screen_links_section_empty)
                 )
             }
 

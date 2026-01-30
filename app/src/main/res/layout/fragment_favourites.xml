@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/empty_hint_image"
             android:layout_centerHorizontal="true"
-            android:text="@string/homepage_empty_hint_favourites"
+            android:text="@string/homepage_favourites_empty_hint"
             android:textAppearance="@style/TextAppearance.Mega.Body2" />
     </RelativeLayout>
 

@@ -58,18 +58,19 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImage
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.FAVOURITES_ADAPTER
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
@@ -141,7 +142,7 @@ class FavouritesFragment : Fragment() {
         binding = FragmentFavouritesBinding.inflate(layoutInflater, container, false)
         binding.emptyHintText.text = formatEmptyScreenText(
             requireContext(),
-            getString(R.string.homepage_empty_hint_favourites)
+            getString(SharedR.string.homepage_favourites_empty_hint)
         )
         binding.fastscroll.setRecyclerView(binding.fileListViewBrowser)
         gridLayoutManager = GridLayoutManager(requireContext(), 2)

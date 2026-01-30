@@ -202,7 +202,6 @@ import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatched
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.LockButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OffOptionForHideSubtitlePressedEvent
 import mega.privacy.mobile.analytics.event.UnlockButtonPressedEvent
@@ -881,17 +880,17 @@ class VideoPlayerViewModel @Inject constructor(
                 -> {
                 when {
                     launchSource == LINKS_ADAPTER && parentHandle == INVALID_HANDLE ->
-                        context.getString(R.string.tab_links_shares) to getVideoNodesFromPublicLinksUseCase(
+                        context.getString(sharedR.string.shares_screen_links_shares_tab_title) to getVideoNodesFromPublicLinksUseCase(
                             order
                         )
 
                     launchSource == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
-                        context.getString(R.string.tab_incoming_shares) to getVideoNodesFromInSharesUseCase(
+                        context.getString(sharedR.string.shares_screen_incoming_shares_tab_title) to getVideoNodesFromInSharesUseCase(
                             order
                         )
 
                     launchSource == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE ->
-                        context.getString(R.string.tab_outgoing_shares) to getVideoNodesFromOutSharesUseCase(
+                        context.getString(sharedR.string.shares_screen_outgoing_shares_tab_title) to getVideoNodesFromOutSharesUseCase(
                             lastHandle = INVALID_HANDLE,
                             order = order
                         )
@@ -1511,7 +1510,7 @@ class VideoPlayerViewModel @Inject constructor(
                 }
                 it.moveRequestResult?.let { result ->
                     if (result.isSuccess) {
-                        snackbarMessage.value = sharedResR.string.node_moved_success_message
+                        snackbarMessage.value = sharedR.string.node_moved_success_message
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
                     }

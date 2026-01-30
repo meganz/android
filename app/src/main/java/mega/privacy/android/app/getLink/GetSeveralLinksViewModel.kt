@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_NONE_SENSITIVE
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_FOLDER
 import mega.privacy.android.app.getLink.GetLinkActivity.Companion.HIDDEN_NODE_WARNING_TYPE_LINKS
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -78,7 +78,7 @@ class GetSeveralLinksViewModel @Inject constructor(
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
 
-        links.add(LinkItem.Header(context.getString(R.string.tab_links_shares)))
+        links.add(LinkItem.Header(context.getString(SharedR.string.shares_screen_links_shares_tab_title)))
 
         for (handle in handlesList) {
             val node = megaApi.getNodeByHandle(handle)

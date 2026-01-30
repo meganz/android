@@ -921,7 +921,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 explorerTabsPager
             ) { tab: TabLayout.Tab, tabPosition: Int ->
                 tab.text = when (tabPosition) {
-                    1 -> getString(R.string.tab_incoming_shares)
+                    1 -> getString(sharedR.string.shares_screen_incoming_shares_tab_title)
                     2 -> getString(sharedR.string.general_chat)
                     0 -> getString(R.string.section_cloud_drive)
                     else -> getString(R.string.section_cloud_drive)

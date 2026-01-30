@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
@@ -30,6 +29,7 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
 import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_087_yellow_700
 import mega.privacy.android.shared.original.core.ui.theme.extensions.yellow_100_yellow_700_alpha_015
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Composable view for Incoming Shares
@@ -83,7 +83,7 @@ fun IncomingSharesView(
             if (uiState.showContactNotVerifiedBanner && !uiState.currentNodeName.isNullOrEmpty()) {
                 Text(
                     text = stringResource(
-                        id = R.string.contact_incoming_shared_folder_contact_not_approved_alert_text,
+                        id = SharedR.string.incoming_shared_folder_contact_not_approved_alert_text,
                         uiState.currentNodeName
                     ),
                     style = MaterialTheme.typography.caption.copy(

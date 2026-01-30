@@ -206,7 +206,6 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscover
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
 import mega.privacy.android.app.presentation.recentactions.recentactionbucket.RecentActionBucketFragment
-import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinFragment
 import mega.privacy.android.app.presentation.rubbishbin.LegacyRubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchActivity
@@ -271,6 +270,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
@@ -3213,7 +3213,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         HomepageScreen.FAVOURITES -> {
                             // Don't override title if we're in a FavouriteFolderFragment (subfolder)
                             if (favouriteFolderFragment == null) {
-                                titleId = R.string.favourites_category_title
+                                titleId = sharedR.string.system_album_favourites_title
                             }
                         }
 

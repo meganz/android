@@ -25,24 +25,6 @@
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
 
-
-    <!-- Start of shares screen strings -->
-    <!-- title of the screen that shows all the shared items -->
-    <string name="title_shared_items">Shared items</string>
-    <!-- Capital letters. Incoming shared folders. The title of a tab -->
-    <string name="tab_incoming_shares">Incoming</string>
-    <!-- Capital letters. Outgoing shared folders. The title of a tab -->
-    <string name="tab_outgoing_shares">Outgoing</string>
-    <!-- Capital letters. Files with link. The title of a tab -->
-    <string name="tab_links_shares">Links</string>
-    <!-- Text of the empty screen when there are not elements in Incoming -->
-    <string name="context_empty_incoming">[B]No [/B][A]incoming shared folders[/A]</string>
-    <!-- Text of the empty screen when there are not elements in Outgoing -->
-    <string name="context_empty_outgoing">[B]No [/B][A]outgoing shared folders[/A]</string>
-    <!-- Text of the empty screen when there are not elements in Links -->
-    <string name="context_empty_links_section">[B]No [/B][A]public links[/A]</string>
-    <!-- End of shares screen strings -->
-
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Empty Folder</string>
     <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
@@ -76,13 +58,5 @@
     <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
     <!-- Message when file removed from offline. -->
     <string name="offline_screen_file_removed_message">File removed from Offline</string>
-
-    <!-- Contact verification -->
-    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
-    <string name="contact_incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
-
-    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
-    <string name="homepage_empty_hint_favourites">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
-    <string name="favourites_category_title">Favourites</string>
 
 </resources>

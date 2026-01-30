@@ -438,7 +438,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         if (isInRootLinksLevel(type, parentHandle)) {
-                            playlistTitle.postValue(context.getString(R.string.tab_links_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_links_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromPublicLinksUseCase(order),
@@ -448,7 +448,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(context.getString(R.string.tab_incoming_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_incoming_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromInSharesUseCase(order),
@@ -458,7 +458,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(context.getString(R.string.tab_outgoing_shares))
+                            playlistTitle.postValue(context.getString(sharedR.string.shares_screen_outgoing_shares_tab_title))
                             buildPlaySourcesByTypedAudioNodes(
                                 type = type,
                                 typedAudioNodes = getAudioNodesFromOutSharesUseCase(

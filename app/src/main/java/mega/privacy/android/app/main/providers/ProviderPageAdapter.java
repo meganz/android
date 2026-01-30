@@ -40,7 +40,7 @@ public class ProviderPageAdapter extends FragmentPagerAdapter {
                 return context.getString(R.string.section_cloud_drive);
             }
             case 1: {
-                return context.getString(R.string.tab_incoming_shares);
+                return context.getString(mega.privacy.android.shared.resources.R.string.shares_screen_incoming_shares_tab_title);
             }
         }
         return null;

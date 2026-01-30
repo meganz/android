@@ -279,7 +279,7 @@ private fun AlbumGetMultipleLinksContent(
             item {
                 Text(
                     modifier = Modifier.padding(vertical = 14.dp),
-                    text = stringResource(id = R.string.tab_links_shares),
+                    text = stringResource(id = sharedR.string.shares_screen_links_shares_tab_title),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                 )

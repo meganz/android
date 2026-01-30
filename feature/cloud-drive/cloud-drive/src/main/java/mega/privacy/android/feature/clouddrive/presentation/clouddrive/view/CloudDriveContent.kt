@@ -210,7 +210,7 @@ internal fun CloudDriveContent(
         if (showContactVerificationBanner) {
             UnverifiedContactShareBanner(
                 text = stringResource(
-                    id = R.string.contact_incoming_shared_folder_contact_not_approved_alert_text,
+                    id = sharedR.string.incoming_shared_folder_contact_not_approved_alert_text,
                     uiState.title.text
                 ),
             )

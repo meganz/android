@@ -44,7 +44,6 @@ import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPaddi
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction.ChangeViewTypeClicked
 import mega.privacy.android.feature.clouddrive.presentation.favourites.model.FavouritesAction.ItemClicked
@@ -121,7 +120,7 @@ internal fun FavouritesContent(
             uiState.isEmpty -> {
                 MegaEmptyView(
                     imagePainter = painterResource(id = iconPackR.drawable.ic_hearts_glass),
-                    text = stringResource(id = R.string.homepage_empty_hint_favourites)
+                    text = stringResource(id = sharedR.string.homepage_favourites_empty_hint)
                 )
             }
 

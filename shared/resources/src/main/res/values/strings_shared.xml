@@ -1470,7 +1470,7 @@
     <!-- Warning that appears prior to remove links of files. Plural. -->
     <plurals name="remove_links_warning_text">
         <item quantity="one">This link will not be publicly available anymore.</item>
-        <item quantity="other">These links will not be publicly available anymore</item>
+        <item quantity="other">These links will not be publicly available anymore.</item>
     </plurals>
     <!-- success message after removing a share of a folder. a contact has no access to the folder now -->
     <string name="context_share_correctly_removed">Access removed</string>
@@ -2182,6 +2182,20 @@
         <item quantity="one">[Undecrypted file]</item>
         <item quantity="other">[Undecrypted files]</item>
     </plurals>
+    <!-- Account type names -->
+    <string name="free_account">Free</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="business_label">Business</string>
+    <string name="recovering_info">Loading&#8230;</string>
+    <!-- Widget -->
+    <string name="section_my_account">My Account</string>
+    <string name="storage_usage_format">%1$s of %2$s used</string>
+    <!-- General Hi -->
+    <string name="general_hi">Hi</string>
     <!-- Snackbar message shown when recent activity is hidden in recents widget -->
     <string name="home_recents_snackbar_activity_hidden">Your recent activity has been hidden</string>
     <!-- Button text to view all recents in recents widget -->
@@ -2202,18 +2216,20 @@
     <string name="home_recents_bucket_subtitle_added_to">Added to %s</string>
     <!-- Snackbar message shown when files in recents bucket are no longer available -->
     <string name="home_recents_bucket_snackbar_files_unavailable">These files are no longer available</string>
-    <!-- Account type names -->
-    <string name="free_account">Free</string>
-    <string name="prolite_account">Pro Lite</string>
-    <string name="pro1_account">Pro I</string>
-    <string name="pro2_account">Pro II</string>
-    <string name="pro3_account">Pro III</string>
-    <string name="pro_flexi_account">Pro Flexi</string>
-    <string name="business_label">Business</string>
-    <string name="recovering_info">Loading&#8230;</string>
-    <!-- Widget -->
-    <string name="section_my_account">My Account</string>
-    <string name="storage_usage_format">%1$s of %2$s used</string>
-    <!-- General Hi -->
-    <string name="general_hi">Hi</string>
+    <!-- Shares screen: Incoming shared folders tab title. -->
+    <string name="shares_screen_incoming_shares_tab_title">Incoming</string>
+    <!-- Shares screen: Outgoing shared folders tab title. -->
+    <string name="shares_screen_outgoing_shares_tab_title">Outgoing</string>
+    <!-- Shares screen: Files with link tab title. -->
+    <string name="shares_screen_links_shares_tab_title">Links</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Incoming -->
+    <string name="shares_screen_incoming_empty">[B]No [/B][A]incoming shared folders[/A]</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Outgoing -->
+    <string name="shares_screen_outgoing_empty">[B]No [/B][A]outgoing shared folders[/A]</string>
+    <!-- Shares screen: Text of the empty screen when there are no elements in Links -->
+    <string name="shares_screen_links_section_empty">[B]No [/B][A]public links[/A]</string>
+    <!-- when user tries receives an incoming share from an non approved contact below warning message will be visible to the user-->
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s is shared by a contact you haven’t verified. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Text that indicates that there's no favourite to show. The format placeholders are to showing it in different colors. -->
+    <string name="homepage_favourites_empty_hint">[B]No[/B] [A]favourites[/A] [B]found[/B]</string>
 </resources>

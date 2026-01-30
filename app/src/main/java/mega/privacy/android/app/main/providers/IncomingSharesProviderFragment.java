@@ -507,7 +507,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
 
                 if (parentHandle == -1) {
                     emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_arrow_up_glass);
-                    String textToShow = String.format(context.getString(R.string.context_empty_incoming));
+                    String textToShow = String.format(context.getString(mega.privacy.android.shared.resources.R.string.shares_screen_incoming_empty));
                     try {
                         textToShow = textToShow.replace(
                                 "[A]", "<font color=\'"

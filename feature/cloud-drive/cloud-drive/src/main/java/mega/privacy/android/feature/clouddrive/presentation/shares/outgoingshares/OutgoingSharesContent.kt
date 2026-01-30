@@ -29,12 +29,12 @@ import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPaddi
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 fun OutgoingSharesContent(
@@ -79,7 +79,7 @@ fun OutgoingSharesContent(
             uiState.isEmpty -> {
                 MegaEmptyView(
                     imagePainter = painterResource(iconPackR.drawable.ic_folder_arrow_down_glass),
-                    text = stringResource(R.string.context_empty_outgoing)
+                    text = stringResource(SharedR.string.shares_screen_outgoing_empty)
                 )
             }
 

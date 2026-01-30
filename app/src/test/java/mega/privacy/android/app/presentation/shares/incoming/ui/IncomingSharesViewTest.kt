@@ -5,17 +5,17 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
-import mega.privacy.android.icon.pack.R as iconPackR
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 @RunWith(AndroidJUnit4::class)
@@ -39,7 +39,7 @@ class IncomingSharesViewTest {
                 uiState = uiState,
                 emptyState = Pair(
                     iconPackR.drawable.ic_folder_arrow_down_glass,
-                    R.string.context_empty_outgoing
+                    SharedR.string.shares_screen_outgoing_empty
                 ),
                 onToggleAppBarElevation = {},
                 onItemClick = {},
@@ -74,7 +74,7 @@ class IncomingSharesViewTest {
                 uiState = uiState,
                 emptyState = Pair(
                     iconPackR.drawable.ic_folder_arrow_down_glass,
-                    R.string.context_empty_outgoing
+                    SharedR.string.shares_screen_outgoing_empty
                 ),
                 onToggleAppBarElevation = {},
                 onItemClick = {},

@@ -382,7 +382,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
         emptyRootText = TextUtil.formatEmptyScreenText(
             requireContext(),
-            getString(R.string.context_empty_incoming)
+            getString(sharedR.string.shares_screen_incoming_empty)
         )
         emptyGeneralText = TextUtil.formatEmptyScreenText(
             requireContext(),
