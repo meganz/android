@@ -33,13 +33,32 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.DoesHaveLinksUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendTextMessageUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkRemovePasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedDisabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedEnabledEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
+import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -47,26 +66,6 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
-import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedEnabledEvent
-import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFileButtonPressedDisabledEvent
-import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedEnabledEvent
-import mega.privacy.mobile.analytics.event.LinkSetExpiryDateFolderButtonPressedDisabledEvent
-import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonEnabledEvent
-import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFileButtonDisabledEvent
-import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonEnabledEvent
-import mega.privacy.mobile.analytics.event.LinkSendDecryptionKeyFolderButtonDisabledEvent
-import mega.privacy.mobile.analytics.event.LinkRemovePasswordFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkRemovePasswordFileButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSetPasswordFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkSetPasswordFileButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFileButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkConfirmPasswordFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkProFeatureSeePlanFileButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFolderButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkProFeatureSeeNotNowPlanFileButtonPressedEvent
-import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFolderDialogEvent
-import mega.privacy.mobile.analytics.event.LinkUpgradeToProFeatureFileDialogEvent
 
 /**
  * View Model used for manage data related to get or manage a link.
@@ -91,7 +90,6 @@ class GetLinkViewModel @Inject constructor(
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
-    private val doesHaveLinksUseCase: DoesHaveLinksUseCase,
     get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     sendTextMessageUseCase: SendTextMessageUseCase,
 ) : BaseLinkViewModel(get1On1ChatIdUseCase, sendTextMessageUseCase) {
@@ -272,7 +270,7 @@ class GetLinkViewModel @Inject constructor(
      * @return True if should show it, false otherwise.
      */
     suspend fun shouldShowCopyright(): Boolean = runCatching {
-        shouldShowCopyrightUseCase() && !doesHaveLinksUseCase()
+        shouldShowCopyrightUseCase()
     }.onFailure {
         Timber.e(it)
     }.getOrDefault(false)

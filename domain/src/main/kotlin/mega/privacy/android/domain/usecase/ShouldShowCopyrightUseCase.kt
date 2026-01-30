@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.media.DoesAlbumsHaveLinksUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.DoesHaveLinksUseCase
 import javax.inject.Inject
 
 /**
@@ -8,10 +10,13 @@ import javax.inject.Inject
  */
 class ShouldShowCopyrightUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
+    private val doesHaveLinksUseCase: DoesHaveLinksUseCase,
+    private val doesAlbumsHaveLinksUseCase: DoesAlbumsHaveLinksUseCase,
 ) {
 
     /**
      * Invoke
      */
-    suspend operator fun invoke() = accountRepository.shouldShowCopyright()
+    suspend operator fun invoke() =
+        accountRepository.shouldShowCopyright() && !doesHaveLinksUseCase() && !doesAlbumsHaveLinksUseCase()
 }

@@ -781,4 +781,12 @@ internal class DefaultAlbumRepository @Inject constructor(
         nodeId = NodeId(node()),
         albumId = AlbumId(setId()),
     )
+
+    override suspend fun haveLinks(): Boolean = withContext(ioDispatcher) {
+        val setList = megaApiGateway.getSets()
+        (0 until setList.size()).any { index ->
+            val set = setList.get(index)
+            set.type() == MegaSet.SET_TYPE_ALBUM && set.isExported
+        }
+    }
 }

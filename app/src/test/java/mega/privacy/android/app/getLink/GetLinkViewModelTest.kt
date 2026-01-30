@@ -14,16 +14,17 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
+import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.domain.usecase.node.publiclink.DoesHaveLinksUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -34,8 +35,7 @@ class GetLinkViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
     private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
-    private val shouldShowCopyrightUseCase = mock<mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase>()
-    private val doesHaveLinksUseCase = mock<DoesHaveLinksUseCase>()
+    private val shouldShowCopyrightUseCase = mock<ShouldShowCopyrightUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -56,7 +56,6 @@ class GetLinkViewModelTest {
             getBusinessStatusUseCase = mock(),
             getNodeByIdUseCase = getNodeByIdUseCase,
             shouldShowCopyrightUseCase = shouldShowCopyrightUseCase,
-            doesHaveLinksUseCase = doesHaveLinksUseCase,
             get1On1ChatIdUseCase = mock(),
             sendTextMessageUseCase = mock(),
         )
@@ -70,7 +69,6 @@ class GetLinkViewModelTest {
             hasSensitiveDescendantUseCase,
             hasSensitiveInheritedUseCase,
             shouldShowCopyrightUseCase,
-            doesHaveLinksUseCase
         )
     }
 
@@ -151,36 +149,14 @@ class GetLinkViewModelTest {
             }
         }
 
-    @Test
-    fun `test that shouldShowCopyright returns false when shouldShowCopyrightUseCase returns false`() =
+    @ParameterizedTest
+    @ValueSource(booleans = [true, false])
+    fun `test that the correct value is returned when checking the copyright visibility`(shouldShow: Boolean) =
         runTest {
-            whenever(shouldShowCopyrightUseCase()).thenReturn(false)
+            whenever(shouldShowCopyrightUseCase()) doReturn shouldShow
 
             val result = underTest.shouldShowCopyright()
 
-            assertThat(result).isFalse()
-            verify(doesHaveLinksUseCase, never()).invoke()
-        }
-
-    @Test
-    fun `test that shouldShowCopyright returns true when shouldShowCopyrightUseCase returns true and account has no links`() =
-        runTest {
-            whenever(shouldShowCopyrightUseCase()).thenReturn(true)
-            whenever(doesHaveLinksUseCase()).thenReturn(false)
-
-            val result = underTest.shouldShowCopyright()
-
-            assertThat(result).isTrue()
-        }
-
-    @Test
-    fun `test that shouldShowCopyright returns false when shouldShowCopyrightUseCase returns true and account has links`() =
-        runTest {
-            whenever(shouldShowCopyrightUseCase()).thenReturn(true)
-            whenever(doesHaveLinksUseCase()).thenReturn(true)
-
-            val result = underTest.shouldShowCopyright()
-
-            assertThat(result).isFalse()
+            assertThat(result).isEqualTo(shouldShow)
         }
 }

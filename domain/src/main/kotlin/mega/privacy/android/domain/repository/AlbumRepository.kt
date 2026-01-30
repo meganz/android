@@ -278,4 +278,11 @@ interface AlbumRepository {
      * @return a flow of all the Albums where its content has been updated
      */
     fun monitorUserSetsContentUpdate(): Flow<List<UserSet>>
+
+    /**
+     * Check if albums have links.
+     *
+     * @return true if albums have links.
+     */
+    suspend fun haveLinks(): Boolean
 }

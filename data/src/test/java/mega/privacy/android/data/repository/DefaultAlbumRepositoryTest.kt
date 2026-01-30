@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaSetList
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -705,6 +706,61 @@ class DefaultAlbumRepositoryTest {
             assertThat(userSets[0].id).isEqualTo(expectedUserSet.id)
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `test that true is returned when at least one album has links`() = runTest {
+        val megaSet1 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSet2 = mock<MegaSet> {
+            on { isExported } doReturn true
+        }
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 2
+            on { get(0) } doReturn megaSet1
+            on { get(1) } doReturn megaSet2
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isTrue()
+    }
+
+    @Test
+    fun `test that false is returned when no albums have links`() = runTest {
+        val megaSet1 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSet2 = mock<MegaSet> {
+            on { isExported } doReturn false
+        }
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 2
+            on { get(0) } doReturn megaSet1
+            on { get(1) } doReturn megaSet2
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isFalse()
+    }
+
+    @Test
+    fun `test that false is returned when no album exists`() = runTest {
+        val megaSetList = mock<MegaSetList> {
+            on { size() } doReturn 0
+        }
+        whenever(megaApiGateway.getSets()) doReturn megaSetList
+
+        underTest = createUnderTest(this)
+        val actual = underTest.haveLinks()
+
+        assertThat(actual).isFalse()
     }
 
     private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
