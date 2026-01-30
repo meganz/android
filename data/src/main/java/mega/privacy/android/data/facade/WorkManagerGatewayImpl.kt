@@ -77,6 +77,7 @@ class WorkManagerGatewayImpl @Inject constructor(
         val workRequest =
             OneTimeWorkRequest.Builder(workerClassGateway.deleteOldestCompletedTransferWorkerClass)
                 .addTag(DeleteOldestCompletedTransfersWorker.DELETE_OLDEST_TRANSFERS_WORKER_TAG)
+                .setInitialDelay(1.minutes.toJavaDuration()) // let's wait to don't affect performance on app start-up
                 .build()
 
         workManager.get()
