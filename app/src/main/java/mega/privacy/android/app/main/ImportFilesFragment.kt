@@ -18,6 +18,7 @@ import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAd
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Fragment for importing files.
@@ -178,7 +179,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
 
                 else -> {
                     getString(
-                        R.string.invalid_characters_defined,
+                        sharedR.string.general_invalid_characters_defined,
                         INVALID_CHARACTERS
                     )
                 }

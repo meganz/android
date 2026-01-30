@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.videosection
 
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
@@ -16,6 +15,7 @@ import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.videosection.view.playlist.CreateVideoPlaylistDialog
 import mega.privacy.android.app.presentation.videosection.view.playlist.ERROR_MESSAGE_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.playlist.POSITIVE_BUTTON_TEST_TAG
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,13 +67,13 @@ class CreateVideoPlaylistDialogKtTest {
     @Test
     fun `test that the error message is displayed correctly when errorMessage is invalid_characters_defined`() {
         setComposeContent(
-            errorMessage = R.string.invalid_characters_defined,
+            errorMessage = sharedR.string.general_invalid_characters_defined,
             isInputValid = { false }
         )
 
         composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG).assertTextEquals(
-            fromId(id = R.string.invalid_characters_defined).replace(
+            fromId(id = sharedR.string.general_invalid_characters_defined).replace(
                 "%1\$s",
                 StringsConstants.INVALID_CHARACTERS
             )

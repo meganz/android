@@ -201,7 +201,7 @@ fun CreateNewAlbumDialog(
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(end = 8.dp),
-                                text = if (it == R.string.invalid_characters_defined) {
+                                text = if (it == sharedR.string.general_invalid_characters_defined) {
                                     stringResource(id = it).replace(
                                         "%1\$s",
                                         StringsConstants.INVALID_CHARACTERS

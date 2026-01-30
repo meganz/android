@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.presentation.videosection.view.VIDEO_SECTION_LOADING_VIEW_TEST_TAG
 import mega.privacy.android.app.presentation.videosection.view.videotoplaylist.VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
@@ -222,7 +223,7 @@ class VideoToPlaylistViewTest {
 
 
         VIDEO_TO_PLAYLIST_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.isDisplayed()
-        composeTestRule.onNodeWithText(context.getString(R.string.general_create)).performClick()
+        composeTestRule.onNodeWithText(context.getString(sharedR.string.general_create_label)).performClick()
         verify(onDialogPositiveButtonClicked).invoke(anyOrNull())
     }
 }

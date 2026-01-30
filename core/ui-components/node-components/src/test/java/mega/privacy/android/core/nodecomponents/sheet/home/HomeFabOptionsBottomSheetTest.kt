@@ -67,7 +67,7 @@ class HomeFabOptionsBottomSheetTest {
             onNodeWithText(R.string.upload_folder).assertExists()
             onNodeWithText(R.string.menu_scan_document).assertExists()
             onNodeWithText(R.string.menu_take_picture).assertExists()
-            onNodeWithText(R.string.action_create_txt).assertExists()
+            onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_syn_button_option).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_backup_button_option).assertExists()
         }

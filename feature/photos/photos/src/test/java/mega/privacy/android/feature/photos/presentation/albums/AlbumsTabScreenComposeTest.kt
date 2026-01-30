@@ -122,7 +122,7 @@ class AlbumsTabScreenComposeTest {
             .assertIsDisplayed()
 
         composeTestRule
-            .onNodeWithText(context.getString(sharedResR.string.media_add_new_album_dialog_positive_button))
+            .onNodeWithText(context.getString(sharedResR.string.general_create_label))
             .performClick()
 
         verify(mockCallback).invoke(any())

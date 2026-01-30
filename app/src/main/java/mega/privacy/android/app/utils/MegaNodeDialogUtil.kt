@@ -21,7 +21,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
 import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -52,12 +51,13 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import java.util.Locale
-import mega.privacy.android.shared.resources.R as sharedResR
 
 object MegaNodeDialogUtil {
     private const val TYPE_RENAME = 0
@@ -110,8 +110,8 @@ object MegaNodeDialogUtil {
         val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
         renameDialogBuilder
-            .setTitle(context.getString(R.string.context_rename))
-            .setPositiveButton(R.string.context_rename, null)
+            .setTitle(context.getString(sharedR.string.context_rename))
+            .setPositiveButton(sharedR.string.context_rename, null)
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         return setFinalValuesAndShowDialog(
@@ -139,8 +139,8 @@ object MegaNodeDialogUtil {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
 
         newFolderDialogBuilder
-            .setTitle(R.string.menu_new_folder)
-            .setPositiveButton(R.string.general_create, null)
+            .setTitle(sharedR.string.general_new_folder)
+            .setPositiveButton(sharedR.string.general_create_label, null)
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
@@ -174,8 +174,8 @@ object MegaNodeDialogUtil {
         val newTxtFileDialogBuilder = MaterialAlertDialogBuilder(context)
 
         newTxtFileDialogBuilder
-            .setTitle(R.string.dialog_title_new_text_file)
-            .setPositiveButton(R.string.general_create, null)
+            .setTitle(sharedR.string.general_new_text_file)
+            .setPositiveButton(sharedR.string.general_create_label, null)
             .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
 
         val dialog = setFinalValuesAndShowDialog(
@@ -249,7 +249,7 @@ object MegaNodeDialogUtil {
                         }
 
                         TYPE_NEW_FOLDER -> {
-                            setHint(R.string.context_new_folder_name)
+                            setHint(sharedR.string.create_new_folder_dialog_hint_text)
                         }
 
                         TYPE_NEW_FILE -> {
@@ -352,7 +352,10 @@ object MegaNodeDialogUtil {
                 showDialogError(
                     typeText,
                     errorText,
-                    context.getString(R.string.invalid_characters_defined, INVALID_CHARACTERS)
+                    context.getString(
+                        sharedR.string.general_invalid_characters_defined,
+                        INVALID_CHARACTERS
+                    )
                 )
             }
 

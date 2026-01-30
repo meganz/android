@@ -212,8 +212,8 @@ fun VideoPlaylistDetailView(
             if (showRenameVideoPlaylistDialog) {
                 CreateVideoPlaylistDialog(
                     modifier = Modifier.testTag(DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
-                    positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                    title = stringResource(id = sharedR.string.context_rename),
+                    positiveButtonText = stringResource(id = sharedR.string.context_rename),
                     inputPlaceHolderText = { inputPlaceHolderText },
                     errorMessage = errorMessage,
                     onDialogInputChange = setInputValidity,

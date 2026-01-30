@@ -180,7 +180,7 @@ private fun RenameNodeDialogBody(
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onValueChange = { inputValue = it },
         errorText = errorMessage?.let { nonNullErrorMessage ->
-            if (nonNullErrorMessage == R.string.invalid_characters_defined) {
+            if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage, NODE_NAME_INVALID_CHARACTERS)
             } else {
                 stringResource(nonNullErrorMessage)
@@ -221,7 +221,7 @@ private fun PreviewRenameNodeDialogM3ViewError() {
         RenameNodeDialogM3View(
             uiState = RenameNodeDialogState(
                 nodeName = "document.pdf",
-                errorMessage = R.string.invalid_characters_defined
+                errorMessage = sharedR.string.general_invalid_characters_defined
             ),
             onLoadNodeName = {},
             resetRenameValidationPassed = {},

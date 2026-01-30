@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -31,7 +32,7 @@ class ImportFilesErrorMessageMapper @Inject constructor(
 
         hasWrongName -> {
             context.getString(
-                R.string.invalid_characters_defined,
+                sharedR.string.general_invalid_characters_defined,
                 INVALID_CHARACTERS
             )
         }

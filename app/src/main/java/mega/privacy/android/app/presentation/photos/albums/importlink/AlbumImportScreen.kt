@@ -767,7 +767,7 @@ private fun RenameAlbumDialog(
                 onClick = { onRename(text.trim()) },
                 content = {
                     Text(
-                        text = stringResource(id = R.string.context_rename),
+                        text = stringResource(id = sharedR.string.context_rename),
                         color = accent_900,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.W500,

@@ -87,7 +87,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         UploadOptionItem(
-            text = stringResource(id = R.string.action_create_txt),
+            text = stringResource(id = sharedResR.string.general_new_text_file),
             icon = IconPack.Medium.Thin.Outline.FilePlus02,
             testTag = TEST_TAG_NEW_TEXT_FILE_ACTION,
             onClick = {

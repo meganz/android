@@ -2,13 +2,13 @@ package mega.privacy.android.app.main.bottomsheets
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
 import mega.privacy.android.app.onNodeWithText
-import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.shared.resources.R as sharedResR
-import androidx.compose.ui.test.performClick
-import com.google.common.truth.Truth.assertThat
 import mega.privacy.mobile.analytics.event.HomeNewTextFileMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFilesMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.HomeUploadFolderMenuToolbarEvent
@@ -36,7 +36,8 @@ class HomeFabOptionsBottomSheetTest {
         composeRule.onNodeWithText(R.string.upload_folder).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.menu_scan_document).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.menu_take_picture).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.action_create_txt).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
+            .assertIsDisplayed()
         composeRule.onNodeWithText(sharedResR.string.settings_section_sync).assertExists()
             .assertIsDisplayed()
         composeRule.onNodeWithText(sharedResR.string.device_center_sync_add_new_syn_button_option)
@@ -66,7 +67,8 @@ class HomeFabOptionsBottomSheetTest {
     @Test
     fun `test that click the Create new text file option sends the right analytics tracker event`() {
         initComposeRule()
-        composeRule.onNodeWithText(R.string.action_create_txt).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
+            .assertIsDisplayed()
             .performClick()
         assertThat(analyticsRule.events).contains(HomeNewTextFileMenuToolbarEvent)
     }

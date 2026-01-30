@@ -38,7 +38,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.entity.photos.Album.GifAlbum
 import mega.privacy.android.domain.entity.photos.Album.RawAlbum
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.timeline.component.AlbumContentSkeletonView
@@ -370,8 +370,8 @@ internal fun AlbumContentScreen(
             val albumName = albumContentState.uiAlbum?.title?.getTitleString(context).orEmpty()
 
             CreateNewAlbumDialog(
-                titleResID = R.string.context_rename,
-                positiveButtonTextResID = R.string.context_rename,
+                titleResID = sharedResR.string.context_rename,
+                positiveButtonTextResID = sharedResR.string.context_rename,
                 onDismissRequest = {
                     albumContentViewModel.showRenameDialog(false)
                     albumContentViewModel.setNewAlbumNameValidity(true)

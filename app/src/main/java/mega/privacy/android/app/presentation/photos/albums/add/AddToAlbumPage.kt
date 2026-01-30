@@ -52,6 +52,7 @@ import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehavi
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body4
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun AddToAlbumPage(
@@ -76,7 +77,7 @@ internal fun AddToAlbumPage(
     if (isCreatingAlbum) {
         CreateNewAlbumDialog(
             titleResID = R.string.photos_album_creation_dialog_title,
-            positiveButtonTextResID = R.string.general_create,
+            positiveButtonTextResID = sharedR.string.general_create_label,
             onDismissRequest = {
                 onCancelAlbumCreation()
                 onClearAlbumNameErrorMessage()

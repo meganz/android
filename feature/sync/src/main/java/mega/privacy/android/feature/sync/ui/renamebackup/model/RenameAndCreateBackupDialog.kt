@@ -66,7 +66,7 @@ internal fun RenameAndCreateBackupDialogBody(
         message = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_text),
         hint = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_hint_text),
         text = initialInput,
-        confirmButtonText = stringResource(sharedR.string.sync_rename_and_create_backup_dialog_positive_button),
+        confirmButtonText = stringResource(sharedR.string.context_rename),
         cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onInputChange = {
             initialInput = it

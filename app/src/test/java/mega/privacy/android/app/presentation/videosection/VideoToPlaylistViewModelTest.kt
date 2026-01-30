@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel.Companion.ERROR_MESSAGE_REPEATED_TITLE
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
@@ -23,6 +22,7 @@ import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlayli
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaSet
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
@@ -251,7 +251,9 @@ class VideoToPlaylistViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.isInputTitleValid).isFalse()
-                assertThat(actual.createDialogErrorMessage).isEqualTo(R.string.invalid_characters_defined)
+                assertThat(actual.createDialogErrorMessage).isEqualTo(
+                    sharedR.string.general_invalid_characters_defined
+                )
                 cancelAndIgnoreRemainingEvents()
             }
         }

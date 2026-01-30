@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.photos.provider.PhotosCache.updateAlbums
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.photos.Album
@@ -42,7 +41,9 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumTitle
 import mega.privacy.android.feature.photos.presentation.albums.model.UIAlbum
+import mega.privacy.android.feature.photos.provider.PhotosCache.updateAlbums
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -617,7 +618,7 @@ class AlbumsViewModel @Inject constructor(
             errorMessage = R.string.photos_create_album_error_message_duplicate
         } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            errorMessage = sharedR.string.general_invalid_characters_defined
         }
 
         _state.update {

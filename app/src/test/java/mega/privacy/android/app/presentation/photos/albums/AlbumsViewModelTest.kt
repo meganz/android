@@ -36,13 +36,13 @@ import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.UIAlbumMapper
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -514,7 +514,7 @@ class AlbumsViewModelTest {
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
                     item.createDialogErrorMessage,
-                    R.string.invalid_characters_defined
+                    sharedR.string.general_invalid_characters_defined
                 )
             }
 

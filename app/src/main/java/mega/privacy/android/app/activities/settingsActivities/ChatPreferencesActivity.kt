@@ -76,7 +76,10 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
             }
             false
         }
-        input.setImeActionLabel(getString(R.string.general_create), EditorInfo.IME_ACTION_DONE)
+        input.setImeActionLabel(
+            getString(sharedR.string.general_create_label),
+            EditorInfo.IME_ACTION_DONE
+        )
         input.requestFocus()
         builder.setTitle(getString(R.string.title_dialog_set_autoaway_value))
         val set = v.findViewById<Button>(R.id.autoaway_set_button)

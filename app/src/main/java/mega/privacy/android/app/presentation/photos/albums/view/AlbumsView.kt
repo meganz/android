@@ -402,7 +402,7 @@ fun AlbumsView(
         if (albumsViewState.showCreateAlbumDialog) {
             CreateNewAlbumDialog(
                 titleResID = R.string.photos_album_creation_dialog_title,
-                positiveButtonTextResID = R.string.general_create,
+                positiveButtonTextResID = sharedR.string.general_create_label,
                 onDismissRequest = {
                     setShowCreateAlbumDialog(false)
                     setInputValidity(true)

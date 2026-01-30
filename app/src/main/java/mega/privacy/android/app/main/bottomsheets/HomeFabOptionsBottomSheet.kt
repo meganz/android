@@ -87,7 +87,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         MenuActionListTile(
-            text = stringResource(R.string.action_create_txt),
+            text = stringResource(sharedResR.string.general_new_text_file),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FilePlus02),
             dividerType = null,
             onActionClicked = {

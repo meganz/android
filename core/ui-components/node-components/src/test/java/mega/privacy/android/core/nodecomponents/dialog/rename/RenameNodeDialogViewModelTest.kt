@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -188,7 +189,7 @@ class RenameNodeDialogViewModelTest {
 
     private fun provideValidationParameters(): List<Pair<ValidNameType, Int>> = listOf(
         ValidNameType.BLANK_NAME to R.string.invalid_string,
-        ValidNameType.INVALID_NAME to R.string.invalid_characters_defined,
+        ValidNameType.INVALID_NAME to sharedR.string.general_invalid_characters_defined,
         ValidNameType.NAME_ALREADY_EXISTS to R.string.same_file_name_warning,
         ValidNameType.NO_EXTENSION to R.string.file_without_extension_warning,
     )

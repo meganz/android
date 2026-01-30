@@ -136,7 +136,7 @@ class AlbumsViewTest {
         composeRule.setContent {
             CreateNewAlbumDialog(
                 titleResID = R.string.photos_album_creation_dialog_title,
-                positiveButtonTextResID = R.string.general_create,
+                positiveButtonTextResID = sharedR.string.general_create_label,
                 onDismissRequest = onDismissRequest,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked
             )
@@ -155,13 +155,13 @@ class AlbumsViewTest {
         composeRule.setContent {
             CreateNewAlbumDialog(
                 titleResID = R.string.photos_album_creation_dialog_title,
-                positiveButtonTextResID = R.string.general_create,
+                positiveButtonTextResID = sharedR.string.general_create_label,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
             )
         }
 
-        composeRule.onNodeWithText(R.string.general_create).performClick()
+        composeRule.onNodeWithText(sharedR.string.general_create_label).performClick()
 
         verify(onDialogPositiveButtonClicked).invoke("")
     }
@@ -175,7 +175,7 @@ class AlbumsViewTest {
         composeRule.setContent {
             CreateNewAlbumDialog(
                 titleResID = R.string.photos_album_creation_dialog_title,
-                positiveButtonTextResID = R.string.general_create,
+                positiveButtonTextResID = sharedR.string.general_create_label,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 onDismissRequest = onDismissRequest,
                 inputPlaceHolderText = { fromId(inputPlaceholderText) }
@@ -184,7 +184,7 @@ class AlbumsViewTest {
 
         composeRule.onNodeWithText(inputPlaceholderText)
             .performTextInput(expectedAlbumName)
-        composeRule.onNodeWithText(R.string.general_create).performClick()
+        composeRule.onNodeWithText(sharedR.string.general_create_label).performClick()
 
         verify(onDialogPositiveButtonClicked).invoke(expectedAlbumName)
     }

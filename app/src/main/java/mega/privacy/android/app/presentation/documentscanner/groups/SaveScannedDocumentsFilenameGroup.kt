@@ -194,7 +194,7 @@ private fun getFilenameErrorMessage(
 ) = when (filenameValidationStatus) {
     ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
     ScanFilenameValidationStatus.InvalidFilename -> stringResource(
-        R.string.scan_snackbar_invalid_characters,
+        SharedR.string.general_invalid_characters_defined,
         "\" * / : < > ? \\ |"
     )
 

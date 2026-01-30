@@ -56,6 +56,7 @@ import mega.privacy.android.shared.original.core.ui.theme.accent_900
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_070
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_070
 import mega.privacy.android.shared.resources.R as SharedResources
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -411,7 +412,7 @@ internal fun ImagePreviewBottomSheet(
                 if (isRenameMenuVisible) {
                     MenuActionListTile(
                         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
-                        text = stringResource(id = R.string.context_rename),
+                        text = stringResource(id = sharedR.string.context_rename),
                         onActionClicked = onClickRename,
                         dividerType = null,
                         modifier = Modifier.testTag(IMAGE_PREVIEW_BOTTOM_SHEET_OPTION_RENAME),

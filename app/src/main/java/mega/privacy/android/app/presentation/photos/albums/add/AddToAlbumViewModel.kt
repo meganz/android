@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCa
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 @HiltViewModel
@@ -261,7 +262,7 @@ internal class AddToAlbumViewModel @Inject constructor(
                 } else if (albumName in state.value.existingAlbumNames) {
                     R.string.photos_create_album_error_message_duplicate
                 } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(albumName)) {
-                    R.string.invalid_characters_defined
+                    sharedR.string.general_invalid_characters_defined
                 } else {
                     null
                 }
@@ -398,7 +399,7 @@ internal class AddToAlbumViewModel @Inject constructor(
                 } else if (playlistName in state.value.existingPlaylistNames) {
                     -888
                 } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(playlistName)) {
-                    R.string.invalid_characters_defined
+                    sharedR.string.general_invalid_characters_defined
                 } else {
                     null
                 }

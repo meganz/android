@@ -240,11 +240,11 @@ internal class ApplyToAllDialogTest {
                 onApplyToCurrent = {},
                 onApplyToAll = {},
                 onCancel = {},
-                actionButtonStringRes = sharedR.string.sync_apply_all_dialog_rename_button
+                actionButtonStringRes = sharedR.string.context_rename
             )
         }
 
-        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.sync_apply_all_dialog_rename_button))
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.context_rename))
             .assertIsDisplayed()
     }
 

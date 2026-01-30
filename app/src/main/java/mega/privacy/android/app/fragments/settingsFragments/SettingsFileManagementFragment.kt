@@ -470,7 +470,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment(),
                 false
             }
             setImeActionLabel(
-                activity.getFormattedStringOrDefault(R.string.general_create),
+                activity.getFormattedStringOrDefault(sharedR.string.general_create_label),
                 EditorInfo.IME_ACTION_DONE
             )
             requestFocus()

@@ -92,7 +92,7 @@ class RenameNodeDialogViewModel @Inject constructor(
             }
 
             ValidNameType.INVALID_NAME -> {
-                _state.update { it.copy(errorMessage = R.string.invalid_characters_defined) }
+                _state.update { it.copy(errorMessage = sharedResR.string.general_invalid_characters_defined) }
             }
 
             ValidNameType.NAME_ALREADY_EXISTS -> {

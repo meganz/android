@@ -45,14 +45,14 @@
         <TextView
             android:id="@+id/new_folder_option"
             style="@style/BottomSheetOption"
-            android:text="@string/action_create_folder"
+            android:text="@string/general_new_folder"
             app:drawableStartCompat="@drawable/ic_folder_plus_01_medium_thin_outline" />
 
         <TextView
             android:id="@+id/new_txt_option"
             style="@style/BottomSheetOption"
             android:layout_width="match_parent"
-            android:text="@string/action_create_txt"
+            android:text="@string/general_new_text_file"
             app:drawableStartCompat="@drawable/ic_file_plus_02_medium_thin_outline" />
 
     </LinearLayout>

@@ -1,13 +1,9 @@
 package mega.privacy.android.core.nodecomponents.sheet.upload
 
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -28,6 +24,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveCaptureMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveNewFolderMenuToolbarEvent
 import mega.privacy.mobile.analytics.event.CloudDriveNewTextFileMenuToolbarEvent
@@ -108,7 +105,7 @@ fun UploadOptionsBottomSheet(
                 },
             )
             UploadOptionItem(
-                text = stringResource(id = R.string.menu_new_folder),
+                text = stringResource(id = sharedR.string.general_new_folder),
                 icon = IconPack.Medium.Thin.Outline.FolderPlus01,
                 testTag = TEST_TAG_NEW_FOLDER_ACTION,
                 onClick = {
@@ -118,7 +115,7 @@ fun UploadOptionsBottomSheet(
                 },
             )
             UploadOptionItem(
-                text = stringResource(id = R.string.action_create_txt),
+                text = stringResource(id = sharedR.string.general_new_text_file),
                 icon = IconPack.Medium.Thin.Outline.FilePlus02,
                 testTag = TEST_TAG_NEW_TEXT_FILE_ACTION,
                 onClick = {

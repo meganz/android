@@ -286,8 +286,8 @@ internal fun VideoPlaylistsTabScreen(
                             VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
                         ),
                         handle = selectedVideoPlaylist?.id?.longValue ?: -1,
-                        title = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
-                        positiveButtonText = stringResource(id = sharedR.string.video_section_playlists_rename_playlist_dialog_title),
+                        title = stringResource(id = sharedR.string.context_rename),
+                        positiveButtonText = stringResource(id = sharedR.string.context_rename),
                         onConfirm = { handle, title ->
                             updatedVideoPlaylistTitle(NodeId(handle), title)
                             showPlaylistBottomSheet = false

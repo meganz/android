@@ -14,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -61,8 +62,8 @@ class UploadOptionsBottomSheetTest {
             onNodeWithText(R.string.upload_folder).assertIsDisplayed()
             onNodeWithText(R.string.menu_scan_document).assertIsDisplayed()
             onNodeWithText(R.string.menu_take_picture).assertIsDisplayed()
-            onNodeWithText(R.string.menu_new_folder).assertIsDisplayed()
-            onNodeWithText(R.string.action_create_txt).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_new_folder).assertIsDisplayed()
+            onNodeWithText(sharedR.string.general_new_text_file).assertIsDisplayed()
         }
     }
 

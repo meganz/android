@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -298,7 +299,7 @@ internal class AlbumImportViewModel @Inject constructor(
             state.update {
                 it.copy(
                     renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = R.string.invalid_characters_defined,
+                        stringId = sharedR.string.general_invalid_characters_defined,
                         INVALID_CHARACTERS,
                     ).takeIf { isInvalid },
                 )

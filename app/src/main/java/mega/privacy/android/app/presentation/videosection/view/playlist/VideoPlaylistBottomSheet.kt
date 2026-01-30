@@ -16,7 +16,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +57,7 @@ internal fun RenameVideoPlaylistBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_RENAME_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
-        text = stringResource(id = R.string.video_section_playlists_rename_playlist_dialog_title),
+        text = stringResource(id = sharedR.string.context_rename),
         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Pen2),
         onActionClicked = onActionClicked,
     )
@@ -70,7 +70,7 @@ internal fun DeleteVideoPlaylistBottomSheetTile(
     MenuActionListTile(
         modifier = Modifier.testTag(VIDEO_PLAYLIST_DELETE_BOTTOM_SHEET_TILE_TEST_TAG),
         dividerType = null,
-        text = stringResource(id = R.string.video_section_playlist_bottom_sheet_option_title_delete),
+        text = stringResource(id = sharedR.string.video_section_playlist_bottom_sheet_option_title_delete),
         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash),
         onActionClicked = onActionClicked,
     )

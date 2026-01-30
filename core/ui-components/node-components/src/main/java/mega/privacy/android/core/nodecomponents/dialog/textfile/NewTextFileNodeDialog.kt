@@ -50,7 +50,7 @@ fun NewTextFileNodeDialog(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     BasicInputDialog(
-        title = stringResource(id = R.string.dialog_title_new_text_file),
+        title = stringResource(id = sharedR.string.general_new_text_file),
         modifier = modifier,
         suffix = {
             MegaText(
@@ -66,7 +66,7 @@ fun NewTextFileNodeDialog(
         },
         isAutoShowKeyboard = true,
         errorText = errorMessage,
-        positiveButtonText = stringResource(id = R.string.general_create),
+        positiveButtonText = stringResource(id = sharedR.string.general_create_label),
         onPositiveButtonClicked = {
             coroutineScope.launch {
                 viewModel.createTextFile(
@@ -85,7 +85,7 @@ fun NewTextFileNodeDialog(
                     errorMessage = when (it) {
                         is EmptyNodeNameException -> context.getString(R.string.invalid_string)
                         is InvalidNodeNameException -> context.getString(
-                            R.string.invalid_characters_defined, INVALID_CHARACTERS
+                            sharedR.string.general_invalid_characters_defined, INVALID_CHARACTERS
                         )
 
                         is NodeNameAlreadyExistsException -> context.getString(R.string.same_file_name_warning)

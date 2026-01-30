@@ -96,13 +96,13 @@ private fun RenameNodeDialogBody(
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         InputDialog(
             modifier = Modifier.testTag(RENAME_NODE_DIALOG_TAG),
-            title = stringResource(id = R.string.context_rename),
-            confirmButtonText = stringResource(id = R.string.context_rename),
+            title = stringResource(id = sharedR.string.context_rename),
+            confirmButtonText = stringResource(id = sharedR.string.context_rename),
             cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             text = initialInput,
             onInputChange = { initialInput = it },
             error = errorMessage?.let { nonNullErrorMessage ->
-                if (nonNullErrorMessage == R.string.invalid_characters_defined) {
+                if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                     stringResource(nonNullErrorMessage, NODE_NAME_INVALID_CHARACTERS)
                 } else {
                     stringResource(nonNullErrorMessage)

@@ -79,6 +79,7 @@ import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseC
 import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.PlaylistCreatedSuccessfullyEvent
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -953,7 +954,7 @@ class VideoSectionViewModel @Inject constructor(
             errorMessage = ERROR_MESSAGE_REPEATED_TITLE
         } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            errorMessage = sharedR.string.general_invalid_characters_defined
         }
 
         _state.update {

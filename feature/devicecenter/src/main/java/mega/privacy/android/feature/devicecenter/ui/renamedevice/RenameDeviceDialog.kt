@@ -103,7 +103,7 @@ private fun RenameDeviceDialogBody(
             initialInput = it
             onInputChange()
         },
-        positiveButtonText = stringResource(id = R.string.device_center_rename_device_dialog_positive_button),
+        positiveButtonText = stringResource(id = sharedR.string.context_rename),
         onPositiveButtonClicked = {
             onRenameConfirmed(initialInput)
         },
@@ -111,7 +111,7 @@ private fun RenameDeviceDialogBody(
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         inputValue = initialInput,
         errorText = uiState.errorMessage?.let { nonNullErrorMessage ->
-            if (nonNullErrorMessage == R.string.device_center_rename_device_dialog_error_message_invalid_characters) {
+            if (nonNullErrorMessage == sharedR.string.general_invalid_characters_defined) {
                 stringResource(nonNullErrorMessage).replace(
                     oldValue = "%1\$s",
                     newValue = "\" * / : < > ? \\ |"
@@ -153,6 +153,6 @@ private class RenameDeviceDialogBodyPreviewProvider : PreviewParameterProvider<R
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name),
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded),
             RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists),
-            RenameDeviceState(errorMessage = R.string.device_center_rename_device_dialog_error_message_invalid_characters),
+            RenameDeviceState(errorMessage = sharedR.string.general_invalid_characters_defined),
         )
 }

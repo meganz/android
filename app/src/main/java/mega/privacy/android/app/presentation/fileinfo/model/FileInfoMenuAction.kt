@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
-import mega.privacy.android.app.R
-import mega.privacy.android.icon.pack.IconPack
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionPlural
 import mega.android.core.ui.model.menu.MenuActionString
 import mega.android.core.ui.model.menu.MenuActionWithoutIcon
+import mega.privacy.android.app.R
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal sealed interface FileInfoMenuAction : MenuAction {
@@ -61,7 +61,7 @@ internal sealed interface FileInfoMenuAction : MenuAction {
 
     object Rename : MenuActionString(
         IconPack.Medium.Thin.Outline.Pen2,
-        R.string.context_rename,
+        sharedR.string.context_rename,
         TEST_TAG_RENAME_ACTION
     ), FileInfoMenuAction {
         override val orderInCategory = 110

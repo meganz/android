@@ -5,6 +5,7 @@ import android.content.res.Resources
 import com.google.common.truth.Truth
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -42,7 +43,7 @@ class ImportFilesErrorMessageMapperTest {
     fun `test that mapper returns invalid characters when wrong names are greater than 0`() {
         whenever(
             context.getString(
-                R.string.invalid_characters_defined,
+                sharedR.string.general_invalid_characters_defined,
                 StringsConstants.INVALID_CHARACTERS
             )
         ).thenReturn("The following characters are not allowed: / \\ < > : \" | ? *")

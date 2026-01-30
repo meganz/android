@@ -14,6 +14,7 @@ import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.usecase.backup.RenameDeviceUseCase
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.model.RenameDeviceState
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,7 +55,7 @@ class RenameDeviceViewModel @Inject constructor(
         } else if (trimmedName in existingDeviceNames) {
             _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
         } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
-            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_invalid_characters) }
+            _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
         } else {
             runCatching {
                 renameDeviceUseCase(

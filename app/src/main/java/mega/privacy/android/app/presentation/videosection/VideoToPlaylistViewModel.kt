@@ -20,6 +20,7 @@ import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlayli
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistSetsUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -131,7 +132,7 @@ class VideoToPlaylistViewModel @Inject constructor(
             errorMessage = ERROR_MESSAGE_REPEATED_TITLE
         } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
             isTitleValid = false
-            errorMessage = R.string.invalid_characters_defined
+            errorMessage = sharedR.string.general_invalid_characters_defined
         }
 
         _uiState.update {

@@ -56,7 +56,7 @@ fun NewFolderNodeDialog(
         errorMessage = when (it) {
             is EmptyNodeNameException -> context.getString(R.string.invalid_string)
             is InvalidNodeNameException -> context.getString(
-                R.string.invalid_characters_defined, INVALID_CHARACTERS
+                sharedR.string.general_invalid_characters_defined, INVALID_CHARACTERS
             )
 
             is NodeNameAlreadyExistsException -> context.getString(R.string.same_item_name_warning)
@@ -65,16 +65,16 @@ fun NewFolderNodeDialog(
     }
 
     BasicInputDialog(
-        title = stringResource(id = R.string.menu_new_folder),
+        title = stringResource(id = sharedR.string.general_new_folder),
         modifier = modifier,
-        inputLabel = stringResource(id = R.string.context_new_folder_name),
+        inputLabel = stringResource(id = sharedR.string.create_new_folder_dialog_hint_text),
         inputValue = folderName,
         onValueChange = { newValue ->
             folderName = newValue
             errorMessage = null
         },
         errorText = errorMessage,
-        positiveButtonText = stringResource(id = R.string.general_create),
+        positiveButtonText = stringResource(id = sharedR.string.general_create_label),
         onPositiveButtonClicked = {
             viewModel.createFolder(
                 folderName = folderName,

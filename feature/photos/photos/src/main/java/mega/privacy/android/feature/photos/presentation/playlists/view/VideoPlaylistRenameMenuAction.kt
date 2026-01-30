@@ -6,7 +6,7 @@ import androidx.compose.ui.res.stringResource
 import jakarta.inject.Inject
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.resources.R
+import mega.privacy.android.shared.resources.R as sharedR
 
 class VideoPlaylistRenameMenuAction @Inject constructor() : MenuActionWithIcon {
 
@@ -16,7 +16,7 @@ class VideoPlaylistRenameMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getDescription() =
-        stringResource(id = R.string.context_rename)
+        stringResource(id = sharedR.string.context_rename)
 
     override val testTag: String = "video_playlist_menu_action:rename_playlist"
 }

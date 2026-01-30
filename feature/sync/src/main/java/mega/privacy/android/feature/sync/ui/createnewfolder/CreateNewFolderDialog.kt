@@ -5,18 +5,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.InputDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
-import androidx.compose.ui.res.stringResource
-import de.palm.composestateevents.EventEffect
 
 @Composable
 internal fun CreateNewFolderDialog(
@@ -56,8 +56,8 @@ private fun CreateNewFolderDialogBody(
     onInputChange: (String) -> Unit = {},
 ) {
     InputDialog(
-        title = stringResource(sharedR.string.create_new_folder_dialog_title),
-        confirmButtonText = stringResource(sharedR.string.create_new_folder_dialog_confirm_button),
+        title = stringResource(sharedR.string.general_new_folder),
+        confirmButtonText = stringResource(sharedR.string.general_create_label),
         cancelButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onConfirm = onConfirm,
         onDismiss = onCancel,

@@ -18,7 +18,7 @@ internal class CreateNewFolderMenuAction @Inject constructor() : MenuActionWithI
 
     @Composable
     override fun getDescription() =
-        stringResource(id = sharedR.string.general_menu_create_new_folder)
+        stringResource(id = sharedR.string.general_new_folder)
 
     override val testTag: String
         get() = "menu_action:create_new_folder"

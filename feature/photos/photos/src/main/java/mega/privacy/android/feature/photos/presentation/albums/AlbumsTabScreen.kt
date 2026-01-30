@@ -167,7 +167,7 @@ internal fun AlbumsTabScreen(
                 onConfirm = addNewAlbum,
                 resetErrorMessage = resetErrorMessage,
                 errorText = (uiState.addNewAlbumErrorMessage as? StateEventWithContentTriggered)?.content,
-                positiveButtonText = stringResource(sharedR.string.media_add_new_album_dialog_positive_button),
+                positiveButtonText = stringResource(sharedR.string.general_create_label),
                 defaultSuggestion = { getPresetNewAlbumName(defaultAlbumName) }
             )
         }

@@ -39,7 +39,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
-import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.ActivityGroupChatPropertiesBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -87,6 +86,7 @@ import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCas
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -730,10 +730,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
             false
         }
-        input.setImeActionLabel(getString(R.string.context_rename), EditorInfo.IME_ACTION_DONE)
+        input.setImeActionLabel(
+            getString(sharedR.string.context_rename),
+            EditorInfo.IME_ACTION_DONE
+        )
 
-        builder.setTitle(R.string.context_rename)
-            .setPositiveButton(getString(R.string.context_rename), null)
+        builder.setTitle(sharedR.string.context_rename)
+            .setPositiveButton(getString(sharedR.string.context_rename), null)
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
             .setOnDismissListener {
