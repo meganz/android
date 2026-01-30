@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import org.junit.jupiter.api.Test
@@ -258,6 +259,146 @@ class CloudDriveUiStateTest {
         val state = CloudDriveUiState(items = items)
 
         assertThat(state.isAllSelected).isTrue()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns true when all conditions are met`() {
+        val items = createTestItems(
+            selected = listOf(false, false),
+            sensitive = listOf(false, false)
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isTrue()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns false when hasWritePermission is false`() {
+        val items = createTestItems(
+            selected = listOf(false, false),
+            sensitive = listOf(false, false)
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns false when nodeSourceType is RUBBISH_BIN`() {
+        val items = createTestItems(
+            selected = listOf(false, false),
+            sensitive = listOf(false, false)
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = true,
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns false when in selection mode`() {
+        val items = createTestItems(
+            selected = listOf(true, false),
+            sensitive = listOf(false, false)
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns false when empty`() {
+        val items = createTestItems(
+            selected = listOf(),
+            sensitive = listOf()
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns true when empty but loading`() {
+        val items = createTestItems(
+            selected = listOf(),
+            sensitive = listOf()
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodesLoadingState = NodesLoadingState.Loading,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isTrue()
+    }
+
+    @Test
+    fun `test that isUploadAllowed returns false when multiple conditions fail`() {
+        val items = createTestItems(
+            selected = listOf(true),
+            sensitive = listOf(false)
+        )
+
+        val state = CloudDriveUiState(
+            items = items,
+            hasWritePermission = false,
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            nodesLoadingState = NodesLoadingState.FullyLoaded,
+            isHiddenNodeSettingsLoading = false,
+            showHiddenNodes = false,
+            isHiddenNodesEnabled = true
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
     }
 
     private fun createTestItems(

@@ -155,7 +155,7 @@ fun CloudDriveScreen(
         floatingActionButton = {
             AddContentFab(
                 modifier = Modifier.testTag(CLOUD_DRIVE_FAB_TAG),
-                visible = uiState.hasWritePermission && !uiState.isInSelectionMode && !uiState.isEmpty,
+                visible = uiState.isUploadAllowed,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
                     showUploadOptionsBottomSheet = true

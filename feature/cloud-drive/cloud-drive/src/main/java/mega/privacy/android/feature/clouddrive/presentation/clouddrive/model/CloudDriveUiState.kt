@@ -112,6 +112,14 @@ data class CloudDriveUiState(
      */
     val selectedNodes: List<TypedNode>
         get() = items.mapNotNull { if (it.isSelected) it.node else null }
+
+    /**
+     * True if upload is allowed in the current folder
+     */
+    val isUploadAllowed = hasWritePermission
+            && nodeSourceType != NodeSourceType.RUBBISH_BIN
+            && !isInSelectionMode
+            && !isEmpty
 }
 
 /**
