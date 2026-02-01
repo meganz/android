@@ -31,7 +31,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.advertisements.GoogleAdsManager
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.filelink.view.FileLinkView
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
@@ -45,6 +44,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
@@ -240,7 +240,7 @@ class FileLinkComposeActivity : PasscodeActivity(),
         val intent = Intent(this, LoginActivity::class.java)
         intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
         intent.data = Uri.parse(viewModel.state.value.url)
-        intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL
+        intent.action = Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
         finish()

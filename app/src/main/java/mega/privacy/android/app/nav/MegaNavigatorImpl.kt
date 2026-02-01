@@ -284,7 +284,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
             putExtra(Constants.CHAT_ID, chatId)
             messageId?.let { putExtra(Constants.ID_MSG, messageId) }
-            isOverQuota?.let { putExtra(Constants.IS_OVERQUOTA, isOverQuota) }
+            isOverQuota?.let { putExtra(Constants.IS_OVER_QUOTA, isOverQuota) }
             // Use setFlags for consistency with ChatHostDestination
             if (flags > 0) {
                 setFlags(flags)

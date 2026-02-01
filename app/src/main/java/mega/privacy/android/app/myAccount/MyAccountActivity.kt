@@ -60,7 +60,7 @@ import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS_FROM_LINK
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVERQUOTA
+import mega.privacy.android.app.utils.Constants.NOTIFICATION_STORAGE_OVER_QUOTA
 import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.Util.isDarkMode
@@ -321,7 +321,7 @@ internal class MyAccountActivity : PasscodeActivity(),
         super.onPostResume()
         try {
             (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).cancel(
-                NOTIFICATION_STORAGE_OVERQUOTA
+                NOTIFICATION_STORAGE_OVER_QUOTA
             )
         } catch (e: Exception) {
             Timber.e(e, "Exception NotificationManager - remove all notifications")

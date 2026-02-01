@@ -110,7 +110,7 @@ class CallService : LifecycleService() {
     private var mBuilderCompat: NotificationCompat.Builder? = null
     private var mNotificationManager: NotificationManager? = null
     private var mBuilderCompatO: NotificationCompat.Builder? = null
-    private val notificationChannelId = Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID
+    private val notificationChannelId = Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_ID
     private var myUserHandle: Long = MEGACHAT_INVALID_HANDLE
 
     /**
@@ -484,7 +484,7 @@ class CallService : LifecycleService() {
 
                 val channel = NotificationChannel(
                     notificationChannelId,
-                    Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
+                    Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT
                 )
 

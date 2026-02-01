@@ -43,7 +43,7 @@ import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActi
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
-import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -109,6 +109,7 @@ import mega.privacy.android.domain.usecase.transfers.GetUsedTransferStatusUseCas
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatusUseCase
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumberUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -118,7 +119,6 @@ import nz.mega.sdk.MegaUtilsAndroid
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * My account view model
@@ -1086,7 +1086,7 @@ class MyAccountViewModel @Inject constructor(
             runCatching {
                 isUrlMatchesRegexUseCase(
                     url = confirmationLink,
-                    patterns = CANCEL_ACCOUNT_LINK_REGEXS,
+                    patterns = CANCEL_ACCOUNT_LINK_REGEX_ARRAY,
                 )
             }.onSuccess { isMatching ->
                 Timber.d(
@@ -1185,7 +1185,7 @@ class MyAccountViewModel @Inject constructor(
         runCatching {
             isUrlMatchesRegexUseCase(
                 url = confirmationLink,
-                patterns = Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS,
+                patterns = Constants.VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY,
             )
         }.onSuccess { isMatching ->
             Timber.d(

@@ -44,7 +44,7 @@ import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
 import mega.privacy.android.app.utils.CallUtil.showConfirmationInACall
-import mega.privacy.android.app.utils.Constants.ACCOUNT_INVITATION_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.ACCOUNT_INVITATION_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.ACTION_CANCEL_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_CHANGE_MAIL
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SUMMARY
@@ -58,37 +58,37 @@ import mega.privacy.android.app.utils.Constants.ACTION_OPEN_HANDLE_NODE
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_MEGA_LINK
 import mega.privacy.android.app.utils.Constants.ACTION_RESET_PASS
-import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.ALBUM_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.BUSINESS_INVITE_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.CHAT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_MEETING_LINK
 import mega.privacy.android.app.utils.Constants.CHECK_LINK_TYPE_UNKNOWN_LINK
-import mega.privacy.android.app.utils.Constants.CONFIRMATION_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CONFIRMATION_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CONTACT_HANDLE
-import mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.CONTACT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.CREATE_ACCOUNT_FRAGMENT
 import mega.privacy.android.app.utils.Constants.EMAIL
-import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.EXPORT_MASTER_KEY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.EXPORT_MASTER_KEY_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.EXTRA_CONFIRMATION
-import mega.privacy.android.app.utils.Constants.FILE_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.HANDLE_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.FILE_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.HANDLE_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.LINK_IS_FOR_MEETING
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
-import mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.MEGA_DROP_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.MEGA_FILE_REQUEST_LINK_REGEXES
-import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.MEGA_DROP_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.MEGA_FILE_REQUEST_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT
-import mega.privacy.android.app.utils.Constants.PASSWORD_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.PENDING_CONTACTS_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGEXS
-import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.PASSWORD_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.PENDING_CONTACTS_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.RESET_PASSWORD_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.REVERT_CHANGE_PASSWORD_LINK_REGEX_ARRAY
+import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
-import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.WEB_SESSION_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrl
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.matchRegexs
@@ -280,7 +280,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 setError(getString(R.string.open_link_not_valid_link))
             }
             // Album link
-            matchRegexs(url, ALBUM_LINK_REGEXS) -> {
+            matchRegexs(url, ALBUM_LINK_REGEX_ARRAY) -> {
                 lifecycleScope.launch {
                     val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
                         context = this@OpenLinkActivity,
@@ -293,33 +293,33 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Email verification link
-            matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS) -> {
+            matchRegexs(url, EMAIL_VERIFY_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open email verification link")
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
                 openWebLink(url)
             }
             // Web session link
-            matchRegexs(url, WEB_SESSION_LINK_REGEXS) -> {
+            matchRegexs(url, WEB_SESSION_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open web session link")
                 openWebLink(url)
             }
 
-            matchRegexs(url, BUSINESS_INVITE_LINK_REGEXS) -> {
+            matchRegexs(url, BUSINESS_INVITE_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open business invite link")
                 openWebLink(url)
             }
             //MEGA DROP link
-            matchRegexs(url, MEGA_DROP_LINK_REGEXS) -> {
+            matchRegexs(url, MEGA_DROP_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open MEGA drop link")
                 openWebLinkInBrowser(url)
             }
             //MEGA File Request
-            matchRegexs(url, MEGA_FILE_REQUEST_LINK_REGEXES) -> {
+            matchRegexs(url, MEGA_FILE_REQUEST_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open MEGA file request link")
                 openWebLinkInBrowser(url)
             }
             // File link
-            matchRegexs(url, FILE_LINK_REGEXS) -> {
+            matchRegexs(url, FILE_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open link url")
                 val intent =
                     Intent(this@OpenLinkActivity, FileLinkComposeActivity::class.java).apply {
@@ -335,7 +335,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 finish()
             }
             // Confirmation link
-            matchRegexs(url, CONFIRMATION_LINK_REGEXS) -> {
+            matchRegexs(url, CONFIRMATION_LINK_REGEX_ARRAY) -> {
                 Timber.d("Confirmation url")
                 urlConfirmationLink = url
                 MegaApplication.urlConfirmationLink = urlConfirmationLink
@@ -346,7 +346,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Folder Download link
-            matchRegexs(url, FOLDER_LINK_REGEXS) -> {
+            matchRegexs(url, FOLDER_LINK_REGEX_ARRAY) -> {
                 val intent = Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
                 startActivity(
                     intent
@@ -361,7 +361,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 finish()
             }
             // Chat link or Meeting link
-            matchRegexs(url, CHAT_LINK_REGEXS) -> {
+            matchRegexs(url, CHAT_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open chat url")
                 if (isLoggedIn) {
                     Timber.d("Logged IN")
@@ -387,7 +387,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Password link
-            matchRegexs(url, PASSWORD_LINK_REGEXS) -> {
+            matchRegexs(url, PASSWORD_LINK_REGEX_ARRAY) -> {
                 Timber.d("Link with password url")
                 startActivity(
                     Intent(this, OpenPasswordLinkActivity::class.java)
@@ -397,7 +397,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 finish()
             }
             // Create account invitation - user must be logged OUT
-            matchRegexs(url, ACCOUNT_INVITATION_LINK_REGEXS) -> {
+            matchRegexs(url, ACCOUNT_INVITATION_LINK_REGEX_ARRAY) -> {
                 Timber.d("New signup url")
                 if (isLoggedIn) {
                     Timber.d("Logged IN")
@@ -409,7 +409,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Export Master Key link - user must be logged IN
-            matchRegexs(url, EXPORT_MASTER_KEY_LINK_REGEXS) -> {
+            matchRegexs(url, EXPORT_MASTER_KEY_LINK_REGEX_ARRAY) -> {
                 Timber.d("Export master key url")
                 if (isLoggedIn) { //Check fetch nodes is already done in ManagerActivity
                     Timber.d("Logged IN")
@@ -424,7 +424,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // New message chat- user must be logged IN
-            matchRegexs(url, NEW_MESSAGE_CHAT_LINK_REGEXS) -> {
+            matchRegexs(url, NEW_MESSAGE_CHAT_LINK_REGEX_ARRAY) -> {
                 Timber.d("New message chat url")
                 if (isLoggedIn) { //Check fetch nodes is already done in ManagerActivity
                     Timber.d("Logged IN")
@@ -439,7 +439,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Cancel account  - user must be logged IN
-            matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEXS) -> {
+            matchRegexs(url, CANCEL_ACCOUNT_LINK_REGEX_ARRAY) -> {
                 Timber.d("Cancel account url")
                 if (isLoggedIn) {
                     if (needsRefreshSession) {
@@ -465,7 +465,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Verify change mail - user must be logged IN
-            matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEXS) -> {
+            matchRegexs(url, VERIFY_CHANGE_MAIL_LINK_REGEX_ARRAY) -> {
                 Timber.d("Verify mail url")
                 if (isLoggedIn) {
                     if (needsRefreshSession) {
@@ -489,12 +489,12 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             // Reset password - two options: logged IN or OUT
-            matchRegexs(url, RESET_PASSWORD_LINK_REGEXS) && matchesRecoveryUrl(url).not() -> {
+            matchRegexs(url, RESET_PASSWORD_LINK_REGEX_ARRAY) && matchesRecoveryUrl(url).not() -> {
                 Timber.d("Reset pass url")
                 viewModel.queryResetPasswordLink(url.orEmpty())
             }
             // Pending contacts
-            matchRegexs(url, PENDING_CONTACTS_LINK_REGEXS) -> {
+            matchRegexs(url, PENDING_CONTACTS_LINK_REGEX_ARRAY) -> {
                 Timber.d("Pending contacts url")
                 if (isLoggedIn) {
                     if (needsRefreshSession) {
@@ -518,13 +518,13 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
 
-            matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEXS)
-                    || matchRegexs(url, MEGA_BLOG_LINK_REGEXS) -> {
+            matchRegexs(url, REVERT_CHANGE_PASSWORD_LINK_REGEX_ARRAY)
+                    || matchRegexs(url, MEGA_BLOG_LINK_REGEX_ARRAY) -> {
                 Timber.d("Open revert password change link: $url")
                 openWebLink(url)
             }
 
-            matchRegexs(url, HANDLE_LINK_REGEXS) -> {
+            matchRegexs(url, HANDLE_LINK_REGEX_ARRAY) -> {
                 Timber.d("Handle link url")
                 if (isLoggedIn) {
                     startActivity(
@@ -540,7 +540,7 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
                 }
             }
             //Contact link
-            matchRegexs(url, CONTACT_LINK_REGEXS) -> {
+            matchRegexs(url, CONTACT_LINK_REGEX_ARRAY) -> {
                 if (isLoggedIn) {
                     url?.split("C!")?.get(1)?.let {
                         startActivity(

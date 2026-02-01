@@ -113,7 +113,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             megaNavigator.getPendingIntentConsideringSingleActivityWithDestination<ManagerActivity, OverQuotaDialogNavKey>(
                 context = context,
                 createPendingIntent = { intent ->
-                    intent.action = Constants.ACTION_OVERQUOTA_STORAGE
+                    intent.action = Constants.ACTION_OVER_QUOTA_STORAGE
                     intent.createPendingIntent()
                 },
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }

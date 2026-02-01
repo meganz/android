@@ -27,7 +27,7 @@ class IsUrlMatchesRegexUseCaseTest {
     fun `test that when url does matches regex pattern should accept url`(
         urlToCheck: String,
     ) {
-        assertThat(underTest(urlToCheck, Constants.MEGA_REGEXS)).isTrue()
+        assertThat(underTest(urlToCheck, Constants.MEGA_REGEX_ARRAY)).isTrue()
     }
 
     @ParameterizedTest(name = "type: {0}")
@@ -35,7 +35,7 @@ class IsUrlMatchesRegexUseCaseTest {
     fun `test that when url does NOT matches regex pattern should NOT accept url`(
         urlToCheck: String,
     ) {
-        assertThat(IsUrlMatchesRegexUseCase().invoke(urlToCheck, Constants.MEGA_REGEXS)).isFalse()
+        assertThat(IsUrlMatchesRegexUseCase().invoke(urlToCheck, Constants.MEGA_REGEX_ARRAY)).isFalse()
     }
 
     private fun acceptedUrl(): Stream<Arguments> = Stream.of(

@@ -144,11 +144,11 @@ class ManagerRedirectIntentMapper @Inject constructor(private val activity: Acti
                     data = intent.dataString?.let { Uri.parse(it) } ?: return null
                 }
 
-            Constants.ACTION_OVERQUOTA_STORAGE -> Intent(activity, LoginActivity::class.java)
+            Constants.ACTION_OVER_QUOTA_STORAGE -> Intent(activity, LoginActivity::class.java)
                 .apply {
                     putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
                     flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    action = Constants.ACTION_OVERQUOTA_STORAGE
+                    action = Constants.ACTION_OVER_QUOTA_STORAGE
                 }
 
             Constants.ACTION_OPEN_CONTACTS_SECTION -> Intent(activity, LoginActivity::class.java)

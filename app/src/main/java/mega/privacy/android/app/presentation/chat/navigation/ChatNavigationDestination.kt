@@ -43,7 +43,7 @@ private fun createChatIntent(context: Context, key: ChatNavKey): Intent {
         key.link?.let { putExtra(EXTRA_LINK, it) }
         key.snackbarText?.let { putExtra(Constants.SHOW_SNACKBAR, it) }
         key.messageId?.let { putExtra(Constants.ID_MSG, it) }
-        key.isOverQuota?.let { putExtra(Constants.IS_OVERQUOTA, it) }
+        key.isOverQuota?.let { putExtra(Constants.IS_OVER_QUOTA, it) }
     }
 
 }

@@ -53,7 +53,7 @@ import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_BUCKET_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECETS_BUCKET
+import mega.privacy.android.app.utils.Constants.VIEWER_FROM_RECENTS_BUCKET
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.isGif
@@ -187,7 +187,7 @@ class RecentActionBucketFragment : Fragment() {
 
         observeAnimatedItems()
 
-        observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECETS_BUCKET)
+        observeDragSupportEvents(viewLifecycleOwner, listView, VIEWER_FROM_RECENTS_BUCKET)
     }
 
     private fun setupListView(nodes: List<NodeItem>) {
@@ -343,7 +343,7 @@ class RecentActionBucketFragment : Fragment() {
         val intent = Intent(context, PdfViewerActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_INSIDE, true)
         intent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, RECENTS_BUCKET_ADAPTER)
-        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECETS_BUCKET, adapter ?: return)
+        putThumbnailLocation(intent, listView, index, VIEWER_FROM_RECENTS_BUCKET, adapter ?: return)
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
@@ -428,7 +428,7 @@ class RecentActionBucketFragment : Fragment() {
             intent,
             listView,
             index,
-            VIEWER_FROM_RECETS_BUCKET,
+            VIEWER_FROM_RECENTS_BUCKET,
             adapter ?: return@launch
         )
         startActivity(intent)

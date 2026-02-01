@@ -69,12 +69,12 @@ class CameraUploadsNotificationManager @Inject constructor(
         private const val NOT_ENOUGH_STORAGE_NOTIFICATION_ID =
             Constants.NOTIFICATION_NOT_ENOUGH_STORAGE
         private const val OVER_STORAGE_QUOTA_NOTIFICATION_ID =
-            Constants.NOTIFICATION_STORAGE_OVERQUOTA
+            Constants.NOTIFICATION_STORAGE_OVER_QUOTA
         private const val NO_WIFI_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_WIFI_CONNECTION
         private const val NO_NETWORK_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_NETWORK_CONNECTION
-        private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVERQUOTA_STORAGE
+        private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVER_QUOTA_STORAGE
     }
 
     /**

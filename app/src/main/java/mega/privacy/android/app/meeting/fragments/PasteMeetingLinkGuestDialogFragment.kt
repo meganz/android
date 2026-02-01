@@ -1,6 +1,5 @@
 package mega.privacy.android.app.meeting.fragments
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
@@ -20,6 +19,7 @@ import mega.privacy.android.app.presentation.openlink.OpenLinkActivity
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 
 class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
@@ -73,7 +73,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
             // Meeting Link and Chat Link are exactly the same format.
             // Using extra approach(getMegaHandleList of openChatPreview())
             // to judge if its a meeting link later on
-            if (Util.matchRegexs(meetingLink, Constants.CHAT_LINK_REGEXS)) {
+            if (Util.matchRegexs(meetingLink, Constants.CHAT_LINK_REGEX_ARRAY)) {
                 // Need to call the async checkChatLink() to check if the chat has a call and
                 // get the meeting name
                 // Delegate the checking to OpenLinkActivity

@@ -45,4 +45,4 @@ private val whitelistedURL = listOf(
 @Deprecated("Use IsUrlMatchesRegexUseCase and IsUrlWhitelistedUseCase instead")
 fun String?.isURLSanitized(): Boolean =
     !this.isNullOrBlank() &&
-            (Util.matchRegexs(this, Constants.MEGA_REGEXS) || whitelistedURL.contains(this))
+            (Util.matchRegexs(this, Constants.MEGA_REGEX_ARRAY) || whitelistedURL.contains(this))

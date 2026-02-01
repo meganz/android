@@ -580,7 +580,7 @@ class ChatAdvancedNotificationBuilder(
         }
         val notificationBuilderO = NotificationCompat.Builder(
             context,
-            Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_ID
+            Constants.NOTIFICATION_CHANNEL_IN_PROGRESS_MISSED_CALLS_ID
         )
         notificationBuilderO
             .setSmallIcon(mega.privacy.android.icon.pack.R.drawable.ic_stat_notify)

@@ -16,11 +16,11 @@ import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivit
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
-import mega.privacy.android.shared.resources.R as sharedR
 
 class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
     private var progressBar: ProgressBar? = null
@@ -104,14 +104,14 @@ class OpenPasswordLinkActivity : PasscodeActivity(), DecryptDialogListener {
         if (e.errorCode == MegaError.API_OK && !TextUtil.isTextEmpty(decryptedLink)) {
             var intent: Intent? = null
 
-            if (Util.matchRegexs(decryptedLink, Constants.FOLDER_LINK_REGEXS)) {
+            if (Util.matchRegexs(decryptedLink, Constants.FOLDER_LINK_REGEX_ARRAY)) {
                 Timber.d("Folder link url")
                 intent = Intent(
                     this@OpenPasswordLinkActivity,
                     FolderLinkComposeActivity::class.java
                 )
                 intent.setAction(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
-            } else if (Util.matchRegexs(decryptedLink, Constants.FILE_LINK_REGEXS)) {
+            } else if (Util.matchRegexs(decryptedLink, Constants.FILE_LINK_REGEX_ARRAY)) {
                 Timber.d("Open link url")
                 intent = Intent(
                     this@OpenPasswordLinkActivity,

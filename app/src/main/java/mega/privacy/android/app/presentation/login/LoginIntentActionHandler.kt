@@ -412,8 +412,8 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                         intentDataString = dataString
                                     }
 
-                                    Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
-                                    Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
+                                    Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL,
+                                    Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL,
                                         -> {
                                         intentData = data
                                     }
@@ -425,14 +425,14 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                     val bundle = Bundle()
 
                                     when (intentAction) {
-                                        Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+                                        Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL -> {
                                             newIntent = getFileLinkIntent(activity)
                                             newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                             intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                             newIntent.data = intentData
                                         }
 
-                                        Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+                                        Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL -> {
                                             newIntent = getFolderLinkIntent(activity)
                                             newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                             intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
@@ -501,14 +501,14 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
 
                         intentAction?.let {
                             when (intentAction) {
-                                Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+                                Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL -> {
                                     newIntent = getFileLinkIntent(activity)
                                     newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                     intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                     newIntent.data = intentData
                                 }
 
-                                Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+                                Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL -> {
                                     newIntent = getFolderLinkIntent(activity)
                                     newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                     intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
@@ -695,13 +695,13 @@ private fun handleLinkNavigation(
                 intentExtras?.let { bundle = intentExtras }
             }
 
-            Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
+            Constants.ACTION_OPEN_FILE_LINK_ROOT_NODES_NULL -> {
                 intent = getFileLinkIntent(activity)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 intent.data = intentData
             }
 
-            Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
+            Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL -> {
                 intent = getFolderLinkIntent(activity)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 intent.action = Constants.ACTION_OPEN_MEGA_FOLDER_LINK

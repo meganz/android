@@ -2722,11 +2722,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     finish()
                 }
 
-                Constants.ACTION_OVERQUOTA_STORAGE -> {
+                Constants.ACTION_OVER_QUOTA_STORAGE -> {
                     showOverQuotaAlert(false)
                 }
 
-                Constants.ACTION_PRE_OVERQUOTA_STORAGE -> {
+                Constants.ACTION_PRE_OVER_QUOTA_STORAGE -> {
                     showOverQuotaAlert(true)
                 }
 

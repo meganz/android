@@ -29,7 +29,7 @@ import mega.privacy.android.app.databinding.ActivityWebViewBinding
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.EMAIL_VERIFY_LINK_REGEX_ARRAY
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
@@ -162,7 +162,7 @@ class WebViewActivity : BaseActivity() {
                 }
             }
 
-            if (Util.matchRegexs(url, EMAIL_VERIFY_LINK_REGEXS)) {
+            if (Util.matchRegexs(url, EMAIL_VERIFY_LINK_REGEX_ARRAY)) {
                 MegaApplication.setIsWebOpenDueToEmailVerification(true)
             }
 

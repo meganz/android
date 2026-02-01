@@ -58,8 +58,8 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.ColorUtils.setStatusBarTextColor
 import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_STRING
 import mega.privacy.android.app.utils.Constants.ACCOUNT_BLOCKED_TYPE
-import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
+import mega.privacy.android.app.utils.Constants.ACTION_OVER_QUOTA_STORAGE
+import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVER_QUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_UPGRADE_ACCOUNT
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
@@ -1160,7 +1160,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     protected fun launchOverQuota() {
         megaNavigator.openManagerActivity(
             context = this,
-            action = ACTION_OVERQUOTA_STORAGE,
+            action = ACTION_OVER_QUOTA_STORAGE,
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
             singleActivityDestination = OverQuotaDialogNavKey(true)
         )
@@ -1173,7 +1173,7 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
     protected fun launchPreOverQuota() {
         megaNavigator.openManagerActivity(
             context = this@BaseActivity,
-            action = ACTION_PRE_OVERQUOTA_STORAGE,
+            action = ACTION_PRE_OVER_QUOTA_STORAGE,
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
             singleActivityDestination = OverQuotaDialogNavKey(false)
         )
