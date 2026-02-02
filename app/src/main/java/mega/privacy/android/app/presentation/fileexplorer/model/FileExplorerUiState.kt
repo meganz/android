@@ -19,6 +19,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
  * decides to back out of the process
  * @property shouldFinishScreen true if the File Explorer should be finished
  * @property isAskingForCollisionsResolution true if the app is asking for name collisions resolution, false otherwise.
+ * @property nonCollidedFilesUploadedCount number of non-collided files that were uploaded (tracked when upload completes while collision resolution is in progress)
  * @property nodeUpdatedEvent event triggered when nodes have been updated
  */
 data class FileExplorerUiState(
@@ -29,6 +30,7 @@ data class FileExplorerUiState(
     val isScanUploadingAborted: Boolean = false,
     val shouldFinishScreen: Boolean = false,
     val isAskingForCollisionsResolution: Boolean = false,
+    val nonCollidedFilesUploadedCount: Int = 0,
     val nodeUpdatedEvent: StateEvent = consumed,
     val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
 ) {

@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.node.namecollision.NodeNameCollisionRe
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -158,7 +159,19 @@ class NameCollisionActivity : PasscodeActivity() {
                 onConsumeEvent = { },
             ) { transferEvent ->
                 ((transferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.CollidedFiles).let {
-                    setResult(NameCollisionActionResult(shouldFinish = viewModel.shouldFinish()))
+                    val uploadedFilesCount = viewModel.getUploadedFilesCount()
+                    // Set message based on uploaded files count
+                    val message = if (uploadedFilesCount > 0) {
+                        getString(sharedR.string.transfers_upload_started_snackbar)
+                    } else {
+                        null
+                    }
+                    setResult(
+                        NameCollisionActionResult(
+                            shouldFinish = viewModel.shouldFinish(),
+                            message = message
+                        )
+                    )
                     viewModel.consumeUploadEvent()
                 }
             }
@@ -197,8 +210,18 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun showCollision(nodeCollisionResult: NodeNameCollisionResult?) {
         val collisionResult = nodeCollisionResult?.toUiEntity()
         if (collisionResult == null) {
-            Timber.e("Cannot show any collision. Finishing...")
-            finish()
+            // All collisions have been processed
+            // Check if should finish (all collisions processed) and if any files were uploaded
+            if (viewModel.shouldFinish() && !isFinishing) {
+                val uploadedFilesCount = viewModel.getUploadedFilesCount()
+                val message = if (uploadedFilesCount > 0) {
+                    getString(sharedR.string.transfers_upload_started_snackbar)
+                } else {
+                    null
+                }
+                setResult(RESULT_OK, Intent().putExtra(MESSAGE_RESULT, message))
+                finish()
+            }
             return
         }
 

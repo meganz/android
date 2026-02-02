@@ -2246,4 +2246,6 @@
     <string name="album_get_multiple_links_list_title">Links</string>
     <!-- Action to copy all of the links on Album Get Multiple Links -->
     <string name="album_get_multiple_links_copy_all_action">Copy all</string>
+    <!-- Snackbar text to inform the user that upload started -->
+    <string name="transfers_upload_started_snackbar">Upload started. See notification for details.</string>
 </resources>

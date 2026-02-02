@@ -6,10 +6,12 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.utils.Constants
@@ -20,11 +22,14 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.domain.usecase.GetFolderTypeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCase
@@ -69,11 +74,13 @@ internal class FileExplorerViewModelTest {
     private val getDocumentsFromSharedUrisUseCase = mock<GetDocumentsFromSharedUrisUseCase>()
     private var savedStateHandle = SavedStateHandle(mapOf())
     private val getFolderTypeByHandleUseCase = mock<GetFolderTypeByHandleUseCase>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val activityLifecycleHandler = mock<ActivityLifecycleHandler>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(kotlinx.coroutines.flow.emptyFlow())
     }
-    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
-    private val testDispatcher = StandardTestDispatcher()
+    private val testScheduler = TestCoroutineScheduler()
+    private val testDispatcher = StandardTestDispatcher(testScheduler)
 
     private val pitagTrigger = PitagTrigger.ShareFromApp
 
@@ -94,6 +101,7 @@ internal class FileExplorerViewModelTest {
             getFolderTypeByHandleUseCase = getFolderTypeByHandleUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
+            activityLifecycleHandler = activityLifecycleHandler,
         )
     }
 
@@ -109,8 +117,9 @@ internal class FileExplorerViewModelTest {
             sendChatAttachmentsUseCase,
             getDocumentsFromSharedUrisUseCase,
             getFolderTypeByHandleUseCase,
-            monitorNodeUpdatesUseCase,
-            getNodeLocationUseCase
+            getNodeLocationUseCase,
+            activityLifecycleHandler,
+            monitorNodeUpdatesUseCase
         )
         // Set default behavior for monitorNodeUpdatesUseCase
         whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
@@ -498,41 +507,141 @@ internal class FileExplorerViewModelTest {
     }
 
     @Test
-    fun `test that navigateToCloud event is triggered and consumed`() = runTest {
-        val handle = 123L
-        val message = "Test message"
-        val nodeId = NodeId(handle)
-        val mockNode = mock<TypedFileNode> {
-            on { id } doReturn nodeId
-            on { parentId } doReturn NodeId(456L)
-        }
-        val ancestorIds = listOf(NodeId(200L), NodeId(300L))
-        val nodeLocation = NodeLocation(
-            node = mockNode,
-            nodeSourceType = mega.privacy.android.domain.entity.node.NodeSourceType.CLOUD_DRIVE,
-            ancestorIds = ancestorIds
-        )
-        val folderDestinations = ancestorIds.plus(nodeId).map { folderId ->
-            CloudDriveNavKey(nodeHandle = folderId.longValue)
+    fun `test that initActivityStartTime sets start time when not initialized`() = runTest {
+        initViewModel()
+
+        assertThat(underTest.activityStartTime).isEqualTo(0L)
+        underTest.initActivityStartTime()
+        assertThat(underTest.activityStartTime).isGreaterThan(0L)
+    }
+
+    @Test
+    fun `test that initActivityStartTime does not override existing start time`() = runTest {
+        val existingTime = 1000L
+        savedStateHandle[FileExplorerViewModel.KEY_ACTIVITY_START_TIME] = existingTime
+        initViewModel()
+
+        assertThat(underTest.activityStartTime).isEqualTo(existingTime)
+        underTest.initActivityStartTime()
+        assertThat(underTest.activityStartTime).isEqualTo(existingTime)
+    }
+
+    @Test
+    fun `test that finishShareAndBack sets shouldFinishScreen when app did not move to background`() =
+        runTest {
+            val startTime = 1000L
+            val lastBackgroundTime = 500L // Before start time
+            savedStateHandle[FileExplorerViewModel.KEY_ACTIVITY_START_TIME] = startTime
+            whenever(activityLifecycleHandler.getLastBackgroundTime()).thenReturn(lastBackgroundTime)
+
+            initViewModel()
+
+            underTest.finishShareAndBack(123L, "test message")
+            testScheduler.advanceUntilIdle()
+
+            assertThat(underTest.uiState.value.shouldFinishScreen).isTrue()
         }
 
+    @Test
+    fun `test that finishShareAndBack navigates to cloud when app moved to background`() =
+        runTest {
+            val startTime = 1000L
+            val lastBackgroundTime = 2000L // After start time
+            val handle = 123L
+            val nodeId = NodeId(handle)
+            val mockNode = mock<TypedNode> {
+                on { id }.thenReturn(nodeId)
+                on { parentId }.thenReturn(NodeId(456L))
+            }
+            val nodeLocation = NodeLocation(
+                node = mockNode,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ancestorIds = listOf(NodeId(789L), nodeId)
+            )
+
+            savedStateHandle[FileExplorerViewModel.KEY_ACTIVITY_START_TIME] = startTime
+            whenever(activityLifecycleHandler.getLastBackgroundTime()).thenReturn(lastBackgroundTime)
+            whenever(getNodeByIdUseCase(nodeId)).thenReturn(mockNode)
+            whenever(getNodeLocationUseCase(mockNode)).thenReturn(nodeLocation)
+
+            initViewModel()
+
+            underTest.finishShareAndBack(handle, "test message")
+            testScheduler.advanceUntilIdle()
+
+            val navigateEvent = underTest.uiState.value.navigateToCloud
+            assertThat(navigateEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            val eventContent = (navigateEvent as StateEventWithContentTriggered).content
+            assertThat(eventContent.nodeId).isEqualTo(nodeId)
+            assertThat(underTest.uiState.value.shouldFinishScreen).isFalse()
+        }
+
+    @Test
+    fun `test that getFolderDestinations sets navigateToCloud event with valid handle`() = runTest {
+        val handle = 123L
+        val nodeId = NodeId(handle)
+        val parentId = NodeId(456L)
+        val ancestorId = NodeId(789L)
+        val mockNode = mock<TypedNode>()
+        val nodeLocation = NodeLocation(
+            node = mockNode,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            ancestorIds = listOf(ancestorId)
+        )
+        val message = "Test message"
+
+        whenever(mockNode.id).thenReturn(nodeId)
+        whenever(mockNode.parentId).thenReturn(parentId)
         whenever(getNodeByIdUseCase(nodeId)).thenReturn(mockNode)
         whenever(getNodeLocationUseCase(mockNode)).thenReturn(nodeLocation)
 
+        initViewModel()
+
         underTest.getFolderDestinations(handle, message)
+        testScheduler.advanceUntilIdle()
 
-        assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(
-            triggered(
-                FileExplorerUiState.NavigateToCloudEvent(
-                    nodeId,
-                    folderDestinations,
-                    message
-                )
-            )
-        )
-        underTest.consumeFolderDestinations()
-
-        assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(consumed())
+        val navigateEvent = underTest.uiState.value.navigateToCloud
+        assertThat(navigateEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+        val eventContent = (navigateEvent as StateEventWithContentTriggered).content
+        assertThat(eventContent.nodeId).isEqualTo(nodeId)
+        assertThat(eventContent.message).isEqualTo(message)
+        assertThat(eventContent.folderDestinations).isNotNull()
+        assertThat(eventContent.folderDestinations?.size).isEqualTo(2) // ancestorId, handle
+        assertThat(eventContent.folderDestinations?.get(0)?.nodeHandle).isEqualTo(ancestorId.longValue)
+        assertThat(eventContent.folderDestinations?.get(1)?.nodeHandle).isEqualTo(handle)
     }
 
+    @Test
+    fun `test that consumeFolderDestinations consumes navigateToCloud event`() = runTest {
+        val handle = 123L
+        val nodeId = NodeId(handle)
+        val parentId = NodeId(456L)
+        val ancestorId = NodeId(789L)
+        val mockNode = mock<TypedNode>()
+        val nodeLocation = NodeLocation(
+            node = mockNode,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            ancestorIds = listOf(ancestorId)
+        )
+
+        whenever(mockNode.id).thenReturn(nodeId)
+        whenever(mockNode.parentId).thenReturn(parentId)
+        whenever(getNodeByIdUseCase(nodeId)).thenReturn(mockNode)
+        whenever(getNodeLocationUseCase(mockNode)).thenReturn(nodeLocation)
+
+        initViewModel()
+
+        underTest.getFolderDestinations(handle, null)
+        testScheduler.advanceUntilIdle()
+
+        // Verify event is triggered
+        val navigateEvent = underTest.uiState.value.navigateToCloud
+        assertThat(navigateEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+
+        // Consume the event
+        underTest.consumeFolderDestinations()
+
+        // Verify event is consumed
+        assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(consumed())
+    }
 }

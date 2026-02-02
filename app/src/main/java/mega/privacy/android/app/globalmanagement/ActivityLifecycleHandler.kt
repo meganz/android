@@ -36,6 +36,10 @@ class ActivityLifecycleHandler @Inject constructor(
     // Flag to indicate if the current Activity is going through configuration change like orientation switch
     private var isActivityChangingConfigurations = false
 
+    // Timestamp when app last moved to background
+    @Volatile
+    private var lastBackgroundTime: Long = 0
+
     /**
      * On activity created
      *
@@ -96,6 +100,8 @@ class ActivityLifecycleHandler @Inject constructor(
         isActivityChangingConfigurations = activity.isChangingConfigurations
         if (--activityReferences == 0 && !isActivityChangingConfigurations) {
             Timber.i("App enters background")
+            lastBackgroundTime = System.currentTimeMillis()
+            Timber.d("App entered background at: %s", lastBackgroundTime)
         }
 
         if (activityReferences == 0) {
@@ -137,4 +143,11 @@ class ActivityLifecycleHandler @Inject constructor(
     )
     val isActivityVisible: Boolean
         get() = currentActivity != null
+
+    /**
+     * Get the timestamp when app last moved to background
+     *
+     * @return Timestamp in milliseconds, or 0 if app has never been in background
+     */
+    fun getLastBackgroundTime(): Long = lastBackgroundTime
 }

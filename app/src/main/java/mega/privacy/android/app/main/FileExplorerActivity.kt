@@ -35,6 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -269,9 +270,23 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         NameCollisionActivityContract()
     ) { result ->
         viewModel.setIsAskingForCollisionsResolution(isAskingForCollisionsResolution = false)
-        backToCloud(
-            if (result == null) parentHandle else INVALID_HANDLE,
-            result
+
+        // Get count of non-collided files that were uploaded
+        val nonCollidedFilesUploadedCount = viewModel.getAndClearNonCollidedFilesUploadedCount()
+
+        // Determine the final message to show:
+        // 1. Priority: collision resolution result message (if files were uploaded via collision resolution)
+        // 2. Fallback: show message if non-collided files were uploaded
+        val finalMessage = when {
+            result != null -> result  // NameCollisionActivity already set message if files were uploaded
+            nonCollidedFilesUploadedCount > 0 -> getString(sharedR.string.transfers_upload_started_snackbar)
+            else -> null
+        }
+
+        // If got message, show message. If got parentHandle, navigate to the destination folder
+        finishShareAndBack(
+            if (parentHandle != 0L) parentHandle else INVALID_HANDLE,
+            finalMessage
         )
     }
 
@@ -557,6 +572,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             pendingToAttach = 0
             totalAttached = 0
             totalErrors = 0
+            // Initialize activity start time in ViewModel
+            viewModel.initActivityStartTime()
         }
 
         prefs = dbH.preferences
@@ -1993,14 +2010,21 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     }
 
     /**
-     * Starts back to Cloud navigation after checking destinations hierarchy in the view model.
+     * Back after uploading files
      *
      * @param handle        Parent handle of the folder to open.
      * @param message       Message to show.
      */
-    private fun backToCloud(handle: Long, message: String?) {
-        Timber.d("handle: %s", handle)
-        viewModel.getFolderDestinations(handle, message)
+    private fun finishShareAndBack(handle: Long, message: String?) = lifecycleScope.launch {
+        Timber.d("finishShareAndBack handle: %s", handle)
+        if (message != null) {
+            // Show snackbar while got message
+            showSnackbar(message)
+            delay(3000)
+        }
+
+        // Delegate business logic to ViewModel
+        viewModel.finishShareAndBack(handle, null)
     }
 
     private fun navigateToCloud(
@@ -2748,13 +2772,16 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 transferEventState = viewModel.uiState.map { it.uploadEvent },
                 onConsumeEvent = viewModel::consumeUploadEvent,
             ) { startTransferEvent ->
-                if (viewModel.isAskingForCollisionsResolution()) {
-                    //Not ready to finish yet
-                    return@createStartTransferView
-                }
+                ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let { uploadEvent ->
+                    if (viewModel.isAskingForCollisionsResolution()) {
+                        // Collision resolution is in progress, track the number of non-collided files uploaded
+                        val uploadedCount = uploadEvent.pathsAndNames.size
+                        viewModel.setNonCollidedFilesUploadedCount(uploadedCount)
+                        return@createStartTransferView
+                    }
 
-                ((startTransferEvent as StartTransferEvent.FinishUploadProcessing).triggerEvent as TransferTriggerEvent.StartUpload.Files).let {
-                    backToCloud(it.destinationId.longValue, null)
+                    // No collision resolution in progress, finish normally
+                    finishShareAndBack(uploadEvent.destinationId.longValue, getString(sharedR.string.transfers_upload_started_snackbar))
                 }
             }
         )

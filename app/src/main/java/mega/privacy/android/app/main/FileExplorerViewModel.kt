@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
@@ -80,6 +81,7 @@ class FileExplorerViewModel @Inject constructor(
     private val getFolderTypeByHandleUseCase: GetFolderTypeByHandleUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
+    private val activityLifecycleHandler: ActivityLifecycleHandler,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -92,6 +94,21 @@ class FileExplorerViewModel @Inject constructor(
     var latestMoveTargetPath: Long? = null
     var latestMoveTargetPathTab: Int = 0
     private val _textInfo = MutableLiveData<ShareTextInfo>()
+
+    /**
+     * Used to determine if app moved to background during share process
+     */
+    val activityStartTime: Long get() = savedStateHandle.get<Long>(KEY_ACTIVITY_START_TIME) ?: 0L
+
+    /**
+     * Initialize activity start time
+     * Should be called in onCreate when savedInstanceState is null
+     */
+    fun initActivityStartTime() {
+        if (!savedStateHandle.contains(KEY_ACTIVITY_START_TIME)) {
+            savedStateHandle[KEY_ACTIVITY_START_TIME] = System.currentTimeMillis()
+        }
+    }
 
     /**
      * Storage state
@@ -584,6 +601,28 @@ class FileExplorerViewModel @Inject constructor(
     fun isAskingForCollisionsResolution() = uiState.value.isAskingForCollisionsResolution
 
     /**
+     * Sets the count of non-collided files that were uploaded.
+     * This is used when non-collided files finish uploading while collision resolution is in progress.
+     *
+     * @param count The number of non-collided files that were uploaded.
+     */
+    fun setNonCollidedFilesUploadedCount(count: Int) {
+        _uiState.update { it.copy(nonCollidedFilesUploadedCount = count) }
+    }
+
+    /**
+     * Gets and clears the count of non-collided files that were uploaded.
+     * This should be called after collision resolution is complete to check if any non-collided files were uploaded.
+     *
+     * @return The number of non-collided files that were uploaded.
+     */
+    fun getAndClearNonCollidedFilesUploadedCount(): Int {
+        val count = uiState.value.nonCollidedFilesUploadedCount
+        _uiState.update { it.copy(nonCollidedFilesUploadedCount = 0) }
+        return count
+    }
+
+    /**
      * Handles Back Navigation logic by checking if the there are scans to be uploaded or not
      */
     fun handleBackNavigation() {
@@ -671,5 +710,33 @@ class FileExplorerViewModel @Inject constructor(
 
     fun consumeFolderDestinations() {
         _uiState.update { it.copy(navigateToCloud = consumed()) }
+    }
+
+    /**
+     * Determine whether to stay in app or finish after share
+     * Checks if app moved to background during share process
+     *
+     * @param handle Parent handle of the folder to open (if staying in app)
+     * @param message Message to show in snackbar
+     */
+    fun finishShareAndBack(handle: Long, message: String?) {
+        viewModelScope.launch {
+            // Check if app has moved to background during the share process
+            // Get the last background time from ActivityLifecycleHandler and compare with activity start time
+            val lastBackgroundTime = activityLifecycleHandler.getLastBackgroundTime()
+            val needStayInApp = lastBackgroundTime > 0 && lastBackgroundTime > activityStartTime
+
+            if (needStayInApp) {
+                // If app moved to the background during share, stay in App and navigate to cloud drive
+                getFolderDestinations(handle, message)
+            } else {
+                // If app didn't move to background during share, finish and back to previous App
+                _uiState.update { it.copy(shouldFinishScreen = true) }
+            }
+        }
+    }
+
+    companion object {
+        internal const val KEY_ACTIVITY_START_TIME = "activityStartTime"
     }
 }

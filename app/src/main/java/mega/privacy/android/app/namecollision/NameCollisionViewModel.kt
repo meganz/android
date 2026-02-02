@@ -102,6 +102,7 @@ class NameCollisionViewModel @Inject constructor(
     private var allCollisionsProcessed = false
     var isCopyToOrigin = false
     var pitagTrigger = PitagTrigger.NotApplicable
+    private var uploadedFilesCount = 0
 
     init {
         viewModelScope.launch {
@@ -157,6 +158,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     fun setSingleData(collision: NameCollision) {
         pitagTrigger = collision.pitagTrigger
+        uploadedFilesCount = 0
         viewModelScope.launch {
             runCatching {
                 if (collision is NodeNameCollision.Default) {
@@ -200,6 +202,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     fun setData(collisions: List<NameCollision>) {
         pitagTrigger = collisions.first().pitagTrigger
+        uploadedFilesCount = 0
         viewModelScope.launch {
             runCatching {
                 require(collisions.isNotEmpty()) { "Collisions list is empty" }
@@ -521,6 +524,11 @@ class NameCollisionViewModel @Inject constructor(
             if (rename) NameCollisionChoice.RENAME
             else NameCollisionChoice.REPLACE_UPDATE_MERGE
 
+        // Count uploaded files when user chooses to upload
+        if (currentCollision.value?.nameCollision?.isFile == true) {
+            uploadedFilesCount++
+        }
+
         if (isFolderUploadContext) {
             continueWithNext(choice)
             return
@@ -553,6 +561,10 @@ class NameCollisionViewModel @Inject constructor(
         list: MutableList<NodeNameCollisionResult>,
         rename: Boolean,
     ) {
+        // Count uploaded files when user chooses to upload
+        val fileCount = list.count { it.nameCollision.isFile }
+        uploadedFilesCount += fileCount
+
         if (isFolderUploadContext) {
             list.forEach { item ->
                 resolvedCollisions.add(item.apply {
@@ -777,6 +789,14 @@ class NameCollisionViewModel @Inject constructor(
      * Checks if all the pending collisions have been processed.
      */
     fun shouldFinish() = pendingCollisions.isEmpty()
+
+    /**
+     * Gets the count of files that were uploaded (choice != CANCEL and isFile == true).
+     * This counts files when user chooses to upload them (RENAME or REPLACE_UPDATE_MERGE).
+     *
+     * @return The number of files that were uploaded.
+     */
+    fun getUploadedFilesCount(): Int = uploadedFilesCount
 
     /**
      * Gets the current collision.
