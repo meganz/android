@@ -4,11 +4,12 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.InvalidNameType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
-import mega.privacy.android.domain.usecase.node.ValidNameType
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +33,7 @@ internal class CreateNewFolderViewModelTest {
     private lateinit var underTest: CreateNewFolderViewModel
 
     private val checkForValidNameUseCase = mock<CheckForValidNameUseCase>()
+    private val nodeNameErrorMessageMapper = mock<NodeNameErrorMessageMapper>()
 
     private val currentFolderMock = mock<FolderNode> {
         whenever(it.id).thenReturn(NodeId(1234L))
@@ -39,12 +41,15 @@ internal class CreateNewFolderViewModelTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = CreateNewFolderViewModel(checkForValidNameUseCase)
+        underTest = CreateNewFolderViewModel(
+            checkForValidNameUseCase = checkForValidNameUseCase,
+            nodeNameErrorMessageMapper = nodeNameErrorMessageMapper,
+        )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(checkForValidNameUseCase)
+        reset(checkForValidNameUseCase, nodeNameErrorMessageMapper)
     }
 
     @Test
@@ -70,13 +75,13 @@ internal class CreateNewFolderViewModelTest {
             val newFolderName = ""
 
             whenever(
-                checkForValidNameUseCase.newFolderCreation(
+                checkForValidNameUseCase(
                     newName = newFolderName,
                     node = currentFolderMock
                 )
-            ).thenReturn(
-                ValidNameType.BLANK_NAME
-            )
+            ).thenReturn(InvalidNameType.BLANK_NAME)
+            whenever(nodeNameErrorMessageMapper(InvalidNameType.BLANK_NAME, true))
+                .thenReturn(sharedR.string.create_new_folder_dialog_error_message_empty_folder_name)
 
             underTest.checkIsValidName(
                 newFolderName = newFolderName,
@@ -99,13 +104,13 @@ internal class CreateNewFolderViewModelTest {
         newFolderName: String,
     ) = runTest {
         whenever(
-            checkForValidNameUseCase.newFolderCreation(
+            checkForValidNameUseCase(
                 newName = newFolderName,
                 node = currentFolderMock
             )
-        ).thenReturn(
-            ValidNameType.INVALID_NAME
-        )
+        ).thenReturn(InvalidNameType.INVALID_NAME)
+        whenever(nodeNameErrorMessageMapper(InvalidNameType.INVALID_NAME, true))
+            .thenReturn(sharedR.string.general_invalid_characters_defined)
 
         underTest.checkIsValidName(
             newFolderName = newFolderName,
@@ -123,13 +128,13 @@ internal class CreateNewFolderViewModelTest {
             val newFolderName = "Folder"
 
             whenever(
-                checkForValidNameUseCase.newFolderCreation(
+                checkForValidNameUseCase(
                     newName = newFolderName,
                     node = currentFolderMock
                 )
-            ).thenReturn(
-                ValidNameType.NAME_ALREADY_EXISTS
-            )
+            ).thenReturn(InvalidNameType.NAME_ALREADY_EXISTS)
+            whenever(nodeNameErrorMessageMapper(InvalidNameType.NAME_ALREADY_EXISTS, true))
+                .thenReturn(sharedR.string.create_new_folder_dialog_error_existing_folder)
 
             underTest.checkIsValidName(
                 newFolderName = newFolderName,

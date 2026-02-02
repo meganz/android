@@ -1,20 +1,19 @@
 package mega.privacy.android.feature.sync.ui.createnewfolder
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderState
-import mega.privacy.android.shared.resources.R as sharedR
-import androidx.lifecycle.viewModelScope
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase
-import mega.privacy.android.domain.usecase.node.ValidNameType
+import mega.privacy.android.feature.sync.ui.createnewfolder.model.CreateNewFolderState
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CreateNewFolderViewModel @Inject constructor(
     private val checkForValidNameUseCase: CheckForValidNameUseCase,
+    private val nodeNameErrorMessageMapper: NodeNameErrorMessageMapper,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateNewFolderState())
@@ -47,31 +47,19 @@ internal class CreateNewFolderViewModel @Inject constructor(
         parentNode: Node,
     ) = viewModelScope.launch {
         runCatching {
-            when (checkForValidNameUseCase.newFolderCreation(
-                newName = newFolderName,
-                node = parentNode
-            )) {
-                ValidNameType.BLANK_NAME -> {
-                    _state.update { it.copy(errorMessage = sharedR.string.create_new_folder_dialog_error_message_empty_folder_name) }
-                }
-
-                ValidNameType.INVALID_NAME -> {
-                    _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
-                }
-
-                ValidNameType.NAME_ALREADY_EXISTS -> {
-                    _state.update { it.copy(errorMessage = sharedR.string.create_new_folder_dialog_error_existing_folder) }
-                }
-
-                else -> {
-                    _state.update {
-                        it.copy(
-                            errorMessage = null,
-                            validNameConfirmed = triggered(newFolderName)
-                        )
+            checkForValidNameUseCase(newName = newFolderName, node = parentNode)
+                .let { invalidNameType ->
+                    nodeNameErrorMessageMapper(invalidNameType, true)?.let {
+                        _state.update { state -> state.copy(errorMessage = it) }
+                    } ?: run {
+                        _state.update {
+                            it.copy(
+                                errorMessage = null,
+                                validNameConfirmed = triggered(newFolderName)
+                            )
+                        }
                     }
                 }
-            }
         }.onFailure { Timber.e(it) }
     }
 

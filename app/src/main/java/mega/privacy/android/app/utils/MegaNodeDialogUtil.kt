@@ -50,6 +50,8 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
@@ -345,6 +347,22 @@ object MegaNodeDialogUtil {
                     typeText,
                     errorText,
                     context.getString(R.string.invalid_string)
+                )
+            }
+
+            typedString.isInvalidDotName() -> {
+                showDialogError(
+                    typeText,
+                    errorText,
+                    context.getString(sharedR.string.general_invalid_dot_name_warning),
+                )
+            }
+
+            typedString.isInvalidDoubleDotName() -> {
+                showDialogError(
+                    typeText,
+                    errorText,
+                    context.getString(sharedR.string.general_invalid_double_dot_name_warning),
                 )
             }
 
