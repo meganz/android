@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -40,11 +42,14 @@ import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideoPlaylistDetailHeaderView
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -62,6 +67,8 @@ fun VideoPlaylistDetailRoute(
         resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
         resetShowRenameVideoPlaylistDialog = viewModel::resetUpdateVideoPlaylistDialogEvent,
         resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
+        onDeleteButtonClicked = viewModel::removeVideoPlaylists,
+        onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
         onBack = navigationHandler::back
     )
 }
@@ -78,10 +85,16 @@ fun VideoPlaylistDetailScreen(
     resetErrorMessage: () -> Unit = {},
     resetShowRenameVideoPlaylistDialog: () -> Unit = {},
     resetUpdateTitleSuccessEvent: () -> Unit = {},
+    onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+    onConsumedPlaylistRemovedEvent: () -> Unit = {},
+    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
+    val context = LocalContext.current
+    val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
     var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
     val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showRemovedDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -118,6 +131,32 @@ fun VideoPlaylistDetailScreen(
                     onConsumed = resetUpdateTitleSuccessEvent,
                     action = {
                         resetShowRenameVideoPlaylistDialog()
+                    }
+                )
+
+                EventEffect(
+                    event = videoPlaylistEditState.playlistsRemovedEvent,
+                    onConsumed = {
+                        showRemovedDialog = false
+                        onConsumedPlaylistRemovedEvent()
+                    },
+                    action = { deletedVideoPlaylistTitles ->
+                        if (deletedVideoPlaylistTitles.isNotEmpty()) {
+                            val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                                context.getString(
+                                    sharedR.string.video_section_playlists_delete_playlists_message_singular,
+                                    deletedVideoPlaylistTitles[0]
+                                )
+                            } else {
+                                resources.getQuantityString(
+                                    sharedR.plurals.video_section_playlists_delete_playlists_message,
+                                    deletedVideoPlaylistTitles.size,
+                                    deletedVideoPlaylistTitles.size
+                                )
+                            }
+                            snackBarQueue.queueMessage(deletedMessage)
+                        }
+                        onBack()
                     }
                 )
 
@@ -192,7 +231,8 @@ fun VideoPlaylistDetailScreen(
                             when (action) {
                                 is VideoPlaylistRenameMenuAction -> showRenameVideoPlaylistDialog()
                                 is VideoPlaylistsTrashMenuAction -> {
-                                    //TODO Will implement in another ticket
+                                    showRemovedDialog = true
+                                    showPlaylistBottomSheet = false
                                 }
                             }
                         },
@@ -221,6 +261,26 @@ fun VideoPlaylistDetailScreen(
                         },
                         initialInputText = { playlistDetail?.uiEntity?.title ?: "" },
                         errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
+                    )
+                }
+
+                if (showRemovedDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                        ),
+                        title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+                        description = null,
+                        positiveButtonText = stringResource(sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
+                        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            uiState.playlistDetail?.uiEntity?.let {
+                                onDeleteButtonClicked(setOf(it))
+                            }
+                            showRemovedDialog = false
+                        },
+                        onNegativeButtonClicked = { showRemovedDialog = false },
+                        onDismiss = { showRemovedDialog = false }
                     )
                 }
             }
@@ -284,3 +344,9 @@ const val VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
  * Test tag for VideoPlaylistBottomSheet
  */
 const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG = "video_playlist_detail:bottom_sheet"
+
+/**
+ * Test tag for delete video playlist dialog
+ */
+const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_delete_video_playlist"

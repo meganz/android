@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -132,7 +133,6 @@ class VideoPlaylistsTabViewModelTest {
                     )
                 )
                 assertThat(actual.selectedPlaylists).isEmpty()
-                assertThat(actual.playlistsRemovedEvent).isEqualTo(consumed())
                 assertThat(actual.query).isNull()
                 cancelAndIgnoreRemainingEvents()
             }
@@ -379,20 +379,17 @@ class VideoPlaylistsTabViewModelTest {
                 removeVideoPlaylistsUseCase(any())
             ).thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
 
-            underTest.uiState
-                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
-                .test {
-                    skipItems(1)
+            underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+            advanceUntilIdle()
 
-                    underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
-                    var actual = awaitItem()
-                    val expectedEvent = triggered(listOf(playlist1.title, playlist2.title))
-                    while (actual.playlistsRemovedEvent != expectedEvent) {
-                        actual = awaitItem()
-                    }
-                    assertThat(actual.playlistsRemovedEvent).isEqualTo(expectedEvent)
-                    cancelAndIgnoreRemainingEvents()
-                }
+            underTest.videoPlaylistEditState.test {
+                val expectedEvent = triggered(listOf(playlist1.title, playlist2.title))
+                assertThat(awaitItem().playlistsRemovedEvent).isEqualTo(expectedEvent)
+
+                underTest.resetPlaylistsRemovedEvent()
+                assertThat(awaitItem().playlistsRemovedEvent).isEqualTo(consumed())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test

@@ -123,7 +123,7 @@ internal fun VideoPlaylistsTabScreen(
 
         is VideoPlaylistsTabUiState.Data -> {
             EventEffect(
-                event = uiState.playlistsRemovedEvent,
+                event = videoPlaylistEditState.playlistsRemovedEvent,
                 onConsumed = onConsumedPlaylistRemovedEvent,
                 action = { deletedVideoPlaylistTitles ->
                     if (deletedVideoPlaylistTitles.isNotEmpty()) {

@@ -26,10 +26,12 @@ import mega.privacy.android.domain.exception.account.PlaylistNameValidationExcep
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
+import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 
@@ -42,6 +44,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
     private val videoPlaylistTitleValidationErrorMessageMapper: VideoPlaylistTitleValidationErrorMessageMapper,
     private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
+    private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
     @Assisted private val playlistHandle: Long,
     @Assisted private val type: PlaylistType,
 ) : ViewModel() {
@@ -140,6 +143,37 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         videoPlaylistEditState.update {
             it.copy(
                 showUpdateVideoPlaylistDialog = false
+            )
+        }
+    }
+
+    internal fun removeVideoPlaylists(deletedItems: Set<VideoPlaylistUiEntity>) =
+        viewModelScope.launch {
+            runCatching {
+                val ids = deletedItems.map { it.id }
+                removeVideoPlaylistsUseCase(ids)
+            }.onSuccess { deletedPlaylistIDs ->
+                val deletedTitlesById = deletedItems.associate {
+                    it.id.longValue to it.title
+                }
+                val deletedPlaylistTitles = deletedPlaylistIDs.mapNotNull { id ->
+                    deletedTitlesById[id]
+                }
+                Timber.d("removeVideoPlaylists deletedPlaylistTitles: $deletedPlaylistTitles")
+                videoPlaylistEditState.update {
+                    it.copy(
+                        playlistsRemovedEvent = triggered(deletedPlaylistTitles)
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    internal fun resetPlaylistsRemovedEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                playlistsRemovedEvent = consumed()
             )
         }
     }

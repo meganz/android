@@ -13,6 +13,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistE
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +35,7 @@ class VideoPlaylistDetailScreenTest {
         resetErrorMessage: () -> Unit = {},
         resetShowRenameVideoPlaylistDialog: () -> Unit = {},
         resetUpdateTitleSuccessEvent: () -> Unit = {},
+        snackBarQueue: SnackbarEventQueue = mock(),
         onBack: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -48,6 +50,7 @@ class VideoPlaylistDetailScreenTest {
                 resetErrorMessage = resetErrorMessage,
                 resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
                 resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
+                snackBarQueue = snackBarQueue,
             )
         }
     }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TextFileTypeInfo
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.exception.account.PlaylistNameValidationExcep
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
@@ -61,6 +63,7 @@ class VideoPlaylistDetailViewModelTest {
     private val videoPlaylistTitleValidationErrorMessageMapper =
         mock<VideoPlaylistTitleValidationErrorMessageMapper>()
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
+    private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
 
     private val testId = NodeId(123456L)
     private val testType = PlaylistType.User
@@ -83,6 +86,7 @@ class VideoPlaylistDetailViewModelTest {
             getVideoPlaylistByIdUseCase = getVideoPlaylistByIdUseCase,
             videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
+            removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
             playlistHandle = testId.longValue,
             type = testType
         )
@@ -96,7 +100,8 @@ class VideoPlaylistDetailViewModelTest {
             videoPlaylistDetailUiEntityMapper,
             getVideoPlaylistByIdUseCase,
             videoPlaylistTitleValidationErrorMessageMapper,
-            updateVideoPlaylistTitleUseCase
+            updateVideoPlaylistTitleUseCase,
+            removeVideoPlaylistsUseCase
         )
     }
 
@@ -405,6 +410,29 @@ class VideoPlaylistDetailViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that playlistsRemovedEvent is updated correctly`() =
+        runTest {
+            val playlist1 = createVideoPlaylistUiEntity(handle = 1L)
+            val playlist2 = createVideoPlaylistUiEntity(handle = 2L)
+
+            whenever(
+                removeVideoPlaylistsUseCase(any())
+            ).thenReturn(listOf(playlist1.id.longValue, playlist2.id.longValue))
+
+            underTest.removeVideoPlaylists(setOf(playlist1, playlist2))
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                val expectedEvent = triggered(listOf(playlist1.title, playlist2.title))
+                assertThat(awaitItem().playlistsRemovedEvent).isEqualTo(expectedEvent)
+
+                underTest.resetPlaylistsRemovedEvent()
+                assertThat(awaitItem().playlistsRemovedEvent).isEqualTo(consumed())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun createVideoUiEntity(
         handle: Long,

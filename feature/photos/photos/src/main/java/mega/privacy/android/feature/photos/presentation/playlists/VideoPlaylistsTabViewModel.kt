@@ -3,7 +3,6 @@ package mega.privacy.android.feature.photos.presentation.playlists
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -57,8 +56,6 @@ class VideoPlaylistsTabViewModel @Inject constructor(
 ) : ViewModel() {
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
-    private val playlistsRemovedFlow =
-        MutableStateFlow<StateEventWithContent<List<String>>>(consumed())
     private val queryFlow = MutableStateFlow<String?>(null)
 
     internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
@@ -98,9 +95,8 @@ class VideoPlaylistsTabViewModel @Inject constructor(
         combine(
             getVideoPlaylistsFlow(),
             sortOrder,
-            playlistsRemovedFlow,
             selectedVideoPlaylistsFlow,
-        ) { (videoPlaylists, query), sortOrder, playlistsRemoved, selectedItems ->
+        ) { (videoPlaylists, query), sortOrder, selectedItems ->
             val videoPlaylistEntities = videoPlaylists.map {
                 videoPlaylistUiEntityMapper(it)
             }.map { it.copy(isSelected = it.id in selectedItems.map { item -> item.id }) }
@@ -110,7 +106,6 @@ class VideoPlaylistsTabViewModel @Inject constructor(
             VideoPlaylistsTabUiState.Data(
                 videoPlaylistEntities = videoPlaylistEntities,
                 selectedSortConfiguration = sortOrderPair,
-                playlistsRemovedEvent = playlistsRemoved,
                 selectedPlaylists = selectedItems,
                 query = query
             )
@@ -190,7 +185,11 @@ class VideoPlaylistsTabViewModel @Inject constructor(
                     deletedTitlesById[id]
                 }
                 Timber.d("removeVideoPlaylists deletedPlaylistTitles: $deletedPlaylistTitles")
-                playlistsRemovedFlow.update { triggered(deletedPlaylistTitles) }
+                videoPlaylistEditState.update {
+                    it.copy(
+                        playlistsRemovedEvent = triggered(deletedPlaylistTitles)
+                    )
+                }
                 clearSelection()
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -198,7 +197,11 @@ class VideoPlaylistsTabViewModel @Inject constructor(
         }
 
     internal fun resetPlaylistsRemovedEvent() {
-        playlistsRemovedFlow.update { consumed() }
+        videoPlaylistEditState.update {
+            it.copy(
+                playlistsRemovedEvent = consumed()
+            )
+        }
     }
 
     internal fun searchQuery(queryString: String?) {
