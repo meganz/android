@@ -557,7 +557,7 @@ class ChatAdvancedNotificationBuilder(
                     intent.also {
                         it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         it.setAction(Constants.ACTION_CHAT_NOTIFICATION_MESSAGE)
-                        it.putExtra(Constants.CHAT_ID, chat.chatId)
+                        it.putExtra(ChatNavKey.LEGACY_CHAT_ID, chat.chatId)
                     }
 
                     PendingIntent.getActivity(

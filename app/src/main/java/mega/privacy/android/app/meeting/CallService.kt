@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.contact.GetMyUserHandleUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorCallScreenOpenedUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -168,7 +169,7 @@ class CallService : LifecycleService() {
         Timber.d("Starting Call service (flags: %d, startId: %d)", flags, startId)
         intent.extras?.let { extras ->
             currentChatId =
-                extras.getLong(Constants.CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                extras.getLong(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
             Timber.d("Chat handle to call: $currentChatId")
         }
 

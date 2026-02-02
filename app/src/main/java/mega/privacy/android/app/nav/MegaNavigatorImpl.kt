@@ -98,6 +98,7 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.navigation.destination.AchievementNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -282,7 +283,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             this.action = action
             putExtra(EXTRA_ACTION, action)
             text?.let { putExtra(Constants.SHOW_SNACKBAR, text) }
-            putExtra(Constants.CHAT_ID, chatId)
+            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
             messageId?.let { putExtra(Constants.ID_MSG, messageId) }
             isOverQuota?.let { putExtra(Constants.IS_OVER_QUOTA, isOverQuota) }
             // Use setFlags for consistency with ChatHostDestination
@@ -309,7 +310,7 @@ internal class MegaNavigatorImpl @Inject constructor(
             )
         ) {
             val intent = Intent(context, ManageChatHistoryActivity::class.java).apply {
-                putExtra(Constants.CHAT_ID, chatId)
+                putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
                 email?.let { putExtra(Constants.EMAIL, it) }
             }
             context.startActivity(intent)
@@ -1069,8 +1070,8 @@ internal class MegaNavigatorImpl @Inject constructor(
             )
         ) {
             val i = Intent(context, ContactAttachmentActivity::class.java)
-            i.putExtra(Constants.CHAT_ID, chatId)
-            i.putExtra(Constants.MESSAGE_ID, msgId)
+            i.putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
+            i.putExtra(LEGACY_MESSAGE_ID, msgId)
             context.startActivity(i)
         }
     }

@@ -24,6 +24,8 @@ import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
 import mega.privacy.android.thirdpartylib.twemoji.EmojiTextView
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -51,8 +53,8 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         titleNameContactChatPanel =
             contentView.findViewById<EmojiTextView>(R.id.group_participants_chat_name_text)
 
-        chatId = arguments?.getLong(Constants.CHAT_ID, MegaApiJava.INVALID_HANDLE)
-            ?: savedInstanceState?.getLong(Constants.CHAT_ID, MegaApiJava.INVALID_HANDLE)
+        chatId = arguments?.getLong(ChatNavKey.LEGACY_CHAT_ID, MegaApiJava.INVALID_HANDLE)
+            ?: savedInstanceState?.getLong(ChatNavKey.LEGACY_CHAT_ID, MegaApiJava.INVALID_HANDLE)
                     ?: (requireActivity() as GroupChatInfoActivity).chatHandle
 
         participantHandle =
@@ -305,7 +307,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putLong(Constants.CHAT_ID, chatId)
+        outState.putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
         outState.putLong(Constants.CONTACT_HANDLE, participantHandle)
     }
 
@@ -346,7 +348,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         ): ParticipantBottomSheetDialogFragment {
             val fragment = ParticipantBottomSheetDialogFragment()
             val arguments = Bundle()
-            arguments.putLong(Constants.CHAT_ID, chatId)
+            arguments.putLong(LEGACY_CHAT_ID, chatId)
             arguments.putLong(Constants.CONTACT_HANDLE, participantHandle)
             fragment.setArguments(arguments)
             return fragment

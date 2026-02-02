@@ -25,6 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
@@ -47,7 +49,6 @@ import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSh
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ScheduledMeetingParticipantBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.ManageMeetingLinkBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.chat.list.view.MeetingLinkBottomSheet
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_CREATED_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_LINK_TAG
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity.Companion.MEETING_TITLE_TAG
@@ -57,7 +58,6 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
@@ -65,15 +65,15 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import mega.privacy.mobile.analytics.event.MeetingInfoAddParticipantButtonTappedEvent
 import mega.privacy.mobile.analytics.event.MeetingInfoLeaveMeetingButtonTappedEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingEditMenuToolbarEvent
@@ -131,7 +131,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
                 if (isLinkCreated) {
                     // show bottom sheet dialog
                     val chatId = result.data?.getLongExtra(
-                        CHAT_ID,
+                        ChatNavKey.LEGACY_CHAT_ID,
                         -1L
                     ) ?: -1L
                     if (chatId != -1L) {
@@ -166,7 +166,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
         appContainerWrapper.setPasscodeCheck(passcodeFacade)
         collectFlows()
 
-        val chatId = intent.getLongExtra(CHAT_ID, -1L)
+        val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, -1L)
         val schedId = intent.getLongExtra(
             SCHEDULED_MEETING_ID,
             -1L
@@ -611,7 +611,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
                             setResult(
                                 RESULT_OK,
                                 Intent().apply {
-                                    putExtra(CHAT_ID, uiState.scheduledMeeting?.chatId)
+                                    putExtra(ChatNavKey.LEGACY_CHAT_ID, uiState.scheduledMeeting?.chatId)
                                     putExtra(MEETING_TITLE_TAG, uiState.scheduledMeeting?.title)
                                     putExtra(
                                         MEETING_LINK_CREATED_TAG,
@@ -645,7 +645,7 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
             Intent(
                 this@ChatInfoActivity,
                 CreateScheduledMeetingActivity::class.java
-            ).putExtra(CHAT_ID, chatRoomId)
+            ).putExtra(ChatNavKey.LEGACY_CHAT_ID, chatRoomId)
         )
     }
 

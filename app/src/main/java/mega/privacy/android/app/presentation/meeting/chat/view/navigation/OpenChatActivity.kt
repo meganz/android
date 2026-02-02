@@ -9,8 +9,8 @@ import mega.privacy.android.app.presentation.meeting.chat.ChatFragment
 import mega.privacy.android.app.presentation.meeting.chat.extension.findChatHostActivity
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_SHOW_MESSAGES
+import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 
 /**
@@ -29,7 +29,7 @@ internal fun openChatFragment(
     context.findChatHostActivity()?.apply {
         Bundle().apply {
             putString(EXTRA_ACTION, action ?: ACTION_CHAT_SHOW_MESSAGES)
-            putLong(Constants.CHAT_ID, chatId)
+            putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
             chatLink?.let {
                 putString(EXTRA_LINK, it)
             }

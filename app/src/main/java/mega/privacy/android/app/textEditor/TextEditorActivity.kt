@@ -33,13 +33,11 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
-import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.animation.AnimationUtils.FAST_OUT_LINEAR_IN_INTERPOLATOR
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -63,7 +61,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ChatUtil.removeAttachmentMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ANIMATION_DURATION
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -73,7 +70,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MOVE_TO
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.LONG_SNACKBAR_DURATION
-import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
@@ -101,6 +97,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.TextEditorCloseMenuToolbarEvent
@@ -473,8 +471,8 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 if (getStorageState() == StorageState.PayWall) {
                     AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
                 } else {
-                    val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
-                    val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                    val msgId = intent.getLongExtra(LEGACY_MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                    val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
                     if (chatId == MEGACHAT_INVALID_HANDLE)
                         return false
                     viewModel.saveChatNodeToOffline(

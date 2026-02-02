@@ -85,6 +85,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.android.shared.resources.R as sharedR
@@ -209,7 +210,7 @@ class ChatTabsFragment : Fragment() {
                 if (isLinkCreated) {
                     // show bottom sheet dialog
                     val chatId = result.data?.getLongExtra(
-                        Constants.CHAT_ID,
+                        ChatNavKey.LEGACY_CHAT_ID,
                         -1L
                     ) ?: -1L
                     if (chatId != -1L) {

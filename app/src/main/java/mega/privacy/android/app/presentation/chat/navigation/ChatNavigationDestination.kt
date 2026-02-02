@@ -38,7 +38,7 @@ private fun createChatIntent(context: Context, key: ChatNavKey): Intent {
         key.action?.let { action = it }
 
         // Specific chat extras
-        putExtra(Constants.CHAT_ID, key.chatId)
+        putExtra(ChatNavKey.LEGACY_CHAT_ID, key.chatId)
         key.action?.let { putExtra(EXTRA_ACTION, it) }
         key.link?.let { putExtra(EXTRA_LINK, it) }
         key.snackbarText?.let { putExtra(Constants.SHOW_SNACKBAR, it) }

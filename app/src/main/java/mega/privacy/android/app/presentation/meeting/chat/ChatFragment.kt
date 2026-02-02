@@ -28,7 +28,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.chatViewNavigationGraph
@@ -43,9 +42,11 @@ import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectF
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
@@ -72,7 +73,7 @@ internal class ChatFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, -1L)
 
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -95,7 +96,7 @@ internal class ChatFragment : Fragment() {
                                     val navHostController =
                                         rememberNavController(bottomSheetNavigator)
                                     val chatId =
-                                        requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1)
+                                        requireActivity().intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, -1)
                                     val chatLink =
                                         requireActivity().intent.getStringExtra(EXTRA_LINK)
                                     val coroutineScope = rememberCoroutineScope()
@@ -188,7 +189,7 @@ internal class ChatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        MegaApplication.openChatId = requireActivity().intent.getLongExtra(Constants.CHAT_ID, -1L)
+        MegaApplication.openChatId = requireActivity().intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, -1L)
         Analytics.tracker.trackEvent(ChatConversationScreenEvent)
     }
 

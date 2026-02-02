@@ -31,6 +31,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.model.chat.AndroidMegaChatMessage
 import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -95,9 +97,9 @@ class ContactAttachmentActivity : PasscodeActivity(), MegaRequestListenerInterfa
         }
         chatController = ChatController(this)
         if (intent != null) {
-            chatId = intent.getLongExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
             messageId =
-                intent.getLongExtra(Constants.MESSAGE_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+                intent.getLongExtra(LEGACY_MESSAGE_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
             Timber.d("Chat ID: %d, Message ID: %d", chatId, messageId)
             val messageMega: MegaChatMessage? = megaChatApi.getMessage(chatId, messageId)
             if (messageMega != null) {

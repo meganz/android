@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
 import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
-import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ class CallRecordingViewModel @Inject constructor(
     private val _state = MutableStateFlow(CallRecordingUIState())
     val state = _state.asStateFlow()
 
-    private var chatId: Long? = savedStateHandle[Constants.CHAT_ID]
+    private var chatId: Long? = savedStateHandle[ChatNavKey.LEGACY_CHAT_ID]
 
     private var monitorCallSessionOnRecordingJob: Job? = null
     private var monitorCallInChatJob: Job? = null

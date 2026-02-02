@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.meeting.managechathistory.view.screen.ManageChatHistoryActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 
 fun EntryProviderScope<NavKey>.manageChatHistoryLegacyDestination(removeDestination: (NavKey) -> Unit) {
@@ -32,7 +33,7 @@ fun EntryProviderScope<NavKey>.manageChatHistoryLegacyDestination(removeDestinat
  */
 private fun createManageChatHistoryIntent(context: Context, key: ManageChatHistoryNavKey): Intent {
     return Intent(context, ManageChatHistoryActivity::class.java).apply {
-        putExtra(Constants.CHAT_ID, key.chatId)
+        putExtra(ChatNavKey.LEGACY_CHAT_ID, key.chatId)
         key.email?.let { putExtra(Constants.EMAIL, it) }
     }
 }

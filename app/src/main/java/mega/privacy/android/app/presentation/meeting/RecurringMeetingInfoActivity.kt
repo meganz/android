@@ -19,15 +19,16 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.extensions.getEndZoneDateTime
 import mega.privacy.android.app.presentation.extensions.getStartZoneDateTime
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.view.RecurringMeetingInfoView
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.EditSingleOccurrenceMeetingMaxDurationReachedEvent
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
@@ -35,7 +36,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Activity which shows occurrences of recurring meeting.
@@ -67,7 +67,7 @@ class RecurringMeetingInfoActivity : PasscodeActivity() {
 
         collectFlows()
 
-        val chatId = intent.getLongExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+        val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         viewModel.setChatId(newChatId = chatId)
         scheduledMeetingManagementViewModel.setChatId(newChatId = chatId)
 

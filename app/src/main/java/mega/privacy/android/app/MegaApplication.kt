@@ -58,7 +58,6 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -75,6 +74,7 @@ import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceRepo
 import mega.privacy.android.domain.usecase.transfers.active.MonitorAndHandleTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorTransferEventsToStartWorkersIfNeededUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -568,7 +568,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         if (chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
             Timber.d("Start call Service. Chat iD = $chatId")
             Intent(this, CallService::class.java).run {
-                putExtra(Constants.CHAT_ID, chatId)
+                putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
                 startForegroundService(this)
             }
         }

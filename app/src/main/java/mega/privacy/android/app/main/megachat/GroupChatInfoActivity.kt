@@ -85,6 +85,7 @@ import mega.privacy.android.domain.usecase.chat.MonitorChatConnectionStateUseCas
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiAndroid
@@ -1560,7 +1561,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         chat?.let {
-            outState.putLong(Constants.CHAT_ID, it.chatId)
+            outState.putLong(ChatNavKey.LEGACY_CHAT_ID, it.chatId)
         }
 
         outState.putBoolean(END_CALL_FOR_ALL_DIALOG, isAlertDialogShown(endCallForAllDialog))

@@ -7,18 +7,17 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.CallRecordingEvent
+import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatSession
-import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -62,7 +61,7 @@ class CallRecordingViewModelTest {
         onBlocking { invoke(chatId) } doReturn callFlow
     }
     private val savedStateHandle: SavedStateHandle = mock {
-        on { get<Long>(Constants.CHAT_ID) } doReturn chatId
+        on { get<Long>(ChatNavKey.LEGACY_CHAT_ID) } doReturn chatId
     }
 
     @BeforeAll
@@ -91,7 +90,7 @@ class CallRecordingViewModelTest {
         wheneverBlocking { monitorCallSessionOnRecordingUseCase(chatId) }.thenReturn(recordingFlow)
         wheneverBlocking { monitorCallRecordingConsentEventUseCase() }.thenReturn(consentFlow)
         wheneverBlocking { monitorCallInChatUseCase(chatId) }.thenReturn(callFlow)
-        whenever(savedStateHandle.get<Long>(Constants.CHAT_ID)).thenReturn(chatId)
+        whenever(savedStateHandle.get<Long>(ChatNavKey.LEGACY_CHAT_ID)).thenReturn(chatId)
     }
 
     @Test

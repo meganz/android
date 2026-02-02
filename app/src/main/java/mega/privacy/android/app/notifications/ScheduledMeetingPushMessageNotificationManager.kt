@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.Constants.NOTIFICATION_CHANNEL_CHAT_SUMMAR
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.pushes.PushMessage.ScheduledMeetingPushMessage
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationJoinButtonEvent
 import mega.privacy.mobile.analytics.event.ScheduledMeetingReminderNotificationMessageButtonEvent
 import javax.inject.Inject
@@ -106,7 +107,7 @@ class ScheduledMeetingPushMessageNotificationManager @Inject constructor(
         ).apply {
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             action = Constants.ACTION_CHAT_SHOW_MESSAGES
-            putExtra(Constants.CHAT_ID, chatId)
+            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
         }
         return PendingIntentCompat.getActivity(
             context,

@@ -25,7 +25,6 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.presentation.chat.dialog.view.ChatRoomItemBottomSheetView
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.data.SnackBarItem
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.ChatInfoActivity
 import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
@@ -34,10 +33,12 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem.MeetingChatRoomItem
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ArchiveNoteToSelfButtonPressedEvent
@@ -57,7 +58,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         fun newInstance(chatId: Long): ChatListBottomSheetDialogFragment =
             ChatListBottomSheetDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putLong(Constants.CHAT_ID, chatId)
+                    putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
                 }
             }
     }
@@ -70,7 +71,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
         { requireParentFragment() })
 
     private val chatId by lazy {
-        arguments?.getLong(Constants.CHAT_ID) ?: error("Invalid Chat Id")
+        arguments?.getLong(ChatNavKey.LEGACY_CHAT_ID) ?: error("Invalid Chat Id")
     }
 
     private lateinit var permissionsRequest: ActivityResultLauncher<Array<String>>
@@ -84,7 +85,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 if (isLinkCreated) {
                     // show bottom sheet dialog
                     val chatId = result.data?.getLongExtra(
-                        Constants.CHAT_ID,
+                        ChatNavKey.LEGACY_CHAT_ID,
                         -1L
                     ) ?: -1L
                     if (chatId != -1L) {
@@ -145,7 +146,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     private fun onOccurrencesClick() {
         val intent = Intent(context, RecurringMeetingInfoActivity::class.java).apply {
-            putExtra(Constants.CHAT_ID, chatId)
+            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
         }
         startActivity(intent)
         dismissAllowingStateLoss()
@@ -160,7 +161,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
             Intent(
                 requireContext(),
                 CreateScheduledMeetingActivity::class.java
-            ).putExtra(Constants.CHAT_ID, chatId)
+            ).putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
         )
     }
 
@@ -173,7 +174,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                         requireContext(),
                         ChatInfoActivity::class.java
                     ).apply {
-                        putExtra(Constants.CHAT_ID, chatId)
+                        putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
                     }
                 }
 
@@ -189,7 +190,7 @@ class ChatListBottomSheetDialogFragment : BottomSheetDialogFragment() {
                             requireContext(),
                             ChatInfoActivity::class.java
                         ).apply {
-                            putExtra(Constants.CHAT_ID, chatId)
+                            putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
                             putExtra(Constants.SCHEDULED_MEETING_ID, item.schedId)
                         })
                     null

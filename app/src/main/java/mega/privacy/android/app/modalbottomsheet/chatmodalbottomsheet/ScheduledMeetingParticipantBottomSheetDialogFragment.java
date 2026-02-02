@@ -5,7 +5,6 @@ import static mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContac
 import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
 import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
 import static mega.privacy.android.app.utils.ChatUtil.setContactStatus;
-import static mega.privacy.android.app.utils.Constants.CHAT_ID;
 import static mega.privacy.android.app.utils.Constants.CONTACT_HANDLE;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_LAND;
 import static mega.privacy.android.app.utils.Constants.MAX_WIDTH_BOTTOM_SHEET_DIALOG_PORT;
@@ -15,6 +14,7 @@ import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+import static mega.privacy.android.navigation.destination.ChatNavKey.LEGACY_CHAT_ID;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 import android.content.Intent;
@@ -60,7 +60,7 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
     public static ScheduledMeetingParticipantBottomSheetDialogFragment newInstance(long chatId, long participantHandle) {
         ScheduledMeetingParticipantBottomSheetDialogFragment fragment = new ScheduledMeetingParticipantBottomSheetDialogFragment();
         Bundle arguments = new Bundle();
-        arguments.putLong(CHAT_ID, chatId);
+        arguments.putLong(LEGACY_CHAT_ID, chatId);
         arguments.putLong(CONTACT_HANDLE, participantHandle);
         fragment.setArguments(arguments);
         return fragment;
@@ -74,10 +74,10 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            chatId = arguments.getLong(CHAT_ID, INVALID_HANDLE);
+            chatId = arguments.getLong(LEGACY_CHAT_ID, INVALID_HANDLE);
             participantHandle = arguments.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         } else if (savedInstanceState != null) {
-            chatId = savedInstanceState.getLong(CHAT_ID, INVALID_HANDLE);
+            chatId = savedInstanceState.getLong(LEGACY_CHAT_ID, INVALID_HANDLE);
             participantHandle = savedInstanceState.getLong(CONTACT_HANDLE, INVALID_HANDLE);
         }
 
@@ -296,7 +296,7 @@ public class ScheduledMeetingParticipantBottomSheetDialogFragment extends BaseBo
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong(CHAT_ID, chatId);
+        outState.putLong(LEGACY_CHAT_ID, chatId);
         outState.putLong(CONTACT_HANDLE, participantHandle);
     }
 }

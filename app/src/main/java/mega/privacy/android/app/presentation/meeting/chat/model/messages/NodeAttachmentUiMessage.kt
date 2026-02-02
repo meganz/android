@@ -33,6 +33,8 @@ import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -207,8 +209,8 @@ data class NodeAttachmentUiMessage(
         context.startActivity(
             Intent(context, TextEditorActivity::class.java)
                 .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_CHAT)
-                .putExtra(Constants.MESSAGE_ID, msgId)
-                .putExtra(Constants.CHAT_ID, chatId)
+                .putExtra(LEGACY_MESSAGE_ID, msgId)
+                .putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
         )
     }
 

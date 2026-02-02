@@ -64,7 +64,15 @@ data class ChatNavKey(
     val snackbarText: String? = null,
     val messageId: Long? = null,
     val isOverQuota: Int? = null,
-) : NoSessionNavKey.Optional, Parcelable
+) : NoSessionNavKey.Optional, Parcelable {
+    companion object {
+        @Deprecated("Use NavKeys instead")
+        const val LEGACY_CHAT_ID: String = "CHAT_ID"
+
+        @Deprecated("Use NavKeys instead")
+        const val LEGACY_MESSAGE_ID: String = "messageId"
+    }
+}
 
 /**
  * Navigation key for Chat List

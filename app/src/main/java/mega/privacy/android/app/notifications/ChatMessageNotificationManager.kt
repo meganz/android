@@ -16,7 +16,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
@@ -35,6 +34,7 @@ import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.toFormattedText
+import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.io.File
@@ -102,7 +102,7 @@ class ChatMessageNotificationManager @Inject constructor(
                     intent.apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                         action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-                        putExtra(Constants.CHAT_ID, chat.chatId)
+                        putExtra(ChatNavKey.LEGACY_CHAT_ID, chat.chatId)
                     }
                     PendingIntent.getActivity(
                         context,

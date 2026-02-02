@@ -318,6 +318,7 @@ import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
@@ -1627,7 +1628,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         drawerItem = DrawerItem.CHAT
                         selectDrawerItem(drawerItem)
                         val chatId: Long = intent.getLongExtra(
-                            Constants.CHAT_ID,
+                            ChatNavKey.LEGACY_CHAT_ID,
                             MEGACHAT_INVALID_HANDLE
                         )
                         if (intent.getBooleanExtra(
@@ -1704,7 +1705,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         openContactLink(intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
                     } else if (intent.action == Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE) {
                         val chatId: Long = intent.getLongExtra(
-                            Constants.CHAT_ID,
+                            ChatNavKey.LEGACY_CHAT_ID,
                             MEGACHAT_INVALID_HANDLE
                         )
                         showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)
@@ -2759,7 +2760,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 Constants.ACTION_CHAT_NOTIFICATION_MESSAGE -> {
                     Timber.d("ACTION_CHAT_NOTIFICATION_MESSAGE")
                     val chatId: Long = intent.getLongExtra(
-                        Constants.CHAT_ID,
+                        ChatNavKey.LEGACY_CHAT_ID,
                         MEGACHAT_INVALID_HANDLE
                     )
                     if (intent.getBooleanExtra(Constants.EXTRA_MOVE_TO_CHAT_SECTION, false)) {
@@ -2825,7 +2826,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
                 Constants.ACTION_SHOW_SNACKBAR_SENT_AS_MESSAGE -> {
                     val chatId: Long = intent.getLongExtra(
-                        Constants.CHAT_ID,
+                        ChatNavKey.LEGACY_CHAT_ID,
                         MEGACHAT_INVALID_HANDLE
                     )
                     showSnackbar(Constants.MESSAGE_SNACKBAR_TYPE, null, chatId)

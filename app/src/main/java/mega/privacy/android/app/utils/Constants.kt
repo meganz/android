@@ -365,8 +365,6 @@ object Constants {
     const val IS_NODE_INCOMING: String = "isNodeIncoming"
     const val CONTACT_HANDLE: String = "contactHandle"
     const val SHOW_SNACKBAR: String = "SHOW_SNACKBAR"
-    const val CHAT_ID: String = "CHAT_ID"
-    const val MESSAGE_ID: String = "messageId"
     const val CHAT_ID_OF_CURRENT_CALL: String = "chatHandleInProgress"
     const val CHAT_ID_OF_INCOMING_CALL: String = "chatHandleToAnswer"
     const val PEER_ID: String = "peerId"

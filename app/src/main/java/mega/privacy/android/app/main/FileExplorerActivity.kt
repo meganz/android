@@ -2515,7 +2515,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             action = if (singleChat) Constants.ACTION_CHAT_NOTIFICATION_MESSAGE else Constants.ACTION_CHAT_SUMMARY,
             flags = if (singleChat) Intent.FLAG_ACTIVITY_CLEAR_TOP else 0,
             bundle = Bundle().apply {
-                singleChatId?.let { putLong(Constants.CHAT_ID, singleChatId) }
+                singleChatId?.let { putLong(ChatNavKey.LEGACY_CHAT_ID, singleChatId) }
             },
             singleActivityDestinations = listOfNotNull(
                 HomeScreensNavKey(MenuHomeScreen),

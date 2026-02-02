@@ -36,7 +36,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDia
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
 import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
@@ -46,7 +45,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.Constants.MESSAGE_ID
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -100,6 +98,8 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCase
+import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -366,8 +366,8 @@ class TextEditorViewModel @Inject constructor(
 
         when (adapterType) {
             FROM_CHAT -> {
-                val msgId = intent.getLongExtra(MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
-                val chatId = intent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE)
+                val msgId = intent.getLongExtra(LEGACY_MESSAGE_ID, MEGACHAT_INVALID_HANDLE)
+                val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, MEGACHAT_INVALID_HANDLE)
 
                 if (msgId != MEGACHAT_INVALID_HANDLE && chatId != MEGACHAT_INVALID_HANDLE) {
                     textEditorData.value?.chatRoom = megaChatApi.getChatRoom(chatId)

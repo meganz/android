@@ -6,8 +6,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
 import mega.privacy.android.navigation.destination.ContactAttachmentNavKey
 
 
@@ -18,8 +19,8 @@ fun EntryProviderScope<NavKey>.contactAttachmentLegacyDestination(removeDestinat
         val context = LocalContext.current
         LaunchedEffect(Unit) {
             val intent = Intent(context, ContactAttachmentActivity::class.java).apply {
-                putExtra(Constants.CHAT_ID, key.chatId)
-                putExtra(Constants.MESSAGE_ID, key.messageId)
+                putExtra(LEGACY_CHAT_ID, key.chatId)
+                putExtra(LEGACY_MESSAGE_ID, key.messageId)
             }
             context.startActivity(intent)
 

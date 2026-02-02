@@ -13,7 +13,7 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatFragment
 import mega.privacy.android.app.utils.CallUtil
-import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.JoinMeetingPressedEvent
 import mega.privacy.mobile.analytics.event.StartMeetingNowPressedEvent
@@ -56,7 +56,7 @@ class ChatActivity : AppCompatActivity(), MeetingBottomSheetDialogActionListener
      */
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val chatId = intent.getLongExtra(Constants.CHAT_ID, -1L)
+        val chatId = intent.getLongExtra(ChatNavKey.LEGACY_CHAT_ID, -1L)
         val link = intent.getStringExtra(EXTRA_LINK)
         val action = intent.getStringExtra(EXTRA_ACTION)
         val isOpenChatList = intent.getBooleanExtra(OPEN_CHAT_LIST, false)

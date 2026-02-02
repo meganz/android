@@ -178,7 +178,7 @@ class NodeAttachmentViewModel @Inject constructor(
             context = context,
             action = Constants.ACTION_CHAT_NOTIFICATION_MESSAGE,
             bundle = Bundle().apply {
-                putLong(Constants.CHAT_ID, chatId)
+                putLong(ChatNavKey.LEGACY_CHAT_ID, chatId)
                 putBoolean(Constants.EXTRA_MOVE_TO_CHAT_SECTION, true)
             },
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,

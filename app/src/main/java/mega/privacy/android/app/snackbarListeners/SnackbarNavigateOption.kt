@@ -9,7 +9,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSet
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
-import mega.privacy.android.app.utils.Constants.CHAT_ID
 import mega.privacy.android.app.utils.Constants.DISMISS_ACTION_SNACKBAR
 import mega.privacy.android.app.utils.Constants.EXTRA_MOVE_TO_CHAT_SECTION
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
@@ -17,6 +16,7 @@ import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_CHAT_ID
 
 class SnackbarNavigateOption @JvmOverloads constructor(
     private val context: Context,
@@ -45,7 +45,7 @@ class SnackbarNavigateOption @JvmOverloads constructor(
                         context = context,
                         action = ACTION_CHAT_NOTIFICATION_MESSAGE,
                         bundle = Bundle().apply {
-                            idChat?.let { putLong(CHAT_ID, idChat) }
+                            idChat?.let { putLong(LEGACY_CHAT_ID, idChat) }
                             putBoolean(EXTRA_MOVE_TO_CHAT_SECTION, true)
                         },
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
