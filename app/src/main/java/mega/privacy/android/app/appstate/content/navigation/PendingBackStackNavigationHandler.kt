@@ -184,7 +184,6 @@ class PendingBackStackNavigationHandler(
         } else {
             if (backstack.contains(passcodeDestination)) {
                 backstack.removeAll { it == passcodeDestination }
-                navigateToPendingScreens()
             }
         }
     }
@@ -277,9 +276,7 @@ class PendingBackStackNavigationHandler(
         if (backstack.isNotEmpty() && backstack.last() == passcodeDestination) {
             return
         }
-        backstack.pending = backstack + backstack.pending
-        backstack.clear()
-        navigate(passcodeDestination)
+        backstack.add(passcodeDestination)
     }
 
     private fun navigateToPendingScreens() {

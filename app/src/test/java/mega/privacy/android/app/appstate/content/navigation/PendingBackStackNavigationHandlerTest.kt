@@ -421,24 +421,23 @@ class PendingBackStackNavigationHandlerTest {
         }
 
     @Test
-    fun `test that if passcode lock is enabled passcode is the only destination on the stack`() =
+    fun `test that if passcode lock is enabled passcode destination is added on top of current stack`() =
         runTest {
             val navTree = listOf(Destination1, Destination2)
             backStack.addAll(navTree)
             underTest.onPasscodeStateChanged(true)
-            assertThat(backStack).containsExactly(PasscodeDestination)
-            assertThat(backStack.pending).containsExactlyElementsIn(listOf(DefaultLandingScreen) + navTree)
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2, PasscodeDestination)
+            assertThat(backStack.pending).isEmpty()
         }
 
     @Test
-    fun `test that when passcode unlocks pending destinations are added and passcode is removed`() =
+    fun `test that when passcode unlocks passcode is removed from stack and pending is unchanged`() =
         runTest {
             val navTree = listOf(Destination1, Destination2)
-            backStack.pending = navTree
+            backStack.addAll(navTree)
             underTest.onPasscodeStateChanged(true)
 
-            assertThat(backStack).containsExactly(PasscodeDestination)
-            assertThat(backStack.pending).containsExactlyElementsIn(listOf(DefaultLandingScreen) + navTree)
+            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2, PasscodeDestination)
 
             underTest.onPasscodeStateChanged(false)
             assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
@@ -465,7 +464,7 @@ class PendingBackStackNavigationHandlerTest {
 
 
     @Test
-    fun `test that if initial passcode lock is enabled passcode is the only destination on the stack`() =
+    fun `test that if initial passcode lock is enabled passcode destination is added on top of stack`() =
         runTest {
             val navTree = listOf(Destination1, Destination2)
             val tempBackStack = PendingBackStack(NavBackStack(*navTree.toTypedArray()))
@@ -473,8 +472,8 @@ class PendingBackStackNavigationHandlerTest {
                 backStack = tempBackStack,
                 isPasscodeLocked = true,
             )
-            assertThat(tempBackStack).containsExactly(PasscodeDestination)
-            assertThat(tempBackStack.pending).containsExactlyElementsIn(navTree)
+            assertThat(tempBackStack).containsExactly(Destination1, Destination2, PasscodeDestination)
+            assertThat(tempBackStack.pending).isEmpty()
         }
 
     @Test
