@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.exception.ResourceAlreadyExistsMegaException
 import mega.privacy.android.domain.usecase.backup.RenameDeviceUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.renamedevice.model.RenameDeviceState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -48,31 +50,54 @@ class RenameDeviceViewModel @Inject constructor(
         existingDeviceNames: List<String>,
     ) = viewModelScope.launch {
         val trimmedName = newDeviceName.trim()
-        if (trimmedName.isBlank()) {
-            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name) }
-        } else if (trimmedName.length > NEW_DEVICE_NAME_MAX_LENGTH) {
-            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded) }
-        } else if (trimmedName in existingDeviceNames) {
-            _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
-        } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
-            _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
-        } else {
-            runCatching {
-                renameDeviceUseCase(
-                    deviceId = deviceId,
-                    deviceName = trimmedName,
-                )
-            }.onSuccess {
-                _state.update {
-                    it.copy(
-                        errorMessage = null,
-                        renameSuccessfulEvent = triggered,
+        when {
+            trimmedName.isBlank() -> {
+                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_empty_device_name) }
+            }
+
+            trimmedName.isInvalidDotName() -> {
+                _state.update { it.copy(errorMessage = sharedR.string.general_invalid_dot_name_warning) }
+            }
+
+            trimmedName.isInvalidDoubleDotName() -> {
+                _state.update { it.copy(errorMessage = sharedR.string.general_invalid_double_dot_name_warning) }
+            }
+
+            INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName) -> {
+                _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
+            }
+
+            trimmedName.length > NEW_DEVICE_NAME_MAX_LENGTH -> {
+                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_maximum_character_length_exceeded) }
+            }
+
+            trimmedName in existingDeviceNames -> {
+                _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
+            }
+
+            else -> {
+                runCatching {
+                    renameDeviceUseCase(
+                        deviceId = deviceId,
+                        deviceName = trimmedName,
                     )
-                }
-            }.onFailure { exception ->
-                when (exception) {
-                    is ResourceAlreadyExistsMegaException -> _state.update { it.copy(errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists) }
-                    else -> Timber.e(exception)
+                }.onSuccess {
+                    _state.update {
+                        it.copy(
+                            errorMessage = null,
+                            renameSuccessfulEvent = triggered,
+                        )
+                    }
+                }.onFailure { exception ->
+                    when (exception) {
+                        is ResourceAlreadyExistsMegaException -> _state.update {
+                            it.copy(
+                                errorMessage = R.string.device_center_rename_device_dialog_error_message_name_already_exists
+                            )
+                        }
+
+                        else -> Timber.e(exception)
+                    }
                 }
             }
         }

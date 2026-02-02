@@ -151,6 +151,42 @@ internal class RenameDeviceViewModelTest {
         }
     }
 
+    @Test
+    fun `test that renaming the device fails when the new device name contains only a dot`() =
+        runTest {
+            val deviceId = "12345-6789"
+
+            underTest.renameDevice(
+                deviceId = deviceId,
+                newDeviceName = ".",
+                existingDeviceNames = emptyList(),
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(
+                    sharedR.string.general_invalid_dot_name_warning
+                )
+            }
+        }
+
+    @Test
+    fun `test that renaming the device fails when the new device name contains only a double dot`() =
+        runTest {
+            val deviceId = "12345-6789"
+
+            underTest.renameDevice(
+                deviceId = deviceId,
+                newDeviceName = "..",
+                existingDeviceNames = emptyList(),
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.errorMessage).isEqualTo(
+                    sharedR.string.general_invalid_double_dot_name_warning
+                )
+            }
+        }
+
     @ParameterizedTest(name = "new device name: {0}")
     @ValueSource(
         strings = [

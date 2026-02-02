@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.exception.BackupAlreadyExistsException
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
@@ -53,22 +55,36 @@ internal class RenameAndCreateBackupViewModel @Inject constructor(
         renameAndCreateBackupJob = viewModelScope.launch {
             runCatching {
                 val trimmedName = newBackupName.trim()
-                if (trimmedName.isBlank()) {
-                    _state.update { it.copy(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_empty_backup_name) }
-                } else if (INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName)) {
-                    _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
-                } else {
-                    syncFolderPairUseCase(
-                        syncType = SyncType.TYPE_BACKUP,
-                        name = trimmedName,
-                        localPath = localPath,
-                        remotePath = RemoteFolder(NodeId(-1L), ""),
-                    )
-                    _state.update {
-                        it.copy(
-                            errorMessage = null,
-                            successEvent = triggered
+                when {
+                    trimmedName.isBlank() -> {
+                        _state.update { it.copy(errorMessage = sharedR.string.sync_rename_and_create_backup_dialog_error_message_empty_backup_name) }
+                    }
+
+                    trimmedName.isInvalidDotName() -> {
+                        _state.update { it.copy(errorMessage = sharedR.string.general_invalid_dot_name_warning) }
+                    }
+
+                    trimmedName.isInvalidDoubleDotName() -> {
+                        _state.update { it.copy(errorMessage = sharedR.string.general_invalid_double_dot_name_warning) }
+                    }
+
+                    INVALID_CHARACTER_REGEX.toRegex().containsMatchIn(trimmedName) -> {
+                        _state.update { it.copy(errorMessage = sharedR.string.general_invalid_characters_defined) }
+                    }
+
+                    else -> {
+                        syncFolderPairUseCase(
+                            syncType = SyncType.TYPE_BACKUP,
+                            name = trimmedName,
+                            localPath = localPath,
+                            remotePath = RemoteFolder(NodeId(-1L), ""),
                         )
+                        _state.update {
+                            it.copy(
+                                errorMessage = null,
+                                successEvent = triggered
+                            )
+                        }
                     }
                 }
             }.onFailure { exception ->
