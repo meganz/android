@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 
+import androidx.compose.runtime.Immutable
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -29,6 +30,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property isSelecting True if nodes are being selected
  * @property hasMediaItems True if there are media(image, video) items in the current folder
  */
+@Immutable
 data class CloudDriveUiState(
     val title: LocalizedText = LocalizedText.Literal(""),
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,

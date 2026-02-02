@@ -8,7 +8,9 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.clouddrive.R
 
 @Composable
@@ -94,3 +96,9 @@ private fun formatModifiedDate(offlineFileInformation: OfflineFileInformation): 
     val addedTime = offlineFileInformation.addedTime ?: return ""
     return formatModifiedDate(java.util.Locale.getDefault(), addedTime)
 }
+
+/**
+ * Extension property to get the thumbnail data as [ThumbnailUriRequest] from [OfflineFileInformation]
+ */
+val OfflineFileInformation.thumbnailData
+    get() = thumbnail?.let { ThumbnailUriRequest(UriPath(it)) }

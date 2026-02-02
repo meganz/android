@@ -93,7 +93,7 @@ internal fun OfflineOptionsBottomSheetContent(
                 } else {
                     getFileTypeIcon(offlineFileInformation.name) ?: return@with
                 },
-                thumbnailData = thumbnail,
+                thumbnailData = thumbnailData,
                 onItemClicked = {},
                 enableClick = false
             )

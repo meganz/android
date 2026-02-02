@@ -1,5 +1,6 @@
 package mega.privacy.android.core.nodecomponents.model
 
+import androidx.compose.runtime.Immutable
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
  * @param duration Optional duration string for video files (displayed as a badge)
  * @constructor Create empty Node UI Item
  */
+@Immutable
 data class NodeUiItem<T : TypedNode>(
     val node: T,
     val isSelected: Boolean,

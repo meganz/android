@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 
@@ -147,7 +149,7 @@ fun NodeListViewItem(
     modifier: Modifier = Modifier,
     description: String? = null,
     tags: List<String>? = null,
-    thumbnailData: Any? = null,
+    thumbnailData: ThumbnailData? = null,
     titleColor: TextColor = TextColor.Primary,
     titleMaxLines: Int = 1,
     titleTextStyle: TextStyle = AppTheme.typography.bodyLarge,
@@ -372,15 +374,22 @@ fun NodeListViewItem(
                 }
             } else {
                 if (onMoreClicked != null) {
-                    MegaIcon(
-                        imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                        contentDescription = "More",
-                        tint = IconColor.Secondary,
+                    Box(
                         modifier = Modifier
                             .size(24.dp)
+                            .wrapContentSize(unbounded = true, align = Alignment.Center)
+                            .size(48.dp)
                             .clickable { onMoreClicked() }
-                            .testTag(MORE_ICON_TAG)
-                    )
+                            .testTag(MORE_ICON_TAG),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        MegaIcon(
+                            imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                            contentDescription = "More",
+                            tint = IconColor.Secondary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 } else {
                     Spacer(modifier = Modifier.size(24.dp))
                 }
@@ -517,7 +526,6 @@ private fun GenericNodeListItemWithLongTitlePreview() {
             showFavourite = true,
             showLink = true,
             label = NodeLabel.BLUE,
-            thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onItemClicked = { }
         )
     }
@@ -537,7 +545,6 @@ private fun GenericNodeListItemTakenDownPreview() {
             showFavourite = false,
             showLink = false,
             isTakenDown = true,
-            thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onItemClicked = { }
         )
     }
@@ -560,7 +567,6 @@ private fun NodeListItemWithAllFeaturesPreview() {
             showLink = true,
             showIsVerified = true,
             label = NodeLabel.YELLOW,
-            thumbnailData = "https://www.mega.com/resources/images/mega-logo.svg",
             onMoreClicked = { },
             onInfoClicked = { },
             onItemClicked = { }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +49,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 
@@ -125,7 +127,7 @@ fun <T : TypedNode> NodeGridViewItem(
 fun NodeGridViewItem(
     name: String,
     @DrawableRes iconRes: Int,
-    thumbnailData: Any?,
+    thumbnailData: ThumbnailData?,
     isTakenDown: Boolean,
     modifier: Modifier = Modifier,
     duration: String? = null,
@@ -315,15 +317,22 @@ fun NodeGridViewItem(
                 )
                 Spacer(modifier = Modifier.width(DSTokens.spacings.s1))
             } else {
-                MegaIcon(
-                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                    tint = IconColor.Secondary,
-                    contentDescription = "More",
+                Box(
                     modifier = Modifier
                         .size(24.dp)
+                        .wrapContentSize(unbounded = true, align = Alignment.Center)
+                        .size(48.dp)
                         .clickable { onMenuClick() }
-                        .testTag(GRID_VIEW_MORE_ICON_TEST_TAG)
-                )
+                        .testTag(GRID_VIEW_MORE_ICON_TEST_TAG),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                        contentDescription = "More",
+                        tint = IconColor.Secondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
@@ -386,7 +395,7 @@ private fun NodeGridViewItemPreview(
 
 private data class NodeGridViewItemData(
     val name: String,
-    val thumbnailData: Any?,
+    val thumbnailData: ThumbnailData? = null,
     val duration: String?,
     val isTakenDown: Boolean,
     val iconRes: Int,
@@ -427,7 +436,6 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
         ),
         NodeGridViewItemData(
             name = "Getting started with MEGA.pdf",
-            thumbnailData = "https://mega.io/wp-content/themes/megapages/megalib/images/megaicon.svg",
             duration = null,
             isTakenDown = false,
             iconRes = IconPackR.drawable.ic_generic_medium_solid,
@@ -444,7 +452,6 @@ private class NodeGridViewItemDataProvider : PreviewParameterProvider<NodeGridVi
         ),
         NodeGridViewItemData(
             name = "Getting started with MEGA.pdf",
-            thumbnailData = "https://mega.io/wp-content/themes/megapages/megalib/images/megaicon.svg",
             duration = "12:3",
             isTakenDown = true,
             iconRes = IconPackR.drawable.ic_audio_medium_solid,

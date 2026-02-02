@@ -11,6 +11,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.R as IconPackR
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +28,7 @@ class NodeGridViewItemTest {
     private fun setContent(
         name: String = "Test File",
         iconRes: Int = IconPackR.drawable.ic_folder_outgoing_medium_solid,
-        thumbnailData: Any? = null,
+        thumbnailData: ThumbnailData? = null,
         isTakenDown: Boolean = false,
         duration: String? = null,
         isSelected: Boolean = false,

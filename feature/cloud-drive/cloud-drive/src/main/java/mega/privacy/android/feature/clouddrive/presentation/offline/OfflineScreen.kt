@@ -459,7 +459,7 @@ private fun OfflineContent(
                         } else {
                             getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
                         },
-                        thumbnailData = node.offlineFileInformation.thumbnail,
+                        thumbnailData = node.offlineFileInformation.thumbnailData,
                         highlightText = uiState.searchQuery ?: "",
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),
@@ -509,7 +509,7 @@ private fun OfflineContent(
                         } else {
                             getFileTypeIcon(node.offlineFileInformation.name) ?: return@items
                         },
-                        thumbnailData = node.offlineFileInformation.thumbnail,
+                        thumbnailData = node.offlineFileInformation.thumbnailData,
                         isTakenDown = false,
                         isSelected = node.isSelected,
                         isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty(),

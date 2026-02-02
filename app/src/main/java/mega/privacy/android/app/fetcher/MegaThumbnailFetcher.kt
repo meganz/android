@@ -1,6 +1,7 @@
 package mega.privacy.android.app.fetcher
 
 import android.webkit.MimeTypeMap
+import androidx.core.net.toFile
 import coil3.ImageLoader
 import coil3.decode.DataSource
 import coil3.decode.ImageSource
@@ -8,9 +9,12 @@ import coil3.fetch.FetchResult
 import coil3.fetch.Fetcher
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
+import mega.privacy.android.data.extensions.isFile
+import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.thumbnail.ChatThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetChatThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
@@ -39,6 +43,8 @@ internal class MegaThumbnailFetcher(
             } else {
                 getThumbnailUseCase.get()(request.id.longValue, true)
             }
+
+            is ThumbnailUriRequest -> request.uri.toUri().toFile()
         } ?: throw NullPointerException("Thumbnail file is null")
         return SourceFetchResult(
             source = ImageSource(file = file.toOkioPath(), fileSystem = FileSystem.SYSTEM),
@@ -73,6 +79,7 @@ internal class MegaThumbnailFetcher(
         private fun isApplicable(data: ThumbnailData): Boolean {
             return (data is ThumbnailRequest && data.id.longValue != -1L)
                     || (data is ChatThumbnailRequest && data.chatId != -1L && data.messageId != -1L)
+                    || (data is ThumbnailUriRequest && data.uri.isFile())
         }
     }
 }
