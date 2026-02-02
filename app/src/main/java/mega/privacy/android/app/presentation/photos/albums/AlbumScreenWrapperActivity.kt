@@ -19,7 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
+import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
 import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
@@ -39,6 +39,7 @@ import mega.privacy.android.feature.photos.presentation.albums.coverselection.Al
 import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkViewModel
+import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksViewModel
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -303,8 +304,8 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             hasSensitiveElement: Boolean,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetMultipleLinksScreen.name)
-            putExtra(ALBUM_ID, albumIds.map { it.id }.toLongArray())
-            putExtra(HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
+            putExtra(AlbumGetMultipleLinksViewModel.ALBUM_ID, albumIds.map { it.id }.toLongArray())
+            putExtra(AlbumGetMultipleLinksViewModel.HAS_SENSITIVE_ELEMENT, hasSensitiveElement)
         }
 
         fun createAlbumDecryptionKeyScreen(

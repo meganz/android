@@ -1,8 +1,11 @@
-package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
+package mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +19,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_ID
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -25,38 +26,57 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 /**
  * ViewModel for GetMultipleLinks
  */
-@HiltViewModel
-class AlbumGetMultipleLinksViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = AlbumGetMultipleLinksViewModel.Factory::class)
+class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbumUseCase: GetUserAlbum,
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val exportAlbumsUseCase: ExportAlbumsUseCase,
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase,
+    private val setShowCopyrightUseCase: SetShowCopyrightUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    @Assisted private val albumIds: LongArray?,
+    @Assisted private val hasSensitiveElement: Boolean?,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetMultipleLinksState())
     val stateFlow = state.asStateFlow()
 
     init {
+        monitorThemeMode()
+        initialize()
+    }
+
+    private fun monitorThemeMode() {
+        monitorThemeModeUseCase()
+            .catch { Timber.e(it) }
+            .onEach { themeMode ->
+                state.update {
+                    it.copy(themeMode = themeMode)
+                }
+            }
+            .launchIn(viewModelScope)
+    }
+
+    fun initialize() {
         viewModelScope.launch {
             val showCopyright = shouldShowCopyrightUseCase()
             val hasSensitiveElement =
-                savedStateHandle.get<Boolean>(AlbumScreenWrapperActivity.HAS_SENSITIVE_ELEMENT)
-                    ?: false
-
+                savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: hasSensitiveElement ?: false
             if (!showCopyright && !hasSensitiveElement) {
                 fetchAlbums()
                 fetchLinks()
@@ -73,7 +93,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     }
 
     fun fetchAlbums() =
-        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, null)
+        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, albumIds)
             .filterNotNull()
             .map(::getAlbumsSummaries)
             .filterNotNull()
@@ -108,7 +128,7 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
     }
 
     fun fetchLinks() =
-        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, null)
+        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, albumIds)
             .filterNotNull()
             .map(::getAlbumLinks)
             .catch { exception -> Timber.e(exception) }
@@ -151,5 +171,47 @@ class AlbumGetMultipleLinksViewModel @Inject constructor(
         state.update {
             it.copy(showSharingSensitiveWarning = false)
         }
+    }
+
+    /**
+     * Updates the flag to show or not show copyright in DB.
+     *
+     * @param show True to show copyright, false to hide it.
+     */
+    fun updateShowCopyRight(show: Boolean) {
+        viewModelScope.launch {
+            runCatching {
+                setShowCopyrightUseCase(show)
+            }
+        }
+    }
+
+    /**
+     * Marks that the user has agreed to copyright terms.
+     */
+    fun agreeCopyrightTerms() {
+        state.update {
+            it.copy(copyrightAgreed = true)
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            albumIds: LongArray?,
+            hasSensitiveElement: Boolean?,
+        ): AlbumGetMultipleLinksViewModel
+    }
+
+    companion object {
+        /**
+         * Navigation argument key for the album IDs
+         */
+        const val ALBUM_ID: String = "album_id"
+
+        /**
+         * Navigation argument key for indicating if the album has sensitive elements
+         */
+        const val HAS_SENSITIVE_ELEMENT: String = "has_sensitive_element"
     }
 }

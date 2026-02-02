@@ -1,5 +1,6 @@
-package mega.privacy.android.app.presentation.photos.albums.getmultiplelinks
+package mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks
 
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
@@ -23,4 +24,6 @@ data class AlbumGetMultipleLinksState(
     val exitScreen: Boolean = false,
     val showCopyright: Boolean = false,
     val showSharingSensitiveWarning: Boolean = false,
+    val copyrightAgreed: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.System,
 )

@@ -2242,4 +2242,8 @@
     <string name="general_invalid_dot_name_warning">The name “.” is not valid</string>
     <!-- General invalid double dot name warning. In can be used for any screen or dialog in which a name is requested. E.g.: New file, folder or album creation. -->
     <string name="general_invalid_double_dot_name_warning">The name “..” is not valid</string>
+    <!-- Title of the list of links displayed on Album Get Multiple Links -->
+    <string name="album_get_multiple_links_list_title">Links</string>
+    <!-- Action to copy all of the links on Album Get Multiple Links -->
+    <string name="album_get_multiple_links_copy_all_action">Copy all</string>
 </resources>
