@@ -147,6 +147,7 @@ internal fun HomeScreen(
             .semantics { testTagsAsResourceId = true },
         topBar = {
             MegaTopAppBar(
+                modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
                 title = stringResource(sharedR.string.general_section_home),
                 navigationType = AppBarNavigationType.None,
                 trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
@@ -246,3 +247,4 @@ internal fun HomeScreen(
 }
 
 internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
+internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"

@@ -95,6 +95,7 @@ fun CloudDriveScreen(
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(CLOUD_DRIVE_SELECTION_MODE_APP_BAR_TAG),
                     count = uiState.selectedItemsCount,
                     isAllSelected = uiState.isAllSelected,
                     isSelecting = uiState.isSelecting,
@@ -103,6 +104,7 @@ fun CloudDriveScreen(
                 )
             } else {
                 MegaTopAppBar(
+                    modifier = Modifier.testTag(CLOUD_DRIVE_MAIN_APP_BAR_TAG),
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
                     trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
@@ -141,6 +143,7 @@ fun CloudDriveScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(CLOUD_DRIVE_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
@@ -193,3 +196,8 @@ fun CloudDriveScreen(
 }
 
 internal const val CLOUD_DRIVE_FAB_TAG = "cloud_drive_screen:add_content_fab"
+internal const val CLOUD_DRIVE_MAIN_APP_BAR_TAG = "cloud_drive_screen:main_app_bar"
+internal const val CLOUD_DRIVE_SELECTION_MODE_APP_BAR_TAG =
+    "cloud_drive_screen:selection_mode_app_bar"
+internal const val CLOUD_DRIVE_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "cloud_drive_screen:selection_mode_bottom_bar"

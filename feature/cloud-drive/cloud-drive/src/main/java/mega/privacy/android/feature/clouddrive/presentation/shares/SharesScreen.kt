@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
@@ -163,6 +164,7 @@ internal fun SharesScreen(
         topBar = {
             if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(SHARES_SELECTION_MODE_APP_BAR_TAG),
                     count = selectedItemsCount,
                     isAllSelected = isAllItemsSelected,
                     isSelecting = false,
@@ -175,6 +177,7 @@ internal fun SharesScreen(
                 )
             } else {
                 MegaTopAppBar(
+                    modifier = Modifier.testTag(SHARES_MAIN_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.Back {
                         navigationHandler.back()
                     },
@@ -198,6 +201,7 @@ internal fun SharesScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(SHARES_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && isInSelectionMode,
@@ -210,13 +214,17 @@ internal fun SharesScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues.excludingBottomPadding()),
+                .padding(paddingValues.excludingBottomPadding())
+                .testTag(SHARES_TAB_ROW_TAG),
             beyondViewportPageCount = 1,
             hideTabs = isInSelectionMode,
             pagerScrollEnabled = !isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_incoming_shares_tab_title)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_incoming_shares_tab_title),
+                        testTag = SHARES_INCOMING_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     IncomingSharesContent(
                         modifier = modifier,
@@ -239,7 +247,10 @@ internal fun SharesScreen(
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_outgoing_shares_tab_title)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_outgoing_shares_tab_title),
+                        testTag = SHARES_OUTGOING_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     OutgoingSharesContent(
                         modifier = modifier,
@@ -261,7 +272,10 @@ internal fun SharesScreen(
                     )
                 }
                 addTextTabWithScrollableContent(
-                    tabItem = TabItems(stringResource(sharedR.string.shares_screen_links_shares_tab_title)),
+                    tabItem = TabItems(
+                        title = stringResource(sharedR.string.shares_screen_links_shares_tab_title),
+                        testTag = SHARES_LINKS_TAB_TAG
+                    ),
                 ) { _, modifier ->
                     LinksContent(
                         modifier = modifier,
@@ -366,3 +380,12 @@ private enum class SharesTab {
         fun fromOrdinal(ordinal: Int) = entries.getOrNull(ordinal) ?: IncomingShares
     }
 }
+
+internal const val SHARES_MAIN_APP_BAR_TAG = "shares_screen:main_app_bar"
+internal const val SHARES_SELECTION_MODE_APP_BAR_TAG = "shares_screen:selection_mode_app_bar"
+internal const val SHARES_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "shares_screen:selection_mode_bottom_bar"
+internal const val SHARES_TAB_ROW_TAG = "shares_screen:tab_row"
+internal const val SHARES_INCOMING_TAB_TAG = "shares_screen:incoming_tab"
+internal const val SHARES_OUTGOING_TAB_TAG = "shares_screen:outgoing_tab"
+internal const val SHARES_LINKS_TAB_TAG = "shares_screen:links_tab"

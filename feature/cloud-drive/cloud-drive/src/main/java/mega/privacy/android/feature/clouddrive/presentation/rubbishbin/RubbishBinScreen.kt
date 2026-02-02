@@ -144,6 +144,7 @@ internal fun RubbishBinScreen(
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(RUBBISH_BIN_SELECTION_MODE_APP_BAR_TAG),
                     count = uiState.selectedNodes.size,
                     isAllSelected = uiState.isAllSelected,
                     isSelecting = uiState.isSelecting,
@@ -152,7 +153,7 @@ internal fun RubbishBinScreen(
                 )
             } else {
                 MegaTopAppBar(
-                    modifier = Modifier,
+                    modifier = Modifier.testTag(RUBBISH_BIN_MAIN_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.Back(
                         onNavigationIconClicked = {
                             onBackPressedDispatcher?.onBackPressed()
@@ -202,6 +203,7 @@ internal fun RubbishBinScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(RUBBISH_BIN_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,
                 visible = nodeActionState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
@@ -342,3 +344,9 @@ internal fun RubbishBinScreen(
  * Test tag for empty view in nodes screen
  */
 const val NODES_EMPTY_VIEW_VISIBLE = "rubbish_bin_screen:empty_view"
+
+internal const val RUBBISH_BIN_MAIN_APP_BAR_TAG = "rubbish_bin_screen:main_app_bar"
+internal const val RUBBISH_BIN_SELECTION_MODE_APP_BAR_TAG =
+    "rubbish_bin_screen:selection_mode_app_bar"
+internal const val RUBBISH_BIN_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "rubbish_bin_screen:selection_mode_bottom_bar"

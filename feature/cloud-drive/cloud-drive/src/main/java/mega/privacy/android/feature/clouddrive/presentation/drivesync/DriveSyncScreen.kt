@@ -113,6 +113,7 @@ internal fun DriveSyncScreen(
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
+                    modifier = Modifier.testTag(DRIVE_SYNCS_SELECTION_MODE_APP_BAR_TAG),
                     count = cloudDriveUiState.selectedItemsCount,
                     isAllSelected = cloudDriveUiState.isAllSelected,
                     isSelecting = cloudDriveUiState.nodesLoadingState != NodesLoadingState.FullyLoaded,
@@ -121,6 +122,7 @@ internal fun DriveSyncScreen(
                 )
             } else {
                 MegaTopAppBar(
+                    modifier = Modifier.testTag(DRIVE_SYNCS_MAIN_APP_BAR_TAG),
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedR.string.general_drive),
                     trailingIcons = {
@@ -147,6 +149,7 @@ internal fun DriveSyncScreen(
         },
         bottomBar = {
             NodeSelectionModeBottomBar(
+                modifier = Modifier.testTag(DRIVE_SYNCS_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
                 visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && cloudDriveUiState.isInSelectionMode,
@@ -278,3 +281,8 @@ internal fun DriveSyncScreen(
 internal const val DRIVE_SYNCS_FAB_TAG = "drive_syncs_screen:add_content_fab"
 internal const val DRIVE_SYNCS_CLOUD_DRIVE_TAB_TAG = "drive_syncs_screen:cloud_drive_tab"
 internal const val DRIVE_SYNCS_SYNCS_TAB_TAG = "drive_syncs_screen:syncs_tab"
+internal const val DRIVE_SYNCS_MAIN_APP_BAR_TAG = "drive_syncs_screen:main_app_bar"
+internal const val DRIVE_SYNCS_SELECTION_MODE_APP_BAR_TAG =
+    "drive_syncs_screen:selection_mode_app_bar"
+internal const val DRIVE_SYNCS_SELECTION_MODE_BOTTOM_BAR_TAG =
+    "drive_syncs_screen:selection_mode_bottom_bar"

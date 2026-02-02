@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.components.selectionmode
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -15,6 +16,7 @@ fun NodeSelectionModeAppBar(
     isSelecting: Boolean,
     onSelectAllClicked: () -> Unit,
     onCancelSelectionClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     MegaTopAppBar(
         navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
