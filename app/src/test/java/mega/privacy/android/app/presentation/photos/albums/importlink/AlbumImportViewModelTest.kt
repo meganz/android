@@ -274,6 +274,36 @@ class AlbumImportViewModelTest {
     }
 
     @Test
+    fun `test that album name with dot should show error`() = runTest {
+        whenever(mockGetStringFromStringResMapper(any()))
+            .thenReturn(".")
+
+        underTest.validateAlbumName(albumName = ".")
+
+        underTest.stateFlow.test {
+            repeat(1) { awaitItem() }
+
+            val state = awaitItem()
+            assertThat(state.renameAlbumErrorMessage).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test that album name with double dot should show error`() = runTest {
+        whenever(mockGetStringFromStringResMapper(any()))
+            .thenReturn(".")
+
+        underTest.validateAlbumName(albumName = ".")
+
+        underTest.stateFlow.test {
+            repeat(1) { awaitItem() }
+
+            val state = awaitItem()
+            assertThat(state.renameAlbumErrorMessage).isNotNull()
+        }
+    }
+
+    @Test
     fun `test that album name contains invalid char should show error`() = runTest {
         // given
         whenever(mockGetStringFromStringResMapper(any(), any()))

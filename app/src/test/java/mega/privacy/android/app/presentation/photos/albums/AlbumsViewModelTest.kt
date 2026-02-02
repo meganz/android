@@ -478,6 +478,38 @@ class AlbumsViewModelTest {
         }
 
     @Test
+    fun `test that creating an album with only a dot will not create the album`() =
+        runTest {
+            underTest.state.test {
+                awaitItem()
+                underTest.createNewAlbum(".")
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    sharedR.string.general_invalid_dot_name_warning,
+                    item.createDialogErrorMessage
+                )
+            }
+            verifyNoInteractions(createAlbumUseCase)
+        }
+
+    @Test
+    fun `test that creating an album with only a double dot will not create the album`() =
+        runTest {
+            underTest.state.test {
+                awaitItem()
+                underTest.createNewAlbum("..")
+                val item = awaitItem()
+                assertEquals(false, item.isInputNameValid)
+                assertEquals(
+                    sharedR.string.general_invalid_double_dot_name_warning,
+                    item.createDialogErrorMessage
+                )
+            }
+            verifyNoInteractions(createAlbumUseCase)
+        }
+
+    @Test
     fun `test that creating an album with an existing title will not create the album`() =
         runTest {
             val testAlbumName = "Album 1"
@@ -494,7 +526,7 @@ class AlbumsViewModelTest {
                 assertEquals(false, item.isInputNameValid)
                 assertEquals(
                     item.createDialogErrorMessage,
-                    R.string.photos_create_album_error_message_duplicate
+                    sharedR.string.album_name_exists_error_message
                 )
             }
             verifyNoInteractions(createAlbumUseCase)

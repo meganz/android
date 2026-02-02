@@ -40,6 +40,8 @@ import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -507,22 +509,21 @@ class LegacyAlbumContentViewModel @Inject constructor(
         proscribedAlbumNames: List<String>,
         albumNames: List<String>,
     ): Boolean {
-        var errorMessage: Int? = null
-        var isTitleValid = true
+        val errorMessage = when {
+            title.isEmpty() -> sharedResR.string.general_invalid_string
+            title.isInvalidDotName() -> sharedResR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedResR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedResR.string.general_invalid_characters_defined
 
-        if (title.isEmpty()) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.general_invalid_string
-        } else if (title.isEmpty() || proscribedAlbumNames.any { it.equals(title, true) }) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.general_invalid_characters_defined
-        } else if (title in albumNames) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.album_invalid_name_error_message
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = sharedResR.string.album_name_exists_error_message
+            proscribedAlbumNames.any { it.equals(title, true) }
+                -> sharedResR.string.album_invalid_name_error_message
+
+            title in albumNames -> sharedResR.string.album_name_exists_error_message
+
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _state.update {
             it.copy(

@@ -31,6 +31,8 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
@@ -602,24 +604,21 @@ class AlbumsViewModel @Inject constructor(
     private suspend fun checkTitleValidity(
         title: String,
     ): Boolean {
-        val proscribedStrings = getProscribedAlbumNamesUseCase()
+        val errorMessage = when {
+            title.isEmpty() -> R.string.invalid_string
+            title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedR.string.general_invalid_characters_defined
 
-        var errorMessage: Int? = null
-        var isTitleValid = true
+            getProscribedAlbumNamesUseCase().any { it.equals(title, true) }
+                -> R.string.photos_create_album_error_message_systems_album
 
-        if (title.isEmpty()) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_string
-        } else if (title.isEmpty() || proscribedStrings.any { it.equals(title, true) }) {
-            isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_systems_album
-        } else if (title in getAllUserAlbumsNames()) {
-            isTitleValid = false
-            errorMessage = R.string.photos_create_album_error_message_duplicate
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = sharedR.string.general_invalid_characters_defined
+            title in getAllUserAlbumsNames() -> sharedR.string.album_name_exists_error_message
+
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _state.update {
             it.copy(

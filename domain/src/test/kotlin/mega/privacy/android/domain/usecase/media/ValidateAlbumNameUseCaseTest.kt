@@ -1,6 +1,5 @@
 package mega.privacy.android.domain.usecase.media
 
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
@@ -52,6 +51,24 @@ internal class ValidateAlbumNameUseCaseTest {
         val emptyName = ""
 
         assertThrows<AlbumNameValidationException.Empty> {
+            underTest(emptyName)
+        }
+    }
+
+    @Test
+    fun `test that Empty exception is thrown when album name is a dot`() = runTest {
+        val emptyName = "."
+
+        assertThrows<AlbumNameValidationException.InvalidDot> {
+            underTest(emptyName)
+        }
+    }
+
+    @Test
+    fun `test that Empty exception is thrown when album name is a double dot`() = runTest {
+        val emptyName = ".."
+
+        assertThrows<AlbumNameValidationException.InvalidDoubleDot> {
             underTest(emptyName)
         }
     }

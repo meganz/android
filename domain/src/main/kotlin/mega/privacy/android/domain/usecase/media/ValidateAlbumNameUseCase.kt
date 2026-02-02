@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.media
 
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import javax.inject.Inject
 
@@ -13,6 +15,14 @@ class ValidateAlbumNameUseCase @Inject constructor(
     suspend operator fun invoke(name: String) {
         if (name.isBlank()) {
             throw AlbumNameValidationException.Empty
+        }
+
+        if (name.isInvalidDotName()) {
+            throw AlbumNameValidationException.InvalidDot()
+        }
+
+        if (name.isInvalidDoubleDotName()) {
+            throw AlbumNameValidationException.InvalidDoubleDot()
         }
 
         val proscribedStrings = getProscribedAlbumNamesUseCase()

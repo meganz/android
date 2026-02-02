@@ -18,6 +18,9 @@ class AlbumNameValidationExceptionMessageMapper @Inject constructor(
                 sharedR.string.general_invalid_characters_defined,
                 exception.chars
             )
+
+            is AlbumNameValidationException.InvalidDot -> context.getString(sharedR.string.general_invalid_dot_name_warning)
+            is AlbumNameValidationException.InvalidDoubleDot -> context.getString(sharedR.string.general_invalid_double_dot_name_warning)
         }
     }
 }

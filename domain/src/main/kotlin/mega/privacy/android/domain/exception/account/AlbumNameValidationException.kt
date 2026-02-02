@@ -13,5 +13,12 @@ sealed class AlbumNameValidationException : Exception("Album name validation fai
         private fun readResolve(): Any = Exists
     }
 
+
+    data class InvalidDot(override val message: String = "Playlist name not allowed: ``.´´") :
+        AlbumNameValidationException()
+
+    data class InvalidDoubleDot(override val message: String = "Playlist name not allowed: ``..´´") :
+        AlbumNameValidationException()
+
     data class InvalidCharacters(val chars: String) : AlbumNameValidationException()
 }

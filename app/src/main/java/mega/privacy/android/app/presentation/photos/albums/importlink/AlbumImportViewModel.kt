@@ -38,6 +38,8 @@ import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -293,6 +295,32 @@ internal class AlbumImportViewModel @Inject constructor(
             isInvalid
         }
 
+        val checkDotName = {
+            val isInvalid = albumName.isInvalidDotName()
+
+            state.update {
+                it.copy(
+                    renameAlbumErrorMessage = getStringFromStringResMapper(
+                        stringId = sharedR.string.general_invalid_dot_name_warning,
+                    ).takeIf { isInvalid },
+                )
+            }
+            isInvalid
+        }
+
+        val checkDoubleDotName = {
+            val isInvalid = albumName.isInvalidDoubleDotName()
+
+            state.update {
+                it.copy(
+                    renameAlbumErrorMessage = getStringFromStringResMapper(
+                        stringId = sharedR.string.general_invalid_double_dot_name_warning,
+                    ).takeIf { isInvalid },
+                )
+            }
+            isInvalid
+        }
+
         val checkInvalidChar = {
             val isInvalid = "[\\\\*/:<>?\"|]".toRegex().containsMatchIn(albumName)
 
@@ -336,6 +364,8 @@ internal class AlbumImportViewModel @Inject constructor(
 
         val constraints = listOf(
             { checkBlankName() },
+            { checkDotName() },
+            { checkDoubleDotName() },
             { checkInvalidChar() },
             { checkDuplicatedName() },
             suspend { checkProscribedName() },

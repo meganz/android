@@ -37,6 +37,28 @@ class AlbumNameValidationExceptionMessageMapperTest {
     }
 
     @Test
+    fun `test that InvalidDot exception maps to general_invalid_dot_name_warning resource`() {
+        val expected = "expected"
+        val exception = AlbumNameValidationException.InvalidDot()
+
+        whenever(context.getString(sharedR.string.general_invalid_dot_name_warning))
+            .thenReturn(expected)
+
+        assertThat(underTest(exception)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that InvalidDoubleDot exception maps to general_invalid_dot_name_warning resource`() {
+        val expected = "expected"
+        val exception = AlbumNameValidationException.InvalidDoubleDot()
+
+        whenever(context.getString(sharedR.string.general_invalid_double_dot_name_warning))
+            .thenReturn(expected)
+
+        assertThat(underTest(exception)).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that Exists exception maps to album_invalid_name_error_message resource`() {
         val expected = "expected"
         val exception = AlbumNameValidationException.Exists
