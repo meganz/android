@@ -159,6 +159,8 @@ object NodeActionHandlerModule {
         renameNodeAction: RenameNodeActionClickHandler,
         shareAction: ShareActionClickHandler,
         unhideAction: UnhideActionClickHandler,
+        favouriteAction: FavouriteActionClickHandler,
+        removeFavouriteAction: RemoveFavouriteActionClickHandler,
         addToActionClickHandler: AddToActionClickHandler,
         addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
     ): Set<MultiNodeAction> {
@@ -184,6 +186,8 @@ object NodeActionHandlerModule {
             renameNodeAction,
             shareAction,
             unhideAction,
+            favouriteAction,
+            removeFavouriteAction,
             addToActionClickHandler,
             addToAlbumActionClickHandler
         )

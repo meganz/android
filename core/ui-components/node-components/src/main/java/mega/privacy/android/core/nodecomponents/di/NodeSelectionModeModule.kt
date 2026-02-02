@@ -7,6 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToAlbumSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.CopySelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.DeletePermanentlySelectionMenuItem
@@ -17,6 +18,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Hide
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.LeaveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ManageLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.MoveSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveFromFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveLinkSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RemoveShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
@@ -60,7 +62,9 @@ abstract class NodeSelectionModeModule {
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
             addToSelectionMenuItem: AddToSelectionMenuItem,
-            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             hideSelectionModeMenuAction,
@@ -78,7 +82,9 @@ abstract class NodeSelectionModeModule {
             disputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem,
             addToSelectionMenuItem,
-            addToAlbumSelectionMenuItem
+            addToAlbumSelectionMenuItem,
+            addToFavouritesSelectionMenuItem,
+            removeFromFavouritesSelectionMenuItem,
         )
 
         @Provides

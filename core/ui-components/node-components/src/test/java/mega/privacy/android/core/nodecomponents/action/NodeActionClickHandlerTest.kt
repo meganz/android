@@ -8,6 +8,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.analytics.test.AnalyticsTestRule
@@ -1141,6 +1142,34 @@ class NodeActionClickHandlerTest {
             verify(mockUpdateNodeFavoriteUseCase).invoke(any(), any())
         }
 
+    @Test
+    fun `test RemoveFavouriteAction multiple nodes handle calls updateNodeFavoriteUseCase for each node and dismisses`() =
+        runTest {
+            val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<RemoveFavouriteMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(123L), false)
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(456L), false)
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test RemoveFavouriteAction multiple nodes empty list dismisses without calling use case`() =
+        runTest {
+            val action = RemoveFavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<RemoveFavouriteMenuAction>()
+
+            action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase, never()).invoke(any(), any())
+            verify(mockViewModel).dismiss()
+        }
+
     // FavouriteAction Tests
     @Test
     fun `test FavouriteAction canHandle returns true for FavouriteMenuAction`() {
@@ -1159,6 +1188,34 @@ class NodeActionClickHandlerTest {
 
         verify(mockUpdateNodeFavoriteUseCase).invoke(any(), any())
     }
+
+    @Test
+    fun `test FavouriteAction multiple nodes handle calls updateNodeFavoriteUseCase for each node and dismisses`() =
+        runTest {
+            val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<FavouriteMenuAction>()
+            val nodes = listOf(mockFileNode, mockFolderNode)
+
+            action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(123L), true)
+            verify(mockUpdateNodeFavoriteUseCase).invoke(NodeId(456L), true)
+            verify(mockViewModel).dismiss()
+        }
+
+    @Test
+    fun `test FavouriteAction multiple nodes empty list dismisses without calling use case`() =
+        runTest {
+            val action = FavouriteActionClickHandler(mockUpdateNodeFavoriteUseCase)
+            val menuAction = mock<FavouriteMenuAction>()
+
+            action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+            testScope.advanceUntilIdle()
+
+            verify(mockUpdateNodeFavoriteUseCase, never()).invoke(any(), any())
+            verify(mockViewModel).dismiss()
+        }
 
     // LeaveShareAction Tests
     @Test
