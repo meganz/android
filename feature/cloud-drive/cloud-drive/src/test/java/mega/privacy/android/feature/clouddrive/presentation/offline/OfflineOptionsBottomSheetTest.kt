@@ -16,7 +16,6 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -122,7 +121,7 @@ class OfflineOptionsBottomSheetTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText(context.getString(sharedResR.string.general_save_to_device))
             .assertIsDisplayed()
-        composeRule.onNodeWithText(context.getString(R.string.offline_screen_selection_menu_remove_from_offline))
+        composeRule.onNodeWithText(context.getString(sharedResR.string.offline_screen_remove_from_offline_selection_menu))
             .assertIsDisplayed()
     }
 

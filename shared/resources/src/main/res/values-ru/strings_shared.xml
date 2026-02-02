@@ -1975,7 +1975,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Папка пуста</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">На облачном диске пока ничего нет</string>
+    <string name="context_empty_cloud_drive_title">В вашем личном хранилище пока ничего нет</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Добавьте файлы — они будут защищены сквозным шифрованием.</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -2031,7 +2031,7 @@
     <string name="external_checkout_information_title">Переход из MEGA</string>
     <string name="external_checkout_information_description">Вы собираетесь открыть внешний сайт (%1$s). MEGA отвечает за транзакции и поддержку клиентов.</string>
     <string name="external_checkout_show_next_time">Показывать в следующий раз</string>
-    <string name="timeline_tab_cu_battery_level_warning_banner_description">Слишком низкий заряд батареи. Для загрузок из камеры зарядите устройство</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Батарея почти разряжена. Для загрузок из камеры зарядите устройство.</string>
     <string name="media_main_screen_camera_uploads_updated">Загрузки из камеры обновлены</string>
     <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Загрузки из камеры синхронизированы</string>
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">Превышен лимит передачи данных</string>
@@ -2202,4 +2202,38 @@
     <string name="general_create_label">Создать</string>
     <string name="general_new_text_file">Новый текстовый файл</string>
     <string name="general_new_folder">Новая папка</string>
+    <string name="home_recents_snackbar_activity_hidden">Ваша недавняя активность была скрыта</string>
+    <string name="home_recents_button_view_all">Показать все</string>
+    <string name="home_recents_options_menu_show_activity">Показать недавнюю активность</string>
+    <string name="home_recents_empty_text_description">Здесь будут отображаться все недавние действия с файлами и папками</string>
+    <string name="home_recents_hidden_text_description">Недавняя активность скрыта</string>
+    <string name="home_recents_bucket_subtitle_added_to">Добавлено в %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Эти файлы больше не доступны</string>
+    <string name="shares_screen_links_section_empty">[B]Нет [/B][A]публичных ссылок[/A]</string>
+    <string name="general_invalid_dot_name_warning">Название «.» недопустимо</string>
+    <string name="general_invalid_double_dot_name_warning">Название «..» недопустимо</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

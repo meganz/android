@@ -556,7 +556,7 @@ private fun EmptyFolderLinkViewPreview() {
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .padding(horizontal = 8.dp),
-                emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
+                emptyViewString = stringResource(id = sharedR.string.empty_file_browser_folder),
             )
         }
     }

@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
@@ -30,7 +29,6 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.R as NodeComponentsR
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -48,6 +46,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RECENTS_LIST_LOADING_TEST_TAG
@@ -93,7 +92,7 @@ fun RecentsBucketScreen(
             } else {
                 MegaTopAppBar(
                     title = pluralStringResource(
-                        NodeComponentsR.plurals.num_files_with_parameter,
+                        sharedR.plurals.num_of_files_with_parameter,
                         uiState.fileCount,
                         uiState.fileCount
                     ),

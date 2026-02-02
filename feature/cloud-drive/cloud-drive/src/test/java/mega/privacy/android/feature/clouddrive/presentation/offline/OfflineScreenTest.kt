@@ -21,9 +21,9 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 import org.junit.Rule
@@ -84,7 +84,7 @@ class OfflineScreenTest {
             InstrumentationRegistry
                 .getInstrumentation()
                 .targetContext
-                .getString(R.string.offline_warning)
+                .getString(SharedR.string.logout_offline_content_deletion_warning)
         ).assertIsDisplayed()
     }
 
@@ -129,7 +129,7 @@ class OfflineScreenTest {
         setupComposeContent(uiState)
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_screen_title)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.offline_screen_title)
         ).assertIsDisplayed()
     }
 
@@ -185,7 +185,7 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays empty folder description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val emptyFolderText = context.getString(R.string.file_browser_empty_folder)
+        val emptyFolderText = context.getString(SharedR.string.empty_file_browser_folder)
         val offlineNodes = listOf(
             createOfflineNodeUiItem("EmptyFolder", isFolder = true, numFiles = 0, numFolders = 0)
         )
@@ -204,7 +204,7 @@ class OfflineScreenTest {
     fun `test that OfflineScreen displays folder with files description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val filesText =
-            context.resources.getQuantityString(R.plurals.num_files_with_parameter, 3, 3)
+            context.resources.getQuantityString(SharedR.plurals.num_of_files_with_parameter, 3, 3)
         val offlineNodes = listOf(
             createOfflineNodeUiItem(
                 "FolderWithFiles",
@@ -228,7 +228,7 @@ class OfflineScreenTest {
     fun `test that OfflineScreen displays folder with subfolders description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val foldersText =
-            context.resources.getQuantityString(R.plurals.num_folders_with_parameter, 2, 2)
+            context.resources.getQuantityString(SharedR.plurals.num_of_folders_with_parameter, 2, 2)
         val offlineNodes = listOf(
             createOfflineNodeUiItem(
                 "FolderWithSubfolders",
@@ -251,8 +251,13 @@ class OfflineScreenTest {
     @Test
     fun `test that OfflineScreen displays folder with files and subfolders description`() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val foldersText = context.resources.getQuantityString(R.plurals.num_folders_num_files, 2, 2)
-        val filesText = context.resources.getQuantityString(R.plurals.num_folders_num_files_2, 5, 5)
+        val foldersText = context.resources.getQuantityString(
+            SharedR.plurals.num_of_folders_and_num_of_files,
+            2,
+            2
+        )
+        val filesText =
+            context.resources.getQuantityString(SharedR.plurals.num_of_files_with_parameter, 5, 5)
         val combinedText = "$foldersText$filesText"
         val offlineNodes = listOf(
             createOfflineNodeUiItem("MixedFolder", isFolder = true, numFiles = 5, numFolders = 2)
@@ -349,7 +354,7 @@ class OfflineScreenTest {
         )
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_screen_title)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.offline_screen_title)
         ).assertIsDisplayed()
     }
 
@@ -368,7 +373,7 @@ class OfflineScreenTest {
         )
 
         composeRule.onNodeWithText(
-            InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.offline_warning)
+            InstrumentationRegistry.getInstrumentation().targetContext.getString(SharedR.string.logout_offline_content_deletion_warning)
         ).assertIsDisplayed()
     }
 

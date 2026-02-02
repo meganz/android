@@ -92,7 +92,7 @@ internal fun OfflineFileInfoScreen(
 
     if (showRemoveFromOfflineDialog) {
         MegaAlertDialog(
-            text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
+            text = stringResource(id = sharedR.string.offline_item_deletion_confirmation_title),
             confirmButtonText = stringResource(id = R.string.general_remove),
             cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
             onConfirm = onRemoveFromOffline,

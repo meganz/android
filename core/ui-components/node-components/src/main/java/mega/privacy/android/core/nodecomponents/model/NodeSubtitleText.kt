@@ -8,6 +8,7 @@ import androidx.compose.ui.text.intl.Locale
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Represents different types of node subtitles that can be resolved to localized strings
@@ -87,18 +88,18 @@ fun NodeSubtitleText.text(): String {
         is NodeSubtitleText.FolderSubtitle -> {
             when {
                 childFolderCount == 0 && childFileCount == 0 ->
-                    stringResource(R.string.file_browser_empty_folder)
+                    stringResource(SharedR.string.empty_file_browser_folder)
 
                 childFolderCount == 0 && childFileCount > 0 ->
                     pluralStringResource(
-                        R.plurals.num_files_with_parameter,
+                        SharedR.plurals.num_of_files_with_parameter,
                         childFileCount,
                         childFileCount
                     )
 
                 childFileCount == 0 && childFolderCount > 0 ->
                     pluralStringResource(
-                        R.plurals.num_folders_with_parameter,
+                        SharedR.plurals.num_of_folders_with_parameter,
                         childFolderCount,
                         childFolderCount
                     )
@@ -109,7 +110,7 @@ fun NodeSubtitleText.text(): String {
                         childFolderCount,
                         childFolderCount
                     ) + pluralStringResource(
-                        R.plurals.num_folders_num_files_2,
+                        SharedR.plurals.num_of_files_with_parameter,
                         childFileCount,
                         childFileCount
                     )

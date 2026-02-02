@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.mapper.file
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedR
 import javax.inject.Inject
 
 /**
@@ -20,29 +20,29 @@ class FolderInfoStringMapper @Inject constructor(
     operator fun invoke(numFolders: Int, numFiles: Int) =
         when {
             numFolders == 0 && numFiles == 0 ->
-                context.getString(R.string.file_browser_empty_folder)
+                context.getString(SharedR.string.empty_file_browser_folder)
 
             numFolders == 0 && numFiles > 0 ->
                 context.resources.getQuantityString(
-                    R.plurals.num_files_with_parameter,
+                    SharedR.plurals.num_of_files_with_parameter,
                     numFiles,
                     numFiles
                 )
 
             numFiles == 0 && numFolders > 0 ->
                 context.resources.getQuantityString(
-                    R.plurals.num_folders_with_parameter,
+                    SharedR.plurals.num_of_folders_with_parameter,
                     numFolders,
                     numFolders
                 )
 
             else ->
                 context.resources.getQuantityString(
-                    R.plurals.num_folders_num_files,
+                    SharedR.plurals.num_of_folders_and_num_of_files,
                     numFolders,
                     numFolders
                 ) + context.resources.getQuantityString(
-                    R.plurals.num_folders_num_files_2,
+                    SharedR.plurals.num_of_files_with_parameter,
                     numFiles,
                     numFiles
                 )

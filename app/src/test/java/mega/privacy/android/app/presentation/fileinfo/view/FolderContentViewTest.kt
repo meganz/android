@@ -3,14 +3,13 @@ package mega.privacy.android.app.presentation.fileinfo.view
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.fileinfo.view.FolderContentView
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
 import mega.privacy.android.app.fromPluralId
 import mega.privacy.android.app.onNodeWithPlural
 import mega.privacy.android.app.onNodeWithText
+import mega.privacy.android.shared.resources.R as SharedR
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class FolderContentViewTest {
@@ -23,7 +22,7 @@ class FolderContentViewTest {
             FolderContentView(numberOfFolders = 0, numberOfFiles = 0)
         }
 
-        composeTestRule.onNodeWithText(R.string.file_browser_empty_folder)
+        composeTestRule.onNodeWithText(SharedR.string.empty_file_browser_folder)
             .assertExists()
     }
 
@@ -33,7 +32,7 @@ class FolderContentViewTest {
             FolderContentView(numberOfFolders = 0, numberOfFiles = 1)
         }
 
-        composeTestRule.onNodeWithPlural(R.plurals.num_files_with_parameter, 1)
+        composeTestRule.onNodeWithPlural(SharedR.plurals.num_of_files_with_parameter, 1)
             .assertExists()
     }
 
@@ -43,7 +42,7 @@ class FolderContentViewTest {
             FolderContentView(numberOfFolders = 1, numberOfFiles = 0)
         }
 
-        composeTestRule.onNodeWithPlural(R.plurals.num_folders_with_parameter, 1)
+        composeTestRule.onNodeWithPlural(SharedR.plurals.num_of_folders_with_parameter, 1)
             .assertExists()
     }
 
@@ -54,12 +53,12 @@ class FolderContentViewTest {
         }
 
         composeTestRule.onNodeWithText(
-            fromPluralId(R.plurals.num_folders_num_files, 1),
+            fromPluralId(SharedR.plurals.num_of_folders_and_num_of_files, 1),
             substring = true
         ).assertExists()
 
         composeTestRule.onNodeWithText(
-            fromPluralId(R.plurals.num_folders_num_files_2, 1),
+            fromPluralId(SharedR.plurals.num_of_files_with_parameter, 1),
             substring = true
         ).assertExists()
     }

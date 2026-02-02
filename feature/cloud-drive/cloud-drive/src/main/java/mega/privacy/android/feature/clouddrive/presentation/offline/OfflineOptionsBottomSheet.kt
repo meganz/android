@@ -19,7 +19,6 @@ import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -150,7 +149,7 @@ internal fun OfflineOptionsBottomSheetContent(
                 modifier = Modifier
                     .testTag(OFFLINE_OPTIONS_DELETE_MENU_ITEM)
                     .fillMaxWidth(),
-                text = stringResource(R.string.offline_screen_selection_menu_remove_from_offline),
+                text = stringResource(sharedResR.string.offline_screen_remove_from_offline_selection_menu),
                 icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
                 onActionClicked = {
                     onDeleteOfflineFile(this)

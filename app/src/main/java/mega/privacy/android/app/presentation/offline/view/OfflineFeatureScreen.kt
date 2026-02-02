@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import com.google.common.io.Files.getFileExtension
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineNodeUIItem
 import mega.privacy.android.app.presentation.offline.offlinecompose.model.OfflineUiState
 import mega.privacy.android.app.presentation.view.NodeGridView
@@ -43,6 +42,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.NodeGridViewI
 import mega.privacy.android.shared.original.core.ui.controls.lists.NodeListViewItem
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import java.time.Instant
 import kotlin.time.Duration.Companion.days
 
@@ -73,7 +73,7 @@ fun OfflineFeatureScreen(
         ) {
             if (uiState.showOfflineWarning && !uiState.isLoading) {
                 WarningBanner(
-                    textString = stringResource(R.string.offline_warning),
+                    textString = stringResource(SharedR.string.logout_offline_content_deletion_warning),
                     onCloseClick = onCloseWarningClick
                 )
             }
@@ -209,26 +209,26 @@ internal fun getOfflineNodeDescription(offlineFileInformation: OfflineFileInform
     return if (offlineFileInformation.isFolder) {
         offlineFileInformation.folderInfo?.let { folderInfo ->
             if (folderInfo.numFolders == 0 && folderInfo.numFiles == 0) {
-                stringResource(R.string.file_browser_empty_folder)
+                stringResource(SharedR.string.empty_file_browser_folder)
             } else if (folderInfo.numFolders == 0 && folderInfo.numFiles > 0) {
                 pluralStringResource(
-                    R.plurals.num_files_with_parameter,
+                    SharedR.plurals.num_of_files_with_parameter,
                     folderInfo.numFiles,
                     folderInfo.numFiles
                 )
             } else if (folderInfo.numFiles == 0 && folderInfo.numFolders > 0) {
                 pluralStringResource(
-                    R.plurals.num_folders_with_parameter,
+                    SharedR.plurals.num_of_folders_with_parameter,
                     folderInfo.numFolders,
                     folderInfo.numFolders
                 )
             } else {
                 pluralStringResource(
-                    R.plurals.num_folders_num_files,
+                    SharedR.plurals.num_of_folders_and_num_of_files,
                     folderInfo.numFolders,
                     folderInfo.numFolders
                 ) + pluralStringResource(
-                    R.plurals.num_folders_num_files_2,
+                    SharedR.plurals.num_of_files_with_parameter,
                     folderInfo.numFiles,
                     folderInfo.numFiles
                 )

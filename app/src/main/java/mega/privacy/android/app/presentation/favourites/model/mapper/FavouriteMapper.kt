@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.favourites.model.mapper
 
 import android.content.Context
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
@@ -16,6 +15,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaNode
 
 /**
@@ -153,26 +153,26 @@ private fun getFolderInfo(
     favouriteInfo: TypedFolderNode,
 ) = { context: Context ->
     if (favouriteInfo.childFolderCount == 0 && favouriteInfo.childFileCount == 0) {
-        context.getString(R.string.file_browser_empty_folder)
+        context.getString(SharedR.string.empty_file_browser_folder)
     } else if (favouriteInfo.childFolderCount == 0 && favouriteInfo.childFileCount > 0) {
         context.resources.getQuantityString(
-            R.plurals.num_files_with_parameter,
+            SharedR.plurals.num_of_files_with_parameter,
             favouriteInfo.childFileCount,
             favouriteInfo.childFileCount
         )
     } else if (favouriteInfo.childFileCount == 0 && favouriteInfo.childFolderCount > 0) {
         context.resources.getQuantityString(
-            R.plurals.num_folders_with_parameter,
+            SharedR.plurals.num_of_folders_with_parameter,
             favouriteInfo.childFolderCount,
             favouriteInfo.childFolderCount
         )
     } else {
         context.resources.getQuantityString(
-            R.plurals.num_folders_num_files,
+            SharedR.plurals.num_of_folders_and_num_of_files,
             favouriteInfo.childFolderCount,
             favouriteInfo.childFolderCount
         ) + context.resources.getQuantityString(
-            R.plurals.num_folders_num_files_2,
+            SharedR.plurals.num_of_files_with_parameter,
             favouriteInfo.childFileCount,
             favouriteInfo.childFileCount
         )

@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.annotation.PluralsRes
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.mapper.file.FolderInfoStringMapper
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -38,27 +37,27 @@ class FolderInfoStringMapperTest {
         val fileString = "$numFiles files"
         val result = "$folderString · $fileString"
 
-        whenever(context.getString(R.string.file_browser_empty_folder)).thenReturn(emptyString)
+        whenever(context.getString(SharedR.string.empty_file_browser_folder)).thenReturn(emptyString)
         initQuantityReturned(
-            stringId = R.plurals.num_folders_with_parameter,
+            stringId = SharedR.plurals.num_of_folders_with_parameter,
             quantity = numFolders,
             content = numFolders,
             returnValue = folderString
         )
         initQuantityReturned(
-            stringId = R.plurals.num_files_with_parameter,
+            stringId = SharedR.plurals.num_of_files_with_parameter,
             quantity = numFiles,
             content = numFiles,
             returnValue = fileString
         )
         initQuantityReturned(
-            stringId = R.plurals.num_folders_num_files,
+            stringId = SharedR.plurals.num_of_folders_and_num_of_files,
             quantity = numFolders,
             content = numFolders,
             returnValue = "$folderString · "
         )
         initQuantityReturned(
-            stringId = R.plurals.num_folders_num_files_2,
+            stringId = SharedR.plurals.num_of_files_with_parameter,
             quantity = numFiles,
             content = numFiles,
             returnValue = fileString

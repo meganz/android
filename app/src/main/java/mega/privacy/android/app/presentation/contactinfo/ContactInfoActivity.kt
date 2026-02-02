@@ -1458,7 +1458,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {
         contentContactProperties.apply {
             shareFoldersButton.text = resources.getQuantityString(
-                R.plurals.num_folders_with_parameter,
+                sharedR.plurals.num_of_folders_with_parameter,
                 nodes.size,
                 nodes.size
             )

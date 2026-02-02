@@ -2086,4 +2086,28 @@
     <string name="general_create_label">Creëren</string>
     <string name="general_new_text_file">Nieuw tekst bestand</string>
     <string name="general_new_folder">Nieuwe map</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

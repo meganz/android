@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.clouddrive.R
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 internal fun getFileTypeIcon(fileName: String): Int? {
@@ -43,12 +44,12 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
     return when {
         numFiles == 0 && numFolders == 0 -> {
-            stringResource(R.string.file_browser_empty_folder)
+            stringResource(SharedR.string.empty_file_browser_folder)
         }
 
         numFolders == 0 && numFiles > 0 -> {
             pluralStringResource(
-                R.plurals.num_files_with_parameter,
+                SharedR.plurals.num_of_files_with_parameter,
                 numFiles,
                 numFiles
             )
@@ -56,7 +57,7 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
         numFiles == 0 && numFolders > 0 -> {
             pluralStringResource(
-                R.plurals.num_folders_with_parameter,
+                SharedR.plurals.num_of_folders_with_parameter,
                 numFolders,
                 numFolders
             )
@@ -64,12 +65,12 @@ private fun getFolderDescription(offlineFileInformation: OfflineFileInformation)
 
         else -> {
             val foldersText = pluralStringResource(
-                R.plurals.num_folders_num_files,
+                SharedR.plurals.num_of_folders_and_num_of_files,
                 numFolders,
                 numFolders
             )
             val filesText = pluralStringResource(
-                R.plurals.num_folders_num_files_2,
+                SharedR.plurals.num_of_files_with_parameter,
                 numFiles,
                 numFiles
             )

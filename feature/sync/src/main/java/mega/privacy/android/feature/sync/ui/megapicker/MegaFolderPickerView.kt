@@ -40,6 +40,7 @@ import mega.privacy.android.shared.original.core.ui.controls.skeleton.ListItemLo
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
 internal fun MegaFolderPickerView(
@@ -246,17 +247,17 @@ private fun FolderNode.folderInfo(): String {
         pluralStringResource(R.plurals.num_files_with_parameter, childFileCount, childFileCount)
     } else if (childFileCount == 0 && childFolderCount > 0) {
         pluralStringResource(
-            R.plurals.num_folders_with_parameter,
+            SharedR.plurals.num_of_folders_with_parameter,
             childFolderCount,
             childFolderCount
         )
     } else {
         pluralStringResource(
-            R.plurals.num_folders_num_files,
+            SharedR.plurals.num_of_folders_and_num_of_files,
             childFolderCount,
             childFolderCount
         ) + pluralStringResource(
-            R.plurals.num_folders_num_files_2,
+            SharedR.plurals.num_of_files_with_parameter,
             childFileCount,
             childFileCount
         )

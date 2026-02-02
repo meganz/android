@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.UpdatedPendingContactIncomingIgnoredAl
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingAcceptedAlert
 import mega.privacy.android.domain.entity.UpdatedPendingContactOutgoingDeniedAlert
 import mega.privacy.android.domain.entity.UserAlert
+import mega.privacy.android.shared.resources.R as SharedR
 
 internal fun UserAlert.title(): (Context) -> String = when (this) {
     is IncomingPendingContactRequestAlert -> { context ->
@@ -153,13 +154,13 @@ internal fun UserAlert.title(): (Context) -> String = when (this) {
             folderCount > 0 && fileCount > 0 -> {
                 val files =
                     context.resources.getQuantityString(
-                        R.plurals.num_files_with_parameter,
+                        SharedR.plurals.num_of_files_with_parameter,
                         fileCount,
                         fileCount
                     )
                 val folders =
                     context.resources.getQuantityString(
-                        R.plurals.num_folders_with_parameter,
+                        SharedR.plurals.num_of_folders_with_parameter,
                         folderCount,
                         folderCount
                     )

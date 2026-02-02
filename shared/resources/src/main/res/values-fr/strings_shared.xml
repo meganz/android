@@ -2126,4 +2126,48 @@
     <string name="general_create_label">Créer</string>
     <string name="general_new_text_file">Nouveau fichier texte</string>
     <string name="general_new_folder">Nouveau dossier</string>
+    <string name="section_banners">Bannières</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">Chargement&#8230;</string>
+    <string name="section_my_account">Mon compte</string>
+    <string name="storage_usage_format">%1$s sur %2$s utilisé(s)</string>
+    <string name="general_hi">Bonjour</string>
+    <string name="home_recents_snackbar_activity_hidden">Votre activité récente a été masquée</string>
+    <string name="home_recents_button_view_all">Voir tout</string>
+    <string name="home_recents_options_menu_show_activity">Afficher l\’activité récente</string>
+    <string name="home_recents_empty_text_description">Toutes vos activités récentes concernant les fichiers et dossiers apparaîtront ici</string>
+    <string name="home_recents_hidden_text_description">Activité récente cachée</string>
+    <string name="home_recents_bucket_subtitle_added_to">Ajouté(s) à %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Ces fichiers ne sont plus disponibles</string>
+    <string name="shares_screen_links_section_empty">[B]Aucun [/B][A]lien public[/A]</string>
+    <string name="general_invalid_dot_name_warning">Le nom \“.\“ n\’est pas valide</string>
+    <string name="general_invalid_double_dot_name_warning">Le nom \“..\“ n\’est pas valide</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

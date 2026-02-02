@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.legacy.core.ui.controls.lists.MEDIA_DISCOVERY_TAG
 import mega.privacy.android.shared.original.core.ui.controls.snackbars.SNACKBAR_TEST_TAG
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
@@ -66,7 +67,7 @@ class FolderLinkViewTest {
                 onStorageStatusDialogDismiss = { },
                 onStorageDialogActionButtonClick = { },
                 onStorageDialogAchievementButtonClick = { },
-                emptyViewString = stringResource(id = R.string.file_browser_empty_folder),
+                emptyViewString = stringResource(id = SharedR.string.empty_file_browser_folder),
                 onLinkClicked = { },
                 onDisputeTakeDownClicked = { },
                 onEnterMediaDiscoveryClick = { },
@@ -107,7 +108,7 @@ class FolderLinkViewTest {
     @Test
     fun `test that empty view is displayed when nodes list is empty`() {
         setComposeContent(uiState = FolderLinkState(isNodesFetched = true, nodesList = listOf()))
-        composeTestRule.onNodeWithText(R.string.file_browser_empty_folder).assertIsDisplayed()
+        composeTestRule.onNodeWithText(SharedR.string.empty_file_browser_folder).assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Folder").assertIsDisplayed()
     }
 

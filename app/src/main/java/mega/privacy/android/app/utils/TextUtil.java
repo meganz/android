@@ -179,13 +179,13 @@ public class TextUtil {
      */
     public static String getFolderInfo(int numFolders, int numFiles, Context context) {
         if (numFolders == 0 && numFiles == 0) {
-            return context.getString(R.string.file_browser_empty_folder);
+            return context.getString(mega.privacy.android.shared.resources.R.string.empty_file_browser_folder);
         } else if (numFolders == 0 && numFiles > 0) {
-            return context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
+            return context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.num_of_files_with_parameter, numFiles, numFiles);
         } else if (numFiles == 0 && numFolders > 0) {
-            return context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
+            return context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.num_of_folders_with_parameter, numFolders, numFolders);
         } else {
-            return context.getResources().getQuantityString(R.plurals.num_folders_num_files, numFolders, numFolders) + context.getResources().getQuantityString(R.plurals.num_folders_num_files_2, numFiles, numFiles);
+            return context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.num_of_folders_and_num_of_files, numFolders, numFolders) + context.getResources().getQuantityString(mega.privacy.android.shared.resources.R.plurals.num_of_files_with_parameter, numFiles, numFiles);
         }
     }
 

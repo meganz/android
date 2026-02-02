@@ -1937,7 +1937,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">Esta pasta está vazia</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">Ainda não há nada na sua nuvem</string>
+    <string name="context_empty_cloud_drive_title">Ainda não há nada no seu cofre privado</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">Mantenha algo seguro com criptografia de conhecimento zero.</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -2067,8 +2067,8 @@
     <string name="business_label">Business</string>
     <plurals name="remove_links_warning_text">
         <item quantity="one">Este link já não estará disponível.</item>
-        <item quantity="many">Estes links já não estarão disponíveis</item>
-        <item quantity="other">Estes links já não estarão disponíveis</item>
+        <item quantity="many">Estes links já não estarão disponíveis.</item>
+        <item quantity="other">Estes links já não estarão disponíveis.</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="one">Deixar de compartilhar esta pasta?</item>
@@ -2141,9 +2141,40 @@
     <string name="home_recents_snackbar_activity_hidden">A sua atividade recente foi ocultada</string>
     <string name="home_recents_button_view_all">Ver tudo</string>
     <string name="home_recents_options_menu_show_activity">Mostrar atividade recente</string>
+    <string name="home_recents_empty_text_description">Todas a sua atividade recente de arquivos e pastas será mostrada aqui</string>
+    <string name="home_recents_hidden_text_description">Atividade recente oculta</string>
+    <string name="home_recents_bucket_subtitle_added_to">Adicionado a %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Estes arquivos já não estão disponíveis</string>
+    <string name="shares_screen_links_section_empty">[B]Não há [/B][A]links públicos[/A][B][/B]</string>
     <string name="general_create_label">Criar</string>
     <string name="general_new_text_file">Novo arquivo de texto</string>
     <string name="general_new_folder">Nova pasta</string>
     <string name="general_invalid_dot_name_warning">“.” não é um nome válido</string>
     <string name="general_invalid_double_dot_name_warning">“..” não é um nome válido</string>
+    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s durante %3$s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

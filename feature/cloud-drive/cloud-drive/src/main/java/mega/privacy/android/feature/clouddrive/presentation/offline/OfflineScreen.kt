@@ -59,7 +59,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
@@ -223,7 +222,7 @@ internal fun OfflineScreen(
                     title = uiState
                         .title
                         .takeIf { uiState.nodeId != -1 }
-                        ?: stringResource(R.string.offline_screen_title),
+                        ?: stringResource(sharedResR.string.offline_screen_title),
                     query = uiState.searchQuery,
                     onQueryChanged = onSearch,
                     isSearchingMode = isSearchMode,
@@ -283,7 +282,7 @@ internal fun OfflineScreen(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG)
                         .fillMaxWidth(),
-                    body = stringResource(R.string.offline_warning),
+                    body = stringResource(sharedResR.string.logout_offline_content_deletion_warning),
                     showCancelButton = true,
                     onCancelButtonClick = onDismissOfflineWarning
                 )
@@ -536,7 +535,7 @@ private fun RemoveFromOfflineDialog(
 ) {
     BasicDialog(
         modifier = modifier,
-        description = stringResource(R.string.confirmation_delete_from_save_for_offline),
+        description = stringResource(sharedResR.string.offline_item_deletion_confirmation_title),
         positiveButtonText = stringResource(sharedResR.string.general_remove),
         negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = onRemove,

@@ -30,6 +30,7 @@ import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionLis
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.shared.resources.R as SharedR
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -59,7 +60,7 @@ internal fun ContactInfoContent(
     ) {
         Text(
             text = pluralStringResource(
-                id = R.plurals.num_folders_with_parameter,
+                id = SharedR.plurals.num_of_folders_with_parameter,
                 count = uiState.inShares.size, uiState.inShares.size,
             ),
             style = MaterialTheme.typography.button,

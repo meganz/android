@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -43,7 +42,7 @@ sealed interface OfflineSelectionAction {
 
         @Composable
         override fun getDescription(): String =
-            stringResource(R.string.offline_screen_selection_menu_remove_from_offline)
+            stringResource(sharedR.string.offline_screen_remove_from_offline_selection_menu)
     }
 
     data object SelectAll : MenuActionWithIcon {

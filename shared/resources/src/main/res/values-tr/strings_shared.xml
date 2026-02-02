@@ -1208,7 +1208,7 @@
     <!-- Title for help centre -->
     <string name="general_help_centre">Yardım Merkezi</string>
     <!-- Warning informing the transfers queue has been paused -->
-    <string name="transfers_all_transfers_paused_warning">Tüm transferler duraklatıldı</string>
+    <string name="transfers_all_transfers_paused_warning">Tüm aktarımlar duraklatıldı</string>
     <!-- Button for resuming the transfers queue -->
     <string name="transfers_resume_all_button">Tümünü devam ettir</string>
     <!-- Label for contacts -->
@@ -1675,7 +1675,7 @@
     <!--header for the Camera Uploads transfer in queue items -->
     <string name="camera_uploads_tranfer_header_in_queue">Sıraya alınıyor</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">Tümü tamamlandı</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Her şey güncel</string>
     <!--description for the Camera Uploads transfer empty view -->
     <string name="camera_uploads_tranfer_empty_view_description">Yeni fotoğraf ve videolar, çekildikten sonra burada görünecektir</string>
     <!--Title for the Camera Uploads transfer top bar -->
@@ -1911,7 +1911,7 @@
     <string name="search_bar_placeholder_text">Ara&#8230;</string>
     <plurals name="remove_links_warning_text">
         <item quantity="one">Bu bağlantı artık herkese açık olmayacak.</item>
-        <item quantity="other">Bu bağlantılar artık herkese açık olmayacak</item>
+        <item quantity="other">Bu bağlantılar artık herkese açık olmayacak.</item>
     </plurals>
     <plurals name="delete_album_confirmation_dialog_title">
         <item quantity="one">Albüm silinsin mi?</item>
@@ -2087,4 +2087,39 @@
     <string name="general_create_label">Oluştur</string>
     <string name="general_new_text_file">Yeni metin dosyası</string>
     <string name="general_new_folder">Yeni klasör</string>
+    <string name="storage_usage_format">%2$s alanın %1$s’si kullanıldı</string>
+    <string name="home_recents_snackbar_activity_hidden">Son etkinlikleriniz gizlendi</string>
+    <string name="home_recents_button_view_all">Tümünü görüntüle</string>
+    <string name="home_recents_options_menu_show_activity">Son etkinlikleri göster</string>
+    <string name="home_recents_empty_text_description">Dosya ve klasörlere ait tüm son etkinlikleriniz burada görünecek</string>
+    <string name="home_recents_hidden_text_description">Son etkinlikler gizlendi</string>
+    <string name="home_recents_bucket_subtitle_added_to">%s konumuna eklendi</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Bu dosyalar artık mevcut değil</string>
+    <string name="shares_screen_links_section_empty">[B]Herkese açık bağlantı [/B][A]yok[/A]</string>
+    <string name="general_invalid_dot_name_warning">“.” adı geçersizdir</string>
+    <string name="general_invalid_double_dot_name_warning">“..” adı geçersizdir</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

@@ -1908,4 +1908,118 @@
     <string name="general_create_label">Buat</string>
     <string name="general_new_text_file">File teks baru</string>
     <string name="general_new_folder">Folder baru</string>
+    <plurals name="trial_awarded_achievement_days_left_text">
+        <item quantity="other">%1$d hari tersisa</item>
+    </plurals>
+    <string name="label_first_time_in_months_full_singular">%1$s untuk bulan pertama</string>
+    <string name="label_first_time_in_years_full_singular">%1$s untuk tahun pertama</string>
+    <string name="hidden_nodes_description_control_visibility_tag">Hanya anda yang dapat menampilkan file tersembunyi, baik secara individual maupun dengan menampilkan sementara item tersembunyi dari [A]pengaturan[/A].</string>
+    <string name="preview_not_available_undecrypted_files">Pratinjau tidak tersedia untuk file yang belum didekripsi</string>
+    <string name="external_checkout_button_text">Beli di situs web kami (Hemat hingga %1$.0f%%)</string>
+    <string name="password_dialog_hint">Masukkan kata sandi tautan</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">Untuk memastikan kami tidak melewatkan semua kenangan anda, MEGA memerlukan akses penuh ke perpustakaan foto anda. [A]Ketuk untuk mengubah izin.[/A]</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">Cadangkan foto dan video anda secara otomatis ke drive Cloud anda</string>
+    <string name="general_alert_not_logged_in">Anda harus masuk terlebih dahulu untuk melakukan tindakan ini</string>
+    <string name="timeline_tab_camera_uploads_limited_access">MEGA memiliki akses terbatas ke perpustakaan foto anda dan tidak dapat mencadangkan semua foto anda</string>
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Unggahan kamera memerlukan [A]akses penuh[/A] ke perpustakaan foto anda</string>
+    <string name="timeline_tab_grid_size_menu_title">Ukuran kisi</string>
+    <string name="timeline_tab_grid_size_compact">Padat</string>
+    <string name="timeline_tab_grid_size_large">Besar</string>
+    <string name="timeline_tab_filter_apply_filter_button">Terapkan filter</string>
+    <string name="general_invite_contact">Undang kontak</string>
+    <string name="contact_found_dialog_title">Kontak ditemukan</string>
+    <string name="album_content_action_remove_favourites">Hapus dari Favorit</string>
+    <string name="context_empty_folder_title">Folder ini kosong</string>
+    <string name="context_empty_cloud_drive_title">Belum ada apa pun di brankas pribadi anda</string>
+    <string name="context_empty_cloud_drive_description">Jaga keamanan sesuatu dengan enkripsi tanpa pengetahuan (zero-knowledge encryption)</string>
+    <string name="open_link_account_confirmation_error">Anda sudah masuk dengan akun MEGA yang berbeda. Keluar terlebih dahulu, lalu buka kembali tautan konfirmasi akun.</string>
+    <string name="general_invalid_link">Tautan tidak valid. Silakan coba lagi atau minta tautan baru.</string>
+    <string name="can_only_join_one_call_error_message">Untuk bergabung dalam panggilan ini, anda harus mengakhiri panggilan anda saat ini</string>
+    <string name="album_content_remove_link_dialog_title">Hapus tautan?</string>
+    <string name="album_content_remove_multiple_links_dialog_title">Hapus tautan?</string>
+    <string name="album_content_remove_link_dialog_description">Orang-orang yang anda bagikan tautan ini akan kehilangan akses ke album tersebut</string>
+    <string name="album_content_remove_multiple_links_dialog_description">Orang-orang yang anda bagikan tautan ini akan kehilangan akses ke album tersebut</string>
+    <string name="delete_album_singular_confirmation_dialog_title">Hapus album?</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">Hapus album?</string>
+    <string name="delete_album_singular_confirmation_dialog_description">Isi album tidak akan dihapus</string>
+    <string name="delete_albums_multiple_confirmation_dialog_description">Isi album tidak akan dihapus</string>
+    <string name="external_checkout_information_title">Tinggalkan MEGA</string>
+    <string name="external_checkout_information_description">Anda akan membuka situs web eksternal (%1$s). MEGA bertanggung jawab atas transaksi dan dukungan pelanggan..</string>
+    <string name="external_checkout_show_next_time">Tunjukkan ini lain kali</string>
+    <string name="album_photos_selection_limit_dialog_description">Anda hanya dapat menambahkan hingga %d item satu per satu ke dalam album.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">Media tidak ditemukan</string>
+    <string name="albums_multiple_delete_success_message">%d album dihapus</string>
+    <string name="home_screen_no_network_desc">Anda sedang offline.\nJika anda membuat file tersedia secara offline, anda tetap dapat mengaksesnya tanpa koneksi internet.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Anda sedang offline.\nItem yang telah anda simpan untuk penggunaan offline masih tersedia.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Lihat file offline</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Perbarui izin</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Untuk memastikan kami tidak melewatkan semua kenangan anda, MEGA memerlukan akses penuh ke perpustakaan foto anda.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Level baterai terlalu rendah. Isi daya perangkat untuk memulai pengunggahan kamera.</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Unggahan kamera terbaru</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/detik</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/detik</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/detik</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/detik</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/detik</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/detik</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/detik</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/detik</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/detik</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/detik</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="offline_remove_singular_item_success_message">1 item dihapus</string>
+    <string name="offline_remove_multiple_item_success_message">%d item dihapus</string>
+    <string name="section_banners">Spanduk</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">Memuat&#8230;</string>
+    <string name="section_my_account">Akun Saya</string>
+    <string name="storage_usage_format">%1$s dari %2$s digunakan</string>
+    <string name="general_hi">Hai</string>
+    <string name="home_recents_snackbar_activity_hidden">Aktivitas terbaru anda telah disembunyikan</string>
+    <string name="home_recents_button_view_all">Lihat semua</string>
+    <string name="home_recents_options_menu_show_activity">Tampilkan aktivitas terbaru</string>
+    <string name="home_recents_empty_text_description">Semua aktivitas file dan folder terbaru anda akan muncul di sini</string>
+    <string name="home_recents_hidden_text_description">Aktivitas terkini disembunyikan</string>
+    <string name="home_recents_bucket_subtitle_added_to">Ditambahkan ke %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">File ini sudah tidak tersedia lagi</string>
+    <string name="shares_screen_links_section_empty">[B]Tidak ada [/B][A]tautan publik[/A]</string>
+    <string name="general_invalid_dot_name_warning">Nama “.” tidak valid</string>
+    <string name="general_invalid_double_dot_name_warning">Nama “..” tidak valid</string>
+    <!-- Text that indicates that a folder is currently empty -->
+    <string name="empty_file_browser_folder">Empty Folder</string>
+    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
+    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="offline_screen_title">Offline</string>
+    <!-- Menu option to delete selected items of the offline state -->
+    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
+    <!-- Confirmation message before removing something from the Offline section. -->
+    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
+    <plurals name="num_of_files_with_parameter">
+        <item quantity="one">%1$d file</item>
+        <item quantity="other">%1$d files</item>
+    </plurals>
+    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
+    <plurals name="num_of_folders_with_parameter">
+        <item quantity="one">%d folder</item>
+        <item quantity="other">%d folders</item>
+    </plurals>
+    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
+    <plurals name="num_of_folders_and_num_of_files">
+        <item quantity="one">%1$d folder&#160;·&#160;</item>
+        <item quantity="other">%1$d folders&#160;·&#160;</item>
+    </plurals>
 </resources>

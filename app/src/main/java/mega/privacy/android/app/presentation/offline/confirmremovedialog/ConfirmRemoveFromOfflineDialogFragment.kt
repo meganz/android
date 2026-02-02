@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.offline.confirmremovedialog
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,12 +13,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,7 +42,7 @@ internal class ConfirmRemoveFromOfflineDialogFragment : DialogFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MegaAlertDialog(
-                        text = stringResource(id = R.string.confirmation_delete_from_save_for_offline),
+                        text = stringResource(id = sharedR.string.offline_item_deletion_confirmation_title),
                         confirmButtonText = stringResource(id = R.string.general_remove),
                         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {

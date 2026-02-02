@@ -24,39 +24,4 @@
     <string name="context_empty_rubbish_bin">[B]Empty [/B][A]Rubbish bin[/A]</string>
     <!-- Empty state text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder_new">[B]Empty[/B][A] Folder[/A]</string>
-
-    <!-- Text that indicates that a folder is currently empty -->
-    <string name="file_browser_empty_folder">Empty Folder</string>
-    <!-- on the section notifications indicates the number of files added to a shared folder, Plural of file. 2 files -->
-    <plurals name="num_files_with_parameter">
-        <item quantity="one">%d file</item>
-        <item quantity="other">%d files</item>
-    </plurals>
-    <!-- on the section notifications indicates the number of folder added to a shared folder, Plural of folder/directory. 2 folders -->
-    <plurals name="num_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
-    </plurals>
-    <!-- First part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. Middle height point is to separate two fragments of text and it was not to be considered a punctuation mark. Please keep the spaces around middle height point. -->
-    <plurals name="num_folders_num_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
-    </plurals>
-    <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
-    <plurals name="num_folders_num_files_2">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
-    </plurals>
-    <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
-    <string name="offline_warning">Logging out deletes your offline content.</string>
-    <!-- Title of the Offline screen -->
-    <string name="offline_screen_title">Offline</string>
-
-    <!-- Menu option to delete selected items of the offline state -->
-    <string name="offline_screen_selection_menu_remove_from_offline">Remove from Offline</string>
-    <!-- Confirmation message before removing something from the Offline section. -->
-    <string name="confirmation_delete_from_save_for_offline">Remove from Offline?</string>
-    <!-- Message when file removed from offline. -->
-    <string name="offline_screen_file_removed_message">File removed from Offline</string>
-
 </resources>
