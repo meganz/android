@@ -893,8 +893,14 @@ class VideoSectionViewModel @Inject constructor(
                     }.onSuccess { title ->
                         Timber.d("Updated video playlist title: $title")
                         refreshVideoPlaylistsWithUpdatedTitle(title)
+                        _state.update {
+                            it.copy(isVideoPlaylistUpdated = true)
+                        }
                     }.onFailure { exception ->
                         Timber.e(exception)
+                        _state.update {
+                            it.copy(isVideoPlaylistUpdated = false)
+                        }
                     }
                 }
             }

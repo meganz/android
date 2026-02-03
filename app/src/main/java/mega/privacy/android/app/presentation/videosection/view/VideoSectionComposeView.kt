@@ -155,10 +155,23 @@ internal fun VideoSectionComposeView(
         }
     }
 
+    LaunchedEffect(uiState.isVideoPlaylistCreatedSuccessfully) {
+        if (uiState.isVideoPlaylistCreatedSuccessfully && uiState.showCreatedDialog) {
+            videoSectionViewModel.updateShowCreateDialog(false)
+        }
+    }
+
+    LaunchedEffect(uiState.isVideoPlaylistUpdated) {
+        if (uiState.isVideoPlaylistUpdated && showRenameVideoPlaylistDialog) {
+            showRenameVideoPlaylistDialog = false
+        }
+    }
+
+
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         contentWindowInsets = WindowInsets.ime,
-        scaffoldState = scaffoldState,
+        scaffoldState = rememberScaffoldState(),
         topBar = {
             if (isVideoSectionActivityEnabled) {
                 VideoSectionTopBar(
@@ -373,7 +386,8 @@ internal fun VideoSectionComposeView(
                         }
                     },
                     showCreateVideoPlaylistDialog = uiState.showCreatedDialog,
-                    updateShowCreateVideoPlaylist = videoSectionViewModel::updateShowCreateDialog
+                    updateShowCreateVideoPlaylist = videoSectionViewModel::updateShowCreateDialog,
+                    scaffoldState = scaffoldState
                 )
             },
             selectedTab = tabState.selectedTab,

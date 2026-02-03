@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +34,6 @@ import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.legacy.core.ui.controls.lists.HeaderViewItem
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyColumn
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -64,6 +64,7 @@ internal fun VideoPlaylistsView(
     onClick: (item: VideoPlaylistUIEntity, index: Int) -> Unit,
     onSortOrderClick: () -> Unit,
     onDeletedMessageShown: () -> Unit,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
     deletedVideoPlaylistTitles: List<String> = emptyList(),
     errorMessage: Int? = null,
     onLongClick: ((item: VideoPlaylistUIEntity, index: Int) -> Unit) = { _, _ -> },
@@ -74,15 +75,8 @@ internal fun VideoPlaylistsView(
         if (scrollToTop) {
             lazyListState.scrollToItem(0)
         }
-        if (showRenameVideoPlaylistDialog) {
-            updateShowRenameVideoPlaylist(false)
-        }
-        if (showCreateVideoPlaylistDialog) {
-            updateShowCreateVideoPlaylist(false)
-        }
     }
 
-    val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     var clickedItem: Int by rememberSaveable { mutableIntStateOf(-1) }
     val resources = LocalResources.current
@@ -114,139 +108,130 @@ internal fun VideoPlaylistsView(
         }
     }
 
-    MegaScaffold(
-        modifier = modifier,
-        scaffoldState = scaffoldState
-    ) { paddingValue ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValue)
-        ) {
-            if (showCreateVideoPlaylistDialog) {
-                CreateVideoPlaylistDialog(
-                    modifier = Modifier.testTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
-                    positiveButtonText = stringResource(id = sharedR.string.general_create_label),
-                    inputPlaceHolderText = { inputPlaceHolderText },
-                    errorMessage = errorMessage,
-                    onDialogInputChange = setInputValidity,
-                    onDismissRequest = {
-                        updateShowCreateVideoPlaylist(false)
-                        setInputValidity(true)
-                    },
-                    onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
-                        Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
-                        onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
-                    },
-                    isInputValid = { isInputTitleValid }
-                )
-            }
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (showCreateVideoPlaylistDialog) {
+            CreateVideoPlaylistDialog(
+                modifier = Modifier.testTag(CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
+                positiveButtonText = stringResource(id = sharedR.string.general_create_label),
+                inputPlaceHolderText = { inputPlaceHolderText },
+                errorMessage = errorMessage,
+                onDialogInputChange = setInputValidity,
+                onDismissRequest = {
+                    updateShowCreateVideoPlaylist(false)
+                    setInputValidity(true)
+                },
+                onDialogPositiveButtonClicked = { titleOfNewVideoPlaylist ->
+                    Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
+                    onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
+                },
+                isInputValid = { isInputTitleValid }
+            )
+        }
 
-            if (showRenameVideoPlaylistDialog) {
-                CreateVideoPlaylistDialog(
-                    modifier = Modifier.testTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = stringResource(id = sharedR.string.context_rename),
-                    positiveButtonText = stringResource(id = sharedR.string.context_rename),
-                    inputPlaceHolderText = { inputPlaceHolderText },
-                    errorMessage = errorMessage,
-                    onDialogInputChange = setInputValidity,
-                    onDismissRequest = {
-                        updateShowRenameVideoPlaylist(false)
-                        setInputValidity(true)
-                    },
-                    initialInputText = {
-                        if (clickedItem != -1) {
-                            items[clickedItem].title
-                        } else {
-                            ""
-                        }
-                    },
-                    onDialogPositiveButtonClicked = { newTitle ->
-                        if (clickedItem != -1) {
-                            onRenameDialogPositiveButtonClicked(items[clickedItem].id, newTitle)
-                        }
-                    },
-                    isInputValid = { isInputTitleValid }
-                )
-            }
-
-            if (showDeleteVideoPlaylistDialog) {
-                DeleteItemsDialog(
-                    modifier = Modifier.testTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
-                    title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
-                    text = null,
-                    confirmButtonText = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
-                    onDeleteButtonClicked = {
-                        if (clickedItem != -1) {
-                            onDeleteDialogPositiveButtonClicked(items[clickedItem])
-                        } else {
-                            onDeletePlaylistsDialogPositiveButtonClicked()
-                        }
-                        clickedItem = -1
-                    },
-                    onDismiss = {
-                        updateShowDeleteVideoPlaylist(false)
-                        onDeleteDialogNegativeButtonClicked()
-                        clickedItem = -1
+        if (showRenameVideoPlaylistDialog) {
+            CreateVideoPlaylistDialog(
+                modifier = Modifier.testTag(RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                title = stringResource(id = sharedR.string.context_rename),
+                positiveButtonText = stringResource(id = sharedR.string.context_rename),
+                inputPlaceHolderText = { inputPlaceHolderText },
+                errorMessage = errorMessage,
+                onDialogInputChange = setInputValidity,
+                onDismissRequest = {
+                    updateShowRenameVideoPlaylist(false)
+                    setInputValidity(true)
+                },
+                initialInputText = {
+                    if (clickedItem != -1) {
+                        items[clickedItem].title
+                    } else {
+                        ""
                     }
-                )
-            }
+                },
+                onDialogPositiveButtonClicked = { newTitle ->
+                    if (clickedItem != -1) {
+                        onRenameDialogPositiveButtonClicked(items[clickedItem].id, newTitle)
+                    }
+                },
+                isInputValid = { isInputTitleValid }
+            )
+        }
 
-            when {
-                progressBarShowing -> VideoSectionLoadingView()
+        if (showDeleteVideoPlaylistDialog) {
+            DeleteItemsDialog(
+                modifier = Modifier.testTag(DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG),
+                title = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_title),
+                text = null,
+                confirmButtonText = stringResource(id = sharedR.string.video_section_playlists_delete_playlist_dialog_delete_button),
+                onDeleteButtonClicked = {
+                    if (clickedItem != -1) {
+                        onDeleteDialogPositiveButtonClicked(items[clickedItem])
+                    } else {
+                        onDeletePlaylistsDialogPositiveButtonClicked()
+                    }
+                    clickedItem = -1
+                },
+                onDismiss = {
+                    updateShowDeleteVideoPlaylist(false)
+                    onDeleteDialogNegativeButtonClicked()
+                    clickedItem = -1
+                }
+            )
+        }
 
-                items.isEmpty() -> LegacyMegaEmptyViewWithImage(
-                    modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
-                    text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
-                    imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
-                )
+        when {
+            progressBarShowing -> VideoSectionLoadingView()
 
-                else -> {
-                    FastScrollLazyColumn(
-                        state = lazyListState,
-                        totalItems = items.size,
-                        modifier = modifier.semantics { testTagsAsResourceId = true },
-                        contentPadding = PaddingValues(bottom = 150.dp)
-                    ) {
-                        item(key = "header") {
-                            HeaderViewItem(
-                                modifier = Modifier.padding(
-                                    vertical = 10.dp,
-                                    horizontal = 8.dp
-                                ),
-                                onSortOrderClick = onSortOrderClick,
-                                onChangeViewTypeClick = {},
-                                onEnterMediaDiscoveryClick = {},
-                                sortOrder = sortOrder,
-                                isListView = true,
-                                showSortOrder = true,
-                                showChangeViewType = false,
-                                showMediaDiscoveryButton = false,
-                            )
-                        }
+            items.isEmpty() -> LegacyMegaEmptyViewWithImage(
+                modifier = Modifier.testTag(VIDEO_PLAYLISTS_EMPTY_VIEW_TEST_TAG),
+                text = stringResource(id = sharedR.string.video_section_playlists_empty_hint_playlist),
+                imagePainter = painterResource(id = iconPackR.drawable.ic_playlist_glass)
+            )
 
-                        items(count = items.size, key = { items[it].id.longValue }) {
-                            val videoPlaylistItem = items[it]
-                            VideoPlaylistItemView(
-                                emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
-                                noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
-                                title = videoPlaylistItem.title,
-                                numberOfVideos = videoPlaylistItem.numberOfVideos,
-                                thumbnailList = videoPlaylistItem.thumbnailList?.map { id ->
-                                    ThumbnailRequest(id)
-                                },
-                                totalDuration = videoPlaylistItem.totalDuration,
-                                isSelected = videoPlaylistItem.isSelected,
-                                isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
-                                onClick = { onClick(videoPlaylistItem, it) },
-                                onMenuClick = {
-                                    clickedItem = it
-                                    onMenuClick()
-                                },
-                                onLongClick = { onLongClick(videoPlaylistItem, it) }
-                            )
-                        }
+            else -> {
+                FastScrollLazyColumn(
+                    state = lazyListState,
+                    totalItems = items.size,
+                    modifier = modifier.semantics { testTagsAsResourceId = true },
+                    contentPadding = PaddingValues(bottom = 150.dp)
+                ) {
+                    item(key = "header") {
+                        HeaderViewItem(
+                            modifier = Modifier.padding(
+                                vertical = 10.dp,
+                                horizontal = 8.dp
+                            ),
+                            onSortOrderClick = onSortOrderClick,
+                            onChangeViewTypeClick = {},
+                            onEnterMediaDiscoveryClick = {},
+                            sortOrder = sortOrder,
+                            isListView = true,
+                            showSortOrder = true,
+                            showChangeViewType = false,
+                            showMediaDiscoveryButton = false,
+                        )
+                    }
+
+                    items(count = items.size, key = { items[it].id.longValue }) {
+                        val videoPlaylistItem = items[it]
+                        VideoPlaylistItemView(
+                            emptyPlaylistIcon = iconPackR.drawable.ic_video_playlist_default_thumbnail,
+                            noThumbnailIcon = iconPackR.drawable.ic_video_playlist_no_thumbnail,
+                            title = videoPlaylistItem.title,
+                            numberOfVideos = videoPlaylistItem.numberOfVideos,
+                            thumbnailList = videoPlaylistItem.thumbnailList?.map { id ->
+                                ThumbnailRequest(id)
+                            },
+                            totalDuration = videoPlaylistItem.totalDuration,
+                            isSelected = videoPlaylistItem.isSelected,
+                            isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
+                            onClick = { onClick(videoPlaylistItem, it) },
+                            onMenuClick = {
+                                clickedItem = it
+                                onMenuClick()
+                            },
+                            onLongClick = { onLongClick(videoPlaylistItem, it) }
+                        )
                     }
                 }
             }

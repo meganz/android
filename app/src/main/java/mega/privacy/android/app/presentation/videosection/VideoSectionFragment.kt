@@ -36,7 +36,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.removelink.RemovePublicLinkDialogFragment
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -55,6 +54,7 @@ import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -366,6 +366,26 @@ class VideoSectionFragment : Fragment() {
                     navigateToVideoSelectedActivity()
                 }
                 videoSectionViewModel.updateNavigateToVideoSelected(false)
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(
+            videoSectionViewModel.state.map { it.deletedVideoPlaylistTitles }.distinctUntilChanged()
+        ) { titles ->
+            if (titles.isNotEmpty()) {
+                val deletedMessage = if (titles.size == 1) {
+                    resources.getString(
+                        sharedR.string.video_section_playlists_delete_playlists_message_singular,
+                        titles[0]
+                    )
+                } else {
+                    resources.getQuantityString(
+                        sharedR.plurals.video_section_playlists_delete_playlists_message,
+                        titles.size,
+                        titles.size
+                    )
+                }
+                Util.showSnackbar(requireActivity(), deletedMessage)
             }
         }
     }

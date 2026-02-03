@@ -197,9 +197,13 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
             val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
             val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
 
-            val isAddFabShown = tabState.selectedTab == VideoSectionTab.Playlists ||
-                    (uiState.currentDestinationRoute == videoPlaylistDetailRoute &&
-                            uiState.currentVideoPlaylist?.isSystemVideoPlayer == false)
+            val isPlaylistsTab = tabState.selectedTab == VideoSectionTab.Playlists
+            val isUserPlaylistDetail =
+                uiState.currentDestinationRoute == videoPlaylistDetailRoute &&
+                        uiState.currentVideoPlaylist?.isSystemVideoPlayer == false
+            val isPlaylistsSearchMode =
+                isPlaylistsTab && uiState.searchState == SearchWidgetState.COLLAPSED
+            val isAddFabShown = isUserPlaylistDetail || isPlaylistsSearchMode
 
             val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
                 { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
