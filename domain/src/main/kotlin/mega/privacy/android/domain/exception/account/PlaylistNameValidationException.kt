@@ -8,6 +8,12 @@ sealed class PlaylistNameValidationException(message: String) : Exception(messag
 
     data object Exists : PlaylistNameValidationException("Playlist name already exists")
 
+    data class InvalidDot(override val message: String = "Playlist name not allowed: ``.´´") :
+        PlaylistNameValidationException(message)
+
+    data class InvalidDoubleDot(override val message: String = "Playlist name not allowed: ``..´´") :
+        PlaylistNameValidationException(message)
+
     data class InvalidCharacters(val chars: String) :
         PlaylistNameValidationException("Playlist name contains invalid characters")
 }

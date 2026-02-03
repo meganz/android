@@ -11,7 +11,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.videosection.VideoToPlaylistViewModel.Companion.ERROR_MESSAGE_REPEATED_TITLE
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistSetUiEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSetUiEntity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -274,7 +273,7 @@ class VideoToPlaylistViewModelTest {
             underTest.uiState.test {
                 val actual = awaitItem()
                 assertThat(actual.isInputTitleValid).isFalse()
-                assertThat(actual.createDialogErrorMessage).isEqualTo(ERROR_MESSAGE_REPEATED_TITLE)
+                assertThat(actual.createDialogErrorMessage).isEqualTo(sharedR.string.video_section_playlists_error_message_playlist_name_exists)
                 cancelAndIgnoreRemainingEvents()
             }
         }

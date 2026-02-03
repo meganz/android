@@ -83,14 +83,13 @@ class CreateVideoPlaylistDialogKtTest {
     @Test
     fun `test that the error message is displayed correctly when errorMessage is others`() {
         setComposeContent(
-            errorMessage = 1,
+            errorMessage = sharedR.string.video_section_playlists_error_message_playlist_name_exists,
             isInputValid = { false }
         )
 
         composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG).assertTextEquals(
-            "A playlist with this name already exists. Enter a different name."
-        )
+        composeTestRule.onNodeWithTag(ERROR_MESSAGE_TEST_TAG)
+            .assertTextEquals(fromId(sharedR.string.video_section_playlists_error_message_playlist_name_exists))
     }
 
     @Test

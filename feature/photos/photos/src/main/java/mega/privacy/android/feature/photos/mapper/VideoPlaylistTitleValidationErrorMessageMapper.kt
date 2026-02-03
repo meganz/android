@@ -31,6 +31,12 @@ class VideoPlaylistTitleValidationErrorMessageMapper @Inject constructor(
                     exception.chars
                 )
 
+            is PlaylistNameValidationException.InvalidDot ->
+                context.getString(sharedR.string.general_invalid_dot_name_warning)
+
+            is PlaylistNameValidationException.InvalidDoubleDot ->
+                context.getString(sharedR.string.general_invalid_double_dot_name_warning)
+
             else -> null
         }
 }

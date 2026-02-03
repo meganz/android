@@ -37,6 +37,28 @@ class VideoPlaylistTitleValidationErrorMessageMapperTest {
     }
 
     @Test
+    fun `test that InvalidDot exception maps to general_invalid_dot_name_warning resource`() {
+        val expected = "expected"
+        val exception = PlaylistNameValidationException.InvalidDot()
+
+        whenever(context.getString(sharedR.string.general_invalid_dot_name_warning))
+            .thenReturn(expected)
+
+        assertThat(underTest(exception)).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that InvalidDoubleDot exception maps to general_invalid_dot_name_warning resource`() {
+        val expected = "expected"
+        val exception = PlaylistNameValidationException.InvalidDoubleDot()
+
+        whenever(context.getString(sharedR.string.general_invalid_double_dot_name_warning))
+            .thenReturn(expected)
+
+        assertThat(underTest(exception)).isEqualTo(expected)
+    }
+
+    @Test
     fun `test that Exists exception maps to video_section_playlists_error_message_playlist_name_exists resource`() {
         val expected = "expected"
         val exception = PlaylistNameValidationException.Exists

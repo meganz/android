@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.StringsConstants
 import mega.privacy.android.legacy.core.ui.controls.dialogs.MegaDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
@@ -197,15 +196,10 @@ internal fun CreateVideoPlaylistDialog(
                                     .testTag(ERROR_MESSAGE_TEST_TAG),
                                 text = when (it) {
                                     sharedR.string.general_invalid_characters_defined -> stringResource(
-                                        id = it
-                                    ).replace(
-                                        "%1\$s",
-                                        StringsConstants.INVALID_CHARACTERS
+                                        id = it, StringsConstants.INVALID_CHARACTERS
                                     )
 
-                                    R.string.invalid_string -> stringResource(id = it)
-
-                                    else -> stringResource(id = sharedR.string.video_section_playlists_error_message_playlist_name_exists)
+                                    else -> stringResource(it)
                                 },
                                 textColor = TextColor.Error,
                                 style = caption

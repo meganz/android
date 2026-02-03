@@ -2,6 +2,8 @@ package mega.privacy.android.domain.usecase.videosection
 
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.repository.VideoSectionRepository
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import javax.inject.Inject
 
 /**
@@ -21,12 +23,14 @@ class ValidatePlaylistNameUseCase @Inject constructor(
      */
     @Throws(PlaylistNameValidationException::class)
     suspend operator fun invoke(title: String) {
-        if (title.isBlank()) throw PlaylistNameValidationException.Empty
-        val titles = videoSectionRepository.getVideoPlaylistTitles()
         when {
-            title in titles -> throw PlaylistNameValidationException.Exists
+            title.isBlank() -> throw PlaylistNameValidationException.Empty
+            title.isInvalidDotName() -> throw PlaylistNameValidationException.InvalidDot()
+            title.isInvalidDoubleDotName() -> throw PlaylistNameValidationException.InvalidDoubleDot()
             title.hasSpecialCharacters() ->
                 throw PlaylistNameValidationException.InvalidCharacters(SPECIAL_CHARACTERS)
+
+            title in videoSectionRepository.getVideoPlaylistTitles() -> throw PlaylistNameValidationException.Exists
         }
     }
 

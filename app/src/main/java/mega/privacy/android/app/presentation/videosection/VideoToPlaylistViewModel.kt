@@ -15,6 +15,8 @@ import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistSet
 import mega.privacy.android.app.presentation.videosection.model.VideoToPlaylistUiState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.videosection.AddVideoToMultiplePlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
@@ -121,19 +123,17 @@ class VideoToPlaylistViewModel @Inject constructor(
     private fun checkVideoPlaylistTitleValidity(
         title: String,
     ): Boolean {
-        var errorMessage: Int? = null
-        var isTitleValid = true
+        val errorMessage = when {
+            title.isBlank() -> R.string.invalid_string
+            title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedR.string.general_invalid_characters_defined
 
-        if (title.isBlank()) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_string
-        } else if (title in getAllVideoPlaylistTitles()) {
-            isTitleValid = false
-            errorMessage = ERROR_MESSAGE_REPEATED_TITLE
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = sharedR.string.general_invalid_characters_defined
+            title in getAllVideoPlaylistTitles() -> sharedR.string.video_section_playlists_error_message_playlist_name_exists
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _uiState.update {
             it.copy(
@@ -252,9 +252,5 @@ class VideoToPlaylistViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    companion object {
-        internal const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }
 }

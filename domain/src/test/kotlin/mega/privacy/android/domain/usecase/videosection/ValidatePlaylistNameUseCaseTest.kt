@@ -38,12 +38,27 @@ internal class ValidatePlaylistNameUseCaseTest {
     @ParameterizedTest(name = "Empty exception for: {0}")
     @ValueSource(strings = ["", "   ", "\t", "\n"])
     fun `test that Empty exception is thrown when playlist name is blank or empty`(
-        name: String
+        name: String,
     ) = runTest {
         assertThrows<PlaylistNameValidationException.Empty> {
             underTest(name)
         }
     }
+
+    @Test
+    fun `test that InvalidDot exception is thrown when playlist name is a dot`() = runTest {
+        assertThrows<PlaylistNameValidationException.InvalidDot> {
+            underTest(".")
+        }
+    }
+
+    @Test
+    fun `test that InvalidDoubleDot exception is thrown when playlist name is a double dot`() =
+        runTest {
+            assertThrows<PlaylistNameValidationException.InvalidDoubleDot> {
+                underTest("..")
+            }
+        }
 
     @Test
     fun `test that Exists exception is thrown when playlist name already exists`() = runTest {
@@ -60,7 +75,7 @@ internal class ValidatePlaylistNameUseCaseTest {
     @ParameterizedTest(name = "InvalidCharacters exception for: {0}")
     @MethodSource("invalidCharacterNames")
     fun `test that InvalidCharacters exception is thrown when playlist name contains invalid characters`(
-        invalidName: String
+        invalidName: String,
     ) = runTest {
         whenever(videoSectionRepository.getVideoPlaylistTitles()).thenReturn(emptyList())
 
@@ -73,7 +88,7 @@ internal class ValidatePlaylistNameUseCaseTest {
     @MethodSource("validNames")
     fun `test that validation passes for valid playlist names`(
         validName: String,
-        existingTitles: List<String>
+        existingTitles: List<String>,
     ) = runTest {
         whenever(videoSectionRepository.getVideoPlaylistTitles()).thenReturn(existingTitles)
 
