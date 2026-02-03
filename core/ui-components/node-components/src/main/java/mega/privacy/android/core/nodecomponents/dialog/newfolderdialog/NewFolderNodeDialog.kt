@@ -18,6 +18,8 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.exception.DotNameException
+import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
@@ -67,6 +69,8 @@ fun NewFolderNodeDialog(
     ) {
         errorMessage = when (it) {
             is EmptyNodeNameException -> context.getString(R.string.invalid_string)
+            is DotNameException -> context.getString(sharedR.string.general_invalid_dot_name_warning)
+            is DoubleDotNameException -> context.getString(sharedR.string.general_invalid_double_dot_name_warning)
             is InvalidNodeNameException -> context.getString(
                 sharedR.string.general_invalid_characters_defined, INVALID_CHARACTERS
             )

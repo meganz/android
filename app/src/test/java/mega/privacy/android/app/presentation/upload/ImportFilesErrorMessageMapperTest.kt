@@ -23,9 +23,98 @@ class ImportFilesErrorMessageMapperTest {
     }
 
     @Test
-    fun `test that mapper return s general incorrect names when both wrong and empty names are greater than 0`() {
+    fun `test that mapper return general incorrect names when both invalid characters and empty names are greater than 0`() {
         whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
-        val result = underTest(true, 1)
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = false,
+            hasDoubleDotNames = false,
+            emptyNames = 1
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when both double dot and empty names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = false,
+            hasDoubleDotNames = true,
+            emptyNames = 1
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when both dot and empty names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = true,
+            hasDoubleDotNames = false,
+            emptyNames = 1
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when both dot and double dot names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = true,
+            hasDoubleDotNames = true,
+            emptyNames = 0
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when both dot and invalid character names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = true,
+            hasDoubleDotNames = false,
+            emptyNames = 0
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when both double dot and invalid character names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = false,
+            hasDoubleDotNames = true,
+            emptyNames = 0
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when invalid char, dot and double dot wrong names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = true,
+            hasDoubleDotNames = true,
+            emptyNames = 0
+        )
+        Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
+    }
+
+    @Test
+    fun `test that mapper return general incorrect names when all wrong names are greater than 0`() {
+        whenever(context.getString(R.string.general_incorrect_names)).thenReturn("Please correct your filenames before proceeding")
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = true,
+            hasDoubleDotNames = true,
+            emptyNames = 1
+        )
         Truth.assertThat(result).isEqualTo("Please correct your filenames before proceeding")
     }
 
@@ -35,8 +124,41 @@ class ImportFilesErrorMessageMapperTest {
         whenever(
             resources.getQuantityString(R.plurals.empty_names, 1)
         ).thenReturn("File name cannot be empty.")
-        val result = underTest(false, 1)
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = false,
+            hasDoubleDotNames = false,
+            emptyNames = 1
+        )
         Truth.assertThat(result).isEqualTo("File name cannot be empty.")
+    }
+
+    @Test
+    fun `test that mapper returns dot names when dot names are greater than 0`() {
+        whenever(
+            context.getString(sharedR.string.general_invalid_dot_name_warning)
+        ).thenReturn("The name “.” is not valid")
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = true,
+            hasDoubleDotNames = false,
+            emptyNames = 0,
+        )
+        Truth.assertThat(result).isEqualTo("The name “.” is not valid")
+    }
+
+    @Test
+    fun `test that mapper returns double dot names when double dot names are greater than 0`() {
+        whenever(
+            context.getString(sharedR.string.general_invalid_double_dot_name_warning)
+        ).thenReturn("The name “..” is not valid")
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = false,
+            hasDoubleDotNames = true,
+            emptyNames = 0,
+        )
+        Truth.assertThat(result).isEqualTo("The name “..” is not valid")
     }
 
     @Test
@@ -47,14 +169,24 @@ class ImportFilesErrorMessageMapperTest {
                 StringsConstants.INVALID_CHARACTERS
             )
         ).thenReturn("The following characters are not allowed: / \\ < > : \" | ? *")
-        val result = underTest(true, 0)
+        val result = underTest(
+            hasInvalidCharsNames = true,
+            hasDotNames = false,
+            hasDoubleDotNames = false,
+            emptyNames = 0
+        )
         Truth.assertThat(result)
             .isEqualTo("The following characters are not allowed: / \\ < > : \" | ? *")
     }
 
     @Test
     fun `test that mapper returns empty string when both wrong and empty names are 0`() {
-        val result = underTest(false, 0)
+        val result = underTest(
+            hasInvalidCharsNames = false,
+            hasDotNames = false,
+            hasDoubleDotNames = false,
+            emptyNames = 0
+        )
         Truth.assertThat(result).isEmpty()
     }
 

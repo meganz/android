@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.transfers.GetFileNameFromStringUriUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R
@@ -93,13 +95,24 @@ class UploadDestinationViewModel @Inject constructor(
     fun isValidNameForUpload(): Boolean {
         Timber.d("Import confirmed")
         val emptyNames = uiState.value.importUiItems.count { it.fileName.isBlank() }
-        val hasWrongNames = uiState.value.importUiItems.any {
+        val hasInvalidCharsNames = uiState.value.importUiItems.any {
             Constants.NODE_NAME_REGEX.matcher(it.fileName).find()
         }
+        val hasDotNames = uiState.value.importUiItems.any {
+            it.fileName.isInvalidDotName()
+        }
+        val hasDoubleDotNames = uiState.value.importUiItems.any {
+            it.fileName.isInvalidDoubleDotName()
+        }
 
-        val hasError = hasWrongNames || emptyNames > 0
+        val hasError = hasInvalidCharsNames || hasDotNames || hasDoubleDotNames || emptyNames > 0
         if (hasError) {
-            val message = importFilesErrorMessageMapper(hasWrongNames, emptyNames)
+            val message = importFilesErrorMessageMapper(
+                hasInvalidCharsNames = hasInvalidCharsNames,
+                hasDotNames = hasDotNames,
+                hasDoubleDotNames = hasDoubleDotNames,
+                emptyNames = emptyNames
+            )
             _uiState.update { it.copy(nameValidationError = triggered(message)) }
         }
         return !hasError

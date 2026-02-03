@@ -4,6 +4,9 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
+import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
 /**
@@ -22,6 +25,14 @@ class ImportFileErrorMessageMapper @Inject constructor(
     operator fun invoke(fileName: String): String? = when {
         fileName.isBlank() -> {
             context.getString(R.string.empty_name)
+        }
+
+        fileName.isInvalidDotName() -> {
+            context.getString(sharedR.string.general_invalid_dot_name_warning)
+        }
+
+        fileName.isInvalidDoubleDotName() -> {
+            context.getString(sharedR.string.general_invalid_double_dot_name_warning)
         }
 
         Constants.NODE_NAME_REGEX.matcher(fileName).find() -> {

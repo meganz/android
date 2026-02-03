@@ -61,6 +61,8 @@ import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -949,19 +951,17 @@ class VideoSectionViewModel @Inject constructor(
     private fun checkVideoPlaylistTitleValidity(
         title: String,
     ): Boolean {
-        var errorMessage: Int? = null
-        var isTitleValid = true
+        val errorMessage = when {
+            title.isBlank() -> R.string.invalid_string
+            title.isInvalidDotName() -> sharedR.string.general_invalid_dot_name_warning
+            title.isInvalidDoubleDotName() -> sharedR.string.general_invalid_double_dot_name_warning
+            "[\\\\*/:<>?\"|]".toRegex()
+                .containsMatchIn(title) -> sharedR.string.general_invalid_characters_defined
 
-        if (title.isBlank()) {
-            isTitleValid = false
-            errorMessage = R.string.invalid_string
-        } else if (title in getAllVideoPlaylistTitles()) {
-            isTitleValid = false
-            errorMessage = ERROR_MESSAGE_REPEATED_TITLE
-        } else if ("[\\\\*/:<>?\"|]".toRegex().containsMatchIn(title)) {
-            isTitleValid = false
-            errorMessage = sharedR.string.general_invalid_characters_defined
+            title in getAllVideoPlaylistTitles() -> sharedR.string.video_section_playlists_error_message_playlist_name_exists
+            else -> null
         }
+        val isTitleValid = errorMessage == null
 
         _state.update {
             it.copy(
@@ -1278,9 +1278,5 @@ class VideoSectionViewModel @Inject constructor(
 
     internal fun updateNavigateToVideoSelected(value: Boolean) {
         _state.update { it.copy(navigateToVideoSelected = value) }
-    }
-
-    companion object {
-        private const val ERROR_MESSAGE_REPEATED_TITLE = 0
     }
 }

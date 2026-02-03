@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.upload
 
 import android.content.Context
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
@@ -18,6 +19,28 @@ class ImportFileErrorMessageMapperTest {
         val fileName = ""
         val result = importFileErrorMessageMapper(fileName)
         assertEquals("empty name", result)
+    }
+
+    @Test
+    fun `test that mapper returns dot name error message when file name is blank`() {
+        val context = mock(Context::class.java)
+        `when`(context.getString(sharedR.string.general_invalid_dot_name_warning))
+            .thenReturn("dot name")
+        val importFileErrorMessageMapper = ImportFileErrorMessageMapper(context)
+        val fileName = "."
+        val result = importFileErrorMessageMapper(fileName)
+        assertEquals("dot name", result)
+    }
+
+    @Test
+    fun `test that mapper returns double dot name error message when file name is blank`() {
+        val context = mock(Context::class.java)
+        `when`(context.getString(sharedR.string.general_invalid_double_dot_name_warning))
+            .thenReturn("double dot name")
+        val importFileErrorMessageMapper = ImportFileErrorMessageMapper(context)
+        val fileName = ".."
+        val result = importFileErrorMessageMapper(fileName)
+        assertEquals("double dot name", result)
     }
 
     @Test

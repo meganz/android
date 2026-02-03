@@ -8,6 +8,16 @@ sealed class NodeNameException : RuntimeException("Node name exception")
 class EmptyNodeNameException : NodeNameException()
 
 /**
+ * Exception thrown when folder name contains only a dot
+ */
+class DotNameException : NodeNameException()
+
+/**
+ * Exception thrown when folder name contains only a double dot
+ */
+class DoubleDotNameException : NodeNameException()
+
+/**
  * Exception thrown when a folder with the same name already exists
  */
 class NodeNameAlreadyExistsException : NodeNameException()
