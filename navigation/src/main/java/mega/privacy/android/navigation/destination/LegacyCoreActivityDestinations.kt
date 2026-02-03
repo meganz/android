@@ -182,7 +182,7 @@ data class UpgradeAccountNavKey(
 
 @Serializable
 @Parcelize
-data class LegacyFileExplorerNavKey(
+data class FileStorageNavKey(
     val uriPath: String?,
     val highlightedFiles: List<String> = emptyList(),
 ) : NoSessionNavKey.Optional, Parcelable

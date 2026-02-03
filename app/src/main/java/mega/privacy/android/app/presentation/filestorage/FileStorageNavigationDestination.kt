@@ -8,10 +8,10 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
-import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
+import mega.privacy.android.navigation.destination.FileStorageNavKey
 
-fun EntryProviderScope<NavKey>.legacyFileStorageScreen(removeDestination: () -> Unit) {
-    entry<LegacyFileExplorerNavKey>(
+private fun EntryProviderScope<NavKey>.fileStorageScreen(removeDestination: () -> Unit) {
+    entry<FileStorageNavKey>(
         metadata = transparentMetadata()
     ) { key ->
         val context = LocalContext.current
@@ -32,7 +32,7 @@ fun EntryProviderScope<NavKey>.legacyFileStorageScreen(removeDestination: () -> 
 class FileStorageFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, _ ->
-            legacyFileStorageScreen(navigationHandler::back)
+            fileStorageScreen(navigationHandler::back)
         }
 }
 

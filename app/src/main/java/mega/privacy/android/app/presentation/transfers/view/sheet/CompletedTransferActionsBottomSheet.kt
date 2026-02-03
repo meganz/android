@@ -55,7 +55,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
+import mega.privacy.android.navigation.destination.FileStorageNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -364,7 +364,7 @@ private fun onViewInFolderSingleActivity(
     when (viewInFolderEvent) {
         is ViewInFolderEvent.Download -> {
             navigationHandler?.navigate(
-                LegacyFileExplorerNavKey(
+                FileStorageNavKey(
                     uriPath = viewInFolderEvent.uriPath.value,
                     highlightedFiles = listOf(viewInFolderEvent.fileName),
                 )

@@ -34,7 +34,7 @@ import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.LegacyFileExplorerNavKey
+import mega.privacy.android.navigation.destination.FileStorageNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.getPendingIntentConsideringSingleActivity
@@ -359,7 +359,7 @@ class DefaultTransfersActionGroupFinishNotificationBuilder @Inject constructor(
                     createPendingIntent(intent = intent, requestCode = actionGroup.groupId)
                 },
                 singleActivityDestination = {
-                    LegacyFileExplorerNavKey(actionGroup.destination, actionGroup.selectedNames)
+                    FileStorageNavKey(actionGroup.destination, actionGroup.selectedNames)
                 }
             )
         }
