@@ -43,16 +43,12 @@ class MyAccountHomeWidget @Inject constructor() : HomeWidget {
             modifier = modifier,
             onClick = {
                 navigationHandler.navigate(
-                    when (state.storageQuotaLevel) {
-                        QuotaLevel.Success -> {
-                            Analytics.tracker.trackEvent(MyAccountHomeWidgetButtonPressedEvent)
-                            MyAccountNavKey()
-                        }
-
-                        else -> {
-                            Analytics.tracker.trackEvent(UpgradeAccountHomeWidgetButtonPressedEvent)
-                            UpgradeAccountNavKey()
-                        }
+                    if (state.storageQuotaLevel == QuotaLevel.Success || state.isBusinessAccount) {
+                        Analytics.tracker.trackEvent(MyAccountHomeWidgetButtonPressedEvent)
+                        MyAccountNavKey()
+                    } else {
+                        Analytics.tracker.trackEvent(UpgradeAccountHomeWidgetButtonPressedEvent)
+                        UpgradeAccountNavKey()
                     }
                 )
             }
