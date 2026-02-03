@@ -24,7 +24,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.view.VideoSectionLoadingView
 import mega.privacy.android.domain.entity.node.NodeId
@@ -91,9 +90,15 @@ internal fun VideoPlaylistsView(
     LaunchedEffect(deletedVideoPlaylistTitles) {
         if (deletedVideoPlaylistTitles.isNotEmpty()) {
             val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
+                val title = deletedVideoPlaylistTitles[0]
+                val updatedTitle = if (title.length > MAX_SNACK_BAR_MESSAGE_LINES_CHARS) {
+                    title.take(MAX_SNACK_BAR_MESSAGE_LINES_CHARS).plus(SNACK_BAR_ELLIPSIS)
+                } else {
+                    title
+                }
                 resources.getString(
                     sharedR.string.video_section_playlists_delete_playlists_message_singular,
-                    deletedVideoPlaylistTitles[0]
+                    updatedTitle
                 )
             } else {
                 resources.getQuantityString(
@@ -134,9 +139,8 @@ internal fun VideoPlaylistsView(
                         Analytics.tracker.trackEvent(VideoPlaylistCreationButtonPressedEvent)
                         onCreateDialogPositiveButtonClicked(titleOfNewVideoPlaylist)
                     },
-                ) {
-                    isInputTitleValid
-                }
+                    isInputValid = { isInputTitleValid }
+                )
             }
 
             if (showRenameVideoPlaylistDialog) {
@@ -163,9 +167,8 @@ internal fun VideoPlaylistsView(
                             onRenameDialogPositiveButtonClicked(items[clickedItem].id, newTitle)
                         }
                     },
-                ) {
-                    isInputTitleValid
-                }
+                    isInputValid = { isInputTitleValid }
+                )
             }
 
             if (showDeleteVideoPlaylistDialog) {
@@ -364,6 +367,9 @@ private fun VideoPlaylistsViewCreateDialogShownPreview() {
         )
     }
 }
+
+private const val MAX_SNACK_BAR_MESSAGE_LINES_CHARS = 70
+private const val SNACK_BAR_ELLIPSIS = "..."
 
 /**
  * Test tag for CreateVideoPlaylistDialog

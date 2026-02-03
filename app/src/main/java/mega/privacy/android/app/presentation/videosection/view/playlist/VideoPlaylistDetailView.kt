@@ -131,11 +131,21 @@ fun VideoPlaylistDetailView(
     val resources = LocalResources.current
     LaunchedEffect(numberOfAddedVideos) {
         if (numberOfAddedVideos > 0) {
+            val updatedTitle = playlist?.title?.let { title ->
+                if (title.length > MAX_SNACK_BAR_MESSAGE_LINES_CHARS) {
+                    title.take(MAX_SNACK_BAR_MESSAGE_LINES_CHARS).plus(
+                        SNACK_BAR_ELLIPSIS
+                    )
+                } else {
+                    title
+                }
+            }
+
             val message = resources.getQuantityString(
                 sharedR.plurals.video_section_playlist_detail_add_videos_message,
                 numberOfAddedVideos,
                 numberOfAddedVideos,
-                playlist?.title
+                updatedTitle
             )
             coroutineScope.launch {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
@@ -156,11 +166,20 @@ fun VideoPlaylistDetailView(
 
     LaunchedEffect(numberOfRemovedItems) {
         if (numberOfRemovedItems > 0) {
+            val updatedTitle = playlist?.title?.let { title ->
+                if (title.length > MAX_SNACK_BAR_MESSAGE_LINES_CHARS) {
+                    title.take(MAX_SNACK_BAR_MESSAGE_LINES_CHARS).plus(
+                        SNACK_BAR_ELLIPSIS
+                    )
+                } else {
+                    title
+                }
+            }
             val message = resources.getQuantityString(
                 sharedR.plurals.video_section_playlist_detail_remove_videos_message,
                 numberOfRemovedItems,
                 numberOfRemovedItems,
-                playlist?.title
+                updatedTitle
             )
             coroutineScope.launch {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(message)
@@ -523,7 +542,7 @@ internal fun VideoPlaylistInfoView(
         MegaText(
             modifier = modifier
                 .fillMaxSize()
-                .weight(1.5f)
+                .weight(2f)
                 .testTag(PLAYLIST_TITLE_TEST_TAG),
             text = title,
             textColor = TextColor.Primary,
@@ -691,6 +710,9 @@ private fun PlayAllButtonViewPreview() {
         PlayAllButtonView()
     }
 }
+
+private const val MAX_SNACK_BAR_MESSAGE_LINES_CHARS = 70
+private const val SNACK_BAR_ELLIPSIS = "..."
 
 /**
  * Test tag for empty view
