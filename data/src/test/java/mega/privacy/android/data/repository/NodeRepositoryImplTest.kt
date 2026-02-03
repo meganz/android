@@ -98,7 +98,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.File
 import java.util.stream.Stream
 import kotlin.test.Ignore
 
@@ -161,6 +160,7 @@ internal class NodeRepositoryImplTest {
             megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
+            defaultDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
             shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
@@ -740,7 +740,7 @@ internal class NodeRepositoryImplTest {
             on { isNodeKeyDecrypted }.thenReturn(true)
             on { hasPreview() }.thenReturn(true)
         }
-        whenever(cacheGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
+        whenever(cacheGateway.getThumbnailCacheFolderPath()).thenReturn("thumbnail_path")
         whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
         whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)

@@ -166,14 +166,14 @@ interface NodeRepository {
      *
      * @param nodeId [NodeId] The parent node ID
      * @param order [SortOrder] Optional sorting order
-     * @param initialBatchSize [Int] Size of initial batch (default: 1000)
+     * @param initialBatchSize [Int] Size of initial batch
      * @param folderTypeData [FolderTypeData] Optional data for folder type determination
      * @return Flow of pairs containing typed node lists and hasMore flag for progressive loading
      */
     suspend fun getTypedNodesByIdInChunks(
         nodeId: NodeId,
         order: SortOrder? = null,
-        initialBatchSize: Int = 1000,
+        initialBatchSize: Int,
         folderTypeData: FolderTypeData? = null,
     ): Flow<Pair<List<TypedNode>, Boolean>>
 

@@ -222,22 +222,20 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
     private suspend fun getThumbnailFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.THUMBNAIL_FOLDER, fileName)
 
-
     private suspend fun getPreviewFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
 
     override suspend fun getThumbnailCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getThumbnailCacheFolder()?.path
+        cacheGateway.getThumbnailCacheFolderPath()
     }
 
     override suspend fun getPreviewCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getPreviewCacheFolder()?.path
+        cacheGateway.getPreviewCacheFolderPath()
     }
 
     override suspend fun getFullSizeCacheFolderPath(): String? = withContext(ioDispatcher) {
-        cacheGateway.getFullSizeCacheFolder()?.path
+        cacheGateway.getFullSizeCacheFolderPath()
     }
-
 
     override suspend fun createThumbnail(handle: Long, uriPath: UriPath) =
         withContext(ioDispatcher) {
@@ -246,7 +244,6 @@ internal class ThumbnailPreviewRepositoryImpl @Inject constructor(
             requireNotNull(thumbnailFile)
             megaApi.createThumbnail(uriPath.value, thumbnailFile.absolutePath)
         }
-
 
     override suspend fun createPreview(handle: Long, uriPath: UriPath) = withContext(ioDispatcher) {
         val previewFileName = getPreviewFileName(handle)

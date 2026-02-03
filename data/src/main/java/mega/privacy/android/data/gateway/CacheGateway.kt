@@ -47,17 +47,17 @@ interface CacheGateway {
     /**
      * Return node thumbnail folder
      */
-    suspend fun getThumbnailCacheFolder(): File?
+    suspend fun getThumbnailCacheFolderPath(): String?
 
     /**
      * Return node preview folder
      */
-    suspend fun getPreviewCacheFolder(): File?
+    suspend fun getPreviewCacheFolderPath(): String?
 
     /**
      * Return node full size folder
      */
-    suspend fun getFullSizeCacheFolder(): File?
+    suspend fun getFullSizeCacheFolderPath(): String?
 
 
     /**

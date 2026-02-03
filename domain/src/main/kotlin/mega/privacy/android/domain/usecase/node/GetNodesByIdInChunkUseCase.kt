@@ -23,12 +23,12 @@ class GetNodesByIdInChunkUseCase @Inject constructor(
      * Get node children in chunks for progressive loading
      *
      * @param nodeId The parent node ID
-     * @param initialBatchSize The initial batch size for loading nodes, default is 1000
+     * @param initialBatchSize The initial batch size for loading nodes, default is 500
      * @return Flow that emits pairs containing typed node lists and hasMore flag progressively
      */
     suspend operator fun invoke(
         nodeId: NodeId,
-        initialBatchSize: Int = 1000,
+        initialBatchSize: Int = 500,
     ): Flow<Pair<List<TypedNode>, Boolean>> = coroutineScope {
         val sortOrderDiffer = async { getCloudSortOrder() }
         val folderTypeDataDiffer = async { getFolderTypeDataUseCase() }

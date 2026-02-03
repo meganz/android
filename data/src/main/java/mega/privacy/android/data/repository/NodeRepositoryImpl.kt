@@ -75,6 +75,7 @@ import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.extension.Chunk
 import mega.privacy.android.domain.extension.ConcurrencyStrategy
 import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
@@ -111,6 +112,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
@@ -1327,7 +1329,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         // Emit initial batch immediately
         val initialMegaNodes = allChildren.take(initialBatchSize)
         val initialTypedNodes = initialMegaNodes
-            .mapAsync(getConcurrencyStrategy(initialMegaNodes.size)) { megaNode ->
+            .mapAsync(ConcurrencyStrategy.Parallel) { megaNode ->
                 typedNodeMapper(
                     megaNode = megaNode,
                     folderTypeData = folderTypeData,
@@ -1337,19 +1339,22 @@ internal class NodeRepositoryImpl @Inject constructor(
         emit(initialTypedNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
-        if (allChildren.size > initialBatchSize) {
-            // Process remaining nodes in chunks
-            val remainingMegaNodes = allChildren.drop(initialBatchSize)
-            val remainingTypedNodes = remainingMegaNodes
-                .mapAsync(getConcurrencyStrategy(remainingMegaNodes.size)) { megaNode ->
-                    typedNodeMapper(
-                        megaNode = megaNode,
-                        folderTypeData = folderTypeData,
-                        offline = offlineItems[megaNode.handle.toString()]
-                    )
-                }
-            // Second emit: Complete list (initial + remaining) with hasMore = false
-            emit(initialTypedNodes + remainingTypedNodes to false)
+        withContext(defaultDispatcher) {
+            if (allChildren.size > initialBatchSize) {
+                // Process remaining nodes in chunks
+                val remainingMegaNodes = allChildren.drop(initialBatchSize)
+                val remainingTypedNodes = remainingMegaNodes
+                    .mapAsync(getConcurrencyStrategy(remainingMegaNodes.size)) { megaNode ->
+                        typedNodeMapper(
+                            megaNode = megaNode,
+                            folderTypeData = folderTypeData,
+                            offline = offlineItems[megaNode.handle.toString()]
+                        )
+                    }
+
+                // Second emit: Complete list (initial + remaining) with hasMore = false
+                emit(initialTypedNodes + remainingTypedNodes to false)
+            }
         }
     }.flowOn(ioDispatcher)
 
@@ -1362,7 +1367,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         count <= 100 -> ConcurrencyStrategy.Parallel // Small folders, process in parallel
         count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
         count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
-        else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(40)) // Very large folders, larger chunks
+        else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(50)) // Very large folders, larger chunks
     }
 
     override suspend fun getFullNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {

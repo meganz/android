@@ -3,6 +3,7 @@ package mega.privacy.android.domain.extension
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 
@@ -82,7 +83,7 @@ suspend fun <T, R> Iterable<T>.mapAsync(
                 val targetChunkSize = when (strategy.chunk) {
                     is Chunk.Size -> strategy.chunk.value
 
-                    is Chunk.Count -> if (strategy.chunk.value <= 0 || strategy.chunk.value > count) {
+                    is Chunk.Count -> if (strategy.chunk.value !in 1..count) {
                         count
                     } else {
                         (count + strategy.chunk.value - 1) / strategy.chunk.value // Ceiling division
@@ -90,6 +91,7 @@ suspend fun <T, R> Iterable<T>.mapAsync(
                 }.coerceAtLeast(1)
 
                 chunked(targetChunkSize).map { chunk ->
+                    ensureActive()
                     async {
                         chunk.map { element ->
                             transformation(element)
@@ -119,6 +121,7 @@ suspend fun <T, R> Iterable<T>.mapAsync(
             coroutineScope {
                 chunked(strategy.chunkSize).map { chunk ->
                     async {
+                        ensureActive()
                         semaphore.withPermit {
                             chunk.map { element ->
                                 transformation(element)
@@ -140,6 +143,7 @@ suspend fun <T, R> Iterable<T>.mapAsync(
             coroutineScope {
                 chunked(dynamicChunkSize).map { chunk ->
                     async {
+                        ensureActive()
                         semaphore.withPermit {
                             chunk.map { element ->
                                 transformation(element)

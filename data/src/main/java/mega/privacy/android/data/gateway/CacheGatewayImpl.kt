@@ -8,6 +8,7 @@ import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
 /**
@@ -21,9 +22,10 @@ internal class CacheGatewayImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CacheGateway {
 
-    companion object {
-        private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
-    }
+    /**
+     * Cache folder paths to avoid multiple IO operations
+     */
+    private val pathCache = ConcurrentHashMap<String, String>()
 
     override suspend fun getOrCreateCacheFolder(folderName: String): File? =
         withContext(ioDispatcher) {
@@ -52,6 +54,7 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun clearCacheDirectory() {
         try {
+            pathCache.clear()
             val dir = context.cacheDir
             dir.list()?.forEach {
                 deleteDir(File(dir, it))
@@ -61,14 +64,18 @@ internal class CacheGatewayImpl @Inject constructor(
         }
     }
 
-    override suspend fun getThumbnailCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)
+    override suspend fun getThumbnailCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.THUMBNAIL_FOLDER)
 
-    override suspend fun getPreviewCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)
+    override suspend fun getPreviewCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.PREVIEW_FOLDER)
 
-    override suspend fun getFullSizeCacheFolder(): File? =
-        getOrCreateCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
+    override suspend fun getFullSizeCacheFolderPath(): String? =
+        getCachedFolderPath(CacheFolderConstant.TEMPORARY_FOLDER)
+
+    private suspend fun getCachedFolderPath(folderName: String): String? =
+        pathCache[folderName]
+            ?: getOrCreateCacheFolder(folderName)?.path?.also { pathCache[folderName] = it }
 
     override suspend fun getCameraUploadsCacheFolder(): File? =
         getOrCreateCacheFolder(CacheFolderConstant.CAMERA_UPLOADS_CACHE_FOLDER)
@@ -78,6 +85,7 @@ internal class CacheGatewayImpl @Inject constructor(
 
     override suspend fun clearAppData(excludeFileNames: Set<String>) {
         try {
+            pathCache.clear()
             val dir = context.filesDir
             dir.list()?.asSequence()
                 ?.filter { !excludeFileNames.contains(it) }
@@ -117,5 +125,9 @@ internal class CacheGatewayImpl @Inject constructor(
         } else {
             false
         }
+    }
+
+    companion object {
+        private const val VOICE_CLIP_FOLDER = "voiceClipsMEGA"
     }
 }

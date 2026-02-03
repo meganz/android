@@ -62,15 +62,15 @@ internal class FileNodeMapper @Inject constructor(
         modificationTime = megaNode.modificationTime,
         thumbnailPath = getThumbnailCacheFilePath(
             megaNode,
-            cacheGateway.getThumbnailCacheFolder()
+            cacheGateway.getThumbnailCacheFolderPath()
         ),
         previewPath = getPreviewCacheFilePath(
             megaNode,
-            cacheGateway.getPreviewCacheFolder()
+            cacheGateway.getPreviewCacheFolderPath()
         ),
         fullSizePath = getFullSizeCacheFilePath(
             megaNode,
-            cacheGateway.getFullSizeCacheFolder()
+            cacheGateway.getFullSizeCacheFolderPath()
         ),
         type = fileTypeInfoMapper(megaNode.name, megaNode.duration),
         isFavourite = megaNode.isFavourite,
@@ -93,17 +93,17 @@ internal class FileNodeMapper @Inject constructor(
         tags = megaNode.tags?.let { stringListMapper(it) }
     )
 
-    private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =
+    private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: String?): String? =
         thumbnailFolder?.let {
             "$it${File.separator}${megaNode.getThumbnailFileName()}"
         }?.takeUnless { megaNode.isFolder }
 
-    private fun getPreviewCacheFilePath(megaNode: MegaNode, previewFolder: File?): String? =
+    private fun getPreviewCacheFilePath(megaNode: MegaNode, previewFolder: String?): String? =
         previewFolder?.let {
             "$it${File.separator}${megaNode.getPreviewFileName()}"
         }?.takeUnless { megaNode.isFolder }
 
-    private fun getFullSizeCacheFilePath(megaNode: MegaNode, tempFolder: File?): String? =
+    private fun getFullSizeCacheFilePath(megaNode: MegaNode, tempFolder: String?): String? =
         tempFolder?.let {
             "$it${File.separator}${megaNode.getFileName()}"
         }?.takeUnless { megaNode.isFolder }
