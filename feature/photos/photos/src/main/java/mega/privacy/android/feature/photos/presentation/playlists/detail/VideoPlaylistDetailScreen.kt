@@ -259,7 +259,7 @@ fun VideoPlaylistDetailScreen(
                         onDismiss = {
                             resetShowRenameVideoPlaylistDialog()
                         },
-                        initialInputText = { playlistDetail?.uiEntity?.title ?: "" },
+                        initialInputText = playlistDetail?.uiEntity?.title ?: "",
                         errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
                     )
                 }

@@ -7,6 +7,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -19,21 +21,26 @@ fun EditVideoPlaylistDialog(
     resetErrorMessage: () -> Unit,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    initialInputText: () -> String = { "" },
-    inputPlaceHolderText: () -> String = { "" },
+    initialInputText: String,
+    inputPlaceHolderText: String = "",
     errorText: String? = null,
 ) {
-    var playlistTitle by rememberSaveable { mutableStateOf(title) }
+    var playlistInput by rememberSaveable(
+        inputs = arrayOf(initialInputText),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(value = TextFieldValue(initialInputText, TextRange(title.length)))
+    }
     BasicInputDialog(
         modifier = modifier,
         title = title,
         positiveButtonText = positiveButtonText,
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
-        inputValue = initialInputText(),
-        placeholder = inputPlaceHolderText(),
+        inputValue = playlistInput,
+        placeholder = inputPlaceHolderText,
         onPositiveButtonClicked = {
             resetErrorMessage()
-            onConfirm(handle, playlistTitle)
+            onConfirm(handle, playlistInput.text)
         },
         onNegativeButtonClicked = {
             resetErrorMessage()
@@ -41,7 +48,7 @@ fun EditVideoPlaylistDialog(
         },
         onValueChange = {
             resetErrorMessage()
-            playlistTitle = it
+            playlistInput = it
         },
         onDismiss = {
             resetErrorMessage()

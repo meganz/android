@@ -297,7 +297,7 @@ internal fun VideoPlaylistsTabScreen(
                             selectedVideoPlaylist = null
                             resetShowRenameVideoPlaylistDialog()
                         },
-                        initialInputText = { selectedVideoPlaylist?.title ?: "" },
+                        initialInputText = selectedVideoPlaylist?.title ?: "",
                         errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
                     )
                 }

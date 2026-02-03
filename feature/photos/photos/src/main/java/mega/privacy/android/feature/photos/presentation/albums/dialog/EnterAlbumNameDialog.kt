@@ -7,6 +7,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -23,7 +25,18 @@ internal fun EnterAlbumNameDialog(
     errorText: String? = null,
     defaultSuggestion: () -> String = { "" },
 ) {
-    var albumName by rememberSaveable { mutableStateOf(name) }
+    // Saves the input across configuration changes
+    var albumName by rememberSaveable(
+        inputs = arrayOf(name),
+        stateSaver = TextFieldValue.Saver
+    ) {
+        mutableStateOf(
+            TextFieldValue(
+                name,
+                TextRange(name.length)
+            )
+        )
+    }
 
     BasicInputDialog(
         modifier = modifier,
@@ -33,7 +46,7 @@ internal fun EnterAlbumNameDialog(
         inputValue = albumName,
         onPositiveButtonClicked = {
             resetErrorMessage()
-            val finalName = albumName.trim().ifBlank { defaultSuggestion().trim() }
+            val finalName = albumName.text.trim().ifBlank { defaultSuggestion().trim() }
             onConfirm(finalName)
         },
         onNegativeButtonClicked = {
