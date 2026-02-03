@@ -22,7 +22,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.qualifiers.ActivityContext
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
 import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.container.AppContainerWrapper
@@ -30,12 +29,10 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.PsaContentView
 import mega.privacy.android.app.presentation.psa.PsaViewModel
-import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
@@ -77,7 +74,6 @@ class ActivityAppContainerWrapper @Inject constructor(
 
     private fun onCreate() {
         val activity = context as Activity
-        val psaViewHolder = (activity as? ManagerActivity)?.psaViewHolder
         val isLoginActivity = activity is LoginActivity
         if (activity.findViewById<ComposeView>(R.id.legacy_container) == null
         ) {
@@ -95,39 +91,6 @@ class ActivityAppContainerWrapper @Inject constructor(
                             val viewModel: PsaViewModel = hiltViewModel()
                             val psaState by viewModel.state.collectAsStateWithLifecycle((context as LifecycleOwner))
 
-                            LaunchedEffect(psaState) {
-                                when (val current = psaState) {
-                                    is PsaState.InfoPsa -> {
-                                        psaViewHolder?.bind(fromInfoPsa(current))
-                                        psaViewHolder?.toggleVisible(true)
-                                    }
-
-                                    PsaState.NoPsa -> {
-                                        psaViewHolder?.toggleVisible(false)
-                                    }
-
-                                    is PsaState.StandardPsa -> {
-                                        psaViewHolder?.bind(
-                                            fromStandardPsa(
-                                                current
-                                            )
-                                        )
-                                        psaViewHolder?.toggleVisible(true)
-                                    }
-
-                                    is PsaState.WebPsa -> {
-                                        psaViewHolder?.toggleVisible(false)
-                                    }
-                                }
-                            }
-
-                            val hasPsaViewHolder = psaViewHolder != null
-                            val handledPsaState = when (psaState) {
-                                is PsaState.InfoPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
-                                PsaState.NoPsa -> psaState
-                                is PsaState.StandardPsa -> if (hasPsaViewHolder.not() && isLoginActivity.not()) psaState else PsaState.NoPsa
-                                is PsaState.WebPsa -> psaState
-                            }
                             val containers: List<(@Composable (@Composable () -> Unit) -> Unit)?> =
                                 listOf(
                                     {
@@ -140,7 +103,7 @@ class ActivityAppContainerWrapper @Inject constructor(
                                             markAsSeen = { psaId ->
                                                 viewModel.markAsSeen(psaId)
                                             },
-                                            state = handledPsaState,
+                                            state = psaState,
                                             content = content,
                                             containerModifier = Modifier
                                                 .navigationBarsPadding(),
@@ -205,30 +168,6 @@ class ActivityAppContainerWrapper @Inject constructor(
                 )
             )
         }
-    }
-
-    private fun fromInfoPsa(psaState: PsaState.InfoPsa) = with(psaState) {
-        Psa(
-            id = this.id,
-            title = this.title,
-            text = this.text,
-            imageUrl = this.imageUrl,
-            positiveText = null,
-            positiveLink = null,
-            url = null,
-        )
-    }
-
-    private fun fromStandardPsa(psaState: PsaState.StandardPsa) = with(psaState) {
-        Psa(
-            id = this.id,
-            title = this.title,
-            text = this.text,
-            imageUrl = this.imageUrl,
-            positiveText = this.positiveText,
-            positiveLink = this.positiveLink,
-            url = null,
-        )
     }
 }
 

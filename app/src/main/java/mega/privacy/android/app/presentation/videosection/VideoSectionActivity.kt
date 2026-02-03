@@ -16,11 +16,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
@@ -52,21 +48,17 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.container.AppContainer
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
-import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.qrcode.findActivity
 import mega.privacy.android.app.presentation.search.navigation.contactArraySeparator
 import mega.privacy.android.app.presentation.search.navigation.searchForeignNodeDialog
 import mega.privacy.android.app.presentation.search.navigation.searchOverQuotaDialog
 import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialog
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.privacy.android.app.presentation.security.check.PasscodeContainer
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -85,6 +77,7 @@ import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.VIDEO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -189,7 +182,6 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
 
         setContent {
             val mode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            var passcodeEnabled by remember { mutableStateOf(true) }
             val scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState)
             val nodeActionState by nodeActionsViewModel.state.collectAsStateWithLifecycle()
             val bottomSheetNavigator = rememberBottomSheetNavigator()
@@ -205,194 +197,178 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                 isPlaylistsTab && uiState.searchState == SearchWidgetState.COLLAPSED
             val isAddFabShown = isUserPlaylistDetail || isPlaylistsSearchMode
 
-            val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-                { OriginalTheme(isDark = mode.isDarkMode(), content = it) },
-                {
-                    PasscodeContainer(
-                        passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                        canLock = { passcodeEnabled },
-                        content = it
-                    )
-                },
-                { PsaContainer(content = it) }
-            )
+            OriginalTheme(isDark = mode.isDarkMode()) {
+                MegaScaffold(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding()
+                        .imePadding()
+                        .semantics { testTagsAsResourceId = true },
+                    scaffoldState = scaffoldState,
+                    floatingActionButton = {
+                        Column {
+                            TransfersWidget(
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .testTag(VIDEO_SECTION_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
+                            )
 
-            AppContainer(
-                containers = containers
-            ) {
-                OriginalTheme(isDark = mode.isDarkMode()) {
-                    MegaScaffold(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .systemBarsPadding()
-                            .imePadding()
-                            .semantics { testTagsAsResourceId = true },
-                        scaffoldState = scaffoldState,
-                        floatingActionButton = {
-                            Column {
-                                TransfersWidget(
+                            if (isAddFabShown) {
+                                MegaFloatingActionButton(
+                                    onClick = { videoSectionViewModel.addFabButtonClicked() },
                                     modifier = Modifier
-                                        .navigationBarsPadding()
-                                        .testTag(VIDEO_SECTION_SCREEN_TRANSFERS_WIDGET_TEST_TAG)
-                                )
-
-                                if (isAddFabShown) {
-                                    MegaFloatingActionButton(
-                                        onClick = { videoSectionViewModel.addFabButtonClicked() },
-                                        modifier = Modifier
-                                            .padding(top = 15.dp)
-                                            .testTag(tag = VIDEO_SECTION_SCREEN_ADD_FAB_TAG_TEST_TAG),
-                                    ) {
-                                        MegaIcon(
-                                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
-                                            contentDescription = null,
-                                            tint = IconColor.InverseAccent
-                                        )
-                                    }
+                                        .padding(top = 15.dp)
+                                        .testTag(tag = VIDEO_SECTION_SCREEN_ADD_FAB_TAG_TEST_TAG),
+                                ) {
+                                    MegaIcon(
+                                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                                        contentDescription = null,
+                                        tint = IconColor.InverseAccent
+                                    )
                                 }
                             }
-                        },
-                    ) { padding ->
-                        ConstraintLayout(
+                        }
+                    },
+                ) { padding ->
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(padding)
+                    ) {
+                        val (audioPlayer, videoSectionFeatureScreen) = createRefs()
+
+                        MiniAudioPlayerView(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(padding)
-                        ) {
-                            val (audioPlayer, videoSectionFeatureScreen) = createRefs()
+                                .constrainAs(audioPlayer) {
+                                    bottom.linkTo(parent.bottom)
+                                }
+                                .fillMaxWidth(),
+                            lifecycle = lifecycle,
+                        )
 
-                            MiniAudioPlayerView(
-                                modifier = Modifier
-                                    .constrainAs(audioPlayer) {
-                                        bottom.linkTo(parent.bottom)
-                                    }
-                                    .fillMaxWidth(),
-                                lifecycle = lifecycle,
-                            )
-
-                            VideoSectionScreen(
-                                modifier = Modifier
-                                    .constrainAs(videoSectionFeatureScreen) {
-                                        top.linkTo(parent.top)
-                                        bottom.linkTo(audioPlayer.top)
-                                        height = Dimension.fillToConstraints
-                                    }
-                                    .fillMaxWidth(),
-                                onSortOrderClick = { showNewSortByPanel() },
-                                videoSectionViewModel = videoSectionViewModel,
-                                onMenuAction = { action ->
-                                    when (action) {
-                                        VideoSectionMenuAction.VideoSectionShareAction ->
-                                            lifecycleScope.launch {
-                                                MegaNodeUtil.shareNodes(
-                                                    this@VideoSectionActivity,
-                                                    videoSectionViewModel.getSelectedMegaNode()
-                                                )
-                                                videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
-                                            }
-
-                                        VideoSectionMenuAction.VideoSectionSortByAction -> {
-                                            showNewSortByPanel()
+                        VideoSectionScreen(
+                            modifier = Modifier
+                                .constrainAs(videoSectionFeatureScreen) {
+                                    top.linkTo(parent.top)
+                                    bottom.linkTo(audioPlayer.top)
+                                    height = Dimension.fillToConstraints
+                                }
+                                .fillMaxWidth(),
+                            onSortOrderClick = { showNewSortByPanel() },
+                            videoSectionViewModel = videoSectionViewModel,
+                            onMenuAction = { action ->
+                                when (action) {
+                                    VideoSectionMenuAction.VideoSectionShareAction ->
+                                        lifecycleScope.launch {
+                                            MegaNodeUtil.shareNodes(
+                                                this@VideoSectionActivity,
+                                                videoSectionViewModel.getSelectedMegaNode()
+                                            )
+                                            videoSectionViewModel.clearAllSelectedVideosOfPlaylist()
                                         }
 
-                                        else -> return@VideoSectionScreen
+                                    VideoSectionMenuAction.VideoSectionSortByAction -> {
+                                        showNewSortByPanel()
                                     }
-                                },
-                                retryActionCallback = {
-                                    videoSectionViewModel.state.value.addToPlaylistHandle?.let {
-                                        launchAddToPlaylistActivity(it)
-                                    }
-                                },
-                                scaffoldState = scaffoldState,
-                                fileTypeIconMapper = fileTypeIconMapper,
-                                listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
-                                nodeActionHandler = bottomSheetActionHandler,
-                                navHostController = navHostController,
-                                bottomSheetNavigator = bottomSheetNavigator
-                            )
-                        }
 
-                        StartTransferComponent(
-                            event = nodeActionState.downloadEvent,
-                            onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
-                            snackBarHostState = snackbarHostState,
+                                    else -> return@VideoSectionScreen
+                                }
+                            },
+                            retryActionCallback = {
+                                videoSectionViewModel.state.value.addToPlaylistHandle?.let {
+                                    launchAddToPlaylistActivity(it)
+                                }
+                            },
+                            scaffoldState = scaffoldState,
+                            fileTypeIconMapper = fileTypeIconMapper,
+                            listToStringWithDelimitersMapper = listToStringWithDelimitersMapper,
+                            nodeActionHandler = bottomSheetActionHandler,
+                            navHostController = navHostController,
+                            bottomSheetNavigator = bottomSheetNavigator
                         )
                     }
 
-                    EventEffect(
-                        event = nodeActionState.nodeNameCollisionsResult,
-                        onConsumed = nodeActionsViewModel::markHandleNodeNameCollisionResult,
-                        action = {
-                            handleNodesNameCollisionResult(it)
-                        }
-                    )
-                    EventEffect(
-                        event = nodeActionState.showForeignNodeDialog,
-                        onConsumed = nodeActionsViewModel::markForeignNodeDialogShown,
-                        action = { navHostController.navigate(searchForeignNodeDialog) }
-                    )
-                    EventEffect(
-                        event = nodeActionState.showQuotaDialog,
-                        onConsumed = nodeActionsViewModel::markQuotaDialogShown,
-                        action = {
-                            navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
-                        }
-                    )
-                    EventEffect(
-                        event = nodeActionState.contactsData,
-                        onConsumed = nodeActionsViewModel::markShareFolderAccessDialogShown,
-                        action = { (contactData, isFromBackups, nodeHandles) ->
-                            val contactList =
-                                contactData.joinToString(separator = contactArraySeparator)
-                            navHostController.navigate(
-                                shareFolderAccessDialog.plus("/${contactList}")
-                                    .plus("/${isFromBackups}")
-                                    .plus("/${nodeHandles}")
-                            )
-                        },
-                    )
-                    EventEffect(
-                        event = nodeActionState.selectAll,
-                        onConsumed = nodeActionsViewModel::selectAllConsumed,
-                        action = videoSectionViewModel::selectAllNodes
-                    )
-                    EventEffect(
-                        event = nodeActionState.clearAll,
-                        onConsumed = nodeActionsViewModel::clearAllConsumed,
-                        action = videoSectionViewModel::clearAllSelectedVideos
-                    )
-                    EventEffect(
-                        event = nodeActionState.infoToShowEvent,
-                        onConsumed = nodeActionsViewModel::onInfoToShowEventConsumed,
-                    ) { info ->
-                        info?.let {
-                            info.getInfo(this@VideoSectionActivity).let { text ->
-                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(text)
-                            }
-                        } ?: findActivity()?.finish()
-                    }
-
-                    EventEffect(
-                        event = nodeActionState.addVideoToPlaylistResultEvent,
-                        onConsumed = nodeActionsViewModel::resetAddVideoToPlaylistResultEvent,
-                        action = { result ->
-                            if (result.isRetry) {
-                                val action =
-                                    scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                                        message = result.message,
-                                        actionLabel = getString(R.string.message_option_retry)
-                                    )
-                                if (action == SnackbarResult.ActionPerformed) {
-                                    videoSectionViewModel.launchVideoToPlaylistActivity(result.videoHandle)
-                                }
-
-                            } else {
-                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                                    message = result.message
-                                )
-                            }
-                        }
+                    StartTransferComponent(
+                        event = nodeActionState.downloadEvent,
+                        onConsumeEvent = nodeActionsViewModel::markDownloadEventConsumed,
+                        snackBarHostState = snackbarHostState,
                     )
                 }
+
+                EventEffect(
+                    event = nodeActionState.nodeNameCollisionsResult,
+                    onConsumed = nodeActionsViewModel::markHandleNodeNameCollisionResult,
+                    action = {
+                        handleNodesNameCollisionResult(it)
+                    }
+                )
+                EventEffect(
+                    event = nodeActionState.showForeignNodeDialog,
+                    onConsumed = nodeActionsViewModel::markForeignNodeDialogShown,
+                    action = { navHostController.navigate(searchForeignNodeDialog) }
+                )
+                EventEffect(
+                    event = nodeActionState.showQuotaDialog,
+                    onConsumed = nodeActionsViewModel::markQuotaDialogShown,
+                    action = {
+                        navHostController.navigate(searchOverQuotaDialog.plus("/${it}"))
+                    }
+                )
+                EventEffect(
+                    event = nodeActionState.contactsData,
+                    onConsumed = nodeActionsViewModel::markShareFolderAccessDialogShown,
+                    action = { (contactData, isFromBackups, nodeHandles) ->
+                        val contactList =
+                            contactData.joinToString(separator = contactArraySeparator)
+                        navHostController.navigate(
+                            shareFolderAccessDialog.plus("/${contactList}")
+                                .plus("/${isFromBackups}")
+                                .plus("/${nodeHandles}")
+                        )
+                    },
+                )
+                EventEffect(
+                    event = nodeActionState.selectAll,
+                    onConsumed = nodeActionsViewModel::selectAllConsumed,
+                    action = videoSectionViewModel::selectAllNodes
+                )
+                EventEffect(
+                    event = nodeActionState.clearAll,
+                    onConsumed = nodeActionsViewModel::clearAllConsumed,
+                    action = videoSectionViewModel::clearAllSelectedVideos
+                )
+                EventEffect(
+                    event = nodeActionState.infoToShowEvent,
+                    onConsumed = nodeActionsViewModel::onInfoToShowEventConsumed,
+                ) { info ->
+                    info?.let {
+                        info.getInfo(this@VideoSectionActivity).let { text ->
+                            scaffoldState.snackbarHostState.showAutoDurationSnackbar(text)
+                        }
+                    } ?: findActivity()?.finish()
+                }
+
+                EventEffect(
+                    event = nodeActionState.addVideoToPlaylistResultEvent,
+                    onConsumed = nodeActionsViewModel::resetAddVideoToPlaylistResultEvent,
+                    action = { result ->
+                        if (result.isRetry) {
+                            val action =
+                                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                    message = result.message,
+                                    actionLabel = getString(R.string.message_option_retry)
+                                )
+                            if (action == SnackbarResult.ActionPerformed) {
+                                videoSectionViewModel.launchVideoToPlaylistActivity(result.videoHandle)
+                            }
+
+                        } else {
+                            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                                message = result.message
+                            )
+                        }
+                    }
+                )
             }
         }
         setupCollectFlow()
