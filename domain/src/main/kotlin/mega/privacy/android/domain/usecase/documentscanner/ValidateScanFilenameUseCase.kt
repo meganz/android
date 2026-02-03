@@ -1,6 +1,8 @@
 package mega.privacy.android.domain.usecase.documentscanner
 
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
+import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
 import javax.inject.Inject
 
 /**
@@ -36,6 +38,14 @@ class ValidateScanFilenameUseCase @Inject constructor() {
         // Check if the filename is empty or only contains whitespaces
         if (filename.isBlank()) {
             return ScanFilenameValidationStatus.EmptyFilename
+        }
+
+        if (filename.isInvalidDotName()) {
+            return ScanFilenameValidationStatus.DotFileName
+        }
+
+        if (filename.isInvalidDoubleDotName()) {
+            return ScanFilenameValidationStatus.DoubleDotFileName
         }
 
         // Check if the filename without the file suffix is empty or only contains whitespaces

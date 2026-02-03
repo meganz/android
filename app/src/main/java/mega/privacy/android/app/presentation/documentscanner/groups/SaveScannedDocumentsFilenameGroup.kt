@@ -193,6 +193,8 @@ private fun getFilenameErrorMessage(
     scanFileType: ScanFileType,
 ) = when (filenameValidationStatus) {
     ScanFilenameValidationStatus.EmptyFilename -> stringResource(R.string.scan_incorrect_name)
+    ScanFilenameValidationStatus.DotFileName -> stringResource(SharedR.string.general_invalid_dot_name_warning)
+    ScanFilenameValidationStatus.DoubleDotFileName -> stringResource(SharedR.string.general_invalid_double_dot_name_warning)
     ScanFilenameValidationStatus.InvalidFilename -> stringResource(
         SharedR.string.general_invalid_characters_defined,
         "\" * / : < > ? \\ |"

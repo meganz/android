@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.documentscanner
 
-import mega.privacy.android.shared.resources.R as SharedR
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -19,7 +18,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -46,6 +45,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffol
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * A Composable that holds views displaying the main Save Scanned Documents screen
@@ -76,7 +76,7 @@ internal fun SaveScannedDocumentsView(
     onUploadScansStarted: (Uri) -> Unit,
     onUploadScansEventConsumed: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -88,14 +88,22 @@ internal fun SaveScannedDocumentsView(
         action = { filenameValidationStatus ->
             val message = when (filenameValidationStatus) {
                 ScanFilenameValidationStatus.EmptyFilename -> {
-                    context.resources.getString(R.string.scan_snackbar_incorrect_name)
+                    resources.getString(R.string.scan_snackbar_incorrect_name)
                 }
 
-                ScanFilenameValidationStatus.IncorrectFilenameExtension -> context.resources.getString(
+                ScanFilenameValidationStatus.DotFileName -> {
+                    resources.getString(SharedR.string.general_invalid_dot_name_warning)
+                }
+
+                ScanFilenameValidationStatus.DoubleDotFileName -> {
+                    resources.getString(SharedR.string.general_invalid_double_dot_name_warning)
+                }
+
+                ScanFilenameValidationStatus.IncorrectFilenameExtension -> resources.getString(
                     SharedR.string.document_scanning_settings_non_matching_file_extension_error_message
                 )
 
-                ScanFilenameValidationStatus.MissingFilenameExtension -> context.resources.getString(
+                ScanFilenameValidationStatus.MissingFilenameExtension -> resources.getString(
                     SharedR.string.document_scanning_settings_file_extension_required_error_message
                 )
 
