@@ -47,6 +47,8 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
@@ -845,7 +847,44 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(any<NavKey>())
+        verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheet(123L)
+        )
+    }
+
+    @Test
+    fun `test LabelAction multiple nodes handle navigates with ChangeLabelBottomSheetMultiple`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheetMultiple(listOf(123L, 456L))
+        )
+    }
+
+    @Test
+    fun `test LabelAction single node in multi handle navigates with ChangeLabelBottomSheet`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+
+        action.handle(menuAction, listOf(mockFileNode), mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            ChangeLabelBottomSheet(123L)
+        )
+    }
+
+    @Test
+    fun `test LabelAction empty nodes handle does not navigate`() {
+        val action = LabelActionClickHandler()
+        val menuAction = mock<LabelMenuAction>()
+
+        action.handle(menuAction, emptyList(), mockMultipleNodesActionProvider)
+
+        verify(mockMultipleNodesActionProvider.viewModel, never()).navigateWithNavKey(any())
     }
 
     // ManageShareFolderAction Tests

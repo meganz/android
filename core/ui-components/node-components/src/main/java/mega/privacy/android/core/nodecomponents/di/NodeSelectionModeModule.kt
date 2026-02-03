@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddLabelSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToAlbumSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToFavouritesSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.AddToSelectionMenuItem
@@ -63,6 +64,7 @@ abstract class NodeSelectionModeModule {
             shareSelectionMenuItem: ShareSelectionMenuItem,
             addToSelectionMenuItem: AddToSelectionMenuItem,
             addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem: AddLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem: AddToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem: RemoveFromFavouritesSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
@@ -83,6 +85,7 @@ abstract class NodeSelectionModeModule {
             shareSelectionMenuItem,
             addToSelectionMenuItem,
             addToAlbumSelectionMenuItem,
+            addLabelSelectionMenuItem,
             addToFavouritesSelectionMenuItem,
             removeFromFavouritesSelectionMenuItem,
         )

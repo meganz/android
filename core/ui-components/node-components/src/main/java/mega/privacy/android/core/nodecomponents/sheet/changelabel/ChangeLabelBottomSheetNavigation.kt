@@ -10,7 +10,10 @@ import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
 import mega.privacy.android.navigation.contract.bottomsheet.megaBottomSheet
 
 @Serializable
-data class ChangeLabelBottomSheet(val nodeId: Long): NavKey
+data class ChangeLabelBottomSheet(val nodeId: Long) : NavKey
+
+@Serializable
+data class ChangeLabelBottomSheetMultiple(val nodeIds: List<Long>) : NavKey
 
 internal fun NavGraphBuilder.changeLabelBottomSheetNavigation(
     onBack: () -> Unit,
@@ -32,6 +35,12 @@ internal fun EntryProviderScope<NavKey>.changeLabelBottomSheetNavigation(
 
         ChangeLabelBottomSheetContentM3(
             nodeId = NodeId(it.nodeId),
+            onDismiss = onBack
+        )
+    }
+    entry<ChangeLabelBottomSheetMultiple>(metadata = bottomSheetMetadata()) {
+        ChangeLabelBottomSheetContentM3(
+            nodeIds = it.nodeIds.map { id -> NodeId(id) },
             onDismiss = onBack
         )
     }

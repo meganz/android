@@ -163,6 +163,7 @@ object NodeActionHandlerModule {
         removeFavouriteAction: RemoveFavouriteActionClickHandler,
         addToActionClickHandler: AddToActionClickHandler,
         addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
+        labelAction: LabelActionClickHandler,
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,
@@ -189,7 +190,8 @@ object NodeActionHandlerModule {
             favouriteAction,
             removeFavouriteAction,
             addToActionClickHandler,
-            addToAlbumActionClickHandler
+            addToAlbumActionClickHandler,
+            labelAction
         )
     }
 }

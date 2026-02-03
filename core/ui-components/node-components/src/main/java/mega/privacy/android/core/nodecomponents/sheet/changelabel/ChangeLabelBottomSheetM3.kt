@@ -56,6 +56,29 @@ internal fun ChangeLabelBottomSheetContentM3(
 }
 
 @Composable
+internal fun ChangeLabelBottomSheetContentM3(
+    nodeIds: List<NodeId>,
+    viewModel: ChangeLabelBottomSheetViewModel = hiltViewModel(),
+    onDismiss: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(nodeIds) {
+        viewModel.loadLabelInfo(nodeIds)
+    }
+    ChangeLabelBottomSheetContentM3(
+        state = state,
+        onLabelSelected = { label ->
+            viewModel.onLabelSelected(label)
+            onDismiss()
+        },
+        onLabelRemoved = {
+            viewModel.onLabelSelected(null)
+            onDismiss()
+        },
+    )
+}
+
+@Composable
 private fun ChangeLabelBottomSheetContentM3(
     state: ChangeLabelState,
     onLabelSelected: (NodeLabel) -> Unit,
