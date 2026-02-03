@@ -1,5 +1,3 @@
-import mega.privacy.android.build.shouldApplyDefaultConfiguration
-
 plugins {
     alias(convention.plugins.mega.android.library)
     alias(convention.plugins.mega.android.library.compose)
@@ -17,6 +15,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
     implementation(project(":domain"))
+    implementation(project(":core:navigation-contract"))
 
     // Analytics
     implementation(lib.mega.analytics)
@@ -28,6 +27,7 @@ dependencies {
     implementation(androidx.bundles.compose.bom)
     implementation(lib.kotlin.ktx)
     implementation(androidx.appcompat)
+    implementation(androidx.navigation3.runtime)
 
     // Logging
     implementation(lib.bundles.logging)

@@ -35,7 +35,6 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -62,7 +61,6 @@ import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEv
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveSearchBarPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveTabEvent
-import mega.privacy.mobile.analytics.event.DriveSyncScreenEvent
 import mega.privacy.mobile.analytics.event.SyncsTabEvent
 
 /**
@@ -99,10 +97,6 @@ internal fun DriveSyncScreen(
 
     BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
         cloudDriveViewModel.processAction(DeselectAllItems)
-    }
-
-    LaunchedOnceEffect {
-        Analytics.tracker.trackEvent(DriveSyncScreenEvent)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(

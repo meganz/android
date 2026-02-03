@@ -50,6 +50,7 @@ import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
@@ -364,7 +365,8 @@ class MegaActivity : FragmentActivity() {
                                             .chain(bottomSheetStrategy),
                                         entryDecorators = listOf(
                                             rememberSaveableStateHolderNavEntryDecorator(),
-                                            rememberViewModelStoreNavEntryDecorator()
+                                            rememberViewModelStoreNavEntryDecorator(),
+                                            rememberAnalyticNavEntryDecorator()
                                         ),
                                         entryProvider = entryProvider {
                                             graphstate.featureDestinations

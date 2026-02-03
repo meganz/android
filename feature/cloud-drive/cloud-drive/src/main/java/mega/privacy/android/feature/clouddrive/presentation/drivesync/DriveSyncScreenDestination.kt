@@ -3,14 +3,17 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.analytics.decorator.withScreenViewEvent
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.mobile.analytics.event.DriveSyncScreenEvent
 
 
 fun EntryProviderScope<NavKey>.driveSyncScreen(
@@ -18,7 +21,11 @@ fun EntryProviderScope<NavKey>.driveSyncScreen(
     setNavigationVisibility: (Boolean) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
-    entry<DriveSyncNavKey> { key ->
+    entry<DriveSyncNavKey>(
+        metadata = buildMetadata {
+            withScreenViewEvent(DriveSyncScreenEvent)
+        }
+    ) { key ->
         val viewModel = hiltViewModel<DriveSyncViewModel>()
         val cloudDriveViewModel = hiltViewModel<CloudDriveViewModel, CloudDriveViewModel.Factory>(
             creationCallback = { factory ->

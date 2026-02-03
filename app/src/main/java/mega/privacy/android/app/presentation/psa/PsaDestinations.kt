@@ -10,6 +10,8 @@ import mega.privacy.android.app.presentation.psa.view.InfoPsaScreen
 import mega.privacy.android.app.presentation.psa.view.StandardPsaScreen
 import mega.privacy.android.app.presentation.psa.view.WebPsaScreen
 import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
+import mega.privacy.android.navigation.contract.bottomsheet.withBottomSheet
+import mega.privacy.android.navigation.contract.metadata.buildMetadata
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.WebSiteNavKey
 
@@ -28,10 +30,12 @@ internal fun EntryProviderScope<NavKey>.standardPsaBottomSheetDestination(
     removeDestination: (NavKey) -> Unit,
 ) {
     entry<StandardPsaBottomSheet>(
-        metadata = bottomSheetMetadata(
-            dismissOnBack = false,
-            dismissOnOutsideClick = false
-        )
+        metadata = buildMetadata {
+            withBottomSheet(
+                dismissOnBack = false,
+                dismissOnOutsideClick = false
+            )
+        },
     ) { key ->
         val viewModel = hiltViewModel<PsaScreenViewModel>()
         StandardPsaScreen(

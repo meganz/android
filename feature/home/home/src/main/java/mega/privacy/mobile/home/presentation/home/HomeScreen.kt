@@ -43,7 +43,6 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -59,7 +58,6 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
-import mega.privacy.mobile.analytics.event.HomeScreenEvent
 import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 import mega.privacy.mobile.home.presentation.home.model.searchNavKey
@@ -135,10 +133,6 @@ internal fun HomeScreen(
             }
             navigationHandler.clearResult(HomeFabOptionsBottomSheetNavKey.KEY)
         }
-    }
-
-    LaunchedOnceEffect {
-        Analytics.tracker.trackEvent(HomeScreenEvent)
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(

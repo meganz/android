@@ -26,6 +26,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewModel
 import mega.privacy.android.app.appstate.content.navigation.TopLevelBackStackNavigationHandler
@@ -137,7 +138,8 @@ fun HomeScreens(
                                 onBack = { homeScreenStacks.removeLast() },
                                 entryDecorators = listOf(
                                     rememberSaveableStateHolderNavEntryDecorator(),
-                                    rememberViewModelStoreNavEntryDecorator()
+                                    rememberViewModelStoreNavEntryDecorator(),
+                                    rememberAnalyticNavEntryDecorator()
                                 ),
                                 entryProvider = entryProvider({
                                     fallback(
