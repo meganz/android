@@ -28,5 +28,6 @@ data class MyAccountWidgetUiState(
     val usedStoragePercentage: Int = 0,
     val storageState: StorageState = StorageState.Unknown,
     val storageQuotaLevel: QuotaLevel = QuotaLevel.Success,
+    val isBusinessAccount: Boolean = false,
     val isLoading: Boolean = true,
 )

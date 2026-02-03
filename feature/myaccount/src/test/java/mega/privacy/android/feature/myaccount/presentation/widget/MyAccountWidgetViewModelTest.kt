@@ -87,6 +87,7 @@ class MyAccountWidgetViewModelTest {
         assertThat(initialState.totalStorage).isEqualTo(0L)
         assertThat(initialState.usedStoragePercentage).isEqualTo(0)
         assertThat(initialState.storageQuotaLevel).isEqualTo(QuotaLevel.Success)
+        assertThat(initialState.isBusinessAccount).isEqualTo(false)
     }
 
     @Test
@@ -94,13 +95,13 @@ class MyAccountWidgetViewModelTest {
         val accountDetail = createAccountDetail(
             usedStorage = 500000000000L, // 500 GB
             totalStorage = 1000000000000L, // 1 TB
-            accountType = AccountType.PRO_I
+            accountType = AccountType.PRO_FLEXI
         )
 
         val expectedAccountTypeResource = 123
         stubDefaultDependencies(
             accountDetailFlow = flowOf(accountDetail),
-            accountTypeMapper = { if (it == AccountType.PRO_I) expectedAccountTypeResource else 0 }
+            accountTypeMapper = { if (it == AccountType.PRO_FLEXI) expectedAccountTypeResource else 0 }
         )
 
         initUnderTest()
@@ -113,6 +114,7 @@ class MyAccountWidgetViewModelTest {
             assertThat(state.accountTypeNameResource).isEqualTo(expectedAccountTypeResource)
             assertThat(state.isLoading).isFalse()
             assertThat(state.storageQuotaLevel).isEqualTo(QuotaLevel.Success)
+            assertThat(state.isBusinessAccount).isEqualTo(true)
             cancelAndIgnoreRemainingEvents()
         }
     }

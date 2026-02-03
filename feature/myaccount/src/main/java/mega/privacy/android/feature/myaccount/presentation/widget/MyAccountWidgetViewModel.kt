@@ -76,7 +76,9 @@ class MyAccountWidgetViewModel @Inject constructor(
                 accountTypeNameResource = accountTypeNameMapper(accountDetail.levelDetail?.accountType),
                 avatarFile = avatarFile,
                 avatarColor = avatarColor?.let { color -> Color(color) } ?: Color.Unspecified,
-                isLoading = false
+                isLoading = false,
+                isBusinessAccount = accountDetail.levelDetail?.accountType?.isBusinessAccount
+                    ?: false
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(
