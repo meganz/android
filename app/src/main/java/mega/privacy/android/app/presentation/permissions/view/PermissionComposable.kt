@@ -1,18 +1,20 @@
 package mega.privacy.android.app.presentation.permissions.view
 
-import mega.privacy.android.icon.pack.R as IconPackR
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R
 
 @Composable
@@ -48,8 +50,12 @@ fun CameraBackupPermissionsScreen(
                 text = stringResource(R.string.camera_backup_permission_banner_info_description),
                 annotations = mapOf(
                     SpanIndicator('A') to SpanStyleWithAnnotation(
-                        megaSpanStyle = MegaSpanStyle.DefaultColorStyle(
-                            spanStyle = SpanStyle(fontWeight = FontWeight.Bold)
+                        megaSpanStyle = MegaSpanStyle.TextColorStyle(
+                            SpanStyle().copy(
+                                fontWeight = FontWeight.Bold,
+                                textDecoration = TextDecoration.None
+                            ),
+                            TextColor.Primary
                         ),
                         annotation = "A"
                     )
