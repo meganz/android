@@ -123,6 +123,7 @@ private fun DeviceChargingNotMetPausedBanner(
     BasicCameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_DEVICE_CHARGING_NOT_MET_BANNER_TEST_TAG),
         statusIcon = R.drawable.ic_cu_status_warning,
+        statusIconColor = IconColor.Primary,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_update_device_charging_not_met_banner_description),
         action = {
@@ -173,6 +174,7 @@ private fun NetworkRequirementNotMetPausedBanner(
             TIMELINE_CAMERA_UPLOADS_NETWORK_REQUIREMENT_NOT_MET_PAUSED_BANNER_TEST_TAG
         ),
         statusIcon = R.drawable.ic_cu_status_warning,
+        statusIconColor = IconColor.Primary,
         title = stringResource(sharedR.string.camera_update_paused_warning_banner_title),
         description = stringResource(sharedR.string.camera_uploads_notification_content_no_wifi_connection),
         action = {
@@ -233,6 +235,7 @@ private fun EnableCameraUploadsBanner(
         modifier = modifier.testTag(TIMELINE_ENABLE_CAMERA_UPLOADS_BANNER_TEST_TAG),
         verticalAlignment = Alignment.Top,
         statusIcon = R.drawable.ic_cu_status,
+        statusIconColor = IconColor.Primary,
         title = null,
         description = stringResource(id = sharedR.string.camera_upload_banner_enable_cu_subtitle),
         action = {
@@ -275,6 +278,7 @@ private fun EnableCameraUploadsBanner(
 @Composable
 private fun BasicCameraUploadsBanner(
     @DrawableRes statusIcon: Int,
+    statusIconColor: IconColor,
     title: String?,
     description: String?,
     modifier: Modifier = Modifier,
@@ -295,6 +299,7 @@ private fun BasicCameraUploadsBanner(
                     .padding(end = 15.dp)
                     .size(24.dp),
                 painter = painterResource(id = statusIcon),
+                tint = statusIconColor,
                 contentDescription = "Camera uploads banner status icon",
             )
 
