@@ -16,7 +16,6 @@ import java.io.File
  * @property jobInProgressState Job storing the transfer progress if any.
  * @property confirmLargeDownload user needs to confirm a large download if not null.
  * @property askDestinationForDownload user needs to choose a destination for this [TransferTriggerEvent.DownloadTriggerEvent]. Depending on Android version and user settings, download destination should be asked for each new download.
- * @property requestFilesPermissionDenied True if the user denied the files permission request.
  * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @property isStorageOverQuota True if the user is in storage over quota state.
  * @property previewFileToOpen
@@ -31,7 +30,6 @@ data class StartTransferViewState(
     val jobInProgressState: StartTransferJobInProgress? = null,
     val confirmLargeDownload: ConfirmLargeDownloadInfo? = null,
     val askDestinationForDownload: TransferTriggerEvent.DownloadTriggerEvent? = null,
-    val requestFilesPermissionDenied: Boolean = false,
     val triggerEventWithoutPermission: TransferTriggerEvent? = null,
     val isStorageOverQuota: Boolean = false,
     val previewFileToOpen: File? = null,

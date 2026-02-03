@@ -78,8 +78,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -152,12 +150,6 @@ class StartTransfersComponentViewModelTest {
     private val saveUriToDeviceUseCase = mock<SaveUriToDeviceUseCase>()
     private val getCurrentUploadSpeedUseCase = mock<GetCurrentUploadSpeedUseCase>()
     private val cancelCancelTokenUseCase = mock<CancelCancelTokenUseCase>()
-    private val monitorRequestFilesPermissionDeniedUseCase =
-        mock<MonitorRequestFilesPermissionDeniedUseCase> {
-            on { invoke() } doReturn emptyFlow()
-        }
-    private val setRequestFilesPermissionDeniedUseCase =
-        mock<SetRequestFilesPermissionDeniedUseCase>()
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase =
         mock<StartDownloadsWorkerAndWaitUntilIsStartedUseCase>()
     private val deleteAllPendingTransfersUseCase = mock<DeleteAllPendingTransfersUseCase>()
@@ -251,8 +243,6 @@ class StartTransfersComponentViewModelTest {
             saveUriToDeviceUseCase = saveUriToDeviceUseCase,
             getCurrentUploadSpeedUseCase = getCurrentUploadSpeedUseCase,
             cancelCancelTokenUseCase = cancelCancelTokenUseCase,
-            monitorRequestFilesPermissionDeniedUseCase = monitorRequestFilesPermissionDeniedUseCase,
-            setRequestFilesPermissionDeniedUseCase = setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase = startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             startUploadsWorkerAndWaitUntilIsStartedUseCase = startUploadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase = deleteAllPendingTransfersUseCase,
@@ -306,7 +296,6 @@ class StartTransfersComponentViewModelTest {
             saveUriToDeviceUseCase,
             getCurrentUploadSpeedUseCase,
             cancelCancelTokenUseCase,
-            setRequestFilesPermissionDeniedUseCase,
             startDownloadsWorkerAndWaitUntilIsStartedUseCase,
             deleteAllPendingTransfersUseCase,
             monitorPendingTransfersUntilResolvedUseCase,
@@ -330,7 +319,6 @@ class StartTransfersComponentViewModelTest {
 
     private fun initialStub() = runTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
-        whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
         val storageStateEvent = mock<StorageStateEvent> {
             on { storageState } doReturn StorageState.Unknown
@@ -838,27 +826,6 @@ class StartTransfersComponentViewModelTest {
             stage = TransferStage.STAGE_SCANNING
         )
     })
-
-    @Test
-    fun `test that monitorRequestFilesPermissionDeniedUseCase updates state`() =
-        runTest {
-            whenever(monitorRequestFilesPermissionDeniedUseCase())
-                .thenReturn(flowOf(true))
-
-            initTest()
-
-            underTest.uiState.map { it.requestFilesPermissionDenied }.test {
-                assertThat(awaitItem()).isTrue()
-            }
-        }
-
-    @Test
-    fun `test that setRequestFilesPermissionDenied invokes correct use case`() = runTest {
-        whenever(setRequestFilesPermissionDeniedUseCase()).thenReturn(Unit)
-
-        underTest.setRequestFilesPermissionDenied()
-        verify(setRequestFilesPermissionDeniedUseCase).invoke()
-    }
 
     @ParameterizedTest(name = " if use case returns {0}")
     @ValueSource(booleans = [true, false])
@@ -1767,7 +1734,6 @@ class StartTransfersComponentViewModelTest {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
         whenever(totalFileSizeOfNodesUseCase(any())).thenReturn(1)
         whenever(shouldAskDownloadDestinationUseCase()).thenReturn(false)
-        whenever(monitorRequestFilesPermissionDeniedUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
     }
 

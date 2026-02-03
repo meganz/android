@@ -70,8 +70,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.SaveDoNotPromptTo
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldAskDownloadDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.ShouldPromptToSaveDestinationUseCase
 import mega.privacy.android.domain.usecase.transfers.downloads.StartDownloadsWorkerAndWaitUntilIsStartedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.MonitorRequestFilesPermissionDeniedUseCase
-import mega.privacy.android.domain.usecase.transfers.filespermission.SetRequestFilesPermissionDeniedUseCase
 import mega.privacy.android.domain.usecase.transfers.offline.SaveOfflineNodesToDevice
 import mega.privacy.android.domain.usecase.transfers.offline.SaveUriToDeviceUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorStorageOverQuotaUseCase
@@ -121,8 +119,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     private val saveUriToDeviceUseCase: SaveUriToDeviceUseCase,
     private val getCurrentUploadSpeedUseCase: GetCurrentUploadSpeedUseCase,
     private val cancelCancelTokenUseCase: CancelCancelTokenUseCase,
-    private val monitorRequestFilesPermissionDeniedUseCase: MonitorRequestFilesPermissionDeniedUseCase,
-    private val setRequestFilesPermissionDeniedUseCase: SetRequestFilesPermissionDeniedUseCase,
     private val startDownloadsWorkerAndWaitUntilIsStartedUseCase: StartDownloadsWorkerAndWaitUntilIsStartedUseCase,
     private val startUploadsWorkerAndWaitUntilIsStartedUseCase: StartUploadsWorkerAndWaitUntilIsStartedUseCase,
     private val deleteAllPendingTransfersUseCase: DeleteAllPendingTransfersUseCase,
@@ -156,7 +152,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     init {
         checkDownloadRating()
         checkUploadRating()
-        monitorRequestFilesPermissionDenied()
         monitorStorageOverQuota()
         monitorPreviews()
         monitorTransferToCancel()
@@ -1141,21 +1136,6 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                         }
                     }
             }
-        }
-    }
-
-    private fun monitorRequestFilesPermissionDenied() {
-        viewModelScope.launch {
-            monitorRequestFilesPermissionDeniedUseCase().collect { denied ->
-                _uiState.update { state -> state.copy(requestFilesPermissionDenied = denied) }
-            }
-        }
-    }
-
-    fun setRequestFilesPermissionDenied() {
-        viewModelScope.launch {
-            runCatching { setRequestFilesPermissionDeniedUseCase() }
-                .onFailure { Timber.e(it) }
         }
     }
 

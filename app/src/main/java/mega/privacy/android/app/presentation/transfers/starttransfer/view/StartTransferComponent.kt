@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +64,6 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.model.Start
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumeChatTransfersDialog
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.dialog.ResumePreviewTransfersDialog
-import mega.privacy.android.app.presentation.transfers.starttransfer.view.filespermission.FilesPermissionDialog
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.CancelPreviewDownloadDialog
 import mega.privacy.android.app.presentation.transfers.view.dialog.LargeDownloadConfirmationDialog
@@ -105,7 +105,6 @@ internal fun StartTransferComponent(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var showFilesPermissionRequest by rememberSaveable { mutableStateOf(false) }
     var showStorageOverQuotaWarning by rememberSaveable { mutableStateOf(false) }
     val notificationPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) {
@@ -169,16 +168,6 @@ internal fun StartTransferComponent(
                 }
             }
         })
-
-    if (showFilesPermissionRequest) {
-        FilesPermissionDialog(
-            onDoNotShowAgainClick = { viewModel.setRequestFilesPermissionDenied() },
-            onStartTransferAndDismiss = {
-                viewModel.startTransferAfterPermissionRequest()
-                showFilesPermissionRequest = false
-            }
-        )
-    }
 
     if (showStorageOverQuotaWarning) {
         NotEnoughSpaceForUploadDialog(onCancel = {
@@ -271,6 +260,7 @@ private fun StartTransferComponent(
     retryTransfers: (TransferTriggerEvent.RetryTransfers) -> Unit,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
     var showOfflineAlertDialog by rememberSaveable { mutableStateOf(false) }
     var showResumeChatUploadsAlertDialog by rememberSaveable { mutableStateOf(false) }
@@ -362,7 +352,7 @@ private fun StartTransferComponent(
 
                 is StartTransferEvent.FinishCopyOffline -> {
                     snackBarHostState.showAutoDurationSnackbar(
-                        context.resources.getQuantityString(
+                        resources.getQuantityString(
                             R.plurals.download_complete,
                             event.totalFiles,
                             event.totalFiles,

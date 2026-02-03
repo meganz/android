@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import androidx.work.WorkInfo
-import dagger.Lazy
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -32,7 +31,6 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.TransfersPreferencesGateway
 import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -119,7 +117,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val deviceGateway: DeviceGateway,
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val transfersPreferencesGateway: Lazy<TransfersPreferencesGateway>,
     private val megaUploadOptionsMapper: MegaUploadOptionsMapper,
 ) : TransferRepository {
 
@@ -836,18 +833,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun updatePendingTransfer(
         updatePendingTransferRequest: UpdatePendingTransferRequest,
     ) = megaLocalRoomGateway.updatePendingTransfers(updatePendingTransferRequest)
-
-    override suspend fun setRequestFilesPermissionDenied() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.get().setRequestFilesPermissionDenied()
-    }
-
-    override fun monitorRequestFilesPermissionDenied() = flow {
-        emitAll(transfersPreferencesGateway.get().monitorRequestFilesPermissionDenied())
-    }.flowOn(ioDispatcher)
-
-    override suspend fun clearPreferences() = withContext(ioDispatcher) {
-        transfersPreferencesGateway.get().clearPreferences()
-    }
 
     override suspend fun getBandwidthOverQuotaDelay() = withContext(ioDispatcher) {
         megaApiGateway.getBandwidthOverQuotaDelay().seconds

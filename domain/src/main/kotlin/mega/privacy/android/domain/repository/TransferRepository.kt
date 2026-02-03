@@ -581,21 +581,6 @@ interface TransferRepository {
     suspend fun deleteAllPendingTransfers()
 
     /**
-     * Sets whether the user has denied the file access permission request
-     */
-    suspend fun setRequestFilesPermissionDenied()
-
-    /**
-     * Monitors whether the user has denied the file access permission request
-     */
-    fun monitorRequestFilesPermissionDenied(): Flow<Boolean>
-
-    /**
-     * Clear all preferences
-     */
-    suspend fun clearPreferences()
-
-    /**
      * Get the time during which transfers will be stopped due to a bandwidth over quota
      *
      * @return Time during which transfers will be stopped, otherwise 0
