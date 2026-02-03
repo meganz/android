@@ -447,13 +447,15 @@ class FolderLinkComposeActivity : PasscodeActivity(),
 
     private fun showLoginScreen() {
         Timber.d("Refresh session - sdk or karere")
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-        intent.data = Uri.parse(viewModel.state.value.url)
-        intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
-        finish()
+        intent?.data?.let { data ->
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+            intent.data = data
+            intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOT_NODES_NULL
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+            finish()
+        } ?: Timber.w("Cannot refresh session - intent data is null")
     }
 
     private fun showAskForDecryptionKeyDialog() {
