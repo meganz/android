@@ -88,7 +88,7 @@ internal fun RubbishBinScreen(
     )
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
-    var showClearRubbishBinDialog by remember { mutableStateOf(false) }
+    var showClearRubbishBinDialog by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
