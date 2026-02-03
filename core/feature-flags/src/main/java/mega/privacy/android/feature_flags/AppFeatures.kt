@@ -134,6 +134,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
         "Convert the MyAccountUsageFragment to ComposeUI",
         false
     ),
+
+    /**
+     * Feature flag to control the migration of FileExplorerFragment to ComposeUI and single activity.
+     */
+    FileExplorer(
+        "Enable file explorer revamp with ComposeUI and single activity",
+        false
+    )
     ;
 
     companion object : FeatureFlagValueProvider {
