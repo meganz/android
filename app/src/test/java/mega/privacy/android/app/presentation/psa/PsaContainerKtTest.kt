@@ -54,7 +54,7 @@ class PsaContainerKtTest {
 
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
         composeTestRule.onNodeWithTag(PsaViewTag).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PsaInfoViewTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaInfoViewTag, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
@@ -77,7 +77,7 @@ class PsaContainerKtTest {
         }
 
         composeTestRule.onNodeWithTag(WebPsaTag).assertDoesNotExist()
-        composeTestRule.onNodeWithTag(PsaViewTag).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PsaViewTag, useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag(PsaInfoViewTag).assertDoesNotExist()
     }
 

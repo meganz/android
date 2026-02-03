@@ -12,12 +12,15 @@ class PsaFeatureDestinations : FeatureDestination {
             standardPsaBottomSheetDestination(
                 closePsaScreen = navigationHandler::remove,
                 onNavigate = navigationHandler::navigate,
+                removeDestination = navigationHandler::remove,
             )
             infoPsaBottomSheetDestination(
-                closePsaScreen = navigationHandler::remove
+                closePsaScreen = navigationHandler::remove,
+                removeDestination = navigationHandler::remove,
             )
             webPsaDestination(
-                closePsaScreen = navigationHandler::remove
+                closePsaScreen = navigationHandler::remove,
+                removeDestination = navigationHandler::remove,
             )
         }
 }

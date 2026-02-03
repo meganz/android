@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.psa
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -162,12 +164,17 @@ private fun NestedPsaView(
     containerModifier: Modifier,
     psaView: @Composable (Modifier) -> Unit,
 ) {
-    Box(Modifier.fillMaxSize()) {
+    BackHandler() { }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {},
+    ) {
         MegaBottomSheetContainer(
             modifier = containerModifier
                 .shadow(6.dp)
                 .align(Alignment.BottomCenter)
-                .fillMaxWidth(),
+                .fillMaxWidth()
         ) {
             psaView(
                 Modifier

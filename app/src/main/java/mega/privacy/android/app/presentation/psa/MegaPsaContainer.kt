@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.psa
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -144,7 +146,12 @@ internal fun MegaPsaStateView(
 private fun MegaNestedPsaView(
     psaView: @Composable (Modifier) -> Unit,
 ) {
-    Box(Modifier.fillMaxSize()) {
+    BackHandler() { }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .clickable(enabled = false) {},
+    ) {
         ColumnSurface(
             surfaceColor = SurfaceColor.Surface1,
             modifier = Modifier
