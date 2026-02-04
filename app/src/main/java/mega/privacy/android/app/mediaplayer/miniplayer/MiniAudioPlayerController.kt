@@ -36,6 +36,10 @@ import mega.privacy.android.icon.pack.R as iconPackR
 /**
  * A helper class containing UI logic of mini player, it help us keep ManagerActivity clean.
  *
+ * Reminder: Once ManagerActivity is removed, add [CoroutineScope] to the constructor and remove
+ * [setCoroutineScope] / [sharingScope] from [onResume]; all call sites will be Compose or
+ * Fragment and can pass lifecycleScope.
+ *
  * @param playerView the ExoPlayer view
  * @param onPlayerVisibilityChanged a callback for mini player view visibility change
  */
@@ -114,7 +118,6 @@ class MiniAudioPlayerController(
     private val audioPlayerPlayingObserver = Observer<Boolean> {
         if (!serviceBound && it) {
             serviceBound = true
-
             val playerServiceIntent = Intent(context, AudioPlayerService::class.java)
             playerServiceIntent.putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false)
             context.bindService(playerServiceIntent, connection, Context.BIND_AUTO_CREATE)
@@ -153,6 +156,17 @@ class MiniAudioPlayerController(
             Lifecycle.Event.ON_PAUSE -> onPause()
             Lifecycle.Event.ON_DESTROY -> onDestroy()
             else -> return
+        }
+    }
+
+    /**
+     * Set the coroutine scope used for emitting [audioBinding] and metadata updates.
+     * Call from Compose when the controller is first composed so [onServiceConnected]
+     * can emit even when lifecycle is INITIALIZED/STARTED (e.g. after returning from Search).
+     */
+    fun setCoroutineScope(scope: CoroutineScope) {
+        if (sharingScope == null) {
+            sharingScope = scope
         }
     }
 

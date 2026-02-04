@@ -24,6 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -138,10 +139,14 @@ fun MiniAudioPlayerView(
     }
 
     DisposableEffect(lifecycleOwner, audioPlayerController) {
-        audioPlayerController?.let {
-            lifecycleOwner.lifecycle.addObserver(it)
+        audioPlayerController?.let { controller ->
+            lifecycleOwner.lifecycle.addObserver(controller)
+            // Set scope immediately so onServiceConnected can emit when it runs (async).
+            // After Search we recompose with lifecycle INITIALIZED/STARTED, so onResume
+            // hasn't run yet and sharingScope would be null when onServiceConnected fires.
+            controller.setCoroutineScope(lifecycleOwner.lifecycleScope)
             onDispose {
-                lifecycleOwner.lifecycle.removeObserver(it)
+                lifecycleOwner.lifecycle.removeObserver(controller)
             }
         } ?: onDispose { }
     }
