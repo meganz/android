@@ -499,7 +499,7 @@ class StartTransfersComponentViewModelTest {
             whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
 
             underTest.startDownloadWithoutConfirmation(startDownloadNode)
-            underTest.startDownloadWithDestination(destinationUri)
+            underTest.checkSaveDestinationAndStartDownload(destinationUri)
 
             assertThat(underTest.uiState.value.promptSaveDestination)
                 .isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -527,7 +527,7 @@ class StartTransfersComponentViewModelTest {
             whenever(getFileNameFromStringUriUseCase(uriString)).thenReturn(destinationName)
 
             underTest.startDownloadWithoutConfirmation(startDownloadNode)
-            underTest.startDownloadWithDestination(destinationUri)
+            underTest.checkSaveDestinationAndStartDownload(destinationUri)
             underTest.consumePromptSaveDestination()
 
             assertThat(underTest.uiState.value.promptSaveDestination)
@@ -699,7 +699,7 @@ class StartTransfersComponentViewModelTest {
             underTest.startDownloadWithoutConfirmation(
                 TransferTriggerEvent.CopyOfflineNode(listOf(nodeId))
             )
-            underTest.startDownloadWithDestination(
+            underTest.checkSaveDestinationAndStartDownload(
                 uri
             )
             assertCurrentEventIsEqualTo(

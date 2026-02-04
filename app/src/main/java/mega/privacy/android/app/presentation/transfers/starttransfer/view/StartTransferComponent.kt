@@ -185,7 +185,8 @@ internal fun StartTransferComponent(
         onOneOffEventConsumed = viewModel::consumeOneOffEvent,
         onCancelled = viewModel::cancelCurrentTransfersJob,
         onLargeDownloadAnswered = viewModel::largeDownloadAnswered,
-        onDestinationSet = viewModel::startDownloadWithDestination,
+        onDestinationSet = viewModel::checkSaveDestinationAndStartDownload,
+        onSaveDestinationFinished = viewModel::startDownloadingAfterCheckSaveDestination,
         onPromptSaveDestinationConsumed = viewModel::consumePromptSaveDestination,
         onSaveDestination = viewModel::saveDestination,
         onAlwaysAskForDestination = viewModel::alwaysAskForDestination,
@@ -245,6 +246,7 @@ private fun StartTransferComponent(
     onCancelled: () -> Unit,
     onLargeDownloadAnswered: (TransferTriggerEvent.DownloadTriggerEvent?, saveDoNotAskAgain: Boolean) -> Unit,
     onDestinationSet: (destination: Uri?) -> Unit,
+    onSaveDestinationFinished: (destination: String) -> Unit,
     onPromptSaveDestinationConsumed: () -> Unit,
     onSaveDestination: (String) -> Unit,
     onAlwaysAskForDestination: () -> Unit,
@@ -466,13 +468,16 @@ private fun StartTransferComponent(
             cancelButtonText = stringResource(id = sharedR.string.transfers_dialog_save_download_location_always_ask_option),
             onConfirm = {
                 onSaveDestination(saveDestinationInfo.destination)
+                onSaveDestinationFinished(saveDestinationInfo.destination)
                 showPromptSaveDestinationDialog = null
             },
             onDismiss = {
+                onSaveDestinationFinished(saveDestinationInfo.destination)
                 showPromptSaveDestinationDialog = null
             },
             onCancel = {
                 onAlwaysAskForDestination()
+                onSaveDestinationFinished(saveDestinationInfo.destination)
                 showPromptSaveDestinationDialog = null
             },
         )

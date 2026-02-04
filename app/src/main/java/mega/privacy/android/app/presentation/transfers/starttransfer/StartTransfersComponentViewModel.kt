@@ -439,19 +439,16 @@ internal class StartTransfersComponentViewModel @Inject constructor(
     }
 
     /**
-     * Start download with the destination manually set by the user
+     * Start download with the destination manually set by the user, it will trigger promptSaveDestination if needed or start download immediately if not
      * @param destinationUri the chosen destination or null if cancelled
      */
-    fun startDownloadWithDestination(
+    fun checkSaveDestinationAndStartDownload(
         destinationUri: Uri?,
     ) {
         Timber.d("Selected destination $destinationUri")
-        val originalEvent = uiState.value.askDestinationForDownload
-        consumeAskDestination()
-        if (destinationUri != null && originalEvent != null) {
+        if (destinationUri != null) {
             viewModelScope.launch {
                 val destination = destinationUri.toString()
-                startDownloadNodes(originalEvent, destination)
                 if (runCatching { shouldPromptToSaveDestinationUseCase() }.getOrDefault(false)) {
                     val destinationName =
                         runCatching { getFileNameFromStringUriUseCase(destination) }
@@ -468,10 +465,23 @@ internal class StartTransfersComponentViewModel @Inject constructor(
                             )
                         )
                     }
+                } else {
+                    startDownloadingAfterCheckSaveDestination(destination)
                 }
             }
         }
     }
+
+    fun startDownloadingAfterCheckSaveDestination(destination: String) {
+        val originalEvent = uiState.value.askDestinationForDownload
+        consumeAskDestination()
+        if (originalEvent != null) {
+            viewModelScope.launch {
+                startDownloadNodes(originalEvent, destination)
+            }
+        }
+    }
+
 
     private fun consumeAskDestination() {
         _uiState.update {
