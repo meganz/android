@@ -38,8 +38,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.extension.systemBarsWithRail
-import mega.privacy.android.navigation.contract.state.LocalBottomNavigationVisible
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
@@ -87,11 +85,6 @@ fun CloudDriveScreen(
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
-        contentWindowInsets = if (LocalBottomNavigationVisible.current) {
-            WindowInsets.systemBarsWithRail()
-        } else {
-            ScaffoldDefaults.contentWindowInsets
-        },
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

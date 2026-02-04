@@ -50,7 +50,6 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.extension.systemBarsWithRail
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -103,7 +102,6 @@ internal fun DriveSyncScreen(
         modifier = Modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        contentWindowInsets = WindowInsets.systemBarsWithRail(),
         topBar = {
             if (cloudDriveUiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(

@@ -4,8 +4,13 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuite
@@ -113,7 +118,24 @@ fun MainNavigationScaffold(
                 LocalBottomNavigationVisible provides isNavigationVisible,
                 LocalNavigationRailVisible provides (navSuiteType == NavigationSuiteType.NavigationRail)
             ) {
-                navContent(navUiController)
+                Box(
+                    modifier = if (isNavigationVisible) {
+                        // we need to consume the displayCutout and other insets depending on MegaNavigationSuite orientation, otherwise it will be applied again to the top app bar or other components
+                        Modifier.consumeWindowInsets(
+                            insets = ScaffoldDefaults.contentWindowInsets.only(
+                                sides = if (navSuiteType == NavigationSuiteType.NavigationRail) {
+                                    WindowInsetsSides.Start
+                                } else {
+                                    WindowInsetsSides.Bottom
+                                }
+                            )
+                        )
+                    } else {
+                        Modifier
+                    }
+                ) {
+                    navContent(navUiController)
+                }
             }
         }
     )
@@ -135,6 +157,10 @@ private fun MegaNavigationSuite(
         colors = scaffoldColors,
         modifier = Modifier
             .testTag(if (navSuiteType == NavigationSuiteType.NavigationBar) MAIN_NAVIGATION_BAR_TEST_TAG else MAIN_NAVIGATION_RAIL_TEST_TAG)
+            .then(
+                if (navSuiteType == NavigationSuiteType.NavigationBar) Modifier
+                else Modifier.padding(top = 14.dp) // to align it to the toolbar title
+            )
             .drawWithContent {
                 drawContent()
                 val strokeWidth = 1.dp.toPx()

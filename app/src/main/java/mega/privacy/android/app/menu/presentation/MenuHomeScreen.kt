@@ -74,7 +74,6 @@ import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3Na
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
-import mega.privacy.android.navigation.contract.extension.systemBarsWithRail
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.NotificationsNavKey
 import mega.privacy.android.navigation.destination.TestPasswordNavKey
@@ -170,7 +169,6 @@ fun MenuHomeScreenUi(
                 navigationType = AppBarNavigationType.None
             )
         },
-        contentWindowInsets = WindowInsets.systemBarsWithRail(),
     ) { paddingValues ->
         LazyColumn(
             state = listState,

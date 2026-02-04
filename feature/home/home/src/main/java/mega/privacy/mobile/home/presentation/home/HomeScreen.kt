@@ -51,7 +51,6 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.extension.systemBarsWithRail
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -167,7 +166,6 @@ internal fun HomeScreen(
                 )
             }
         },
-        contentWindowInsets = WindowInsets.systemBarsWithRail(),
     ) { paddingValues ->
         when (state) {
             is HomeUiState.Data -> {
