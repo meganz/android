@@ -4598,4 +4598,9 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">Unggahan Kamera teraktifkan</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">Lokasi ini tidak ada lagi.</string>
+    <string name="invalid_string">Tidak boleh kosong</string>
+    <string name="invalid_input">Bukan entri yang valid</string>
+    <string name="invalid_link">Tautan tidak valid. Silakan coba lagi atau minta tautan baru.</string>
+    <string name="dialog_taken_down_folder_description">Folder ini telah dihapus sesuai dengan [A]Kebijakan Panduan Penghapusan[/A] kami. Anda dapat mengajukan keberatan atas penghapusan ini jika anda yakin kami telah melakukan kesalahan.</string>
+    <string name="dialog_taken_down_file_description">File ini telah dihapus sesuai dengan [A]Kebijakan Panduan Penghapusan Konten[/A] kami. Anda dapat mengajukan keberatan atas penghapusan ini jika anda yakin kami telah melakukan kesalahan.</string>
 </resources>
