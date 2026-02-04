@@ -25,7 +25,8 @@ class GetLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode1, mockNode2),
                 canBeMovedToTarget = false,
                 noNodeInBackups = true,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isTrue()
@@ -44,7 +45,8 @@ class GetLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode),
                 canBeMovedToTarget = false,
                 noNodeInBackups = true,
-                noNodeTakenDown = false
+                noNodeTakenDown = false,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -63,7 +65,8 @@ class GetLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode),
                 canBeMovedToTarget = false,
                 noNodeInBackups = true,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -79,7 +82,8 @@ class GetLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mock()),
                 canBeMovedToTarget = false,
                 noNodeInBackups = false,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -95,7 +99,8 @@ class GetLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mock()),
                 canBeMovedToTarget = false,
                 noNodeInBackups = true,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()

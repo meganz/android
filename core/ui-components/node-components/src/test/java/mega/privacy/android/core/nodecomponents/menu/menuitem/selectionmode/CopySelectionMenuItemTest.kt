@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -32,7 +33,8 @@ class CopySelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isTrue()
@@ -47,7 +49,8 @@ class CopySelectionMenuItemTest {
             selectedNodes = listOf(mockTakenDownNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -63,7 +66,8 @@ class CopySelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         val result2 = copyMenuItem.shouldDisplay(
@@ -71,7 +75,8 @@ class CopySelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isTrue() // Should be true because noNodeTakenDown = true

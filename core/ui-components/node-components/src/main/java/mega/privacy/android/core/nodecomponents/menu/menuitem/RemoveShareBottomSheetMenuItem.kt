@@ -4,6 +4,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
@@ -22,6 +23,7 @@ class RemoveShareBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ) = node.isTakenDown.not()
             && isOutShareUseCase(node)
             && isNodeInRubbish.not()

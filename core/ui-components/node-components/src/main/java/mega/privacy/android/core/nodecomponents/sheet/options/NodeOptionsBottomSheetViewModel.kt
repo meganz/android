@@ -106,7 +106,8 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
                     isNodeInRubbish = isNodeInRubbish,
                     accessPermission = permission,
                     isInBackUps = isInBackUps.await(),
-                    isConnected = uiState.value.isOnline
+                    isConnected = uiState.value.isOnline,
+                    nodeSourceType = nodeSourceType
                 )
                     .groupBy { it.group }
                     .toSortedMap()

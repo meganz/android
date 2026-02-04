@@ -24,7 +24,8 @@ class RemoveLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode),
                 canBeMovedToTarget = false,
                 noNodeInBackups = false,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isTrue()
@@ -43,7 +44,8 @@ class RemoveLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode),
                 canBeMovedToTarget = false,
                 noNodeInBackups = false,
-                noNodeTakenDown = false
+                noNodeTakenDown = false,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -65,7 +67,8 @@ class RemoveLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mockNode1, mockNode2),
                 canBeMovedToTarget = false,
                 noNodeInBackups = false,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -81,7 +84,8 @@ class RemoveLinkSelectionMenuItemTest {
                 selectedNodes = listOf(mock()),
                 canBeMovedToTarget = false,
                 noNodeInBackups = false,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()

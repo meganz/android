@@ -1,49 +1,40 @@
 package mega.privacy.android.app.nav
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.navigation.destination.SharesNavKey
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.wheneverBlocking
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeDestinationMapperTest {
-
     private lateinit var underTest: NodeDestinationMapper
-
-    private val deviceGateway = mock<DeviceGateway>()
 
     private val nodeId = NodeId(100L)
     private val node = mock<TypedFileNode> {
         on { id } doReturn nodeId
     }
     private val now = 234541346L
+    private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase = mock {
+        on { invoke() } doReturn now
+    }
 
     @BeforeAll
     fun setup() {
-        underTest = NodeDestinationMapper(deviceGateway)
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(deviceGateway)
-
-        wheneverBlocking { deviceGateway.now } doReturn now
+        underTest = NodeDestinationMapper(getDeviceCurrentTimeUseCase)
     }
 
     @ParameterizedTest

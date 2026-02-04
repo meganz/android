@@ -4,6 +4,7 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
 import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
@@ -22,7 +23,9 @@ class CopyBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
-    ) = node.isTakenDown.not() && isNodeInRubbish.not() && node.isNotS4Container() && node.isNodeKeyDecrypted
+        nodeSourceType: NodeSourceType,
+    ) =
+        node.isTakenDown.not() && isNodeInRubbish.not() && node.isNotS4Container() && node.isNodeKeyDecrypted
 
     override val groupId = 8
 }

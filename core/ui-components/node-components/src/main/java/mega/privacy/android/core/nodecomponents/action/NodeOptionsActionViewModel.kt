@@ -28,6 +28,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAct
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
@@ -79,12 +80,14 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
@@ -145,6 +148,9 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val checkNodeCanBeMovedToTargetNode: CheckNodeCanBeMovedToTargetNode,
     private val nodeOptionsActionEventSender: NodeOptionsActionEventSender,
+    private val getNodeLocationUseCase: GetNodeLocationUseCase,
+    private val nodeDestinationMapper: NodeDestinationMapper,
+    private val navigationEventQueue: NavigationEventQueue,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -834,6 +840,18 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     fun resetRestoreSuccessEvent() {
         uiState.update {
             it.copy(restoreSuccessEvent = consumed())
+        }
+    }
+
+    fun viewFileInFolder(node: TypedNode) {
+        viewModelScope.launch {
+            runCatching {
+                val nodeLocation = getNodeLocationUseCase(node)
+                nodeDestinationMapper(nodeLocation)
+            }.onSuccess { destinations ->
+                navigationEventQueue.emit(destinations)
+                uiState.update { it.copy(dismissEvent = triggered) }
+            }
         }
     }
 

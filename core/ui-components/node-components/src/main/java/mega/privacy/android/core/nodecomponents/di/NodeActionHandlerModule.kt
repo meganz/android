@@ -40,6 +40,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.SyncActionCl
 import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ViewInFolderActionClickHandler
 import javax.inject.Singleton
 
 /**
@@ -91,6 +92,7 @@ object NodeActionHandlerModule {
         addToActionClickHandler: AddToActionClickHandler,
         addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
         addToPlaylistAction: AddToPlaylistActionClickHandler,
+        viewInFolderAction: ViewInFolderActionClickHandler,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -125,7 +127,8 @@ object NodeActionHandlerModule {
             syncAction,
             addToActionClickHandler,
             addToAlbumActionClickHandler,
-            addToPlaylistAction
+            addToPlaylistAction,
+            viewInFolderAction
         )
     }
 

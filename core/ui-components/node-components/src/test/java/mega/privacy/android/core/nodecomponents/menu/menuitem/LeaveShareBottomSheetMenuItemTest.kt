@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LeaveShareMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -33,7 +34,8 @@ class LeaveShareBottomSheetMenuItemTest {
             accessPermission = accessPermission,
             isInBackups = isInBackups,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertEquals(expected, result)
     }

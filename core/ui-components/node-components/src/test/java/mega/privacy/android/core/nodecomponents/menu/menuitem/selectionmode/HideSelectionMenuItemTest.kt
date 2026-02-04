@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -61,7 +62,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -85,7 +87,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -109,7 +112,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -287,13 +291,14 @@ class HideSelectionMenuItemTest {
                 getBusinessStatusUseCase
             )
 
-            val result = hideMenuItem.shouldDisplay(
-                hasNodeAccessPermission = true,
-                selectedNodes = listOf(mockSensitiveFileNode),
-                canBeMovedToTarget = true,
-                noNodeInBackups = true,
-                noNodeTakenDown = true
-            )
+        val result = hideMenuItem.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(mockSensitiveFileNode),
+            canBeMovedToTarget = true,
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
 
             assertThat(result).isFalse()
         }
@@ -327,13 +332,14 @@ class HideSelectionMenuItemTest {
                 getBusinessStatusUseCase
             )
 
-            val result = hideMenuItem.shouldDisplay(
-                hasNodeAccessPermission = true,
-                selectedNodes = listOf(mockFileNode, mockInheritedSensitiveFileNode),
-                canBeMovedToTarget = true,
-                noNodeInBackups = true,
-                noNodeTakenDown = true
-            )
+        val result = hideMenuItem.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(mockFileNode, mockInheritedSensitiveFileNode),
+            canBeMovedToTarget = true,
+            noNodeInBackups = true,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+        )
 
             assertThat(result).isFalse()
         }
@@ -372,7 +378,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         val result2 = hideMenuItem.shouldDisplay(
@@ -380,7 +387,8 @@ class HideSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isTrue()

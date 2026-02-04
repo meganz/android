@@ -18,6 +18,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -80,6 +81,7 @@ class HideBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
         if (isNodeInRubbish || accessPermission != AccessPermission.OWNER || node.isTakenDown || isInBackups || !node.isNodeKeyDecrypted)
             return false

@@ -7,6 +7,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.extension.isNotS4Container
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import timber.log.Timber
@@ -28,6 +29,7 @@ class TrashBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ) = isNodeInRubbish.not()
             && node.isIncomingShare.not()
             && accessPermission in listOf(

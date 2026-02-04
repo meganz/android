@@ -45,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.SyncActionCl
 import mega.privacy.android.core.nodecomponents.action.clickhandler.UnhideActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VerifyActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.ViewInFolderActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
@@ -83,6 +84,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ViewInFolderMenuAction
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -1618,5 +1620,31 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
         verify(mockSingleNodeActionProvider.videoToPlaylistLauncher).launch(123L)
+    }
+
+    @Test
+    fun `test that ViewInFolder canHandle returns true when action is ViewInFolderMenuAction`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<ViewInFolderMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isTrue()
+    }
+
+    @Test
+    fun `test that ViewInFolder canHandle returns false when action is other`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<SyncMenuAction>()
+
+        assertThat(action.canHandle(menuAction)).isFalse()
+    }
+
+    @Test
+    fun `test that ViewInFolder calls view model method on handle`() {
+        val action = ViewInFolderActionClickHandler()
+        val menuAction = mock<ViewInFolderMenuAction>()
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockSingleNodeActionProvider.viewModel).viewFileInFolder(mockFileNode)
     }
 }

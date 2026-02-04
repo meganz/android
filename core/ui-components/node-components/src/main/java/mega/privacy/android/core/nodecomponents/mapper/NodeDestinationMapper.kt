@@ -1,8 +1,8 @@
-package mega.privacy.android.app.nav
+package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
@@ -11,9 +11,8 @@ import mega.privacy.android.navigation.destination.SharesNavKey
 import javax.inject.Inject
 
 class NodeDestinationMapper @Inject constructor(
-    private val deviceGateway: DeviceGateway,
+    private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
 ) {
-
     operator fun invoke(nodeLocation: NodeLocation) = with(nodeLocation) {
         buildList {
             val highlightedInRoot = if (ancestorIds.isEmpty()) node.id else null
@@ -36,7 +35,7 @@ class NodeDestinationMapper @Inject constructor(
                     HomeScreensNavKey(
                         root = DriveSyncNavKey(highlightedNodeHandle = highlightedInRoot?.longValue),
                         destinations = childDestinations.takeIf { it.isNotEmpty() },
-                        timestamp = deviceGateway.now
+                        timestamp = getDeviceCurrentTimeUseCase()
                     )
                 )
             } else {

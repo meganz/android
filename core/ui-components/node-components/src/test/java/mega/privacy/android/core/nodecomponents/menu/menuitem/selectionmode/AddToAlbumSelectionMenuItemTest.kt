@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,7 +32,8 @@ class AddToAlbumSelectionMenuItemTest {
             selectedNodes = selectedNodes,
             canBeMovedToTarget = false,
             noNodeInBackups = false,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isEqualTo(isDisplayed)

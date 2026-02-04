@@ -86,7 +86,17 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeBottomSheetActionMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             emptyList()
         )
 
@@ -114,6 +124,7 @@ class NodeOptionsBottomSheetViewModelTest {
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
             whenever(
                 nodeBottomSheetActionMapper(
+                    any(),
                     any(),
                     any(),
                     any(),
@@ -194,7 +205,17 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
         whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
         whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeBottomSheetActionMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             listOf(mock())
         )
 

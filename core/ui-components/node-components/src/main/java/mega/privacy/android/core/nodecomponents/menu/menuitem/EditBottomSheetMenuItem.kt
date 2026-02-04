@@ -5,6 +5,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission.FULL
@@ -30,6 +31,7 @@ class EditBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
         val filePath = (node as? FileNode)?.fullSizePath ?: return false
         val file = File(filePath)

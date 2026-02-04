@@ -3,10 +3,11 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.ExportedData
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.doReturn
@@ -48,7 +49,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isTrue()
@@ -63,7 +65,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -78,7 +81,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -93,7 +97,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink, mockFolderNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -108,7 +113,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -123,7 +129,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFolderNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -139,7 +146,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = false,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         val result2 = manageLinkMenuItem.shouldDisplay(
@@ -147,7 +155,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isTrue()
@@ -164,7 +173,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = emptyList(),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         // Test with single node without exported data
@@ -173,7 +183,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         // Test with single node with exported data
@@ -182,7 +193,8 @@ class ManageLinkSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNodeWithLink),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isFalse() // Empty list

@@ -7,6 +7,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
@@ -44,6 +45,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ): Boolean {
         shareData = getNodeShareDataUseCase(node)
         return shareData?.user.isNullOrEmpty().not()

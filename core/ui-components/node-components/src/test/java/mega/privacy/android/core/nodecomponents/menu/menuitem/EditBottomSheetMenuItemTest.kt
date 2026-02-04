@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.EditMenuAction
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -39,7 +40,8 @@ class EditBottomSheetMenuItemTest {
                 accessPermission = AccessPermission.OWNER,
                 isInBackups = false,
                 node = fileNode,
-                isConnected = true
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
             assertThat(result).isTrue()
         }
@@ -58,7 +60,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = fileNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -77,7 +80,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = true,
             node = fileNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -96,7 +100,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = fileNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -115,7 +120,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.READ,
             isInBackups = false,
             node = fileNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -131,7 +137,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = folderNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -150,7 +157,8 @@ class EditBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = fileNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }

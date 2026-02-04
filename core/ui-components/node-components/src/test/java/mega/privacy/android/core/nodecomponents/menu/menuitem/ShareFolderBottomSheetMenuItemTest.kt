@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareFolderMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -43,6 +44,7 @@ class ShareFolderBottomSheetMenuItemTest {
             isInBackups,
             node,
             isConnected,
+            NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isEqualTo(expected)
     }

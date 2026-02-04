@@ -19,6 +19,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAct
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -77,13 +79,17 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
+import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -155,6 +161,9 @@ class NodeOptionsActionViewModelTest {
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
     private val nodeMenuProviderRegistry = mock<NodeMenuProviderRegistry>()
     private val nodeOptionsActionEventSender = mock<NodeOptionsActionEventSender>()
+    private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
+    private val nodeDestinationMapper = mock<NodeDestinationMapper>()
+    private val navigationEventQueue = mock<NavigationEventQueue>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -208,6 +217,9 @@ class NodeOptionsActionViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeOptionsActionEventSender = nodeOptionsActionEventSender,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -279,6 +291,9 @@ class NodeOptionsActionViewModelTest {
             mockFolderNode,
             mockNodeSelectionMenuItem,
             mockNodeSelectionModeMenuItem,
+            getNodeLocationUseCase,
+            nodeDestinationMapper,
+            navigationEventQueue,
         )
     }
 
@@ -645,7 +660,10 @@ class NodeOptionsActionViewModelTest {
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeOptionsActionEventSender = nodeOptionsActionEventSender,
             applicationContext = mockContext,
-            nodeSourceType = null
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -706,7 +724,10 @@ class NodeOptionsActionViewModelTest {
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeOptionsActionEventSender = nodeOptionsActionEventSender,
             applicationContext = mockContext,
-            nodeSourceType = null
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -761,7 +782,10 @@ class NodeOptionsActionViewModelTest {
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeOptionsActionEventSender = nodeOptionsActionEventSender,
             applicationContext = mockContext,
-            nodeSourceType = null
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -808,7 +832,10 @@ class NodeOptionsActionViewModelTest {
             checkNodeCanBeMovedToTargetNode = checkNodeCanBeMovedToTargetNode,
             nodeOptionsActionEventSender = nodeOptionsActionEventSender,
             applicationContext = mockContext,
-            nodeSourceType = null
+            nodeSourceType = null,
+            getNodeLocationUseCase = getNodeLocationUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
+            navigationEventQueue = navigationEventQueue,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1450,4 +1477,38 @@ class NodeOptionsActionViewModelTest {
             mock<FileNodeContent.UrlContent>()
         )
     )
+
+    @Test
+    fun `test viewFileInFolder calls getNodeLocationUseCase and emits navigation destinations`() =
+        runTest {
+            initViewModel()
+            val testNode = mockFileNode
+            val nodeLocation = NodeLocation(
+                node = testNode,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ancestorIds = listOf(NodeId(100L), NodeId(200L))
+            )
+            val destinations = listOf(
+                HomeScreensNavKey(
+                    root = DriveSyncNavKey(),
+                    destinations = emptyList(),
+                    timestamp = System.currentTimeMillis()
+                )
+            )
+
+            whenever(getNodeLocationUseCase(testNode)).thenReturn(nodeLocation)
+            whenever(nodeDestinationMapper(nodeLocation)).thenReturn(destinations)
+
+            viewModel.viewFileInFolder(testNode)
+            advanceUntilIdle()
+
+            verify(getNodeLocationUseCase).invoke(testNode)
+            verify(nodeDestinationMapper).invoke(nodeLocation)
+            verify(navigationEventQueue).emit(destinations)
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
 } 

@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.chat.GetNodeToAttachUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
+import mega.privacy.android.domain.entity.node.NodeSourceType
 
 /**
  * Send to chat bottom sheet menu item
@@ -32,6 +33,7 @@ class SendToChatBottomSheetMenuItem @Inject constructor(
         isInBackups: Boolean,
         node: TypedNode,
         isConnected: Boolean,
+        nodeSourceType: NodeSourceType,
     ) = isConnected
             && node is TypedFileNode
             && node.isTakenDown.not()

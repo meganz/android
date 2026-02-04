@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -35,7 +36,8 @@ class TrashBottomSheetMenuItemTest {
                 accessPermission = AccessPermission.OWNER,
                 isInBackups = false,
                 node = node,
-                isConnected = true
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
             assertThat(result).isTrue()
         }
@@ -53,7 +55,8 @@ class TrashBottomSheetMenuItemTest {
                 accessPermission = AccessPermission.FULL,
                 isInBackups = false,
                 node = node,
-                isConnected = true
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
             assertThat(result).isTrue()
         }
@@ -70,7 +73,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -87,7 +91,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -104,7 +109,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.READWRITE,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -121,7 +127,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = true,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -139,7 +146,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = folderNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -156,7 +164,8 @@ class TrashBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }

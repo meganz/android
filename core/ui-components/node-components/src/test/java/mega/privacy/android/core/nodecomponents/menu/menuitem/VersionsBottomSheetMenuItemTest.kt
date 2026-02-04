@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -36,7 +37,8 @@ class VersionsBottomSheetMenuItemTest {
             accessPermission,
             isInBackups,
             node,
-            true
+            true,
+            NodeSourceType.CLOUD_DRIVE
         )
         assertEquals(expected, result)
     }
@@ -53,7 +55,8 @@ class VersionsBottomSheetMenuItemTest {
             accessPermission = AccessPermission.OWNER,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertFalse(result)
     }

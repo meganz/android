@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeLabelResourceMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.LabelMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -41,7 +42,8 @@ class LabelBottomSheetMenuItemTest {
             accessPermission = accessPermission,
             isInBackups = isInBackups,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertEquals(expected, result)
     }

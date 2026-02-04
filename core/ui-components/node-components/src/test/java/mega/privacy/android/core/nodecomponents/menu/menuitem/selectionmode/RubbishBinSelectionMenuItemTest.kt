@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
@@ -41,7 +42,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isTrue()
@@ -57,7 +59,8 @@ class RubbishBinSelectionMenuItemTest {
                 selectedNodes = listOf(mockFileNode, mockFolderNode),
                 canBeMovedToTarget = true,
                 noNodeInBackups = true,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isTrue()
@@ -72,7 +75,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = false,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -87,7 +91,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = false,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -102,7 +107,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -117,7 +123,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockIncomingShareNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result).isFalse()
@@ -133,7 +140,8 @@ class RubbishBinSelectionMenuItemTest {
                 selectedNodes = listOf(mockFileNode, mockIncomingShareNode),
                 canBeMovedToTarget = true,
                 noNodeInBackups = true,
-                noNodeTakenDown = true
+                noNodeTakenDown = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
 
             assertThat(result).isFalse()
@@ -149,7 +157,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = true
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         val result2 = rubbishBinMenuItem.shouldDisplay(
@@ -157,7 +166,8 @@ class RubbishBinSelectionMenuItemTest {
             selectedNodes = listOf(mockFileNode),
             canBeMovedToTarget = true,
             noNodeInBackups = true,
-            noNodeTakenDown = false
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
 
         assertThat(result1).isTrue()

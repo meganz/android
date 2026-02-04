@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.menu.menuitem
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.jupiter.api.Test
@@ -26,7 +27,8 @@ class DownloadBottomSheetMenuItemTest {
                 accessPermission = null,
                 isInBackups = false,
                 node = node,
-                isConnected = true
+                isConnected = true,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE
             )
             assertThat(result).isTrue()
         }
@@ -42,7 +44,8 @@ class DownloadBottomSheetMenuItemTest {
             accessPermission = null,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -58,7 +61,8 @@ class DownloadBottomSheetMenuItemTest {
             accessPermission = null,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -75,7 +79,8 @@ class DownloadBottomSheetMenuItemTest {
             accessPermission = null,
             isInBackups = false,
             node = folderNode,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
@@ -91,7 +96,8 @@ class DownloadBottomSheetMenuItemTest {
             accessPermission = null,
             isInBackups = false,
             node = node,
-            isConnected = true
+            isConnected = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE
         )
         assertThat(result).isFalse()
     }
