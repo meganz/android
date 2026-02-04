@@ -94,7 +94,7 @@ class FavouriteFolderFragment : Fragment() {
         binding = FragmentFavouriteFolderBinding.inflate(inflater, container, false)
         binding.emptyHintText.text = formatEmptyScreenText(
             context,
-            getString(R.string.file_browser_empty_folder_new)
+            getString(SharedR.string.annotated_empty_folder)
         )
         initData()
         setupAdapter()

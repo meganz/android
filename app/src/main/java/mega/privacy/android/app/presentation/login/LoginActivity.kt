@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.utils.setupSplashExitAnimation
+import mega.privacy.android.shared.resources.R as SharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -191,7 +192,7 @@ class LoginActivity : BaseActivity() {
                         description = stringResource(id = R.string.error_server_expired_session),
                         buttons = persistentListOf(
                             BasicDialogButton(
-                                text = stringResource(id = R.string.general_ok),
+                                text = stringResource(id = SharedR.string.general_ok_only),
                                 onClick = {
                                     showLoggedOutDialog = false
                                 }

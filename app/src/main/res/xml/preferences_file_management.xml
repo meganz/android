@@ -30,7 +30,7 @@
 
     <androidx.preference.Preference
         android:key="settings_file_management_rubbish"
-        android:title="@string/context_clear_rubbish"
+        android:title="@string/empty_rubbish_bin_menu"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
         app:iconSpaceReserved="false" />

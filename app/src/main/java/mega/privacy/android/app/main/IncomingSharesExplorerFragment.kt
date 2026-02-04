@@ -331,7 +331,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
         when {
             modeCloud == FileExplorerActivity.UPLOAD ->
-                binding.actionText.text = getString(R.string.context_upload)
+                binding.actionText.text = getString(sharedR.string.general_upload_label)
 
             modeCloud == FileExplorerActivity.IMPORT ->
                 binding.actionText.text = getString(R.string.add_to_cloud)
@@ -386,7 +386,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         )
         emptyGeneralText = TextUtil.formatEmptyScreenText(
             requireContext(),
-            getString(R.string.file_browser_empty_folder_new)
+            getString(sharedR.string.annotated_empty_folder)
         )
         updateEmptyScreen()
 

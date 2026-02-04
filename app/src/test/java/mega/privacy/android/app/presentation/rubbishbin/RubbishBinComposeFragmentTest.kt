@@ -4,12 +4,12 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.rubbishbin.model.LegacyRubbishBinState
 import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.presentation.view.NODES_EMPTY_VIEW_VISIBLE
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as SharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +34,10 @@ class RubbishBinComposeFragmentTest {
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
                 sortOrder = "Name",
-                emptyState = Pair(iconPackR.drawable.ic_empty_trash_glass, R.string.context_empty_rubbish_bin),
+                emptyState = Pair(
+                    iconPackR.drawable.ic_empty_trash_glass,
+                    SharedR.string.annotated_empty_rubbish_bin_menu
+                ),
                 onLinkClicked = {},
                 onDisputeTakeDownClicked = {},
                 fileTypeIconMapper = fileTypeIconMapper,

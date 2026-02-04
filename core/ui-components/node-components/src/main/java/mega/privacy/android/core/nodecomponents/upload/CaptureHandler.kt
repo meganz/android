@@ -13,6 +13,7 @@ import mega.privacy.android.core.sharedcomponents.handler.rememberAppSettingsHan
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.camera.CameraArg
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Data class to hold capture handler function.
@@ -47,14 +48,14 @@ fun rememberCaptureHandler(
     }
 
     val appSettingsHandler = rememberAppSettingsHandler(
-        message = context.getString(R.string.chat_attach_pick_from_camera_deny_permission),
+        message = context.getString(SharedR.string.camera_denied_info_message),
         actionLabel = context.getString(R.string.general_allow),
         CAMERA,
         onPermissionsGranted = {
             takePictureLauncher.launch(
                 CameraArg(
-                    title = context.getString(R.string.context_upload),
-                    buttonText = context.getString(R.string.context_upload)
+                    title = context.getString(SharedR.string.general_upload_label),
+                    buttonText = context.getString(SharedR.string.general_upload_label)
                 )
             )
         }
@@ -66,8 +67,8 @@ fun rememberCaptureHandler(
         if (permissionsResult[CAMERA] == true) {
             takePictureLauncher.launch(
                 CameraArg(
-                    title = context.getString(R.string.context_upload),
-                    buttonText = context.getString(R.string.context_upload)
+                    title = context.getString(SharedR.string.general_upload_label),
+                    buttonText = context.getString(SharedR.string.general_upload_label)
                 )
             )
         } else {

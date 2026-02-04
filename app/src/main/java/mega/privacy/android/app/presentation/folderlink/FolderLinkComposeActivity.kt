@@ -514,7 +514,7 @@ class FolderLinkComposeActivity : PasscodeActivity(),
     }
 
     private fun getEmptyViewString(): String {
-        var textToShow = getString(R.string.file_browser_empty_folder_new)
+        var textToShow = getString(sharedR.string.annotated_empty_folder)
         try {
             textToShow = textToShow.replace(
                 "[A]",

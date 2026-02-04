@@ -1,6 +1,5 @@
 package mega.privacy.android.app.main.dialog
 
-import mega.privacy.android.shared.resources.R as sharedR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,13 +11,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.R
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,9 +41,9 @@ internal class ClearRubbishBinDialogFragment : DialogFragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     ConfirmationDialog(
-                        title = stringResource(id = R.string.context_clear_rubbish),
-                        text = stringResource(id = R.string.clear_rubbish_confirmation),
-                        confirmButtonText = stringResource(id = R.string.general_clear),
+                        title = stringResource(id = sharedR.string.empty_rubbish_bin_menu),
+                        text = stringResource(id = sharedR.string.remove_all_rubbish_bin_confirmation),
+                        confirmButtonText = stringResource(id = sharedR.string.general_clear),
                         cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
                         onConfirm = {
                             nodeController.cleanRubbishBin()

@@ -43,7 +43,7 @@ fun HomeFabOptionsBottomSheet(
             .padding(8.dp)
     ) {
         MegaText(
-            text = stringResource(R.string.context_upload),
+            text = stringResource(sharedResR.string.general_upload_label),
             textColor = TextColor.Secondary,
             modifier = Modifier.padding(8.dp),
             style = MaterialTheme.typography.subtitle2,

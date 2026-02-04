@@ -46,7 +46,7 @@ fun HomeFabOptionsBottomSheet(
         // Upload section
         SecondaryHeaderListItem(
             modifier = Modifier.testTag(TEST_TAG_UPLOAD_SECTION_HEADER),
-            text = stringResource(R.string.context_upload),
+            text = stringResource(sharedResR.string.general_upload_label),
             headerTextStyle = HeaderTextStyle.Medium,
             enableClick = false
         )

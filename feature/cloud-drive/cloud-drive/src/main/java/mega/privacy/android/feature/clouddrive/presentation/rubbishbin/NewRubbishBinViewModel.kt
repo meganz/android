@@ -38,20 +38,19 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.CleanRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase
 import mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
@@ -446,9 +445,9 @@ class NewRubbishBinViewModel @AssistedInject constructor(
             cleanRubbishBinUseCase()
         }.onFailure { throwable ->
             Timber.e(throwable)
-            setMessage(LocalizedText.StringRes(R.string.rubbish_bin_no_emptied))
+            setMessage(LocalizedText.StringRes(sharedR.string.empty_rubbish_bin_error_message))
         }.onSuccess {
-            setMessage(LocalizedText.StringRes(R.string.rubbish_bin_emptied))
+            setMessage(LocalizedText.StringRes(sharedR.string.empty_rubbish_bin_success_message))
             refreshNodes()
         }
     }

@@ -25,7 +25,6 @@ import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.app.R
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.extensions.launchUrl
@@ -49,6 +48,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.ChatConversationScreenEvent
 import javax.inject.Inject
 
@@ -173,7 +173,7 @@ internal class ChatFragment : Fragment() {
                                                     context,
                                                     coroutineScope,
                                                     scaffoldState.snackbarHostState,
-                                                    R.string.chat_attach_pick_from_camera_deny_permission
+                                                    SharedR.string.camera_denied_info_message
                                                 )
                                             },
                                             enablePasscodeCheck = { passcodeEnabled = true },

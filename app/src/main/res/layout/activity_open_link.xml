@@ -56,7 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-            android:text="@string/general_ok"
+            android:text="@string/general_ok_only"
             android:textAppearance="@style/TextAppearance.Mega.Subtitle2.AccentColor" />
 
     </RelativeLayout>

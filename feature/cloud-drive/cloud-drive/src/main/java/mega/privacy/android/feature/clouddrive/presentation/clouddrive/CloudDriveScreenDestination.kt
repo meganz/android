@@ -15,9 +15,9 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.resources.R
 
 /**
  * Entry for Cloud Drive Screen
@@ -56,7 +56,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
 
         LaunchedEffect(key.isNewFolder) {
             if (key.isNewFolder && !hasShownSnackbar) {
-                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.context_folder_created))
+                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.folder_created_success_message))
                 hasShownSnackbar = true
             }
         }

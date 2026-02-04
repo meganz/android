@@ -285,9 +285,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         sharedFoldersFragment?.let {
             if (!it.isVisible) return
             val message = if (e.errorCode == MegaError.API_OK) {
-                getString(R.string.context_folder_created)
+                getString(sharedR.string.folder_created_success_message)
             } else {
-                getString(R.string.context_folder_no_created)
+                getString(sharedR.string.folder_not_created_error_message)
             }
             showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
             it.setNodes()

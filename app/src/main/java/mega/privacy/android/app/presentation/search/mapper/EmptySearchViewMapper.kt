@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.search.SearchCategory.SPREADSHEET
 import mega.privacy.android.domain.entity.search.SearchCategory.VIDEO
 import mega.privacy.android.feature.photos.R as featurePhotosR
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import javax.inject.Inject
 
@@ -55,7 +56,7 @@ class EmptySearchViewMapper @Inject constructor(
                 Pair(res, context.getString(R.string.context_empty_cloud_drive))
             } else {
                 val res = iconPackR.drawable.ic_empty_folder_glass
-                Pair(res, context.getString(R.string.file_browser_empty_folder_new))
+                Pair(res, context.getString(SharedR.string.annotated_empty_folder))
             }
         } else {
             when {

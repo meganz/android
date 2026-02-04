@@ -1726,7 +1726,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         when {
             infos == null -> {
                 dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(getString(R.string.upload_can_not_open))
+                showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
             }
 
             existsMyChatFilesFolder() -> {
@@ -1752,7 +1752,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         if (folderSelected) {
             if (documents.isEmpty()) {
                 dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(getString(R.string.upload_can_not_open))
+                showSnackbar(getString(sharedR.string.unable_to_open_selected_file_message))
                 return
             }
 

@@ -2065,9 +2065,9 @@
     <string name="album_get_link_share_link_with_key">Lien&#160;: %1$s\n\nClé&#160;: %2$s</string>
     <string name="album_has_hidden_nodes_dialog_description">Des éléments cachés sont présents dans cet album. Partager l’album implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre disque Cloud.</string>
     <plurals name="album_get_link_screen_title">
-        <item quantity="one">Partager un lien</item>
-        <item quantity="many">Partager des liens</item>
-        <item quantity="other">Partager des liens</item>
+        <item quantity="one">Partager le lien</item>
+        <item quantity="many">Partager les liens</item>
+        <item quantity="other">Partager les liens</item>
     </plurals>
     <plurals name="album_link_copied_success_message">
         <item quantity="one">Lien copié dans le presse-papiers</item>
@@ -2084,26 +2084,26 @@
     <string name="create_action_bucket">[A]créé par [/A]%s</string>
     <string name="update_action_bucket">[A]mis à jour par [/A]%s</string>
     <string name="label_yesterday">Hier</string>
-    <string name="shared_items_verify_credentials_undecrypted_folder">[dossier non déchiffré]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[Dossier non déchiffré]</string>
     <string name="section_recents">Récents</string>
     <plurals name="title_media_bucket_only_images">
         <item quantity="one">%d image</item>
-        <item quantity="many">%d d’images</item>
+        <item quantity="many">%d images</item>
         <item quantity="other">%d images</item>
     </plurals>
     <plurals name="title_media_bucket_only_videos">
         <item quantity="one">%d vidéo</item>
-        <item quantity="many">%d de vidéos</item>
+        <item quantity="many">%d vidéos</item>
         <item quantity="other">%d vidéos</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="one">%1$d&#160;image&#160;</item>
-        <item quantity="many">%1$d d’images&#160;</item>
-        <item quantity="other">%1$d&#160;images&#160;</item>
+        <item quantity="one">%1$d image&#160;</item>
+        <item quantity="many">%1$d images&#160;</item>
+        <item quantity="other">%1$d images&#160;</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="one">et %1$d vidéo</item>
-        <item quantity="many">et %1$d de vidéos</item>
+        <item quantity="many">et %1$d vidéos</item>
         <item quantity="other">et %1$d vidéos</item>
     </plurals>
     <plurals name="cloud_drive_undecrypted_file">
@@ -2113,7 +2113,7 @@
     </plurals>
     <string name="free_account">Gratuit</string>
     <string name="business_label">Pour entreprise</string>
-    <string name="home_recents_options_menu_hide_activity">Cacher l’activité récente</string>
+    <string name="home_recents_options_menu_hide_activity">Masquer l’activité récente</string>
     <string name="home_recents_empty_button_upload">Téléverser</string>
     <string name="home_recents_hidden_button_show_activity">Afficher l’activité</string>
     <string name="shares_screen_incoming_shares_tab_title">Entrants</string>
@@ -2121,7 +2121,7 @@
     <string name="shares_screen_links_shares_tab_title">Liens</string>
     <string name="shares_screen_incoming_empty">[B]Aucun [/B][A]dossier partagé entrant[/A]</string>
     <string name="shares_screen_outgoing_empty">[B]Aucun [/B][A]dossier partagé sortant[/A]</string>
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s est partagé par un contact que vous n’avez pas confirmé. Pour renforcer la sécurité, nous vous recommandons de confirmer son numéro d’identification dans Contacts. Touchez les trois points situés à côté du contact que vous souhaitez confirmer, puis touchez Renseignements</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s est partagé par un contact que vous n’avez pas confirmé. Pour renforcer la sécurité, nous vous recommandons de confirmer son numéro d’identification dans Contacts. Appuyez sur les trois points situés à côté du contact que vous souhaitez confirmer, puis appuyez sur Informations.</string>
     <string name="homepage_favourites_empty_hint">[B]Aucun[/B] [A]favori[/A] [B]n’a été trouvé[/B]</string>
     <string name="general_create_label">Créer</string>
     <string name="general_new_text_file">Nouveau fichier texte</string>
@@ -2140,12 +2140,39 @@
     <string name="home_recents_button_view_all">Voir tout</string>
     <string name="home_recents_options_menu_show_activity">Afficher l\’activité récente</string>
     <string name="home_recents_empty_text_description">Toutes vos activités récentes concernant les fichiers et dossiers apparaîtront ici</string>
-    <string name="home_recents_hidden_text_description">Activité récente cachée</string>
+    <string name="home_recents_hidden_text_description">Activité récente masquée</string>
     <string name="home_recents_bucket_subtitle_added_to">Ajouté(s) à %s</string>
     <string name="home_recents_bucket_snackbar_files_unavailable">Ces fichiers ne sont plus disponibles</string>
     <string name="shares_screen_links_section_empty">[B]Aucun [/B][A]lien public[/A]</string>
     <string name="general_invalid_dot_name_warning">Le nom \“.\“ n\’est pas valide</string>
     <string name="general_invalid_double_dot_name_warning">Le nom \“..\“ n\’est pas valide</string>
+    <string name="album_get_multiple_links_list_title">Liens</string>
+    <string name="album_get_multiple_links_copy_all_action">Tout copier</string>
+    <string name="transfers_upload_started_snackbar">Le téléversement a commencé. Voir la notification pour plus d\’infos.</string>
+    <!-- success message when creating a folder -->
+    <string name="folder_created_success_message">Folder created</string>
+    <!-- error message when creating a folder -->
+    <string name="folder_not_created_error_message">Error. Folder not created</string>
+    <string name="unable_to_open_selected_file_message">Cannot open selected file</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="camera_denied_info_message">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="incoming_share_storage_quota_warning_message">The file cannot be sent as the target user is over their storage quota.</string>
+    <string name="general_ok_only">OK</string>
+    <!-- success message when emptying the RB -->
+    <string name="empty_rubbish_bin_success_message">Rubbish bin emptied</string>
+    <!-- error message when emptying the RB -->
+    <string name="empty_rubbish_bin_error_message">An error occurred. The Rubbish bin has not been emptied</string>
+    <!-- Menu option title -->
+    <string name="empty_rubbish_bin_menu">Empty Rubbish bin</string>
+    <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
+    <string name="remove_all_rubbish_bin_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
+    <!-- Button to clear the chat history -->
+    <string name="general_clear">Clear</string>
+    <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
+    <string name="annotated_empty_rubbish_bin_menu">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <!-- Empty state text that indicates that a folder is currently empty -->
+    <string name="annotated_empty_folder">[B]Empty[/B][A] Folder[/A]</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="empty_file_browser_folder">Empty Folder</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
@@ -2170,4 +2197,6 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
+    <!-- General upload label to be used in the app. -->
+    <string name="general_upload_label">Upload</string>
 </resources>

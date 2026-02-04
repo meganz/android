@@ -8,6 +8,7 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as SharedR
 
 /**
  * Transfer menu action.
@@ -76,7 +77,7 @@ sealed interface TransferMenuAction : MenuActionWithIcon {
      * Clear selected
      */
     data object ClearSelected : TransferTopAppBarActionString(
-        descriptionRes = R.string.general_clear,
+        descriptionRes = SharedR.string.general_clear,
         testTag = TEST_TAG_CLEAR_ACTION,
     ), TransferMenuAction {
         @Composable

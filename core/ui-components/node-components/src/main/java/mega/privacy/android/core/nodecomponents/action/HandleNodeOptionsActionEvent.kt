@@ -15,7 +15,6 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
@@ -205,7 +204,7 @@ internal fun HandleNodeOptionsActionEvent(
     if (isShowForeignDialog) {
         BasicDialog(
             title = "",
-            description = stringResource(id = R.string.warning_share_owner_storage_quota),
+            description = stringResource(id = sharedResR.string.incoming_share_storage_quota_warning_message),
             onPositiveButtonClicked = {
                 isShowForeignDialog = false
             },

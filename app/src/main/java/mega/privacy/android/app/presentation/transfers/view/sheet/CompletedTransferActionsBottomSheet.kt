@@ -189,7 +189,7 @@ fun CompletedTransferActionsBottomSheet(
         BottomSheetAction(
             modifier = Modifier.testTag(TEST_TAG_CLEAR_ACTION),
             iconPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Eraser),
-            name = stringResource(id = R.string.general_clear),
+            name = stringResource(id = sharedR.string.general_clear),
             onClick = {
                 Analytics.tracker.trackEvent(CompletedTransfersItemClearMenuItemEvent)
                 onClearTransfer(completedTransfer)

@@ -375,7 +375,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
 
             FileExplorerActivity.UPLOAD -> binding.actionText.text =
-                getString(R.string.context_upload)
+                getString(sharedR.string.general_upload_label)
 
             FileExplorerActivity.IMPORT -> binding.actionText.text =
                 getString(R.string.add_to_cloud)
@@ -407,7 +407,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             formatEmptyScreenText(requireContext(), getString(R.string.context_empty_cloud_drive))
         emptyGeneralText = formatEmptyScreenText(
             requireContext(),
-            getString(R.string.file_browser_empty_folder_new)
+            getString(sharedR.string.annotated_empty_folder)
         )
         updateEmptyScreen()
 

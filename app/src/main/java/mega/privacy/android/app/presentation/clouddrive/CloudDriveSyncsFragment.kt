@@ -675,7 +675,7 @@ class CloudDriveSyncsFragment : Fragment() {
         return if (isCloudDriveEmpty) {
             Pair(iconPackR.drawable.ic_empty_cloud_glass, R.string.context_empty_cloud_drive)
         } else {
-            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
+            Pair(iconPackR.drawable.ic_empty_folder_glass, sharedR.string.annotated_empty_folder)
         }
     }
 

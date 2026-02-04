@@ -229,7 +229,7 @@ internal fun FileLinkView(
 
     if (showForeignNodeErrorDialog.value) {
         MegaAlertDialog(
-            text = stringResource(id = R.string.warning_share_owner_storage_quota),
+            text = stringResource(id = sharedResR.string.incoming_share_storage_quota_warning_message),
             confirmButtonText = stringResource(id = sharedResR.string.general_ok),
             cancelButtonText = null,
             onConfirm = { showForeignNodeErrorDialog.value = false },

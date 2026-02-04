@@ -1904,7 +1904,7 @@
     <string name="payment_ads_free_intro_description">Upgrade naar een Pro-abonnement met veel opslagruimte en meer. Onze Pro-abonnementen beginnen al vanaf %1$s per maand.</string>
     <plurals name="remove_links_warning_text">
         <item quantity="one">Deze link zal niet langer publiekelijk beschikbaar zijn.</item>
-        <item quantity="other">Deze links zullen niet langer publiekelijk beschikbaar zijn</item>
+        <item quantity="other">Deze links zullen niet langer publiekelijk beschikbaar zijn.</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="one">Deze map niet meer delen?</item>
@@ -2070,22 +2070,59 @@
     <string name="pro3_account">Pro III</string>
     <string name="pro_flexi_account">Pro Flexi</string>
     <string name="recovering_info">Loading&#8230;</string>
-    <string name="section_my_account">My Account</string>
+    <string name="section_my_account">Mijn Account</string>
     <string name="storage_usage_format">%1$s of %2$s used</string>
     <string name="general_hi">Hi</string>
     <string name="home_recents_options_menu_hide_activity">Recente activiteit verbergen</string>
-    <string name="home_recents_empty_button_upload">Uploaden</string>
+    <string name="home_recents_empty_button_upload">Upload</string>
     <string name="home_recents_hidden_button_show_activity">Activiteit weergeven</string>
     <string name="shares_screen_incoming_shares_tab_title">Binnenkomende</string>
     <string name="shares_screen_outgoing_shares_tab_title">Uitgaande</string>
     <string name="shares_screen_links_shares_tab_title">Links</string>
     <string name="shares_screen_incoming_empty">[B]Geen [/B][A]binnenkomende gedeelde mappen[/A]</string>
     <string name="shares_screen_outgoing_empty">[B]Geen [/B][A]uitgaande gedeelde mappen[/A]</string>
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s wordt gedeeld door een contactpersoon die u niet heeft goedgekeurd. Om extra veiligheid te garanderen, raden we aan dat u hun inloggegevens goedkeurt in Contacten. Tik op de drie punten naast het contact dat u wilt goedkeuren en tik informatie.</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s wordt gedeeld door een contactpersoon die u niet heeft goedgekeurd. Om extra veiligheid te garanderen, raden we aan dat u hun inloggegevens goed te keuren in Contacten. Tik op de drie punten naast het contact dat u wilt goedkeuren en tik informatie.</string>
     <string name="homepage_favourites_empty_hint">[B]Geen[/B] [A]favorieten[/A] [B]gevonden[/B]</string>
     <string name="general_create_label">Creëren</string>
     <string name="general_new_text_file">Nieuw tekst bestand</string>
     <string name="general_new_folder">Nieuwe map</string>
+    <string name="album_get_multiple_links_list_title">Links</string>
+    <string name="album_get_multiple_links_copy_all_action">Alles kopiëren</string>
+    <string name="home_recents_snackbar_activity_hidden">Uw recente activiteit is verborgen</string>
+    <string name="home_recents_button_view_all">Alles weergeven</string>
+    <string name="home_recents_options_menu_show_activity">Recente activiteit weergeven</string>
+    <string name="home_recents_empty_text_description">Al uw recente bestand en map activiteit worden hier weergegeven</string>
+    <string name="home_recents_hidden_text_description">Recent activiteit verborgen</string>
+    <string name="home_recents_bucket_subtitle_added_to">Toegevoegd tot %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Deze bestanden zijn niet langer beschikbaar</string>
+    <string name="shares_screen_links_section_empty">[B]Geen[/B][A]publieke links[/A]</string>
+    <string name="general_invalid_dot_name_warning">De naam “.” is niet geldig</string>
+    <string name="general_invalid_double_dot_name_warning">De naam “..” is niet geldig</string>
+    <string name="transfers_upload_started_snackbar">Upload was gestart. Zie melding voor meer informatie.</string>
+    <!-- success message when creating a folder -->
+    <string name="folder_created_success_message">Folder created</string>
+    <!-- error message when creating a folder -->
+    <string name="folder_not_created_error_message">Error. Folder not created</string>
+    <string name="unable_to_open_selected_file_message">Cannot open selected file</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="camera_denied_info_message">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="incoming_share_storage_quota_warning_message">The file cannot be sent as the target user is over their storage quota.</string>
+    <string name="general_ok_only">OK</string>
+    <!-- success message when emptying the RB -->
+    <string name="empty_rubbish_bin_success_message">Rubbish bin emptied</string>
+    <!-- error message when emptying the RB -->
+    <string name="empty_rubbish_bin_error_message">An error occurred. The Rubbish bin has not been emptied</string>
+    <!-- Menu option title -->
+    <string name="empty_rubbish_bin_menu">Empty Rubbish bin</string>
+    <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
+    <string name="remove_all_rubbish_bin_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
+    <!-- Button to clear the chat history -->
+    <string name="general_clear">Clear</string>
+    <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
+    <string name="annotated_empty_rubbish_bin_menu">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <!-- Empty state text that indicates that a folder is currently empty -->
+    <string name="annotated_empty_folder">[B]Empty[/B][A] Folder[/A]</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="empty_file_browser_folder">Empty Folder</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
@@ -2110,4 +2147,6 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
+    <!-- General upload label to be used in the app. -->
+    <string name="general_upload_label">Upload</string>
 </resources>

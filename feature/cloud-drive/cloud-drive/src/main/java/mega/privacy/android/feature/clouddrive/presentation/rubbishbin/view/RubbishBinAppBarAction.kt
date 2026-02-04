@@ -7,6 +7,7 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as SharedR
 
 sealed interface RubbishBinAppBarAction : MenuAction {
     object Empty : MenuActionWithIcon {
@@ -17,7 +18,7 @@ sealed interface RubbishBinAppBarAction : MenuAction {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
 
         @Composable
-        override fun getDescription() = stringResource(id = R.string.context_clear_rubbish)
+        override fun getDescription() = stringResource(id = SharedR.string.empty_rubbish_bin_menu)
 
         override val testTag: String = "rubbish_bin_app_bar:empty_bin"
     }

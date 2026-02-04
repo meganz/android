@@ -78,7 +78,7 @@ class HomeFabOptionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithText(R.string.context_upload).assertExists()
+            onNodeWithText(sharedResR.string.general_upload_label).assertExists()
             onNodeWithText(sharedResR.string.settings_section_sync).assertExists()
             onNodeWithText(sharedResR.string.general_chat).assertExists()
             onNodeWithText(R.string.fab_label_new_chat).assertExists()

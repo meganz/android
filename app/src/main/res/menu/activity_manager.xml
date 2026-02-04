@@ -73,7 +73,7 @@
         android:id="@+id/action_menu_clear_rubbish_bin"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="150"
-        android:title="@string/context_clear_rubbish"
+        android:title="@string/empty_rubbish_bin_menu"
         android:visible="false"
         app:showAsAction="never" />
 

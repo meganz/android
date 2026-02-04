@@ -20,7 +20,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -28,6 +27,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsEmptyStateUploadButtonPressedEvent
 
 @Composable
@@ -65,7 +65,7 @@ internal fun RecentsEmptyView(
                 )
             ) {
                 MegaText(
-                    text = stringResource(sharedR.string.home_recents_empty_button_upload),
+                    text = stringResource(sharedR.string.general_upload_label),
                     style = AppTheme.typography.labelLarge.copy(
                         textDecoration = TextDecoration.Underline
                     ),

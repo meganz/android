@@ -35,7 +35,6 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.dialog.rubbishbin.ConfirmMoveToRubbishBinDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.data.NodeUIItem
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.app.presentation.node.action.HandleNodeAction
@@ -45,6 +44,7 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as SharedR
 import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -223,9 +224,12 @@ class LegacyRubbishBinFragment : Fragment() {
 
     private fun getEmptyFolderDrawable(isRubbishBinEmpty: Boolean): Pair<Int, Int> {
         return if (isRubbishBinEmpty) {
-            Pair(iconPackR.drawable.ic_empty_trash_glass, R.string.context_empty_rubbish_bin)
+            Pair(
+                iconPackR.drawable.ic_empty_trash_glass,
+                SharedR.string.annotated_empty_rubbish_bin_menu
+            )
         } else {
-            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
+            Pair(iconPackR.drawable.ic_empty_folder_glass, SharedR.string.annotated_empty_folder)
         }
     }
 

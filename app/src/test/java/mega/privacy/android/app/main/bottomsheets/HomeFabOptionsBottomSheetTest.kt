@@ -31,7 +31,8 @@ class HomeFabOptionsBottomSheetTest {
     @Test
     fun `test that all items are displayed`() {
         initComposeRule()
-        composeRule.onNodeWithText(R.string.context_upload).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.general_upload_label)
+            .assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.upload_files).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.upload_folder).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(R.string.menu_scan_document).assertExists().assertIsDisplayed()

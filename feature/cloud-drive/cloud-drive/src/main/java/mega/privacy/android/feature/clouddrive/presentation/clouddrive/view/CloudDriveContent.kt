@@ -58,7 +58,6 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
@@ -376,7 +375,7 @@ internal fun CloudDriveContent(
                                 )
                             )
                         } else {
-                            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.context_folder_no_created))
+                            snackbarHostState?.showAutoDurationSnackbar(context.getString(sharedR.string.folder_not_created_error_message))
                         }
                     }
                 },

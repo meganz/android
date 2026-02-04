@@ -404,7 +404,7 @@ class IncomingSharesComposeFragment : Fragment() {
                 sharedR.string.shares_screen_incoming_empty
             )
         } else {
-            Pair(iconPackR.drawable.ic_empty_folder_glass, R.string.file_browser_empty_folder_new)
+            Pair(iconPackR.drawable.ic_empty_folder_glass, sharedR.string.annotated_empty_folder)
         }
     }
 

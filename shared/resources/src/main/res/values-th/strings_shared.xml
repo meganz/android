@@ -2020,6 +2020,33 @@
     <string name="general_create_label">สร้าง</string>
     <string name="general_new_text_file">ไฟล์ข้อความใหม่</string>
     <string name="general_new_folder">โฟลเดอร์ใหม่</string>
+    <string name="album_get_multiple_links_list_title">ลิงก์</string>
+    <string name="album_get_multiple_links_copy_all_action">คัดลอกทั้งหมด</string>
+    <string name="transfers_upload_started_snackbar">เริ่มการอัปโหลดแล้ว ดูรายละเอียดได้ที่การแจ้งเตือน</string>
+    <!-- success message when creating a folder -->
+    <string name="folder_created_success_message">Folder created</string>
+    <!-- error message when creating a folder -->
+    <string name="folder_not_created_error_message">Error. Folder not created</string>
+    <string name="unable_to_open_selected_file_message">Cannot open selected file</string>
+    <!-- Warning shown if user denies the camera permission when trying to capture photos or videos from camera -->
+    <string name="camera_denied_info_message">MEGA needs access to your camera to capture photos and videos.</string>
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <string name="incoming_share_storage_quota_warning_message">The file cannot be sent as the target user is over their storage quota.</string>
+    <string name="general_ok_only">OK</string>
+    <!-- success message when emptying the RB -->
+    <string name="empty_rubbish_bin_success_message">Rubbish bin emptied</string>
+    <!-- error message when emptying the RB -->
+    <string name="empty_rubbish_bin_error_message">An error occurred. The Rubbish bin has not been emptied</string>
+    <!-- Menu option title -->
+    <string name="empty_rubbish_bin_menu">Empty Rubbish bin</string>
+    <!-- Ask for confirmation before removing all the elements of the rubbish bin -->
+    <string name="remove_all_rubbish_bin_confirmation">You are about to permanently remove all items from your Rubbish bin.</string>
+    <!-- Button to clear the chat history -->
+    <string name="general_clear">Clear</string>
+    <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
+    <string name="annotated_empty_rubbish_bin_menu">[B]Empty [/B][A]Rubbish bin[/A]</string>
+    <!-- Empty state text that indicates that a folder is currently empty -->
+    <string name="annotated_empty_folder">[B]Empty[/B][A] Folder[/A]</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="empty_file_browser_folder">Empty Folder</string>
     <!-- Warning in Offline section alerting all the Offline files will be deleted after logout. -->
@@ -2044,4 +2071,6 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
+    <!-- General upload label to be used in the app. -->
+    <string name="general_upload_label">Upload</string>
 </resources>

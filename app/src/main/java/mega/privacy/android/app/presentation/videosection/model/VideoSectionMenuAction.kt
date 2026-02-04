@@ -186,7 +186,7 @@ sealed interface VideoSectionMenuAction : MenuAction {
      */
     object VideoRecentlyWatchedClearAction : MenuActionString(
         icon = IconPack.Medium.Thin.Outline.Trash,
-        descriptionRes = R.string.general_clear,
+        descriptionRes = sharedR.string.general_clear,
         testTag = TEST_TAG_VIDEO_SECTION_RECENTLY_WATCHED_CLEAR_ACTION
     ), VideoSectionMenuAction {
         override val orderInCategory = 180

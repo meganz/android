@@ -15,6 +15,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.shared.resources.R as SharedR
 
 @Serializable
 data object RemoteLogoutDialogNavKey : NoSessionNavKey.Mandatory, DialogNavKey
@@ -42,7 +43,7 @@ fun EntryProviderScope<DialogNavKey>.remoteLogoutDestination(
             description = stringResource(id = R.string.error_server_expired_session),
             buttons = persistentListOf(
                 BasicDialogButton(
-                    text = stringResource(id = R.string.general_ok),
+                    text = stringResource(id = SharedR.string.general_ok_only),
                     onClick = {
                         onDialogHandled()
                         navigateBack()

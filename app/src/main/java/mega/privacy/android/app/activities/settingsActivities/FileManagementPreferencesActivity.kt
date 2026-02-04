@@ -68,7 +68,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
     fun showClearOfflineDialog() {
         clearOfflineDialog = MaterialAlertDialogBuilder(this)
             .setMessage(getString(R.string.clear_offline_confirmation))
-            .setPositiveButton(getString(R.string.general_clear)) { _, _ ->
+            .setPositiveButton(getString(sharedR.string.general_clear)) { _, _ ->
                 viewModel.clearOffline()
             }
             .setNegativeButton(getString(sharedR.string.general_dismiss_dialog), null)
@@ -81,10 +81,10 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
      */
     fun showClearRubbishBinDialog() {
         val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(getFormattedStringOrDefault(R.string.context_clear_rubbish))
-        builder.setMessage(getFormattedStringOrDefault(R.string.clear_rubbish_confirmation))
+        builder.setTitle(getFormattedStringOrDefault(sharedR.string.empty_rubbish_bin_menu))
+        builder.setMessage(getFormattedStringOrDefault(sharedR.string.remove_all_rubbish_bin_confirmation))
         builder.setPositiveButton(
-            getFormattedStringOrDefault(R.string.general_clear)
+            getFormattedStringOrDefault(sharedR.string.general_clear)
         ) { _: DialogInterface?, _: Int ->
             val nC = NodeController(this)
             nC.cleanRubbishBin()

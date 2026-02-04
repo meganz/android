@@ -5451,7 +5451,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }.onSuccess { node ->
                 showSnackbar(
                     SNACKBAR_TYPE,
-                    getString(R.string.context_folder_created),
+                    getString(sharedR.string.folder_created_success_message),
                     -1
                 )
                 if (drawerItem === DrawerItem.CLOUD_DRIVE) {
@@ -5476,7 +5476,11 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     }
                 }
             }.onFailure {
-                showSnackbar(SNACKBAR_TYPE, getString(R.string.context_folder_no_created), -1)
+                showSnackbar(
+                    SNACKBAR_TYPE,
+                    getString(sharedR.string.folder_not_created_error_message),
+                    -1
+                )
             }
             dismissAlertDialogIfExists(statusDialog)
         }
@@ -6320,7 +6324,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             dismissAlertDialogIfExists(processFileDialog)
             showSnackbar(
                 SNACKBAR_TYPE,
-                getString(R.string.upload_can_not_open),
+                getString(sharedR.string.unable_to_open_selected_file_message),
                 MEGACHAT_INVALID_HANDLE
             )
             return

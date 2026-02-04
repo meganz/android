@@ -19,7 +19,6 @@ import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.app.camera.InAppCameraLauncher
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.DrawerItem
@@ -46,6 +45,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.navigation.camera.CameraArg
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.DocumentScanInitiatedEvent
 import timber.log.Timber
 import javax.inject.Inject
@@ -207,12 +207,15 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
         ) { permissions ->
             if (permissions[Manifest.permission.CAMERA] == true) {
                 inAppCameraLauncher.launch(
-                    CameraArg("", activity.getString(R.string.context_upload))
+                    CameraArg(
+                        "",
+                        activity.getString(SharedR.string.general_upload_label)
+                    )
                 )
             } else {
                 managerActivity.showSnackbar(
                     type = Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
-                    content = managerActivity.getString(R.string.chat_attach_pick_from_camera_deny_permission),
+                    content = managerActivity.getString(SharedR.string.camera_denied_info_message),
                     chatId = -1L
                 )
             }

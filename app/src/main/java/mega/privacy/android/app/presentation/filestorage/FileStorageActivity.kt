@@ -164,7 +164,7 @@ class FileStorageActivity : PasscodeActivity(), Scrollable {
         }
 
         emptyImageView?.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass)
-        var textToShow = getString(R.string.file_browser_empty_folder_new)
+        var textToShow = getString(sharedR.string.annotated_empty_folder)
         try {
             textToShow = textToShow.replace(
                 "[A]", ("<font color=\'"

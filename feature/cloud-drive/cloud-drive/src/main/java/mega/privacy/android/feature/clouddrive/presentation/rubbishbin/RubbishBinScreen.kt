@@ -48,7 +48,6 @@ import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.ClearRubbishBinDialog
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.view.RubbishBinAppBarAction
@@ -237,9 +236,9 @@ internal fun RubbishBinScreen(
                     ),
                     text = stringResource(
                         if (isRootDirectory) {
-                            R.string.context_empty_rubbish_bin
+                            sharedR.string.annotated_empty_rubbish_bin_menu
                         } else {
-                            R.string.file_browser_empty_folder_new
+                            sharedR.string.annotated_empty_folder
                         }
                     )
                 )

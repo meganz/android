@@ -768,7 +768,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
         if (infos.isEmpty()) {
             dismissAlertDialogIfExists(statusDialog)
             Util.showErrorAlertDialog(
-                getString(R.string.upload_can_not_open),
+                getString(sharedR.string.unable_to_open_selected_file_message),
                 false, this
             )
             return
@@ -913,7 +913,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 if (contactFileListFragment?.isVisible == true) {
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        getString(R.string.context_folder_created)
+                        getString(sharedR.string.folder_created_success_message)
                     )
                     contactFileListFragment?.navigateToFolder(folderNode)
                 }
@@ -921,7 +921,7 @@ internal class ContactFileListActivity : PasscodeActivity(), MegaGlobalListenerI
                 if (contactFileListFragment?.isVisible == true) {
                     showSnackbar(
                         SNACKBAR_TYPE,
-                        getString(R.string.context_folder_no_created)
+                        getString(sharedR.string.folder_not_created_error_message)
                     )
                     contactFileListFragment?.setNodes()
                 }

@@ -462,7 +462,7 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
 
                 } else {
                     emptyImageView.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_empty_folder_glass);
-                    String textToShow = String.format(context.getString(R.string.file_browser_empty_folder_new));
+                    String textToShow = String.format(context.getString(mega.privacy.android.shared.resources.R.string.annotated_empty_folder));
                     try {
                         textToShow = textToShow.replace(
                                 "[A]", "<font color=\'"
