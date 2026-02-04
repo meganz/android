@@ -96,14 +96,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
-     * New import section
-     */
-    NewUploadDestinationActivity(
-        "Enable upload destination activity",
-        false
-    ),
-
-    /**
      * Call settings implemented with the new components library
      */
     CallSettingsNewComponents(

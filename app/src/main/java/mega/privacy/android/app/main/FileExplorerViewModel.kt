@@ -25,11 +25,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
-import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
-import mega.privacy.android.core.sharedcomponents.serializable
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -240,10 +238,7 @@ class FileExplorerViewModel @Inject constructor(
             context = context,
         )
 
-        val nameMap =
-            intent.serializable<HashMap<String, String>>(UploadDestinationActivity.EXTRA_NAME_MAP)
-                ?: mapOf(subject to subject)
-        setFileNames(nameMap)
+        setFileNames(mapOf(subject to subject))
         _textInfo.postValue(ShareTextInfo(isUrl, subject, fileContent, messageContent))
     }
 

@@ -86,7 +86,6 @@ import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferEvent
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.createStartTransferView
-import mega.privacy.android.app.presentation.upload.UploadDestinationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChatUtil
@@ -206,9 +205,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private val viewModel by viewModels<FileExplorerViewModel>()
 
     private lateinit var binding: ActivityFileExplorerBinding
-    private val isFromUploadDestinationActivity by lazy {
-        intent.hasExtra(UploadDestinationActivity.EXTRA_NAVIGATION)
-    }
 
     var isList = true
         private set
@@ -315,11 +311,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             if (chatExplorer != null) {
                                 chatExplorer?.clearSelections()
                                 showFabButton(false)
-                                if (isFromUploadDestinationActivity) {
-                                    finishAndRemoveTask()
-                                } else {
-                                    chooseFragment(IMPORT_FRAGMENT)
-                                }
+                                chooseFragment(IMPORT_FRAGMENT)
                             }
                         }
                     }
@@ -660,7 +652,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             afterLoginAndFetch()
         }
 
-        handleImportFromUploadDestination()
         window.setFlags(
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
             WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH
@@ -707,21 +698,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     )
                 }
             }
-        }
-    }
-
-    private fun handleImportFromUploadDestination() {
-        if (isFromUploadDestinationActivity) {
-            val fragment =
-                intent.getIntExtra(UploadDestinationActivity.EXTRA_NAVIGATION, CLOUD_FRAGMENT)
-            importFileF = true
-            importFragmentSelected = fragment
-            chooseFragment(fragment)
-            viewModel.ownFilePrepareTask(this, intent)
-            createAndShowProgressDialog(
-                false,
-                resources.getQuantityString(R.plurals.upload_prepare, 1)
-            )
         }
     }
 
@@ -1569,11 +1545,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
     private fun performImportFileBack() {
         if (importFileF) {
-            if (isFromUploadDestinationActivity) {
-                finishAndRemoveTask()
-            } else {
-                chooseFragment(IMPORT_FRAGMENT)
-            }
+            chooseFragment(IMPORT_FRAGMENT)
         } else {
             viewModel.handleBackNavigation()
         }
@@ -1643,11 +1615,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
     private fun openManagerAndFinish() {
         megaNavigator.openManagerActivity(
             context = this,
-            flags = if (isFromUploadDestinationActivity) {
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            } else {
-                Intent.FLAG_ACTIVITY_CLEAR_TOP
-            },
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
             singleActivityDestination = null
         )
         finish()
@@ -2039,11 +2007,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             } else {
                 ACTION_VIEW
             },
-            flags = if (isFromUploadDestinationActivity) {
-                Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            } else {
-                Intent.FLAG_ACTIVITY_CLEAR_TOP
-            },
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP,
             bundle = Bundle().apply {
                 putString(Constants.EXTRA_MESSAGE, message)
                 nodeId?.let {
