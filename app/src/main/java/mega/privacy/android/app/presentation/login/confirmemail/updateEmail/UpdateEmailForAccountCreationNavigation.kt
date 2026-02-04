@@ -7,6 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -18,7 +19,6 @@ import mega.privacy.android.app.presentation.login.StartRoute
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmationEmailNavKey
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountNavKey
 import mega.privacy.android.app.presentation.login.onboarding.TourNavKey
-import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 /**
@@ -32,6 +32,11 @@ fun NavGraphBuilder.updateEmailForAccountCreation(
     onChangeEmailSuccess: (String) -> Unit,
 ) {
     composable<UpdateEmailForAccountCreationScreen> { backStackEntry ->
+        val key = backStackEntry.toRoute<UpdateEmailForAccountCreationScreen>()
+        val viewModel =
+            hiltViewModel<UpdateEmailForAccountCreationViewModel, UpdateEmailForAccountCreationViewModel.Factory>(
+                creationCallback = { it.create(key.email, key.fullName) }
+            )
         val sharedViewModel = activityViewModel ?: run {
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry<LoginGraph>()
@@ -54,6 +59,7 @@ fun NavGraphBuilder.updateEmailForAccountCreation(
             stopShowingSplashScreen = stopShowingSplashScreen,
         ) {
             UpdateEmailForAccountCreationRoute(
+                viewModel = viewModel,
                 onChangeEmailSuccess = onChangeEmailSuccess
             )
         }
@@ -68,15 +74,16 @@ data class UpdateEmailForAccountCreationScreen(
 
 
 internal fun EntryProviderScope<NavKey>.updateEmailForAccountCreation(
-    navigationHandler: NavigationHandler,
     onChangeEmailSuccess: (String) -> Unit,
 ) {
     entry<UpdateEmailForAccountCreationScreen> { key ->
+        val viewModel =
+            hiltViewModel<UpdateEmailForAccountCreationViewModel, UpdateEmailForAccountCreationViewModel.Factory>(
+                creationCallback = { it.create(key.email, key.fullName) }
+            )
         UpdateEmailForAccountCreationRoute(
-            onChangeEmailSuccess = { newEmail ->
-                onChangeEmailSuccess(newEmail)
-                navigationHandler.back()
-            }
+            viewModel = viewModel,
+            onChangeEmailSuccess = onChangeEmailSuccess
         )
     }
 }

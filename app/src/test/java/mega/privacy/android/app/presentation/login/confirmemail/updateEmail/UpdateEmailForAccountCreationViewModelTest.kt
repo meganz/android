@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login.confirmemail.updateEmail
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.navigation.testing.invoke
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -52,14 +51,11 @@ internal class UpdateEmailForAccountCreationViewModelTest {
         email: String? = null,
         fullName: String? = null,
     ) {
-        savedStateHandle = SavedStateHandle.Companion.invoke(
-            route = UpdateEmailForAccountCreationScreen(
-                email = email,
-                fullName = fullName
-            )
-        )
+        savedStateHandle = SavedStateHandle()
 
         underTest = UpdateEmailForAccountCreationViewModel(
+            email = email,
+            fullName = fullName,
             savedStateHandle = savedStateHandle,
             isEmailValidUseCase = isEmailValidUseCase,
             resendSignUpLinkUseCase = resendSignUpLinkUseCase,

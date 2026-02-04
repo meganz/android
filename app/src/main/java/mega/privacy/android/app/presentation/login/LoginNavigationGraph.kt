@@ -147,7 +147,6 @@ internal fun EntryProviderScope<NavKey>.loginEntryProvider(
     )
 
     updateEmailForAccountCreation(
-        navigationHandler = navigationHandler,
         onChangeEmailSuccess = { newEmail ->
             navigationHandler.returnResult(
                 key = UpdateEmailForAccountCreationViewModel.EMAIL,

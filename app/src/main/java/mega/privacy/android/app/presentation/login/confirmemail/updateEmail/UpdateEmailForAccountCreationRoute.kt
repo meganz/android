@@ -57,9 +57,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun UpdateEmailForAccountCreationRoute(
+    viewModel: UpdateEmailForAccountCreationViewModel,
     onChangeEmailSuccess: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: UpdateEmailForAccountCreationViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

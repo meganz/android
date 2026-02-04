@@ -4,7 +4,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.toRoute
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -15,16 +17,16 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
 import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.login.confirmemail.ResendSignUpLinkUseCase
-import javax.inject.Inject
 
-@HiltViewModel
-internal class UpdateEmailForAccountCreationViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = UpdateEmailForAccountCreationViewModel.Factory::class)
+internal class UpdateEmailForAccountCreationViewModel @AssistedInject constructor(
+    @Assisted("email") private val email: String?,
+    @Assisted("fullName") private val fullName: String?,
     private val savedStateHandle: SavedStateHandle,
     private val isEmailValidUseCase: IsEmailValidUseCase,
     private val resendSignUpLinkUseCase: ResendSignUpLinkUseCase,
     private val resendSignUpLinkErrorMapper: ResendSignUpLinkErrorMapper,
 ) : ViewModel() {
-    private val route = savedStateHandle.toRoute<UpdateEmailForAccountCreationScreen>()
     private val _uiState = MutableStateFlow(UpdateEmailForAccountCreationUIState())
 
     /**
@@ -34,7 +36,7 @@ internal class UpdateEmailForAccountCreationViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        savedStateHandle[EMAIL] = route.email
+        savedStateHandle[EMAIL] = savedStateHandle.get<String>(EMAIL) ?: email
         _uiState.update {
             it.copy(email = savedStateHandle[EMAIL] ?: "")
         }
@@ -63,16 +65,15 @@ internal class UpdateEmailForAccountCreationViewModel @Inject constructor(
 
     fun changeEmailAddress() {
         viewModelScope.launch {
-            val email = savedStateHandle[EMAIL] ?: ""
-            val fullName = route.fullName
-            if (validateEmail(email).not()) {
+            val currentEmail = savedStateHandle[EMAIL] ?: ""
+            if (validateEmail(currentEmail).not()) {
                 return@launch
             }
             _uiState.update {
                 it.copy(isLoading = true)
             }
             runCatching {
-                resendSignUpLinkUseCase(email = email, fullName = fullName)
+                resendSignUpLinkUseCase(email = currentEmail, fullName = fullName)
             }.onSuccess {
                 _uiState.update {
                     it.copy(changeEmailAddressSuccessEvent = triggered, isLoading = false)
@@ -94,6 +95,14 @@ internal class UpdateEmailForAccountCreationViewModel @Inject constructor(
      */
     internal fun onResendSignUpLinkErrorConsumed() {
         _uiState.update { it.copy(resendSignUpLinkError = consumed()) }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("email") email: String?,
+            @Assisted("fullName") fullName: String?,
+        ): UpdateEmailForAccountCreationViewModel
     }
 
     companion object {
