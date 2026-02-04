@@ -692,7 +692,13 @@ private fun MediaScreen.MediaContent(
                 showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
                 onNavigate = navigationHandler::navigate,
-                viewModel = albumsTabViewModel
+                viewModel = albumsTabViewModel,
+                contentPadding = PaddingValues(
+                    start = 8.dp,
+                    end = 8.dp,
+                    top = 8.dp,
+                    bottom = 100.dp
+                )
             )
         }
 

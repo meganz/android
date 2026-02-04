@@ -46,6 +46,7 @@ fun AlbumsTabRoute(
     viewModel: AlbumsTabViewModel = hiltViewModel(),
     showNewAlbumDialogEvent: StateEvent = consumed,
     resetNewAlbumDialogEvent: () -> Unit = {},
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -62,7 +63,8 @@ fun AlbumsTabRoute(
         resetNavigationEvent = viewModel::resetNavigationEvent,
         resetDeleteAlbumsConfirmationEvent = viewModel::resetDeleteAlbumsConfirmationEvent,
         onAlbumSelectionToggle = viewModel::toggleAlbumSelection,
-        getPresetNewAlbumName = viewModel::getPresetNewAlbumName
+        getPresetNewAlbumName = viewModel::getPresetNewAlbumName,
+        contentPadding = contentPadding
     )
 }
 
@@ -82,6 +84,7 @@ internal fun AlbumsTabScreen(
     resetDeleteAlbumsConfirmationEvent: () -> Unit = {},
     onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {},
     getPresetNewAlbumName: (String) -> String = { "" },
+    contentPadding: PaddingValues = PaddingValues()
 ) {
     val placeholder = if (uiState.themeMode.isDarkMode()) {
         painterResource(R.drawable.ic_album_cover_d)
@@ -113,7 +116,7 @@ internal fun AlbumsTabScreen(
             columns = GridCells.Adaptive(100.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(8.dp)
+            contentPadding = contentPadding
         ) {
             items(
                 count = uiState.albums.size,
