@@ -2302,4 +2302,6 @@
     <string name="annotated_empty_folder">[B]Empty[/B][A] Folder[/A]</string>
     <!-- General upload label to be used in the app. -->
     <string name="general_upload_label">Upload</string>
+    <!-- Offline screen empty state description text -->
+    <string name="offline_screen_empty_state_description">No files saved for Offline</string>
 </resources>

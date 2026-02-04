@@ -57,7 +57,12 @@ class OfflineScreenTest {
         val uiState = OfflineUiState(isLoadingCurrentFolder = true)
         setupComposeContent(uiState)
 
-        composeRule.onNodeWithText("No offline files available").assertDoesNotExist()
+        composeRule.onNodeWithText(
+            InstrumentationRegistry
+                .getInstrumentation()
+                .targetContext
+                .getString(SharedR.string.offline_screen_empty_state_description)
+        ).assertDoesNotExist()
     }
 
     @Test
@@ -68,7 +73,12 @@ class OfflineScreenTest {
         )
         setupComposeContent(uiState)
 
-        composeRule.onNodeWithText("No offline files available").assertIsDisplayed()
+        composeRule.onNodeWithText(
+            InstrumentationRegistry
+                .getInstrumentation()
+                .targetContext
+                .getString(SharedR.string.offline_screen_empty_state_description)
+        ).assertIsDisplayed()
     }
 
     @Test

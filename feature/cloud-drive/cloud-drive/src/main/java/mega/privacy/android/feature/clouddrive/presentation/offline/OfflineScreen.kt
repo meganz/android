@@ -67,6 +67,8 @@ import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
+import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * OfflineScreen - A purely composable screen for displaying offline files
@@ -305,7 +307,7 @@ internal fun OfflineScreen(
                             modifier = Modifier
                                 .testTag(OFFLINE_SCREEN_EMPTY_TAG)
                                 .align(Alignment.Center),
-                            text = "No offline files available",
+                            text = stringResource(sharedR.string.offline_screen_empty_state_description),
                             imagePainter = painterResource(iconPackR.drawable.ic_arrow_circle_down_glass)
                         )
                     }
