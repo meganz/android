@@ -1426,6 +1426,7 @@ class SearchViewModelTest {
 
         verify(monitorRecentSearchesUseCase).invoke()
         assertThat(underTest.uiState.value.recentSearches).isEqualTo(recentSearches)
+        assertThat(underTest.uiState.value.isRecentSearchesLoading).isFalse()
     }
 
     @Test

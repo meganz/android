@@ -492,7 +492,10 @@ class SearchViewModel @AssistedInject constructor(
                 .catch { Timber.e(it) }
                 .collect { recentSearches ->
                     _uiState.update { state ->
-                        state.copy(recentSearches = recentSearches)
+                        state.copy(
+                            recentSearches = recentSearches,
+                            isRecentSearchesLoading = false
+                        )
                     }
                 }
         }

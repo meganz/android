@@ -2272,4 +2272,8 @@
         <item quantity="one">%1$d folder&#160;·&#160;</item>
         <item quantity="other">%1$d folders&#160;·&#160;</item>
     </plurals>
+    <!-- Title for the Search Landing Screen -->
+    <string name="search_landing_title">Looking for something?</string>
+    <!-- Subtitle for the Search Landing Screen -->
+    <string name="search_landing_subtitle">Search files and folders</string>
 </resources>

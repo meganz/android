@@ -63,6 +63,7 @@ import mega.privacy.android.feature.clouddrive.presentation.search.view.RecentSe
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchEmptyView
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterBottomSheetContent
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchFilterChips
+import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchLandingView
 import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTopAppBar
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -330,10 +331,17 @@ fun SearchContent(
                         modifier = Modifier
                             .fillMaxSize()
                             .imePadding()
-                            .testTag(SEARCH_CONTENT_PRE_SEARCH_TAG),
+                            .testTag(SEARCH_CONTENT_RECENT_SEARCHES_TAG),
                         queries = uiState.recentSearches,
                         onClicked = onRecentSearchClicked,
                         onClearAllClicked = onClearRecentSearches,
+                    )
+                } else if (!uiState.isRecentSearchesLoading) {
+                    SearchLandingView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .imePadding()
+                            .testTag(SEARCH_CONTENT_LANDING_TAG)
                     )
                 }
             }
@@ -386,7 +394,9 @@ fun SearchContent(
 private fun SearchContentPreSearchPreview() {
     AndroidThemeForPreviews {
         SearchContent(
-            uiState = SearchUiState(),
+            uiState = SearchUiState(
+                isRecentSearchesLoading = false
+            ),
             contentPadding = PaddingValues(0.dp),
             isListView = true,
             spanCount = 2,
@@ -451,6 +461,7 @@ private fun SearchContentLoadingPreview() {
     }
 }
 
-internal const val SEARCH_CONTENT_PRE_SEARCH_TAG = "search_content:pre_search"
+internal const val SEARCH_CONTENT_RECENT_SEARCHES_TAG = "search_content:recent_searches"
+internal const val SEARCH_CONTENT_LANDING_TAG = "search_content:landing"
 internal const val SEARCH_CONTENT_EMPTY_TAG = "search_content:empty"
 internal const val SEARCH_CONTENT_RESULTS_TAG = "search_content:results"

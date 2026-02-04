@@ -27,14 +27,30 @@ class SearchContentTest {
     val composeRule = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun `test that pre-search view is displayed when search has not been performed`() {
+    fun `test that recent searches are displayed when search has not been performed`() {
         setupComposeContent(
             uiState = SearchUiState(
-                recentSearches = listOf("query1", "query2")
+                recentSearches = listOf("query1", "query2"),
+                isRecentSearchesLoading = false
             )
         )
 
-        composeRule.onNodeWithTag(SEARCH_CONTENT_PRE_SEARCH_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(SEARCH_CONTENT_RECENT_SEARCHES_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(SEARCH_CONTENT_EMPTY_TAG).assertIsNotDisplayed()
+        composeRule.onNodeWithTag(SEARCH_CONTENT_RESULTS_TAG).assertIsNotDisplayed()
+    }
+
+
+    @Test
+    fun `test that pre-search landing view is displayed when search has not been performed`() {
+        setupComposeContent(
+            uiState = SearchUiState(
+                recentSearches = emptyList(),
+                isRecentSearchesLoading = false
+            )
+        )
+
+        composeRule.onNodeWithTag(SEARCH_CONTENT_LANDING_TAG).assertIsDisplayed()
         composeRule.onNodeWithTag(SEARCH_CONTENT_EMPTY_TAG).assertIsNotDisplayed()
         composeRule.onNodeWithTag(SEARCH_CONTENT_RESULTS_TAG).assertIsNotDisplayed()
     }
@@ -51,7 +67,7 @@ class SearchContentTest {
         )
 
         composeRule.onNodeWithTag(SEARCH_CONTENT_EMPTY_TAG).assertIsDisplayed()
-        composeRule.onNodeWithTag(SEARCH_CONTENT_PRE_SEARCH_TAG).assertIsNotDisplayed()
+        composeRule.onNodeWithTag(SEARCH_CONTENT_RECENT_SEARCHES_TAG).assertIsNotDisplayed()
         composeRule.onNodeWithTag(SEARCH_CONTENT_RESULTS_TAG).assertIsNotDisplayed()
     }
 

@@ -43,6 +43,7 @@ data class SearchUiState(
     val navigateBack: StateEvent = consumed,
     val placeholderText: LocalizedText = LocalizedText.Literal(""),
     val recentSearches: List<String> = emptyList(),
+    val isRecentSearchesLoading: Boolean = true,
 ) {
     /**
      * True if nodes or hidden node settings are loading
