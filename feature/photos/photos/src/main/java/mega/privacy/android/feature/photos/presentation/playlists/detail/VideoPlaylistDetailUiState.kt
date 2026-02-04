@@ -1,6 +1,9 @@
 package mega.privacy.android.feature.photos.presentation.playlists.detail
 
 import androidx.compose.runtime.Stable
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 
 @Stable
@@ -11,10 +14,43 @@ sealed interface VideoPlaylistDetailUiState {
      * The state is for the video playlist detail screen
      *
      * @property playlistDetail The video playlist detail ui entity
+     * @property selectedTypedNodes The selected typed nodes
+     * @property showHiddenItems Whether to show hidden items
+     * @property isHiddenNodesEnabled Whether hidden nodes are enabled
+     * @property selectedCount The count of selected items
+     * @property areAllSelected Whether all items are selected
      */
     data class Data(
         val playlistDetail: VideoPlaylistDetailUiEntity? = null,
-    ) : VideoPlaylistDetailUiState
+        val selectedTypedNodes: Set<TypedNode> = emptySet(),
+        val showHiddenItems: Boolean = false,
+        val isHiddenNodesEnabled: Boolean = false,
+    ) : VideoPlaylistDetailUiState {
+        val selectedCount: Int
+            get() = selectedTypedNodes.size
+
+        val areAllSelected: Boolean
+            get() = selectedTypedNodes.isNotEmpty() && playlistDetail?.videos?.size == selectedTypedNodes.size
+
+        val bottomBarActions: List<MenuActionWithIcon>
+            get() = if (selectedTypedNodes.isEmpty()) {
+                emptyList()
+            } else {
+                val includeSensitiveInheritedNode =
+                    selectedTypedNodes.any { it.isSensitiveInherited }
+                val hasNonSensitiveNode = selectedTypedNodes.any { !it.isMarkedSensitive }
+                val isNodeHidden =
+                    isHiddenNodesEnabled && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                buildList {
+                    if (isNodeHidden) {
+                        add(VideoPlaylistDetailSelectionMenuAction.Unhide)
+                    } else {
+                        add(VideoPlaylistDetailSelectionMenuAction.Hide)
+                    }
+                    add(VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist)
+                }
+            }
+    }
 }
 
 

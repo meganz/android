@@ -18,11 +18,14 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
@@ -38,6 +41,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
@@ -64,6 +69,8 @@ class VideoPlaylistDetailViewModelTest {
         mock<VideoPlaylistTitleValidationErrorMessageMapper>()
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
     private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
 
     private val testId = NodeId(123456L)
     private val testType = PlaylistType.User
@@ -87,6 +94,8 @@ class VideoPlaylistDetailViewModelTest {
             videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
             removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             playlistHandle = testId.longValue,
             type = testType
         )
@@ -101,7 +110,9 @@ class VideoPlaylistDetailViewModelTest {
             getVideoPlaylistByIdUseCase,
             videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase,
-            removeVideoPlaylistsUseCase
+            removeVideoPlaylistsUseCase,
+            monitorShowHiddenItemsUseCase,
+            monitorHiddenNodesEnabledUseCase
         )
     }
 
@@ -249,6 +260,8 @@ class VideoPlaylistDetailViewModelTest {
     private suspend fun stubInitialValues(
         videoPlaylist: VideoPlaylist = expectedVideoPlaylist,
         detailEntity: VideoPlaylistDetailUiEntity = expectedPlaylistDetail,
+        showHiddenItems: Boolean = false,
+        isHiddenNodesEnabled: Boolean = true,
     ) {
         whenever(monitorNodeUpdatesUseCase()).thenReturn(
             flow {
@@ -262,8 +275,26 @@ class VideoPlaylistDetailViewModelTest {
                 awaitCancellation()
             }
         )
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
+            flow {
+                emit(isHiddenNodesEnabled)
+                awaitCancellation()
+            }
+        )
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(
+            flow {
+                emit(showHiddenItems)
+                awaitCancellation()
+            }
+        )
         whenever(getVideoPlaylistByIdUseCase(any(), any())).thenReturn(videoPlaylist)
-        whenever(videoPlaylistDetailUiEntityMapper(videoPlaylist)).thenReturn(detailEntity)
+        whenever(
+            videoPlaylistDetailUiEntityMapper(
+                videoPlaylist = any(),
+                showHiddenItems = any(),
+                selectedIds = any()
+            )
+        ).thenReturn(detailEntity)
     }
 
     @Test
@@ -434,6 +465,191 @@ class VideoPlaylistDetailViewModelTest {
             }
         }
 
+    @Test
+    fun `test that selectedTypedNodes are updated correctly when onItemLongClicked`() = runTest {
+        val video1 = createVideoUiEntity(handle = 1L)
+        val video2 = createVideoUiEntity(handle = 2L)
+        val typedNode1 = createTypedVideoNode(video1)
+        val typedNode2 = createTypedVideoNode(video2)
+        val playlistWithVideos = createVideoPlaylist(
+            expectedPlaylistUiEntity,
+            videos = listOf(typedNode1, typedNode2)
+        )
+        val detailWithVideos = mock<VideoPlaylistDetailUiEntity> {
+            on { uiEntity }.thenReturn(expectedPlaylistUiEntity)
+            on { videos }.thenReturn(listOf(video1, video2))
+        }
+        stubInitialValues(
+            videoPlaylist = playlistWithVideos,
+            detailEntity = detailWithVideos
+        )
+
+        underTest.uiState
+            .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+            .test {
+                var actual = awaitItem()
+                assertThat(actual.selectedTypedNodes).isEmpty()
+
+                underTest.onItemLongClicked(video1)
+                actual = awaitItem()
+                assertThat(actual.selectedTypedNodes).hasSize(1)
+                assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
+
+                underTest.onItemLongClicked(video2)
+                actual = awaitItem()
+                assertThat(actual.selectedTypedNodes).hasSize(2)
+                assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
+                    video1.id,
+                    video2.id
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
+
+    @Test
+    fun `test that selectedTypedNodes are updated when onItemClicked and selection is not empty`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            val typedNode1 = createTypedVideoNode(video1)
+            val typedNode2 = createTypedVideoNode(video2)
+            val playlistWithVideos = createVideoPlaylist(
+                expectedPlaylistUiEntity,
+                videos = listOf(typedNode1, typedNode2)
+            )
+            val detailWithVideos = mock<VideoPlaylistDetailUiEntity> {
+                on { uiEntity }.thenReturn(expectedPlaylistUiEntity)
+                on { videos }.thenReturn(listOf(video1, video2))
+            }
+            stubInitialValues(
+                videoPlaylist = playlistWithVideos,
+                detailEntity = detailWithVideos
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemLongClicked(video1)
+                    var actual = awaitItem()
+                    assertThat(actual.selectedTypedNodes).hasSize(1)
+
+                    underTest.onItemClicked(video2)
+                    actual = awaitItem()
+                    assertThat(actual.selectedTypedNodes).hasSize(2)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
+                        video1.id,
+                        video2.id
+                    )
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that selectedTypedNodes are updated correctly after selectAllVideos is invoked`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            val typedNode1 = createTypedVideoNode(video1)
+            val typedNode2 = createTypedVideoNode(video2)
+            val playlistWithVideos = createVideoPlaylist(
+                expectedPlaylistUiEntity,
+                videos = listOf(typedNode1, typedNode2)
+            )
+            val detailWithVideos = mock<VideoPlaylistDetailUiEntity> {
+                on { uiEntity }.thenReturn(expectedPlaylistUiEntity)
+                on { videos }.thenReturn(listOf(video1, video2))
+            }
+            stubInitialValues(
+                videoPlaylist = playlistWithVideos,
+                detailEntity = detailWithVideos
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    var actual = awaitItem()
+                    assertThat(actual.playlistDetail?.videos).isNotEmpty()
+                    assertThat(actual.selectedTypedNodes).isEmpty()
+
+                    underTest.selectAllVideos()
+                    actual = awaitItem()
+                    assertThat(actual.selectedTypedNodes).hasSize(2)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(
+                        video1.id,
+                        video2.id
+                    )
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that selectedTypedNodes are updated correctly after clearSelection is invoked`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L)
+            val video2 = createVideoUiEntity(handle = 2L)
+            val typedNode1 = createTypedVideoNode(video1)
+            val typedNode2 = createTypedVideoNode(video2)
+            val playlistWithVideos = createVideoPlaylist(
+                expectedPlaylistUiEntity,
+                videos = listOf(typedNode1, typedNode2)
+            )
+            val detailWithVideos = mock<VideoPlaylistDetailUiEntity> {
+                on { uiEntity }.thenReturn(expectedPlaylistUiEntity)
+                on { videos }.thenReturn(listOf(video1, video2))
+            }
+            stubInitialValues(
+                videoPlaylist = playlistWithVideos,
+                detailEntity = detailWithVideos
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemLongClicked(video1)
+                    var actual = awaitItem()
+                    assertThat(actual.selectedTypedNodes).hasSize(1)
+                    assertThat(actual.selectedTypedNodes.map { it.id }).containsExactly(video1.id)
+
+                    underTest.clearSelection()
+                    actual = awaitItem()
+                    assertThat(actual.selectedTypedNodes).isEmpty()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @ParameterizedTest(name = "when showHiddenItems is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that uiState showHiddenItems is updated correctly`(showHiddenItems: Boolean) =
+        runTest {
+            stubInitialValues(showHiddenItems = showHiddenItems)
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    val actual = awaitItem()
+                    assertThat(actual.showHiddenItems).isEqualTo(showHiddenItems)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @ParameterizedTest(name = "when isHiddenNodesEnabled is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that uiState isHiddenNodesEnabled is updated correctly`(
+        isHiddenNodesEnabled: Boolean,
+    ) = runTest {
+        stubInitialValues(isHiddenNodesEnabled = isHiddenNodesEnabled)
+
+        underTest.uiState
+            .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+            .test {
+                val actual = awaitItem()
+                assertThat(actual.isHiddenNodesEnabled).isEqualTo(isHiddenNodesEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
+
     private fun createVideoUiEntity(
         handle: Long,
         parentHandle: Long = 50L,
@@ -476,6 +692,7 @@ class VideoPlaylistDetailViewModelTest {
 
     private fun createVideoPlaylist(
         playlistUiEntity: VideoPlaylistUiEntity,
+        videos: List<TypedVideoNode>? = null,
     ) =
         UserVideoPlaylist(
             id = playlistUiEntity.id,
@@ -484,8 +701,23 @@ class VideoPlaylistDetailViewModelTest {
             creationTime = playlistUiEntity.creationTime,
             modificationTime = playlistUiEntity.modificationTime,
             thumbnailList = playlistUiEntity.thumbnailList,
-            numberOfVideos = playlistUiEntity.numberOfVideos,
+            numberOfVideos = videos?.size ?: playlistUiEntity.numberOfVideos,
             totalDuration = 0.minutes,
-            videos = emptyList()
+            videos = videos ?: emptyList()
         )
+
+    private fun createTypedVideoNode(videoUiEntity: VideoUiEntity) = TypedVideoNode(
+        fileNode = mock<FileNode> {
+            on { id }.thenReturn(videoUiEntity.id)
+            on { name }.thenReturn(videoUiEntity.name)
+            on { parentId }.thenReturn(videoUiEntity.parentId)
+            on { isMarkedSensitive }.thenReturn(videoUiEntity.isMarkedSensitive)
+            on { isSensitiveInherited }.thenReturn(videoUiEntity.isSensitiveInherited)
+        },
+        duration = videoUiEntity.duration,
+        elementID = null,
+        isOutShared = videoUiEntity.isSharedItems,
+        watchedTimestamp = 0L,
+        collectionTitle = null,
+    )
 }

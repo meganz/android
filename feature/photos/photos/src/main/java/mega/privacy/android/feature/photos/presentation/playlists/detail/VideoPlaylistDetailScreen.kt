@@ -1,7 +1,9 @@
 package mega.privacy.android.feature.photos.presentation.playlists.detail
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
@@ -15,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -30,10 +33,14 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
@@ -42,15 +49,18 @@ import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.components.VideoPlaylistDetailHeaderView
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
+import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
+import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
+import java.util.Locale
 
 @Composable
 fun VideoPlaylistDetailRoute(
@@ -69,6 +79,10 @@ fun VideoPlaylistDetailRoute(
         resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
         onDeleteButtonClicked = viewModel::removeVideoPlaylists,
         onConsumedPlaylistRemovedEvent = viewModel::resetPlaylistsRemovedEvent,
+        onClick = viewModel::onItemClicked,
+        onLongClick = viewModel::onItemLongClicked,
+        selectAll = viewModel::selectAllVideos,
+        clearSelection = viewModel::clearSelection,
         onBack = navigationHandler::back
     )
 }
@@ -87,6 +101,11 @@ fun VideoPlaylistDetailScreen(
     resetUpdateTitleSuccessEvent: () -> Unit = {},
     onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
     onConsumedPlaylistRemovedEvent: () -> Unit = {},
+    onClick: (item: VideoUiEntity) -> Unit = {},
+    onLongClick: (item: VideoUiEntity) -> Unit = {},
+    selectAll: () -> Unit = {},
+    clearSelection: () -> Unit = {},
+    multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
     val context = LocalContext.current
@@ -95,6 +114,15 @@ fun VideoPlaylistDetailScreen(
     var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
     val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showRemovedDialog by rememberSaveable { mutableStateOf(false) }
+
+    val dataState = uiState as? VideoPlaylistDetailUiState.Data
+    val selectedNodes = dataState?.selectedTypedNodes ?: emptySet()
+    val areAllVideosSelected = dataState?.areAllSelected ?: false
+    val videoSelectedCount = dataState?.selectedCount ?: 0
+
+    BackHandler(videoSelectedCount > 0) {
+        clearSelection()
+    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -105,14 +133,56 @@ fun VideoPlaylistDetailScreen(
                 modifier = Modifier
                     .testTag(VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG),
                 navigationType = AppBarNavigationType.Back(onBack),
-                title = (uiState as? VideoPlaylistDetailUiState.Data)?.playlistDetail?.uiEntity?.title
-                    ?: "",
-                actions = listOf(
-                    MenuActionWithClick(
-                        menuAction = NodeSelectionAction.More,
-                        onClick = { showPlaylistBottomSheet = true }
-                    )
-                )
+                title = if (videoSelectedCount > 0) {
+                    String.format(Locale.ROOT, "%s", videoSelectedCount)
+                } else {
+                    dataState?.playlistDetail?.uiEntity?.title ?: ""
+                },
+                actions = buildList {
+                    if (videoSelectedCount > 0) {
+                        if (!areAllVideosSelected) {
+                            add(NodeSelectionAction.SelectAll)
+                        }
+                    } else {
+                        add(NodeSelectionAction.More)
+                    }
+                },
+                onActionPressed = { action ->
+                    when (action) {
+                        is NodeSelectionAction.More -> showPlaylistBottomSheet = true
+                        is NodeSelectionAction.SelectAll -> selectAll()
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            SelectionModeBottomBar(
+                visible = videoSelectedCount > 0,
+                actions = dataState?.bottomBarActions ?: emptyList(),
+                onActionPressed = { action ->
+                    when (action) {
+                        is VideoPlaylistDetailSelectionMenuAction.Hide -> {
+                            multiNodeActionHandler(
+                                HideMenuAction(),
+                                selectedNodes.toList()
+                            )
+                            clearSelection()
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Unhide -> {
+                            multiNodeActionHandler(
+                                UnhideMenuAction(),
+                                selectedNodes.toList()
+                            )
+                            clearSelection()
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist -> {
+                            //TODO Will implement in another ticket
+                            clearSelection()
+                        }
+                    }
+                }
             )
         }
     ) { innerPadding ->
@@ -174,8 +244,14 @@ fun VideoPlaylistDetailScreen(
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
+                        contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
                         modifier = Modifier
-                            .padding(innerPadding)
+                            .padding(
+                                PaddingValues(
+                                    top = innerPadding.calculateTopPadding(),
+                                    end = innerPadding.calculateEndPadding(LocalLayoutDirection.current)
+                                )
+                            )
                             .testTag(VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG)
                     ) {
                         item(key = "header") {
@@ -212,9 +288,15 @@ fun VideoPlaylistDetailScreen(
                                 },
                                 thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
-                                onClick = {},
+                                onClick = { onClick(videoItem) },
                                 onMenuClick = {},
-                                onLongClick = {},
+                                onLongClick = {
+                                    if (!playlistDetail.uiEntity.isSystemVideoPlayer) {
+                                        onLongClick(videoItem)
+                                    }
+                                },
+                                isSensitive = uiState.showHiddenItems &&
+                                        (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
                             )
                         }
                     }

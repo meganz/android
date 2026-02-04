@@ -4,16 +4,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +40,12 @@ class VideoPlaylistDetailScreenTest {
         resetErrorMessage: () -> Unit = {},
         resetShowRenameVideoPlaylistDialog: () -> Unit = {},
         resetUpdateTitleSuccessEvent: () -> Unit = {},
+        onDeleteButtonClicked: (Set<VideoPlaylistUiEntity>) -> Unit = {},
+        onConsumedPlaylistRemovedEvent: () -> Unit = {},
+        onClick: (VideoUiEntity) -> Unit = {},
+        onLongClick: (VideoUiEntity) -> Unit = {},
+        selectAll: () -> Unit = {},
+        clearSelection: () -> Unit = {},
         snackBarQueue: SnackbarEventQueue = mock(),
         onBack: () -> Unit = {},
         modifier: Modifier = Modifier,
@@ -50,6 +61,13 @@ class VideoPlaylistDetailScreenTest {
                 resetErrorMessage = resetErrorMessage,
                 resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
                 resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
+                onDeleteButtonClicked = onDeleteButtonClicked,
+                onConsumedPlaylistRemovedEvent = onConsumedPlaylistRemovedEvent,
+                onClick = onClick,
+                onLongClick = onLongClick,
+                selectAll = selectAll,
+                clearSelection = clearSelection,
+                multiNodeActionHandler = mock(),
                 snackBarQueue = snackBarQueue,
             )
         }
@@ -168,6 +186,120 @@ class VideoPlaylistDetailScreenTest {
         )
 
         VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that app bar shows selection count when videoSelectedCount is greater than zero`() {
+        val selectedNode = mock<TypedNode> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        val videos = listOf(
+            mock<VideoUiEntity> {
+                on { id }.thenReturn(NodeId(1L))
+                on { name }.thenReturn("Video 1")
+                on { duration }.thenReturn(10.seconds)
+                on { durationString }.thenReturn("00:10")
+            },
+            mock<VideoUiEntity> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("Video 2")
+                on { duration }.thenReturn(10.seconds)
+                on { durationString }.thenReturn("00:10")
+            }
+        )
+        val videoPlaylistEntity = mock<VideoPlaylistUiEntity> {
+            on { thumbnailList }.thenReturn(emptyList())
+        }
+        val playlistDetail = mock<VideoPlaylistDetailUiEntity> {
+            on { uiEntity }.thenReturn(videoPlaylistEntity)
+            on { this.videos }.thenReturn(videos)
+        }
+        setComposeContent(
+            uiState = VideoPlaylistDetailUiState.Data(
+                playlistDetail = playlistDetail,
+                selectedTypedNodes = setOf(selectedNode),
+            )
+        )
+
+        composeTestRule.onNodeWithTag(
+            VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG,
+            useUnmergedTree = true
+        ).assertIsDisplayed()
+        composeTestRule.onNodeWithText("1", useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that SelectAll action is displayed and invokes selectAll when clicked in selection mode`() {
+        val selectedNode = mock<TypedNode> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        val videos = listOf(
+            mock<VideoUiEntity> {
+                on { id }.thenReturn(NodeId(1L))
+                on { name }.thenReturn("Video 1")
+                on { duration }.thenReturn(10.seconds)
+                on { durationString }.thenReturn("00:10")
+            },
+            mock<VideoUiEntity> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("Video 2")
+                on { duration }.thenReturn(10.seconds)
+                on { durationString }.thenReturn("00:10")
+            }
+        )
+        val videoPlaylistEntity = mock<VideoPlaylistUiEntity> {
+            on { thumbnailList }.thenReturn(emptyList())
+        }
+        val playlistDetail = mock<VideoPlaylistDetailUiEntity> {
+            on { uiEntity }.thenReturn(videoPlaylistEntity)
+            on { this.videos }.thenReturn(videos)
+        }
+        var selectAllInvoked = false
+        setComposeContent(
+            uiState = VideoPlaylistDetailUiState.Data(
+                playlistDetail = playlistDetail,
+                selectedTypedNodes = setOf(selectedNode),
+            ),
+            selectAll = { selectAllInvoked = true }
+        )
+
+        NodeSelectionAction.SelectAll.testTag.assertIsDisplayedWithTag()
+        composeTestRule.onNodeWithTag(NodeSelectionAction.SelectAll.testTag, useUnmergedTree = true)
+            .performClick()
+        composeTestRule.waitForIdle()
+        assertThat(selectAllInvoked).isTrue()
+    }
+
+    @Test
+    fun `test that app bar shows playlist title when videoSelectedCount is zero`() {
+        val playlistTitle = "My Playlist"
+        val videos = listOf(
+            mock<VideoUiEntity> {
+                on { id }.thenReturn(NodeId(1L))
+                on { name }.thenReturn("Video 1")
+                on { duration }.thenReturn(10.seconds)
+                on { durationString }.thenReturn("00:10")
+            }
+        )
+        val videoPlaylistEntity = mock<VideoPlaylistUiEntity> {
+            on { thumbnailList }.thenReturn(emptyList())
+            on { title }.thenReturn(playlistTitle)
+        }
+        val playlistDetail = mock<VideoPlaylistDetailUiEntity> {
+            on { uiEntity }.thenReturn(videoPlaylistEntity)
+            on { this.videos }.thenReturn(videos)
+        }
+        setComposeContent(
+            uiState = VideoPlaylistDetailUiState.Data(
+                playlistDetail = playlistDetail,
+                selectedTypedNodes = emptySet(),
+            )
+        )
+
+        VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithText(playlistTitle, useUnmergedTree = true)
+            .onFirst()
+            .assertIsDisplayed()
     }
 
     private fun String.assertIsDisplayedWithTag() =
