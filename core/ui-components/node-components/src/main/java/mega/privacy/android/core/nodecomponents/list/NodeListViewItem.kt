@@ -287,7 +287,7 @@ fun NodeListViewItem(
                 MegaText(
                     text = subtitle,
                     textColor = subtitleColor,
-                    overflow = TextOverflow.Clip,
+                    overflow = TextOverflow.Ellipsis,
                     style = AppTheme.typography.bodySmall,
                     maxLines = 1,
                     modifier = Modifier.testTag(SUBTITLE_TAG),
