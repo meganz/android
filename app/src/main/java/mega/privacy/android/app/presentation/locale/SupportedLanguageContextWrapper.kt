@@ -44,7 +44,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
          * @param context base context to wrap
          * @return wrapped context
          */
-        fun wrap(context: Context?): SupportedLanguageContextWrapper {
+        fun wrap(context: Context?): SupportedLanguageContextWrapper? {
             /**
              * When selecting a non supported locale and then a supported locale in the language settings
              * causes a strange error in which the order of the two locales get randomly flipped.
@@ -67,7 +67,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
                         context.resources.displayMetrics
                     )
                 }
-            }
+            } ?: return null
 
             return SupportedLanguageContextWrapper(context)
         }
@@ -76,7 +76,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
             locales: LocaleList,
         ) = (0 until locales.size())
             .mapNotNull { i ->
-                locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
+                locales.get(i)?.takeIf { locale -> supportedLanguages.contains(locale.language) }
             }
             .toTypedArray()
     }
