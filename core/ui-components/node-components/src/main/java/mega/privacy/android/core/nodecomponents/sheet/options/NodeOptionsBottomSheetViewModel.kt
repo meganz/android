@@ -75,13 +75,6 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
         viewModelScope.launch {
             val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
-
-            uiState.update {
-                it.copy(
-                    actions = emptyList(),
-                    node = null
-                )
-            }
             val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
             val isNodeInRubbish =
                 runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false)

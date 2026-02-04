@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -255,11 +256,15 @@ internal fun NodeOptionsBottomSheetContent(
             listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 0
         }
     }
-
-    var isSheetReady by remember { mutableStateOf(false) }
+    var isSheetReady by rememberSaveable { mutableStateOf(false) }
     val isContentReady = isSheetReady && uiState.node != null
 
     LaunchedEffect(Unit) {
+        // Skip if already ready (preserved from screen rotation)
+        if (isSheetReady) {
+            return@LaunchedEffect
+        }
+
         // Delay should only be applied on first load
         if (uiState.actions.isEmpty()) {
             delay(SHEET_READY_DELAY_MS)

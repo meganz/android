@@ -197,64 +197,6 @@ class NodeOptionsBottomSheetViewModelTest {
     }
 
     @Test
-    fun `test that getBottomSheetOptions resets state before processing`() = runTest {
-        // First set some state
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
-        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
-        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(
-            nodeBottomSheetActionMapper(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        ).thenReturn(
-            listOf(mock())
-        )
-
-        viewModel.uiState.test {
-            // Initial state
-            awaitItem()
-
-            // First call
-            viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
-
-            // Verify state is set
-            val firstState = awaitItem()
-            assertThat(firstState.node).isNotNull()
-            assertThat(firstState.actions).isNotEmpty()
-
-            // Now call with a different node
-            val differentNode = mock<TypedFileNode>().stub {
-                on { id } doReturn NodeId(999)
-                on { name } doReturn "different_file.txt"
-                on { isIncomingShare } doReturn false
-            }
-            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
-            whenever(nodeUiItemMapper(listOf(differentNode))).thenReturn(listOf(mockNodeUi))
-            whenever(getNodeByIdUseCase(NodeId(999))).thenReturn(differentNode)
-
-            viewModel.getBottomSheetOptions(999L, NodeSourceType.CLOUD_DRIVE)
-
-            // First we get the reset state (node = null, actions = empty)
-            val resetState = awaitItem()
-            assertThat(resetState.node).isNull()
-            assertThat(resetState.actions).isEmpty()
-
-            // Then we get the updated state with the new node
-            val secondState = awaitItem()
-            assertThat(secondState.node).isEqualTo(mockNodeUi)
-        }
-    }
-
-    @Test
     fun `test that on show snackbar should call use case`() = runTest {
         val snackbarAttributes = mock<SnackbarAttributes>()
         viewModel.showSnackbar(snackbarAttributes)
