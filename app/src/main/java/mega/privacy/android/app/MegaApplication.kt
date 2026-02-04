@@ -277,7 +277,8 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             }
 
         } else {
-            Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
+            val isDebugBuildType = BuildConfig.BUILD_TYPE == "debug"
+            Firebase.crashlytics.setCrashlyticsCollectionEnabled(!isDebugBuildType)
             JniExceptionReporter.handler = object : JniExceptionHandler {
                 override fun onJniException(location: String, message: String, stacktrace: String) {
                     try {
