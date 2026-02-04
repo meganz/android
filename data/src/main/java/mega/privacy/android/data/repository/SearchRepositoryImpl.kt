@@ -2,12 +2,8 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.SortOrderSource
 import mega.privacy.android.data.database.dao.RecentSearchDao
@@ -22,6 +18,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.search.SearchParameters
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -48,6 +46,7 @@ internal class SearchRepositoryImpl @Inject constructor(
     private val recentSearchDao: RecentSearchDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SearchRepository {
+
     override suspend fun search(
         nodeId: NodeId?,
         order: SortOrder,
@@ -76,7 +75,6 @@ internal class SearchRepositoryImpl @Inject constructor(
         }
         mapMegaNodesToUnTypedNodes(searchList.await(), offlineItems.await())
     }
-
 
     override suspend fun getChildren(
         nodeId: NodeId?,
@@ -112,18 +110,11 @@ internal class SearchRepositoryImpl @Inject constructor(
     private suspend fun mapMegaNodesToUnTypedNodes(
         childList: List<MegaNode>,
         offlineItems: Map<String, Offline>?,
-    ): List<UnTypedNode> = coroutineScope {
-        val semaphore = Semaphore(10)
-        childList.map { megaNode ->
-            async {
-                semaphore.withPermit {
-                    nodeMapper(
-                        megaNode = megaNode,
-                        offline = offlineItems?.get(megaNode.handle.toString())
-                    )
-                }
-            }
-        }.awaitAll()
+    ): List<UnTypedNode> = childList.mapAsync(getNodeMappingStrategy(childList.size)) {
+        nodeMapper(
+            megaNode = it,
+            offline = offlineItems?.get(it.handle.toString())
+        )
     }
 
     override suspend fun getInShares() = withContext(ioDispatcher) {

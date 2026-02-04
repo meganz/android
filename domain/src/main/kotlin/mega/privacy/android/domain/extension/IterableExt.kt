@@ -234,3 +234,14 @@ sealed interface Chunk {
     data class Size(val value: Int) : Chunk
 }
 
+/**
+ * Determine an appropriate [ConcurrencyStrategy] based on the number of nodes to map
+ * @param count
+ * @return ConcurrencyStrategy
+ */
+fun getNodeMappingStrategy(count: Int) = when {
+    count <= 100 -> ConcurrencyStrategy.Parallel // Small folders, process in parallel
+    count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
+    count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
+    else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(50)) // Very large folders, larger chunks
+}

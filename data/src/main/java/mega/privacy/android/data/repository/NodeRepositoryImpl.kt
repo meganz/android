@@ -72,8 +72,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
-import mega.privacy.android.domain.extension.Chunk
 import mega.privacy.android.domain.extension.ConcurrencyStrategy
+import mega.privacy.android.domain.extension.getNodeMappingStrategy
 import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -1302,7 +1302,7 @@ internal class NodeRepositoryImpl @Inject constructor(
         val offlineItems = offlineItemsDiffer.await()
         val megaNodes = megaNodesDiffer.await()
 
-        megaNodes.mapAsync(getConcurrencyStrategy(megaNodes.size)) { megaNode ->
+        megaNodes.mapAsync(getNodeMappingStrategy(megaNodes.size)) { megaNode ->
             typedNodeMapper(
                 megaNode = megaNode,
                 folderTypeData = folderTypeData,
@@ -1344,7 +1344,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                 // Process remaining nodes in chunks
                 val remainingMegaNodes = allChildren.drop(initialBatchSize)
                 val remainingTypedNodes = remainingMegaNodes
-                    .mapAsync(getConcurrencyStrategy(remainingMegaNodes.size)) { megaNode ->
+                    .mapAsync(getNodeMappingStrategy(remainingMegaNodes.size)) { megaNode ->
                         typedNodeMapper(
                             megaNode = megaNode,
                             folderTypeData = folderTypeData,
@@ -1357,18 +1357,6 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }
     }.flowOn(ioDispatcher)
-
-    /**
-     * Determine concurrency strategy based on the number of nodes to map
-     * @param count
-     * @return ConcurrencyStrategy
-     */
-    private fun getConcurrencyStrategy(count: Int) = when {
-        count <= 100 -> ConcurrencyStrategy.Parallel // Small folders, process in parallel
-        count <= 1000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(20))
-        count <= 5000 -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(30))
-        else -> ConcurrencyStrategy.ChunkedParallel(Chunk.Count(50)) // Very large folders, larger chunks
-    }
 
     override suspend fun getFullNodePathById(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
