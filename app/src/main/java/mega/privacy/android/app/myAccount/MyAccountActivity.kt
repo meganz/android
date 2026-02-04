@@ -420,33 +420,32 @@ internal class MyAccountActivity : PasscodeActivity(),
      * Only sets the graph when savedInstanceState == null.
      */
     private fun setupNavigationGraph(savedInstanceState: Bundle?) {
+        val navGraph = navController.navInflater.inflate(R.navigation.my_account)
         if (savedInstanceState != null) {
-            return
-        }
+            navController.setGraph(navGraph, intent.extras)
+        } else {
+            lifecycleScope.launch {
+                runCatching {
+                    val startDestination = when (intent.action) {
+                        ACTION_OPEN_USAGE_METER_FROM_MENU -> {
+                            val myAccountUsageFragmentComposeUI =
+                                runCatching {
+                                    getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)
+                                }.getOrDefault(false)
 
-        lifecycleScope.launch {
-            runCatching {
-                val navGraph = navController.navInflater.inflate(R.navigation.my_account)
-
-                val startDestination = when (intent.action) {
-                    ACTION_OPEN_USAGE_METER_FROM_MENU -> {
-                        val myAccountUsageFragmentComposeUI =
-                            runCatching {
-                                getFeatureFlagValueUseCase(AppFeatures.MyAccountUsageFragmentComposeUI)
-                            }.getOrDefault(false)
-
-                        if (myAccountUsageFragmentComposeUI) {
-                            R.id.my_account_usage_compose
-                        } else {
-                            R.id.my_account_usage
+                            if (myAccountUsageFragmentComposeUI) {
+                                R.id.my_account_usage_compose
+                            } else {
+                                R.id.my_account_usage
+                            }
                         }
+
+                        else -> R.id.my_account
                     }
 
-                    else -> R.id.my_account
+                    navGraph.setStartDestination(startDestination)
+                    navController.setGraph(navGraph, intent.extras)
                 }
-
-                navGraph.setStartDestination(startDestination)
-                navController.setGraph(navGraph, intent.extras)
             }
         }
     }
