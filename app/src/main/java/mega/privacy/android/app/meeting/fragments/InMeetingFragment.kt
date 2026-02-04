@@ -76,8 +76,8 @@ import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
 import mega.privacy.android.app.meeting.pip.PictureInPictureCallFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
+import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.InMeetingUiState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState

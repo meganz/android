@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.feature.chat.meeting.recording
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.call.CallRecordingConsentStatus
 import mega.privacy.android.domain.entity.call.CallRecordingEvent
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
@@ -44,7 +45,8 @@ class CallRecordingViewModelTest {
     private val chatId = 123L
     private val peerId = 456L
     private val recordingFlow = MutableSharedFlow<CallRecordingEvent>()
-    private val consentFlow = MutableStateFlow<Boolean?>(null)
+    private val consentFlow =
+        MutableStateFlow<CallRecordingConsentStatus>(CallRecordingConsentStatus.None)
     private val callFlow = MutableSharedFlow<ChatCall?>()
 
     private val monitorCallSessionOnRecordingUseCase: MonitorCallSessionOnRecordingUseCase = mock {
@@ -61,7 +63,7 @@ class CallRecordingViewModelTest {
         onBlocking { invoke(chatId) } doReturn callFlow
     }
     private val savedStateHandle: SavedStateHandle = mock {
-        on { get<Long>(ChatNavKey.LEGACY_CHAT_ID) } doReturn chatId
+        on { get<Long>(ChatNavKey.Companion.LEGACY_CHAT_ID) } doReturn chatId
     }
 
     @BeforeAll
@@ -90,7 +92,7 @@ class CallRecordingViewModelTest {
         wheneverBlocking { monitorCallSessionOnRecordingUseCase(chatId) }.thenReturn(recordingFlow)
         wheneverBlocking { monitorCallRecordingConsentEventUseCase() }.thenReturn(consentFlow)
         wheneverBlocking { monitorCallInChatUseCase(chatId) }.thenReturn(callFlow)
-        whenever(savedStateHandle.get<Long>(ChatNavKey.LEGACY_CHAT_ID)).thenReturn(chatId)
+        whenever(savedStateHandle.get<Long>(ChatNavKey.Companion.LEGACY_CHAT_ID)).thenReturn(chatId)
     }
 
     @Test
@@ -124,7 +126,9 @@ class CallRecordingViewModelTest {
             underTest.state.map { it.callRecordingEvent }.test {
                 Truth.assertThat(awaitItem()).isEqualTo(event)
             }
-            verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(null)
+            verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
+                CallRecordingConsentStatus.None
+            )
         }
 
     @ParameterizedTest(name = " and accepted is {0}")
@@ -136,7 +140,10 @@ class CallRecordingViewModelTest {
 
         init()
         testScheduler.advanceUntilIdle()
-        consentFlow.emit(accepted)
+        consentFlow.emit(
+            if (accepted) CallRecordingConsentStatus.Granted(chatId)
+            else CallRecordingConsentStatus.Denied(chatId)
+        )
         underTest.state.map { it.isRecordingConsentAccepted }.test {
             Truth.assertThat(awaitItem()).isEqualTo(accepted)
         }
@@ -148,8 +155,8 @@ class CallRecordingViewModelTest {
 
         init()
         testScheduler.advanceUntilIdle()
-        consentFlow.emit(true)
-        consentFlow.emit(null)
+        consentFlow.emit(CallRecordingConsentStatus.Granted(chatId))
+        consentFlow.emit(CallRecordingConsentStatus.None)
         underTest.state.test {
             val item = awaitItem()
             Truth.assertThat(item.callRecordingEvent.isSessionOnRecording).isEqualTo(false)
@@ -181,12 +188,16 @@ class CallRecordingViewModelTest {
         runTest {
             init()
             underTest.setIsRecordingConsentAccepted(true)
-            consentFlow.emit(true)
+            consentFlow.emit(CallRecordingConsentStatus.Granted(chatId))
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.isRecordingConsentAccepted }.test {
                 Truth.assertThat(awaitItem()).isTrue()
             }
-            verify(broadcastCallRecordingConsentEventUseCase).invoke(true)
+            verify(broadcastCallRecordingConsentEventUseCase).invoke(
+                CallRecordingConsentStatus.Granted(
+                    chatId
+                )
+            )
             verifyNoInteractions(hangChatCallByChatIdUseCase)
         }
 
@@ -195,12 +206,16 @@ class CallRecordingViewModelTest {
         runTest {
             init()
             underTest.setIsRecordingConsentAccepted(false)
-            consentFlow.emit(false)
+            consentFlow.emit(CallRecordingConsentStatus.Denied(chatId))
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.isRecordingConsentAccepted }.test {
                 Truth.assertThat(awaitItem()).isFalse()
             }
-            verify(broadcastCallRecordingConsentEventUseCase).invoke(false)
+            verify(broadcastCallRecordingConsentEventUseCase).invoke(
+                CallRecordingConsentStatus.Denied(
+                    chatId
+                )
+            )
             verify(hangChatCallByChatIdUseCase).invoke(chatId)
         }
 
@@ -226,7 +241,9 @@ class CallRecordingViewModelTest {
         underTest.state.map { it.isParticipatingInCall }.test {
             Truth.assertThat(awaitItem()).isFalse()
         }
-        verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(null)
+        verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
+            CallRecordingConsentStatus.None
+        )
     }
 
     @ParameterizedTest(name = " and call state changes as joined with {0}")
@@ -286,7 +303,9 @@ class CallRecordingViewModelTest {
         underTest.state.map { it.isParticipatingInCall }.test {
             Truth.assertThat(awaitItem()).isTrue()
         }
-        verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(null)
+        verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
+            CallRecordingConsentStatus.None
+        )
     }
 
     @ParameterizedTest(name = " and regardless of the status of the call: {0}")

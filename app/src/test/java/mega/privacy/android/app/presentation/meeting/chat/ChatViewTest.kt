@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction.Companion.TEST_TAG_ADD_PARTICIPANTS_ACTION
@@ -33,7 +32,6 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBarViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryState
 import mega.privacy.android.app.presentation.meeting.chat.view.sheet.ChatGalleryViewModel
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.transfers.starttransfer.StartTransfersComponentViewModel
 import mega.privacy.android.app.presentation.transfers.starttransfer.model.StartTransferViewState
@@ -42,6 +40,8 @@ import mega.privacy.android.app.presentation.transfers.transferoverquota.model.T
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.shared.original.core.ui.controls.menus.TAG_MENU_ACTIONS_SHOW_MORE
 import org.junit.Rule
 import org.junit.Test
@@ -272,6 +272,7 @@ class ChatViewTest {
                     navigateToReactionInfo = {},
                     navigateToNotSentModal = {},
                     navigateToConversation = {},
+                    navigateToWebSite = {},
                     navHostController = rememberNavController(),
                 )
             }

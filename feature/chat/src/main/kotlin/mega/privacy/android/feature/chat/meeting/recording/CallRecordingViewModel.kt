@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting
+package mega.privacy.android.feature.chat.meeting.recording
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,13 +11,14 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
+import mega.privacy.android.domain.entity.call.CallRecordingConsentStatus
 import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
+import mega.privacy.android.feature.chat.meeting.call.isJoined
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.navigation.destination.ChatNavKey
 import timber.log.Timber
 import javax.inject.Inject
@@ -25,7 +26,7 @@ import javax.inject.Inject
 /**
  * ViewModel for call recording
  *
- * @property state [CallRecordingUIState]
+ * @property state [mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState]
  */
 @HiltViewModel
 class CallRecordingViewModel @Inject constructor(
@@ -51,9 +52,9 @@ class CallRecordingViewModel @Inject constructor(
             monitorCallInChat(it)
         }
         viewModelScope.launch {
-            monitorCallRecordingConsentEventUseCase().collectLatest { isRecordingConsentAccepted ->
+            monitorCallRecordingConsentEventUseCase().collectLatest { callRecordingConsentStatus ->
                 _state.update { state ->
-                    state.copy(isRecordingConsentAccepted = isRecordingConsentAccepted)
+                    state.copy(callRecordingConsentStatus = callRecordingConsentStatus)
                 }
             }
         }
@@ -86,7 +87,7 @@ class CallRecordingViewModel @Inject constructor(
                             state.copy(callRecordingEvent = callRecordingEvent)
                         }
                         if (!it.isSessionOnRecording) {
-                            broadcastCallRecordingConsentEvent(null)
+                            broadcastCallRecordingConsentEvent(CallRecordingConsentStatus.None)
                         }
                     }
                 }
@@ -106,7 +107,7 @@ class CallRecordingViewModel @Inject constructor(
                                 .filter { it.value.isRecording }.isNotEmpty()
 
                             if (!isRecording || !isParticipatingInCall) {
-                                broadcastCallRecordingConsentEvent(null)
+                                broadcastCallRecordingConsentEvent(CallRecordingConsentStatus.None)
                             }
 
                             state.copy(
@@ -136,9 +137,14 @@ class CallRecordingViewModel @Inject constructor(
      * Sets isRecordingConsentAccepted.
      */
     fun setIsRecordingConsentAccepted(accepted: Boolean) {
-        broadcastCallRecordingConsentEvent(accepted)
-        if (!accepted) {
-            chatId?.let { chatId ->
+        chatId?.let { chatId ->
+            val status =
+                if (accepted) CallRecordingConsentStatus.Granted(chatId) else CallRecordingConsentStatus.Denied(
+                    chatId
+                )
+            broadcastCallRecordingConsentEvent(status)
+
+            if (status is CallRecordingConsentStatus.Denied) {
                 viewModelScope.launch {
                     runCatching { hangChatCallByChatIdUseCase(chatId) }
                         .onFailure { Timber.d(it) }
@@ -147,7 +153,7 @@ class CallRecordingViewModel @Inject constructor(
         }
     }
 
-    private fun broadcastCallRecordingConsentEvent(accepted: Boolean?) {
+    private fun broadcastCallRecordingConsentEvent(accepted: CallRecordingConsentStatus) {
         viewModelScope.launch {
             broadcastCallRecordingConsentEventUseCase(accepted)
         }

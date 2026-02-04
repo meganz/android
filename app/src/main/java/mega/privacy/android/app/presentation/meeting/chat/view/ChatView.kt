@@ -61,8 +61,8 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
-import mega.privacy.android.app.presentation.meeting.chat.extension.isStarted
+import mega.privacy.android.feature.chat.meeting.call.isJoined
+import mega.privacy.android.feature.chat.meeting.call.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
@@ -192,6 +192,7 @@ internal fun ChatView(
     navigateToReactionInfo: () -> Unit,
     navigateToNotSentModal: () -> Unit,
     navigateToConversation: (Long) -> Unit,
+    navigateToWebSite: (String) -> Unit,
     navHostController: androidx.navigation.NavHostController,
     inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
     onInfoToShowConsumed: () -> Unit = {},
@@ -545,7 +546,7 @@ internal fun ChatView(
 
                 UsersInWaitingRoomDialog()
                 DenyEntryToCallDialog()
-                CallRecordingConsentDialog()
+                CallRecordingConsentDialog(openWebView = navigateToWebSite)
             }
 
             EventEffect(
@@ -682,6 +683,7 @@ private fun ChatViewPreview() {
             navigateToConversation = {},
             navHostController = rememberNavController(),
             inviteContactsToChat = { _, _ -> },
+            navigateToWebSite = {},
         )
     }
 }

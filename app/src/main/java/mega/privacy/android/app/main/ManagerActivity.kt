@@ -119,6 +119,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.extensions.consumeParentInsets
 import mega.privacy.android.app.extensions.isPortrait
 import mega.privacy.android.app.extensions.isTablet
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.main.HomepageFragment
@@ -1053,7 +1054,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val isDark = themeMode.isDarkMode()
                 OriginalTheme(isDark = isDark) {
-                    CallRecordingConsentDialog()
+                    CallRecordingConsentDialog(openWebView = ::launchUrl)
                 }
             }
         }

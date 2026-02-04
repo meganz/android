@@ -32,7 +32,7 @@ import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
+import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessagesResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper

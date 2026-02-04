@@ -41,6 +41,7 @@ internal fun NavGraphBuilder.chatScreen(
     navigateToConversation: (Long) -> Unit,
     onBackPress: () -> Unit,
     enablePasscodeCheck: () -> Unit,
+    navigateToWebSite: (String) -> Unit,
 ) {
     composable(
         route = ConversationRoute
@@ -82,6 +83,7 @@ internal fun NavGraphBuilder.chatScreen(
             navigateToReactionInfo = navigateToReactionInfo,
             navigateToNotSentModal = navigateToNotSentModal,
             navigateToConversation = navigateToConversation,
+            navigateToWebSite = navigateToWebSite,
             navHostController = navController,
             inviteContactsToChat = viewModel::inviteContactsToChat,
             onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,

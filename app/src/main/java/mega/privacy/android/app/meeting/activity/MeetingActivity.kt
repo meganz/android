@@ -30,6 +30,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
 import mega.privacy.android.app.meeting.fragments.InMeetingFragment
@@ -40,9 +41,9 @@ import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.app.presentation.meeting.CallRecordingViewModel
+import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
-import mega.privacy.android.app.presentation.meeting.model.CallRecordingUIState
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
@@ -302,7 +303,7 @@ class MeetingActivity : PasscodeActivity() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 OriginalTheme(isDark = true) {
-                    CallRecordingConsentDialog()
+                    CallRecordingConsentDialog(openWebView = ::launchUrl)
                 }
             }
         }

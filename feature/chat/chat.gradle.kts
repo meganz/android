@@ -34,6 +34,7 @@ dependencies {
     implementation(androidx.navigation.compose)
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
+    implementation(lib.logging.timber)
 
     //test
     testImplementation(project(":core-test"))

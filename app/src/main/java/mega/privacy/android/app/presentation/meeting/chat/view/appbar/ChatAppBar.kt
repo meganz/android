@@ -28,7 +28,7 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.app.presentation.meeting.chat.extension.isJoined
+import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.permission.PermissionUtils

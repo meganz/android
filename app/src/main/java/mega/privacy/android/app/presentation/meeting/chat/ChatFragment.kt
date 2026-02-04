@@ -28,6 +28,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.chatsession.ChatSessionContainer
 import mega.privacy.android.app.components.session.SessionContainer
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_ACTION
 import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.chatViewNavigationGraph
@@ -175,7 +176,10 @@ internal class ChatFragment : Fragment() {
                                                     R.string.chat_attach_pick_from_camera_deny_permission
                                                 )
                                             },
-                                            enablePasscodeCheck = { passcodeEnabled = true }
+                                            enablePasscodeCheck = { passcodeEnabled = true },
+                                            navigateToWebSite = {
+                                                context.launchUrl(it)
+                                            }
                                         )
                                     }
                                 }

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.meeting.chat.extension
+package mega.privacy.android.feature.chat.meeting.call
 
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 
