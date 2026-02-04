@@ -6,8 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -39,7 +40,6 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
-import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
@@ -53,6 +53,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEve
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel
 class TimelineTabViewModel @Inject constructor(
@@ -189,47 +190,57 @@ class TimelineTabViewModel @Inject constructor(
         )
     }
 
-    private fun buildTimelineTabUiState(
+    private suspend fun buildTimelineTabUiState(
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
         gridSize: TimelineGridSize,
         selectedPhotoIds: Set<Long>,
-    ): TimelineTabUiState {
-        val displayedPhotos = buildList {
-            sortResult.sortedPhotos.forEachIndexed { index, photoResult ->
-                val shouldShowDate = index == 0 || needsDateSeparator(
-                    current = photoResult.photo,
-                    previous = sortResult.sortedPhotos[index - 1].photo,
-                    gridSize = gridSize
-                )
-                if (shouldShowDate) {
+    ): TimelineTabUiState = coroutineScope {
+        val displayedPhotos = async {
+            buildList {
+                sortResult.sortedPhotos.forEachIndexed { index, photoResult ->
+                    val shouldShowDate = index == 0 || needsDateSeparator(
+                        current = photoResult.photo,
+                        previous = sortResult.sortedPhotos[index - 1].photo,
+                        gridSize = gridSize
+                    )
+                    if (shouldShowDate) {
+                        add(
+                            PhotosNodeContentType.HeaderItem(
+                                time = photoResult.photo.modificationTime,
+                                shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty()
+                            )
+                        )
+                    }
                     add(
-                        PhotosNodeContentType.HeaderItem(
-                            time = photoResult.photo.modificationTime,
-                            shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty()
+                        PhotosNodeContentType.PhotoNodeItem(
+                            node = PhotoNodeUiState(
+                                photo = photoUiStateMapper(photoResult.photo),
+                                isSensitive = photoResult.isMarkedSensitive,
+                                isSelected = photoResult.photo.id in selectedPhotoIds,
+                                defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
+                            )
                         )
                     )
                 }
-                add(
-                    PhotosNodeContentType.PhotoNodeItem(
-                        node = PhotoNodeUiState(
-                            photo = photoUiStateMapper(photoResult.photo),
-                            isSensitive = photoResult.isMarkedSensitive,
-                            isSelected = photoResult.photo.id in selectedPhotoIds,
-                            defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
-                        )
-                    )
-                )
             }
         }
-
-        return TimelineTabUiState(
+        val daysCardPhotos = async {
+            photosNodeListCardMapper(photosDateResults = sortResult.photosInDay)
+        }
+        val monthsCardPhotos = async {
+            photosNodeListCardMapper(photosDateResults = sortResult.photosInMonth)
+        }
+        val yearsCardPhotos = async {
+            photosNodeListCardMapper(photosDateResults = sortResult.photosInYear)
+        }
+        TimelineTabUiState(
             isLoading = false,
             allPhotos = allPhotos,
-            displayedPhotos = displayedPhotos,
-            daysCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInDay),
-            monthsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInMonth),
-            yearsCardPhotos = photosNodeListCardMapper(photosDateResults = sortResult.photosInYear),
+            displayedPhotos = displayedPhotos.await(),
+            daysCardPhotos = daysCardPhotos.await(),
+            monthsCardPhotos = monthsCardPhotos.await(),
+            yearsCardPhotos = yearsCardPhotos.await(),
             gridSize = gridSize,
             selectedPhotoCount = selectedPhotoIds.size,
             currentSort = sortOptionsFlow.value,
