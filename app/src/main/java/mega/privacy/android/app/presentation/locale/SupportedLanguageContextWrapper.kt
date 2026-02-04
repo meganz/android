@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.locale
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
 
@@ -43,7 +44,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
          * @param context base context to wrap
          * @return wrapped context
          */
-        fun wrap(context: Context?): SupportedLanguageContextWrapper {
+        fun wrap(context: Context?): SupportedLanguageContextWrapper? {
             /**
              * When selecting a non supported locale and then a supported locale in the language settings
              * causes a strange error in which the order of the two locales get randomly flipped.
@@ -58,7 +59,15 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
 
                 Locale.setDefault(resolvedLocale)
                 configuration.setLocales(LocaleList(resolvedLocale))
-            }
+
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    @Suppress("DEPRECATION")
+                    context.resources.updateConfiguration(
+                        configuration,
+                        context.resources.displayMetrics
+                    )
+                }
+            } ?: return null
 
             return SupportedLanguageContextWrapper(context)
         }
@@ -67,7 +76,7 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
             locales: LocaleList,
         ) = (0 until locales.size())
             .mapNotNull { i ->
-                locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
+                locales.get(i)?.takeIf { locale -> supportedLanguages.contains(locale.language) }
             }
             .toTypedArray()
     }
