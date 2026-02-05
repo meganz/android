@@ -42,5 +42,5 @@ fun getDbHandler(): LegacyDatabaseHandler = fromApplication(
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface DatabaseHandlerEntryPoint {
-    var dbH: LegacyDatabaseHandler
+    val dbH: LegacyDatabaseHandler
 }

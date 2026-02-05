@@ -33,7 +33,7 @@ buildscript {
         classpath(plugin.junit5)
         classpath(plugin.kotlin.gradle)
         classpath(lib.kotlin.serialisation)
-        classpath("androidx.benchmark:benchmark-baseline-profile-gradle-plugin:1.3.3")
+        classpath(plugin.benchmark.baseline.profile)
         classpath("org.jfrog.buildinfo:build-info-extractor-gradle:${plugin.versions.jfrog.artifactory.get()}")
     }
 }
@@ -78,6 +78,7 @@ allprojects {
     }
     configurations.all {
         resolutionStrategy.cacheDynamicVersionsFor(5, "minutes")
+        exclude(group = "org.jetbrains.kotlin", module = "kotlin-android-extensions-runtime")
     }
 }
 

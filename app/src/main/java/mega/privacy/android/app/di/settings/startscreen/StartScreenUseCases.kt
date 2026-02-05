@@ -73,5 +73,5 @@ fun getMonitorStartScreenPreference(): MonitorStartScreenPreference =
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface MonitorStartScreenPreferenceEntryPoint {
-    var monitorStartScreenPreference: MonitorStartScreenPreference
+    val monitorStartScreenPreference: MonitorStartScreenPreference
 }

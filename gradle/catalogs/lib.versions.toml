@@ -3,10 +3,10 @@ bannerviewpager = "3.5.12"
 billing-client = "8.3.0"
 coil3 = "3.2.0"
 concurrent-futures-ktx = "1.1.0"
-coroutines = "1.10.1"
+coroutines = "1.10.2"
 javax = "1"
-kotlin = "2.1.0"
-kotlin-ktx = "1.15.0"
+kotlin = "2.2.20"
+kotlin-ktx = "1.17.0"
 logging-logback = "2.0.0"
 logging-slf4j = "1.7.36"
 logging-timber = "5.0.1"
@@ -17,7 +17,7 @@ kotlinpoet = "1.14.2"
 xray = "1.0"
 nocturn = "1.0"
 karma = "1.3"
-kotlin-serialisation = "1.9.0"
+kotlin-serialisation = "1.10.0"
 eclipse-jgit = "6.6.0.202305301015-r"
 json = "20240303"
 mega-telephoto = "0.16.1"
@@ -28,6 +28,7 @@ commonmark-java = "0.24.0"
 ucropnedit = "4.1.6"
 sqlcipher = "4.9.0"
 slack-compose-lints = "1.4.2"
+profileinstaller = "1.4.1"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -84,6 +85,7 @@ commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonma
 ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
+profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstaller" }
 
 [bundles]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]

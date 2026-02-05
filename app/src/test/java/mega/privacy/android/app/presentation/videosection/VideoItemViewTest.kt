@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.annotation.ExperimentalCoilApi
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_ICON_CONTENT_DESCRIPTION
 import mega.privacy.android.app.presentation.videosection.view.allvideos.VIDEO_ITEM_COLLECTION_TITLE_TEST_TAG
@@ -40,7 +39,6 @@ import org.mockito.kotlin.verify
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoilApi::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class VideoItemViewTest {

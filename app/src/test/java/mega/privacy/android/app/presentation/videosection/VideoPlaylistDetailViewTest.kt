@@ -13,7 +13,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.annotation.ExperimentalCoilApi
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction.Companion.TEST_TAG_VIDEO_SECTION_MORE_ACTION
@@ -38,7 +37,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import kotlin.time.Duration.Companion.seconds
 
-@OptIn(ExperimentalCoilApi::class)
 @RunWith(AndroidJUnit4::class)
 class VideoPlaylistDetailViewTest {
     @get:Rule

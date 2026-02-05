@@ -8,7 +8,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import coil.annotation.ExperimentalCoilApi
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.presentation.videosection.model.DurationFilterOption
@@ -26,7 +25,7 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 
-@OptIn(ExperimentalCoilApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 class AllVideosViewTest {

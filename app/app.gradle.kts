@@ -187,6 +187,13 @@ project.extensions.configure<ApplicationExtension> {
 
 applyTestLiteForTasks()
 
+configurations.matching { it.name.contains("AndroidTest", ignoreCase = true) }.configureEach {
+    resolutionStrategy {
+        force("androidx.test:core:1.6.1")
+        force("androidx.test.services:storage:1.4.2")
+    }
+}
+
 dependencies {
     // Modules
     implementation(project(":core:formatter"))
@@ -196,9 +203,9 @@ dependencies {
     implementation(project(":legacy-core-ui"))
     implementation(project(":data"))
     implementation(project(":navigation"))
-    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
+    implementation(lib.profileinstaller)
     implementation(project(":shared:sync"))
-    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3:2.10.0-alpha04")
+    implementation(androidx.lifecycle.viewmodel.navigation3)
     "baselineProfile"(project(":baselineprofile"))
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":icon-pack"))
@@ -249,6 +256,7 @@ dependencies {
     implementation(androidx.constraintlayout)
     implementation(androidx.constraintlayout.compose)
     implementation(androidx.datastore.preferences)
+    implementation(androidx.security.crypto)
     implementation(androidx.emoji2)
     implementation(androidx.emojiPicker)
     implementation(androidx.exifinterface)
@@ -410,7 +418,6 @@ dependencies {
 
     // Live Data testing
     testImplementation(testlib.jraska.livedata.test)
-    testImplementation(testlib.coil.test)
     testImplementation(testlib.coil3.test)
 
     //QA
