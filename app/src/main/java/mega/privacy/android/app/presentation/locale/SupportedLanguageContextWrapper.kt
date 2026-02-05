@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.locale
 
 import android.content.Context
 import android.content.ContextWrapper
-import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
 
@@ -59,14 +58,6 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
 
                 Locale.setDefault(resolvedLocale)
                 configuration.setLocales(LocaleList(resolvedLocale))
-
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-                    @Suppress("DEPRECATION")
-                    context.resources.updateConfiguration(
-                        configuration,
-                        context.resources.displayMetrics
-                    )
-                }
             } ?: return null
 
             return SupportedLanguageContextWrapper(context)
