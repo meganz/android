@@ -137,7 +137,6 @@ class MyAccountInfo @Inject constructor(
             usedStorage = accountInfo.storageUsed
             usedFormatted = getSizeString(usedStorage, context)
             usedPercentage = 0
-            subscriptionMethodId = accountInfo.subscriptionMethodId
 
             if (totalStorage != 0L) {
                 usedPercentage = (100 * usedStorage / totalStorage).toInt()
@@ -167,6 +166,7 @@ class MyAccountInfo @Inject constructor(
             subscriptionStatus = accountInfo.subscriptionStatus
             subscriptionRenewTime = accountInfo.subscriptionRenewTime
             proExpirationTime = accountInfo.proExpiration
+            subscriptionMethodId = accountInfo.subscriptionMethodId
 
             when (accountType) {
                 0 -> levelAccountDetails = INVALID_VALUE
