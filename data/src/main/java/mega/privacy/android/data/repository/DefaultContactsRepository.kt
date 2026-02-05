@@ -626,7 +626,8 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                     .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.firstName.takeIf { !it.isNullOrBlank() }
+                credentialsPreferencesGateway.get().monitorCredentials()
+                    .firstOrNull()?.firstName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_FIRSTNAME)
                         .also { credentialsPreferencesGateway.get().saveFirstName(it) }
             }
@@ -638,7 +639,8 @@ internal class DefaultContactsRepository @Inject constructor(
                 getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                     .also { credentialsPreferencesGateway.get().saveLastName(it) }
             } else {
-                credentialsPreferencesGateway.get().monitorCredentials().firstOrNull()?.lastName.takeIf { !it.isNullOrBlank() }
+                credentialsPreferencesGateway.get().monitorCredentials()
+                    .firstOrNull()?.lastName.takeIf { !it.isNullOrBlank() }
                     ?: getCurrentUserNameAttribute(MegaApiJava.USER_ATTR_LASTNAME)
                         .also { credentialsPreferencesGateway.get().saveLastName(it) }
             }
@@ -999,7 +1001,11 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun updateContactCache(userUpdate: UserUpdate) {
         Timber.d("updateContactCache")
         if (userUpdate.changes.any { it.value.contains(UserChanges.Alias) }) {
-            getCurrentUserAliases()
+            runCatching {
+                getCurrentUserAliases()
+            }.onFailure {
+                Timber.e(it, "reload user aliases failed")
+            }
         }
         userUpdate.changes.forEach { entry ->
             entry.value.forEach {

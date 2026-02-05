@@ -23,7 +23,11 @@ class ReloadContactDatabaseInitialiser @Inject constructor(
         runCatching {
             monitorFetchNodesFinishUseCase().collectLatest { isFinish ->
                 if (isFinish) {
-                    reloadContactDatabase(!isFastLogin)
+                    runCatching {
+                        reloadContactDatabase(!isFastLogin)
+                    }.onFailure { e ->
+                        Timber.e(e, "Error re-loading contacts DB")
+                    }
                 }
             }
         }.onFailure { e ->

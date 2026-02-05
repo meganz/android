@@ -18,6 +18,7 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,7 +44,13 @@ internal class ApiFeatureFlagProvider @Inject constructor(
                 // Fail-safe: Call getUserData if not called already. This will trigger EVENT_MISC_FLAGS_READY event
                 accountRepository.getCurrentMiscState()
                     .takeIf { it is MiscLoadedState.NotLoaded }
-                    ?.let { accountRepository.getUserData() }
+                    ?.let {
+                        runCatching {
+                            accountRepository.getUserData()
+                        }.onFailure {
+                            Timber.e(it, "getUserData failed")
+                        }
+                    }
 
                 // Wait for flags to be loaded
                 accountRepository.monitorMiscState()
