@@ -109,6 +109,7 @@ import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.SaveScannedDocumentsActivityNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
@@ -822,23 +823,38 @@ internal class MegaNavigatorImpl @Inject constructor(
         scanPdfUri: Uri,
         scanSoloImageUri: Uri?,
     ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestination = SaveScannedDocumentsNavKey(
-                originatedFromChat = originatedFromChat,
-                cloudDriveParentHandle = cloudDriveParentHandle,
-                scanPdfUri = scanPdfUri.toString(),
-                scanSoloImageUri = scanSoloImageUri?.toString(),
-            )
-        ) {
-            val intent = SaveScannedDocumentsActivity.getIntent(
+        applicationScope.launch {
+            val singleActivityDestination =
+                if (runCatching { getFeatureFlagValueUseCase(AppFeatures.FileExplorer) }
+                        .getOrDefault(false)
+                ) {
+                    SaveScannedDocumentsNavKey(
+                        originatedFromChat = originatedFromChat,
+                        cloudDriveParentHandle = cloudDriveParentHandle,
+                        scanPdfUri = scanPdfUri.toString(),
+                        scanSoloImageUri = scanSoloImageUri?.toString(),
+                    )
+                } else {
+                    SaveScannedDocumentsActivityNavKey(
+                        originatedFromChat = originatedFromChat,
+                        cloudDriveParentHandle = cloudDriveParentHandle,
+                        scanPdfUri = scanPdfUri.toString(),
+                        scanSoloImageUri = scanSoloImageUri?.toString(),
+                    )
+                }
+            navigateForSingleActivity(
                 context = context,
-                fromChat = originatedFromChat,
-                parentHandle = cloudDriveParentHandle,
-                pdfUri = scanPdfUri,
-                imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
-            )
-            context.startActivity(intent)
+                singleActivityDestination = singleActivityDestination
+            ) {
+                val intent = SaveScannedDocumentsActivity.getIntent(
+                    context = context,
+                    fromChat = originatedFromChat,
+                    parentHandle = cloudDriveParentHandle,
+                    pdfUri = scanPdfUri,
+                    imageUris = scanSoloImageUri?.let { listOf(it) } ?: emptyList(),
+                )
+                context.startActivity(intent)
+            }
         }
     }
 

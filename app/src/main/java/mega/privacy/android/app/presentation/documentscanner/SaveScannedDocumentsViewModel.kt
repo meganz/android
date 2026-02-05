@@ -3,15 +3,16 @@ package mega.privacy.android.app.presentation.documentscanner
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -29,7 +30,6 @@ import mega.privacy.mobile.analytics.event.DocumentScannerSavePDFToCloudDriveEve
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Locale
-import javax.inject.Inject
 
 /**
  * The [ViewModel] for Save Scanned Documents
@@ -40,11 +40,11 @@ import javax.inject.Inject
  * the renamed File
  * @property savedStateHandle The Saved State Handle
  */
-@HiltViewModel
-internal class SaveScannedDocumentsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = SaveScannedDocumentsViewModel.Factory::class)
+internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
     private val validateScanFilenameUseCase: ValidateScanFilenameUseCase,
     private val renameFileAndDeleteOriginalUseCase: RenameFileAndDeleteOriginalUseCase,
-    private val savedStateHandle: SavedStateHandle,
+    @Assisted private val args: Args,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SaveScannedDocumentsUiState())
@@ -55,57 +55,30 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_ORIGINATED_FROM_CHAT,
-                    initialValue = false,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
-                    initialValue = -1L,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_SCAN_PDF_URI,
-                    initialValue = null
-                ),
-                savedStateHandle.getStateFlow(
-                    key = EXTRA_SCAN_SOLO_IMAGE_URI,
-                    initialValue = null,
-                ),
-                savedStateHandle.getStateFlow(
-                    key = INITIAL_FILENAME_FORMAT,
-                    initialValue = "",
-                ),
-            ) { originatedFromChat: Boolean, cloudDriveParentHandle: Long, pdfUri: Uri?, soloImageUri: Uri?, fileFormat ->
-                { state: SaveScannedDocumentsUiState ->
-                    val formattedDateTime = String.format(
-                        Locale.getDefault(),
-                        DATE_TIME_FORMAT,
-                        Calendar.getInstance(),
-                    )
-                    val initialFilename = String.format(
-                        Locale.getDefault(),
-                        fileFormat,
-                        formattedDateTime,
-                    ) + _uiState.value.scanFileType.fileSuffix
+        _uiState.update { state: SaveScannedDocumentsUiState ->
+            val formattedDateTime = String.format(
+                Locale.getDefault(),
+                DATE_TIME_FORMAT,
+                Calendar.getInstance(),
+            )
+            val initialFilename = String.format(
+                Locale.getDefault(),
+                args.fileFormat,
+                formattedDateTime,
+            ) + _uiState.value.scanFileType.fileSuffix
 
-                    state.copy(
-                        cloudDriveParentHandle = cloudDriveParentHandle,
-                        filename = initialFilename,
-                        originatedFromChat = originatedFromChat,
-                        pdfUri = pdfUri,
-                        scanDestination = if (originatedFromChat) {
-                            ScanDestination.Chat
-                        } else {
-                            ScanDestination.CloudDrive
-                        },
-                        soloImageUri = soloImageUri,
-                    )
-                }
-            }.collect {
-                _uiState.update(it)
-            }
+            state.copy(
+                cloudDriveParentHandle = args.cloudDriveParentHandle ?: -1,
+                filename = initialFilename,
+                originatedFromChat = args.originatedFromChat,
+                pdfUri = args.pdfUri,
+                scanDestination = if (args.originatedFromChat) {
+                    ScanDestination.Chat
+                } else {
+                    ScanDestination.CloudDrive
+                },
+                soloImageUri = args.soloImageUri,
+            )
         }
     }
 
@@ -288,6 +261,19 @@ internal class SaveScannedDocumentsViewModel @Inject constructor(
     fun onUploadScansEventConsumed() {
         _uiState.update { it.copy(uploadScansEvent = consumed()) }
     }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(args: Args): SaveScannedDocumentsViewModel
+    }
+
+    data class Args(
+        val originatedFromChat: Boolean,
+        val cloudDriveParentHandle: Long?,
+        val pdfUri: Uri?,
+        val soloImageUri: Uri?,
+        val fileFormat: String,
+    )
 
     companion object {
         internal const val EXTRA_ORIGINATED_FROM_CHAT = "EXTRA_ORIGINATED_FROM_CHAT"

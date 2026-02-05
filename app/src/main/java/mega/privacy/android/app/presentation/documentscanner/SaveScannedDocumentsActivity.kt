@@ -1,20 +1,19 @@
 package mega.privacy.android.app.presentation.documentscanner
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_CLOUD_DRIVE_PARENT_HANDLE
@@ -22,15 +21,12 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_PDF_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.EXTRA_SCAN_SOLO_IMAGE_URI
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel.Companion.INITIAL_FILENAME_FORMAT
-import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.resources.R as SharedR
-import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
-import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
 import javax.inject.Inject
 
 /**
@@ -50,8 +46,6 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
      */
     @Inject
     lateinit var passcodeCryptObjectFactory: PasscodeCryptObjectFactory
-
-    private val viewModel by viewModels<SaveScannedDocumentsViewModel>()
 
     /**
      * onCreate
@@ -74,26 +68,59 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
                 passcodeCryptObjectFactory = passcodeCryptObjectFactory
             ) {
                 SaveScannedDocumentsScreen(
-                    viewModel = viewModel,
-                    onUploadScansStarted = { uriToUpload ->
-                        val uiState = viewModel.uiState.value
-                        if (uiState.originatedFromChat) {
-                            Analytics.tracker.trackEvent(
-                                if (uiState.scanFileType == ScanFileType.Pdf) {
-                                    DocumentScannerUploadingPDFToChatEvent
-                                } else {
-                                    DocumentScannerUploadingImageToChatEvent
-                                }
-                            )
-                            redirectBackToChat(uriToUpload)
+                    viewModel = hiltViewModel<SaveScannedDocumentsViewModel, SaveScannedDocumentsViewModel.Factory> { factory ->
+                        factory.create(
+                            SaveScannedDocumentsViewModel.Args(
+                                originatedFromChat = intent.getBooleanExtra(
+                                    EXTRA_ORIGINATED_FROM_CHAT,
+                                    false
+                                ),
+                                cloudDriveParentHandle = intent.getLongExtra(
+                                    EXTRA_CLOUD_DRIVE_PARENT_HANDLE,
+                                    -1L
+                                )
+                                    .takeIf { it != -1L },
+                                pdfUri = intent.getUriExtra(EXTRA_SCAN_PDF_URI),
+                                soloImageUri = intent.getUriExtra(EXTRA_SCAN_SOLO_IMAGE_URI),
+                                fileFormat = intent.getStringExtra(INITIAL_FILENAME_FORMAT)
+                                    .orEmpty(),
+
+                                )
+                        )
+                    },
+                    onUploadToChat = { uri, scanFileType, originatedFromChat, canSelectScanFileType ->
+                        if (originatedFromChat) {
+                            redirectBackToChat(uri)
                         } else {
-                            proceedToFileExplorer(uriToUpload)
+                            proceedToFileExplorer(
+                                uriToUpload = uri,
+                                cloudDriveParentHandle = null,
+                                scanFileType = scanFileType,
+                                canSelectScanFileType = canSelectScanFileType,
+                            )
                         }
-                    }
+
+                    },
+                    onUploadToCloudDrive = { uri, scanFileType, cloudDriveParentHandle, canSelectScanFileType ->
+                        proceedToFileExplorer(
+                            uriToUpload = uri,
+                            cloudDriveParentHandle = cloudDriveParentHandle,
+                            scanFileType = scanFileType,
+                            canSelectScanFileType = canSelectScanFileType,
+                        )
+                    },
                 )
             }
         }
     }
+
+    private fun Intent.getUriExtra(key: String): Uri? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelableExtra(key, Uri::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            getParcelableExtra(key)
+        }
 
     /**
      * When the Activity is accessed from Chat and the Document Scanning finishes, this creates an
@@ -106,7 +133,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
         val intent = Intent().apply {
             setDataAndType(uriToUpload, contentResolver.getType(uriToUpload))
         }
-        setResult(Activity.RESULT_OK, intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 
@@ -117,26 +144,24 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
      *
      * @param uriToUpload The [Uri] containing the scans to be uploaded
      */
-    private fun proceedToFileExplorer(uriToUpload: Uri) {
-        val uiState = viewModel.uiState.value
-        val scanDestination = viewModel.uiState.value.scanDestination
-
+    private fun proceedToFileExplorer(
+        uriToUpload: Uri,
+        cloudDriveParentHandle: Long?,
+        scanFileType: ScanFileType,
+        canSelectScanFileType: Boolean,
+    ) {
         val intent = Intent(this, FileExplorerActivity::class.java).apply {
             putExtra(Intent.EXTRA_STREAM, uriToUpload)
-            putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, uiState.scanFileType.ordinal)
-            putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !uiState.canSelectScanFileType)
-            when (scanDestination) {
-                ScanDestination.CloudDrive -> {
-                    action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CLOUD
-                    putExtra(
-                        FileExplorerActivity.EXTRA_PARENT_HANDLE,
-                        uiState.cloudDriveParentHandle,
-                    )
-                }
-
-                ScanDestination.Chat -> {
-                    action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
-                }
+            putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, scanFileType.ordinal)
+            putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !canSelectScanFileType)
+            if (cloudDriveParentHandle != null) {
+                action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CLOUD
+                putExtra(
+                    FileExplorerActivity.EXTRA_PARENT_HANDLE,
+                    cloudDriveParentHandle,
+                )
+            } else {
+                action = FileExplorerActivity.ACTION_UPLOAD_SCAN_TO_CHAT
             }
             type = contentResolver.getType(uriToUpload)
         }

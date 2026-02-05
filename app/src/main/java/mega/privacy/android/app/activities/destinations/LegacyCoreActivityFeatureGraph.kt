@@ -18,7 +18,6 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.nav
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
-import mega.privacy.android.app.presentation.documentscanner.navigation.saveScannedDocumentsLegacyDestination
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
@@ -91,7 +90,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyPhotosSearch(navigationHandler::back, navigationHandler::returnResult)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             fileInfoScreen(navigationHandler::back)
-            saveScannedDocumentsLegacyDestination(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)
             legacyVideoToPlaylistDestination(
                 navigationHandler::back,

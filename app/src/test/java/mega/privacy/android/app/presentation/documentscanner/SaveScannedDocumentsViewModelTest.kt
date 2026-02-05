@@ -76,7 +76,13 @@ internal class SaveScannedDocumentsViewModelTest {
         underTest = SaveScannedDocumentsViewModel(
             validateScanFilenameUseCase = validateScanFilenameUseCase,
             renameFileAndDeleteOriginalUseCase = renameFileAndDeleteOriginalUseCase,
-            savedStateHandle = savedStateHandle,
+            args = SaveScannedDocumentsViewModel.Args(
+                originatedFromChat = savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] ?: false,
+                savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] ?: -1,
+                savedStateHandle[EXTRA_SCAN_PDF_URI] ?: Uri.EMPTY,
+                savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] ?: Uri.EMPTY,
+                savedStateHandle[INITIAL_FILENAME_FORMAT] ?: ""
+            ),
         )
     }
 

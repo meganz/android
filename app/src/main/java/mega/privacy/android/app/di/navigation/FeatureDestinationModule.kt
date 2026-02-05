@@ -11,6 +11,7 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
+import mega.privacy.android.app.presentation.documentscanner.navigation.SaveScannedDocumentsDestination
 import mega.privacy.android.app.presentation.filecontact.navigation.FileContactFeatureDestination
 import mega.privacy.android.app.presentation.filestorage.FileStorageFeatureDestination
 import mega.privacy.android.app.presentation.logout.LogoutFeatureDestination
@@ -80,4 +81,8 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideMeetingFeatureDestination(): FeatureDestination = MeetingFeatureDestination
+
+    @Provides
+    @IntoSet
+    fun provideScanDestination(): FeatureDestination = SaveScannedDocumentsDestination()
 }
