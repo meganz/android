@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_PENDING_TRANSFER
 import mega.privacy.android.data.database.converter.PendingTransferNodeIdentifierConverter
-import mega.privacy.android.data.database.converter.PendingTransferPitagTriggerConverter
+import mega.privacy.android.data.database.converter.PitagTriggerConverter
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferStage
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -39,7 +39,7 @@ import mega.privacy.android.domain.entity.transfer.pending.PendingTransferState
 )
 @TypeConverters(
     PendingTransferNodeIdentifierConverter::class,
-    PendingTransferPitagTriggerConverter::class
+    PitagTriggerConverter::class
 )
 data class PendingTransferEntity(
     @PrimaryKey(autoGenerate = true) @ColumnInfo("pendingTransferId") val pendingTransferId: Long? = null,
