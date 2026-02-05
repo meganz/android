@@ -28,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -36,6 +35,7 @@ import mega.privacy.android.domain.usecase.inappupdate.ResetInAppUpdateStatistic
 import mega.privacy.android.domain.usecase.inappupdate.ShouldPromptUserForUpdateUseCase
 import mega.privacy.android.domain.usecase.inappupdate.ShouldResetInAppUpdateStatisticsUseCase
 import mega.privacy.android.domain.usecase.inappupdate.UpdateInAppUpdateStatisticsUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.InAppUpdateCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.InAppUpdateDownloadSuccessMessageDisplayedEvent
 import mega.privacy.mobile.analytics.event.InAppUpdateRestartButtonPressedEvent
@@ -64,8 +64,6 @@ class InAppUpdateHandlerImpl @Inject constructor(
     private val noOfDaysBeforePrompt = 7 //x
     private val incrementalFrequencyInDays = 10 //n
     private val incrementalPromptStopCount = 4 // This will stop prompts after x + 3n
-    private val initialMessageDuration = 5000
-    private val reminderMessageDuration = 1500
     private val isIncrementalPromptEnabled = false
 
     private var availableVersionCode = 0
@@ -124,7 +122,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
                 }
 
                 if (result == InstallStatus.DOWNLOADED) {
-                    popupSnackBarForCompleteUpdate(initialMessageDuration)
+                    popupSnackBarForCompleteUpdate()
                 }
             }
         }
@@ -134,7 +132,7 @@ class InAppUpdateHandlerImpl @Inject constructor(
         val appUpdateInfo = appUpdateManager.requestAppUpdateInfo()
         // If the update is downloaded but not installed, notify the user to complete the update.
         if (appUpdateInfo.installStatus() == InstallStatus.DOWNLOADED) {
-            popupSnackBarForCompleteUpdate(reminderMessageDuration)
+            popupSnackBarForCompleteUpdate()
         }
     }
 
@@ -173,16 +171,16 @@ class InAppUpdateHandlerImpl @Inject constructor(
         }
 
     @SuppressLint("RestrictedApi")
-    private fun popupSnackBarForCompleteUpdate(duration: Int) {
+    private fun popupSnackBarForCompleteUpdate() {
         val contentView =
             (context as? Activity)?.findViewById<ViewGroup>((android.R.id.content))?.getChildAt(0)
         contentView?.let { view ->
             val snackbar = Snackbar.make(
                 view,
-                context.getString(R.string.general_app_update_message_download_success),
-                duration
+                context.getString(sharedR.string.general_app_update_download_success_message),
+                Snackbar.LENGTH_INDEFINITE
             ).apply {
-                setAction(context.getString(R.string.general_app_update_action_restart)) {
+                setAction(context.getString(sharedR.string.general_install_label)) {
                     Analytics.tracker.trackEvent(InAppUpdateRestartButtonPressedEvent)
                     completeUpdate()
                 }
