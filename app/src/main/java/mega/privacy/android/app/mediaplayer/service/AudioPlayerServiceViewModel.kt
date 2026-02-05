@@ -720,60 +720,61 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
         val nodesWithoutThumbnail = ArrayList<Pair<Long, File>>()
 
-        filterNonSensitiveNodes(typedAudioNodes).mapIndexed { currentIndex, typedAudioNode ->
-            getLocalFilePathUseCase(typedAudioNode).let { localPath ->
-                if (localPath != null && isLocalFile(typedAudioNode, localPath)) {
-                    mediaItemFromFile(File(localPath), typedAudioNode.id.longValue.toString())
-                } else {
-                    val url =
-                        if (type == FOLDER_LINK_ADAPTER) {
-                            if (isMegaApiFolder(type)) {
-                                getLocalFolderLinkFromMegaApiFolderUseCase(typedAudioNode.id.longValue)
-                            } else {
-                                getLocalFolderLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
-                            }
-                        } else {
-                            getLocalLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
-                        }
-                    if (url == null) {
-                        null
+        filterNonSensitiveNodes(typedAudioNodes).filterTakeDownNodes()
+            .mapIndexed { currentIndex, typedAudioNode ->
+                getLocalFilePathUseCase(typedAudioNode).let { localPath ->
+                    if (localPath != null && isLocalFile(typedAudioNode, localPath)) {
+                        mediaItemFromFile(File(localPath), typedAudioNode.id.longValue.toString())
                     } else {
-                        MediaItem.Builder()
-                            .setUri(url.toUri())
-                            .setMediaId(typedAudioNode.id.longValue.toString())
-                            .build()
+                        val url =
+                            if (type == FOLDER_LINK_ADAPTER) {
+                                if (isMegaApiFolder(type)) {
+                                    getLocalFolderLinkFromMegaApiFolderUseCase(typedAudioNode.id.longValue)
+                                } else {
+                                    getLocalFolderLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
+                                }
+                            } else {
+                                getLocalLinkFromMegaApiUseCase(typedAudioNode.id.longValue)
+                            }
+                        if (url == null) {
+                            null
+                        } else {
+                            MediaItem.Builder()
+                                .setUri(url.toUri())
+                                .setMediaId(typedAudioNode.id.longValue.toString())
+                                .build()
+                        }
+                    }?.let {
+                        mediaItems.add(it)
                     }
-                }?.let {
-                    mediaItems.add(it)
+                }
+
+                if (typedAudioNode.id.longValue == firstPlayHandle) {
+                    firstPlayIndex = currentIndex
+                }
+                val thumbnail = typedAudioNode.thumbnailPath?.let { path ->
+                    File(path)
+                }
+
+                val duration = typedAudioNode.duration
+
+                playlistItemMapper(
+                    typedAudioNode.id.longValue,
+                    typedAudioNode.name,
+                    thumbnail,
+                    currentIndex,
+                    TYPE_NEXT,
+                    typedAudioNode.size,
+                    duration,
+                    typedAudioNode.type.extension
+                ).let { playlistItem ->
+                    playlistItems.add(playlistItem)
+                }
+
+                if (thumbnail != null && !thumbnail.exists()) {
+                    nodesWithoutThumbnail.add(Pair(typedAudioNode.id.longValue, thumbnail))
                 }
             }
-
-            if (typedAudioNode.id.longValue == firstPlayHandle) {
-                firstPlayIndex = currentIndex
-            }
-            val thumbnail = typedAudioNode.thumbnailPath?.let { path ->
-                File(path)
-            }
-
-            val duration = typedAudioNode.duration
-
-            playlistItemMapper(
-                typedAudioNode.id.longValue,
-                typedAudioNode.name,
-                thumbnail,
-                currentIndex,
-                TYPE_NEXT,
-                typedAudioNode.size,
-                duration,
-                typedAudioNode.type.extension
-            ).let { playlistItem ->
-                playlistItems.add(playlistItem)
-            }
-
-            if (thumbnail != null && !thumbnail.exists()) {
-                nodesWithoutThumbnail.add(Pair(typedAudioNode.id.longValue, thumbnail))
-            }
-        }
 
         if (nodesWithoutThumbnail.isNotEmpty() && isConnectedToInternetUseCase()) {
             cancellableJobs[JOB_KEY_UPDATE_THUMBNAIL]?.cancel()
@@ -817,6 +818,9 @@ class AudioPlayerServiceViewModel @Inject constructor(
             nodes.filter { !it.isMarkedSensitive && !it.isSensitiveInherited }
         }
     }
+
+    private fun List<TypedAudioNode>.filterTakeDownNodes(): List<TypedAudioNode> =
+        filter { !it.isTakenDown }
 
     /**
      * Build play sources by node handles
