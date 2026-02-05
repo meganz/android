@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.pitag.PitagTrigger
 /**
  * Converter for [PitagTrigger]
  */
-internal class PendingTransferPitagTriggerConverter {
+internal class PitagTriggerConverter {
 
     @TypeConverter
     fun fromPitagTrigger(pitagTrigger: PitagTrigger): String = pitagTrigger.name
