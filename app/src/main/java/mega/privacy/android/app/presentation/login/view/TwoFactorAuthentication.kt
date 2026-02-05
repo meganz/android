@@ -64,6 +64,13 @@ fun NewTwoFactorAuthentication(
         request.requestFocus()
         softKeyboard?.show()
     }
+    LaunchedEffect(state.multiFactorAuthState) {
+        if (state.multiFactorAuthState == MultiFactorAuthState.Failed) {
+            code = ""
+            request.requestFocus()
+            softKeyboard?.show()
+        }
+    }
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
     val isPhoneLandscape =
