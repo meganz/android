@@ -120,26 +120,6 @@
         android:theme="@style/Theme.Mega"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".presentation.upload.UploadDestinationActivity"
-            android:configChanges="orientation|screenSize"
-            android:exported="true"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="*/*" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="*/*" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".presentation.cancelaccountplan.CancelAccountPlanActivity"
             android:exported="false"
             android:launchMode="singleTop" />
@@ -292,9 +272,20 @@
         <activity
             android:name=".main.FileExplorerActivity"
             android:configChanges="orientation|screenSize"
-            android:exported="false"
+            android:exported="true"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan" >
+        <intent-filter>
+            <action android:name="android.intent.action.SEND" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="*/*" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.SEND_MULTIPLE" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <data android:mimeType="*/*" />
+        </intent-filter>
+        </activity>
         <activity android:name=".main.megachat.chat.explorer.ChatExplorerActivity" />
         <activity android:name=".main.megachat.NodeAttachmentHistoryActivity" />
         <activity android:name=".main.CountryCodePickerActivity" />
