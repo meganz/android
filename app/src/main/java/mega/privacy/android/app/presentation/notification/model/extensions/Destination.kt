@@ -69,12 +69,19 @@ internal fun UserAlert.destination(): NavKey? {
         is UpdatedPendingContactIncomingDeniedAlert -> null
         is UpdatedPendingContactIncomingIgnoredAlert -> null
         is UpdatedPendingContactOutgoingDeniedAlert -> null
-        is IncomingShareAlert -> nodeId?.let {
-            CloudDriveNavKey(
-                nodeHandle = it,
-                nodeSourceType = NodeSourceType.INCOMING_SHARES
-            )
-        }
+        is IncomingShareAlert ->
+            when (destination) {
+                UserAlertDestination.CloudDrive -> nodeId?.let { CloudDriveNavKey(it) }
+                UserAlertDestination.RubbishBin -> nodeId?.let { RubbishBinNavKey(it) }
+                UserAlertDestination.IncomingShares -> nodeId?.let {
+                    CloudDriveNavKey(
+                        nodeHandle = it,
+                        nodeSourceType = NodeSourceType.INCOMING_SHARES
+                    )
+                }
+
+                else -> null
+            }
 
         is ContactAlert ->
             if (contact.isVisible) {

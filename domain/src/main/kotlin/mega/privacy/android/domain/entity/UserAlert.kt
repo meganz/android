@@ -43,6 +43,7 @@ interface ContactAlert {
 sealed interface IncomingShareAlert {
     val nodeId: Long?
     val contact: Contact
+    val destination: UserAlertDestination?
 }
 
 /**
@@ -308,6 +309,7 @@ data class NewShareAlert(
     override val isOwnChange: Boolean,
     override val nodeId: Long?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -329,6 +331,7 @@ data class DeletedShareAlert(
     override val nodeId: Long?,
     val nodeName: String?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 
@@ -349,6 +352,7 @@ data class RemovedFromShareByOwnerAlert(
     override val isOwnChange: Boolean,
     override val nodeId: Long?,
     override val contact: Contact,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -372,6 +376,7 @@ data class NewSharedNodesAlert(
     override val contact: Contact,
     val folderCount: Int,
     val fileCount: Int,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
@@ -393,6 +398,7 @@ data class RemovedSharedNodesAlert(
     override val nodeId: Long?,
     override val contact: Contact,
     val itemCount: Int,
+    override val destination: UserAlertDestination?,
 ) : UserAlert, IncomingShareAlert {}
 
 /**
