@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.jupiter.api.Test
@@ -35,6 +36,7 @@ class AlbumGetMultipleLinksViewModelTest {
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
     private val setShowCopyrightUseCase: SetShowCopyrightUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase = mock()
 
     @Test
     fun `test that fetch link works correctly`() = runTest {
@@ -54,8 +56,8 @@ class AlbumGetMultipleLinksViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase,
             albumIds = longArrayOf(1L, 2L),
-            hasSensitiveElement = false,
         )
         val userAlbum1 = Album.UserAlbum(
             id = AlbumId(1L),
@@ -96,6 +98,8 @@ class AlbumGetMultipleLinksViewModelTest {
                     AlbumIdLink(userAlbum2.id, AlbumLink("Link 2"))
                 )
             )
+
+        whenever(albumHasSensitiveContentUseCase(userAlbum1.id)).thenReturn(false)
 
         underTest.initialize()
 

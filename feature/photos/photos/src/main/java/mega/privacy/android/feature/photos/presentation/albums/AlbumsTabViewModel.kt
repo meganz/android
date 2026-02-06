@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
@@ -26,10 +27,28 @@ import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.collections.Set
+import kotlin.collections.contains
+import kotlin.collections.emptySet
+import kotlin.collections.filter
+import kotlin.collections.first
+import kotlin.collections.firstOrNull
+import kotlin.collections.flatten
+import kotlin.collections.map
+import kotlin.collections.mapNotNull
+import kotlin.collections.minus
+import kotlin.collections.plus
+import kotlin.collections.sortedBy
+import kotlin.collections.toList
+import kotlin.collections.toSet
+import kotlin.plus
+import kotlin.sequences.contains
+import kotlin.sequences.minus
 
 @HiltViewModel
 class AlbumsTabViewModel @Inject constructor(
@@ -41,6 +60,7 @@ class AlbumsTabViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
@@ -138,13 +158,26 @@ class AlbumsTabViewModel @Inject constructor(
     internal fun handleSelectionAction(action: MenuActionWithIcon) {
         when (action) {
             AlbumSelectionAction.ManageLink -> {
-                val navKey = AlbumGetMultipleLinksNavKey(
-                    albumIds = uiState.value.selectedUserAlbums.map { it.id.id }.toSet(),
-                    hasSensitiveContent = true
-                )
+                viewModelScope.launch {
+                    val selectedAlbums = uiState.value.selectedUserAlbums
+                    val navKey = if (selectedAlbums.size == 1) {
+                        val albumId = selectedAlbums.first().id
+                        AlbumGetLinkNavKey(
+                            albumId = albumId.id,
+                            hasSensitiveContent = runCatching {
+                                albumHasSensitiveContentUseCase(albumId)
+                            }.getOrDefault(false)
+                        )
+                    } else {
+                        AlbumGetMultipleLinksNavKey(
+                            albumIds = uiState.value.selectedUserAlbums.map { it.id.id }.toSet(),
+                        )
+                    }
 
-                uiState.update { it.copy(navigationEvent = triggered(navKey)) }
-                clearAlbumsSelection()
+                    uiState.update { it.copy(navigationEvent = triggered(navKey)) }
+                    clearAlbumsSelection()
+                }
+
             }
 
             AlbumSelectionAction.Delete -> {

@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumSummary
@@ -50,8 +51,8 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
     @Assisted private val albumIds: LongArray?,
-    @Assisted private val hasSensitiveElement: Boolean?,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetMultipleLinksState())
     val stateFlow = state.asStateFlow()
@@ -75,8 +76,17 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
     fun initialize() {
         viewModelScope.launch {
             val showCopyright = shouldShowCopyrightUseCase()
-            val hasSensitiveElement =
-                savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: hasSensitiveElement ?: false
+            val hasSensitiveElement = savedStateHandle
+                .getStateFlow(ALBUM_ID, albumIds)
+                .value
+                ?.map { AlbumId(it) }
+                ?.any {
+                    runCatching {
+                        albumHasSensitiveContentUseCase(it)
+                    }.getOrDefault(false)
+                }
+                ?: false
+
             if (!showCopyright && !hasSensitiveElement) {
                 fetchAlbums()
                 fetchLinks()
@@ -93,7 +103,7 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
     }
 
     fun fetchAlbums() =
-        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, albumIds)
+        savedStateHandle.getStateFlow(ALBUM_ID, albumIds)
             .filterNotNull()
             .map(::getAlbumsSummaries)
             .filterNotNull()
@@ -128,7 +138,7 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
     }
 
     fun fetchLinks() =
-        savedStateHandle.getStateFlow<LongArray?>(ALBUM_ID, albumIds)
+        savedStateHandle.getStateFlow(ALBUM_ID, albumIds)
             .filterNotNull()
             .map(::getAlbumLinks)
             .catch { exception -> Timber.e(exception) }
@@ -142,7 +152,6 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
             it.copy(
                 albumLinks = links,
                 albumLinksList = links.values.map { albumLink -> albumLink.link }.toList()
-
             )
         }
     }
@@ -197,10 +206,7 @@ class AlbumGetMultipleLinksViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            albumIds: LongArray?,
-            hasSensitiveElement: Boolean?,
-        ): AlbumGetMultipleLinksViewModel
+        fun create(albumIds: LongArray?): AlbumGetMultipleLinksViewModel
     }
 
     companion object {

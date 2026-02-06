@@ -31,6 +31,8 @@ import mega.privacy.android.feature.photos.presentation.albums.coverselection.Al
 import mega.privacy.android.feature.photos.presentation.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkScreen
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkViewModel
+import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
+import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksViewModel
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
@@ -45,6 +47,7 @@ import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
+import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -350,3 +353,32 @@ fun EntryProviderScope<NavKey>.albumGetLink(
     }
 }
 
+fun EntryProviderScope<NavKey>.albumGetMultipleLinks(
+    navigationHandler: NavigationHandler
+) {
+    entry<AlbumGetMultipleLinksNavKey> { args ->
+        val context = LocalContext.current
+        val albumGetMultipleLinksViewModel =
+            hiltViewModel<AlbumGetMultipleLinksViewModel, AlbumGetMultipleLinksViewModel.Factory> {
+                it.create(albumIds = args.albumIds.toLongArray())
+            }
+        AlbumGetMultipleLinksScreen(
+            viewModel = albumGetMultipleLinksViewModel,
+            onBack = navigationHandler::back,
+            onShareLinks = { links ->
+                with(context) {
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        val linksText = links.joinToString(System.lineSeparator()) { it.link }
+                        putExtra(Intent.EXTRA_TEXT, linksText)
+                    }
+                    val shareIntent = Intent.createChooser(
+                        intent,
+                        getString(sharedR.string.general_share)
+                    )
+                    startActivity(shareIntent)
+                }
+            },
+        )
+    }
+}

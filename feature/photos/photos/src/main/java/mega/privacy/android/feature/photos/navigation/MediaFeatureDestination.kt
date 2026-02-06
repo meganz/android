@@ -37,5 +37,6 @@ class MediaFeatureDestination : FeatureDestination {
                 }
             )
             albumGetLink(navigationHandler = navigationHandler)
+            albumGetMultipleLinks(navigationHandler = navigationHandler)
         }
 }
