@@ -4,17 +4,13 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -29,14 +25,14 @@ internal class MonitorUserAlbumByIdUseCaseTest {
     private lateinit var underTest: MonitorUserAlbumByIdUseCase
 
     private val albumRepository: AlbumRepository = mock()
-    private val photosRepository: PhotosRepository = mock()
+    private val getAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase = mock()
 
     @BeforeEach
     fun setUp() {
-        reset(albumRepository, photosRepository)
+        reset(albumRepository, getAlbumCoverPhotoUseCase)
         underTest = MonitorUserAlbumByIdUseCase(
             albumRepository = albumRepository,
-            photosRepository = photosRepository
+            getAlbumCoverPhotoUseCase = getAlbumCoverPhotoUseCase
         )
     }
 
@@ -48,7 +44,7 @@ internal class MonitorUserAlbumByIdUseCaseTest {
 
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(updatedUserSets))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(emptyList())
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, false)).thenReturn(null)
 
         underTest(albumId).test {
             // First emission from onStart (cache, refresh = false)
@@ -71,7 +67,8 @@ internal class MonitorUserAlbumByIdUseCaseTest {
         whenever(albumRepository.getUserSet(albumId))
             .thenReturn(initialUserSet) // First call from onStart
             .thenReturn(updatedUserSet) // Second call from mapLatest
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(emptyList())
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, true)).thenReturn(null)
 
         underTest(albumId).test {
             // First emission from onStart
@@ -93,7 +90,8 @@ internal class MonitorUserAlbumByIdUseCaseTest {
 
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(emptyList())
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, true)).thenReturn(null)
 
         underTest(albumId).test {
             // First emission from onStart
@@ -136,7 +134,7 @@ internal class MonitorUserAlbumByIdUseCaseTest {
         whenever(albumRepository.getUserSet(albumId))
             .thenReturn(initialUserSet) // First call from onStart
             .thenReturn(null) // Not in updated sets
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(emptyList())
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, false)).thenReturn(null)
 
         underTest(albumId).test {
             // First emission from onStart
@@ -153,18 +151,13 @@ internal class MonitorUserAlbumByIdUseCaseTest {
     fun `test that album with cover photo is handled correctly`() = runTest {
         val albumId = AlbumId(1L)
         val coverId = 123L
-        val photoNodeId = NodeId(456L)
         val userSet = createMockUserSet(id = 1L, name = "Album with Cover", cover = coverId)
-        val albumPhotoId = createMockAlbumPhotoId(id = coverId, nodeId = photoNodeId.longValue)
         val coverPhoto = createMockPhoto()
 
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(listOf(albumPhotoId))
-        whenever(photosRepository.getPhotoFromNodeID(photoNodeId, albumPhotoId, false))
-            .thenReturn(coverPhoto)
-        whenever(photosRepository.getPhotoFromNodeID(photoNodeId, albumPhotoId, true))
-            .thenReturn(coverPhoto)
+        whenever(getAlbumCoverPhotoUseCase(albumId, coverId, false)).thenReturn(coverPhoto)
+        whenever(getAlbumCoverPhotoUseCase(albumId, coverId, true)).thenReturn(coverPhoto)
 
         underTest(albumId).test {
             // First emission from onStart (refresh = false)
@@ -188,7 +181,8 @@ internal class MonitorUserAlbumByIdUseCaseTest {
 
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(emptyList())
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, false)).thenReturn(null)
+        whenever(getAlbumCoverPhotoUseCase(albumId, null, true)).thenReturn(null)
 
         underTest(albumId).test {
             // First emission from onStart
@@ -209,22 +203,20 @@ internal class MonitorUserAlbumByIdUseCaseTest {
     fun `test that refresh parameter is correct for cache and update flows`() = runTest {
         val albumId = AlbumId(1L)
         val coverId = 123L
-        val photoNodeId = NodeId(456L)
         val userSet = createMockUserSet(id = 1L, name = "Test Album", cover = coverId)
-        val albumPhotoId = createMockAlbumPhotoId(id = coverId, nodeId = photoNodeId.longValue)
         val coverPhoto = createMockPhoto()
 
         whenever(albumRepository.monitorUserSetsUpdate()).thenReturn(flowOf(listOf(userSet)))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(albumRepository.getAlbumElementIDs(albumId)).thenReturn(listOf(albumPhotoId))
-        whenever(photosRepository.getPhotoFromNodeID(any(), any(), any())).thenReturn(coverPhoto)
+        whenever(getAlbumCoverPhotoUseCase(albumId, coverId, false)).thenReturn(coverPhoto)
+        whenever(getAlbumCoverPhotoUseCase(albumId, coverId, true)).thenReturn(coverPhoto)
 
         underTest(albumId).test {
             // First emission from onStart
             awaitItem()
 
             // Verify refresh = false for cache
-            verify(photosRepository).getPhotoFromNodeID(photoNodeId, albumPhotoId, false)
+            verify(getAlbumCoverPhotoUseCase).invoke(albumId, coverId, false)
 
             // Second emission from monitorUserSetsUpdate
             awaitItem()
@@ -233,7 +225,7 @@ internal class MonitorUserAlbumByIdUseCaseTest {
         }
 
         // Verify refresh = true for update
-        verify(photosRepository).getPhotoFromNodeID(photoNodeId, albumPhotoId, true)
+        verify(getAlbumCoverPhotoUseCase).invoke(albumId, coverId, true)
     }
 
     private fun createMockUserSet(
@@ -262,12 +254,5 @@ internal class MonitorUserAlbumByIdUseCaseTest {
         }
     }
 
-    private fun createMockAlbumPhotoId(id: Long, nodeId: Long, albumId: Long = 1L): AlbumPhotoId {
-        return AlbumPhotoId(
-            id = id,
-            nodeId = NodeId(nodeId),
-            albumId = AlbumId(albumId)
-        )
-    }
 }
 

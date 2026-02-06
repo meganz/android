@@ -8,12 +8,11 @@ import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
 class MonitorUserAlbumByIdUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
-    private val photosRepository: PhotosRepository,
+    private val getAlbumCoverPhotoUseCase: GetUserAlbumCoverPhotoUseCase,
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     operator fun invoke(albumId: AlbumId): Flow<MediaAlbum.User?> =
@@ -30,15 +29,10 @@ class MonitorUserAlbumByIdUseCase @Inject constructor(
 
     private suspend fun getUserAlbum(albumId: AlbumId, refresh: Boolean): MediaAlbum.User? =
         albumRepository.getUserSet(albumId)?.let { set ->
-            val photo = set.cover?.let { eid ->
-                albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
-                    .find { it.id == eid }
-                    ?.run { photosRepository.getPhotoFromNodeID(nodeId, this, refresh) }
-            }
             MediaAlbum.User(
                 id = AlbumId(set.id),
                 title = set.name,
-                cover = photo,
+                cover = getAlbumCoverPhotoUseCase(albumId, set.cover, refresh),
                 creationTime = set.creationTime,
                 modificationTime = set.modificationTime,
                 isExported = set.isExported,
