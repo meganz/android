@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
@@ -21,12 +22,14 @@ import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelect
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -49,6 +52,7 @@ internal class AlbumsTabViewModelTest {
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -59,7 +63,8 @@ internal class AlbumsTabViewModelTest {
             albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase,
             snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase
+            getNextDefaultAlbumNameUseCase,
+            albumHasSensitiveContentUseCase
         )
     }
 
@@ -72,7 +77,8 @@ internal class AlbumsTabViewModelTest {
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase
         )
     }
 
@@ -155,7 +161,8 @@ internal class AlbumsTabViewModelTest {
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
-            monitorThemeModeUseCase = monitorThemeModeUseCase
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase
         )
 
         underTest.uiState.test {
@@ -273,16 +280,33 @@ internal class AlbumsTabViewModelTest {
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.navigationEvent).isEqualTo(
-                triggered(
-                    AlbumGetMultipleLinksNavKey(
-                        albumIds = setOf(1L, 2L),
-                        hasSensitiveContent = true
-                    )
-                )
+                triggered(AlbumGetMultipleLinksNavKey(albumIds = setOf(1L, 2L)))
             )
             assertThat(state.selectedUserAlbums).isEmpty()
         }
     }
+
+    @Test
+    fun `test that handleSelectionAction with ManageLink triggers navigation event with single nav key`() =
+        runTest {
+            whenever(mockAlbumsDataProvider.order).thenReturn(1)
+            whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(emptyList()))
+            whenever(albumHasSensitiveContentUseCase(any(), eq(false))).thenReturn(false)
+
+            initViewModel()
+
+            val album1 = createMockUserAlbum(1L, "Album 1")
+            underTest.toggleAlbumSelection(album1)
+            underTest.handleSelectionAction(AlbumSelectionAction.ManageLink)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.navigationEvent).isEqualTo(
+                    triggered(AlbumGetLinkNavKey(albumId = 1L, hasSensitiveContent = false))
+                )
+                assertThat(state.selectedUserAlbums).isEmpty()
+            }
+        }
 
     @Test
     fun `test that handleSelectionAction with Delete triggers confirmation event`() = runTest {

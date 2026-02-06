@@ -80,7 +80,7 @@ fun AlbumGetMultipleLinksScreen(
     modifier: Modifier = Modifier,
     viewModel: AlbumGetMultipleLinksViewModel =
         hiltViewModel<AlbumGetMultipleLinksViewModel, AlbumGetMultipleLinksViewModel.Factory> {
-            it.create(null, null)
+            it.create(null)
         },
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
