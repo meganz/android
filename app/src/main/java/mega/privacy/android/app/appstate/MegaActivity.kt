@@ -86,6 +86,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
+import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
@@ -240,6 +241,7 @@ class MegaActivity : FragmentActivity() {
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
             val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
+            val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
             val loginViewModel = hiltViewModel<LoginViewModel, LoginViewModel.Factory>(
                 creationCallback = { factory ->
                     factory.create(isInSingleActivity = true)
@@ -406,7 +408,7 @@ class MegaActivity : FragmentActivity() {
 
                                     if (currentNavKey !is HomeScreensNavKey && currentNavKey !is FetchingContentNavKey) {
                                         RequestStatusProgressContainer(
-                                            viewModel = hiltViewModel(),
+                                            viewModel = requestStatusProgressViewModel,
                                             modifier = Modifier
                                                 .align(Alignment.BottomCenter)
                                                 .navigationBarsPadding(),
