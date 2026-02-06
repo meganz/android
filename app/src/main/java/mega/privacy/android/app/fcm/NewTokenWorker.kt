@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.domain.usecase.GetPushToken
+import mega.privacy.android.domain.usecase.pushnotifications.GetPushTokenUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
 import timber.log.Timber
@@ -24,7 +24,7 @@ import timber.log.Timber
 /**
  * Worker class to manage device token updates.
  *
- * @property getPushToken               Required for getting push token.
+ * @property getPushTokenUseCase        Required for getting push token.
  * @property registerPushNotificationsUseCase  Required for registering push notifications.
  * @property setPushTokenUseCase               Required for setting push token.
  */
@@ -32,7 +32,7 @@ import timber.log.Timber
 class NewTokenWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val getPushToken: GetPushToken,
+    private val getPushTokenUseCase: GetPushTokenUseCase,
     private val registerPushNotificationsUseCase: RegisterPushNotificationsUseCase,
     private val setPushTokenUseCase: SetPushTokenUseCase,
 ) : CoroutineWorker(context, workerParams) {
@@ -41,7 +41,7 @@ class NewTokenWorker @AssistedInject constructor(
         withContext(Dispatchers.IO) {
             val newToken = inputData.getString(NEW_TOKEN)
 
-            if (newToken.isNullOrEmpty() || getPushToken() == newToken) {
+            if (newToken.isNullOrEmpty() || getPushTokenUseCase() == newToken) {
                 Timber.d("No need to register new token.")
             } else {
                 Timber.d("Push service's new token: $newToken")

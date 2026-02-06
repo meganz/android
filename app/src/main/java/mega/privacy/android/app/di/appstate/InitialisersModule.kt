@@ -19,6 +19,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Notific
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PushTokenPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
@@ -113,6 +114,11 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideOnboardingPaymentInitialiser(initialiser: OnboardingPaymentInitialiser): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun providePushTokenPostLoginInitialiser(initialiser: PushTokenPostLoginInitialiser): PostLoginInitialiser =
         initialiser
 
     @Provides
