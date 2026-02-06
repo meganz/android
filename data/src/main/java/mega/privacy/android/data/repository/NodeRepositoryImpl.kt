@@ -1339,22 +1339,20 @@ internal class NodeRepositoryImpl @Inject constructor(
         emit(initialTypedNodes to (allChildren.size > initialBatchSize))
 
         // If there are more nodes, process them and emit the complete list
-        withContext(defaultDispatcher) {
-            if (allChildren.size > initialBatchSize) {
-                // Process remaining nodes in chunks
+        if (allChildren.size > initialBatchSize) {
+            // Process remaining nodes in chunks
+            val remainingTypedNodes = withContext(defaultDispatcher) {
                 val remainingMegaNodes = allChildren.drop(initialBatchSize)
-                val remainingTypedNodes = remainingMegaNodes
-                    .mapAsync(getNodeMappingStrategy(remainingMegaNodes.size)) { megaNode ->
-                        typedNodeMapper(
-                            megaNode = megaNode,
-                            folderTypeData = folderTypeData,
-                            offline = offlineItems[megaNode.handle.toString()]
-                        )
-                    }
-
-                // Second emit: Complete list (initial + remaining) with hasMore = false
-                emit(initialTypedNodes + remainingTypedNodes to false)
+                remainingMegaNodes.mapAsync(getNodeMappingStrategy(remainingMegaNodes.size)) { megaNode ->
+                    typedNodeMapper(
+                        megaNode = megaNode,
+                        folderTypeData = folderTypeData,
+                        offline = offlineItems[megaNode.handle.toString()]
+                    )
+                }
             }
+            // Second emit: Complete list (initial + remaining) with hasMore = false
+            emit(initialTypedNodes + remainingTypedNodes to false)
         }
     }.flowOn(ioDispatcher)
 
