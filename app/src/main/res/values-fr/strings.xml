@@ -45,7 +45,7 @@
     <!-- state while importing the file -->
     <string name="general_forwarding">Réacheminement</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="general_import">Ajouter au Disque nuagique</string>
+    <string name="general_import">Ajouter au disque Cloud</string>
     <!-- It will be followed by the error message -->
     <string name="general_error_word">Erreur</string>
     <!-- when trying to download a file that is already downloaded in the device -->
@@ -183,7 +183,7 @@
         <item quantity="other">Les transferts sélectionnés seront annulés.</item>
     </plurals>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="section_cloud_drive">Disque nuagique</string>
+    <string name="section_cloud_drive">Disque Cloud</string>
     <!-- Label to reference a recents section -->
     <string name="section_recents">Récents</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
@@ -215,7 +215,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Partages entrants avec</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Aucun fichier dans votre Disque nuagique</string>
+    <string name="file_browser_empty_cloud_drive">Aucun fichier dans votre disque Cloud</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Le dossier est vide</string>
     <!-- Title of the fragment Choose Account -->
@@ -1109,13 +1109,13 @@
     <!-- Button to show plans in the alert when the transfer quota is depleted -->
     <string name="plans_depleted_transfer_overquota">Voir les abonnements</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
-    <string name="add_to_cloud">Ajouter au Disque nuagique</string>
+    <string name="add_to_cloud">Ajouter au disque Cloud</string>
     <!-- Menu option to choose to add file to Cloud Drive in the chat -->
-    <string name="add_to_cloud_node_chat">Ajouter au Disque nuagique</string>
+    <string name="add_to_cloud_node_chat">Ajouter au disque Cloud</string>
     <!-- Menu option -->
     <string name="general_view_contacts">Visualiser les contacts</string>
     <!-- Menu option -->
-    <string name="import_success_error">Erreur. N’a pas été ajouté au Disque nuagique</string>
+    <string name="import_success_error">Erreur. N’a pas été ajouté au disque Cloud</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
     <string name="chat_connecting">Connexion&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
@@ -1123,7 +1123,7 @@
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Avertissement sur le droit d’auteur à tous les utilisateurs</string>
     <!-- text_copyright_alert_first_paragraph -->
-    <string name="copyright_alert_first_paragraph">MEGA respecte le droit d’auteur d’autrui et exige que les utilisateurs du service nuagique de MEGA se conforment aux lois sur le droit d’auteur.</string>
+    <string name="copyright_alert_first_paragraph">MEGA respecte le droit d’auteur d’autrui et exige que les utilisateurs du service Cloud de MEGA se conforment aux lois sur le droit d’auteur.</string>
     <!-- text_copyright_alert_second_paragraph -->
     <string name="copyright_alert_second_paragraph">Il vous est strictement interdit d\’utiliser le service MEGA Cloud pour enfreindre les droits d\’auteur. Vous ne pouvez pas téléverser, télécharger, stocker, partager, afficher, diffuser, distribuer, envoyer par e-mail, créer un lien vers, transmettre ou rendre disponible, de quelque manière que ce soit, tout fichier, toute donnée ou tout contenu qui enfreint les droits d\’auteur ou d\’autres droits de propriété intellectuelle de toute personne ou entité.</string>
     <!-- text of the Agree button -->
@@ -1171,7 +1171,7 @@
     <!--  -->
     <string name="no_files_selected_warning">Aucun fichier n’a été sélectionné</string>
     <!--  -->
-    <string name="attachment_upload_panel_from_cloud">Du Disque nuagique</string>
+    <string name="attachment_upload_panel_from_cloud">Du disque Cloud</string>
     <!--  -->
     <string name="attachment_upload_panel_contact">Contact</string>
     <!-- Button and title of dialog shown when the user wants to delete permanently their account. -->
@@ -1321,7 +1321,7 @@
     <!-- Label to include info of the user email in the feedback form -->
     <string name="user_account_feedback">Compte utilisateur</string>
     <!-- Label shown in MEGA pdf-viewer when it open a PDF save in smartphone storage -->
-    <string name="save_to_mega">Enregistrer sur mon \nDisque nuagique</string>
+    <string name="save_to_mega">Enregistrer sur mon \ndisque Cloud</string>
     <!-- Error message when creating a chat one to one with a contact that already has a chat -->
     <string name="chat_already_exists">La conversation existe déjà</string>
     <!-- Info label about the connectivity state of the chat -->
@@ -1345,7 +1345,7 @@
     <!-- Option in menu of section  My QR code to delete the QR code -->
     <string name="action_delete_qr">Supprimer le code QR</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in Cloud Drive -->
-    <string name="save_cloud_drive">Sur le Disque nuagique</string>
+    <string name="save_cloud_drive">Sur le disque Cloud</string>
     <!-- Option shown in QR code bottom sheet dialog to save QR code in File System -->
     <string name="save_file_system">Sur le système de fichiers</string>
     <!-- Subtitle of QR code settings auto-accept -->
@@ -1397,7 +1397,7 @@
     <!-- Text of the empty screen when there are not elements in the Rubbish Bin -->
     <string name="context_empty_rubbish_bin">[A]La Corbeille[/A] [B]est vide[/B]</string>
     <!-- Text of the empty screen when there are not elements in Cloud Drive -->
-    <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre Disque nuagique[/A]</string>
+    <string name="context_empty_cloud_drive">[B]Aucun fichier [/B][A]dans votre disque Cloud[/A]</string>
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Aucun fichier [/B][A]enregistré Hors&#160;ligne[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
@@ -1821,17 +1821,17 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">Le code est invalide</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">Votre Disque nuagique est presque saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning">Votre disque Cloud est presque saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">Votre Disque nuagique est presque saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_almost_full_warning_pro_account">Votre disque Cloud est presque saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">Votre Disque nuagique est presque saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_almost_full_warning_pro3_account">Votre disque Cloud est presque saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">Votre Disque nuagique est saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning">Votre disque Cloud est saturé. Passez à un compte&#160;Pro et obtenez jusqu’à %1$s To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">Votre Disque nuagique est saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
+    <string name="text_storage_full_warning_pro_account">Votre disque Cloud est saturé. Surclassez votre compte maintenant et obtenez jusqu’à %1$s&#160;To d’espace de stockage et %2$s&#160;To de quota de transfert.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">Votre Disque nuagique est saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
+    <string name="text_storage_full_warning_pro3_account">Votre disque Cloud est saturé. Si vous avez besoin de plus d’espace de stockage, veuillez contacter l’assistance de MEGA pour obtenir un abonnement personnalisé.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">Voir les abonnements</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2435,7 +2435,7 @@
     <!-- Label indicating storage over quota -->
     <string name="label_storage_over_quota">Le quota d’espace de stockage a été dépassé</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
-    <string name="warning_node_not_exists_in_cloud">Le fichier est introuvable pas dans votre Disque nuagique.</string>
+    <string name="warning_node_not_exists_in_cloud">Le fichier est introuvable pas dans votre disque Cloud.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
     <string name="over_disk_quota_paywall_header">L’espace de stockage est saturé</string>
     <!-- Title of the Over Disk Quota Paywall warning -->
@@ -2743,7 +2743,7 @@
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
     <string name="settings_background_play_hint">Lecture en arrière-plan</string>
     <!-- Text to show as subtitle of Enable camera uploads screen -->
-    <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre Disque nuagique.</string>
+    <string name="enable_cu_subtitle">Sauvegardez automatiquement vos photos et vos vidéos dans votre disque Cloud.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
     <string name="all_view_button">Toutes</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
@@ -2927,7 +2927,7 @@
     <!-- the title of join without account on left meeting page-->
     <string name="left_meeting_join_title">La protection de vos renseignements personnels est importante</string>
     <!-- the content of join without account on left meeting page-->
-    <string name="left_meeting_join_content">Joignez-vous à la plus grande plateforme de stockage nuagique et de collaboration sécurisée au monde.</string>
+    <string name="left_meeting_join_content">Joignez-vous à la plus grande plateforme de stockage Cloud et de collaboration sécurisée au monde.</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Inscrivez-vous maintenant et profitez gratuitement de fonctions évoluées de collaboration.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3319,7 +3319,7 @@
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Commencer la réunion maintenant</string>
     <!-- Warning indicating a text file was not saved to Cloud Drive. -->
-    <string name="text_editor_creation_error">Le fichier n’a pas été enregistré dans le Disque nuagique. Veuillez réessayer.</string>
+    <string name="text_editor_creation_error">Le fichier n’a pas été enregistré dans le disque Cloud. Veuillez réessayer.</string>
     <!-- Action label to start images slideshow -->
     <string name="action_slideshow">Diaporama</string>
     <!-- Filter page: Prompt to choose media type -->
@@ -3331,7 +3331,7 @@
     <!-- Filter page: Radio button text for CD + CU source -->
     <string name="filter_button_all_source">Tous les emplacements</string>
     <!-- Filter page: Radio button text for CD only source -->
-    <string name="filter_button_cd_only">Disque nuagique</string>
+    <string name="filter_button_cd_only">Disque Cloud</string>
     <!-- Timeline: Empty state for No Media (No Images and Videos) -->
     <string name="timeline_empty_media">Aucun [B]média[/B] n’a été trouvé</string>
     <!-- Timeline: Empty state for No Images -->
@@ -3349,7 +3349,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Aucun élément dans les [/B][A]sauvegardes[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Vos fichiers et dossiers sauvegardés y sont stockés. Vos éléments sauvegardés sont en «&#160;lecture seulement&#160;» pour empêcher qu’ils soient modifiés par accident dans votre disque nuagique.Vous pouvez sauvegarder des éléments de votre ordinateur vers MEGA grâce à notre appli pour ordinateur.</string>
+    <string name="backups_empty_state_body">Vos fichiers et dossiers sauvegardés y sont stockés. Vos éléments sauvegardés sont en «&#160;lecture seulement&#160;» pour empêcher qu’ils soient modifiés par accident dans votre disque Cloud. Vous pouvez sauvegarder des éléments de votre ordinateur vers MEGA grâce à notre appli pour ordinateur.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Votre compte MEGA a été désactivé en raison d’allégations répétées de violation des droits d’auteur. Cela signifie que vous ne pouvez ni accéder à votre compte ni à ses données.\nPour de plus amples renseignements sur la manière de déposer un contre-avis, vérifiez votre boîte de réception des courriels.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -4403,13 +4403,13 @@
         <item quantity="other">Quiconque disposant de ces liens peut consulter et télécharger vos données</item>
     </plurals>
     <!-- General button text to save selected items to cloud drive -->
-    <string name="general_save_to_cloud_drive">Enregistrer sur mon Disque nuagique</string>
+    <string name="general_save_to_cloud_drive">Enregistrer sur mon disque Cloud</string>
     <!-- Album import saving -->
     <string name="album_import_saving">Enregistrement&#8230;</string>
     <!-- Album import success message -->
-    <string name="album_import_success_message">«&#160;%1$s&#160;» a été enregistré dans votre Disque nuagique</string>
+    <string name="album_import_success_message">«&#160;%1$s&#160;» a été enregistré dans votre disque Cloud</string>
     <!-- Album import error message -->
-    <string name="album_import_error_message">«&#160;%1$s&#160;» ne peut pas être enregistré dans le Disque nuagique. Réessayez plus tard et si le problème persiste, contactez la personne qui a partagé le lien avec vous.</string>
+    <string name="album_import_error_message">«&#160;%1$s&#160;» ne peut pas être enregistré dans le disque Cloud. Réessayez plus tard et si le problème persiste, contactez la personne qui a partagé le lien avec vous.</string>
     <!-- Text of the option weekdays in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_weekdays_button">En semaine</string>
     <!-- Title of occurs ever section in Custom Recurrence screen -->
@@ -4459,7 +4459,7 @@
     <!-- Album import storage exceeded title -->
     <string name="album_import_storage_exceeded_title">Impossible d’enregistrer l’album</string>
     <!-- Album import storage exceeded description -->
-    <string name="album_import_storage_exceeded_description">Vous n’avez pas suffisamment d’espace de stockage pour enregistrer cet album dans votre Disque nuagique. Surclassez votre compte pour obtenir davantage d’espace de stockage.</string>
+    <string name="album_import_storage_exceeded_description">Vous n’avez pas suffisamment d’espace de stockage pour enregistrer cet album dans votre disque Cloud. Surclassez votre compte pour obtenir davantage d’espace de stockage.</string>
     <!-- Title of occurs on day option in Custom Recurrence screen -->
     <string name="meetings_custom_recurrence_occurs_on_day_section">Jour</string>
     <!-- Dropdown menu text to choose the Monday of monthly recurrence in Custom Recurrence screen. This text is used at the start of the sentence -->
@@ -4709,7 +4709,7 @@
     <!-- Description text in empty search screen when documents filter selected -->
     <string name="search_empty_screen_no_documents">Aucun document</string>
     <!-- Description text cloud drive screen when no items are available in cloud drive -->
-    <string name="cloud_drive_empty_screen_message">Votre Disque nuagique est vide</string>
+    <string name="cloud_drive_empty_screen_message">Votre disque Cloud est vide</string>
     <!-- Button text from verify credentials screen when contact is not verified -->
     <string name="contact_verify_credentials_mark_as_verified_text">Marquer comme confirmé</string>
     <!-- Description text from contact info screen when contact is verified -->
@@ -5007,7 +5007,7 @@
         <item quantity="other">%1$s et %2$d&#160;autres personnes avez levé la main</item>
     </plurals>
     <!-- Hidden nodes sharing album -->
-    <string name="hidden_nodes_sharing_album">Des éléments cachés sont présents dans cet album. Partager l’album implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre Disque nuagique.</string>
+    <string name="hidden_nodes_sharing_album">Des éléments cachés sont présents dans cet album. Partager l’album implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre disque Cloud.</string>
     <!-- Image or Video map location title-->
     <string name="file_properties_info_map_location">Emplacement</string>
     <!-- Image or Video no map location info-->

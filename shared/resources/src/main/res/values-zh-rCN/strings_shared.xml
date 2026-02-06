@@ -2003,22 +2003,19 @@
     <string name="general_clear">清除</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]回收站[/A][B]为空[/B]</string>
     <string name="annotated_empty_folder">[A]文件夹[/A][B]为空[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">上传</string>
+    <string name="empty_file_browser_folder">空文件夹</string>
+    <string name="logout_offline_content_deletion_warning">登出帐户后，您保存在离线的内容将被删除。</string>
+    <string name="offline_screen_title">离线</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">从离线中移除</string>
+    <string name="offline_item_deletion_confirmation_title">要从离线中移除吗？</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="other">%1$d个文件</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="other">%d个文件夹</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d个文件夹&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">上传</string>
 </resources>

@@ -2037,22 +2037,22 @@
     <string name="general_clear">Löschen</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Der Papierkorb ist [/A][B]leer[/B]</string>
     <string name="annotated_empty_folder">[B]Leerer[/B][A] Ordner[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="general_upload_label">Hochladen</string>
+    <string name="empty_file_browser_folder">Keine Dateien im Ordner</string>
+    <string name="logout_offline_content_deletion_warning">Beim Ausloggen werden Ihre Offline-Inhalte gelöscht.</string>
     <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Aus Offline-Daten entfernen</string>
+    <string name="offline_item_deletion_confirmation_title">Aus Offline-Bereich entfernen?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d Datei</item>
+        <item quantity="other">%1$d Dateien</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d Ordner</item>
+        <item quantity="other">%d Ordner</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d Ordner&#160;·&#160;</item>
+        <item quantity="other">%1$d Ordner&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Hochladen</string>
 </resources>

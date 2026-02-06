@@ -2229,22 +2229,33 @@
     <string name="general_clear">Wyczyść</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]Pusty [/B][A]Kosz na śmieci[/A]</string>
     <string name="annotated_empty_folder">[B]Pusty[/B][A] katalog[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">Wgrywane</string>
+    <string name="search_landing_title">Szukasz czegoś?</string>
+    <string name="search_landing_subtitle">Wyszukaj pliki i foldery</string>
+    <string name="offline_screen_empty_state_description">Brak plików zapisanych do trybu offline</string>
+    <string name="empty_file_browser_folder">Katalog jest pusty</string>
+    <string name="logout_offline_content_deletion_warning">Wylogowanie powoduje usunięcie zawartości lokalnej.</string>
+    <string name="offline_screen_title">Lokalne</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Usuń z lokalnych</string>
+    <string name="offline_item_deletion_confirmation_title">Usunąć z trybu lokalnego?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d plik</item>
+        <item quantity="few">%1$d plików</item>
+        <item quantity="many">%1$d plików</item>
+        <item quantity="other">%1$d plików</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d katalog</item>
+        <item quantity="few">%d katalogów</item>
+        <item quantity="many">%d katalogów</item>
+        <item quantity="other">%d katalogów</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d katalog&#160;·&#160;</item>
+        <item quantity="few">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="many">%1$d katalogów&#160;·&#160;</item>
+        <item quantity="other">%1$d katalogów&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Wgrywane</string>
+    <string name="general_install_label">Zainstaluj</string>
+    <string name="general_app_update_download_success_message">Pobrano aktualizację aplikacji</string>
 </resources>

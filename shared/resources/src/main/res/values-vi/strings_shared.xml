@@ -1903,22 +1903,19 @@
     <string name="general_clear">Dọn sạch</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Thùng Rác[/A] [B]trống[/B]</string>
     <string name="annotated_empty_folder">[A]Thư Mục[/A] [B]Trống[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">Tải lên</string>
+    <string name="empty_file_browser_folder">Thư Mục Rỗng</string>
+    <string name="logout_offline_content_deletion_warning">Đăng xuất tài khoản sẽ xóa các mục đã được lưu về ngoại tuyến.</string>
+    <string name="offline_screen_title">Ngoại Tuyến</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Xóa khỏi Ngoại Tuyến</string>
+    <string name="offline_item_deletion_confirmation_title">Xóa khỏi Lưu Ngoại Tuyến?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="other">%1$d tệp tin</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="other">%d thư mục</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d thư mục&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Tải lên</string>
 </resources>

@@ -117,7 +117,7 @@
     <!-- All locations option of the video section location filter  -->
     <string name="video_section_videos_location_option_all_locations">Tous les emplacements</string>
     <!-- Cloud drive option of the video section location filter  -->
-    <string name="video_section_videos_location_option_cloud_drive">Disque nuagique</string>
+    <string name="video_section_videos_location_option_cloud_drive">Disque Cloud</string>
     <!-- Camera uploads option of the video section location filter  -->
     <string name="video_section_videos_location_option_camera_uploads">Téléversements de l’appareil photo</string>
     <!-- Shared items option of the video section location filter  -->
@@ -365,9 +365,9 @@
     <!-- Hidden item -->
     <string name="hidden_item">Un élément est caché</string>
     <!-- Share hidden item link description -->
-    <string name="share_hidden_item_link_description">Cet élément est défini comme étant caché. Une fois que vous aurez partagé l’article, quiconque disposant du lien pourra le voir. Il sera toujours caché dans votre Disque nuagique.</string>
+    <string name="share_hidden_item_link_description">Cet élément est défini comme étant caché. Une fois que vous aurez partagé l’article, quiconque disposant du lien pourra le voir. Il sera toujours caché dans votre disque Cloud.</string>
     <!-- Share hidden item links description -->
-    <string name="share_hidden_item_links_description">Un ou plusieurs de ces éléments sont définis comme étant cachés. Une fois que vous aurez partagé les éléments cachés, quiconque disposant du lien pourra les voir. Les éléments seront toujours cachés dans votre Disque nuagique.</string>
+    <string name="share_hidden_item_links_description">Un ou plusieurs de ces éléments sont définis comme étant cachés. Une fois que vous aurez partagé les éléments cachés, quiconque disposant du lien pourra les voir. Les éléments seront toujours cachés dans votre disque Cloud.</string>
     <!-- Title shown when cancelling the subscription -->
     <string name="account_cancellation_instructions_cancel_subscription_title">Annuler l’abonnement</string>
     <!-- Title shown when reactivating the subscription -->
@@ -491,9 +491,9 @@
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
     <string name="invite_contacts_action_label">Inviter</string>
     <!-- Share hidden folder description -->
-    <string name="share_hidden_folder_description">Des éléments cachés sont présents dans ce dossier. Partager le dossier implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre Disque nuagique.</string>
+    <string name="share_hidden_folder_description">Des éléments cachés sont présents dans ce dossier. Partager le dossier implique que les éléments cachés sont visibles par les personnes avec qui vous le partagez. Les éléments resteront cachés sur votre disque Cloud.</string>
     <!-- Share hidden folders description -->
-    <string name="share_hidden_folders_description">Des éléments cachés sont présents dans un ou plusieurs de ces dossiers. Partager les dossiers implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre Disque nuagique.</string>
+    <string name="share_hidden_folders_description">Des éléments cachés sont présents dans un ou plusieurs de ces dossiers. Partager les dossiers implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre disque Cloud.</string>
     <!-- Title shown at the top of the survey screen when cancelling the subscription -->
     <string name="account_cancel_subscription_survey_title">Nous sommes désolés de vous voir partir. Pouvez-vous nous indiquer pourquoi vous annulez votre abonnement ?</string>
     <!-- Message explaining the immediate effect of subscription cancellation -->
@@ -553,7 +553,7 @@
     <!--Warning message to inform the user that the edit text field for the survey is empty and needs to be filled with details-->
     <string name="account_cancel_subscription_survey_enter_details">Saisissez des détails</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="meeting_guest_left_meeting_bonus_title">Obtenir du stockage nuagique gratuit</string>
+    <string name="meeting_guest_left_meeting_bonus_title">Obtenir du stockage Cloud gratuit</string>
     <!-- Label "What’s new" of the bottom sheet to promote Sync feature -->
     <string name="sync_promotion_bottom_sheet_whats_new_label">Nouveautés</string>
     <!-- Title of the bottom sheet to promote Sync feature -->
@@ -595,7 +595,7 @@
     <!-- Label for the upgrade action link -->
     <string name="account_storage_over_quota_inline_error_banner_upgrade_link">Surclasser le compte maintenant</string>
     <!-- Hidden nodes sharing albums -->
-    <string name="hidden_nodes_sharing_albums">Des éléments cachés sont présents dans un ou plusieurs de ces albums. Partager les albums implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre Disque nuagique.</string>
+    <string name="hidden_nodes_sharing_albums">Des éléments cachés sont présents dans un ou plusieurs de ces albums. Partager les albums implique que les éléments cachés seront visibles par les personnes avec qui vous les partagez. Les éléments resteront cachés dans votre disque Cloud.</string>
     <!-- Backup title for toolbar when inside new backup screen -->
     <string name="sync_add_new_backup_toolbar_title">Sauvegarde</string>
     <!-- Text for the header of the screen to add a new backup folder -->
@@ -761,7 +761,7 @@
     <!-- Warning message to indicate that cannot select a currently backed up folder -->
     <string name="sync_local_device_folder_currently_backed_up_message">Ce dossier est déjà sauvegardé</string>
     <!-- The name of every users root drive in the cloud of MEGA. -->
-    <string name="general_section_cloud_drive">Disque nuagique</string>
+    <string name="general_section_cloud_drive">Disque Cloud</string>
     <!-- App Bar Title in of Cloud Drive Bottom Menu -->
     <string name="general_drive">Disque</string>
     <!-- Tab bar title of Syncs tab -->
@@ -869,7 +869,7 @@
         <item quantity="other">%2$d fichiers ajoutés à «%1$s». Les fichiers dupliqués ne peuvent pas être ajoutés à nouveau.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Enregistrement %1$s vers Disque nuagique&#8230;</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Enregistrement de %1$s vers le disque Cloud&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Téléversement&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
@@ -1936,9 +1936,9 @@
         <item quantity="other">Ces liens ne seront plus accessibles au public.</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
-        <item quantity="one">Ne plus partager ce dossier ?</item>
-        <item quantity="many">Ne plus partager ces %1$d dossiers ?</item>
-        <item quantity="other">Ne plus partager ces %1$d dossiers ?</item>
+        <item quantity="one">Ne plus partager ce dossier&#160;?</item>
+        <item quantity="many">Ne plus partager ces %1$d dossiers&#160;?</item>
+        <item quantity="other">Ne plus partager ces %1$d dossiers&#160;?</item>
     </plurals>
     <plurals name="transfers_retry_feedback_snackbar_message">
         <item quantity="one">Nouvelle tentative de transfert, voir l\’onglet Actif pour suivre la progression</item>
@@ -2150,34 +2150,40 @@
     <string name="album_get_multiple_links_copy_all_action">Tout copier</string>
     <string name="transfers_upload_started_snackbar">Le téléversement a commencé. Voir la notification pour plus d\’infos.</string>
     <string name="folder_created_success_message">Le dossier a été créé</string>
-    <string name="folder_not_created_error_message">Erreur. Le dossier n’a pas été créé</string>
+    <string name="folder_not_created_error_message">Erreur. Le dossier n’a pas été créé.</string>
     <string name="unable_to_open_selected_file_message">Impossible d’ouvrir le fichier sélectionné</string>
     <string name="camera_denied_info_message">MEGA a besoin d’accéder à votre appareil photo pour capturer des photos et des vidéos.</string>
     <string name="incoming_share_storage_quota_warning_message">Le fichier ne peut pas être envoyé, car l’utilisateur cible a dépassé son quota d’espace de stockage.</string>
-    <string name="general_ok_only">Valider</string>
+    <string name="general_ok_only">Ok</string>
     <string name="empty_rubbish_bin_success_message">La Corbeille a été vidée</string>
-    <string name="empty_rubbish_bin_error_message">Une erreur est survenue. La Corbeille n’a pas été vidée</string>
+    <string name="empty_rubbish_bin_error_message">Une erreur est survenue. La Corbeille n’a pas été vidée.</string>
     <string name="empty_rubbish_bin_menu">Vider la Corbeille</string>
     <string name="remove_all_rubbish_bin_confirmation">Vous êtes sur le point de supprimer définitivement tous les éléments contenus dans votre Corbeille.</string>
     <string name="general_clear">Effacer</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]La Corbeille[/A] [B]est vide[/B]</string>
     <string name="annotated_empty_folder">[A]Le dossier[/A] [B]est vide[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">Téléverser</string>
+    <string name="search_landing_title">Vous cherchez quelque chose&#160;?</string>
+    <string name="search_landing_subtitle">Recherchez des fichiers et des dossiers</string>
+    <string name="offline_screen_empty_state_description">Aucun fichier n’est enregistré en Hors&#160;ligne</string>
+    <string name="empty_file_browser_folder">Dossier vide</string>
+    <string name="logout_offline_content_deletion_warning">La déconnexion entraîne la suppression de votre contenu hors ligne.</string>
+    <string name="offline_screen_title">Hors ligne</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Supprimer de Hors&#160;ligne</string>
+    <string name="offline_item_deletion_confirmation_title">Supprimer de Hors&#160;ligne ?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d fichier</item>
+        <item quantity="many">%1$d fichiers</item>
+        <item quantity="other">%1$d fichiers</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d dossier</item>
+        <item quantity="many">%d dossiers</item>
+        <item quantity="other">%d dossiers</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d dossier&#160;·&#160;</item>
+        <item quantity="many">%1$d dossiers&#160;·&#160;</item>
+        <item quantity="other">%1$d dossiers&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Téléverser</string>
 </resources>

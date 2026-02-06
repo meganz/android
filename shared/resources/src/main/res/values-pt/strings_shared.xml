@@ -2169,22 +2169,30 @@
     <string name="general_clear">Deletar</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Lixeira [/A][B]vazia[/B]</string>
     <string name="annotated_empty_folder">[B]Pasta[/B][A] vazia[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="general_upload_label">Upload</string>
+    <string name="empty_file_browser_folder">Pasta vazia</string>
+    <string name="logout_offline_content_deletion_warning">Ao fazer logout, os seus arquivos offline serão deletados.</string>
     <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Remover de Offline</string>
+    <string name="offline_item_deletion_confirmation_title">Você quer eliminar da seção Offline?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d arquivo</item>
+        <item quantity="many">%1$d de arquivos</item>
+        <item quantity="other">%1$d arquivos</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d pasta</item>
+        <item quantity="many">%d pastas</item>
+        <item quantity="other">%d pastas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d pasta&#160;·&#160;</item>
+        <item quantity="many">%1$d de pastas&#160;·&#160;</item>
+        <item quantity="other">%1$d pastas&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Upload</string>
+    <string name="search_landing_title">Procurando alguma coisa?</string>
+    <string name="search_landing_subtitle">Pesquisar arquivos e pastas</string>
+    <string name="offline_screen_empty_state_description">Não há arquivos salvos para uso offline</string>
+    <string name="general_install_label">Instalar</string>
+    <string name="general_app_update_download_success_message">Foi feito o download da atualização do aplicativo</string>
 </resources>
