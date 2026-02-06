@@ -48,7 +48,6 @@ internal fun EnterAlbumNameDialog(
             resetErrorMessage()
             val finalName = albumName.text.trim().ifBlank { defaultSuggestion().trim() }
             onConfirm(finalName)
-            onDismiss()
         },
         onNegativeButtonClicked = {
             resetErrorMessage()

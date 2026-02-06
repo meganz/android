@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -32,28 +33,20 @@ import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.collections.Set
+import kotlin.Boolean
+import kotlin.String
 import kotlin.collections.contains
-import kotlin.collections.emptySet
-import kotlin.collections.filter
-import kotlin.collections.first
-import kotlin.collections.firstOrNull
-import kotlin.collections.flatten
-import kotlin.collections.map
-import kotlin.collections.mapNotNull
 import kotlin.collections.minus
 import kotlin.collections.plus
-import kotlin.collections.sortedBy
-import kotlin.collections.toList
-import kotlin.collections.toSet
-import kotlin.plus
+import kotlin.getOrDefault
+import kotlin.onFailure
+import kotlin.onSuccess
+import kotlin.runCatching
 import kotlin.sequences.contains
-import kotlin.sequences.minus
 
 @HiltViewModel
 class AlbumsTabViewModel @Inject constructor(
     private val albumsProvider: Set<@JvmSuppressWildcards AlbumsDataProvider>,
-    private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
     private val albumUiStateMapper: AlbumUiStateMapper,
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
@@ -61,9 +54,12 @@ class AlbumsTabViewModel @Inject constructor(
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
+    private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
+
+    private var addNewAlbumJob: Job? = null
 
     init {
         monitorThemeMode()
@@ -98,7 +94,9 @@ class AlbumsTabViewModel @Inject constructor(
     }
 
     internal fun addNewAlbum(name: String) {
-        viewModelScope.launch {
+        if (addNewAlbumJob?.isActive == true) return
+
+        addNewAlbumJob = viewModelScope.launch {
             runCatching {
                 validateAndCreateUserAlbumUseCase(name)
             }.onFailure { e ->

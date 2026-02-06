@@ -35,6 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -97,13 +98,18 @@ fun MediaSearchScreenM3(
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
         topBar = {
+            val keyboardController = LocalSoftwareKeyboardController.current
+
             MediaSearchTopAppBar(
                 query = state.query,
                 selectedQuery = state.selectedQuery,
                 onUpdateQuery = updateQuery,
                 onSelectedQueryRead = { updateSelectedQuery(null) },
                 onSaveQuery = updateRecentQueries,
-                onSearch = searchPhotos,
+                onSearch = {
+                    searchPhotos(it)
+                    keyboardController?.hide()
+                },
                 onCloseScreen = onCloseScreen,
             )
         },
