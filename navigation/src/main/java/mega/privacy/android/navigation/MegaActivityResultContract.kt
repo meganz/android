@@ -63,6 +63,7 @@ interface MegaActivityResultContract {
      * @return [ActivityResultContract] with input type [Boolean] (onboarding state)
      *         and output type [Boolean] (onboarding completion status)
      */
+    @Deprecated("Migrate to Nav 3 to access this activity")
     val hiddenNodeOnboardingActivityResultContract: ActivityResultContract<Boolean, Boolean>
 
     /**

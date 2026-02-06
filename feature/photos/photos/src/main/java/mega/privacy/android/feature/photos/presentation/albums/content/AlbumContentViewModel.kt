@@ -17,10 +17,13 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -28,7 +31,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -163,6 +168,7 @@ class AlbumContentViewModel @AssistedInject constructor(
 
     private fun monitorThemeMode() {
         monitorThemeModeUseCase()
+            .catch {}
             .onEach { mode ->
                 _state.update { it.copy(themeMode = mode) }
             }
@@ -174,10 +180,15 @@ class AlbumContentViewModel @AssistedInject constructor(
         photosFetcher()
     }
 
-    private fun fetchIsHiddenNodesOnboarded() = viewModelScope.launch {
-        val isHiddenNodesOnboarded = isHiddenNodesOnboardedUseCase()
-        _state.update {
-            it.copy(isHiddenNodesOnboarded = isHiddenNodesOnboarded)
+    private fun fetchIsHiddenNodesOnboarded() {
+        viewModelScope.launch {
+            runCatching {
+                isHiddenNodesOnboardedUseCase()
+            }.onSuccess { isOnboarded ->
+                _state.update {
+                    it.copy(isHiddenNodesOnboarded = isOnboarded)
+                }
+            }
         }
     }
 
@@ -194,31 +205,34 @@ class AlbumContentViewModel @AssistedInject constructor(
             updateSelection(filteredPhotos)
         }.launchIn(viewModelScope)
 
-    private fun monitorAccountDetail() = monitorAccountDetailUseCase()
-        .onEach { accountDetail ->
-            val accountType = accountDetail.levelDetail?.accountType
-            val businessStatus =
-                if (accountType?.isBusinessAccount == true) {
-                    getBusinessStatusUseCase()
-                } else null
+    private fun monitorAccountDetail() {
+        monitorAccountDetailUseCase()
+            .catch { Timber.e(it) }
+            .onEach { accountDetail ->
+                val accountType = accountDetail.levelDetail?.accountType
+                val businessStatus =
+                    if (accountType?.isBusinessAccount == true) {
+                        getBusinessStatusUseCase()
+                    } else null
 
-            _state.update {
-                it.copy(
-                    accountType = accountType,
-                    isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
-                    hiddenNodeEnabled = true,
-                )
-            }
+                _state.update {
+                    it.copy(
+                        accountType = accountType,
+                        isBusinessAccountExpired = businessStatus == BusinessAccountStatus.Expired,
+                        hiddenNodeEnabled = true,
+                    )
+                }
 
-            if (_state.value.isLoading) return@onEach
+                if (_state.value.isLoading) return@onEach
 
-            val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
-            _state.update { state ->
-                state.copy(photos = filteredPhotos)
-            }
+                val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
+                _state.update { state ->
+                    state.copy(photos = filteredPhotos)
+                }
 
-            updateSelection(filteredPhotos)
-        }.launchIn(viewModelScope)
+                updateSelection(filteredPhotos)
+            }.launchIn(viewModelScope)
+    }
 
     private fun updateSelection(photos: List<PhotoUiState>) {
         val selectedPhotos = _state.value.selectedPhotos.filter { selectedPhoto ->
@@ -698,22 +712,87 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun hideOrUnhideNodes(hide: Boolean) {
-        val photoIds = _state.value.selectedPhotos.map { it.id }
+    fun hideNodes() {
         viewModelScope.launch {
-            for (id in photoIds) {
-                async {
-                    runCatching {
-                        updateNodeSensitiveUseCase(nodeId = NodeId(id), isSensitive = hide)
-                    }.onFailure { Timber.e("Update sensitivity failed: $it") }
+            val isHiddenNodesOnboarded =
+                runCatching { isHiddenNodesOnboardedUseCase() }.getOrDefault(false)
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
+            if (!isPaid || isBusinessAccountExpired) {
+                // Show onboarding for non-paid or expired accounts
+                _state.update {
+                    it.copy(showHiddenNodesOnboardingEvent = triggered(false))
+                }
+            } else if (isHiddenNodesOnboarded) {
+                // User is onboarded, proceed with hiding
+                updateNodeSensitivity(isSensitive = true) { count ->
+                    val message = LocalizedText.PluralsRes(
+                        resId = R.plurals.hidden_nodes_result_message,
+                        quantity = count,
+                        formatArgs = listOf(count)
+                    )
+
+                    snackbarEventQueue.queueMessage(message.get(context))
+                }
+            } else {
+                // User is paid but not onboarded, show onboarding first
+                setHiddenNodesOnboarded()
+                _state.update {
+                    it.copy(showHiddenNodesOnboardingEvent = triggered(true))
                 }
             }
         }
     }
 
+    fun unhideNodes() {
+        viewModelScope.launch {
+            val isPaid = _state.value.accountType?.isPaid ?: false
+            val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
+
+            if (isPaid && !isBusinessAccountExpired) {
+                updateNodeSensitivity(isSensitive = false) { count ->
+                    val message = LocalizedText.PluralsRes(
+                        resId = sharedResR.plurals.unhidden_nodes_result_message,
+                        quantity = count,
+                        formatArgs = listOf(count)
+                    )
+
+                    snackbarEventQueue.queueMessage(message.get(context))
+                }
+            }
+        }
+    }
+
+    private suspend inline fun CoroutineScope.updateNodeSensitivity(
+        isSensitive: Boolean,
+        action: (Int) -> Unit,
+    ) {
+        val photoIds = _state.value.selectedPhotos.map { it.id }
+        val count = photoIds.size
+        photoIds.map { id ->
+            async {
+                runCatching {
+                    updateNodeSensitiveUseCase(
+                        nodeId = NodeId(id),
+                        isSensitive = isSensitive
+                    )
+                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+            }
+        }.awaitAll()
+
+        action(count)
+    }
+
     fun setHiddenNodesOnboarded() {
         _state.update {
             it.copy(isHiddenNodesOnboarded = true)
+        }
+    }
+
+    fun resetShowHiddenNodesOnboardingEvent() {
+        _state.update {
+            it.copy(showHiddenNodesOnboardingEvent = consumed())
         }
     }
 
