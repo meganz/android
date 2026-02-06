@@ -216,6 +216,13 @@ internal suspend fun toUserAlert(
                 isOwnChange = megaUserAlert.isOwnChange,
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
                 nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -233,6 +240,13 @@ internal suspend fun toUserAlert(
                     isOwnChange = megaUserAlert.isOwnChange,
                     nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                    destination = getDestination(
+                        megaUserAlert,
+                        nodeProvider,
+                        rootParentNodeProvider,
+                        rubbishNodeProvider,
+                        rootNodeProvider
+                    )
                 )
             } else {
                 val node = getNode(megaUserAlert, nodeProvider)
@@ -244,6 +258,13 @@ internal suspend fun toUserAlert(
                     nodeId = node?.handle,
                     nodeName = node?.name,
                     contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                    destination = getDestination(
+                        megaUserAlert,
+                        nodeProvider,
+                        rootParentNodeProvider,
+                        rubbishNodeProvider,
+                        rootNodeProvider
+                    )
                 )
             }
 
@@ -262,6 +283,13 @@ internal suspend fun toUserAlert(
                 folderCount = megaUserAlert.getNumber(folderIndex).toInt(),
                 fileCount = megaUserAlert.getNumber(fileIndex).toInt(),
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
@@ -275,6 +303,13 @@ internal suspend fun toUserAlert(
                 nodeId = getNode(megaUserAlert, nodeProvider)?.handle,
                 itemCount = megaUserAlert.getNumber(itemCountIndex).toInt(),
                 contact = contactProvider(megaUserAlert.userHandle, megaUserAlert.email),
+                destination = getDestination(
+                    megaUserAlert,
+                    nodeProvider,
+                    rootParentNodeProvider,
+                    rubbishNodeProvider,
+                    rootNodeProvider
+                )
             )
         }
 
