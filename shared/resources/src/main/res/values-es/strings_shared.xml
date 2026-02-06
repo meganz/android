@@ -2123,22 +2123,25 @@
     <string name="general_clear">Limpiar</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Papelera [/A][B]vacía[/B]</string>
     <string name="annotated_empty_folder">[A]Carpeta[/A][B] vacía[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">Subir</string>
+    <string name="empty_file_browser_folder">Carpeta vacía</string>
+    <string name="logout_offline_content_deletion_warning">Si cierras sesión, el contenido sin conexión será eliminado.</string>
+    <string name="offline_screen_title">Sin conexión</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Eliminar desde Sin conexión</string>
+    <string name="offline_item_deletion_confirmation_title">¿Eliminar desde Sin conexión?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d archivo</item>
+        <item quantity="many">%1$dde archivos</item>
+        <item quantity="other">%1$d archivos</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d carpeta</item>
+        <item quantity="many">%d de carpetas</item>
+        <item quantity="other">%d carpetas</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d carpeta&#160;·&#160;</item>
+        <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
+        <item quantity="other">%1$d carpetas&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Subir</string>
 </resources>

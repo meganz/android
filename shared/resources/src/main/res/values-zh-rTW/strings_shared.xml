@@ -2033,22 +2033,19 @@
     <string name="general_clear">清除</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]空的[/B][A]垃圾筒[/A]</string>
     <string name="annotated_empty_folder">[B]空[/B][A]資料夾[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">上傳</string>
+    <string name="empty_file_browser_folder">空白資料夾</string>
+    <string name="logout_offline_content_deletion_warning">登出會刪除您的離線內容。</string>
+    <string name="offline_screen_title">離線</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">從可離線使用中移除</string>
+    <string name="offline_item_deletion_confirmation_title">要移除離線存取嗎？</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="other">%1$d個檔案</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="other">%d 個資料夾</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">上傳</string>
 </resources>

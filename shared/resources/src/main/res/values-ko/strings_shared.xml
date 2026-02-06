@@ -2023,22 +2023,19 @@
     <string name="general_clear">비우기</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]빈[/B] [A]휴지통[/A]</string>
     <string name="annotated_empty_folder">[B]빈[/B] [A]폴더[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">업로드</string>
+    <string name="empty_file_browser_folder">빈 폴더</string>
+    <string name="logout_offline_content_deletion_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
+    <string name="offline_screen_title">오프라인</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">오프라인에서 제거</string>
+    <string name="offline_item_deletion_confirmation_title">오프라인에서 제거할까요?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="other">파일 %1$d개</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="other">%d개의 폴더</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
-    <string name="general_upload_label">업로드</string>
 </resources>

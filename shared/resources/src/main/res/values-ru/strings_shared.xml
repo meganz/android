@@ -2228,22 +2228,28 @@
     <string name="general_clear">Очистить</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]Корзина [/A][B]пуста[/B]</string>
     <string name="annotated_empty_folder">[B]Пустая[/B][A] папка[/A]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">Загрузить</string>
+    <string name="empty_file_browser_folder">Папка пуста</string>
+    <string name="logout_offline_content_deletion_warning">Выход из системы удалит локальный контент.</string>
+    <string name="offline_screen_title">Локальные</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Удалить из локальных</string>
+    <string name="offline_item_deletion_confirmation_title">Удалить из локальных?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d файл</item>
+        <item quantity="few">%1$d файла</item>
+        <item quantity="many">%1$d файлов</item>
+        <item quantity="other">%1$d файлов</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d папка</item>
+        <item quantity="few">%d папки</item>
+        <item quantity="many">%d папок</item>
+        <item quantity="other">%d папок</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d папка&#160;·&#160;</item>
+        <item quantity="few">%1$d папки&#160;·&#160;</item>
+        <item quantity="many">%1$d папок&#160;·&#160;</item>
+        <item quantity="other">%1$d папок&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Загрузить</string>
 </resources>

@@ -2200,22 +2200,34 @@
     <string name="general_clear">مسح</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]سلة المحذوفات[/A][B]فارغة[/B]</string>
     <string name="annotated_empty_folder">[A]مجلد[/A][B]فارغ[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
-    <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="general_upload_label">رفع</string>
+    <string name="empty_file_browser_folder">مجلد فارغ</string>
+    <string name="logout_offline_content_deletion_warning">تسجيل الخروج يحذف المحتوى الخاص بك في قسم بدون الاتصال.</string>
+    <string name="offline_screen_title">غير متصل بالانترنت</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">حذف من غير متصل بالانترنت</string>
+    <string name="offline_item_deletion_confirmation_title">إزالة من “غير متصل“؟</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="zero">%1$d ملف</item>
+        <item quantity="one">%1$d ملف</item>
+        <item quantity="two">%1$d ملفان</item>
+        <item quantity="few">%1$d ملفات</item>
+        <item quantity="many">%1$d ملفاً</item>
+        <item quantity="other">%1$d ملف</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="zero">%d مجلد</item>
+        <item quantity="one">%d مجلد</item>
+        <item quantity="two">%d مجلدان</item>
+        <item quantity="few">%d مجلدات</item>
+        <item quantity="many">%d مجلد</item>
+        <item quantity="other">%d مجلد</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="zero">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="one">%1$d مجلد&#160;.&#160;</item>
+        <item quantity="two">%1$d مجلدان&#160;.&#160;</item>
+        <item quantity="few">%1$d مجلدات&#160;.&#160;</item>
+        <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
+        <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
-    <string name="general_upload_label">رفع</string>
 </resources>

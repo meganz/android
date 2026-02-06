@@ -2112,22 +2112,22 @@
     <string name="general_clear">Wissen</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]Lege[/B] [A]Prullenbak[/A]</string>
     <string name="annotated_empty_folder">[A]Map[/A][B]leegmaken[/B]</string>
-    <string name="empty_file_browser_folder">Empty Folder</string>
-    <string name="logout_offline_content_deletion_warning">Logging out deletes your offline content.</string>
+    <string name="general_upload_label">Uploaden</string>
+    <string name="empty_file_browser_folder">Lege Map</string>
+    <string name="logout_offline_content_deletion_warning">Als u zich afmeldt, wordt uw offline inhoud verwijderd.</string>
     <string name="offline_screen_title">Offline</string>
-    <string name="offline_screen_remove_from_offline_selection_menu">Remove from Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Remove from Offline?</string>
+    <string name="offline_screen_remove_from_offline_selection_menu">Verwijderen uit Offline</string>
+    <string name="offline_item_deletion_confirmation_title">Verwijderen van Offline?</string>
     <plurals name="num_of_files_with_parameter">
-        <item quantity="one">%1$d file</item>
-        <item quantity="other">%1$d files</item>
+        <item quantity="one">%1$d bestand</item>
+        <item quantity="other">%1$d bestanden</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="one">%d folder</item>
-        <item quantity="other">%d folders</item>
+        <item quantity="one">%d map</item>
+        <item quantity="other">%d mappen</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="one">%1$d folder&#160;·&#160;</item>
-        <item quantity="other">%1$d folders&#160;·&#160;</item>
+        <item quantity="one">%1$d map&#160;·&#160;</item>
+        <item quantity="other">%1$d mappen&#160;·&#160;</item>
     </plurals>
-    <string name="general_upload_label">Uploaden</string>
 </resources>
