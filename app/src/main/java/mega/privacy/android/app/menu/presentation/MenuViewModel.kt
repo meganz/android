@@ -131,7 +131,8 @@ class MenuViewModel @Inject constructor(
                             ),
                             title = item.title,
                             subTitle = currentPlanSubtitleFlow,
-                            actionLabel = if (accountType != null && accountType != AccountType.PRO_FLEXI && accountType != AccountType.BUSINESS) item.actionLabel else 0
+                            actionLabel = if (accountType != null && accountType != AccountType.PRO_FLEXI && accountType != AccountType.BUSINESS) item.actionLabel else 0,
+                            analyticsEventIdentifier = item.analyticsEventIdentifier,
                         )
                     }
 

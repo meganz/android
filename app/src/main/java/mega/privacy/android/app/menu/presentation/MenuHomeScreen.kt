@@ -11,7 +11,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,6 +79,7 @@ import mega.privacy.android.navigation.destination.TestPasswordNavKey
 import mega.privacy.android.shared.original.core.ui.utils.composeLet
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
+import mega.privacy.mobile.analytics.event.LogoutButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MyAccountProfileNavigationItemEvent
 import mega.privacy.mobile.analytics.event.NotificationsEntryButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PrivacySuiteCollapsedEvent
@@ -269,6 +269,9 @@ fun MenuHomeScreenUi(
                                             packageName = appPackage
                                         )
                                     } ?: context.launchUrl(item.link)
+                                    item.analyticsEventIdentifier?.let {
+                                        Analytics.tracker.trackEvent(it)
+                                    }
                                 }
                             )
 
@@ -283,6 +286,7 @@ fun MenuHomeScreenUi(
                     isLoggingOut = uiState.isLoggingOut
                 ) {
                     onLogoutClicked()
+                    Analytics.tracker.trackEvent(LogoutButtonPressedEvent)
                 }
             }
         }
