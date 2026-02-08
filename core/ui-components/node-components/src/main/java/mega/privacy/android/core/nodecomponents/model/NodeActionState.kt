@@ -6,7 +6,6 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -56,7 +55,7 @@ data class NodeActionState(
     val visibleActions: List<MenuActionWithIcon> = emptyList(),
     val availableActions: List<MenuActionWithIcon> = emptyList(),
     val navigationEvent: StateEventWithContent<NavKey> = consumed(),
-    val restoreSuccessEvent: StateEventWithContent<RestoreSuccess.RestoreData> = consumed(),
+    val restoreSuccessEvent: StateEventWithContent<RestoreData> = consumed(),
     val dismissEvent: StateEvent = consumed,
     val addVideoToPlaylistResultEvent: StateEventWithContent<AddVideoToPlaylistResult> = consumed(),
     val actionTriggeredEvent: StateEvent = consumed,

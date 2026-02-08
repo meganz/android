@@ -51,7 +51,6 @@ import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDial
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
-import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToPlaylistMenuAction
@@ -105,7 +104,6 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
-import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
@@ -141,8 +139,6 @@ class NodeActionClickHandlerTest {
     private val mockViewModel = mock<NodeOptionsActionViewModel>()
     private val mockNodeHandlesToJsonMapper = mock<NodeHandlesToJsonMapper>()
     private val mockCheckNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
-    private val mockRestoreNodesUseCase = mock<RestoreNodesUseCase>()
-    private val mockRestoreNodeResultMapper = mock<RestoreNodeResultMapper>()
     private val mockIsHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
     private val mockRemoveOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
     private val mockGetNodeToAttachUseCase = mock<GetNodeToAttachUseCase>()
@@ -245,8 +241,6 @@ class NodeActionClickHandlerTest {
             mockViewModel,
             mockNodeHandlesToJsonMapper,
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             mockIsHiddenNodesOnboardedUseCase,
             mockRemoveOfflineNodeUseCase,
             mockGetNodeToAttachUseCase,
@@ -394,8 +388,6 @@ class NodeActionClickHandlerTest {
     fun `test RestoreAction canHandle returns true for RestoreMenuAction`() = runTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
@@ -407,8 +399,6 @@ class NodeActionClickHandlerTest {
     fun `test RestoreAction single node handle calls checkNodesNameCollisionUseCase`() = runTest {
         val action = RestoreActionClickHandler(
             mockCheckNodesNameCollisionUseCase,
-            mockRestoreNodesUseCase,
-            mockRestoreNodeResultMapper,
             isNodeDeletedFromBackupsUseCase
         )
         val menuAction = mock<RestoreMenuAction>()
@@ -426,8 +416,6 @@ class NodeActionClickHandlerTest {
         runTest {
             val action = RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
-                mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper,
                 isNodeDeletedFromBackupsUseCase
             )
             val menuAction = mock<RestoreMenuAction>()
@@ -1463,8 +1451,6 @@ class NodeActionClickHandlerTest {
         assertThat(
             RestoreActionClickHandler(
                 mockCheckNodesNameCollisionUseCase,
-                mockRestoreNodesUseCase,
-                mockRestoreNodeResultMapper,
                 isNodeDeletedFromBackupsUseCase
             ).canHandle(wrongAction)
         ).isFalse()

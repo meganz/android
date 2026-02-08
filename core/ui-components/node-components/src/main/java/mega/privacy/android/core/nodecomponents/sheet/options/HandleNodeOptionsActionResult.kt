@@ -37,6 +37,7 @@ fun HandleNodeOptionsActionResult(
         nodeActionState = nodeActionState,
         onCopyNodes = nodeOptionsActionViewModel::copyNodes,
         onMoveNodes = nodeOptionsActionViewModel::moveNodes,
+        onRestoreNodes = nodeOptionsActionViewModel::restoreNodes,
         onTransfer = onTransfer,
         onNavigate = onNavigate,
         onShareContactSelected = nodeOptionsActionViewModel::contactSelectedForShareFolder,
@@ -52,6 +53,29 @@ fun HandleNodeOptionsActionResult(
         consumeShareFolderEvent = nodeOptionsActionViewModel::resetShareFolderEvent,
         consumeShareFolderDialogEvent = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
         onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
+        onRestoreSuccess = { data ->
+            val locateActionLabel = context.getString(
+                sharedResR.string.transfers_notification_location_action
+            )
+            coroutineScope.launch {
+                snackbarQueue.queueMessage(
+                    SnackbarAttributes(
+                        message = data.message,
+                        duration = SnackbarDuration.Long,
+                        action = locateActionLabel,
+                        actionClick = {
+                            onNavigate(
+                                CloudDriveNavKey(
+                                    nodeHandle = data.parentHandle,
+                                    highlightedNodeHandle = data.restoredNodeHandle
+                                )
+                            )
+                        }
+                    )
+                )
+            }
+        },
+        consumeRestoreSuccess = nodeOptionsActionViewModel::resetRestoreSuccessEvent,
     )
 
     LaunchedEffect(nodeBottomSheetResult.value) {
@@ -70,30 +94,6 @@ fun HandleNodeOptionsActionResult(
 
             is NodeOptionsBottomSheetResult.NodeNameCollision -> {
                 nodeOptionsActionViewModel.triggerCollisionsResult(result.result)
-            }
-
-            is NodeOptionsBottomSheetResult.RestoreSuccess -> {
-                val data = result.data
-                val locateActionLabel = context.getString(
-                    sharedResR.string.transfers_notification_location_action
-                )
-                coroutineScope.launch {
-                    snackbarQueue.queueMessage(
-                        SnackbarAttributes(
-                            message = data.message,
-                            duration = SnackbarDuration.Long,
-                            action = locateActionLabel,
-                            actionClick = {
-                                onNavigate(
-                                    CloudDriveNavKey(
-                                        nodeHandle = data.parentHandle,
-                                        highlightedNodeHandle = data.restoredNodeHandle
-                                    )
-                                )
-                            }
-                        )
-                    )
-                }
             }
 
             is NodeOptionsBottomSheetResult.AddToPlaylist -> {

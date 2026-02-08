@@ -31,6 +31,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
@@ -39,7 +40,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
+import mega.privacy.android.core.nodecomponents.model.RestoreData
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -84,6 +86,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -118,6 +121,8 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
+    private val restoreNodesUseCase: RestoreNodesUseCase,
+    private val restoreNodeResultMapper: RestoreNodeResultMapper,
     private val setMoveLatestTargetPathUseCase: SetMoveLatestTargetPathUseCase,
     private val setCopyLatestTargetPathUseCase: SetCopyLatestTargetPathUseCase,
     private val deleteNodeVersionsUseCase: DeleteNodeVersionsUseCase,
@@ -244,6 +249,34 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
                             LocalizedText.Literal(moveRequestMessageMapper(result))
                         )
                     )
+                }
+            }.onFailure {
+                manageCopyMoveError(it)
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Restore nodes (from rubbish bin or after resolving name collision).
+     * Similar to copy and move: takes a map of node handle to destination parent handle.
+     *
+     * @param nodes Map of node handle to restore destination (parent) handle
+     */
+    fun restoreNodes(nodes: Map<Long, Long>) {
+        applicationScope.launch {
+            runCatching {
+                restoreNodesUseCase(nodes)
+            }.onSuccess { result ->
+                val message = restoreNodeResultMapper(result)
+                if (result is SingleNodeRestoreResult && result.destinationHandle != null && nodes.size == 1) {
+                    onRestoreSuccess(
+                        message = message,
+                        parentHandle = result.destinationHandle ?: -1L,
+                        restoredNodeHandle = nodes.keys.first()
+                    )
+                } else {
+                    snackbarEventQueue.queueMessage(message)
                 }
             }.onFailure {
                 manageCopyMoveError(it)
@@ -817,7 +850,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             }.getOrDefault(false)
         }
 
-    fun onRestoreSuccess(
+    private fun onRestoreSuccess(
         message: String,
         parentHandle: Long,
         restoredNodeHandle: Long,
@@ -826,7 +859,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             uiState.update {
                 it.copy(
                     restoreSuccessEvent = triggered(
-                        RestoreSuccess.RestoreData(
+                        RestoreData(
                             message = message,
                             parentHandle = parentHandle,
                             restoredNodeHandle = restoredNodeHandle

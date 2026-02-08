@@ -61,7 +61,6 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.text
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult.RestoreSuccess
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
@@ -95,7 +94,6 @@ internal fun NodeOptionsBottomSheetRoute(
     onNavigate: (NavKey) -> Unit = {},
     onRename: (NodeId) -> Unit = {},
     onCollisionResult: (NodeNameCollisionsResult) -> Unit = {},
-    onRestoreSuccess: (RestoreSuccess.RestoreData) -> Unit = {},
     onAddVideoToPlaylistResult: (AddVideoToPlaylistResult) -> Unit = {},
     nodeOptionsActionViewModel: NodeOptionsActionViewModel =
         hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
@@ -195,12 +193,6 @@ internal fun NodeOptionsBottomSheetRoute(
         event = nodeOptionActionState.nodeNameCollisionsResult,
         onConsumed = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         action = onCollisionResult
-    )
-
-    EventEffect(
-        event = nodeOptionActionState.restoreSuccessEvent,
-        onConsumed = nodeOptionsActionViewModel::resetRestoreSuccessEvent,
-        action = onRestoreSuccess
     )
 
     EventEffect(

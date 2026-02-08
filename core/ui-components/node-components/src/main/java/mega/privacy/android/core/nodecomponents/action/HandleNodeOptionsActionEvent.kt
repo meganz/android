@@ -21,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDi
 import mega.privacy.android.core.nodecomponents.dialog.storage.StorageStatusDialogViewM3
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.model.RestoreData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
@@ -30,7 +31,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQ
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
-import timber.log.Timber
 
 /**
  * Handles node option events and triggers appropriate actions based on the event.
@@ -38,6 +38,7 @@ import timber.log.Timber
  * @param nodeActionState The current state of node actions.
  * @param onCopyNodes Callback to handle copying nodes.
  * @param onMoveNodes Callback to handle moving nodes.
+ * @param onRestoreNodes Callback to handle restoring nodes (e.g. from rubbish bin).
  * @param consumeNameCollisionResult Callback to consume the name collision result.
  * @param consumeInfoToShow Callback to consume the info to show event.
  * @param consumeForeignNodeDialog Callback to consume the foreign node dialog event.
@@ -48,8 +49,10 @@ internal fun HandleNodeOptionsActionEvent(
     nodeActionState: NodeActionState,
     onCopyNodes: (nodes: Map<Long, Long>) -> Unit,
     onMoveNodes: (nodes: Map<Long, Long>) -> Unit,
+    onRestoreNodes: (nodes: Map<Long, Long>) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigate: (NavKey) -> Unit,
+    onRestoreSuccess: (RestoreData) -> Unit,
     onShareContactSelected: (List<String>, List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
     consumeInfoToShow: () -> Unit,
@@ -62,6 +65,7 @@ internal fun HandleNodeOptionsActionEvent(
     consumeAccessDialogShown: () -> Unit,
     consumeShareFolderEvent: () -> Unit,
     consumeShareFolderDialogEvent: () -> Unit,
+    consumeRestoreSuccess: () -> Unit = {},
     onActionTriggered: () -> Unit = {},
 ) {
     val snackbarQueue = rememberSnackBarQueue()
@@ -101,13 +105,17 @@ internal fun HandleNodeOptionsActionEvent(
                     when (collisionType) {
                         NodeNameCollisionType.MOVE -> onMoveNodes(nodes)
                         NodeNameCollisionType.COPY -> onCopyNodes(nodes)
-                        else -> {
-                            /* No-op for other types */
-                        }
+                        NodeNameCollisionType.RESTORE -> onRestoreNodes(nodes)
                     }
                 }
             )
         }
+    )
+
+    EventEffect(
+        event = nodeActionState.restoreSuccessEvent,
+        onConsumed = consumeRestoreSuccess,
+        action = onRestoreSuccess
     )
 
     EventEffect(
@@ -254,12 +262,6 @@ fun handleNodesNameCollisionResult(
             .launch(result.conflictNodes.values.toCollection(ArrayList()))
     }
     if (result.noConflictNodes.isNotEmpty()) {
-        when (result.type) {
-            NodeNameCollisionType.MOVE, NodeNameCollisionType.COPY -> {
-                onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
-            }
-
-            else -> Timber.d("Not implemented")
-        }
+        onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
     }
 }
