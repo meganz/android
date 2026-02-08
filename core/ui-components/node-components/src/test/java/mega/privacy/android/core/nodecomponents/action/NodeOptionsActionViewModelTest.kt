@@ -22,6 +22,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSelectionModeActionMapper
+import mega.privacy.android.core.nodecomponents.mapper.RestoreNodeResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMessageMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
@@ -83,6 +84,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
+import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -121,6 +123,8 @@ class NodeOptionsActionViewModelTest {
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
+    private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
+    private val restoreNodeResultMapper = mock<RestoreNodeResultMapper>()
     private val setCopyLatestTargetPathUseCase = mock<SetCopyLatestTargetPathUseCase>()
     private val setMoveLatestTargetPathUseCase = mock<SetMoveLatestTargetPathUseCase>()
     private val deleteNodeVersionsUseCase = mock<DeleteNodeVersionsUseCase>()
@@ -187,6 +191,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -258,6 +264,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase,
             moveNodesUseCase,
             copyNodesUseCase,
+            restoreNodesUseCase,
+            restoreNodeResultMapper,
             setCopyLatestTargetPathUseCase,
             setMoveLatestTargetPathUseCase,
             deleteNodeVersionsUseCase,
@@ -629,6 +637,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -693,6 +703,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -751,6 +763,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,
@@ -801,6 +815,8 @@ class NodeOptionsActionViewModelTest {
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
+            restoreNodesUseCase = restoreNodesUseCase,
+            restoreNodeResultMapper = restoreNodeResultMapper,
             setMoveLatestTargetPathUseCase = setMoveLatestTargetPathUseCase,
             setCopyLatestTargetPathUseCase = setCopyLatestTargetPathUseCase,
             deleteNodeVersionsUseCase = deleteNodeVersionsUseCase,

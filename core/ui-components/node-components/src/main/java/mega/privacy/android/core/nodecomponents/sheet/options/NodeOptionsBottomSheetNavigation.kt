@@ -43,14 +43,6 @@ sealed class NodeOptionsBottomSheetResult() {
     data class NodeNameCollision(val result: NodeNameCollisionsResult) :
         NodeOptionsBottomSheetResult()
 
-    data class RestoreSuccess(val data: RestoreData) : NodeOptionsBottomSheetResult() {
-        data class RestoreData(
-            val message: String,
-            val parentHandle: Long,
-            val restoredNodeHandle: Long,
-        )
-    }
-
     data class AddToPlaylist(val result: AddVideoToPlaylistResult) : NodeOptionsBottomSheetResult()
 }
 
@@ -105,12 +97,6 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                 returnResult(
                     NodeOptionsBottomSheetNavKey.RESULT,
                     NodeOptionsBottomSheetResult.NodeNameCollision(result)
-                )
-            },
-            onRestoreSuccess = { data ->
-                returnResult(
-                    NodeOptionsBottomSheetNavKey.RESULT,
-                    NodeOptionsBottomSheetResult.RestoreSuccess(data)
                 )
             },
             onAddVideoToPlaylistResult = { result ->
