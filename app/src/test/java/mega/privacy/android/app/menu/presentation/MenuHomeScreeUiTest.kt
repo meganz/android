@@ -1,6 +1,7 @@
 package mega.privacy.android.app.menu.presentation
 
 import android.os.Parcelable
+import androidx.activity.ComponentActivity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
@@ -9,7 +10,7 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -17,10 +18,12 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
@@ -33,8 +36,10 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLB
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavDrawerItem
+import mega.privacy.mobile.analytics.event.LogoutButtonPressedEvent
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -44,8 +49,12 @@ import org.mockito.kotlin.verify
 @RunWith(AndroidJUnit4::class)
 class MenuHomeScreeUiTest {
 
+    private val composeRule = createAndroidComposeRule<ComponentActivity>()
+
+    private val analyticsRule = AnalyticsTestRule()
+
     @get:Rule
-    val composeRule = createComposeRule()
+    val ruleChain: RuleChain = RuleChain.outerRule(analyticsRule).around(composeRule)
 
     @Parcelize
     object TestDestination : Parcelable, NavKey
@@ -199,6 +208,7 @@ class MenuHomeScreeUiTest {
         )
         composeRule.onNodeWithTag(LOGOUT_BUTTON).performScrollTo().performClick()
         verify(onLogoutClicked).invoke()
+        assertThat(analyticsRule.events).contains(LogoutButtonPressedEvent)
     }
 
     @Test
