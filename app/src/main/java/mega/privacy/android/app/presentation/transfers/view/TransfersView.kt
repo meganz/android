@@ -59,6 +59,8 @@ import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfe
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -127,6 +129,7 @@ internal fun TransfersView(
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
+    val scrollToHideState = rememberScrollToHideState()
 
     // Track screen view event
     LaunchedEffect(Unit) {
@@ -282,9 +285,10 @@ internal fun TransfersView(
             MegaScrollableTabRow(
                 modifier = Modifier
                     .padding(paddingValues)
+                    .scrollToHide(scrollToHideState)
                     .fillMaxSize(),
                 beyondViewportPageCount = 1,
-                hideTabs = isInSelectTransfersMode,
+                hideTabs = isInSelectTransfersMode || scrollToHideState.shouldHide,
                 pagerScrollEnabled = false,
                 fixedHeader = {
                     AnimatedVisibility(
@@ -360,6 +364,9 @@ internal fun TransfersView(
                 },
                 initialSelectedIndex = selectedTab,
                 onTabSelected = {
+                    if (selectedTab != it) {
+                        scrollToHideState.show()
+                    }
                     when (it) {
                         ACTIVE_TAB_INDEX -> ActiveTransfersTabEvent
                         COMPLETED_TAB_INDEX -> CompletedTransfersTabEvent
