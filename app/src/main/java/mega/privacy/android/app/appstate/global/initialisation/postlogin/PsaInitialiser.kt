@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.presentation.psa.InfoPsaBottomSheet
 import mega.privacy.android.app.presentation.psa.StandardPsaBottomSheet
 import mega.privacy.android.app.presentation.psa.WebPsaScreen
@@ -13,6 +12,7 @@ import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject

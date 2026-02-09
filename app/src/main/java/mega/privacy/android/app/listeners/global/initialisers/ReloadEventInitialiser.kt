@@ -6,8 +6,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.domain.usecase.node.root.MonitorRootNodeRefreshEventUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 

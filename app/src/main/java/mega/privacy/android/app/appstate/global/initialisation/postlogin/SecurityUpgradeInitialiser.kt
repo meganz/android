@@ -2,8 +2,8 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInAppUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue

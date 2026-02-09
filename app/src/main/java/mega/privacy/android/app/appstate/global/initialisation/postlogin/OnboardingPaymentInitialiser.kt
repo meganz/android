@@ -1,9 +1,9 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey

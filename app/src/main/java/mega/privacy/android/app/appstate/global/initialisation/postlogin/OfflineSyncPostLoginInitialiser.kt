@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.offline.StartOfflineSyncWorkerUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 

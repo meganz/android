@@ -6,9 +6,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBusinessStatusInitialiser
@@ -19,13 +16,13 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Notific
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPermissionInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.postlogin.PushTokenPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PsaInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseResultInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PurchaseReviewInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.PushTokenPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartCameraUploadsAfterStorageStateEventInitializer
-import mega.privacy.android.app.appstate.initialisation.postlogin.PurchaseReviewInitialiser
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
@@ -35,6 +32,9 @@ import mega.privacy.android.domain.logging.Logger
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PreLoginInitialiser
 
 @Module
 @InstallIn(SingletonComponent::class)

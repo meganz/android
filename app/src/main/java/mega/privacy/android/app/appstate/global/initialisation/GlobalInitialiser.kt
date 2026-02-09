@@ -3,10 +3,10 @@ package mega.privacy.android.app.appstate.initialisation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.AppStartInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PreLoginInitialiser
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PreLoginInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton

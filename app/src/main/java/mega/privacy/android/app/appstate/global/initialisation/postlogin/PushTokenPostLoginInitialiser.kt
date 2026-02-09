@@ -4,12 +4,12 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.pushnotifications.GetPushTokenUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 

@@ -3,13 +3,13 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterIsInstance
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.entity.PurchaseType
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.MegaPurchaseState
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue

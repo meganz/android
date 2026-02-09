@@ -1,10 +1,10 @@
 package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import mega.privacy.android.app.appstate.content.navigation.view.PermissionScreensNavKey
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.permisison.CheckOnboardingPermissionsUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber

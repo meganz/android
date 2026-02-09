@@ -4,12 +4,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
-import mega.privacy.android.app.appstate.global.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.MonitorBusinessAccountExpiredUseCase
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.BusinessAccountExpiredDialogNavKey
