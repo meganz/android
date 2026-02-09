@@ -70,6 +70,7 @@ import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSy
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
+import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressedEvent
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -698,6 +699,16 @@ class AlbumContentViewModelTest {
             underTest.state.test {
                 assertThat(awaitItem().showRemoveLinkConfirmation).isEqualTo(triggered)
             }
+        }
+
+    @Test
+    fun `test that handleAction AddItems tracks MediaScreenAlbumAddItemsButtonPressedEvent`() =
+        runTest {
+            createViewModel()
+
+            underTest.handleAction(AlbumContentSelectionAction.AddItems)
+
+            verify(analyticsTracker).trackEvent(MediaScreenAlbumAddItemsButtonPressedEvent)
         }
 
     @Test
