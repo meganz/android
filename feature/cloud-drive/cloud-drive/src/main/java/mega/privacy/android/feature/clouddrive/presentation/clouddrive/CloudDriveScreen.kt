@@ -2,15 +2,14 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,7 +28,10 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -70,6 +72,7 @@ fun CloudDriveScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     val megaNavigator = rememberMegaNavigator()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val scrollToHideState = rememberScrollToHideState()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
@@ -150,7 +153,12 @@ fun CloudDriveScreen(
         },
         floatingActionButton = {
             AddContentFab(
-                modifier = Modifier.testTag(CLOUD_DRIVE_FAB_TAG),
+                modifier = Modifier
+                    .testTag(CLOUD_DRIVE_FAB_TAG)
+                    .animateFloatingActionButton(
+                        visible = !scrollToHideState.shouldHide,
+                        alignment = Alignment.BottomEnd
+                    ),
                 visible = uiState.isUploadAllowed,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -160,6 +168,7 @@ fun CloudDriveScreen(
         },
         content = { innerPadding ->
             CloudDriveContent(
+                modifier = Modifier.scrollToHide(scrollToHideState),
                 isTabContent = false,
                 navigationHandler = navigationHandler,
                 uiState = uiState,

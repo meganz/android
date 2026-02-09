@@ -2,7 +2,6 @@ package mega.privacy.android.feature.clouddrive.presentation.drivesync
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -35,10 +35,11 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
 import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
-import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideTabsState
-import mega.privacy.android.core.sharedcomponents.scroll.scrollToHideTabs
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -89,7 +90,7 @@ internal fun DriveSyncScreen(
     var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
-    val scrollToHideTabsState = rememberScrollToHideTabsState()
+    val scrollToHideState = rememberScrollToHideState()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -159,8 +160,14 @@ internal fun DriveSyncScreen(
         floatingActionButton = {
             val showFab =
                 selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.isEmpty
+
             AddContentFab(
-                modifier = Modifier.testTag(DRIVE_SYNCS_FAB_TAG),
+                modifier = Modifier
+                    .animateFloatingActionButton(
+                        visible = !scrollToHideState.shouldHide,
+                        alignment = Alignment.BottomEnd,
+                    )
+                    .testTag(DRIVE_SYNCS_FAB_TAG),
                 visible = showFab,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -172,10 +179,10 @@ internal fun DriveSyncScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .scrollToHideTabs(scrollToHideTabsState)
+                .scrollToHide(scrollToHideState)
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = cloudDriveUiState.isInSelectionMode || scrollToHideTabsState.shouldHideTabs,
+            hideTabs = cloudDriveUiState.isInSelectionMode || scrollToHideState.shouldHide,
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
@@ -249,7 +256,7 @@ internal fun DriveSyncScreen(
             initialSelectedIndex = initialTabIndex,
             onTabSelected = {
                 if (selectedTabIndex != it) {
-                    scrollToHideTabsState.showTabs()
+                    scrollToHideState.show()
                     selectedTabIndex = it
                     when (selectedTabIndex) {
                         0 -> Analytics.tracker.trackEvent(CloudDriveTabEvent)
