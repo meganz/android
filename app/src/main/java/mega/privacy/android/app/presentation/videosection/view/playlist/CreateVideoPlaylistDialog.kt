@@ -69,7 +69,7 @@ internal fun CreateVideoPlaylistDialog(
     errorMessage: Int? = null,
     isInputValid: () -> Boolean = { true },
 ) {
-    var textState by rememberSaveable { mutableStateOf(initialInputText()) }
+    var textState by remember { mutableStateOf(initialInputText()) }
     val isEnabled by rememberSaveable { mutableStateOf(true) }
     val isError by rememberSaveable { mutableStateOf(false) }
     val singleLine = true
