@@ -90,6 +90,7 @@ import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
+import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
@@ -843,6 +844,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                     }
 
                     is AlbumContentSelectionAction.AddItems -> {
+                        Analytics.tracker.trackEvent(MediaScreenAlbumAddItemsButtonPressedEvent)
                         _state.update {
                             it.copy(addMoreItemsEvent = triggered)
                         }
