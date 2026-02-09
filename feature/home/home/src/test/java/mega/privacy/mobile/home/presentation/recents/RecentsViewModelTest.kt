@@ -520,7 +520,49 @@ class RecentsViewModelTest {
     private fun createMockRecentsUiItem(
         timestamp: Long = 1234567890L,
         bucket: RecentActionBucket = createMockRecentActionBucket(),
-    ): RecentsUiItem = mock {
-        on { it.bucket }.thenReturn(bucket)
+    ): RecentsUiItem {
+        val bucketIdentifier = bucket.identifier
+        return mock {
+            on { it.bucket }.thenReturn(bucket)
+            on { it.key }.thenReturn(bucketIdentifier)
+        }
+    }
+
+    @Test
+    fun `test that duplicate items with same key are filtered by distinctBy`() = runTest {
+        val duplicateBucket1 = createMockRecentActionBucket(
+            timestamp = 1000L,
+            identifier = "duplicate_bucket"
+        )
+        val duplicateBucket2 = createMockRecentActionBucket(
+            timestamp = 2000L,
+            identifier = "duplicate_bucket"
+        )
+        val uniqueBucket = createMockRecentActionBucket(
+            timestamp = 3000L,
+            identifier = "unique_bucket"
+        )
+
+        val duplicateUiItem1 = createMockRecentsUiItem(bucket = duplicateBucket1)
+        val duplicateUiItem2 = createMockRecentsUiItem(bucket = duplicateBucket2)
+        val uniqueUiItem = createMockRecentsUiItem(bucket = uniqueBucket)
+
+        whenever(getRecentActionsUseCase(excludeSensitives = false, maxBucketCount = 4)).thenReturn(
+            listOf(duplicateBucket1, duplicateBucket2, uniqueBucket)
+        )
+        whenever(recentActionUiItemMapper(duplicateBucket1)).thenReturn(duplicateUiItem1)
+        whenever(recentActionUiItemMapper(duplicateBucket2)).thenReturn(duplicateUiItem2)
+        whenever(recentActionUiItemMapper(uniqueBucket)).thenReturn(uniqueUiItem)
+
+        initViewModel()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isNodesLoading).isFalse()
+            assertThat(state.recentActionItems).hasSize(2)
+            assertThat(state.recentActionItems).contains(duplicateUiItem1)
+            assertThat(state.recentActionItems).contains(uniqueUiItem)
+            assertThat(state.recentActionItems).doesNotContain(duplicateUiItem2)
+        }
     }
 }
