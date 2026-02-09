@@ -173,8 +173,7 @@ fun MenuHomeScreenUi(
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .fillMaxWidth(),
             contentPadding = paddingValues,
         )
         {
@@ -281,12 +280,14 @@ fun MenuHomeScreenUi(
             }
 
             item {
-                LogoutButton(
-                    enabled = uiState.isConnectedToNetwork,
-                    isLoggingOut = uiState.isLoggingOut
-                ) {
-                    onLogoutClicked()
-                    Analytics.tracker.trackEvent(LogoutButtonPressedEvent)
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    LogoutButton(
+                        enabled = uiState.isConnectedToNetwork,
+                        isLoggingOut = uiState.isLoggingOut,
+                    ) {
+                        onLogoutClicked()
+                        Analytics.tracker.trackEvent(LogoutButtonPressedEvent)
+                    }
                 }
             }
         }
