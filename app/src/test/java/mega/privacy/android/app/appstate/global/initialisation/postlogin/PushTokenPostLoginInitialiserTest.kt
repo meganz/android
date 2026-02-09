@@ -3,14 +3,17 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import com.google.android.gms.tasks.Task
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.GetPushTokenUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -32,6 +35,7 @@ class PushTokenPostLoginInitialiserTest {
     private val getPushTokenUseCase = mock<GetPushTokenUseCase>()
     private val registerPushNotificationsUseCase = mock<RegisterPushNotificationsUseCase>()
     private val setPushTokenUseCase = mock<SetPushTokenUseCase>()
+    private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
     @BeforeAll
@@ -41,8 +45,14 @@ class PushTokenPostLoginInitialiserTest {
             getPushTokenUseCase = getPushTokenUseCase,
             registerPushNotificationsUseCase = registerPushNotificationsUseCase,
             setPushTokenUseCase = setPushTokenUseCase,
+            monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             ioDispatcher = ioDispatcher,
         )
+    }
+
+    @BeforeEach
+    fun stubMonitorFetchNodesFinish() {
+        whenever(monitorFetchNodesFinishUseCase()).thenReturn(flowOf(true))
     }
 
     @AfterEach
@@ -52,6 +62,7 @@ class PushTokenPostLoginInitialiserTest {
             getPushTokenUseCase,
             registerPushNotificationsUseCase,
             setPushTokenUseCase,
+            monitorFetchNodesFinishUseCase,
         )
     }
 

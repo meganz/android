@@ -2,10 +2,15 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.GetPushTokenUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
@@ -22,29 +27,37 @@ class PushTokenPostLoginInitialiser @Inject constructor(
     private val getPushTokenUseCase: GetPushTokenUseCase,
     private val registerPushNotificationsUseCase: RegisterPushNotificationsUseCase,
     private val setPushTokenUseCase: SetPushTokenUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PostLoginInitialiser(
     action = { _, _ ->
         withContext(ioDispatcher) {
-            runCatching {
-                val newToken = firebaseMessaging.token.await()
-                when {
-                    newToken.isNullOrEmpty() || getPushTokenUseCase() == newToken ->
-                        Timber.d("No need to register new token.")
+            monitorFetchNodesFinishUseCase()
+                .filter { it }
+                .take(1)
+                .catch { e -> Timber.e(e) }
+                .collectLatest {
+                    runCatching {
+                        val newToken = firebaseMessaging.token.await()
+                        when {
+                            newToken.isNullOrEmpty() || getPushTokenUseCase() == newToken ->
+                                Timber.d("No need to register new token.")
 
-                    else -> {
-                        Timber.d("Registering new push token after login.")
-                        runCatching {
-                            registerPushNotificationsUseCase(DEVICE_ANDROID, newToken)
-                        }.onSuccess { token ->
-                            runCatching { setPushTokenUseCase(token) }
-                                .onFailure { Timber.w("Exception setting push token: $it") }
-                        }.onFailure { Timber.w("Exception registering push notifications: $it") }
+                            else -> {
+                                Timber.d("Registering new push token after login.")
+                                runCatching {
+                                    registerPushNotificationsUseCase(DEVICE_ANDROID, newToken)
+                                }.onSuccess { token ->
+                                    runCatching { setPushTokenUseCase(token) }
+                                        .onFailure { Timber.w("Exception setting push token: $it") }
+                                }
+                                    .onFailure { Timber.w("Exception registering push notifications: $it") }
+                            }
+                        }
+                    }.onFailure {
+                        Timber.e(it, "Error registering push token after login")
                     }
                 }
-            }.onFailure {
-                Timber.e(it, "Error registering push token after login")
-            }
         }
     }
 )
