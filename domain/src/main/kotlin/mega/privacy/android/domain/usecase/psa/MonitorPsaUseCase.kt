@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.psa.Psa
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
@@ -20,6 +21,7 @@ import kotlin.time.Duration.Companion.minutes
  * @property fetchPsaUseCase
  * @property psaCheckFrequency
  */
+@Singleton
 class MonitorPsaUseCase(
     private val fetchPsaUseCase: FetchPsaUseCase,
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
@@ -35,6 +37,15 @@ class MonitorPsaUseCase(
         psaCheckFrequency = 5.minutes,
     )
 
+    private var hasRun: Boolean = false
+    private fun shouldRefresh(): Boolean {
+        if (!hasRun) {
+            hasRun = true
+            return true
+        }
+        return false
+    }
+
     /**
      * Invoke
      *
@@ -48,7 +59,7 @@ class MonitorPsaUseCase(
                 flow {
                     fetchPsaUseCase(
                         currentTime = currentMilliSecondTimeProvider(),
-                        forceRefresh = true
+                        forceRefresh = shouldRefresh()
                     )?.let { emit(it) }
                     while (true) {
                         delay(psaCheckFrequency)

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
@@ -35,7 +34,6 @@ class PsaViewModel(
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val psaStateMapper: PsaStateMapper,
     private val currentTimeProvider: () -> Long,
-    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     @Inject
@@ -44,14 +42,12 @@ class PsaViewModel(
         fetchPsaUseCase: FetchPsaUseCase,
         dismissPsaUseCase: DismissPsaUseCase,
         psaStateMapper: PsaStateMapper,
-        getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     ) : this(
         monitorPsaUseCase = monitorPsaUseCase,
         fetchPsaUseCase = fetchPsaUseCase,
         dismissPsaUseCase = dismissPsaUseCase,
         psaStateMapper = psaStateMapper,
         currentTimeProvider = System::currentTimeMillis,
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
 
     private val seenChannel = Channel<PsaState>()

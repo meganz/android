@@ -11,11 +11,9 @@ import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.psa.Psa
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -64,11 +62,6 @@ class PsaViewModelTest {
         }
     }
 
-
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase> {
-        onBlocking { invoke(AppFeatures.SingleActivity) }.thenReturn(true)
-    }
-
     private fun initViewModel() {
         underTest = PsaViewModel(
             monitorPsaUseCase = monitorPsaUseCase,
@@ -76,7 +69,6 @@ class PsaViewModelTest {
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
             currentTimeProvider = { 0 },
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
