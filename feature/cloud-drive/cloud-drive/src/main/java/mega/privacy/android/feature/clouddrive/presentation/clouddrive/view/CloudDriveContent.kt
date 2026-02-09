@@ -370,7 +370,6 @@ internal fun CloudDriveContent(
                             navigationHandler.navigate(
                                 CloudDriveNavKey(
                                     nodeHandle = folderId.longValue,
-                                    isNewFolder = true,
                                     nodeSourceType = uiState.nodeSourceType
                                 )
                             )

@@ -26,6 +26,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewModel
@@ -79,6 +80,8 @@ fun HomeScreens(
         handledStorageState == storageUiState.storageState
     }
 
+    val snackbarHostState = LocalSnackBarHostState.current
+
     when (val currentState = state) {
         MainNavState.Loading -> {
             // add shimmer effect later
@@ -119,6 +122,7 @@ fun HomeScreens(
                         .weight(1f),
                     mainNavItems = currentState.mainNavItems,
                     onDestinationClick = { destination ->
+                        snackbarHostState?.currentSnackbarData?.dismiss()
                         if (destination == homeScreenStacks.topLevelKey) {
                             homeScreenStacks.replaceStack()
                         } else {

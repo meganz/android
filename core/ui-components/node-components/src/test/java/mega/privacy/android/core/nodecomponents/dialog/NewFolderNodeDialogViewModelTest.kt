@@ -17,6 +17,7 @@ import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,6 +38,7 @@ class NewFolderNodeDialogViewModelTest {
     private val validateFolderNameUseCase = mock<ValidateNodeNameUseCase>()
     private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     @BeforeEach
     fun setUp() {
@@ -44,6 +46,7 @@ class NewFolderNodeDialogViewModelTest {
             validateNodeNameUseCase = validateFolderNameUseCase,
             createFolderNodeUseCase = createFolderNodeUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
+            snackbarEventQueue = snackbarEventQueue
         )
     }
 

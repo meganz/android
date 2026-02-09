@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -10,14 +9,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.LocalSnackBarHostState
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.shared.resources.R
 
 /**
  * Entry for Cloud Drive Screen
@@ -53,13 +50,6 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
             nodeResultFlow = navigationHandler::monitorResult,
             clearResultFlow = navigationHandler::clearResult,
         )
-
-        LaunchedEffect(key.isNewFolder) {
-            if (key.isNewFolder && !hasShownSnackbar) {
-                snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.folder_created_success_message))
-                hasShownSnackbar = true
-            }
-        }
 
         CloudDriveScreen(
             navigationHandler = navigationHandler,
