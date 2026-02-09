@@ -14,6 +14,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -26,6 +28,7 @@ class NewFolderNodeDialogViewModel @Inject constructor(
     private val validateNodeNameUseCase: ValidateNodeNameUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewFolderDialogState())
@@ -50,6 +53,7 @@ class NewFolderNodeDialogViewModel @Inject constructor(
                 .getOrNull()
         }.onSuccess { folderId ->
             _uiState.update { it.copy(folderCreatedEvent = triggered(folderId)) }
+            snackbarEventQueue.queueMessage(sharedR.string.folder_created_success_message)
         }.onFailure { e ->
             Timber.e(e)
             _uiState.update { it.copy(errorEvent = triggered(e)) }
