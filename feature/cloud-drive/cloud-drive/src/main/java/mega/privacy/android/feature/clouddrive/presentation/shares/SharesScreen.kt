@@ -44,6 +44,8 @@ import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -85,6 +87,7 @@ internal fun SharesScreen(
     val snackbarHostState = LocalSnackBarHostState.current
     var selectedTab by rememberSaveable { mutableStateOf(SharesTab.IncomingShares) }
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val scrollToHideState = rememberScrollToHideState()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
@@ -214,10 +217,11 @@ internal fun SharesScreen(
         MegaScrollableTabRow(
             modifier = Modifier
                 .fillMaxSize()
+                .scrollToHide(scrollToHideState)
                 .padding(paddingValues.excludingBottomPadding())
                 .testTag(SHARES_TAB_ROW_TAG),
             beyondViewportPageCount = 1,
-            hideTabs = isInSelectionMode,
+            hideTabs = isInSelectionMode || scrollToHideState.shouldHide,
             pagerScrollEnabled = !isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
@@ -300,6 +304,9 @@ internal fun SharesScreen(
             },
             initialSelectedIndex = SharesTab.IncomingShares.ordinal,
             onTabSelected = {
+                if (selectedTab.ordinal != it) {
+                    scrollToHideState.show()
+                }
                 selectedTab = SharesTab.fromOrdinal(it)
                 true
             }
