@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
  */
 fun Modifier.animateFloatingActionButton(
     visible: Boolean,
-    alignment: Alignment,
+    alignment: Alignment = Alignment.BottomEnd,
     targetScale: Float = 0.2f,
     scaleAnimationSpec: AnimationSpec<Float>? = null,
     alphaAnimationSpec: AnimationSpec<Float>? = null,

@@ -2,8 +2,10 @@ package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -44,6 +47,10 @@ import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
@@ -103,10 +110,12 @@ fun ChatTabsView(
         ChatTab.entries.size
     }
     var scrollToTop by remember { mutableStateOf(false) }
-    var showFabButton by remember { mutableStateOf(true) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
     var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
-
+    val scrollToHideState = rememberScrollToHideState()
+    LaunchedOnceEffect(pagerState.currentPage) {
+        scrollToHideState.show()
+    }
     MegaScaffold(
         modifier = if (isNewSingleActivity) Modifier.systemBarsPadding() else Modifier,
         scaffoldState = scaffoldState,
@@ -135,11 +144,21 @@ fun ChatTabsView(
                     showOnTop = true,
                     onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
-                    FabButton(true, onStartChatClick)
+                    FabButton(
+                        modifier = Modifier.animateFloatingActionButton(
+                            visible = !scrollToHideState.shouldHide,
+                        ),
+                        onStartChatClick = onStartChatClick,
+                    )
                 }
             } else {
                 if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty() || pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
-                    FabButton(showFabButton, onStartChatClick)
+                    FabButton(
+                        modifier = Modifier.animateFloatingActionButton(
+                            visible = !scrollToHideState.shouldHide,
+                        ),
+                        onStartChatClick = onStartChatClick
+                    )
                 }
             }
         }
@@ -147,32 +166,39 @@ fun ChatTabsView(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
+                .scrollToHide(scrollToHideState)
                 .fillMaxSize()
         ) {
-            Tabs(
-                pagerEnabled = false,
-                pagerState = pagerState,
-                selectedTabIndex = pagerState.currentPage,
-                onTabSelected = {
-                    if (pagerState.currentPage == it) {
-                        scrollToTop = !scrollToTop
-                        false
-                    }
-                    true
-                }
+            AnimatedVisibility(
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically(),
+                visible = !scrollToHideState.shouldHide
             ) {
-                ChatTab.entries.forEachIndexed { index, item ->
-                    addTextTab(
-                        text = stringResource(item.titleStringRes),
-                        tag = item.name,
-                        suffix = { activeColor, color ->
-                            if (state.currentUnreadStatus?.toList()?.getOrNull(index) == true) {
-                                Canvas(modifier = Modifier.size(4.dp)) {
-                                    drawCircle(color = activeColor, center = Offset(20f, 20f))
+                Tabs(
+                    pagerEnabled = false,
+                    pagerState = pagerState,
+                    selectedTabIndex = pagerState.currentPage,
+                    onTabSelected = {
+                        if (pagerState.currentPage == it) {
+                            scrollToTop = !scrollToTop
+                            false
+                        }
+                        true
+                    }
+                ) {
+                    ChatTab.entries.forEachIndexed { index, item ->
+                        addTextTab(
+                            text = stringResource(item.titleStringRes),
+                            tag = item.name,
+                            suffix = { activeColor, color ->
+                                if (state.currentUnreadStatus?.toList()?.getOrNull(index) == true) {
+                                    Canvas(modifier = Modifier.size(4.dp)) {
+                                        drawCircle(color = activeColor, center = Offset(20f, 20f))
+                                    }
                                 }
-                            }
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
             }
             HorizontalPager(
@@ -203,7 +229,9 @@ fun ChatTabsView(
                     isSearchMode = isSearchMode,
                     onItemMoreClick = onItemMoreClick,
                     onItemSelected = onItemSelected,
-                    onScrollInProgress = { showFabButton = !it },
+                    onScrollInProgress = {
+                        // Ignore, handle using scrollToHideState
+                    },
                     onEmptyButtonClick = { onStartChatClick(false) },
                     onScheduleMeeting = onScheduleMeeting,
                     onShowNextTooltip = onShowNextTooltip,
@@ -276,19 +304,19 @@ private fun ChatRoomItem.matches(searchQuery: String): Boolean =
             || lastMessage?.normalize()?.contains(searchQuery, true) == true
 
 @Composable
-private fun FabButton(showFabButton: Boolean, onStartChatClick: (isFabClicked: Boolean) -> Unit) {
-    AnimatedVisibility(
-        visible = showFabButton,
-        enter = scaleIn(),
-        exit = scaleOut(),
-    ) {
-        FloatingActionButton(onClick = { onStartChatClick(true) }) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Create new chat",
-                tint = MaterialTheme.colors.white_black
-            )
-        }
+private fun FabButton(
+    onStartChatClick: (isFabClicked: Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FloatingActionButton(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        onClick = { onStartChatClick(true) }) {
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = "Create new chat",
+            tint = MaterialTheme.colors.white_black
+        )
     }
 }
 
