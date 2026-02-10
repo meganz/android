@@ -74,6 +74,7 @@ data class AlbumContentUiState(
     val previewAlbumContentEvent: StateEventWithContent<AlbumContentPreviewNavKey> = consumed(),
     val addMoreItemsEvent: StateEvent = consumed,
     val visibleBottomBarActions: ImmutableList<AlbumContentSelectionAction> = persistentListOf(),
+    val showHiddenNodesOnboardingEvent: StateEventWithContent<Boolean> = consumed(),
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0

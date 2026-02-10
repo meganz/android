@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -93,6 +94,7 @@ import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AlbumAddPhotosFABEvent
 import mega.privacy.mobile.analytics.event.AlbumContentDeleteAlbumEvent
@@ -117,6 +119,20 @@ fun AlbumContentScreen(
         viewModel = actionViewModel,
         navigationHandler = navigationHandler
     )
+    val megaActivityResultContract = rememberMegaResultContract()
+    val hiddenNodesOnboardingLauncher = rememberLauncherForActivityResult(
+        contract = megaActivityResultContract.hiddenNodeOnboardingActivityResultContract
+    ) { isOnboarding ->
+        if (isOnboarding) {
+            viewModel.hideNodes()
+        }
+    }
+
+    EventEffect(
+        event = uiState.showHiddenNodesOnboardingEvent,
+        onConsumed = viewModel::resetShowHiddenNodesOnboardingEvent,
+        action = hiddenNodesOnboardingLauncher::launch
+    )
 
     AlbumContentScreen(
         uiState = uiState,
@@ -132,8 +148,8 @@ fun AlbumContentScreen(
         resetSharePhotosEvent = viewModel::resetSharePhotos,
         sendPhotosToChatEvent = viewModel::sendPhotosToChat,
         resetSendPhotosToChatEvent = viewModel::resetSendPhotosToChat,
-        hidePhotosEvent = { viewModel.hideOrUnhideNodes(true) },
-        unhidePhotosEvent = { viewModel.hideOrUnhideNodes(false) },
+        hidePhotos = { viewModel.hideNodes() },
+        unhidePhotos = { viewModel.unhideNodes() },
         removeFavourites = viewModel::removeFavourites,
         removePhotos = viewModel::removePhotosFromAlbum,
         deleteAlbum = viewModel::deleteAlbum,
@@ -193,8 +209,8 @@ internal fun AlbumContentScreen(
     resetSharePhotosEvent: () -> Unit,
     sendPhotosToChatEvent: () -> Unit,
     resetSendPhotosToChatEvent: () -> Unit,
-    hidePhotosEvent: () -> Unit,
-    unhidePhotosEvent: () -> Unit,
+    hidePhotos: () -> Unit,
+    unhidePhotos: () -> Unit,
     removeFavourites: () -> Unit,
     removePhotos: () -> Unit,
     deleteAlbum: () -> Unit,
@@ -409,12 +425,12 @@ internal fun AlbumContentScreen(
                         }
 
                         is AlbumContentSelectionAction.Hide -> {
-                            hidePhotosEvent()
+                            hidePhotos()
                             deselectAll()
                         }
 
                         is AlbumContentSelectionAction.Unhide -> {
-                            unhidePhotosEvent()
+                            unhidePhotos()
                             deselectAll()
                         }
 
@@ -768,8 +784,8 @@ private fun AlbumContentScreenPreview() {
             resetSharePhotosEvent = {},
             sendPhotosToChatEvent = {},
             resetSendPhotosToChatEvent = {},
-            hidePhotosEvent = {},
-            unhidePhotosEvent = {},
+            hidePhotos = {},
+            unhidePhotos = {},
             removeFavourites = {},
             removePhotos = {},
             deleteAlbum = {},
@@ -796,7 +812,7 @@ private fun AlbumContentScreenPreview() {
             consumeDownloadEvent = {},
             consumeInfoToShowEvent = {},
             handleAction = {},
-            navigateToPhotoSelection = {}
+            navigateToPhotoSelection = {},
         )
     }
 }

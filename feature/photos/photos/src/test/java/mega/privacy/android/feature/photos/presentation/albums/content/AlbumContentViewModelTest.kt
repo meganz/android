@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -18,12 +19,15 @@ import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
@@ -82,6 +86,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
@@ -521,19 +526,6 @@ class AlbumContentViewModelTest {
             assertThat(state.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
         }
     }
-
-    @Test
-    fun `test that hideOrUnhideNodes calls updateNodeSensitiveUseCase with correct parameters`() =
-        runTest {
-            createViewModel()
-            val photo = mock<PhotoUiState.Image>()
-            whenever(photo.id).thenReturn(123L)
-
-            underTest.togglePhotoSelection(photo)
-            underTest.hideOrUnhideNodes(hide = true)
-
-            verify(updateNodeSensitiveUseCase).invoke(NodeId(123L), true)
-        }
 
     @Test
     fun `test that on update album name update success should reset state`() = runTest {
@@ -1330,6 +1322,124 @@ class AlbumContentViewModelTest {
             on { this.isSensitive }.thenReturn(isSensitive)
             on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
         }
+    }
+
+    private fun mockAccountDetail(accountType: AccountType): AccountDetail {
+        val mockAccountLevelDetail = mock<AccountLevelDetail> {
+            on { this.accountType }.thenReturn(accountType)
+        }
+        return mock { on { levelDetail }.thenReturn(mockAccountLevelDetail) }
+    }
+
+    @Test
+    fun `test that hideNodes triggers onboarding event for non-paid account`() = runTest {
+        createViewModel()
+        val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+        underTest.togglePhotoSelection(photo)
+
+        val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.FREE))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+        underTest.hideNodes()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showHiddenNodesOnboardingEvent).isInstanceOf(
+                StateEventWithContentTriggered::class.java
+            )
+            val event = state.showHiddenNodesOnboardingEvent as? StateEventWithContentTriggered
+            assertThat(event?.content).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that hideNodes triggers onboarding event for expired business account`() = runTest {
+        createViewModel()
+        val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+        underTest.togglePhotoSelection(photo)
+
+        val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.BUSINESS))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+
+        underTest.hideNodes()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.showHiddenNodesOnboardingEvent).isInstanceOf(
+                StateEventWithContentTriggered::class.java
+            )
+            val event = state.showHiddenNodesOnboardingEvent as? StateEventWithContentTriggered
+            assertThat(event?.content).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that hideNodes triggers onboarding event for paid account not yet onboarded`() =
+        runTest {
+            val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.PRO_I))
+            whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+            isHiddenNodesOnboardedUseCase.stub {
+                onBlocking { invoke() }.thenReturn(false)
+            }
+
+            createViewModel()
+            val photo = createMockPhotoUiState(id = 1L, isSensitive = false)
+            underTest.togglePhotoSelection(photo)
+
+            underTest.hideNodes()
+
+            underTest.state.test {
+                val event =
+                    expectMostRecentItem().showHiddenNodesOnboardingEvent as? StateEventWithContentTriggered
+                assertThat(event?.content).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that unhideNodes does nothing for non-paid account`() = runTest {
+        createViewModel()
+        val photo = createMockPhotoUiState(id = 1L, isSensitive = true)
+        underTest.togglePhotoSelection(photo)
+
+        val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.FREE))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+
+        underTest.unhideNodes()
+
+        verify(updateNodeSensitiveUseCase, never()).invoke(any(), any())
+        verify(snackbarEventQueue, never()).queueMessage(any(), any())
+    }
+
+    @Test
+    fun `test that unhideNodes does nothing for expired business account`() = runTest {
+        createViewModel()
+        val photo = createMockPhotoUiState(id = 1L, isSensitive = true)
+        underTest.togglePhotoSelection(photo)
+
+        val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.BUSINESS))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+        whenever(getBusinessStatusUseCase()).thenReturn(BusinessAccountStatus.Expired)
+
+        underTest.unhideNodes()
+
+        verify(updateNodeSensitiveUseCase, never()).invoke(any(), any())
+        verify(snackbarEventQueue, never()).queueMessage(any(), any())
+    }
+
+    @Test
+    fun `test that hideNodes does nothing when no photos are selected`() = runTest {
+        createViewModel()
+
+        val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.PRO_I))
+        whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
+        isHiddenNodesOnboardedUseCase.stub {
+            onBlocking { invoke() }.thenReturn(true)
+        }
+
+        underTest.hideNodes()
+
+        verify(updateNodeSensitiveUseCase, never()).invoke(any(), any())
     }
 }
 
