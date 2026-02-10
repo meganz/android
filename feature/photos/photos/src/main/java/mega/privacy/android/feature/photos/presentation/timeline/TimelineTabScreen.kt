@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.size
@@ -58,6 +59,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
@@ -70,17 +72,16 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Enabl
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
-import mega.privacy.mobile.analytics.event.MediaScreenAllFilterSelectedEvent
-import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
-import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
-import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
 import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.MediaScreenAllFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
 
 @Composable
 internal fun TimelineTabRoute(
@@ -453,6 +454,7 @@ private fun TimelineTabContent(
             PhotoModificationTimePeriodSelector(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .navigationBarsPadding()
                     .align(Alignment.BottomCenter)
                     .testTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG),
                 isVisible = shouldShowTimePeriodSelector,
