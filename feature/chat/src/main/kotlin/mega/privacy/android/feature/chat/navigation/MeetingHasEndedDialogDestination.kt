@@ -11,6 +11,7 @@ import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
+import mega.privacy.android.navigation.destination.LeftMeetingNavKey
 
 /**
  * Meeting has ended dialog destination [DialogNavKey]
@@ -52,7 +53,7 @@ fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
             onShowChat = {
                 key.chatId?.let {
                     navigate(ChatNavKey(it, ACTION_CHAT_SHOW_MESSAGES))
-                }
+                } ?: navigate(LeftMeetingNavKey)
             },
         )
     }
