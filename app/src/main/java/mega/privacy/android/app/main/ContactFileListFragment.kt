@@ -25,7 +25,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
@@ -34,10 +33,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
+import mega.privacy.android.app.components.legacyfab.LegacyFabButtonAdd
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
-import mega.privacy.android.app.main.listeners.FabButtonListener
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity.Companion.createSecondaryIntent
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
@@ -77,7 +76,7 @@ class ContactFileListFragment : ContactFileBaseFragment() {
     var mLayoutManager: LinearLayoutManager? = null
     var emptyImageView: ImageView? = null
     var emptyTextView: TextView? = null
-    var fab: FloatingActionButton? = null
+    var fab: LegacyFabButtonAdd? = null
     var parentHandleStack: Stack<Long>? = Stack()
     var currNodePosition: Int = -1
 
@@ -324,13 +323,21 @@ class ContactFileListFragment : ContactFileBaseFragment() {
         if (userEmail != null) {
             v = inflater.inflate(R.layout.fragment_contact_file_list, container, false)
 
-            mainLayout =
-                v.findViewById<View>(R.id.contact_file_list_coordinator_layout) as CoordinatorLayout
+            mainLayout = v.findViewById(R.id.contact_file_list_coordinator_layout)
 
-            fab =
-                v.findViewById<View>(R.id.floating_button_contact_file_list) as FloatingActionButton
-            fab!!.setOnClickListener(FabButtonListener(context))
-            fab!!.hide()
+            fab = v.findViewById(R.id.floating_button_contact_file_list)
+            fab?.setOnClickListener({
+                if (!Util.isOnline(context)) {
+                    (context as? ContactFileListActivity)?.showSnackbar(
+                        Constants.SNACKBAR_TYPE, context.getString(
+                            R.string.error_server_connection_problem
+                        )
+                    )
+                    return@setOnClickListener
+                }
+                (context as? ContactFileListActivity)?.showUploadPanel()
+            })
+            fab?.hide()
 
             contact = megaApi.getContact(userEmail)
             if (contact == null) {

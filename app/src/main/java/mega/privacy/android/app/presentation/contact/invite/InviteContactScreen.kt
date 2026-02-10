@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -82,6 +83,7 @@ import com.google.accompanist.permissions.isGranted
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
@@ -106,6 +108,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
@@ -300,7 +303,8 @@ internal fun InviteContactRoute(
                     localKeyboardController?.hide()
                 }
             },
-            onContactChipClick = viewModel::onContactChipClick
+            onContactChipClick = viewModel::onContactChipClick,
+            isSingleActivity = uiState.isSingleActivity,
         )
 
         if (uiState.showOpenCameraConfirmation) {
@@ -359,6 +363,7 @@ internal fun InviteContactScreen(
     onDoneImeActionClick: () -> Unit,
     onContactChipClick: (contactInfo: InvitationContactInfo) -> Unit,
     modifier: Modifier = Modifier,
+    isSingleActivity: Boolean = false,
 ) {
     val localConfiguration = LocalConfiguration.current
     val localKeyboardController = LocalSoftwareKeyboardController.current
@@ -428,21 +433,35 @@ internal fun InviteContactScreen(
             )
         },
         floatingActionButton = {
-            MegaFloatingActionButton(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(56.dp)
-                    .testTag(INVITE_CONTACT_FAB_TAG),
-                enabled = isInviteButtonEnabled,
-                onClick = {
-                    isInviteButtonEnabled = false
-                    onInviteContactClick()
+            val modifier = Modifier
+                .padding(16.dp)
+                .size(56.dp)
+                .testTag(INVITE_CONTACT_FAB_TAG)
+            if (isSingleActivity) {
+                if (isInviteButtonEnabled) {
+                    MegaFab(
+                        modifier = modifier,
+                        painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
+                        onClick = {
+                            isInviteButtonEnabled = false
+                            onInviteContactClick()
+                        }
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_thin_outline),
-                    contentDescription = null,
-                )
+            } else {
+                MegaFloatingActionButton(
+                    modifier = modifier,
+                    enabled = isInviteButtonEnabled,
+                    onClick = {
+                        isInviteButtonEnabled = false
+                        onInviteContactClick()
+                    }
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconPackR.drawable.ic_send_horizontal_medium_thin_outline),
+                        contentDescription = null,
+                    )
+                }
             }
         }
     ) { paddingValues ->

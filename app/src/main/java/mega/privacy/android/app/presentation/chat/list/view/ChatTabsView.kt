@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -33,11 +32,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import mega.android.core.ui.components.fab.MegaFab
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
@@ -53,6 +54,7 @@ import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideSta
 import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.controls.tooltips.LegacyMegaTooltip
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.controls.tab.Tabs
@@ -148,6 +150,7 @@ fun ChatTabsView(
                         modifier = Modifier.animateFloatingActionButton(
                             visible = !scrollToHideState.shouldHide,
                         ),
+                        newFab = isNewSingleActivity,
                         onStartChatClick = onStartChatClick,
                     )
                 }
@@ -157,6 +160,7 @@ fun ChatTabsView(
                         modifier = Modifier.animateFloatingActionButton(
                             visible = !scrollToHideState.shouldHide,
                         ),
+                        newFab = isNewSingleActivity,
                         onStartChatClick = onStartChatClick
                     )
                 }
@@ -305,18 +309,27 @@ private fun ChatRoomItem.matches(searchQuery: String): Boolean =
 
 @Composable
 private fun FabButton(
-    onStartChatClick: (isFabClicked: Boolean) -> Unit,
+    newFab: Boolean,
     modifier: Modifier = Modifier,
+    onStartChatClick: (isFabClicked: Boolean) -> Unit,
 ) {
-    FloatingActionButton(
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        onClick = { onStartChatClick(true) }) {
-        Icon(
-            imageVector = Icons.Filled.Add,
-            contentDescription = "Create new chat",
-            tint = MaterialTheme.colors.white_black
+    if (newFab) {
+        MegaFab(
+            modifier = modifier,
+            onClick = { onStartChatClick(true) },
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
         )
+    } else {
+        FloatingActionButton(
+            onClick = { onStartChatClick(true) },
+            modifier = modifier,
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = "Create new chat",
+                tint = MaterialTheme.colors.white_black
+            )
+        }
     }
 }
 

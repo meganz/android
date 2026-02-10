@@ -31,13 +31,12 @@
 
     </RelativeLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <mega.privacy.android.app.components.legacyfab.LegacyFabButtonAdd
         android:id="@+id/floating_button_contact_file_list"
-        android:layout_width="@dimen/fab_button_diameter"
-        android:layout_height="@dimen/fab_button_diameter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:elevation="@dimen/elevation_low"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_add_white"
+        android:padding="16dp"
         android:stateListAnimator="@anim/button_elevation"
         android:layout_gravity="bottom|right|end"/>
 

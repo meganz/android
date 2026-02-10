@@ -22,6 +22,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.Purchas
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.PushTokenPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadContactDatabaseInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.SetupLegacyViewsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartCameraUploadsAfterStorageStateEventInitializer
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
@@ -169,5 +170,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideDeleteOldestCompletedTransfersInitializer(initialiser: DeleteOldestCompletedTransfersInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideSetupLegacyViewsInitializer(initialiser: SetupLegacyViewsInitializer): PostLoginInitialiser =
         initialiser
 }

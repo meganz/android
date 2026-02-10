@@ -110,7 +110,8 @@ class InviteContactViewModelTest {
             invitationContactInfoUiMapper = invitationContactInfoUiMapper,
             invitationStatusMessageUiMapper = invitationStatusMessageUiMapper,
             emailValidationResultMapper = emailValidationResultMapper,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
+            getFeatureFlagValueUseCase = mock()
         )
     }
 

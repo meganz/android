@@ -204,6 +204,7 @@ interface IconPackInterface {
                 val Screenshot: ImageVector
                 val SearchLarge: ImageVector
                 val SearchSmall: ImageVector
+                val SendHorizontal: ImageVector
                 val ShareNetwork: ImageVector
                 val Shield: ImageVector
                 val ShieldLite: ImageVector

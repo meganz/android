@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -52,9 +51,9 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.HeaderItemDecoration
 import mega.privacy.android.app.components.SimpleDividerItemDecoration
+import mega.privacy.android.app.components.legacyfab.LegacyFabButtonSend
 import mega.privacy.android.app.components.scrollBar.FastScroller
 import mega.privacy.android.app.components.scrollBar.FastScrollerScrollListener
-import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
 import mega.privacy.android.app.main.PhoneContactInfo
 import mega.privacy.android.app.main.ShareContactInfo
@@ -87,6 +86,8 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
@@ -105,7 +106,6 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * Add contact activity
@@ -300,7 +300,7 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
     private var fastScroller: FastScroller? = null
 
     private var fabImageGroup: FloatingActionButton? = null
-    private var fabButton: FloatingActionButton? = null
+    private var fabButton: LegacyFabButtonSend? = null
     private var nameGroup: EmojiEditText? = null
 
     /**
@@ -1079,8 +1079,27 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
         relativeLayout = findViewById<View>(R.id.relative_container_add_contact) as RelativeLayout
 
-        fabButton = findViewById<View>(R.id.fab_button_next) as FloatingActionButton
-        fabButton?.setOnClickListener(this)
+        fabButton = findViewById<LegacyFabButtonSend>(R.id.fab_button_next)
+        fabButton?.setOnClickListener {
+            when (contactType) {
+                Constants.CONTACT_TYPE_DEVICE -> {
+                    inviteContacts(addedContactsPhone)
+                }
+
+                Constants.CONTACT_TYPE_MEGA -> {
+                    if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
+                        showSnackbar(getString(R.string.error_creating_group_and_attaching_file))
+                        return@setOnClickListener
+                    }
+                    setResultContacts(addedContactsMEGA, true)
+                }
+
+                else -> {
+                    shareWith(addedContactsShare)
+                }
+            }
+            hideSoftKeyboard()
+        }
 
         mailError = findViewById<View>(R.id.add_contact_email_error) as RelativeLayout
         mailError?.visibility = View.GONE
@@ -2514,27 +2533,6 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
 
             R.id.allow_add_participants_switch -> {
                 isAllowAddParticipantsEnabled = allowAddParticipantsSwitch?.isChecked == true
-            }
-
-            R.id.fab_button_next -> {
-                when (contactType) {
-                    Constants.CONTACT_TYPE_DEVICE -> {
-                        inviteContacts(addedContactsPhone)
-                    }
-
-                    Constants.CONTACT_TYPE_MEGA -> {
-                        if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
-                            showSnackbar(getString(R.string.error_creating_group_and_attaching_file))
-                            return
-                        }
-                        setResultContacts(addedContactsMEGA, true)
-                    }
-
-                    else -> {
-                        shareWith(addedContactsShare)
-                    }
-                }
-                hideSoftKeyboard()
             }
         }
     }

@@ -484,12 +484,11 @@
 
 	</androidx.core.widget.NestedScrollView>
 
-	<com.google.android.material.floatingactionbutton.FloatingActionButton
+	<mega.privacy.android.app.components.legacyfab.LegacyFabButtonSend
 		android:id="@+id/fab_button_next"
-		android:layout_width="@dimen/fab_button_diameter"
-		android:layout_height="@dimen/fab_button_diameter"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
 		android:layout_alignParentEnd="true"
 		android:layout_alignParentBottom="true"
-		android:layout_margin="16dp"
-		android:src="@drawable/ic_send_horizontal_medium_thin_outline" />
+		android:padding="16dp" />
 </RelativeLayout>
