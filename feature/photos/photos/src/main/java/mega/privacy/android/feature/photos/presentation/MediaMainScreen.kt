@@ -116,6 +116,7 @@ fun MediaMainRoute(
 ) {
     val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
+    val selectedPhotosInTypedNodes by timelineViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
@@ -246,7 +247,7 @@ fun MediaMainRoute(
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         showTimelineFilter = showTimelineFilter,
-        selectedPhotosInTypedNode = { timelineViewModel.selectedPhotosInTypedNode },
+        selectedPhotosInTypedNode = { selectedPhotosInTypedNodes },
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
                 mediaSource = timelineFilterUiState.mediaSource,
