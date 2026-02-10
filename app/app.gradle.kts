@@ -493,15 +493,38 @@ fun Project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile: File) {
     val artifactoryHost = System.getenv("ARTIFACTORY_BASE_URL")
     if (!debugKeyStoreFile.exists() && !artifactoryHost.isNullOrBlank()) {
         println("Downloading debug keystore")
+        val proxyArgs = detectCurlProxyArgs()
         exec {
             commandLine(
-                "curl",
-                "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
-                "-o",
-                debugKeyStoreFile.name
+                listOf(
+                    "curl",
+                    "--fail",
+                    "--location",
+                ) + proxyArgs + listOf(
+                    "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
+                    "-o",
+                    debugKeyStoreFile.absolutePath
+                )
             )
         }
     }
+}
+
+/**
+ * Detect system proxy settings and return the appropriate curl arguments for SOCKS5 proxy.
+ */
+fun Project.detectCurlProxyArgs(): List<String> {
+    val socksHost = System.getProperty("socksProxyHost")
+    val socksPort = System.getProperty("socksProxyPort")
+
+    if (!socksHost.isNullOrBlank() && !socksPort.isNullOrBlank()) {
+        val args = listOf("--socks5-hostname", "$socksHost:$socksPort")
+        logger.lifecycle("Detected SOCKS proxy: $socksHost:$socksPort -> curl args: $args")
+        return args
+    }
+
+    logger.lifecycle("No proxy detected, curl will connect directly")
+    return emptyList()
 }
 
 /**
