@@ -10,7 +10,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -87,7 +86,7 @@ internal fun DriveSyncScreen(
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = viewModel.megaNavigator
-    var showUploadOptionsBottomSheet by remember { mutableStateOf(false) }
+    var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
     val scrollToHideState = rememberScrollToHideState()
