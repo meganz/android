@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -52,8 +51,9 @@ internal class CorrectActiveTransfersUseCaseTest {
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val updateActiveTransfersUseCase =
         mock<UpdateActiveTransfersUseCase>()
+    private val setActiveTransfersAsFinishedUseCase = mock<SetActiveTransfersAsFinishedUseCase>()
 
-    private val mockedActiveTransfers = (0L..10L).map { mock<ActiveTransfer>() }
+    private val mockedActiveTransfers = (0L..10L).map { mock<Transfer>() }
     private val mockedTransfers = (0L..10L).map { mock<Transfer>() }
 
     @BeforeAll
@@ -65,7 +65,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             fileSystemRepository = fileSystemRepository,
             isUserLoggedInUseCase = isUserLoggedInUseCase,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
-            updateActiveTransfersUseCase = updateActiveTransfersUseCase
+            updateActiveTransfersUseCase = updateActiveTransfersUseCase,
+            setActiveTransfersAsFinishedUseCase = setActiveTransfersAsFinishedUseCase,
         )
     }
 
@@ -81,6 +82,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             *mockedActiveTransfers.toTypedArray(),
             *mockedTransfers.toTypedArray(),
             updateActiveTransfersUseCase,
+            setActiveTransfersAsFinishedUseCase,
         )
         whenever(
             transferRepository.monitorPendingTransfersByTypeAndState(
@@ -134,8 +136,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
-                expected.map { it.uniqueId },
+            verify(setActiveTransfersAsFinishedUseCase).invoke(
+                expected,
                 false
             )
         }
@@ -157,8 +159,8 @@ internal class CorrectActiveTransfersUseCaseTest {
             }
             Truth.assertThat(expected).isNotEmpty()
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository).setActiveTransfersAsFinishedByUniqueId(
-                expected.map { it.uniqueId },
+            verify(setActiveTransfersAsFinishedUseCase).invoke(
+                expected,
                 true
             )
         }
@@ -173,8 +175,8 @@ internal class CorrectActiveTransfersUseCaseTest {
                 .thenReturn(mockedActiveTransfers)
             whenever(getInProgressTransfersUseCase()).thenReturn(inProgress)
             underTest(TransferType.GENERAL_UPLOAD)
-            verify(transferRepository, never()).setActiveTransfersAsFinishedByUniqueId(
-                uniqueIds = anyOrNull(),
+            verify(setActiveTransfersAsFinishedUseCase, never()).invoke(
+                transfers = anyOrNull(),
                 cancelled = eq(true)
             )
         }
@@ -517,7 +519,7 @@ internal class CorrectActiveTransfersUseCaseTest {
     @ParameterizedTest
     @EnumSource(TransferType::class)
     @NullSource
-    fun `test that updateActiveTransfersUseCase is called before getCurrentActiveTransfers`(
+    fun `test that updateActiveTransfersUseCase is called before getActiveTransfers`(
         transferType: TransferType?,
     ) = runTest {
         whenever(getInProgressTransfersUseCase()).thenReturn(emptyList())

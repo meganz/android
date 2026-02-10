@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.isBackgroundTransfer
 import mega.privacy.android.domain.entity.transfer.isPreviewDownload
@@ -28,6 +29,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val updateActiveTransfersUseCase: UpdateActiveTransfersUseCase,
+    private val setActiveTransfersAsFinishedUseCase: SetActiveTransfersAsFinishedUseCase,
 ) {
     /**
      * Invoke.
@@ -54,26 +56,26 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         transferRepository.updateActiveTransfersBytes(inProgressTransfers)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
-        val notInProgressActiveTransfersUniqueIds = activeTransfers
+        val notInProgressActiveTransfers = activeTransfers
             .filter { activeTransfer ->
                 !activeTransfer.isFinished
                         && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
             }
 
-        if (notInProgressActiveTransfersUniqueIds.isNotEmpty()) {
+        if (notInProgressActiveTransfers.isNotEmpty()) {
             //Set not in progress as finished. We are not sure if they have been cancelled or failed, we check the existence of the file to set it as cancelled as best effort approach
             transferRepository.apply {
-                val (fileExists, fileNotExists) = notInProgressActiveTransfersUniqueIds.partition {
-                    fileSystemRepository.doesUriPathExist(UriPath(it.localPath))
+                val (fileExists, fileNotExists) = notInProgressActiveTransfers
+                    .filterIsInstance<Transfer>() //Completed transfers are finished by definition, doesn't need to update its finished status
+                    .partition { fileSystemRepository.doesUriPathExist(UriPath(it.localPath)) }
+                fileExists.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedUseCase(it, cancelled = false)
                 }
-                fileExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
-                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = false)
-                }
-                fileNotExists.map { it.uniqueId }.takeIf { it.isNotEmpty() }?.let {
-                    setActiveTransfersAsFinishedByUniqueId(it, cancelled = true)
+                fileNotExists.takeIf { it.isNotEmpty() }?.let {
+                    setActiveTransfersAsFinishedUseCase(it, cancelled = true)
                 }
                 removeInProgressTransfers(
-                    notInProgressActiveTransfersUniqueIds.map { it.uniqueId }.toSet()
+                    notInProgressActiveTransfers.map { it.uniqueId }.toSet()
                 )
             }
         }

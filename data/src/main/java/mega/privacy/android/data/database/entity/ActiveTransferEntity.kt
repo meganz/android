@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.converter.ActiveTransferAppDataConverter
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
 
@@ -39,27 +38,27 @@ internal data class ActiveTransferEntity(
     @ColumnInfo("id")
     val id: Long? = null,
     @ColumnInfo(name = "uniqueId", defaultValue = "0")
-    override val uniqueId: Long,
+    val uniqueId: Long,
     @ColumnInfo(name = "tag")
-    override val tag: Int,
+    val tag: Int,
     @ColumnInfo(name = "file_name", defaultValue = "")
-    override val fileName: String,
+    val fileName: String,
     @ColumnInfo(name = "transfer_type")
-    override val transferType: TransferType,
+    val transferType: TransferType,
     @ColumnInfo(name = "total_bytes")
-    override val totalBytes: Long,
+    val totalBytes: Long,
     @ColumnInfo(name = "is_finished")
-    override val isFinished: Boolean,
+    val isFinished: Boolean,
     @ColumnInfo(name = "is_folder_transfer", defaultValue = "0")
-    override val isFolderTransfer: Boolean,
+    val isFolderTransfer: Boolean,
     @ColumnInfo(name = "is_paused", defaultValue = "0")
-    override val isPaused: Boolean,
+    val isPaused: Boolean,
     @ColumnInfo(name = "is_already_downloaded", defaultValue = "0")
-    override val isAlreadyTransferred: Boolean,
+    val isAlreadyTransferred: Boolean,
     @ColumnInfo(name = "is_cancelled", defaultValue = "0")
-    override val isCancelled: Boolean,
+    val isCancelled: Boolean,
     @ColumnInfo(name = "transferappdata", defaultValue = "")
-    override val appData: List<TransferAppData>,
+    val appData: List<TransferAppData>,
     @ColumnInfo(name = "local_path", defaultValue = "")
-    override val localPath: String,
-) : ActiveTransfer
+    val localPath: String,
+)

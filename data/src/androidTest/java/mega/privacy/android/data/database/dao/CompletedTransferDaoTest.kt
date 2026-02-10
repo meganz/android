@@ -42,7 +42,7 @@ class CompletedTransferDaoTest {
             entity
         }
 
-        completedTransferDao.getAllCompletedTransfers().first().forEachIndexed { i, actual ->
+        completedTransferDao.getAllCompletedTransfers().forEachIndexed { i, actual ->
             assertThat(actual.fileName).isEqualTo(entities[i].fileName)
             assertThat(actual.type).isEqualTo(entities[i].type)
             assertThat(actual.state).isEqualTo(entities[i].state)
@@ -62,7 +62,7 @@ class CompletedTransferDaoTest {
     fun test_that_getById_returns_the_corresponding_item() = runTest {
         val entity = createCompletedTransferEntity()
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
-        val id = completedTransferDao.getAllCompletedTransfers().first().first().id
+        val id = completedTransferDao.getAllCompletedTransfers().first().id
 
         val actual = completedTransferDao.getCompletedTransferById(id ?: return@runTest)
 
@@ -85,7 +85,7 @@ class CompletedTransferDaoTest {
         val entity = createCompletedTransferEntity()
         completedTransferDao.insertOrUpdateCompletedTransfer(entity)
 
-        assertThat(completedTransferDao.getAllCompletedTransfers().first().size).isEqualTo(1)
+        assertThat(completedTransferDao.getAllCompletedTransfers().size).isEqualTo(1)
     }
 
     @Test
@@ -98,7 +98,7 @@ class CompletedTransferDaoTest {
         completedTransferDao.insertOrUpdateCompletedTransfers(expected)
 
         assertThat(
-            completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
+            completedTransferDao.getAllCompletedTransfers().map { it.copy(id = null) }
         ).isEqualTo(expected)
     }
 
@@ -116,7 +116,7 @@ class CompletedTransferDaoTest {
             )
 
             assertThat(
-                completedTransferDao.getAllCompletedTransfers().first().map { it.copy(id = null) }
+                completedTransferDao.getAllCompletedTransfers().map { it.copy(id = null) }
             ).isEqualTo(expected)
         }
 
@@ -130,7 +130,7 @@ class CompletedTransferDaoTest {
 
         completedTransferDao.deleteAllCompletedTransfers()
 
-        assertThat(completedTransferDao.getAllCompletedTransfers().first()).isEmpty()
+        assertThat(completedTransferDao.getAllCompletedTransfers()).isEmpty()
     }
 
     @Test
@@ -141,7 +141,7 @@ class CompletedTransferDaoTest {
             entity
         }
 
-        val id = completedTransferDao.getAllCompletedTransfers().first().first().id
+        val id = completedTransferDao.getAllCompletedTransfers().first().id
 
         val entity = completedTransferDao.getCompletedTransferById(id ?: return@runTest)
         assertThat(entity).isNotNull()
@@ -162,12 +162,12 @@ class CompletedTransferDaoTest {
             }
 
             completedTransferDao.insertOrUpdateCompletedTransfers(entities)
-            val inserted = completedTransferDao.getAllCompletedTransfers().first()
+            val inserted = completedTransferDao.getAllCompletedTransfers()
             assertThat(inserted.size).isEqualTo(entities.size)
             completedTransferDao.deleteCompletedTransferByIds(
                 inserted.map { it.id ?: 0 }, 10
             )
-            val actual = completedTransferDao.getAllCompletedTransfers().first()
+            val actual = completedTransferDao.getAllCompletedTransfers()
             assertThat(actual).isEmpty()
         }
 
@@ -230,7 +230,7 @@ class CompletedTransferDaoTest {
             )
 
             // Verify that only state 1 transfers were affected and only the oldest ones were deleted
-            val remainingTransfers = completedTransferDao.getAllCompletedTransfers().first()
+            val remainingTransfers = completedTransferDao.getAllCompletedTransfers()
             assertThat(remainingTransfers.size).isEqualTo(expectedTotalCount)
 
             // Verify state 1 transfers: should have only the most recent ones up to the limit

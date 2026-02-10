@@ -170,12 +170,13 @@ abstract class AbstractTransfersWorker(
     private suspend fun checkFinishedGroups(transferTotals: ActiveTransferTotals) {
         transferTotals.actionGroups.filter { it.finished() && !alreadyFinishedGroups.contains(it.groupId) }
             .also { finishedGroups ->
-                alreadyFinishedGroups.addAll(finishedGroups.map { it.groupId })
                 finishedGroups.forEach { group ->
-                    showActionGroupFinishedNotification(group)
-                    runCatching {
-                        deleteActiveTransferGroupUseCase(group.groupId)
-                    }.onFailure { Timber.e(it) }
+                    if (showActionGroupFinishedNotification(group)) {
+                        alreadyFinishedGroups.add(group.groupId)
+                        runCatching {
+                            deleteActiveTransferGroupUseCase(group.groupId)
+                        }.onFailure { Timber.e(it) }
+                    }
                 }
             }
     }
@@ -328,10 +329,13 @@ abstract class AbstractTransfersWorker(
     open suspend fun createActionGroupFinishNotification(actionGroup: ActiveTransferTotals.ActionGroup): Notification? =
         null
 
+    /**
+     * @return true if the notification was shown, false otherwise
+     */
     @SuppressLint("MissingPermission")
     private suspend fun showActionGroupFinishedNotification(
         actionGroup: ActiveTransferTotals.ActionGroup,
-    ) {
+    ): Boolean {
         if (areNotificationsEnabledUseCase()) {
             notificationManager.cancel(NOTIFICATION_GROUP_MULTIPLAYER * updateNotificationId + actionGroup.groupId)
             finalNotificationId?.let { finalNotificationId ->
@@ -347,10 +351,12 @@ abstract class AbstractTransfersWorker(
                             groupNotificationId,
                             groupNotification,
                         )
+                        return true
                     }
                 }
             }
         }
+        return false
     }
 
     /**

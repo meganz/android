@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -39,7 +38,6 @@ import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
 import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
@@ -62,7 +60,6 @@ import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -82,11 +79,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val contactEntityMapper: ContactEntityMapper,
     private val contactModelMapper: ContactModelMapper,
     private val completedTransferDao: Lazy<CompletedTransferDao>,
-    private val activeTransferDao: Lazy<ActiveTransferDao>,
     private val completedTransferModelMapper: CompletedTransferModelMapper,
     private val completedTransferEntityMapper: CompletedTransferEntityMapper,
     private val completedTransferLegacyModelMapper: CompletedTransferLegacyModelMapper,
-    private val activeTransferEntityMapper: ActiveTransferEntityMapper,
     private val backupDao: Lazy<BackupDao>,
     private val backupEntityMapper: BackupEntityMapper,
     private val backupModelMapper: BackupModelMapper,
@@ -280,42 +275,6 @@ internal class MegaLocalRoomFacade @Inject constructor(
                 completedTransferDao.get().deleteAllLegacyCompletedTransfers()
             }
     }
-
-    override suspend fun getActiveTransferByUniqueId(uniqueId: Long) =
-        activeTransferDao.get().getActiveTransferByUniqueId(uniqueId)
-
-    override suspend fun getActiveTransferByTag(tag: Int) =
-        activeTransferDao.get().getActiveTransferByTag(tag)
-
-    override fun getActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getActiveTransfersByType(transferType)
-
-
-    override suspend fun getCurrentActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().getCurrentActiveTransfersByType(transferType)
-
-    override suspend fun getCurrentActiveTransfers(): List<ActiveTransfer> =
-        activeTransferDao.get().getCurrentActiveTransfers()
-
-    override suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer) =
-        activeTransferDao.get()
-            .insertOrUpdateActiveTransfer(activeTransferEntityMapper(activeTransfer))
-
-    override suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>) =
-        activeTransfers.map { activeTransferEntityMapper(it) }.let { mappedActiveTransfers ->
-            activeTransferDao.get().insertOrUpdateActiveTransfers(mappedActiveTransfers)
-        }
-
-    override suspend fun deleteAllActiveTransfersByType(transferType: TransferType) =
-        activeTransferDao.get().deleteAllActiveTransfersByType(transferType)
-
-    override suspend fun deleteAllActiveTransfers() =
-        activeTransferDao.get().deleteAllActiveTransfers()
-
-    override suspend fun setActiveTransfersAsFinishedByUniqueId(
-        uniqueIds: List<Long>,
-        cancelled: Boolean,
-    ) = activeTransferDao.get().setActiveTransfersAsFinishedByUniqueId(uniqueIds, cancelled)
 
     override suspend fun insertActiveTransferGroup(activeTransferActionGroup: ActiveTransferActionGroup) =
         activeTransferGroupDao.get()

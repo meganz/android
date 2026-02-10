@@ -12,11 +12,9 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -47,15 +45,6 @@ class UpdateActiveTransfersUseCaseTest {
     }
 
     @Test
-    fun `test that when there are no transfers, all active transfers are deleted`() =
-        runTest {
-            underTest()
-
-            verify(transferRepository).deleteAllActiveTransfers()
-            verify(transferRepository, never()).putActiveTransfers(any())
-        }
-
-    @Test
     fun `test that in progress transfers are inserted as active transfers`() = runTest {
         val inProgressTransfer1 = mock<Transfer> {
             on { uniqueId } doReturn 1L
@@ -69,7 +58,6 @@ class UpdateActiveTransfersUseCaseTest {
 
         underTest()
 
-        verify(transferRepository).deleteAllActiveTransfers()
         verify(transferRepository).putActiveTransfers(
             argThat { this.size == 2 && this.containsAll(inProgressTransfers) }
         )
@@ -101,7 +89,6 @@ class UpdateActiveTransfersUseCaseTest {
 
         underTest()
 
-        verify(transferRepository).deleteAllActiveTransfers()
         verify(transferRepository).putActiveTransfers(
             argThat { transfers ->
                 transfers.size == 2 &&
@@ -139,7 +126,6 @@ class UpdateActiveTransfersUseCaseTest {
 
         underTest()
 
-        verify(transferRepository).deleteAllActiveTransfers()
         verify(transferRepository).putActiveTransfers(
             argThat { transfers ->
                 transfers.size == 2 && !transfers.contains(completedTransfer3)
@@ -170,7 +156,6 @@ class UpdateActiveTransfersUseCaseTest {
 
             underTest()
 
-            verify(transferRepository).deleteAllActiveTransfers()
             verify(transferRepository).putActiveTransfers(
                 argThat { transfers ->
                     transfers.size == 2 &&
@@ -179,17 +164,4 @@ class UpdateActiveTransfersUseCaseTest {
                 }
             )
         }
-
-    @Test
-    fun `test that active transfers are added after deleting previous ones`() = runTest {
-        val inProgressTransfer = mock<Transfer>()
-
-        whenever(getInProgressTransfersUseCase()).thenReturn(listOf(inProgressTransfer))
-
-        underTest()
-
-        val inOrder = org.mockito.kotlin.inOrder(transferRepository)
-        inOrder.verify(transferRepository).deleteAllActiveTransfers()
-        inOrder.verify(transferRepository).putActiveTransfers(any())
-    }
 }

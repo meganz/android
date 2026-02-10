@@ -49,6 +49,7 @@ data class CompletedTransfer(
     override val localPath = originalPath
     override val tag = 0
     override val transferType = type
+    override val transferredBytes = totalBytes
 
     /**
      * Whether the transfer is a download to the local storage and the download location is a content URI.

@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -48,7 +47,7 @@ class GetPreviewDownloadUseCaseTest {
     @Test
     fun `test that transfer is returned when found`() = runTest {
         val foundActiveTransferId = 1L
-        val foundActiveTransfer = mock<ActiveTransfer> {
+        val foundActiveTransfer = mock<Transfer> {
             on { appData } doReturn previewAppData
             on { this.fileName } doReturn fileName
             on { uniqueId } doReturn foundActiveTransferId
@@ -58,12 +57,12 @@ class GetPreviewDownloadUseCaseTest {
         }
         val activeDownloads = buildList {
             add(foundActiveTransfer)
-            add(mock<ActiveTransfer> {
+            add(mock<Transfer> {
                 on { appData } doReturn previewAppData
                 on { fileName } doReturn "otherName"
                 on { uniqueId } doReturn 2
             })
-            add(mock<ActiveTransfer> {
+            add(mock<Transfer> {
                 on { appData } doReturn emptyList()
                 on { fileName } doReturn "otherName"
                 on { uniqueId } doReturn 3
@@ -88,7 +87,7 @@ class GetPreviewDownloadUseCaseTest {
     @Test
     fun `test that null is returned if transfer is not found`() = runTest {
         val foundActiveTransferId = 1L
-        val foundActiveTransfer = mock<ActiveTransfer> {
+        val foundActiveTransfer = mock<Transfer> {
             on { appData } doReturn previewAppData
             on { this.fileName } doReturn fileName
             on { uniqueId } doReturn foundActiveTransferId
@@ -98,12 +97,12 @@ class GetPreviewDownloadUseCaseTest {
         }
         val activeDownloads = buildList {
             add(foundActiveTransfer)
-            add(mock<ActiveTransfer> {
+            add(mock<Transfer> {
                 on { appData } doReturn previewAppData
                 on { fileName } doReturn "otherName"
                 on { uniqueId } doReturn 2
             })
-            add(mock<ActiveTransfer> {
+            add(mock<Transfer> {
                 on { appData } doReturn emptyList()
                 on { fileName } doReturn "otherName"
                 on { uniqueId } doReturn 3

@@ -27,7 +27,6 @@ class UpdateActiveTransfersUseCase @Inject constructor(
             transferRepository.getActiveTransferGroups().mapNotNull { it.groupId?.toLong() }
         val activeFromCompleted =
             completedTransfers.filter { it.getTransferGroup()?.groupId in transferGroupIds }
-        transferRepository.deleteAllActiveTransfers()
         val activeTransfers = inProgressTransfers + activeFromCompleted
         if (activeTransfers.isNotEmpty()) {
             transferRepository.putActiveTransfers(activeTransfers)

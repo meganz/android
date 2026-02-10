@@ -335,12 +335,12 @@ interface TransferRepository {
      * Get current active transfers
      * @return all active transfers list
      */
-    suspend fun getActiveTransfers(): List<ActiveTransfer>
+    suspend fun getActiveTransfers(): Collection<ActiveTransfer>
 
     /**
      * Insert a new active transfer or replace it if there's already an active transfer with the same uniqueId
      */
-    suspend fun putActiveTransfer(activeTransfer: ActiveTransfer)
+    suspend fun putActiveTransfer(activeTransfer: Transfer)
 
     /**
      * Insert (or replace  if there's already an active transfer with the same uniqueId) a list of active transfers
@@ -356,13 +356,6 @@ interface TransferRepository {
      * Delete all active transfer
      */
     suspend fun deleteAllActiveTransfers()
-
-    /**
-     * Set an active transfer as finished by its uniqueId
-     * @param uniqueIds the unique ids of the active transfers to be set as finished
-     * @param cancelled whether the transfer was cancelled or not
-     */
-    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
 
     /**
      * Get active transfer totals by type

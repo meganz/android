@@ -13,7 +13,6 @@ import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
-import mega.privacy.android.domain.entity.transfer.ActiveTransfer
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
@@ -215,64 +214,6 @@ interface MegaLocalRoomGateway {
      * Migrate legacy completed transfers
      */
     suspend fun migrateLegacyCompletedTransfers()
-
-    /**
-     * Get active transfer by uniqueId
-     */
-    suspend fun getActiveTransferByUniqueId(uniqueId: Long): ActiveTransfer?
-
-    /**
-     * Get active transfer by tag.
-     *
-     * Make you sure you use this only for getting the parent folder Transfer using
-     * Transfer.folderTransferTag, otherwise it may lead to unexpected results.
-     */
-    suspend fun getActiveTransferByTag(tag: Int): ActiveTransfer?
-
-    /**
-     * Get active transfers by type
-     * @return a flow of all active transfers list
-     */
-    fun getActiveTransfersByType(transferType: TransferType): Flow<List<ActiveTransfer>>
-
-    /**
-     * Get active transfers by type
-     * @return A list of all active transfers of this type
-     */
-    suspend fun getCurrentActiveTransfersByType(transferType: TransferType): List<ActiveTransfer>
-
-    /**
-     * Get all active transfers
-     * @return A list of all active transfers
-     */
-    suspend fun getCurrentActiveTransfers(): List<ActiveTransfer>
-
-    /**
-     * Insert a new active transfer or update it if there's already an active transfer with the same tag but it's not yet finished
-     */
-    suspend fun insertOrUpdateActiveTransfer(activeTransfer: ActiveTransfer)
-
-    /**
-     * Insert (or update if there's already an active transfer with the same tag) a list of active transfers
-     */
-    suspend fun insertOrUpdateActiveTransfers(activeTransfers: List<ActiveTransfer>)
-
-    /**
-     * Delete all active transfer by type
-     */
-    suspend fun deleteAllActiveTransfersByType(transferType: TransferType)
-
-    /**
-     * Delete all active transfer by type
-     */
-    suspend fun deleteAllActiveTransfers()
-
-    /**
-     * Set an active transfer as finished by its uniqueId
-     * @param uniqueIds the unique ids of the active transfers to be set as finished
-     * @param cancelled whether the transfer was cancelled or not
-     */
-    suspend fun setActiveTransfersAsFinishedByUniqueId(uniqueIds: List<Long>, cancelled: Boolean)
 
     /**
      * Insert a new active transfer group and returns it's id
@@ -535,7 +476,7 @@ interface MegaLocalRoomGateway {
 
     /**
      * Insert pending transfers
-     * @param pendingTransfer
+     * @param pendingTransfers
      */
     suspend fun insertPendingTransfers(pendingTransfers: List<InsertPendingTransferRequest>)
 

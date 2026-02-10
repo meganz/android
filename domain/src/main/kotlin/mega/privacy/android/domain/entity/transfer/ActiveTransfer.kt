@@ -5,6 +5,8 @@ package mega.privacy.android.domain.entity.transfer
  */
 interface ActiveTransfer : TypedTransfer, AppDataOwner {
 
+    val transferredBytes: Long
+
     /**
      * [TransferType] of this transfer.
      */

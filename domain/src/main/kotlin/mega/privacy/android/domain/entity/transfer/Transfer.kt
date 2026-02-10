@@ -49,7 +49,7 @@ data class Transfer(
     override val uniqueId: Long,
     override val transferType: TransferType,
     val startTime: Long,
-    val transferredBytes: Long,
+    override val transferredBytes: Long,
     override val totalBytes: Long,
     override val localPath: String,
     val parentPath: String,

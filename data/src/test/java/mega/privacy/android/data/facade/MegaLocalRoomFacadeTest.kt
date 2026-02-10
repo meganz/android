@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cryptography.DecryptData
 import mega.privacy.android.data.cryptography.EncryptData
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -20,7 +19,6 @@ import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -48,7 +46,6 @@ import mega.privacy.android.data.mapper.offline.OfflineModelMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfEntityMapper
 import mega.privacy.android.data.mapper.pdf.LastPageViewedInPdfModelMapper
 import mega.privacy.android.data.mapper.transfer.TransferStateIntMapper
-import mega.privacy.android.data.mapper.transfer.active.ActiveTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferGroupEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferEntityMapper
 import mega.privacy.android.data.mapper.transfer.completed.CompletedTransferLegacyModelMapper
@@ -71,7 +68,6 @@ import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroupImpl
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
-import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -106,8 +102,6 @@ internal class MegaLocalRoomFacadeTest {
     private val completedTransferModelMapper = mock<CompletedTransferModelMapper>()
     private val encryptData = mock<EncryptData>()
     private val decryptData = mock<DecryptData>()
-    private val activeTransferDao = mock<ActiveTransferDao>()
-    private val activeTransferEntityMapper = mock<ActiveTransferEntityMapper>()
     private val completedTransferEntityMapper: CompletedTransferEntityMapper = mock()
     private val backupDao = mock<BackupDao>()
     private val backupEntityMapper = mock<BackupEntityMapper>()
@@ -148,9 +142,7 @@ internal class MegaLocalRoomFacadeTest {
             contactEntityMapper = contactEntityMapper,
             contactModelMapper = contactModelMapper,
             completedTransferDao = { completedTransferDao },
-            activeTransferDao = { activeTransferDao },
             completedTransferModelMapper = completedTransferModelMapper,
-            activeTransferEntityMapper = activeTransferEntityMapper,
             encryptData = encryptData,
             decryptData = decryptData,
             completedTransferEntityMapper = completedTransferEntityMapper,
@@ -197,8 +189,6 @@ internal class MegaLocalRoomFacadeTest {
             completedTransferDao,
             completedTransferModelMapper,
             encryptData,
-            activeTransferDao,
-            activeTransferEntityMapper,
             backupDao,
             backupEntityMapper,
             backupModelMapper,
@@ -578,22 +568,6 @@ internal class MegaLocalRoomFacadeTest {
             expected,
             MAX_INSERT_LIST_SIZE,
         )
-    }
-
-    @Test
-    fun `test that insertOrUpdateActiveTransfers insert the mapped entities`() = runTest {
-        val activeTransfers = (0..10).map {
-            mock<Transfer>()
-        }
-        val roomEntitiesMap = activeTransfers.associateWith { mock<ActiveTransferEntity>() }
-        activeTransfers.forEach {
-            whenever(activeTransferEntityMapper(it)) doReturn roomEntitiesMap.getValue(it)
-        }
-        val expected = roomEntitiesMap.values.toList()
-
-        underTest.insertOrUpdateActiveTransfers(activeTransfers)
-
-        verify(activeTransferDao).insertOrUpdateActiveTransfers(expected)
     }
 
     @Test
