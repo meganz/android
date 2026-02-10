@@ -185,6 +185,7 @@ class MegaActivity : FragmentActivity() {
                 Timber.d("NavKey from intent: $it")
             }
             navigationEventQueue.emit(navKeys)
+            intent.removeExtra(EXTRA_NAV_KEYS)
         }
     }
 
