@@ -151,7 +151,6 @@ class MediaMainScreenAnalyticsTest {
                     onTimelineGridSizeChange = {},
                     onTimelineSortOptionChange = {},
                     onTimelineApplyFilterClick = {},
-                    setNavigationItemVisibility = {},
                     navigateToMediaSearch = {},
                     onTimelinePhotoSelected = onTimelinePhotoSelected,
                     onAllTimelinePhotosSelected = {},
@@ -174,7 +173,9 @@ class MediaMainScreenAnalyticsTest {
                     onSelectAllPlaylists = {},
                     onClearPlaylistsSelection = {},
                     viewModel = mediaMainViewModel,
-                    albumsTabViewModel = albumsTabViewModel
+                    albumsTabViewModel = albumsTabViewModel,
+                    showTimelineFilter = false,
+                    onTimelineFilterVisibilityChange = {}
                 )
             }
         }
