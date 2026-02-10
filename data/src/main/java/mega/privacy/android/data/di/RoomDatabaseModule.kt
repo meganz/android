@@ -17,7 +17,6 @@ import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.SQLCipherManager
 import mega.privacy.android.data.database.chat.CHAT_DATABASE_NAME
 import mega.privacy.android.data.database.chat.ChatDatabase
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -121,11 +120,6 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideCompletedTransferDao(database: MegaDatabase): CompletedTransferDao =
         database.completedTransferDao()
-
-    @Provides
-    @Singleton
-    internal fun provideActiveTransferDao(database: MegaDatabase): ActiveTransferDao =
-        database.activeTransfersDao()
 
     @Provides
     @Singleton

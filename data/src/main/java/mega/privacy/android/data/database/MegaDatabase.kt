@@ -8,7 +8,6 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import mega.privacy.android.data.database.dao.ActiveTransferDao
 import mega.privacy.android.data.database.dao.ActiveTransferGroupDao
 import mega.privacy.android.data.database.dao.BackupDao
 import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
@@ -26,7 +25,6 @@ import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
 import mega.privacy.android.data.database.entity.ActiveTransferActionGroupEntity
-import mega.privacy.android.data.database.entity.ActiveTransferEntity
 import mega.privacy.android.data.database.entity.BackupEntity
 import mega.privacy.android.data.database.entity.CameraUploadsRecordEntity
 import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
@@ -43,6 +41,7 @@ import mega.privacy.android.data.database.entity.SyncShownNotificationEntity
 import mega.privacy.android.data.database.entity.SyncSolvedIssueEntity
 import mega.privacy.android.data.database.entity.UserPausedSyncEntity
 import mega.privacy.android.data.database.entity.VideoRecentlyWatchedEntity
+import mega.privacy.android.data.database.spec.AutoMigrationDeleteActiveTransfersSpec
 import mega.privacy.android.data.database.spec.AutoMigrationSpec100to101
 import mega.privacy.android.data.database.spec.AutoMigrationSpec102to103
 import mega.privacy.android.data.database.spec.AutoMigrationSpec73to74
@@ -55,7 +54,6 @@ import timber.log.Timber
         ContactEntity::class,
         CompletedTransferEntity::class,
         CompletedTransferEntityLegacy::class,
-        ActiveTransferEntity::class,
         ActiveTransferActionGroupEntity::class,
         BackupEntity::class,
         OfflineEntity::class,
@@ -112,6 +110,7 @@ import timber.log.Timber
         AutoMigration(114, 115),
         AutoMigration(115, 116),
         AutoMigration(116, 117),
+        AutoMigration(117, 118, spec = AutoMigrationDeleteActiveTransfersSpec::class),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -119,7 +118,6 @@ internal abstract class MegaDatabase : RoomDatabase() {
 
     abstract fun completedTransferDao(): CompletedTransferDao
 
-    abstract fun activeTransfersDao(): ActiveTransferDao
 
     abstract fun activeTransferGroupsDao(): ActiveTransferGroupDao
 
@@ -302,12 +300,12 @@ internal abstract class MegaDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Update ActiveTransferEntity indices
                 db.execSQL(
-                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_uniqueId " +
-                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (uniqueId)"
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY}_uniqueId " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY} (uniqueId)"
                 )
                 db.execSQL(
-                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS}_tag " +
-                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS} (tag)"
+                    "CREATE INDEX IF NOT EXISTS index_${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY}_tag " +
+                            "ON ${MegaDatabaseConstant.TABLE_ACTIVE_TRANSFERS_LEGACY} (tag)"
                 )
 
                 // Update CompletedTransferEntity indices - drop composite index and create separate indices

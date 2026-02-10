@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 117
+    const val DATABASE_VERSION = 118
 
     /**
      * Database Name
@@ -31,9 +31,9 @@ object MegaDatabaseConstant {
     const val TABLE_COMPLETED_TRANSFERS_LEGACY = "completedtransfers"
 
     /**
-     * Table Active Transfers
+     * Table Active Transfers, not used anymore, keep the constant for database migration purposes only
      */
-    const val TABLE_ACTIVE_TRANSFERS = "active_transfers"
+    const val TABLE_ACTIVE_TRANSFERS_LEGACY = "active_transfers"
 
     /**
      * Table Active Transfer Groups
