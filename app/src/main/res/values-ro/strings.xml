@@ -14,8 +14,6 @@
     <string name="general_select">Selectează</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Selectează un folder</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Creează</string>
     <!-- button -->
     <string name="general_add">Adaugă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Deconectați-vă</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Încarcă</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Folder nou</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Fișier text nou</string>
     <!-- Menu item -->
     <string name="action_settings">Setări</string>
     <!-- Search button -->
@@ -279,8 +273,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Acest link nu va mai fi disponibil publicului.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Redenumește</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Deschide</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Se pregătește fișierul</string>
@@ -300,8 +292,6 @@
     <string name="context_move_to_trash">Mutați în Coșul de gunoi</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Eliminați de pe MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Numele folderului</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Se creează folderul</string>
     <!-- Menu option title -->
@@ -390,8 +380,6 @@
     <string name="subscription_type_monthly">Lunar</string>
     <!--  -->
     <string name="subscription_type_yearly">Anual</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Folder nou</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Adaugă un contact</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1288,8 +1276,6 @@
     <string name="settings_feedback_body_device_model">Modelul dispozitivului</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versiunea Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Fișier text nou</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Numele fișierului</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1308,8 +1294,6 @@
     <string name="general_incorrect_names">Vă rugăm să corectați numele fișierelor înainte de a continua</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Caractere nevalide</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Numele fișierului nu poate fi gol.</item>

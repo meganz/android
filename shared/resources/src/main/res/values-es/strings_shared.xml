@@ -138,8 +138,6 @@
     <string name="video_section_videos_duration_option_more_than_20_minutes">Más de 20 minutos</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Introducir el nombre de la lista de reproducción</string>
-    <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Renombrar</string>
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Ya existe una lista de reproducción con este nombre. Introduce un nombre diferente.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
@@ -420,14 +418,8 @@
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Pulsa [A]Cancelar suscripción[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">No hay conexión a internet</string>
-    <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Nueva carpeta</string>
-    <!-- Create new folder dialog title -->
-    <string name="create_new_folder_dialog_title">Nueva carpeta</string>
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">Nombre de carpeta</string>
-    <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">Crear</string>
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">Cancelar</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
@@ -988,8 +980,6 @@
     <string name="sync_rename_and_create_backup_dialog_text">Ya existe una carpeta con el mismo nombre en tus backups. Cambia el nombre de la nueva carpeta para continuar con el backup. El nombre de la carpeta no cambiará en tu dispositivo.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
     <string name="sync_rename_and_create_backup_dialog_hint_text">Nombre del backup</string>
-    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_positive_button">Renombrar</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Introducir un nombre para el backup</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
@@ -1438,8 +1428,6 @@
     <string name="colored_folders_onboarding_description">Al añadir una etiqueta, su color aparecerá directamente en la carpeta para que puedas encontrar lo que buscas más rápido.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Combinar</string>
-    <!-- Dialog rename option -->
-    <string name="sync_apply_all_dialog_rename_button">Renombrar</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Eliminar problemas resueltos</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
@@ -1758,8 +1746,6 @@
     <string name="general_mega_privacy_suite">Privacidad con MEGA</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Introducir el nombre del álbum</string>
-    <!-- Add new album on Media screen dialog positive button text -->
-    <string name="media_add_new_album_dialog_positive_button">Crear</string>
     <!-- Title of favourite album. -->
     <string name="system_album_favourites_title">Favoritos</string>
     <!-- Title of gif album. -->
@@ -1862,9 +1848,9 @@
     <string name="payment_ads_free_intro_description">Amplía a un plan Pro con mucho almacenamiento y más. Nuestros planes Pro empiezan desde tan solo %1$s al mes.</string>
     <string name="hidden_nodes_description_hide_files_folders_feature">Puedes ocultar archivos y carpetas confidenciales para proteger tu privacidad en un solo paso.</string>
     <plurals name="remove_links_warning_text">
-        <item quantity="one">Este enlace se eliminará.</item>
-        <item quantity="many">Estos enlaces se eliminarán.</item>
-        <item quantity="other">Estos enlaces se eliminarán.</item>
+        <item quantity="one">Este enlace público se eliminará.</item>
+        <item quantity="many">Estos enlaces públicos se eliminarán.</item>
+        <item quantity="other">Estos enlaces públicos se eliminarán.</item>
     </plurals>
     <string name="hidden_nodes_description_control_visibility">Solo tú puedes revelar los archivos ocultos, ya sea de forma individual o mostrando temporalmente los elementos ocultos en los ajustes.</string>
     <string name="hidden_nodes_description_visible_shared_files">Muestra los elementos ocultos con sus miniaturas difuminadas, para que puedas identificarlos sin exponer su contenido.</string>
@@ -2144,4 +2130,19 @@
         <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
         <item quantity="other">%1$d carpetas&#160;·&#160;</item>
     </plurals>
+    <string name="home_recents_snackbar_activity_hidden">Tu actividad reciente ha sido ocultada</string>
+    <string name="home_recents_button_view_all">Ver todo</string>
+    <string name="home_recents_options_menu_show_activity">Mostrar actividad reciente</string>
+    <string name="home_recents_empty_text_description">Aquí aparecerá toda la actividad reciente de tus archivos y carpetas</string>
+    <string name="home_recents_hidden_text_description">Actividad reciente oculta</string>
+    <string name="home_recents_bucket_subtitle_added_to">Añadido a %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Estos archivos ya no están disponibles</string>
+    <string name="shares_screen_links_section_empty">[B]No hay [/B][A]enlaces públicos[/A]</string>
+    <string name="general_invalid_dot_name_warning">El nombre “.” no es válido</string>
+    <string name="general_invalid_double_dot_name_warning">El nombre “..” no es válido</string>
+    <string name="search_landing_title">¿Buscas algo?</string>
+    <string name="search_landing_subtitle">Buscar archivos y carpetas</string>
+    <string name="offline_screen_empty_state_description">No hay archivos en Sin conexión</string>
+    <string name="general_install_label">Instalar</string>
+    <string name="general_app_update_download_success_message">Actualización de la aplicación descargada</string>
 </resources>

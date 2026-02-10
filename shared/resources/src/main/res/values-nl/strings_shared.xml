@@ -138,8 +138,6 @@
     <string name="video_section_videos_duration_option_more_than_20_minutes">Meer dan 20 minuten</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Voer de naam van de afspeellijst in</string>
-    <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Hernoemen</string>
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Er bestaat al een playlist met deze naam. Voer een andere naam in.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
@@ -412,14 +410,8 @@
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Tik [A]Abonnement opzeggen[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Geen internet verbinding</string>
-    <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Nieuwe map</string>
-    <!-- Create new folder dialog title -->
-    <string name="create_new_folder_dialog_title">Nieuwe map</string>
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">Map naam</string>
-    <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">Creëren</string>
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">Annuleren</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
@@ -972,8 +964,6 @@
     <string name="sync_rename_and_create_backup_dialog_text">Er bestaat al een map met dezelfde naam in uw back-ups. Hernoem de nieuwe map om door te gaan met de backup. De mapnaam verandert niet op uw apparaat.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
     <string name="sync_rename_and_create_backup_dialog_hint_text">Back-upnaam</string>
-    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_positive_button">Hernoemen</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Een backupnaam invoeren</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
@@ -1426,8 +1416,6 @@
     <string name="colored_folders_onboarding_description">Wanneer je een label aan een map toevoegt, wordt de kleur ervan direct op de map weergegeven. Zo vind u sneller wat u nodig hebt.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Samenvoegen</string>
-    <!-- Dialog rename option -->
-    <string name="sync_apply_all_dialog_rename_button">Hernoemen</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Opgeloste problemen wissen</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
@@ -1748,8 +1736,6 @@
     <string name="account_upgrade_account_label_save_at_least">Bespaar minstens 16% op een jaarabonnement</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Voer album naam in</string>
-    <!-- Add new album on Media screen dialog positive button text -->
-    <string name="media_add_new_album_dialog_positive_button">Creëren</string>
     <!-- Title of favourite album. -->
     <string name="system_album_favourites_title">Favorieten</string>
     <!-- Title of gif album. -->
@@ -2130,4 +2116,9 @@
         <item quantity="one">%1$d map&#160;·&#160;</item>
         <item quantity="other">%1$d mappen&#160;·&#160;</item>
     </plurals>
+    <string name="search_landing_title">Op zoek naar iets?</string>
+    <string name="search_landing_subtitle">Zoek bestanden en mappen</string>
+    <string name="offline_screen_empty_state_description">Geen bestanden opgeslagen voor Offline gebruik</string>
+    <string name="general_install_label">Installeren</string>
+    <string name="general_app_update_download_success_message">Applicatie update gedownload</string>
 </resources>

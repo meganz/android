@@ -2,8 +2,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- Title of the Rename Device Dialog -->
     <string name="device_center_rename_device_dialog_title">Redenumire dispozitivul</string>
-    <!-- The name of the Positive Button for the Rename Device Dialog -->
-    <string name="device_center_rename_device_dialog_positive_button">Redenumește</string>
     <!-- The name of the Header in Device Center which signifies the User's Device that is currently in use -->
     <string name="device_center_list_view_item_header_this_device">Acest dispozitiv</string>
     <!-- The name of the Header in Device Center which signifies the User's Devices that are not currently in use  -->
@@ -32,8 +30,6 @@
     <string name="device_center_bottom_sheet_item_camera_uploads_enabled_status">Activată</string>
     <!-- The disabled Camera uploads status that is shown alongside the "Camera uploads" Device Center Bottom Sheet item -->
     <string name="device_center_bottom_sheet_item_camera_uploads_disabled_status">Dezactivat</string>
-    <!-- The name of one of the Device Center Bottom Sheet items that when clicked, opens the "Rename device" Dialog to let the User rename the selected Device -->
-    <string name="device_center_bottom_sheet_item_rename">Redenumește</string>
     <!-- The name of one of the Device Center Bottom Sheet items that when clicked, takes the User to the Node Information screen to view more information about the Device or Device Folder -->
     <string name="device_center_bottom_sheet_item_info">Informații</string>
     <!-- The name of the Device or Folder Sub State when its code is STORAGE_OVERQUOTA -->
@@ -48,16 +44,12 @@
     <string name="device_center_rename_device_dialog_error_message_empty_device_name">Introduceți un nume de dispozitiv.</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name that already exists in the current list of Devices -->
     <string name="device_center_rename_device_dialog_error_message_name_already_exists">Un dispozitiv cu acest nume există deja. Introduceți un alt nume.</string>
-    <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name with invalid characters -->
-    <string name="device_center_rename_device_dialog_error_message_invalid_characters">Următoarele caractere nu sunt permise: %1$s</string>
     <!-- The Snackbar message to inform the User that the Device has been successfully renamed -->
     <string name="device_center_snackbar_message_rename_device_successful">Dispozitiv a fost redenumit</string>
     <!-- The Error Message shown in the Rename Device Dialog when the User submits a new Device Name whose length is greater than 32 characters -->
     <string name="device_center_rename_device_dialog_error_message_maximum_character_length_exceeded">Maximum 32 de caractere</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the Camera uploads feature settings -->
     <string name="device_center_device_top_menu_option_camera_uploads">Încărcări cameră</string>
-    <!-- Label of the top app bar menu option of selected device in Device Center which opens the dialog to rename the selected Device -->
-    <string name="device_center_device_top_menu_option_rename">Redenumește</string>
     <!-- Label of the top app bar menu option of selected device in Device Center which takes the user to the device info screen -->
     <string name="device_center_device_top_menu_option_info">Informații</string>
     <!-- Text to show in the Device Center for a No Network State when there is no network connectivity -->

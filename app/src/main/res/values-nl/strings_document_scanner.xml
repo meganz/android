@@ -46,6 +46,4 @@
     <string name="scan_snackbar_incorrect_name">Corrigeer uw bestandsnaam voordat u verder gaat</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">%1$s voorbereiden. Wacht alstublieft&#8230;</string>
-    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
-    <string name="scan_snackbar_invalid_characters">De volgende tekens zijn niet toegestaan: %1$s</string>
 </resources>

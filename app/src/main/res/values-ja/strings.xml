@@ -14,8 +14,6 @@
     <string name="general_select">選択</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">フォルダを選択</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">作成</string>
     <!-- button -->
     <string name="general_add">追加</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">ログ&#160;アウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">アップロード</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">新規フォルダ</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">新規テキストファイル</string>
     <!-- Menu item -->
     <string name="action_settings">設定</string>
     <!-- Search button -->
@@ -273,8 +267,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">このリンクは公開されなくなりました。</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">名前を変更</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">開く</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">ファイルを準備中</string>
@@ -294,8 +286,6 @@
     <string name="context_move_to_trash">ごみ箱に移す</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">MEGAから削除</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">フォルダ名</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">フォルダを作成中</string>
     <!-- Menu option title -->
@@ -384,8 +374,6 @@
     <string name="subscription_type_monthly">月ごと</string>
     <!--  -->
     <string name="subscription_type_yearly">年間</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">新規フォルダ</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">連絡先を追加</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1240,8 +1228,6 @@
     <string name="settings_feedback_body_device_model">端末モデル</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Androidバージョン</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">新規テキストファイル</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ファイル名</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1260,8 +1246,6 @@
     <string name="general_incorrect_names">先に進む前にファイル名を修正してください</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">無効な文字です</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">次の文字は許可されていません：%1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">ファイル名を空にすることはできません。</item>

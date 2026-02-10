@@ -65,7 +65,7 @@ class CreateVideoPlaylistDialogKtTest {
     }
 
     @Test
-    fun `test that the error message is displayed correctly when errorMessage is invalid_characters_defined`() {
+    fun `test that the error message is displayed correctly when errorMessage is general_invalid_characters_defined`() {
         setComposeContent(
             errorMessage = sharedR.string.general_invalid_characters_defined,
             isInputValid = { false }

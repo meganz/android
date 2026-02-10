@@ -14,8 +14,6 @@
     <string name="general_select">Seç</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Klasör seç</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Oluştur</string>
     <!-- button -->
     <string name="general_add">Ekle</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Çıkış&#160;yap</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Yükle</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Yeni klasör oluştur</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Yeni metin dosyası</string>
     <!-- Menu item -->
     <string name="action_settings">Ayarlar</string>
     <!-- Search button -->
@@ -276,8 +270,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Bu bağlantı artık herkese açık olmayacak.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Yeniden adlandır</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Aç</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Dosya hazırlanıyor</string>
@@ -297,8 +289,6 @@
     <string name="context_move_to_trash">Çöp kutusuna taşı</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">MEGA’dan kaldır</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Klasör adı</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Klasör oluşturuluyor</string>
     <!-- Menu option title -->
@@ -387,8 +377,6 @@
     <string name="subscription_type_monthly">Aylık</string>
     <!--  -->
     <string name="subscription_type_yearly">Yıllık</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Yeni klasör</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kişi ekle</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1264,8 +1252,6 @@
     <string name="settings_feedback_body_device_model">Cihaz modeli</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android sürümü</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Yeni metin dosyası</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Dosya adı</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1284,8 +1270,6 @@
     <string name="general_incorrect_names">Lütfen devam etmeden önce dosya adlarınızı düzeltin</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Geçersiz karakterler</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Şu karakterlere izin verilmez: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Dosya adı boş olamaz.</item>
@@ -2982,7 +2966,7 @@
     <!-- Text shown in the last alert dialog to confirm delete user account with a ECP/Stripe subscription-->
     <string name="delete_account_text_other_platform_last_step">Bu, hesabınızı silmek için son adımdır. Hem hesabınız hem de aboneliğiniz silinecek ve saklanan tüm verilerinizi kalıcı olarak kaybedeceksiniz. Lütfen aşağıya şifrenizi girin.</string>
     <!-- Title of timeline tab in photos section -->
-    <string name="tab_title_timeline">Zaman akışı</string>
+    <string name="tab_title_timeline">Zaman çizelgesi</string>
     <!-- Title of album tab in photos section. -->
     <string name="tab_title_album">Albümler</string>
     <!-- Title of favourite album. -->

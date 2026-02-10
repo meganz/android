@@ -14,8 +14,6 @@
     <string name="general_select">Pilih</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Pilih folder</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Buat</string>
     <!-- button -->
     <string name="general_add">Tambah</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Keluar</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Unggah</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Folder baru</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">File teks baru</string>
     <!-- Menu item -->
     <string name="action_settings">Pengaturan</string>
     <!-- Search button -->
@@ -273,8 +267,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Tautan ini tidak akan tersedia untuk umum lagi.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Ubah nama</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Buka</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Mempersiapkan file</string>
@@ -294,8 +286,6 @@
     <string name="context_move_to_trash">Pindahkan ke Sampah</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Hapus dari MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Nama folder</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Membuat folder</string>
     <!-- Menu option title -->
@@ -384,8 +374,6 @@
     <string name="subscription_type_monthly">Bulanan</string>
     <!--  -->
     <string name="subscription_type_yearly">Tahunan</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Folder baru</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Tambah kontak</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1236,8 +1224,6 @@
     <string name="settings_feedback_body_device_model">Model perangkat</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Versi Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">File teks baru</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Nama File</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1256,8 +1242,6 @@
     <string name="general_incorrect_names">Perbaiki nama file anda sebelum melanjutkan</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Karakter salah</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Karakter berikut tidak diperbolehkan: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">Nama file tidak boleh kosong.</item>

@@ -14,8 +14,6 @@
     <string name="general_select">เลือก</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">เลือกโฟลเดอร์</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">สร้าง</string>
     <!-- button -->
     <string name="general_add">เพิ่ม</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">ออกจากระบบ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">อัปโหลด</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">โฟลเดอร์ใหม่</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">ไฟล์ข้อความใหม่</string>
     <!-- Menu item -->
     <string name="action_settings">ตั้งค่า</string>
     <!-- Search button -->
@@ -273,8 +267,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">ลิงก์นี้จะไม่เปิดเผยต่อสาธารณะอีกต่อไป</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">เปลี่ยนชื่อ</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">เปิด</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">กำลังจัดเตรียมไฟล์</string>
@@ -294,8 +286,6 @@
     <string name="context_move_to_trash">ย้ายไปที่ถังขยะ</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">นำออกจาก MEGA</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">ชื่อโฟล์เดอร์</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">กำลังสร้างโฟลเดอร์</string>
     <!-- Menu option title -->
@@ -384,8 +374,6 @@
     <string name="subscription_type_monthly">รายเดือน</string>
     <!--  -->
     <string name="subscription_type_yearly">รายปี</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">โฟลเดอร์ใหม่</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">เพิ่มผู้ติดต่อ</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1240,8 +1228,6 @@
     <string name="settings_feedback_body_device_model">รูปแบบอุปกรณ์</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">เวอร์ชัน Android</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">ไฟล์ข้อความใหม่</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">ชื่อไฟล์</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1260,8 +1246,6 @@
     <string name="general_incorrect_names">กรุณาแก้ไขชื่อไฟล์ของคุณก่อนดำเนินการต่อ</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">ไม่ได้อนุญาตให้ใช้อักขระนี้</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">ไม่อนุญาตให้ใช้อักขระต่อไปนี้: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">ชื่อไฟล์ต้องไม่ว่างเปล่า</item>

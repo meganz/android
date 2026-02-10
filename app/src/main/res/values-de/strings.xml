@@ -14,8 +14,6 @@
     <string name="general_select">Auswählen</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">Ordner wählen</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">Erstellen</string>
     <!-- button -->
     <string name="general_add">Hinzufügen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">Ausloggen</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Hochladen</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">Neuer Ordner</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">Neue Textdatei</string>
     <!-- Menu item -->
     <string name="action_settings">Einstellungen</string>
     <!-- Search button -->
@@ -276,8 +270,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Dieser Link ist nicht mehr öffentlich verfügbar.</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">Umbenennen</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Öffnen</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">Datei wird vorbereitet</string>
@@ -297,8 +289,6 @@
     <string name="context_move_to_trash">In Papierkorb verschieben</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">Von MEGA entfernen</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">Ordnername</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">Ordner wird erstellt</string>
     <!-- Menu option title -->
@@ -387,8 +377,6 @@
     <string name="subscription_type_monthly">monatlich</string>
     <!--  -->
     <string name="subscription_type_yearly">Jährlich</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">Neuer Ordner</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Kontakt hinzufügen</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1264,8 +1252,6 @@
     <string name="settings_feedback_body_device_model">Gerätetyp</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android-Version</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">Neue Textdatei</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">Dateiname</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1284,8 +1270,6 @@
     <string name="general_incorrect_names">Bitte korrigieren Sie die Dateinamen, bevor Sie fortfahren</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">Ungültige Zeichen</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">Die folgenden Zeichen sind nicht zulässig: %1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="one">Der Dateiname darf nicht leer sein.</item>

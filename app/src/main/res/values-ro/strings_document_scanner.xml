@@ -46,6 +46,4 @@
     <string name="scan_snackbar_incorrect_name">Corectați numele fișierului înainte de a continua</string>
     <!-- Dialog message showing file progress -->
     <string name="scan_dialog_progress">Pregătirea %1$s. Vă rugăm să așteptați&#8230;</string>
-    <!-- Snackbar text indicating that invalid characters are being used for naming a scanned document. The placeholder is for including the list of invalid characters (hardcoded) -->
-    <string name="scan_snackbar_invalid_characters">Următoarele caractere nu sunt permise: %1$s</string>
 </resources>

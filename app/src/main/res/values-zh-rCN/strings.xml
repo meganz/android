@@ -14,8 +14,6 @@
     <string name="general_select">选择</string>
     <!-- Selecting a specific location in MEGA. This is the text of the button -->
     <string name="general_select_to_download">选择文件夹</string>
-    <!-- This is the final button when creating a folder in the dialog where the user inserts the folder name -->
-    <string name="general_create">创建</string>
     <!-- button -->
     <string name="general_add">新增</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -60,10 +58,6 @@
     <string name="action_logout">登&#160;出</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">上传</string>
-    <!-- Menu item -->
-    <string name="action_create_folder">新建文件夹</string>
-    <!-- Option which allows create a new text file -->
-    <string name="action_create_txt">新建文本文档</string>
     <!-- Menu item -->
     <string name="action_settings">设置</string>
     <!-- Search button -->
@@ -273,8 +267,6 @@
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">此链接将不再公开。</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_rename">重命名</string>
-    <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">打开</string>
     <!-- while file provider is downloading a file -->
     <string name="context_preparing_provider">正在准备文件</string>
@@ -294,8 +286,6 @@
     <string name="context_move_to_trash">移至回收站</string>
     <!-- menu item -->
     <string name="context_delete_from_mega">从MEGA中移除</string>
-    <!-- Input field description in the create folder dialog. -->
-    <string name="context_new_folder_name">文件夹名称</string>
     <!-- status dialog when performing the action -->
     <string name="context_creating_folder">正在创建文件夹</string>
     <!-- Menu option title -->
@@ -384,8 +374,6 @@
     <string name="subscription_type_monthly">每月</string>
     <!--  -->
     <string name="subscription_type_yearly">每年</string>
-    <!-- Menu option to create a new folder in the file manager. -->
-    <string name="menu_new_folder">新建文件夹</string>
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">添加联系人</string>
     <!-- Title of the alert to introduce the decryption key -->
@@ -1240,8 +1228,6 @@
     <string name="settings_feedback_body_device_model">设备型号</string>
     <!-- mail body -->
     <string name="settings_feedback_body_android_version">Android版本</string>
-    <!-- Title of the dialog to create a new text file by inserting the name -->
-    <string name="dialog_title_new_text_file">新建文本文档</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">文件名</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1260,8 +1246,6 @@
     <string name="general_incorrect_names">请更改您的文件名后继续</string>
     <!-- Error text for invalid characters -->
     <string name="invalid_characters">无效的字符</string>
-    <!-- Error message when the user writes a character not allowed for naming a file or folder -->
-    <string name="invalid_characters_defined">不允许使用这些字符：%1$s</string>
     <!-- Warning show to the user after try to import files to MEGA with empty names. Plural. When more than one file name have this error. -->
     <plurals name="empty_names">
         <item quantity="other">文件名不能为空。</item>

@@ -138,8 +138,6 @@
     <string name="video_section_videos_duration_option_more_than_20_minutes">Mais de 20 minutos</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">Digite o nome da lista de reprodução</string>
-    <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">Renomear</string>
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">Já existe uma lista de reprodução com este nome. Digite outro nome.</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
@@ -420,14 +418,8 @@
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. Pressione [A]Cancelar assinatura[/A].</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">Não há conexão à Internet</string>
-    <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">Nova pasta</string>
-    <!-- Create new folder dialog title -->
-    <string name="create_new_folder_dialog_title">Nova pasta</string>
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">Nome da pasta</string>
-    <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">Criar</string>
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">Cancelar</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
@@ -988,8 +980,6 @@
     <string name="sync_rename_and_create_backup_dialog_text">Uma pasta com o mesmo nome já existe nos seus Backups. Renomeie a nova pasta para continuar com o backup. O nome da pasta não mudará no seu computador.</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
     <string name="sync_rename_and_create_backup_dialog_hint_text">Nome do backup</string>
-    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_positive_button">Renomear</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">Digite o nome do backup</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
@@ -1444,8 +1434,6 @@
     <string name="colored_folders_onboarding_description">Quando você adicionar uma etiqueta a uma pasta, a cor vai aparecer diretamente na pasta, para que você possa encontrar o que precisa com mais rapidez.</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">Combinar</string>
-    <!-- Dialog rename option -->
-    <string name="sync_apply_all_dialog_rename_button">Renomear</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">Deletar os problemas solucionados</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
@@ -1792,8 +1780,6 @@
     <string name="account_upgrade_account_label_save_at_least">Economize pelo menos 16% ao adquirir um plano anual</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">Digite o nome do álbum</string>
-    <!-- Add new album on Media screen dialog positive button text -->
-    <string name="media_add_new_album_dialog_positive_button">Criar</string>
     <!-- Title of favourite album. -->
     <string name="system_album_favourites_title">Favoritos</string>
     <!-- Title of gif album. -->
@@ -2091,7 +2077,7 @@
     <string name="external_checkout_information_title">Saindo do MEGA</string>
     <string name="external_checkout_information_description">Você está prestes a acessar um site externo (%1$s). O MEGA é responsável pelas transações e pelo suporte ao cliente.</string>
     <string name="external_checkout_show_next_time">Mostrar de novo</string>
-    <string name="album_photos_selection_limit_dialog_description">Você só pode adicionar %d itens um álbum por vez.</string>
+    <string name="album_photos_selection_limit_dialog_description">Somente é possível adicionar %d itens por vez a um álbum.</string>
     <string name="album_photos_selection_empty_state_no_media_found">Não há arquivos de mídia</string>
     <string name="albums_multiple_delete_success_message">%d álbuns foram deletados</string>
     <string name="home_screen_no_network_desc">Você está offline.\nSe você salvar arquivos offline, poderá acessá-los sem ter conexão.</string>

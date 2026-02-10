@@ -138,8 +138,6 @@
     <string name="video_section_videos_duration_option_more_than_20_minutes">มากกว่า 20 นาที</string>
     <!-- Create playlist dialog title of the video section playlists tab -->
     <string name="video_section_playlists_create_playlist_dialog_title">กรอกชื่อเพลย์ลิสต์</string>
-    <!-- Rename playlist dialog title of the video section playlists tab -->
-    <string name="video_section_playlists_rename_playlist_dialog_title">เปลี่ยนชื่อ</string>
     <!-- Error message when the playlist name already exists -->
     <string name="video_section_playlists_error_message_playlist_name_exists">มีชื่อเพลย์ลิสต์นี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
     <!-- Delete playlist dialog title of the video section playlists tab -->
@@ -404,14 +402,8 @@
     <string name="account_cancellation_instructions_tap_cancel_subscription">4. แตะ[A]ยกเลิกการสมัครใช้งาน[/A]</string>
     <!-- Text to show in the Android Sync feature for a No Network State when there is no network connectivity -->
     <string name="sync_no_network_state">ไม่มีการเชื่อมต่ออินเทอร์เน็ต</string>
-    <!-- Menu option to create a new folder in the file manager -->
-    <string name="general_menu_create_new_folder">โฟลเดอร์ใหม่</string>
-    <!-- Create new folder dialog title -->
-    <string name="create_new_folder_dialog_title">โฟลเดอร์ใหม่</string>
     <!-- Create new folder dialog hint text (input field description) -->
     <string name="create_new_folder_dialog_hint_text">ชื่อโฟล์เดอร์</string>
-    <!-- Create new folder dialog confirm button -->
-    <string name="create_new_folder_dialog_confirm_button">สร้าง</string>
     <!-- Dialog cancel option -->
     <string name="general_dialog_cancel_button">ยกเลิก</string>
     <!-- Create new folder dialog error message shown when the user tries to an empty folder name -->
@@ -956,8 +948,6 @@
     <string name="sync_rename_and_create_backup_dialog_text">มีโฟลเดอร์ชื่อเดียวกันอยู่ในการสำรองข้อมูลของคุณ กรุณาเปลี่ยนชื่อโฟลเดอร์ใหม่เพื่อดำเนินการสำรองข้อมูลต่อ ชื่อโฟลเดอร์จะไม่เปลี่ยนแปลงบนอุปกรณ์ของคุณ</string>
     <!-- Rename and Create Backup Dialog hint text (input field description) -->
     <string name="sync_rename_and_create_backup_dialog_hint_text">ชื่อสำรองข้อมูล</string>
-    <!-- Label for the Positive Button of the Rename and Create Backup Dialog -->
-    <string name="sync_rename_and_create_backup_dialog_positive_button">เปลี่ยนชื่อ</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits an empty backup name -->
     <string name="sync_rename_and_create_backup_dialog_error_message_empty_backup_name">กรอกชื่อสำรองข้อมูล</string>
     <!-- The Error Message shown in the Rename and Create Backup Dialog when the user submits a new backup name that already exists in Backups -->
@@ -1408,8 +1398,6 @@
     <string name="colored_folders_onboarding_description">เมื่อคุณเพิ่มป้ายกำกับให้โฟลเดอร์ สีของป้ายกำกับจะแสดงบนโฟลเดอร์โดยตรง ซึ่งจะช่วยให้คุณค้นหาสิ่งที่ต้องการได้เร็วขึ้น</string>
     <!-- Dialog merge option -->
     <string name="sync_apply_all_dialog_merge_button">รวม</string>
-    <!-- Dialog rename option -->
-    <string name="sync_apply_all_dialog_rename_button">เปลี่ยนชื่อ</string>
     <!-- Sync text when need to solved stalled issues-->
     <string name="sync_menu_clear_issues">ล้างรายการที่แก้ไขปัญหาเสร็จแล้ว</string>
     <!--Sign Up page text field input first name error message when character limit exceeded-->
@@ -1710,8 +1698,6 @@
     <string name="account_upgrade_account_label_save_at_least">ประหยัดอย่างน้อย 16% เมื่อสมัครแผนรายปี</string>
     <!-- Add new album on Media screen dialog title -->
     <string name="media_add_new_album_dialog_title">กรอกชื่ออัลบั้ม</string>
-    <!-- Add new album on Media screen dialog positive button text -->
-    <string name="media_add_new_album_dialog_positive_button">สร้าง</string>
     <!-- Title of favourite album. -->
     <string name="system_album_favourites_title">รายการโปรด</string>
     <!-- Title of gif album. -->
@@ -2051,4 +2037,19 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d โฟลเดอร์&#160;·&#160;</item>
     </plurals>
+    <string name="home_recents_snackbar_activity_hidden">ซ่อนกิจกรรมล่าสุดของคุณแล้ว</string>
+    <string name="home_recents_button_view_all">ดูทั้งหมด</string>
+    <string name="home_recents_options_menu_show_activity">แสดงกิจกรรมล่าสุด</string>
+    <string name="home_recents_empty_text_description">กิจกรรมล่าสุดของไฟล์และโฟลเดอร์จะแสดงที่นี่</string>
+    <string name="home_recents_hidden_text_description">ซ่อนกิจกรรมล่าสุด</string>
+    <string name="home_recents_bucket_subtitle_added_to">เพิ่มลงใน %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">ไฟล์เหล่านี้ใช้งานไม่ได้แล้ว</string>
+    <string name="shares_screen_links_section_empty">[B]ไม่มี [/B][A]ลิงก์สาธารณะ[/A]</string>
+    <string name="general_invalid_dot_name_warning">ชื่อ “.” ใช้งานไม่ได้</string>
+    <string name="general_invalid_double_dot_name_warning">ชื่อ “..” ใช้งานไม่ได้</string>
+    <string name="search_landing_title">กำลังหาอะไรอยู่หรือเปล่า</string>
+    <string name="search_landing_subtitle">ค้นหาไฟล์และโฟลเดอร์</string>
+    <string name="offline_screen_empty_state_description">ไม่มีไฟล์ในบันทึกออฟไลน์</string>
+    <string name="general_install_label">ติดตั้ง</string>
+    <string name="general_app_update_download_success_message">ดาวน์โหลดตัวอัปเดตแอปเสร็จแล้ว</string>
 </resources>
