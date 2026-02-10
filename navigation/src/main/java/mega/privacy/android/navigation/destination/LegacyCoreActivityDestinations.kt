@@ -387,3 +387,6 @@ data class ContactAttachmentNavKey(
 
 @Serializable
 data object BusinessExpiredAlertNavKey : NavKey
+
+@Serializable
+data object LeftMeetingNavKey : NoSessionNavKey.Optional
