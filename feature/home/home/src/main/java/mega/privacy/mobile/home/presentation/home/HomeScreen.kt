@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,8 +42,11 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
+import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
+import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -78,6 +80,7 @@ internal fun HomeScreen(
     var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
+    val scrollToHideState = rememberScrollToHideState()
     val uploadHandler = rememberUploadHandler(
         parentId = rootFolderId,
         onFilesSelected = { uris ->
@@ -157,7 +160,12 @@ internal fun HomeScreen(
         floatingActionButton = {
             if (state is HomeUiState.Data) {
                 AddContentFab(
-                    modifier = Modifier.testTag(HOME_FAB_TAG),
+                    modifier = Modifier
+                        .testTag(HOME_FAB_TAG)
+                        .animateFloatingActionButton(
+                            visible = !scrollToHideState.shouldHide,
+                            alignment = Alignment.BottomEnd
+                        ),
                     visible = true,
                     onClick = {
                         Analytics.tracker.trackEvent(HomeFabOptionsButtonPressedEvent)
@@ -172,6 +180,7 @@ internal fun HomeScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
+                        .scrollToHide(scrollToHideState)
                         .padding(paddingValues.excludingBottomPadding()),
                     contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp),
                 ) {
