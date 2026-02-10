@@ -11,12 +11,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -80,14 +80,10 @@ class TimelineTabViewModel @Inject constructor(
      * uiState when this property changes.
      */
     internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
-    private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
-    private var allPhotosInTypedNode: Map<Long, TypedNode> = emptyMap()
-    internal val selectedPhotosInTypedNode: List<TypedNode>
-        get() {
-            if (selectedPhotoIdsFlow.value.isEmpty()) return emptyList()
-            return selectedPhotoIdsFlow.value.mapNotNull { allPhotosInTypedNode[it] }
-        }
-
+    private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(value = emptySet())
+    private val _selectedPhotosInTypedNodesFlow =
+        MutableStateFlow<List<TypedNode>>(value = emptyList())
+    internal val selectedPhotosInTypedNodesFlow = _selectedPhotosInTypedNodesFlow.asStateFlow()
     private val actionFlow = MutableStateFlow(TimelineTabActionUiState())
     internal val actionUiState: StateFlow<TimelineTabActionUiState> by lazy {
         actionFlow.asUiStateFlow(
@@ -141,37 +137,11 @@ class TimelineTabViewModel @Inject constructor(
             sortOrder = sortOptions.sortOrder
         )
         Pair(photosResult.allPhotos, sortResult)
-    }.onEach { (allPhotos, _) ->
-        // We need to do this to ensure no extra time needed to retrieve the TypedNode value
-        // of a node when a selection occurs.
-        updateAllPhotosInTypedNodeValue(allPhotos = allPhotos)
     }.flatMapLatest { (allPhotos, sortResult) ->
         buildUiState(
             allPhotos = allPhotos,
             sortResult = sortResult
         )
-    }
-
-    private fun updateAllPhotosInTypedNodeValue(allPhotos: List<PhotoResult>) {
-        viewModelScope.launch {
-            val ids = allPhotos
-                .asSequence()
-                .filterNot { it.photo.id in allPhotosInTypedNode.keys }
-                .map { NodeId(longValue = it.photo.id) }
-                .toList()
-
-            if (ids.isEmpty()) return@launch
-
-            runCatching {
-                getNodeListByIdsUseCase(nodeIds = ids)
-            }.onSuccess { nodes ->
-                if (nodes.isNotEmpty()) {
-                    allPhotosInTypedNode = nodes.associateBy { it.id.longValue }
-                }
-            }.onFailure {
-                Timber.e(it, "Unable to retrieve all photos in typed node")
-            }
-        }
     }
 
     private fun buildUiState(
@@ -392,58 +362,74 @@ class TimelineTabViewModel @Inject constructor(
     private fun updateSelectionModeActions() {
         if (selectedPhotoIdsFlow.value.isEmpty()) return
 
-        val bottomBarActions = buildList {
-            add(TimelineSelectionMenuAction.Download)
-            add(TimelineSelectionMenuAction.ShareLink)
-            add(TimelineSelectionMenuAction.SendToChat)
-            add(TimelineSelectionMenuAction.Share)
-            add(TimelineSelectionMenuAction.MoveToRubbishBin)
-            add(TimelineSelectionMenuAction.More)
-        }
-
-        val bottomSheetActions = buildList {
-            val selectedNodes = uiState.value.allPhotos.filter {
-                it.photo.id in selectedPhotoIdsFlow.value
+        viewModelScope.launch {
+            val selectedPhotosInTypedNodes = async {
+                val selectedPhotoIds = selectedPhotoIdsFlow.value
+                if (selectedPhotoIds.isNotEmpty()) {
+                    retrieveTypedNodeFromSelection(ids = selectedPhotoIds.map { NodeId(longValue = it) })
+                } else emptyList()
             }
-            val shouldShowRemoveLink =
-                selectedPhotoIdsFlow.value.size == 1 && selectedPhotosInTypedNode.firstOrNull()?.exportedData != null
-            if (shouldShowRemoveLink) {
-                add(TimelineSelectionMenuAction.RemoveLink)
+            val bottomBarActions = buildList {
+                add(TimelineSelectionMenuAction.Download)
+                add(TimelineSelectionMenuAction.ShareLink)
+                add(TimelineSelectionMenuAction.SendToChat)
+                add(TimelineSelectionMenuAction.Share)
+                add(TimelineSelectionMenuAction.MoveToRubbishBin)
+                add(TimelineSelectionMenuAction.More)
             }
 
-            val includeSensitiveInheritedNode = selectedNodes.any {
-                it.photo.isSensitiveInherited
-            }
-            val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
-            val isNodeHidden =
-                isHiddenNodesEnabled && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-            if (isNodeHidden) {
-                add(TimelineSelectionMenuAction.Unhide)
-            } else {
-                add(TimelineSelectionMenuAction.Hide)
-            }
+            val bottomSheetActions = buildList {
+                val selectedNodes = uiState.value.allPhotos.filter {
+                    it.photo.id in selectedPhotoIdsFlow.value
+                }
+                val selectedTypedNodes = selectedPhotosInTypedNodes.await()
+                val shouldShowRemoveLink =
+                    selectedTypedNodes.size == 1 && selectedTypedNodes.firstOrNull()?.exportedData != null
+                if (shouldShowRemoveLink) {
+                    add(TimelineSelectionMenuAction.RemoveLink)
+                }
 
-            add(TimelineSelectionMenuAction.Move)
-            add(TimelineSelectionMenuAction.Copy)
+                val includeSensitiveInheritedNode = selectedNodes.any {
+                    it.photo.isSensitiveInherited
+                }
+                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
+                val isNodeHidden =
+                    isHiddenNodesEnabled && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+                if (isNodeHidden) {
+                    add(TimelineSelectionMenuAction.Unhide)
+                } else {
+                    add(TimelineSelectionMenuAction.Hide)
+                }
 
-            val isAbleToBeAddedToAlbum = selectedPhotosInTypedNode
-                .filter { node ->
+                add(TimelineSelectionMenuAction.Move)
+                add(TimelineSelectionMenuAction.Copy)
+
+                val isAbleToBeAddedToAlbum = selectedTypedNodes.filter { node ->
                     val type = (node as? FileNode)?.type
                     type is ImageFileTypeInfo || type is VideoFileTypeInfo
                 }.size == selectedNodes.size
-            if (isAbleToBeAddedToAlbum) {
-                add(TimelineSelectionMenuAction.AddToAlbum)
+                if (isAbleToBeAddedToAlbum) {
+                    add(TimelineSelectionMenuAction.AddToAlbum)
+                }
+            }
+
+            actionFlow.update {
+                it.copy(
+                    selectionModeItem = TimelineTabSelectionModeActionUiState(
+                        bottomBarActions = bottomBarActions,
+                        bottomSheetActions = bottomSheetActions
+                    )
+                )
             }
         }
+    }
 
-        actionFlow.update {
-            it.copy(
-                selectionModeItem = TimelineTabSelectionModeActionUiState(
-                    bottomBarActions = bottomBarActions,
-                    bottomSheetActions = bottomSheetActions
-                )
-            )
-        }
+    private suspend fun retrieveTypedNodeFromSelection(ids: List<NodeId>): List<TypedNode> {
+        val nodes = runCatching {
+            getNodeListByIdsUseCase(nodeIds = ids)
+        }.getOrDefault(defaultValue = emptyList())
+        _selectedPhotosInTypedNodesFlow.update { nodes }
+        return nodes
     }
 
     internal fun onPhotoTimePeriodSelected(value: PhotoModificationTimePeriod) {
