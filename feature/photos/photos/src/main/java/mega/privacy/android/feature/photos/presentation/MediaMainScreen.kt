@@ -170,6 +170,17 @@ fun MediaMainRoute(
         }
     }
 
+    var showTimelineFilter by rememberSaveable { mutableStateOf(false) }
+    val shouldShowNavigationItem by remember {
+        derivedStateOf {
+            selectionModeType == MediaSelectionModeType.None && !showTimelineFilter
+        }
+    }
+
+    LaunchedEffect(shouldShowNavigationItem) {
+        setNavigationItemVisibility(shouldShowNavigationItem)
+    }
+
     LaunchedEffect(addToPlaylistIsRetry) {
         if (addToPlaylistIsRetry && addedVideoHandle != null) {
             addedVideoHandle?.let {
@@ -221,7 +232,6 @@ fun MediaMainRoute(
         onClearAlbumsSelection = albumsTabViewModel::clearAlbumsSelection,
         onClearVideosSelection = videosTabViewModel::clearSelection,
         onClearPlaylistsSelection = videoPlaylistsTabViewModel::clearSelection,
-        setNavigationItemVisibility = setNavigationItemVisibility
     )
 
     MediaMainScreen(
@@ -235,6 +245,7 @@ fun MediaMainRoute(
         nodeActionUiState = nodeActionUiState,
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
+        showTimelineFilter = showTimelineFilter,
         selectedPhotosInTypedNode = { timelineViewModel.selectedPhotosInTypedNode },
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
@@ -256,7 +267,6 @@ fun MediaMainRoute(
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
-        setNavigationItemVisibility = setNavigationItemVisibility,
         onTimelinePhotoSelected = timelineViewModel::onPhotoSelected,
         onAllTimelinePhotosSelected = timelineViewModel::onSelectAllPhotos,
         onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
@@ -280,6 +290,7 @@ fun MediaMainRoute(
         onClearVideosSelection = videosTabViewModel::clearSelection,
         onSelectAllPlaylists = videoPlaylistsTabViewModel::selectAllVideos,
         onClearPlaylistsSelection = videoPlaylistsTabViewModel::clearSelection,
+        onTimelineFilterVisibilityChange = { showTimelineFilter = it }
     )
 }
 
@@ -299,11 +310,11 @@ fun MediaMainScreen(
     multiNodeActionHandler: MultiNodeActionHandler,
     navigationHandler: NavigationHandler,
     timelineFilterUiState: TimelineFilterUiState,
+    showTimelineFilter: Boolean,
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
-    setNavigationItemVisibility: (Boolean) -> Unit,
     navigateToMediaSearch: (NavKey) -> Unit,
     onTimelinePhotoSelected: (nodes: PhotoNodeUiState) -> Unit,
     onAllTimelinePhotosSelected: () -> Unit,
@@ -325,13 +336,13 @@ fun MediaMainScreen(
     onClearVideosSelection: () -> Unit,
     onSelectAllPlaylists: () -> Unit,
     onClearPlaylistsSelection: () -> Unit,
+    onTimelineFilterVisibilityChange: (shouldShow: Boolean) -> Unit,
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
-    var showTimelineFilter by rememberSaveable { mutableStateOf(false) }
     var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
 
     var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
@@ -348,8 +359,7 @@ fun MediaMainScreen(
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
         if (showTimelineFilter) {
-            showTimelineFilter = false
-            setNavigationItemVisibility(true)
+            onTimelineFilterVisibilityChange(false)
         }
     }
 
@@ -434,7 +444,7 @@ fun MediaMainScreen(
                 onFilterActionClick = {
                     MediaAppBarAction.FilterSecondary.toTrackingEvent()
                         ?.let { Analytics.tracker.trackEvent(it) }
-                    showTimelineFilter = true
+                    onTimelineFilterVisibilityChange(true)
                 },
                 onSortActionClick = {
                     MediaAppBarAction.SortBy.toTrackingEvent()
@@ -579,9 +589,6 @@ fun MediaMainScreen(
         }
     }
 
-    if (showTimelineFilter) {
-        setNavigationItemVisibility(false)
-    }
     AnimatedVisibility(
         visible = showTimelineFilter,
         enter = slideInVertically(initialOffsetY = { it }),
@@ -592,12 +599,10 @@ fun MediaMainScreen(
             currentFilter = timelineFilterUiState,
             onApplyFilterClick = { request ->
                 onTimelineApplyFilterClick(request)
-                showTimelineFilter = false
-                setNavigationItemVisibility(true)
+                onTimelineFilterVisibilityChange(false)
             },
             onClose = {
-                showTimelineFilter = false
-                setNavigationItemVisibility(true)
+                onTimelineFilterVisibilityChange(false)
             },
         )
     }
@@ -736,12 +741,12 @@ private fun PhotosMainScreenPreview() {
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             selectedTimePeriod = PhotoModificationTimePeriod.All,
+            showTimelineFilter = false,
             selectedPhotosInTypedNode = { emptyList() },
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},
             onTimelineApplyFilterClick = {},
-            setNavigationItemVisibility = {},
             onTimelinePhotoSelected = {},
             onAllTimelinePhotosSelected = {},
             onClearTimelinePhotosSelection = {},
@@ -787,7 +792,8 @@ private fun PhotosMainScreenPreview() {
             onSelectAllVideos = {},
             onClearVideosSelection = {},
             onSelectAllPlaylists = {},
-            onClearPlaylistsSelection = {}
+            onClearPlaylistsSelection = {},
+            onTimelineFilterVisibilityChange = {}
         )
     }
 }
