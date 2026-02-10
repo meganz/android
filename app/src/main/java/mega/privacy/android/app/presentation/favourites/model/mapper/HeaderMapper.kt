@@ -12,8 +12,9 @@ internal fun toHeader(sortOrder: FavouriteSortOrder) = FavouriteHeaderItem(
 )
 
 private fun getFavouriteSortHeaderStringIdentifier(order: FavouriteSortOrder) = when (order) {
-    FavouriteSortOrder.Label -> R.string.title_label
+    is FavouriteSortOrder.Label -> R.string.title_label
     is FavouriteSortOrder.ModifiedDate -> R.string.sortby_date
     is FavouriteSortOrder.Name -> R.string.sortby_name
     is FavouriteSortOrder.Size -> R.string.sortby_size
+    else -> R.string.sortby_name
 }

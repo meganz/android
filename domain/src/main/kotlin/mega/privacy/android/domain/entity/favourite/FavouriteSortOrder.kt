@@ -31,9 +31,14 @@ sealed interface FavouriteSortOrder {
     data class ModifiedDate(override val sortDescending: Boolean) : FavouriteSortOrder
 
     /**
+     * Added date
+     *
+     * @property sortDescending
+     */
+    data class AddedDate(override val sortDescending: Boolean) : FavouriteSortOrder
+
+    /**
      * Label
      */
-    data object Label : FavouriteSortOrder {
-        override val sortDescending = true
-    }
+    data class Label(override val sortDescending: Boolean) : FavouriteSortOrder
 }

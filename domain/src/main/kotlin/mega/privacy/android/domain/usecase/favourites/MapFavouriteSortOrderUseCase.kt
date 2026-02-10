@@ -21,7 +21,11 @@ class MapFavouriteSortOrderUseCase @Inject constructor() {
         SortOrder.ORDER_SIZE_DESC -> FavouriteSortOrder.Size(true)
         SortOrder.ORDER_MODIFICATION_ASC -> FavouriteSortOrder.ModifiedDate(false)
         SortOrder.ORDER_MODIFICATION_DESC -> FavouriteSortOrder.ModifiedDate(true)
-        else -> FavouriteSortOrder.Label
+        SortOrder.ORDER_CREATION_ASC -> FavouriteSortOrder.AddedDate(false)
+        SortOrder.ORDER_CREATION_DESC -> FavouriteSortOrder.AddedDate(true)
+        SortOrder.ORDER_LABEL_ASC -> FavouriteSortOrder.Label(false)
+        SortOrder.ORDER_LABEL_DESC -> FavouriteSortOrder.Label(true)
+        else -> FavouriteSortOrder.Name(false)
     }
 
 }

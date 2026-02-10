@@ -62,19 +62,34 @@ class MapFavouriteSortOrderUseCaseTest {
         }
 
     @Test
-    fun `test that remaining values return FavouriteSortOrder Label`() = runTest {
-        val remainingSortOrders = SortOrder.values().toList() - listOf(
-            SortOrder.ORDER_DEFAULT_ASC,
-            SortOrder.ORDER_DEFAULT_DESC,
-            SortOrder.ORDER_SIZE_ASC,
-            SortOrder.ORDER_SIZE_DESC,
-            SortOrder.ORDER_MODIFICATION_ASC,
-            SortOrder.ORDER_MODIFICATION_DESC,
-        )
+    fun `test that ORDER_CREATION_ASC returns FavouriteSortOrder AddedDate with sortDescending false`() =
+        runTest {
+            val actual = underTest(SortOrder.ORDER_CREATION_ASC)
 
-        remainingSortOrders.forEach { order ->
-            val actual = underTest(order)
-            assertThat(actual).isEqualTo(FavouriteSortOrder.Label)
+            assertThat(actual).isEqualTo(FavouriteSortOrder.AddedDate(false))
         }
-    }
+
+    @Test
+    fun `test that ORDER_CREATION_DESC returns FavouriteSortOrder AddedDate with sortDescending true`() =
+        runTest {
+            val actual = underTest(SortOrder.ORDER_CREATION_DESC)
+
+            assertThat(actual).isEqualTo(FavouriteSortOrder.AddedDate(true))
+        }
+
+    @Test
+    fun `test that ORDER_LABEL_ASC returns FavouriteSortOrder Label with sortDescending false`() =
+        runTest {
+            val actual = underTest(SortOrder.ORDER_LABEL_ASC)
+
+            assertThat(actual).isEqualTo(FavouriteSortOrder.Label(false))
+        }
+
+    @Test
+    fun `test that ORDER_LABEL_DESC returns FavouriteSortOrder Label with sortDescending true`() =
+        runTest {
+            val actual = underTest(SortOrder.ORDER_LABEL_DESC)
+
+            assertThat(actual).isEqualTo(FavouriteSortOrder.Label(true))
+        }
 }
