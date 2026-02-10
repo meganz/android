@@ -122,22 +122,25 @@ private fun ChangeLabelBottomSheetContentM3(
                     onClickListener = { onLabelSelected(label.label) }
                 )
             }
-            item {
-                FlexibleLineListItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = stringResource(id = R.string.action_remove_label),
-                    leadingElement = {
-                        MegaIcon(
-                            modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(24.dp),
-                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
-                            textColorTint = TextColor.Error
-                        )
-                    },
-                    onClickListener = onLabelRemoved,
-                    titleTextColor = TextColor.Error
-                )
+
+            if (state.isRemoveEnabled) {
+                item {
+                    FlexibleLineListItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        title = stringResource(id = R.string.action_remove_label),
+                        leadingElement = {
+                            MegaIcon(
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(24.dp),
+                                painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+                                textColorTint = TextColor.Error
+                            )
+                        },
+                        onClickListener = onLabelRemoved,
+                        titleTextColor = TextColor.Error
+                    )
+                }
             }
         }
     }
