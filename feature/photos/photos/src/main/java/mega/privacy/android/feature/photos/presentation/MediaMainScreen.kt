@@ -507,8 +507,7 @@ fun MediaMainScreen(
                     .padding(
                         PaddingValues(
                             top = paddingValues.calculateTopPadding(),
-                            end = paddingValues.calculateEndPadding(layoutDirection = LocalLayoutDirection.current),
-                            bottom = paddingValues.calculateBottomPadding()
+                            end = paddingValues.calculateEndPadding(layoutDirection = LocalLayoutDirection.current)
                         )
                     ),
                 beyondViewportPageCount = 1,
