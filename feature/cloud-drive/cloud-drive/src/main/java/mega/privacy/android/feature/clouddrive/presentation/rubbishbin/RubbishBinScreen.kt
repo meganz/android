@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -94,6 +95,10 @@ internal fun RubbishBinScreen(
     val spanCount = rememberDynamicSpanCount(
         isListView = uiState.currentViewType == ViewType.LIST
     )
+
+    BackHandler(enabled = uiState.isInSelectionMode) {
+        viewModel.clearAllSelectedNodes()
+    }
 
     EventEffect(
         event = uiState.openFolderEvent,
