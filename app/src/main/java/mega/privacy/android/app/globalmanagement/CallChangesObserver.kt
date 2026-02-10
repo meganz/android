@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.call.ChatSessionStatus
 import mega.privacy.android.domain.entity.call.ChatSessionUpdatesResult
 import mega.privacy.android.domain.entity.call.EndCallReason
 import mega.privacy.android.domain.entity.meeting.CallPushMessageNotificationActionType
+import mega.privacy.android.domain.entity.meeting.FakeIncomingCallState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainImmediateDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
@@ -297,7 +298,7 @@ class CallChangesObserver @Inject constructor(
         val isPendingHangUpCall = isPendingToHangUpUseCase(call.chatId)
 
         if (!isNotificationShown &&
-            isFakeIncomingCall == null &&
+            (isFakeIncomingCall == null || isFakeIncomingCall == FakeIncomingCallState.Remove) &&
             !isPendingHangUpCall
         ) {
             if (isRinging) {
