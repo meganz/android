@@ -1251,10 +1251,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     newChatMenuItem?.isVisible = false
 
                     cDriveExplorer = cloudExplorerFragment
-                    // Show search menu if folder is not empty, regardless of mode
-                    // Previously this was only checked in multiselect mode, causing search to be hidden in MOVE/COPY modes
-                    searchMenuItem?.isVisible =
-                        cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
+                    // Show search menu if folder is not empty and in file selector mode
+                    if (isMultiselect) {
+                        searchMenuItem?.isVisible =
+                            cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
+                    }
                 }
 
                 INCOMING_TAB -> {
@@ -1280,8 +1281,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
                     newChatMenuItem?.isVisible = false
 
-                    // Show search menu if folder is not empty, regardless of mode
-                    searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
+                    // Show search menu if folder is not empty and in file selector mode
+                    if (isMultiselect) {
+                        searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
+                    }
                 }
 
                 CHAT_TAB -> {
