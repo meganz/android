@@ -1,7 +1,9 @@
 package mega.privacy.android.core.nodecomponents.dialog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
@@ -30,6 +32,7 @@ fun TakeDownDialog(
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
     BasicDialog(
+        modifier = Modifier.testTag(TAKE_DOWN_DIALOG_TAG),
         title = SpannableText(
             stringResource(
                 id = if (isFolder) {
@@ -99,3 +102,5 @@ fun PreviewTakeDownDialogWhenFolderFalse() {
         )
     }
 }
+
+internal const val TAKE_DOWN_DIALOG_TAG = "take_down:dialog"

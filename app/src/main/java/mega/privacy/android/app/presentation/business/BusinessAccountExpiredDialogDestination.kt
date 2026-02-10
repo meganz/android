@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.business
 
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -52,6 +54,7 @@ fun EntryProviderScope<DialogNavKey>.businessAccountExpiredDialogDestination(
         }
 
         BasicDialog(
+            modifier = Modifier.testTag(BUSINESS_ACCOUNT_EXPIRED_DIALOG_TAG),
             title = stringResource(id = titleRes),
             description = stringResource(id = messageRes),
             buttons = persistentListOf(
@@ -71,3 +74,4 @@ fun EntryProviderScope<DialogNavKey>.businessAccountExpiredDialogDestination(
     }
 }
 
+internal const val BUSINESS_ACCOUNT_EXPIRED_DIALOG_TAG = "business_account_expired:dialog"

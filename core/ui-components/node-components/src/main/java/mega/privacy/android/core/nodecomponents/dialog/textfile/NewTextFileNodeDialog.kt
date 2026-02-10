@@ -10,6 +10,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -58,7 +59,7 @@ fun NewTextFileNodeDialog(
 
     BasicInputDialog(
         title = stringResource(id = sharedR.string.general_new_text_file),
-        modifier = modifier,
+        modifier = modifier.testTag(NEW_TEXT_FILE_NODE_DIALOG_TAG),
         suffix = {
             MegaText(
                 text = ".txt", // Suffix for the file name no need to be localized
@@ -109,4 +110,6 @@ fun NewTextFileNodeDialog(
         onDismiss = onDismiss,
         inputTextAlign = TextAlign.End
     )
-} 
+}
+
+internal const val NEW_TEXT_FILE_NODE_DIALOG_TAG = "new_text_file_node:dialog"

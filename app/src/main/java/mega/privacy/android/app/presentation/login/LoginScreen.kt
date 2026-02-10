@@ -11,8 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -146,6 +148,7 @@ fun LoginScreen(
 
     if (uiState.ongoingTransfersExist == true) {
         BasicDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_CANCELLING_TRANSFER_CONFIRMATION_TAG),
             title = "",
             description = stringResource(id = R.string.login_warning_abort_transfers),
             positiveButtonText = stringResource(id = sharedR.string.login_text),
@@ -164,6 +167,7 @@ fun LoginScreen(
 
     if (showIncorrectRkDialog) {
         BasicDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_RECOVERY_KEY_ERROR_TAG),
             title = stringResource(id = sharedR.string.recovery_key_error_title),
             description = stringResource(id = sharedR.string.recovery_key_error_description),
             positiveButtonText = stringResource(id = sharedR.string.general_ok),
@@ -176,6 +180,7 @@ fun LoginScreen(
     val recoveryKeyLink = uiState.recoveryKeyLink
     if (recoveryKeyLink != null) {
         BasicInputDialog(
+            modifier = Modifier.testTag(LOGIN_SCREEN_PASSWORD_RESET_TAG),
             title = stringResource(id = R.string.title_dialog_insert_MK),
             description = stringResource(id = R.string.text_dialog_insert_MK),
             inputLabel = stringResource(id = R.string.edit_text_insert_mk),
@@ -221,3 +226,8 @@ private fun navigateToChangePassword(context: Context, link: String, value: Stri
     intent.putExtra(IntentConstants.EXTRA_MASTER_KEY, value)
     context.startActivity(intent)
 }
+
+internal const val LOGIN_SCREEN_CANCELLING_TRANSFER_CONFIRMATION_TAG =
+    "login_screen:dialog_cancelling_transfer_confirmation"
+internal const val LOGIN_SCREEN_RECOVERY_KEY_ERROR_TAG = "login_screen:dialog_recovery_key_error"
+internal const val LOGIN_SCREEN_PASSWORD_RESET_TAG = "login_screen:dialog_password_reset"

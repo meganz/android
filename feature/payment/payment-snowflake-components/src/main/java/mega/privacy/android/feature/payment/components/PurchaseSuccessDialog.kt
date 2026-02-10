@@ -15,6 +15,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -47,6 +48,7 @@ fun PurchaseSuccessDialog(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         BasicAlertDialog(
+            modifier = Modifier.testTag(PURCHASE_SUCCESS_DIALOG_TAG),
             onDismissRequest = onDismiss,
             properties = DialogProperties(
                 dismissOnClickOutside = true,
@@ -111,3 +113,4 @@ private fun PurchaseSuccessDialogPreview() {
     }
 }
 
+internal const val PURCHASE_SUCCESS_DIALOG_TAG = "purchase_success:dialog"

@@ -9,7 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
@@ -211,6 +213,7 @@ internal fun HandleNodeOptionsActionEvent(
 
     if (isShowForeignDialog) {
         BasicDialog(
+            modifier = Modifier.testTag(HANDLE_NODE_OPTIONS_ACTION_EVENT_FOREIGN_DIALOG_TAG),
             title = "",
             description = stringResource(id = sharedResR.string.incoming_share_storage_quota_warning_message),
             onPositiveButtonClicked = {
@@ -265,3 +268,6 @@ fun handleNodesNameCollisionResult(
         onHandleNodesWithoutConflict(result.type, result.noConflictNodes)
     }
 }
+
+internal const val HANDLE_NODE_OPTIONS_ACTION_EVENT_FOREIGN_DIALOG_TAG =
+    "handle_node_options_action_event:dialog_foreign"

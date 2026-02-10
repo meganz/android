@@ -1,7 +1,8 @@
 package mega.privacy.android.core.nodecomponents.dialog.removelink
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -18,6 +19,7 @@ fun RemoveNodeLinkDialogM3(
     viewModel: RemoveNodeLinkViewModel = hiltViewModel()
 ) {
     BasicDialog(
+        modifier = Modifier.testTag(REMOVE_NODE_LINK_DIALOG_TAG),
         description = stringResource(sharedR.string.remove_links_warning_message),
         positiveButtonText = stringResource(id = sharedR.string.general_remove),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
@@ -49,3 +51,5 @@ private class CountProvider : PreviewParameterProvider<List<Long>> {
         listOf(1L, 2L)
     ).asSequence()
 }
+
+internal const val REMOVE_NODE_LINK_DIALOG_TAG = "remove_node_link:dialog"

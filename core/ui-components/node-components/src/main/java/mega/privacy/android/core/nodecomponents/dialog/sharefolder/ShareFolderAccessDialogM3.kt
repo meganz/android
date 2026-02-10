@@ -1,17 +1,15 @@
 package mega.privacy.android.core.nodecomponents.dialog.sharefolder
 
 import android.content.Context
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.collections.immutable.persistentListOf
@@ -19,7 +17,6 @@ import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.components.dialogs.BasicDialogRadioOption
 import mega.android.core.ui.components.dialogs.BasicRadioDialog
-import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -77,6 +74,7 @@ private fun ShareFolderAccessDialogBody(
     }
 
     BasicRadioDialog(
+        modifier = Modifier.testTag(SHARE_FOLDER_ACCESS_DIALOG_TAG),
         options = radioButtonOptions
             .map { permission ->
                 BasicDialogRadioOption(
@@ -132,3 +130,5 @@ private fun ShareFolderAccessDialogBodyPreview() {
         )
     }
 }
+
+internal const val SHARE_FOLDER_ACCESS_DIALOG_TAG = "share_folder_access:dialog_body"

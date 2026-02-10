@@ -3,6 +3,8 @@ package mega.privacy.android.core.nodecomponents.dialog.removeshare
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,6 +59,7 @@ private fun RemoveShareFolderDialogBodyM3(
         stringResource(id = sharedResR.string.general_dialog_cancel_button)
 
     BasicDialog(
+        modifier = Modifier.testTag(REMOVE_SHARE_FOLDER_DIALOG_TAG),
         description = text,
         positiveButtonText = confirmButtonText,
         negativeButtonText = cancelButtonText,
@@ -82,3 +85,5 @@ private fun RemoveShareFolderBodyPreview() {
         )
     }
 }
+
+internal const val REMOVE_SHARE_FOLDER_DIALOG_TAG = "remove_share_folder:dialog"

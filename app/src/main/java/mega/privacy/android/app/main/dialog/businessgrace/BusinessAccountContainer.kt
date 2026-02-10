@@ -6,6 +6,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -31,6 +33,9 @@ fun BusinessAccountContainer(
     content()
     if (showUnverifiedBusinessAccountDialog) {
         BasicDialog(
+            modifier = Modifier.testTag(
+                BUSINESS_ACCOUNT_CONTAINER_UNVERIFIED_BUSINESS_ACCOUNT_DIALOG_TAG
+            ),
             title = stringResource(R.string.unverified_business_account_dialog_title),
             description = stringResource(R.string.unverified_business_account_dialog_description),
             positiveButtonText = stringResource(mega.privacy.android.app.R.string.general_close),
@@ -43,3 +48,6 @@ fun BusinessAccountContainer(
         )
     }
 }
+
+internal const val BUSINESS_ACCOUNT_CONTAINER_UNVERIFIED_BUSINESS_ACCOUNT_DIALOG_TAG =
+    "business_account_container:dialog_unverified_business_account"

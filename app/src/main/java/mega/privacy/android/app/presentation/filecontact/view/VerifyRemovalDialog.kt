@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.filecontact.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -33,6 +35,7 @@ internal fun VerifyRemovalDialog(
 
 
     BasicDialog(
+        modifier = Modifier.testTag(VERIFY_REMOVAL_DIALOG_TAG),
         title = title,
         positiveButtonText = stringResource(R.string.general_remove),
         onPositiveButtonClicked = {
@@ -56,3 +59,5 @@ private fun VerifyRemovalDialogPreview(@PreviewParameter(ShareRecipientPreviewPa
         )
     }
 }
+
+internal const val VERIFY_REMOVAL_DIALOG_TAG = "verify_removal:dialog"

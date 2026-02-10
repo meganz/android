@@ -239,6 +239,7 @@ internal fun HomeScreen(
 
     if (showNewTextFileDialog) {
         NewTextFileNodeDialog(
+            modifier = Modifier.testTag(HOME_SCREEN_NEW_TEXT_FILE_DIALOG_TAG),
             parentNode = rootFolderId,
             onDismiss = {
                 showNewTextFileDialog = false
@@ -249,3 +250,4 @@ internal fun HomeScreen(
 
 internal const val HOME_FAB_TAG = "home_screen:add_content_fab"
 internal const val HOME_MAIN_APP_BAR_TAG = "home_screen:main_app_bar"
+internal const val HOME_SCREEN_NEW_TEXT_FILE_DIALOG_TAG = "home_screen:dialog_new_text_file"

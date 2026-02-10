@@ -133,7 +133,7 @@ internal fun StorageStatusDialogViewM3(
     ) {
         BasicAlertDialog(
             onDismissRequest = dismissClickListener, /* is not dismissible, but just in case */
-            modifier = modifier,
+            modifier = modifier.testTag(STORAGE_STATUS_DIALOG_TAG),
             properties = DialogProperties(
                 dismissOnClickOutside = false,
                 dismissOnBackPress = false
@@ -453,3 +453,5 @@ private class StorageStatusDialogM3PreviewProvider :
             )
         )
 }
+
+internal const val STORAGE_STATUS_DIALOG_TAG = "storage_status:dialog"

@@ -2,6 +2,8 @@ package mega.privacy.android.core.nodecomponents.dialog.delete
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -32,6 +34,7 @@ fun MoveToRubbishOrDeleteNodeDialogM3(
     }
 
     BasicDialog(
+        modifier = Modifier.testTag(MOVE_TO_RUBBISH_OR_DELETE_NODE_DIALOG_TAG),
         description = stringResource(id = message),
         positiveButtonText = stringResource(id = positiveText),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
@@ -46,3 +49,6 @@ fun MoveToRubbishOrDeleteNodeDialogM3(
         onNegativeButtonClicked = onDismiss
     )
 }
+
+internal const val MOVE_TO_RUBBISH_OR_DELETE_NODE_DIALOG_TAG =
+    "move_to_rubbish_or_delete_node:dialog"
