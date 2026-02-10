@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- TODO: we need to move this to strings_shared.xml -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,MissingTranslation">
     <string name="upload_files">Upload files</string>
     <string name="upload_folder">Upload folder</string>
