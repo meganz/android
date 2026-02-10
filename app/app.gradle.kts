@@ -79,8 +79,26 @@ android {
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
 
+    val debugKeyStoreFile = file("debug.keystore")
+    signingConfigs {
+        create("debug_sign") {
+            storeFile = debugKeyStoreFile
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         debug {
+            project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile)
+
+            if (debugKeyStoreFile.exists()) {
+                println("Shared debug keystore found!")
+                signingConfig = signingConfigs["debug_sign"]
+            } else {
+                println("Shared debug keystore not found, use default keystore from Android SDK!")
+            }
             isDebuggable = true
             extra["enableCrashlytics"] = false
             extra["alwaysUpdateBuildId"] = false
@@ -465,6 +483,24 @@ tasks.register("printPrebuildSdkVersion") {
 tasks.register("printAppVersionNameChannel") {
     doLast {
         println(readVersionNameChannel())
+    }
+}
+
+/**
+ * Downloads the debug keystore from Artifactory if it does not exist locally.
+ */
+fun Project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile: File) {
+    val artifactoryHost = System.getenv("ARTIFACTORY_BASE_URL")
+    if (!debugKeyStoreFile.exists() && !artifactoryHost.isNullOrBlank()) {
+        println("Downloading debug keystore")
+        exec {
+            commandLine(
+                "curl",
+                "$artifactoryHost:443/artifactory/android-mega/cicd/debug-keystore/debug.keystore",
+                "-o",
+                debugKeyStoreFile.name
+            )
+        }
     }
 }
 

@@ -77,3 +77,5 @@ replay_pid*
 
 #copilot
 .idea/copilot*
+
+*.keystore
