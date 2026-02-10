@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,17 +13,20 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -36,6 +40,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.detail.model.V
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.LocationFilterOption
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -71,6 +76,8 @@ class VideoPlaylistDetailViewModelTest {
     private val removeVideoPlaylistsUseCase = mock<RemoveVideoPlaylistsUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
+    private val nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper()
 
     private val testId = NodeId(123456L)
     private val testType = PlaylistType.User
@@ -87,15 +94,17 @@ class VideoPlaylistDetailViewModelTest {
     @BeforeEach
     fun setUp() {
         underTest = VideoPlaylistDetailViewModel(
-            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
-            monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
             videoPlaylistDetailUiEntityMapper = videoPlaylistDetailUiEntityMapper,
             getVideoPlaylistByIdUseCase = getVideoPlaylistByIdUseCase,
+            monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
+            monitorVideoPlaylistSetsUpdateUseCase = monitorVideoPlaylistSetsUpdateUseCase,
             videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
             removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            nodeSourceTypeToViewTypeMapper = nodeSourceTypeToViewTypeMapper,
+            getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
             playlistHandle = testId.longValue,
             type = testType
         )
@@ -112,7 +121,8 @@ class VideoPlaylistDetailViewModelTest {
             updateVideoPlaylistTitleUseCase,
             removeVideoPlaylistsUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorHiddenNodesEnabledUseCase
+            monitorHiddenNodesEnabledUseCase,
+            getNodeContentUriByHandleUseCase
         )
     }
 
@@ -646,6 +656,78 @@ class VideoPlaylistDetailViewModelTest {
             .test {
                 val actual = awaitItem()
                 assertThat(actual.isHiddenNodesEnabled).isEqualTo(isHiddenNodesEnabled)
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
+
+    @Test
+    fun `test that onItemClicked when selection is empty triggers navigateToVideoPlayer with correct NavKey`() =
+        runTest {
+            val video = createVideoUiEntity(handle = 1L, name = "test-video")
+            val contentUri = NodeContentUri.RemoteContentUri("http://test.url", false)
+            stubInitialValues()
+            whenever(getNodeContentUriByHandleUseCase(video.id.longValue)).thenReturn(contentUri)
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemClicked(video)
+                    advanceUntilIdle()
+
+                    val event = underTest.navigateToVideoPlayerEvent.value
+                    assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                    val navKey =
+                        (event as StateEventWithContentTriggered).content as LegacyMediaPlayerNavKey
+                    assertThat(navKey.nodeHandle).isEqualTo(video.id.longValue)
+                    assertThat(navKey.fileName).isEqualTo(video.name)
+                    assertThat(navKey.parentHandle).isEqualTo(video.parentId.longValue)
+                    assertThat(navKey.fileHandle).isEqualTo(video.id.longValue)
+                    assertThat(navKey.mediaQueueTitle).isEqualTo(expectedPlaylistUiEntity.title)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that onItemClicked when selection is empty and getNodeContentUriByHandleUseCase throws does not trigger navigation`() =
+        runTest {
+            val video = createVideoUiEntity(handle = 1L)
+            stubInitialValues()
+            whenever(getNodeContentUriByHandleUseCase(any())).thenAnswer {
+                throw RuntimeException("test failure")
+            }
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    awaitItem()
+                    underTest.onItemClicked(video)
+                    advanceUntilIdle()
+
+                    assertThat(underTest.navigateToVideoPlayerEvent.value)
+                        .isEqualTo(consumed())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that resetNavigateToVideoPlayer resets event to consumed`() = runTest {
+        val video = createVideoUiEntity(handle = 1L)
+        val contentUri = NodeContentUri.RemoteContentUri("http://test.url", false)
+        stubInitialValues()
+        whenever(getNodeContentUriByHandleUseCase(video.id.longValue)).thenReturn(contentUri)
+
+        underTest.uiState
+            .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+            .test {
+                awaitItem()
+                underTest.onItemClicked(video)
+                advanceUntilIdle()
+                assertThat(underTest.navigateToVideoPlayerEvent.value)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+
+                underTest.resetNavigateToVideoPlayer()
+                assertThat(underTest.navigateToVideoPlayerEvent.value).isEqualTo(consumed())
                 cancelAndIgnoreRemainingEvents()
             }
     }

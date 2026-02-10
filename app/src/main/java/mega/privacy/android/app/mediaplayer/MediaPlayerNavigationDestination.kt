@@ -28,7 +28,10 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 isFolderLink = key.isFolderLink,
                 viewType = key.nodeSourceType,
                 searchedItems = key.searchedItems,
-                nodeHandles = key.nodeHandles
+                nodeHandles = key.nodeHandles,
+                mediaQueueTitle = key.mediaQueueTitle,
+                collectionTitle = key.collectionTitle,
+                collectionId = key.collectionId,
             )
             context.startActivity(intent)
 

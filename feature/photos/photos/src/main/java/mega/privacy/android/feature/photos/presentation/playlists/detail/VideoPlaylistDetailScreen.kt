@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
@@ -69,6 +70,15 @@ fun VideoPlaylistDetailRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val videoPlaylistEditState by viewModel.videoPlaylistEditState.collectAsStateWithLifecycle()
+    val navigateEvent by viewModel.navigateToVideoPlayerEvent.collectAsStateWithLifecycle()
+
+    NavigationEventEffect(
+        event = navigateEvent,
+        onConsumed = viewModel::resetNavigateToVideoPlayer
+    ) {
+        navigationHandler.navigate(it)
+    }
+
     VideoPlaylistDetailScreen(
         uiState = uiState,
         videoPlaylistEditState = videoPlaylistEditState,

@@ -2,10 +2,12 @@ package mega.privacy.android.feature.photos.presentation.playlists.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation3.runtime.NavKey
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,12 +22,16 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -39,6 +45,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistE
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -53,10 +60,15 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val removeVideoPlaylistsUseCase: RemoveVideoPlaylistsUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     @Assisted private val playlistHandle: Long,
     @Assisted private val type: PlaylistType,
 ) : ViewModel() {
     private val selectedVideoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
+
+    internal val navigateToVideoPlayerEvent: StateFlow<StateEventWithContent<NavKey>>
+        field: MutableStateFlow<StateEventWithContent<NavKey>> = MutableStateFlow(consumed())
 
     internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
         field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
@@ -212,6 +224,8 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     internal fun onItemClicked(item: VideoUiEntity) {
         if (selectedVideoIdsFlow.value.isNotEmpty()) {
             toggleItemSelection(item)
+        } else {
+            navigateToVideoPlayer(item)
         }
     }
 
@@ -237,6 +251,37 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
 
     internal fun clearSelection() {
         selectedVideoIdsFlow.update { emptySet() }
+    }
+
+    private fun navigateToVideoPlayer(item: VideoUiEntity) {
+        viewModelScope.launch {
+            val uri = runCatching {
+                getNodeContentUriByHandleUseCase(item.id.longValue)
+            }.onFailure { Timber.e(it) }.getOrNull() ?: return@launch
+
+            val content = FileNodeContent.AudioOrVideo(uri = uri)
+            val playlistDetail = (uiState.value as? VideoPlaylistDetailUiState.Data)?.playlistDetail
+
+            val navKey = LegacyMediaPlayerNavKey(
+                nodeHandle = item.id.longValue,
+                nodeContentUri = content.uri,
+                nodeSourceType = nodeSourceTypeToViewTypeMapper(NodeSourceType.SEARCH),
+                isFolderLink = false,
+                fileName = item.name,
+                parentHandle = item.parentId.longValue,
+                fileHandle = item.id.longValue,
+                fileTypeInfo = item.fileTypeInfo,
+                searchedItems = playlistDetail?.videos?.map { it.id.longValue },
+                mediaQueueTitle = playlistDetail?.uiEntity?.title,
+                collectionId = playlistDetail?.uiEntity?.id?.longValue,
+                nodeHandles = null,
+            )
+            navigateToVideoPlayerEvent.update { triggered(navKey) }
+        }
+    }
+
+    internal fun resetNavigateToVideoPlayer() {
+        navigateToVideoPlayerEvent.update { consumed() }
     }
 
     @AssistedFactory
