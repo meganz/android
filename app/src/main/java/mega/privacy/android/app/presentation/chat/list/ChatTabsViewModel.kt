@@ -57,9 +57,11 @@ import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingCanceledUseCase
 import mega.privacy.android.domain.usecase.meeting.StartMeetingInWaitingRoomChatUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaChatError
 import timber.log.Timber
@@ -118,6 +120,7 @@ class ChatTabsViewModel @Inject constructor(
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase,
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -138,6 +141,7 @@ class ChatTabsViewModel @Inject constructor(
         retrieveChatsUnreadStatus()
         monitorLeaveChat()
         monitorHasAnyContact()
+        updateSingleActivityFeatureFlag()
         viewModelScope.launch {
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
@@ -150,6 +154,16 @@ class ChatTabsViewModel @Inject constructor(
                 .collect { hasAnyContact ->
                     state.update { state -> state.copy(hasAnyContact = hasAnyContact) }
                 }
+        }
+    }
+
+    private fun updateSingleActivityFeatureFlag() {
+        viewModelScope.launch {
+            runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                .onSuccess { isSingleActivity ->
+                    state.update { it.copy(isSingleActivityEnabled = isSingleActivity) }
+                }
+                .onFailure { Timber.e(it, "Failed to get single activity feature flag") }
         }
     }
 

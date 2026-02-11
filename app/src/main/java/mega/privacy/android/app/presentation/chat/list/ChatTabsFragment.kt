@@ -325,21 +325,27 @@ class ChatTabsFragment : Fragment() {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         val (audioPlayer, videoSectionFeatureScreen) = createRefs()
+                        val isSingleActivityEnabled = chatsTabState.isSingleActivityEnabled
 
-                        MiniAudioPlayerView(
-                            modifier = Modifier
-                                .constrainAs(audioPlayer) {
-                                    bottom.linkTo(parent.bottom)
-                                }
-                                .fillMaxWidth(),
-                            lifecycle = lifecycle,
-                        )
+                        if (!isSingleActivityEnabled) {
+                            MiniAudioPlayerView(
+                                modifier = Modifier
+                                    .constrainAs(audioPlayer) {
+                                        bottom.linkTo(parent.bottom)
+                                    }
+                                    .fillMaxWidth(),
+                                lifecycle = lifecycle,
+                            )
+                        }
 
                         Box(
                             modifier = Modifier
                                 .constrainAs(videoSectionFeatureScreen) {
                                     top.linkTo(parent.top)
-                                    bottom.linkTo(audioPlayer.top)
+                                    bottom.linkTo(
+                                        if (isSingleActivityEnabled) parent.bottom
+                                        else audioPlayer.top
+                                    )
                                     height = Dimension.fillToConstraints
                                 }
                         ) {
