@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.meeting.CancelScheduledMeetingUseCase
 import mega.privacy.android.domain.usecase.meeting.LoadMessagesUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
@@ -43,6 +44,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import mega.privacy.android.feature_flags.AppFeatures
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -79,6 +81,7 @@ internal class ChatTabsViewModelTest {
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase = mock()
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     @BeforeEach
     fun resetMocks() {
@@ -107,8 +110,10 @@ internal class ChatTabsViewModelTest {
             getChatsUnreadStatusUseCase,
             startMeetingInWaitingRoomChatUseCase,
             monitorChatCallUpdatesUseCase,
-            getStringFromStringResMapper
+            getStringFromStringResMapper,
+            getFeatureFlagValueUseCase
         )
+        wheneverBlocking { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }.thenReturn(false)
     }
 
     private fun initTestClass() {
@@ -137,7 +142,8 @@ internal class ChatTabsViewModelTest {
             monitorChatCallUpdatesUseCase,
             hasArchivedChatsUseCase,
             monitorHasAnyContactUseCase,
-            getStringFromStringResMapper
+            getStringFromStringResMapper,
+            getFeatureFlagValueUseCase
         )
     }
 
