@@ -6,7 +6,7 @@ import mega.privacy.android.app.presentation.meeting.navigation.UpgradeProPlanBo
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
@@ -21,7 +21,7 @@ class MeetingEventsPostLoginInitialiser @Inject constructor(
     private val monitorChatCallUpdatesUseCase: MonitorChatCallUpdatesUseCase,
     private val navigationEventQueue: NavigationEventQueue,
     private val appDialogsEventQueue: AppDialogsEventQueue,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         monitorChatCallUpdatesUseCase()
             .retry {

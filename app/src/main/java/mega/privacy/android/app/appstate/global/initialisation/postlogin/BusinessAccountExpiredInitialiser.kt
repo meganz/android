@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.business.MonitorBusinessAccountExpiredUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.BusinessAccountExpiredDialogNavKey
@@ -21,7 +21,7 @@ class BusinessAccountExpiredInitialiser @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val appDialogsEventQueue: AppDialogsEventQueue,
     private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         combine(
             monitorBusinessAccountExpiredUseCase(),

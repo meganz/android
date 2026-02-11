@@ -21,14 +21,13 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.BlockedState
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
-import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
-import mega.privacy.android.domain.extension.onFirst
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.HandleBlockedStateSessionUseCase
@@ -161,10 +160,7 @@ class GlobalStateViewModel @Inject constructor(
             .catch { Timber.e(it, "Error monitoring user credentials") }
             .map { it?.session }
             .distinctUntilChanged()
-            .onFirst(
-                predicate = { true },
-                action = { globalInitialiser.onPreLogin(it) }
-            ).shareIn(
+            .shareIn(
                 scope = viewModelScope,
                 started = SharingStarted.Lazily,
                 replay = 1,

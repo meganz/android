@@ -7,8 +7,12 @@ package mega.privacy.android.navigation.contract.initialisation.initialisers
  *
  * @property action The suspend function to be executed during app start initialisation.
  */
-open class AppStartInitialiser(private val action: suspend () -> Unit) {
-    suspend operator fun invoke() {
+open class AppStartInitialiserAction(private val action: suspend () -> Unit): AppStartInitialiser {
+    override suspend operator fun invoke() {
         action()
     }
+}
+
+interface AppStartInitialiser {
+    suspend operator fun invoke()
 }

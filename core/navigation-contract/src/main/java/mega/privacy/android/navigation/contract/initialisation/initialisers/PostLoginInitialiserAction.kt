@@ -7,8 +7,13 @@ package mega.privacy.android.navigation.contract.initialisation.initialisers
  *
  * @property action The suspend function to be executed during post-login initialisation. It takes the non nullable session string and isFastLogin boolean as parameters.
  */
-open class PostLoginInitialiser(private val action: suspend (String, Boolean) -> Unit) {
-    suspend operator fun invoke(session: String, isFastLogin: Boolean) {
+open class PostLoginInitialiserAction(private val action: suspend (String, Boolean) -> Unit) :
+    PostLoginInitialiser {
+    override suspend operator fun invoke(session: String, isFastLogin: Boolean) {
         action(session, isFastLogin)
     }
+}
+
+interface PostLoginInitialiser {
+    suspend operator fun invoke(session: String, isFastLogin: Boolean)
 }

@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.billing.MegaPurchaseState
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.usecase.billing.MonitorBillingEventUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class PurchaseResultInitialiser @Inject constructor(
     private val monitorBillingEventUseCase: MonitorBillingEventUseCase,
     private val appDialogsEventQueue: AppDialogsEventQueue,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         monitorBillingEventUseCase()
             .catch { Timber.e(it, "Failed to monitor billing event") }

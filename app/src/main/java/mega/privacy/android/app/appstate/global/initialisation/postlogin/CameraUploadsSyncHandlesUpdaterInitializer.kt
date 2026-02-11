@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.filter
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class CameraUploadsSyncHandlesUpdaterInitializer @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         monitorUserUpdates()
             .catch { Timber.Forest.w("Exception monitoring user updates: $it") }

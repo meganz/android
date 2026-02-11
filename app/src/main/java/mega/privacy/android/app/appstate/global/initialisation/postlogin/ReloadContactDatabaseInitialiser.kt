@@ -3,7 +3,7 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.flow.collectLatest
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ import javax.inject.Inject
 class ReloadContactDatabaseInitialiser @Inject constructor(
     private val reloadContactDatabase: ReloadContactDatabase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, isFastLogin ->
         runCatching {
             monitorFetchNodesFinishUseCase().collectLatest { isFinish ->

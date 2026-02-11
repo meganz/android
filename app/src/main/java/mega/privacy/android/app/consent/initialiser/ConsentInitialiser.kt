@@ -10,7 +10,7 @@ import mega.privacy.android.app.consent.CookieDialog
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.domain.usecase.setting.ShouldShowGenericCookieDialogUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import timber.log.Timber
@@ -24,7 +24,7 @@ class ConsentInitialiser @Inject constructor(
     private val shouldShowGenericCookieDialogUseCase: ShouldShowGenericCookieDialogUseCase,
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val adConsentWrapper: AdConsentWrapper,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         val misFlagsLoaded = monitorMiscLoadedUseCase().filter { it }
             .timeout(20.seconds)

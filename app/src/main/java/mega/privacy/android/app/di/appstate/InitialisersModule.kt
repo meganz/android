@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.ElementsIntoSet
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.BusinessAccountExpiredInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.CameraUploadsSyncHandlesUpdaterInitializer
@@ -34,8 +33,9 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiserAction
 import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PreLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -44,26 +44,22 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideHistoricalProcessExitReasonsUseCaseInitialiser(getHistoricalProcessExitReasonsUseCase: GetHistoricalProcessExitReasonsUseCase): AppStartInitialiser =
-        AppStartInitialiser { getHistoricalProcessExitReasonsUseCase() }
+        AppStartInitialiserAction { getHistoricalProcessExitReasonsUseCase() }
 
     @Provides
     @IntoSet
     fun provideResetChatSettingsUseCaseInitialiser(resetChatSettingsUseCase: ResetChatSettingsUseCase): AppStartInitialiser =
-        AppStartInitialiser { resetChatSettingsUseCase() }
+        AppStartInitialiserAction { resetChatSettingsUseCase() }
 
     @Provides
     @IntoSet
     fun provideDomainLoggerInitialiser(logger: Logger): AppStartInitialiser =
-        AppStartInitialiser { Log.setLogger(logger) }
-
-    @Provides
-    @ElementsIntoSet
-    fun providePreLoginInitialisers(): Set<PreLoginInitialiser> = emptySet()
+        AppStartInitialiserAction { Log.setLogger(logger) }
 
     @Provides
     @IntoSet
     fun provideChatPostLoginInitialisers(useCase: InitialiseMegaChatUseCase): PostLoginInitialiser =
-        PostLoginInitialiser { session, isFastLogin ->
+        PostLoginInitialiserAction { session, isFastLogin ->
             useCase(session)
         }
 

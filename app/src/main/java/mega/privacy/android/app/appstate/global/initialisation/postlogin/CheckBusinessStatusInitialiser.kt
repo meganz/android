@@ -12,7 +12,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.IsMasterBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
@@ -28,7 +28,7 @@ class CheckBusinessStatusInitialiser @Inject constructor(
     private val isMasterBusinessAccountUseCase: IsMasterBusinessAccountUseCase,
     private val navigationEventQueue: NavigationEventQueue,
     private val appDialogsEventQueue: AppDialogsEventQueue,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, isFastLogin ->
         if (!isFastLogin) {
             combine(

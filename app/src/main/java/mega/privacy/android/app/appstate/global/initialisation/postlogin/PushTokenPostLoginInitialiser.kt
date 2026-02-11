@@ -14,7 +14,7 @@ import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.GetPushTokenUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.RegisterPushNotificationsUseCase
 import mega.privacy.android.domain.usecase.pushnotifications.SetPushTokenUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,7 +29,7 @@ class PushTokenPostLoginInitialiser @Inject constructor(
     private val setPushTokenUseCase: SetPushTokenUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         withContext(ioDispatcher) {
             monitorFetchNodesFinishUseCase()

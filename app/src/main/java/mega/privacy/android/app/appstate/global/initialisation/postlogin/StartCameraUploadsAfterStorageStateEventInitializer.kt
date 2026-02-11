@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.filter
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class StartCameraUploadsAfterStorageStateEventInitializer @Inject constructor(
     private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     private val startCameraUploads: StartCameraUploadUseCase,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { context, _ ->
         monitorMyAccountUpdateUseCase()
             .catch { Timber.e(it, "Failed to monitor my account update event") }

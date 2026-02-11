@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.initialisation
+package mega.privacy.android.app.appstate.global.initialisation
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -6,7 +6,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PreLoginInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,7 +23,6 @@ import javax.inject.Singleton
 class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
-    private val preLoginInitialisers: Set<@JvmSuppressWildcards PreLoginInitialiser>,
     private val postLoginInitialisers: Set<@JvmSuppressWildcards PostLoginInitialiser>,
 ) {
     private var onPreLoginJob: Job? = null
@@ -37,22 +35,6 @@ class GlobalInitialiser @Inject constructor(
                     it()
                 } catch (e: Exception) {
                     Timber.e(e, "Error during auth viewmodel initialisation")
-                }
-            }
-        }
-    }
-
-    fun onPreLogin(session: String?) {
-        onPreLoginJob?.cancel()
-        Timber.d("Starting pre-login initialisation")
-        onPreLoginJob = coroutineScope.launch {
-            preLoginInitialisers.forEach { initialiser ->
-                launch {
-                    try {
-                        initialiser(session)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Error during pre-login initialisation")
-                    }
                 }
             }
         }

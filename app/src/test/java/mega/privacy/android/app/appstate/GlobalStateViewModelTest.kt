@@ -15,9 +15,9 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
+import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.appstate.global.mapper.BlockedStateMapper
 import mega.privacy.android.app.appstate.global.model.GlobalState
-import mega.privacy.android.app.appstate.initialisation.GlobalInitialiser
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
@@ -108,61 +108,6 @@ class GlobalStateViewModelTest {
     @Test
     fun `test that app start initializers are called during initialization`() = runTest {
         verify(globalInitialiser).onAppStart()
-    }
-
-    @Test
-    fun `test that pre login initializers are called when checking existing session`() = runTest {
-
-        val themeMode = ThemeMode.Light
-        monitorThemeModeUseCase.stub {
-            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
-        }
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(MutableStateFlow(null))
-        }
-        stubConnectivity()
-
-        stubNotBlockedState()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state).isInstanceOf(GlobalState.RequireLogin::class.java)
-
-            // Verify pre-login initializers were called with null session
-            verify(globalInitialiser).onPreLogin(null)
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that pre login initializers are called with existing session`() = runTest {
-
-        val credentials = UserCredentials(
-            email = "test@example.com",
-            session = "existing-session",
-            firstName = "John",
-            lastName = "Doe",
-            myHandle = "123456789"
-        )
-        val themeMode = ThemeMode.Light
-        monitorThemeModeUseCase.stub {
-            on { invoke() }.thenReturn(MutableStateFlow(themeMode))
-        }
-        monitorUserCredentialsUseCase.stub {
-            on { invoke() }.thenReturn(MutableStateFlow(credentials))
-        }
-        stubConnectivity()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state).isInstanceOf(GlobalState.LoggedIn::class.java)
-
-            // Verify pre-login initializers were called with existing session
-            verify(globalInitialiser).onPreLogin("existing-session")
-
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     @Test
@@ -728,7 +673,6 @@ class GlobalStateViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(globalInitialiser, times(1)).onPreLogin(session)
         }
 
     @Test
@@ -755,7 +699,6 @@ class GlobalStateViewModelTest {
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
             advanceTimeBy(6_000) // Advance time past ui state flow timeout
             underTest.state.test { cancelAndIgnoreRemainingEvents() }
-            verify(globalInitialiser, times(1)).onPreLogin(session)
         }
 
     @Test

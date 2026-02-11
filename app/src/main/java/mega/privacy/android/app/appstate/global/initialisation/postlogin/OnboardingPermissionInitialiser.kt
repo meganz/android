@@ -4,7 +4,7 @@ import mega.privacy.android.app.appstate.content.navigation.view.PermissionScree
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.notifications.ShouldShowNotificationReminderUseCase
 import mega.privacy.android.domain.usecase.permisison.CheckOnboardingPermissionsUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
@@ -16,7 +16,7 @@ class OnboardingPermissionInitialiser @Inject constructor(
     private val shouldShowNotificationReminderUseCase: ShouldShowNotificationReminderUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val navigationEventQueue: NavigationEventQueue,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         runCatching {
             val isFirstLaunch = isFirstLaunchUseCase()

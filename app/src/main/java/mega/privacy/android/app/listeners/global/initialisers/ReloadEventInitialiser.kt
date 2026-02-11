@@ -7,14 +7,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.domain.usecase.node.root.MonitorRootNodeRefreshEventUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
 class ReloadEventInitialiser @Inject constructor(
     @ApplicationContext private val appContext: Context,
     private val monitorRootNodeRefreshEventUseCase: MonitorRootNodeRefreshEventUseCase,
-) : AppStartInitialiser(
+) : AppStartInitialiserAction(
     action = {
         monitorRootNodeRefreshEventUseCase()
             .onEach { Timber.d("Root node refresh event received") }

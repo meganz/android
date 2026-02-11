@@ -12,7 +12,7 @@ import mega.privacy.android.app.presentation.psa.mapper.PsaStateMapper
 import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import timber.log.Timber
 import javax.inject.Inject
@@ -23,7 +23,7 @@ class PsaInitialiser(
     private val psaStateMapper: PsaStateMapper,
     private val currentTimeProvider: () -> Long,
     private val navigationEventQueue: NavigationEventQueue,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         coroutineScope.launch {
             monitorPsaUseCase(currentTimeProvider)

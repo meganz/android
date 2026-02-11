@@ -2,7 +2,7 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.domain.usecase.billing.MonitorSuccessfulPurchasesUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import javax.inject.Inject
 
 /**
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class PurchaseReviewInitialiser @Inject constructor(
     monitorSuccessfulPurchasesUseCase: MonitorSuccessfulPurchasesUseCase,
     ratingHandlerImpl: RatingHandlerImpl,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, _ ->
         monitorSuccessfulPurchasesUseCase()
             .collect {

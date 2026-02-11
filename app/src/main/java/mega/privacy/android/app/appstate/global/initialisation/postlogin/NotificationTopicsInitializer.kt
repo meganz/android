@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.app.fcm.FcmManager
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class NotificationTopicsInitializer @Inject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val fcmManager: FcmManager,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { context, _ ->
         monitorAccountDetailUseCase()
             .catch { Timber.Forest.e(it) }

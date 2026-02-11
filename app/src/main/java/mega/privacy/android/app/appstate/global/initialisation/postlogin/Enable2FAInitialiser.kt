@@ -6,7 +6,7 @@ import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
+import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.Enable2FANavKey
 import timber.log.Timber
@@ -19,7 +19,7 @@ class Enable2FAInitialiser @Inject constructor(
     getLastRegisteredEmailUseCase: GetLastRegisteredEmailUseCase,
     navigationEventQueue: NavigationEventQueue,
     monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase,
-) : PostLoginInitialiser(
+) : PostLoginInitialiserAction(
     action = { _, isFastLogin ->
         monitorUpdateUserDataUseCase() // ensure current user email loaded
             .catch {
