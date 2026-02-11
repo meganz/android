@@ -2,27 +2,34 @@ package mega.privacy.android.feature.clouddrive.presentation.offline
 
 import android.os.Build
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.nodecomponents.list.GRID_VIEW_TOGGLE_TAG
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.transfers.widget.TransfersToolabarWidgetUiState
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OfflineFolderInfo
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetStatus
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
@@ -30,6 +37,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.AfterEach
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -46,6 +54,23 @@ class OfflineScreenTest {
 
     @get:Rule
     val analyticsRule = AnalyticsTestRule(analyticsTracker)
+
+    private val transfersToolbarWidgetViewModel = mock<TransfersToolbarWidgetViewModel> {
+        on { state } doReturn
+                MutableStateFlow(
+                    TransfersToolabarWidgetUiState(
+                        status = TransfersToolbarWidgetStatus.Transferring,
+                        isUserLoggedIn = true,
+                    )
+                )
+    }
+
+    private val viewModelStore = mock<ViewModelStore> {
+        on { get(argThat<String> { contains(TransfersToolbarWidgetViewModel::class.java.canonicalName.orEmpty()) }) } doReturn transfersToolbarWidgetViewModel
+    }
+    private val viewModelStoreOwner = mock<ViewModelStoreOwner> {
+        on { viewModelStore } doReturn viewModelStore
+    }
 
     @AfterEach
     fun resetMocks() {
@@ -516,6 +541,31 @@ class OfflineScreenTest {
     }
 
     @Test
+    fun `test that OfflineScreen handles transfers navigation events correctly`() {
+        val mockNavigateCallback: () -> Unit = mock()
+        val nodeUiItem = createOfflineNodeUiItem(
+            id = 999,
+            name = "test_folder",
+            isFolder = true,
+            handle = "999"
+        )
+        val offlineNodes = listOf(nodeUiItem)
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = offlineNodes,
+            openFolderInPageEvent = triggered(nodeUiItem.offlineFileInformation)
+        )
+
+        setupComposeContent(
+            uiState = uiState,
+            onNavigateToTransfers = mockNavigateCallback,
+        )
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_TRANSFER_WIDGET).performClick()
+        verify(mockNavigateCallback).invoke()
+    }
+
+    @Test
     fun `test that loading tag is visible when isLoading is true`() {
         val uiState = OfflineUiState(isLoadingCurrentFolder = true)
         setupComposeContent(uiState)
@@ -760,6 +810,7 @@ class OfflineScreenTest {
         onItemClicked: (OfflineNodeUiItem) -> Unit = {},
         onItemLongClicked: (OfflineNodeUiItem) -> Unit = {},
         onNavigateToFolder: (Int, String) -> Unit = { _, _ -> },
+        onNavigateToTransfers: () -> Unit = {},
         onOpenFile: (OfflineFileInformation) -> Unit = {},
         onBack: () -> Unit = {},
         onDismissOfflineWarning: () -> Unit = {},
@@ -774,7 +825,10 @@ class OfflineScreenTest {
         onChangeViewType: () -> Unit = {},
     ) {
         composeRule.setContent {
-            CompositionLocalProvider(LocalContext provides composeRule.activity) {
+            CompositionLocalProvider(
+                LocalActivity provides null,
+                LocalViewModelStoreOwner provides viewModelStoreOwner
+            ) {
                 AndroidThemeForPreviews {
                     OfflineScreen(
                         uiState = uiState,
@@ -782,6 +836,7 @@ class OfflineScreenTest {
                         onItemClicked = onItemClicked,
                         onItemLongClicked = onItemLongClicked,
                         onNavigateToFolder = onNavigateToFolder,
+                        onNavigateToTransfers = onNavigateToTransfers,
                         onOpenFile = onOpenFile,
                         onDismissOfflineWarning = onDismissOfflineWarning,
                         selectAll = selectAll,

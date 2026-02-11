@@ -60,6 +60,7 @@ import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshare
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.OutgoingSharesViewModel
 import mega.privacy.android.feature.clouddrive.presentation.shares.outgoingshares.model.OutgoingSharesAction
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -186,7 +187,9 @@ internal fun SharesScreen(
                     },
                     title = stringResource(sharedR.string.video_section_videos_location_option_shared_items),
                     trailingIcons = {
-                        TransfersToolbarWidget(navigationHandler::navigate)
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
+                        }
                     },
                     actions = buildList {
                         add(

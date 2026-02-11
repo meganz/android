@@ -59,6 +59,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -87,6 +88,7 @@ import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 fun OfflineScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openFileInformation: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -114,6 +116,7 @@ fun OfflineScreen(
         onOpenFile = actionViewModel::handleOpenOfflineFile,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,
+        onNavigateToTransfers = onNavigateToTransfers,
         onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
@@ -145,6 +148,7 @@ internal fun OfflineScreen(
     onItemClicked: (OfflineNodeUiItem) -> Unit,
     onItemLongClicked: (OfflineNodeUiItem) -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onOpenFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     onSearch: (String) -> Unit,
@@ -225,6 +229,12 @@ internal fun OfflineScreen(
                     navigationType = AppBarNavigationType.Back {
                         Analytics.tracker.trackEvent(BackButtonPressedEvent)
                         onBack()
+                    },
+                    trailingIcons = {
+                        TransfersToolbarWidget(
+                            onClick = onNavigateToTransfers,
+                            modifier = Modifier.testTag(OFFLINE_SCREEN_TRANSFER_WIDGET)
+                        )
                     },
                     title = uiState
                         .title
@@ -563,3 +573,4 @@ internal const val OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG = "offline_screen:top_w
 internal const val OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG =
     "offline_screen:selection_mode_bottom_bar"
 internal const val OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG = "offline_screen:sort_bottom_sheet"
+internal const val OFFLINE_SCREEN_TRANSFER_WIDGET = "offline_screen:transfers_widget"
