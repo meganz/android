@@ -48,7 +48,7 @@ class VerifyBottomSheetMenuItem @Inject constructor(
         nodeSourceType: NodeSourceType,
     ): Boolean {
         shareData = getNodeShareDataUseCase(node)
-        return shareData?.user.isNullOrEmpty().not()
+        return shareData?.user.isNullOrEmpty().not() && shareData?.isPending == false
     }
 
     override val groupId = 2
