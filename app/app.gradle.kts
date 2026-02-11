@@ -229,6 +229,7 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":feature:sync"))
     implementation(project(":feature:devicecenter"))
+    implementation(project(":feature:cloudexplorer"))
     implementation(project(":shared:resources"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
