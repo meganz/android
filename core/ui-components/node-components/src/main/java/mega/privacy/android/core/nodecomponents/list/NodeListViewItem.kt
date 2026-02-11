@@ -290,7 +290,9 @@ fun NodeListViewItem(
                     overflow = TextOverflow.Ellipsis,
                     style = AppTheme.typography.bodySmall,
                     maxLines = 1,
-                    modifier = Modifier.testTag(SUBTITLE_TAG),
+                    modifier = Modifier
+                        .weight(1f, fill = false)
+                        .testTag(SUBTITLE_TAG),
                 )
                 if (showOffline) {
                     MegaIcon(
