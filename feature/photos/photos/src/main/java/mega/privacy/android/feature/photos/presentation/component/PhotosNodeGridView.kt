@@ -1,13 +1,9 @@
 package mega.privacy.android.feature.photos.presentation.component
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,12 +25,8 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -42,8 +34,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
@@ -89,52 +79,22 @@ fun PhotosNodeGridView(
     contentPadding: PaddingValues = PaddingValues(),
     header: (@Composable () -> Unit)? = null,
 ) {
-    val scope = rememberCoroutineScope()
-    var userScrollEnabled by remember { mutableStateOf(true) }
     val configuration = LocalConfiguration.current
-    // We need this local state because the value will be read in a lambda. Otherwise, we will face
-    // the "stale-callback" issue. You can confirm this by removing this state and just use
-    // the gridSize parameter when zooming in/out the screen content.
-    val latestGridSize by rememberUpdatedState(gridSize)
-    val spanCount = remember(key1 = configuration.orientation, key2 = latestGridSize) {
+    val spanCount = remember(key1 = configuration.orientation, key2 = gridSize) {
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            latestGridSize.portrait
+            gridSize.portrait
         } else {
-            latestGridSize.landscape
+            gridSize.landscape
         }
     }
-    val isPreview by remember(configuration, latestGridSize) {
-        derivedStateOf { isPreview(configuration, latestGridSize) }
+    val isPreview by remember(configuration, gridSize) {
+        derivedStateOf { isPreview(configuration, gridSize) }
     }
 
     FastScrollLazyVerticalGrid(
         totalItems = items.size,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier
-            .fillMaxSize()
-            .screenContentZoomGestureDetector(
-                onZoom = { type ->
-                    scope.launch {
-                        userScrollEnabled = false
-                        when (type) {
-                            ZoomType.ZoomIn -> {
-                                if (latestGridSize != TimelineGridSize.entries.first()) {
-                                    onGridSizeChange(TimelineGridSize.entries[latestGridSize.ordinal - 1])
-                                }
-                            }
-
-                            ZoomType.ZoomOut -> {
-                                if (latestGridSize != TimelineGridSize.entries.last()) {
-                                    onGridSizeChange(TimelineGridSize.entries[latestGridSize.ordinal + 1])
-                                }
-                            }
-                        }
-                        // Delay to disable user scrolling while the grid is being updated
-                        delay(250)
-                        userScrollEnabled = true
-                    }
-                }
-            ),
+        modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
         state = lazyGridState,
         tooltipText = { index ->
@@ -146,12 +106,11 @@ fun PhotosNodeGridView(
                 }
                 dateText(
                     modificationTime = modificationTime,
-                    gridSize = latestGridSize,
+                    gridSize = gridSize,
                     locale = configuration.locales[0],
                 )
             }.orEmpty()
         },
-        userScrollEnabled = userScrollEnabled,
         horizontalArrangement = Arrangement.spacedBy(1.dp),
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
@@ -188,7 +147,7 @@ fun PhotosNodeGridView(
                             .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
                         time = contentType.time,
                         shouldShowGridSizeSettings = contentType.shouldShowGridSizeSettings,
-                        gridSize = latestGridSize,
+                        gridSize = gridSize,
                         onGridSizeChange = onGridSizeChange
                     )
                 }
@@ -374,37 +333,6 @@ private fun PhotoNodeBody(
 private fun isPreview(configuration: Configuration, gridSize: TimelineGridSize) =
     configuration.orientation == Configuration.ORIENTATION_PORTRAIT
             && gridSize.portrait == TimelineGridSize.Large.portrait
-
-enum class ZoomType {
-    ZoomIn, ZoomOut
-}
-
-@SuppressLint("SuspiciousModifierThen")
-private fun Modifier.screenContentZoomGestureDetector(onZoom: (type: ZoomType) -> Unit) = then(
-    other = pointerInput(Unit) {
-        awaitEachGesture {
-            awaitFirstDown(requireUnconsumed = false)
-            do {
-                val event = awaitPointerEvent(
-                    pass = PointerEventPass.Initial
-                )
-                if (event.changes.any { it.isConsumed })
-                    break
-                val zoomChange = event.calculateZoom()
-                if (zoomChange != 1.0f) {
-                    if (zoomChange > 1.0f) {
-                        onZoom(ZoomType.ZoomIn)
-                    } else {
-                        onZoom(ZoomType.ZoomOut)
-                    }
-                    // Consume event in case to trigger scroll
-                    event.changes.map { it.consume() }
-                    break
-                }
-            } while (event.changes.any { it.pressed })
-        }
-    }
-)
 
 private fun dateText(
     gridSize: TimelineGridSize,
