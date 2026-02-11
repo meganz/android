@@ -65,6 +65,7 @@ import mega.privacy.android.feature.photos.presentation.component.MediaTopBar
 import mega.privacy.android.feature.photos.presentation.effects.MediaMainEffects
 import mega.privacy.android.feature.photos.presentation.effects.MediaNodeActionEffects
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
+import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType.Companion.isAnActiveSelection
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModelHandler
 import mega.privacy.android.feature.photos.presentation.handler.timelineActionsHandler
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
@@ -500,8 +501,8 @@ fun MediaMainScreen(
                         )
                     ),
                 beyondViewportPageCount = 1,
-                hideTabs = selectionModeType == MediaSelectionModeType.Timeline || selectionModeType == MediaSelectionModeType.Albums || selectionModeType == MediaSelectionModeType.Videos || shouldHideTabs,
-                pagerScrollEnabled = true,
+                hideTabs = selectionModeType.isAnActiveSelection() || shouldHideTabs,
+                pagerScrollEnabled = selectionModeType == MediaSelectionModeType.None,
                 initialSelectedIndex = currentTabIndex,
                 onTabSelected = { index ->
                     currentTabIndex = index
@@ -519,7 +520,7 @@ fun MediaMainScreen(
                                     MediaContent(
                                         modifier = modifier.fillMaxSize(),
                                         timelineContentPadding = PaddingValues(
-                                            bottom = if (selectionModeType == MediaSelectionModeType.Timeline || selectionModeType == MediaSelectionModeType.Albums || selectionModeType == MediaSelectionModeType.Videos) {
+                                            bottom = if (selectionModeType.isAnActiveSelection()) {
                                                 paddingValues.calculateBottomPadding()
                                             } else {
                                                 50.dp
