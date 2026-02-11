@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.feature.cloudexplorer.navigation.CloudExplorerFeatureDestination
+import mega.privacy.android.feature.cloudexplorer.navigation.ShareToMegaDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 
 @Module
@@ -16,4 +17,8 @@ class CloudExplorerModule {
     @IntoSet
     fun provideCloudExplorerFeatureDestination(): FeatureDestination =
         CloudExplorerFeatureDestination()
+
+    @Provides
+    @IntoSet
+    fun provideShareToMegaDestination(): FeatureDestination = ShareToMegaDestination()
 }

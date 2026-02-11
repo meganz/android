@@ -33,6 +33,7 @@ data class FileExplorerUiState(
     val nonCollidedFilesUploadedCount: Int = 0,
     val nodeUpdatedEvent: StateEvent = consumed,
     val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
+    val isFeatureFlagEnabled: Boolean? = null,
 ) {
 
     data class NavigateToCloudEvent(

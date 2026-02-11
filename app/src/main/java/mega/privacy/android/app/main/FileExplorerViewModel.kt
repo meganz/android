@@ -48,11 +48,13 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -80,6 +82,7 @@ class FileExplorerViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileExplorerUiState())
@@ -166,6 +169,16 @@ class FileExplorerViewModel @Inject constructor(
                     )
                 }
             }.collect { _uiState.update(it) }
+        }
+    }
+
+    fun checkFeatureFlag() {
+        viewModelScope.launch {
+            val isFeatureFlagEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.FileExplorer)
+            }.getOrDefault(false)
+
+            _uiState.update { state -> state.copy(isFeatureFlagEnabled = isFeatureFlagEnabled) }
         }
     }
 

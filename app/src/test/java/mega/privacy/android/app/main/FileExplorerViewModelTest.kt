@@ -12,6 +12,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.fileexplorer.model.FileExplorerUiState
 import mega.privacy.android.app.utils.Constants
@@ -36,10 +37,12 @@ import mega.privacy.android.domain.usecase.account.GetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.GetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.message.AttachNodeUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetDocumentsFromSharedUrisUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -79,6 +82,7 @@ internal class FileExplorerViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase> {
         on { invoke() }.thenReturn(kotlinx.coroutines.flow.emptyFlow())
     }
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val testScheduler = TestCoroutineScheduler()
     private val testDispatcher = StandardTestDispatcher(testScheduler)
 
@@ -102,6 +106,7 @@ internal class FileExplorerViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
             activityLifecycleHandler = activityLifecycleHandler,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -119,7 +124,8 @@ internal class FileExplorerViewModelTest {
             getFolderTypeByHandleUseCase,
             getNodeLocationUseCase,
             activityLifecycleHandler,
-            monitorNodeUpdatesUseCase
+            monitorNodeUpdatesUseCase,
+            getFeatureFlagValueUseCase,
         )
         // Set default behavior for monitorNodeUpdatesUseCase
         whenever(monitorNodeUpdatesUseCase()).thenReturn(kotlinx.coroutines.flow.emptyFlow())
@@ -643,5 +649,20 @@ internal class FileExplorerViewModelTest {
 
         // Verify event is consumed
         assertThat(underTest.uiState.value.navigateToCloud).isEqualTo(consumed())
+    }
+
+    @ParameterizedTest()
+    @ValueSource(booleans = [true, false])
+    fun `test that checkFeatureFlag updates state correctly`(
+        isFeatureFlagEnabled: Boolean,
+    ) = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.FileExplorer)) doReturn isFeatureFlagEnabled
+
+        underTest.checkFeatureFlag()
+        testScheduler.advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isFeatureFlagEnabled).isEqualTo(isFeatureFlagEnabled)
+        }
     }
 }

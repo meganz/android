@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.os.Bundle
@@ -37,6 +38,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -49,6 +51,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityFileExplorerBinding
 import mega.privacy.android.app.extensions.consumeInsetsWithToolbar
@@ -428,6 +431,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         Timber.d("onCreate first")
         super.onCreate(savedInstanceState)
+        viewModel.checkFeatureFlag()
         credentials = runBlocking {
             runCatching {
                 getAccountCredentialsUseCase()
@@ -514,8 +518,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                 }
             }
 
-        setupObservers()
+        setupObservers(savedInstanceState)
+    }
 
+    private fun proceedWithInitialization(savedInstanceState: Bundle?) {
         if (savedInstanceState != null) {
             with(savedInstanceState) {
                 Timber.d("Bundle is NOT NULL")
@@ -701,7 +707,8 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
     }
 
-    private fun setupObservers() {
+    @SuppressLint("UnsafeIntentLaunch")
+    private fun setupObservers(savedInstanceState: Bundle?) {
         this.lifecycleScope.launch {
             val documents = viewModel.uiState
                 .mapNotNull { it.documents.takeIf { it.isNotEmpty() } }
@@ -717,6 +724,23 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             if (fileExplorerState.shouldFinishScreen) {
                 finishAndRemoveTask()
                 viewModel.setShouldFinishScreen(false)
+            }
+        }
+
+        collectFlow(viewModel.uiState.map { it.isFeatureFlagEnabled }
+            .distinctUntilChanged()) { isEnabled ->
+            isEnabled?.let {
+                if (isEnabled) {
+                    intent.setClass(
+                        this@FileExplorerActivity,
+                        MegaActivity::class.java
+                    ).also {
+                        startActivity(it)
+                    }
+                    finish()
+                } else {
+                    proceedWithInitialization(savedInstanceState)
+                }
             }
         }
 

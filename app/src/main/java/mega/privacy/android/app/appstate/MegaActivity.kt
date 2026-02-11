@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -85,10 +86,12 @@ import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartT
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
+import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -98,6 +101,7 @@ import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -167,6 +171,43 @@ class MegaActivity : FragmentActivity() {
             RefreshEvent.SdkReload.name -> {
                 globalStateViewModel.refreshSession(RefreshEvent.SdkReload)
                 intent.action = null
+            }
+
+            Intent.ACTION_SEND_MULTIPLE -> {
+                getShareUris()?.let { shareUris ->
+                    navigationEventQueue.emit(ShareToMegaNavKey(shareUris))
+                } ?: Timber.w("Action send multiple but nothing to share")
+                intent.action = null
+                intent.removeExtra(Intent.EXTRA_STREAM)
+            }
+        }
+    }
+
+    private fun getShareUris() = with(intent) {
+        parcelableArrayList<Parcelable>(Intent.EXTRA_STREAM)?.let {
+            it.mapNotNull { item -> item as? Uri }.let { uris ->
+                Timber.d("Multiple files")
+                grantUriPermission(uris)
+                uris.map { uri -> UriPath(uri.toString()) }.ifEmpty { null }
+            }
+        } ?: (intent.parcelable<Parcelable>(Intent.EXTRA_STREAM) as? Uri)
+            ?.let { uri ->
+                Timber.d("Single file")
+                grantUriPermission(listOf(uri))
+                listOf(UriPath(uri.toString()))
+            }
+    }
+
+    private fun grantUriPermission(uris: List<Uri>) {
+        uris.forEach { uri ->
+            runCatching {
+                this@MegaActivity.grantUriPermission(
+                    this@MegaActivity.packageName,
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            }.onFailure {
+                Timber.e(it, "Error granting uri permission")
             }
         }
     }
