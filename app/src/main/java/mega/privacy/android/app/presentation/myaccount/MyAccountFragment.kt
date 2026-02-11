@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -92,6 +96,9 @@ class MyAccountFragment : Fragment(), MyAccountHomeViewActions {
 
                 OriginalTheme(isDark = themeMode.isDarkMode()) {
                     MyAccountHomeView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .semantics { testTagsAsResourceId = true },
                         storageState = storageState,
                         uiState = uiState,
                         uiActions = this@MyAccountFragment,

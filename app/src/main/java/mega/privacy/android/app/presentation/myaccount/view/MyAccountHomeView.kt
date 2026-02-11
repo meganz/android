@@ -191,6 +191,7 @@ fun MyAccountHomeView(
     uiState: MyAccountHomeUIState,
     uiActions: MyAccountHomeViewActions,
     navController: NavController?,
+    modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -199,7 +200,7 @@ fun MyAccountHomeView(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         scaffoldState = rememberScaffoldState(),
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->

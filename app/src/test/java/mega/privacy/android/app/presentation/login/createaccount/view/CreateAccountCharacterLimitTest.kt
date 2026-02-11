@@ -1,11 +1,12 @@
 package mega.privacy.android.app.presentation.login.createaccount.view
 
-import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -20,6 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class CreateAccountCharacterLimitTest {
@@ -69,6 +71,7 @@ class CreateAccountCharacterLimitTest {
     }
 
     @Test
+    @Config(qualifiers = "w720dp-h1280dp-xhdpi")
     fun `test that first name error message is displayed when length exceeded`() = runTest {
         val state = CreateAccountUIState(
             isFirstNameLengthExceeded = true
@@ -76,9 +79,9 @@ class CreateAccountCharacterLimitTest {
 
         setupRule(state = state)
 
-        composeRule.onNode(
-            hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
+        composeRule.onNode(hasTestTag(FIRST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -89,9 +92,9 @@ class CreateAccountCharacterLimitTest {
 
         setupRule(state = state)
 
-        composeRule.onNode(
-            hasTestTag(LAST_NAME)
-        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
+        composeRule.onNode(hasTestTag(LAST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -104,9 +107,9 @@ class CreateAccountCharacterLimitTest {
 
             setupRule(state = state)
 
-            composeRule.onNode(
-                hasTestTag(FIRST_NAME)
-            ).assert(hasAnyChild(hasText("Enter a first name")))
+            composeRule.onNode(hasTestTag(FIRST_NAME))
+                .onChildren()
+                .assertAny(hasAnyChild(hasText("Enter a first name")))
         }
 
     @Test
@@ -119,9 +122,9 @@ class CreateAccountCharacterLimitTest {
 
             setupRule(state = state)
 
-            composeRule.onNode(
-                hasTestTag(LAST_NAME)
-            ).assert(hasAnyChild(hasText("Enter a last name")))
+            composeRule.onNode(hasTestTag(LAST_NAME))
+                .onChildren()
+                .assertAny(hasAnyChild(hasText("Enter a last name")))
         }
 
     @Test
@@ -157,13 +160,13 @@ class CreateAccountCharacterLimitTest {
 
         setupRule(state = state)
 
-        composeRule.onNode(
-            hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
+        composeRule.onNode(hasTestTag(FIRST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_char_limit_exceed_error))))
 
-        composeRule.onNode(
-            hasTestTag(LAST_NAME)
-        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
+        composeRule.onNode(hasTestTag(LAST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 
     @Test
@@ -176,13 +179,12 @@ class CreateAccountCharacterLimitTest {
 
         setupRule(state = state)
 
-        composeRule.onNode(
-            hasTestTag(FIRST_NAME)
-        ).assert(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_error_message))))
+        composeRule.onNode(hasTestTag(FIRST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_error_message))))
 
-        composeRule.onNode(
-            hasTestTag(LAST_NAME)
-        )
-            .assert(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
+        composeRule.onNode(hasTestTag(LAST_NAME))
+            .onChildren()
+            .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_char_limit_exceed_error))))
     }
 }
