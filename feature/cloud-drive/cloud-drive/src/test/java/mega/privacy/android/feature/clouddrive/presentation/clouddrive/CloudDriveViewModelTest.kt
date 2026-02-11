@@ -19,14 +19,19 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
@@ -38,8 +43,10 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -88,7 +95,6 @@ class CloudDriveViewModelTest {
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase = mock()
@@ -100,6 +106,11 @@ class CloudDriveViewModelTest {
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
     private val mockTracker: AnalyticsTracker = mock()
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
+    private val monitorAlmostFullStorageBannerVisibilityUseCase =
+        mock<MonitorAlmostFullStorageBannerVisibilityUseCase>()
+    private val overQuotaStatusMapper = mock<OverQuotaStatusMapper>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
 
     private lateinit var testScheduler: TestCoroutineScheduler
 
@@ -126,7 +137,6 @@ class CloudDriveViewModelTest {
             getRootNodeIdUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
-            monitorStorageStateEventUseCase,
             monitorTransferOverQuotaUseCase,
             getContactVerificationWarningUseCase,
             areCredentialsVerifiedUseCase,
@@ -134,7 +144,9 @@ class CloudDriveViewModelTest {
             getNodeAccessPermission,
             monitorSortCloudOrderUseCase,
             getFeatureFlagValueUseCase,
-            mockTracker
+            mockTracker,
+            monitorAlmostFullStorageBannerVisibilityUseCase,
+            overQuotaStatusMapper,
         )
         Analytics.initialise(null)
     }
@@ -142,29 +154,35 @@ class CloudDriveViewModelTest {
     private fun createViewModel(
         nodeHandle: Long = folderNodeHandle,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
-    ) = CloudDriveViewModel(
-        getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
-        getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
-        setViewTypeUseCase = setViewTypeUseCase,
-        monitorViewTypeUseCase = monitorViewTypeUseCase,
-        monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-        monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-        monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-        nodeUiItemMapper = nodeUiItemMapper,
-        getRootNodeIdUseCase = getRootNodeIdUseCase,
-        getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
-        setCloudSortOrderUseCase = setCloudSortOrderUseCase,
-        nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
-        monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
-        monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
-        getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
-        areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
-        getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
-        getNodeAccessPermission = getNodeAccessPermission,
-        monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
-        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-        navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
-    )
+    ): CloudDriveViewModel {
+        return CloudDriveViewModel(
+            getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
+            getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
+            setViewTypeUseCase = setViewTypeUseCase,
+            monitorViewTypeUseCase = monitorViewTypeUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+            nodeUiItemMapper = nodeUiItemMapper,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
+            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
+            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
+            getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
+            getNodeAccessPermission = getNodeAccessPermission,
+            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            monitorAlmostFullStorageBannerVisibilityUseCase = monitorAlmostFullStorageBannerVisibilityUseCase,
+            overQuotaStatusMapper = overQuotaStatusMapper,
+            setAlmostFullStorageBannerClosingTimestampUseCase = mock(),
+            navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        )
+    }
 
     private suspend fun setupTestData(
         items: List<TypedNode>,
@@ -220,13 +238,8 @@ class CloudDriveViewModelTest {
         ).thenReturn(flowOf())
 
         // Setup quota monitoring mocks
-        whenever(monitorStorageStateEventUseCase()).thenReturn(
-            MutableStateFlow(
-                StorageStateEvent(
-                    1L,
-                    StorageState.Green
-                )
-            )
+        whenever(monitorStorageStateUseCase()).thenReturn(
+            MutableStateFlow(StorageState.Green)
         )
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(false))
 
@@ -234,6 +247,16 @@ class CloudDriveViewModelTest {
         whenever(getContactVerificationWarningUseCase()).thenReturn(false)
         whenever(areCredentialsVerifiedUseCase(any())).thenReturn(false)
         whenever(getIncomingShareParentUserEmailUseCase(any())).thenReturn(null)
+        whenever(monitorAlmostFullStorageBannerVisibilityUseCase()) doReturn MutableStateFlow(true)
+        whenever(overQuotaStatusMapper(any(), any(), any())) doReturn
+                OverQuotaStatus()
+        val accountLevelDetail = mock<AccountLevelDetail> {
+            on { accountType } doReturn AccountType.FREE
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { levelDetail } doReturn accountLevelDetail
+        }
+        whenever(monitorAccountDetailUseCase()) doReturn MutableStateFlow(accountDetail)
     }
 
     private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
@@ -282,13 +305,8 @@ class CloudDriveViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
 
         // Setup quota monitoring mocks
-        whenever(monitorStorageStateEventUseCase()).thenReturn(
-            MutableStateFlow(
-                StorageStateEvent(
-                    1L,
-                    StorageState.Green
-                )
-            )
+        whenever(monitorStorageStateUseCase()).thenReturn(
+            MutableStateFlow(StorageState.Green)
         )
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(false))
 
@@ -1510,88 +1528,36 @@ class CloudDriveViewModelTest {
 
         underTest.uiState.test {
             val initialState = awaitItem()
-            assertThat(initialState.isStorageOverQuota).isFalse()
-            assertThat(initialState.isTransferOverQuota).isFalse()
+            assertThat(initialState.overQuotaStatus).isEqualTo(OverQuotaStatus())
         }
     }
 
     @Test
-    fun `test that monitorStorageOverQuota updates isStorageOverQuota with Red state`() =
-        runTest {
-            setupTestData(emptyList())
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(StorageStateEvent(1L, StorageState.Red))
-            )
+    fun `test that overQuotaStatus is updated with value from overQuotaStatusMapper`(
+    ) = runTest {
+        val status = OverQuotaStatus(OverQuotaIssue.Storage.Full)
+        setupTestData(emptyList())
+        whenever(overQuotaStatusMapper(any(), any(), any())) doReturn
+                status
 
-            val underTest = createViewModel()
-            advanceUntilIdle()
+        val underTest = createViewModel()
+        advanceUntilIdle()
 
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.isStorageOverQuota).isTrue()
-                assertThat(state.isTransferOverQuota).isFalse()
-            }
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.overQuotaStatus).isEqualTo(status)
         }
-
-    @Test
-    fun `test that monitorStorageOverQuota updates isStorageOverQuota with PayWall state`() =
-        runTest {
-            setupTestData(emptyList())
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(StorageStateEvent(1L, StorageState.PayWall))
-            )
-
-            val underTest = createViewModel()
-            advanceUntilIdle()
-
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.isStorageOverQuota).isTrue()
-                assertThat(state.isTransferOverQuota).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that monitorStorageOverQuota handles Green storage state correctly`() =
-        runTest {
-            setupTestData(emptyList())
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
-            )
-
-            val underTest = createViewModel()
-            advanceUntilIdle()
-
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.isStorageOverQuota).isFalse()
-                assertThat(state.isTransferOverQuota).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that monitorTransferOverQuota updates isTransferOverQuota correctly`() =
-        runTest {
-            setupTestData(emptyList())
-            whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true))
-
-            val underTest = createViewModel()
-            advanceUntilIdle()
-
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.isTransferOverQuota).isTrue()
-                assertThat(state.isStorageOverQuota).isFalse()
-            }
-        }
+    }
 
     @Test
     fun `test that ConsumeOverQuotaWarning action resets both quota flags`() =
         runTest {
             setupTestData(emptyList())
-            whenever(monitorStorageStateEventUseCase()).thenReturn(
-                MutableStateFlow(StorageStateEvent(1L, StorageState.Red))
-            )
+            whenever(overQuotaStatusMapper(any(), any(), any())) doReturn
+                    OverQuotaStatus(
+                        OverQuotaIssue.Storage.AlmostFull,
+                        OverQuotaIssue.Transfer.TransferOverQuotaFreeUser
+                    )
             whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true))
 
             val underTest = createViewModel()
@@ -1600,30 +1566,30 @@ class CloudDriveViewModelTest {
             // Verify both flags are set
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.isStorageOverQuota).isTrue()
-                assertThat(state.isTransferOverQuota).isTrue()
+                assertThat(state.overQuotaStatus.storage).isEqualTo(OverQuotaIssue.Storage.AlmostFull)
+                assertThat(state.overQuotaStatus.transfer).isEqualTo(OverQuotaIssue.Transfer.TransferOverQuotaFreeUser)
 
                 // Consume the warning
                 underTest.processAction(CloudDriveAction.OverQuotaConsumptionWarning)
                 val updatedState = awaitItem()
-                assertThat(updatedState.isStorageOverQuota).isFalse()
-                assertThat(updatedState.isTransferOverQuota).isFalse()
+                assertThat(updatedState.overQuotaStatus).isEqualTo(OverQuotaStatus())
             }
         }
 
     @Test
     fun `test that quota monitoring starts immediately on ViewModel creation`() = runTest {
         setupTestData(emptyList())
-        whenever(monitorStorageStateEventUseCase()).thenReturn(
-            MutableStateFlow(StorageStateEvent(1L, StorageState.Red))
+        whenever(monitorStorageStateUseCase()).thenReturn(
+            MutableStateFlow(StorageState.Red)
         )
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(true))
 
         createViewModel()
         advanceUntilIdle()
 
-        verify(monitorStorageStateEventUseCase).invoke()
+        verify(monitorStorageStateUseCase).invoke()
         verify(monitorTransferOverQuotaUseCase).invoke()
+        verify(monitorAccountDetailUseCase).invoke()
     }
 
     // Contact Verification Tests

@@ -76,6 +76,7 @@ fun <T : TypedNode> NodesView(
     isContactVerificationOn: Boolean = false,
     inSelectionMode: Boolean = false,
     onEnterMediaDiscoveryClick: () -> Unit = {},
+    bannerHeader: (@Composable () -> Unit)? = null,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
@@ -125,6 +126,7 @@ fun <T : TypedNode> NodesView(
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
             isContactVerificationOn = isContactVerificationOn,
+            bannerHeader = bannerHeader,
         )
     } else {
         NodeGridView(
@@ -152,6 +154,7 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
+            bannerHeader = bannerHeader,
         )
     }
 

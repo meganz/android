@@ -5,6 +5,8 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
@@ -48,15 +50,14 @@ data class CloudDriveUiState(
     val hasMediaItems: Boolean = false,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
-    val isStorageOverQuota: Boolean = false,
-    val isTransferOverQuota: Boolean = false,
+    val overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
+    val shouldShowWarning: Boolean = true,
     val isContactVerificationOn: Boolean = false,
     val showContactNotVerifiedBanner: Boolean = false,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val hasWritePermission: Boolean = false,
     val isSearchRevampEnabled: Boolean = false,
 ) {
-
     /**
      * True if nodes or hidden node settings are loading
      */

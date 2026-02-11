@@ -60,6 +60,7 @@ fun <T : TypedNode> NodeListView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
     isContactVerificationOn: Boolean = false,
+    bannerHeader: (@Composable () -> Unit)? = null,
 ) {
     FastScrollLazyColumn(
         state = listState,
@@ -68,6 +69,11 @@ fun <T : TypedNode> NodeListView(
         contentPadding = listContentPadding
     ) {
         if (showSortOrder || showChangeViewType) {
+            if (bannerHeader != null) {
+                item(key = "bannerHeader") {
+                    bannerHeader()
+                }
+            }
             item(key = "header") {
                 NodeHeaderItem(
                     modifier = Modifier

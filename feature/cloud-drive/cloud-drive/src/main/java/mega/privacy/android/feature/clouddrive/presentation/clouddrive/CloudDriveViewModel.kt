@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
@@ -24,6 +25,8 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -40,8 +43,11 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorAlmostFullStorageBannerVisibilityUseCase
+import mega.privacy.android.domain.usecase.SetAlmostFullStorageBannerClosingTimestampUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -84,9 +90,13 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
+    private val monitorAlmostFullStorageBannerVisibilityUseCase: MonitorAlmostFullStorageBannerVisibilityUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val overQuotaStatusMapper: OverQuotaStatusMapper,
+    private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -111,7 +121,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         monitorNodeUpdates()
         monitorCloudSortOrder()
         monitorStorageOverQuota()
-        monitorTransferOverQuota()
         checkSearchRevampEnabled()
     }
 
@@ -455,30 +464,31 @@ class CloudDriveViewModel @AssistedInject constructor(
      */
     private fun monitorStorageOverQuota() {
         viewModelScope.launch {
-            monitorStorageStateEventUseCase()
-                .collectLatest { storageState ->
-                    _uiState.update { state ->
-                        val isStorageOverQuota = storageState.storageState == StorageState.Red
-                                || storageState.storageState == StorageState.PayWall
-
-                        state.copy(
-                            isStorageOverQuota = isStorageOverQuota,
-                        )
+            combine(
+                monitorStorageStateUseCase(),
+                monitorTransferOverQuotaUseCase(),
+                monitorAccountDetailUseCase().map { it.levelDetail?.accountType?.isPaid == false }
+            )
+            { storageState: StorageState, transferOverQuota: Boolean, isFreeAccount: Boolean ->
+                overQuotaStatusMapper(
+                    storageState = storageState,
+                    transferOverQuota = transferOverQuota,
+                    freeAccount = isFreeAccount,
+                )
+            }.catch { Timber.e(it) }
+                .collectLatest { overQuotaStatus ->
+                    _uiState.update {
+                        it.copy(overQuotaStatus = overQuotaStatus)
                     }
                 }
         }
-    }
-
-    /**
-     * Monitor transfer over quota state
-     */
-    private fun monitorTransferOverQuota() {
         viewModelScope.launch {
-            monitorTransferOverQuotaUseCase()
-                .collectLatest { isTransferOverQuota ->
-                    _uiState.update { state ->
-                        state.copy(
-                            isTransferOverQuota = isTransferOverQuota,
+            monitorAlmostFullStorageBannerVisibilityUseCase()
+                .catch { Timber.e(it) }
+                .collectLatest { shouldShowWarning ->
+                    _uiState.update {
+                        it.copy(
+                            shouldShowWarning = shouldShowWarning,
                         )
                     }
                 }
@@ -491,9 +501,13 @@ class CloudDriveViewModel @AssistedInject constructor(
     private fun onConsumeOverQuotaWarning() {
         _uiState.update { state ->
             state.copy(
-                isTransferOverQuota = false,
-                isStorageOverQuota = false
+                overQuotaStatus = OverQuotaStatus()
             )
+        }
+        viewModelScope.launch {
+            runCatching {
+                setAlmostFullStorageBannerClosingTimestampUseCase()
+            }.onFailure { Timber.e(it) }
         }
     }
 
@@ -528,7 +542,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     }
 
     private fun checkWritePermission(
-        folderId: NodeId = uiState.value.currentFolderId
+        folderId: NodeId = uiState.value.currentFolderId,
     ) {
         viewModelScope.launch {
             runCatching {
