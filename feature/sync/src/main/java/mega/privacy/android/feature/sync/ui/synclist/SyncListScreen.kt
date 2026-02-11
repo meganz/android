@@ -105,7 +105,6 @@ internal fun SyncListScreen(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
     isSingleActivity: Boolean = false,
 ) {
     val onBackPressedDispatcher =
@@ -256,7 +255,7 @@ internal fun SyncListScreen(
                             onFabExpanded(state == MultiFloatingActionButtonState.EXPANDED)
                             multiFabState.value = state
                         },
-                        isCircular = !applyRevampStyles,
+                        isCircular = !isSingleActivity,
                     )
                 }
             },

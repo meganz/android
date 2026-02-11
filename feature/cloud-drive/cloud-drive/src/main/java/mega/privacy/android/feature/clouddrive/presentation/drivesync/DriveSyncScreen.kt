@@ -218,7 +218,7 @@ internal fun DriveSyncScreen(
                     ),
                 ) {
                     SyncListRoute(
-                        applyRevampStyles = true,
+                        isSingleActivity = true,
                         isInCloudDrive = true,
                         syncPermissionsManager = viewModel.syncPermissionsManager,
                         onSyncFolderClicked = {

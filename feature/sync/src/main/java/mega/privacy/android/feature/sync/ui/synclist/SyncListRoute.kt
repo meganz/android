@@ -62,7 +62,6 @@ fun SyncListRoute(
     isInCloudDrive: Boolean = false,
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
     isSingleActivity: Boolean = false,
 ) {
     val fragmentActivity = LocalContext.current.findFragmentActivity()
@@ -86,7 +85,6 @@ fun SyncListRoute(
         onOpenMegaFolderClicked = onOpenMegaFolderClicked,
         onCameraUploadsSettingsClicked = onCameraUploadsSettingsClicked,
         onFabExpanded = onFabExpanded,
-        applyRevampStyles = applyRevampStyles,
         isSingleActivity = isSingleActivity,
     )
 }
@@ -109,7 +107,6 @@ internal fun SyncListRoute(
     viewModel: SyncListViewModel = hiltViewModel(),
     selectedChip: SyncChip = SyncChip.SYNC_FOLDERS,
     onFabExpanded: (Boolean) -> Unit = {},
-    applyRevampStyles: Boolean = false,
     isSingleActivity: Boolean = false,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -190,7 +187,6 @@ internal fun SyncListRoute(
         syncIssueNotificationViewModel = syncIssueNotificationViewModel,
         selectedChip = selectedChip,
         onFabExpanded = onFabExpanded,
-        applyRevampStyles = applyRevampStyles,
         isSingleActivity = isSingleActivity,
     )
 
