@@ -53,6 +53,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
@@ -117,7 +118,9 @@ internal fun DriveSyncScreen(
                     navigationType = AppBarNavigationType.None,
                     title = stringResource(sharedR.string.general_drive),
                     trailingIcons = {
-                        TransfersToolbarWidget(navigationHandler::navigate)
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
+                        }
                     },
                     actions = buildList {
                         when {

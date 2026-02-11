@@ -9,6 +9,7 @@ import mega.privacy.android.navigation.destination.OfflineNavKey
 fun EntryProviderScope<NavKey>.offlineScreen(
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
+    onNavigateToTransfers: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     openFileInformation: (String) -> Unit,
 ) {
@@ -23,8 +24,9 @@ fun EntryProviderScope<NavKey>.offlineScreen(
             viewModel = viewModel,
             onBack = onBack,
             onNavigateToFolder = onNavigateToFolder,
+            onNavigateToTransfers = onNavigateToTransfers,
             onTransfer = onTransfer,
-            openFileInformation = openFileInformation
+            openFileInformation = openFileInformation,
         )
     }
 }

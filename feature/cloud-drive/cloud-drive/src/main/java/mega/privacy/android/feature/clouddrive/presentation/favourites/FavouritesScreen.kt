@@ -27,6 +27,7 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.view.Favo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.FavouritesScreenEvent
@@ -91,7 +92,11 @@ fun FavouritesScreen(
                         Analytics.tracker.trackEvent(BackButtonPressedEvent)
                         navigationHandler.back()
                     },
-                    trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
+                    trailingIcons = {
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
+                        }
+                    },
                     actions = buildList {
                         if (!uiState.isEmpty) {
                             add(

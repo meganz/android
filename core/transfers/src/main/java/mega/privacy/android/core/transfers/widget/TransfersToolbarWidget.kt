@@ -19,13 +19,13 @@ import mega.privacy.mobile.analytics.event.TransfersToolbarWidgetPressedEvent
  */
 @Composable
 fun TransfersToolbarWidget(
-    onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TransfersToolbarWidgetViewModel = hiltViewModel(
         LocalActivity.current as? ComponentActivity
             ?: checkNotNull(LocalViewModelStoreOwner.current) {
                 "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
             }),
+    onClick: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     state.status?.let { status ->
@@ -37,7 +37,7 @@ fun TransfersToolbarWidget(
             onClick = {
                 if (state.isUserLoggedIn) {
                     Analytics.tracker.trackEvent(TransfersToolbarWidgetPressedEvent)
-                    onNavigate(TransfersNavKey())
+                    onClick()
                 }
             },
         )

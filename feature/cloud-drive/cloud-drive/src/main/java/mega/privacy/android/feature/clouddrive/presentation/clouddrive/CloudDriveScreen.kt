@@ -38,6 +38,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
@@ -100,7 +101,11 @@ fun CloudDriveScreen(
                     modifier = Modifier.testTag(CLOUD_DRIVE_MAIN_APP_BAR_TAG),
                     title = uiState.title.text,
                     navigationType = AppBarNavigationType.Back(onBack),
-                    trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
+                    trailingIcons = {
+                        TransfersToolbarWidget {
+                            navigationHandler.navigate(TransfersNavKey())
+                        }
+                    },
                     actions = buildList {
                         if (uiState.items.isNotEmpty()) {
                             add(

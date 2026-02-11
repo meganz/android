@@ -29,11 +29,13 @@ import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.RecentsBucketScreenNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.RecentsScreenEvent
@@ -73,6 +75,9 @@ fun RecentsScreen(
                 navigationType = AppBarNavigationType.Back {
                     Analytics.tracker.trackEvent(BackButtonPressedEvent)
                     onBack()
+                },
+                trailingIcons = {
+                    TransfersToolbarWidget { onNavigate(TransfersNavKey()) }
                 },
                 actions = listOf(
                     MenuActionWithClick(CommonAppBarAction.More) {

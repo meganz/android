@@ -53,6 +53,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
@@ -143,7 +144,11 @@ internal fun HomeScreen(
                 modifier = Modifier.testTag(HOME_MAIN_APP_BAR_TAG),
                 title = stringResource(sharedR.string.general_section_home),
                 navigationType = AppBarNavigationType.None,
-                trailingIcons = { TransfersToolbarWidget(navigationHandler::navigate) },
+                trailingIcons = {
+                    TransfersToolbarWidget {
+                        navigationHandler.navigate(TransfersNavKey())
+                    }
+                },
                 actions = buildList {
                     if (state is HomeUiState.Data) {
                         add(MenuActionWithClick(CommonAppBarAction.Search) {

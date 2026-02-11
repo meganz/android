@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
@@ -102,7 +103,9 @@ fun RecentsBucketScreen(
                     ),
                     navigationType = AppBarNavigationType.Back(onBack),
                     actions = emptyList(),
-                    trailingIcons = { TransfersToolbarWidget(onNavigate) }
+                    trailingIcons = {
+                        TransfersToolbarWidget { onNavigate(TransfersNavKey()) }
+                    }
                 )
             }
         },

@@ -17,6 +17,7 @@ import mega.privacy.android.navigation.destination.LegacyFileLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 
 class CloudDriveFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
@@ -43,6 +44,9 @@ class CloudDriveFeatureDestination : FeatureDestination {
                             title = name,
                         )
                     )
+                },
+                onNavigateToTransfers = {
+                    navigationHandler.navigate(TransfersNavKey())
                 },
                 onTransfer = transferHandler::setTransferEvent,
                 openFileInformation = { handle ->
