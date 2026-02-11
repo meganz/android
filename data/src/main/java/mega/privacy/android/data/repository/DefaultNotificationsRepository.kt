@@ -84,9 +84,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnUserAlertsUpdate>()
             .mapNotNull { (newUserAlerts) ->
                 withContext(dispatcher) {
-                    newUserAlerts
-                        ?.filter { !it.seen }
-                        ?.mapAndFilterMeetingIfNeeded()
+                    getNotSeenUserAlerts()
                 }
             }.flowOn(dispatcher)
 

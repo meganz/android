@@ -1065,32 +1065,60 @@ class DefaultNotificationsRepositoryTest {
         verify(megaApiGateway, never()).getMegaNodeByHandle(seenId)
     }
 
+    @Test
+    fun `test that monitorNotSeenUserAlerts emits current not-seen count from API on each update`() =
+        runTest {
+            val alert1 = mock<MegaUserAlert> {
+                on { id }.thenReturn(1L)
+                on { seen }.thenReturn(false)
+                on { type }.thenReturn(MegaUserAlert.TYPE_PAYMENT_SUCCEEDED)
+            }
+            val alert2 = mock<MegaUserAlert> {
+                on { id }.thenReturn(2L)
+                on { seen }.thenReturn(false)
+                on { type }.thenReturn(MegaUserAlert.TYPE_PAYMENT_SUCCEEDED)
+            }
+            val seenAlert = mock<MegaUserAlert> {
+                on { id }.thenReturn(3L)
+                on { seen }.thenReturn(true)
+                on { type }.thenReturn(MegaUserAlert.TYPE_NEWSHARE)
+            }
+
+            whenever(megaApiGateway.getUserAlerts())
+                .thenReturn(
+                    listOf(alert1),
+                    listOf(alert1, alert2),
+                    listOf(alert1, alert2, seenAlert),
+                    listOf()
+                )
+
+            val updatesFlow = MutableStateFlow(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
+            whenever(megaApiGateway.globalUpdates).thenReturn(updatesFlow)
+
+            underTest.monitorNotSeenUserAlerts().test {
+                val first = awaitItem()
+                assertThat(first).hasSize(1)
+                updatesFlow.emit(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(alert2)))
+                assertThat(awaitItem()).hasSize(2)
+                updatesFlow.emit(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(seenAlert)))
+                assertThat(awaitItem()).hasSize(2)
+                updatesFlow.emit(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
+                assertThat(awaitItem()).isEmpty()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
 
     @Test
-    fun `test that monitorNotSeenUserAlerts only emits not seen alerts`() = runTest {
-        val notSeenId = 1423L
-        val seenId = notSeenId + 1L
-        val notSeenAlert = mock<MegaUserAlert> {
-            on { id }.thenReturn(notSeenId)
-            on { seen }.thenReturn(false)
-            on { type }.thenReturn(MegaUserAlert.TYPE_PAYMENT_SUCCEEDED)
-        }
-        val seenAlert = mock<MegaUserAlert> {
-            on { id }.thenReturn(seenId)
-            on { seen }.thenReturn(true)
-            on { type }.thenReturn(MegaUserAlert.TYPE_NEWSHARE)
-        }
-        val globalUpdate = GlobalUpdate.OnUserAlertsUpdate(arrayListOf(notSeenAlert, seenAlert))
+    fun `test that monitorNotSeenUserAlerts emits empty list when getNotSeenUserAlerts returns empty`() =
+        runTest {
+            whenever(megaApiGateway.getUserAlerts()).thenReturn(emptyList())
+            whenever(megaApiGateway.globalUpdates).thenReturn(
+                flowOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))
+            )
 
-        val mutableStateFlow = MutableStateFlow(GlobalUpdate.OnUserAlertsUpdate(arrayListOf()))
-        whenever(megaApiGateway.globalUpdates).thenReturn(mutableStateFlow)
-
-        underTest.monitorNotSeenUserAlerts().test {
-            assertThat(awaitItem()).isEmpty()
-            mutableStateFlow.emit(globalUpdate)
-            assertThat(awaitItem().single().id).isEqualTo(notSeenId)
-            cancelAndConsumeRemainingEvents()
+            underTest.monitorNotSeenUserAlerts().test {
+                assertThat(awaitItem()).isEmpty()
+                cancelAndConsumeRemainingEvents()
+            }
         }
-        verify(megaApiGateway, never()).getMegaNodeByHandle(seenId)
-    }
 }
