@@ -1,5 +1,7 @@
 package mega.privacy.android.data.cache
 
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import mega.privacy.android.data.gateway.DeviceGateway
 
 internal interface Cache<T> {
@@ -8,6 +10,12 @@ internal interface Cache<T> {
     fun set(value: T?)
 
     fun clear()
+}
+
+internal interface StateFlowCache<T> : Cache<T> {
+    val state: StateFlow<T?>
+
+    suspend fun setAsync(value: T?)
 }
 
 internal class ExpiringCache<T>(
@@ -41,5 +49,24 @@ internal class PermanentCache<T> : Cache<T> {
 
     override fun clear() {
         curValue = null
+    }
+}
+
+internal class InMemoryStateFlowCache<T> : StateFlowCache<T> {
+    override val state: StateFlow<T?>
+        field: MutableStateFlow<T?> = MutableStateFlow(null)
+
+    override fun get() = state.value
+
+    override fun set(value: T?) {
+        state.tryEmit(value)
+    }
+
+    override suspend fun setAsync(value: T?) {
+        state.emit(value)
+    }
+
+    override fun clear() {
+        state.tryEmit(null)
     }
 }

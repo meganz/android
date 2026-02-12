@@ -44,7 +44,8 @@ internal fun EntryProviderScope<NavKey>.standardPsaBottomSheetDestination(
                 viewModel.markAsSeen(it)
                 closePsaScreen(key)
             },
-            navigateToPsaPage = { url -> onNavigate(WebSiteNavKey(url)) }
+            navigateToPsaPage = { url -> onNavigate(WebSiteNavKey(url)) },
+            onDisplay = viewModel::setDisplayed,
         )
 
         DisposableEffect(key) {
@@ -70,6 +71,7 @@ internal fun EntryProviderScope<NavKey>.infoPsaBottomSheetDestination(
                 viewModel.markAsSeen(it)
                 closePsaScreen(key)
             },
+            onDisplay = viewModel::setDisplayed,
         )
 
         DisposableEffect(key) {
@@ -90,6 +92,7 @@ internal fun EntryProviderScope<NavKey>.webPsaDestination(
                 viewModel.markAsSeen(it)
                 closePsaScreen(key)
             },
+            onDisplay = viewModel::setDisplayed,
         )
 
         DisposableEffect(key) {

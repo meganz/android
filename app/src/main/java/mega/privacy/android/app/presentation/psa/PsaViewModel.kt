@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 import mega.privacy.android.domain.usecase.psa.DismissPsaUseCase
 import mega.privacy.android.domain.usecase.psa.FetchPsaUseCase
 import mega.privacy.android.domain.usecase.psa.MonitorPsaUseCase
+import mega.privacy.android.domain.usecase.psa.SetDisplayedPsaUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,6 +35,7 @@ class PsaViewModel(
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val psaStateMapper: PsaStateMapper,
     private val currentTimeProvider: () -> Long,
+    private val setDisplayedPsaUseCase: SetDisplayedPsaUseCase,
 ) : ViewModel() {
 
     @Inject
@@ -42,12 +44,14 @@ class PsaViewModel(
         fetchPsaUseCase: FetchPsaUseCase,
         dismissPsaUseCase: DismissPsaUseCase,
         psaStateMapper: PsaStateMapper,
+        setDisplayedPsaUseCase: SetDisplayedPsaUseCase,
     ) : this(
         monitorPsaUseCase = monitorPsaUseCase,
         fetchPsaUseCase = fetchPsaUseCase,
         dismissPsaUseCase = dismissPsaUseCase,
         psaStateMapper = psaStateMapper,
         currentTimeProvider = System::currentTimeMillis,
+        setDisplayedPsaUseCase = setDisplayedPsaUseCase,
     )
 
     private val seenChannel = Channel<PsaState>()
@@ -71,6 +75,10 @@ class PsaViewModel(
                 Timber.e(it)
             }
         }.asUiStateFlow(scope = viewModelScope, initialValue = PsaState.NoPsa)
+    }
+
+    suspend fun setDisplayed(psaId: Int) {
+        setDisplayedPsaUseCase(psaId)
     }
 
     /**

@@ -1,10 +1,12 @@
 package mega.privacy.android.data.repository.psa
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
+import mega.privacy.android.data.cache.psa.PsaDisplayCache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
@@ -20,6 +22,7 @@ import javax.inject.Inject
 internal class PsaRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val psaCache: Cache<Psa>,
+    private val psaOnDisplayCache: PsaDisplayCache,
     private val psaPreferenceGateway: PsaPreferenceGateway,
     private val psaMapper: PsaMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -79,5 +82,11 @@ internal class PsaRepositoryImpl @Inject constructor(
     override suspend fun dismissPsa(psaId: Int) {
         Timber.d("Dismiss Psa called with id: $psaId")
         withContext(ioDispatcher) { megaApiGateway.setPsaHandled(psaId) }
+    }
+
+    override fun monitorDisplayedPsa(): Flow<Int?> = psaOnDisplayCache.state
+
+    override suspend fun setDisplayedPsa(psaId: Int?) {
+        psaOnDisplayCache.setAsync(psaId)
     }
 }

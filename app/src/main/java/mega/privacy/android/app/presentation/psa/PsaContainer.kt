@@ -57,7 +57,8 @@ fun PsaContainer(
         coroutineScope = coroutineScope,
         navigateToPsaPage = navigateToPsaPage,
         context = context,
-        markAsSeen = viewModel::markAsSeen
+        markAsSeen = viewModel::markAsSeen,
+        onDisplay = viewModel::setDisplayed,
     )
 }
 
@@ -72,6 +73,7 @@ fun PsaContainer(
  * @param innerModifier - Workaround for legacy screens
  * @param navigateToPsaPage
  * @param content
+ * @param onDisplay
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -80,10 +82,11 @@ internal fun PsaContentView(
     state: PsaState,
     coroutineScope: CoroutineScope,
     markAsSeen: (Int) -> Unit,
+    content: @Composable () -> Unit,
+    onDisplay: suspend (Int) -> Unit,
     containerModifier: Modifier = Modifier,
     innerModifier: (Modifier) -> Modifier = { it },
     navigateToPsaPage: (Context, String) -> Unit = ::navigateToWebView,
-    content: @Composable () -> Unit,
 ) {
     Box(modifier = Modifier.semantics {
         testTagsAsResourceId = true
@@ -103,6 +106,7 @@ internal fun PsaContentView(
             },
             containerModifier = containerModifier,
             innerModifier = innerModifier,
+            onDisplay = onDisplay,
         )
     }
 }
@@ -115,6 +119,7 @@ internal fun PsaStateView(
     navigateToPsaPage: (String) -> Unit,
     containerModifier: Modifier,
     innerModifier: (Modifier) -> Modifier,
+    onDisplay: suspend (Int) -> Unit,
 ) {
     when (state) {
         is PsaState.NoPsa -> {}
@@ -122,7 +127,8 @@ internal fun PsaStateView(
         is PsaState.WebPsa -> {
             WebPsaView(
                 psa = state,
-                markAsSeen = { markAsSeen(state.id) }
+                markAsSeen = { markAsSeen(state.id) },
+                onDisplay = suspend { onDisplay(state.id) },
             )
         }
 
@@ -139,7 +145,8 @@ internal fun PsaStateView(
                         markAsSeen(state.id)
                     },
                     onDismiss = { markAsSeen(state.id) },
-                    modifier = psaModifier
+                    modifier = psaModifier,
+                    onDisplay = suspend { onDisplay(state.id) },
                 )
             }
         }
@@ -153,6 +160,7 @@ internal fun PsaStateView(
                     imageUrl = state.imageUrl,
                     onDismiss = { markAsSeen(state.id) },
                     modifier = psaModifier,
+                    onDisplay = suspend { onDisplay(state.id) },
                 )
             }
         }
@@ -199,6 +207,7 @@ private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvid
             navigateToPsaPage = {},
             containerModifier = Modifier,
             innerModifier = { it },
+            onDisplay = {},
         )
 
     }

@@ -25,8 +25,9 @@ class PsaContainerKtTest {
                 state = PsaState.NoPsa,
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
@@ -47,8 +48,9 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
@@ -71,8 +73,9 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 
@@ -91,8 +94,9 @@ class PsaContainerKtTest {
                 ),
                 markAsSeen = {},
                 navigateToPsaPage = {},
-                innerModifier = { it },
                 containerModifier = Modifier,
+                onDisplay = {},
+                innerModifier = { it },
             )
         }
 

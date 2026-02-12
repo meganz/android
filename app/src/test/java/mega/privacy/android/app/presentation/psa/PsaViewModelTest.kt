@@ -69,6 +69,7 @@ class PsaViewModelTest {
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
             currentTimeProvider = { 0 },
+            setDisplayedPsaUseCase = mock(),
         )
     }
 

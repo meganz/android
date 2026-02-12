@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -25,14 +26,13 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as IconPack
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Psa view
@@ -54,6 +54,7 @@ fun PsaView(
     onPositiveTapped: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onDisplay: suspend () -> Unit,
 ) {
     PsaViewContent(
         modifier = modifier.testTag(PsaViewTag),
@@ -62,6 +63,7 @@ fun PsaView(
         painter = imageUrl?.let { rememberAsyncImagePainter(it) },
         positiveButton = getPositiveButton(positiveText, onPositiveTapped),
         onDismiss = onDismiss,
+        onDisplay = onDisplay,
     )
 }
 
@@ -81,6 +83,7 @@ fun InfoPsaView(
     imageUrl: String?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onDisplay: suspend () -> Unit,
 ) {
     PsaViewContent(
         modifier = modifier.testTag(PsaInfoViewTag),
@@ -89,6 +92,7 @@ fun InfoPsaView(
         painter = imageUrl?.let { rememberAsyncImagePainter(it) },
         positiveButton = null,
         onDismiss = onDismiss,
+        onDisplay = onDisplay,
     )
 }
 
@@ -117,7 +121,11 @@ private fun PsaViewContent(
     painter: Painter?,
     positiveButton: (@Composable () -> Unit)?,
     onDismiss: () -> Unit,
+    onDisplay: suspend () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        onDisplay()
+    }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Top
@@ -204,6 +212,7 @@ private fun PsaViewPreview(
                 onPositiveTapped = {},
             ),
             onDismiss = {},
+            onDisplay = suspend {},
         )
     }
 }
@@ -225,6 +234,7 @@ private fun InfoPsaViewPreview(
                 painter = imagePainter(),
                 positiveButton = null,
                 onDismiss = {},
+                onDisplay = suspend {},
             )
         }
     }
@@ -238,7 +248,8 @@ private fun ButtonRowPreview() {
             ButtonRow(
                 positiveButton = { TextMegaButton(text = "Positive", onClick = {}) },
                 onDismiss = {},
-                modifier = Modifier.navigationBarsPadding()
+                modifier = Modifier
+                    .navigationBarsPadding()
                     .align(Alignment.BottomCenter),
             )
         }
@@ -251,6 +262,7 @@ internal class ImagePainterProvider : PreviewParameterProvider<@Composable () ->
         { painterResource(IconPack.drawable.ic_bell_glass) },
     ).asSequence()
 }
+
 internal const val PsaViewTag = "psa_view"
 internal const val PsaInfoViewTag = "psa_info_view"
 internal const val PsaImageViewTag = "psa_view:image_view"

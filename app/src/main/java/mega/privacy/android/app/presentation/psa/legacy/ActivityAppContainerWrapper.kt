@@ -99,15 +99,16 @@ class ActivityAppContainerWrapper @Inject constructor(
                                     { content ->
                                         PsaContentView(
                                             context = context,
+                                            state = psaState,
                                             coroutineScope = rememberCoroutineScope(),
                                             markAsSeen = { psaId ->
                                                 viewModel.markAsSeen(psaId)
                                             },
-                                            state = psaState,
-                                            content = content,
                                             containerModifier = Modifier
                                                 .navigationBarsPadding(),
-                                            innerModifier = { it.padding(bottom = 16.dp) }
+                                            innerModifier = { it.padding(bottom = 16.dp) },
+                                            content = content,
+                                            onDisplay = viewModel::setDisplayed,
                                         )
                                     },
                                     {

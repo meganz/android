@@ -56,7 +56,8 @@ fun MegaPsaContainer(
         coroutineScope = coroutineScope,
         navigateToPsaPage = navigateToPsaPage,
         context = context,
-        markAsSeen = viewModel::markAsSeen
+        markAsSeen = viewModel::markAsSeen,
+        onDisplay = viewModel::setDisplayed,
     )
 }
 
@@ -69,6 +70,7 @@ fun MegaPsaContainer(
  * @param markAsSeen
  * @param navigateToPsaPage
  * @param content
+ * @param onDisplay
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -77,8 +79,9 @@ internal fun MegaPsaContentView(
     state: PsaState,
     coroutineScope: CoroutineScope,
     markAsSeen: (Int) -> Unit,
-    navigateToPsaPage: (Context, String) -> Unit = ::navigateToWebView,
     content: @Composable () -> Unit,
+    onDisplay: suspend (Int) -> Unit,
+    navigateToPsaPage: (Context, String) -> Unit = ::navigateToWebView,
 ) {
     Box(modifier = Modifier.semantics {
         testTagsAsResourceId = true
@@ -92,6 +95,7 @@ internal fun MegaPsaContentView(
                     context, url
                 )
             },
+            onDisplay = onDisplay,
         )
     }
 }
@@ -102,13 +106,17 @@ internal fun MegaPsaStateView(
     state: PsaState,
     markAsSeen: (Int) -> Unit,
     navigateToPsaPage: (String) -> Unit,
+    onDisplay: suspend (Int) -> Unit,
 ) {
     when (state) {
         is PsaState.NoPsa -> {}
 
         is PsaState.WebPsa -> {
             WebPsaView(
-                psa = state, markAsSeen = { markAsSeen(state.id) })
+                psa = state,
+                markAsSeen = { markAsSeen(state.id) },
+                onDisplay = { onDisplay(state.id) },
+            )
         }
 
         is PsaState.StandardPsa -> {
@@ -123,6 +131,7 @@ internal fun MegaPsaStateView(
                         markAsSeen(state.id)
                     },
                     onDismiss = { markAsSeen(state.id) },
+                    onDisplay = { onDisplay(state.id) },
                     modifier = modifier,
                 )
             }
@@ -135,6 +144,7 @@ internal fun MegaPsaStateView(
                     text = state.text,
                     imageUrl = state.imageUrl,
                     onDismiss = { markAsSeen(state.id) },
+                    onDisplay = { onDisplay(state.id) },
                     modifier = modifier,
                 )
             }
@@ -180,6 +190,7 @@ private fun PsaContainerPreview(@PreviewParameter(PsaStatePreviewParameterProvid
             state = psaState,
             markAsSeen = {},
             navigateToPsaPage = {},
+            onDisplay = {},
         )
 
     }

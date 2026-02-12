@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.cache.PermanentCache
+import mega.privacy.android.data.cache.psa.PsaDisplayCache
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.mapper.psa.PsaMapper
@@ -40,6 +41,7 @@ class PsaRepositoryImplTest {
         underTest = PsaRepositoryImpl(
             megaApiGateway = megaApiGateway,
             psaCache = cache,
+            psaOnDisplayCache = PsaDisplayCache(),
             psaPreferenceGateway = psaPreferenceGateway,
             psaMapper = psaMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
