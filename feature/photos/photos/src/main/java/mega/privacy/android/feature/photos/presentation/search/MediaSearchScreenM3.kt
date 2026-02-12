@@ -105,11 +105,11 @@ fun MediaSearchScreenM3(
                 selectedQuery = state.selectedQuery,
                 onUpdateQuery = updateQuery,
                 onSelectedQueryRead = { updateSelectedQuery(null) },
-                onSaveQuery = updateRecentQueries,
-                onSearch = {
-                    searchPhotos(it)
+                onSaveQuery = {
+                    updateRecentQueries(it)
                     keyboardController?.hide()
                 },
+                onSearch = searchPhotos,
                 onCloseScreen = onCloseScreen,
             )
         },
