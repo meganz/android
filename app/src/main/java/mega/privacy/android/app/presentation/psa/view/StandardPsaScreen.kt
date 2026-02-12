@@ -9,6 +9,7 @@ fun StandardPsaScreen(
     state: PsaState.StandardPsa,
     markAsSeen: (Int) -> Unit,
     navigateToPsaPage: (String) -> Unit,
+    onDisplay: suspend (Int) -> Unit,
 ){
     PsaView(
         title = state.title,
@@ -20,6 +21,7 @@ fun StandardPsaScreen(
             markAsSeen(state.id)
         },
         onDismiss = { markAsSeen(state.id) },
-        modifier = Modifier
+        modifier = Modifier,
+        onDisplay = suspend { onDisplay(state.id) },
     )
 }

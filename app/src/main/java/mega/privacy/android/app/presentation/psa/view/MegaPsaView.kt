@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -27,7 +28,6 @@ import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -50,6 +50,7 @@ fun MegaPsaView(
     onPositiveTapped: () -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onDisplay: suspend () -> Unit,
 ) {
     MegaPsaViewContent(
         modifier = modifier.testTag(PsaViewTag),
@@ -58,6 +59,7 @@ fun MegaPsaView(
         painter = imageUrl?.let { rememberAsyncImagePainter(it) },
         positiveButton = getPositiveButton(positiveText, onPositiveTapped),
         onDismiss = onDismiss,
+        onDisplay = onDisplay,
     )
 }
 
@@ -77,6 +79,7 @@ fun SharedInfoPsaView(
     imageUrl: String?,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    onDisplay: suspend () -> Unit,
 ) {
     MegaPsaViewContent(
         modifier = modifier.testTag(PsaInfoViewTag),
@@ -85,6 +88,7 @@ fun SharedInfoPsaView(
         painter = imageUrl?.let { rememberAsyncImagePainter(it) },
         positiveButton = null,
         onDismiss = onDismiss,
+        onDisplay = onDisplay,
     )
 }
 
@@ -113,7 +117,11 @@ private fun MegaPsaViewContent(
     painter: Painter?,
     positiveButton: (@Composable () -> Unit)?,
     onDismiss: () -> Unit,
+    onDisplay: suspend () -> Unit,
 ) {
+    LaunchedEffect(Unit) {
+        onDisplay()
+    }
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.Top
@@ -200,6 +208,7 @@ private fun MegaPsaViewPreview(
                 onPositiveTapped = {},
             ),
             onDismiss = {},
+            onDisplay = {},
         )
     }
 }
@@ -220,6 +229,7 @@ private fun MegaInfoPsaViewPreview(
                 text = "Text",
                 painter = imagePainter(),
                 positiveButton = null,
+                onDisplay = {},
                 onDismiss = {},
             )
         }

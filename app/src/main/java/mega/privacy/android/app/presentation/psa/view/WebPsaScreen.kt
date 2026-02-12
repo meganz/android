@@ -7,9 +7,11 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 fun WebPsaScreen(
     state: PsaState.WebPsa,
     markAsSeen: (Int) -> Unit,
+    onDisplay: suspend (Int) -> Unit,
 ){
     WebPsaView(
         psa = state,
-        markAsSeen = { markAsSeen(state.id) }
+        markAsSeen = { markAsSeen(state.id) },
+        onDisplay = suspend { onDisplay(state.id) }
     )
 }

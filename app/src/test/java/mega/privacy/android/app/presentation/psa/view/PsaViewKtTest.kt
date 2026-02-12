@@ -26,7 +26,8 @@ class PsaViewKtTest {
                 imageUrl = "imageUrl",
                 positiveText = "positiveText",
                 onPositiveTapped = {},
-                onDismiss = {}
+                onDismiss = {},
+                onDisplay = {},
             )
         }
 
@@ -44,7 +45,8 @@ class PsaViewKtTest {
                 title = "title",
                 text = "text",
                 imageUrl = "imageUrl",
-                onDismiss = {}
+                onDisplay = {},
+                onDismiss = {},
             )
         }
 
@@ -65,7 +67,8 @@ class PsaViewKtTest {
                 imageUrl = "imageUrl",
                 positiveText = "positiveText",
                 onPositiveTapped = onPositiveTapped,
-                onDismiss = onDismiss
+                onDismiss = onDismiss,
+                onDisplay = {},
             )
         }
         verifyNoInteractions(onPositiveTapped)
@@ -84,7 +87,8 @@ class PsaViewKtTest {
                 title = "title",
                 text = "text",
                 imageUrl = "imageUrl",
-                onDismiss = onDismiss
+                onDismiss = onDismiss,
+                onDisplay = {},
             )
         }
         verifyNoInteractions(onDismiss)

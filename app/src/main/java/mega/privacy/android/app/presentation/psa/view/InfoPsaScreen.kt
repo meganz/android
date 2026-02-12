@@ -8,6 +8,7 @@ import mega.privacy.android.app.presentation.psa.model.PsaState
 fun InfoPsaScreen(
     state: PsaState.InfoPsa,
     markAsSeen: (Int) -> Unit,
+    onDisplay: suspend (Int) -> Unit,
 ){
     InfoPsaView(
         title = state.title,
@@ -15,5 +16,6 @@ fun InfoPsaScreen(
         imageUrl = state.imageUrl,
         onDismiss = { markAsSeen(state.id) },
         modifier = Modifier,
+        onDisplay = suspend { onDisplay(state.id) },
     )
 }
