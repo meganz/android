@@ -92,7 +92,7 @@ class AlbumContentScreenComposeTest {
         hideRemoveLinkConfirmation: () -> Unit = {},
         removeLink: () -> Unit = {},
         resetLinkRemovedSuccessEvent: () -> Unit = {},
-        openGetLink: (AlbumId, Boolean) -> Unit = { _, _ -> },
+        openGetLink: (AlbumId) -> Unit = { _ -> },
         handleBottomSheetAction: (AlbumContentSelectionAction) -> Unit = {},
         navigateToPaywall: () -> Unit = {},
         resetPaywallEvent: () -> Unit = {},

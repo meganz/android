@@ -20,7 +20,6 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
@@ -38,7 +37,6 @@ import kotlin.String
 import kotlin.collections.contains
 import kotlin.collections.minus
 import kotlin.collections.plus
-import kotlin.getOrDefault
 import kotlin.onFailure
 import kotlin.onSuccess
 import kotlin.runCatching
@@ -53,7 +51,6 @@ class AlbumsTabViewModel @Inject constructor(
     private val snackbarEventQueue: SnackbarEventQueue,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
-    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
     private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
@@ -160,12 +157,7 @@ class AlbumsTabViewModel @Inject constructor(
                     val selectedAlbums = uiState.value.selectedUserAlbums
                     val navKey = if (selectedAlbums.size == 1) {
                         val albumId = selectedAlbums.first().id
-                        AlbumGetLinkNavKey(
-                            albumId = albumId.id,
-                            hasSensitiveContent = runCatching {
-                                albumHasSensitiveContentUseCase(albumId)
-                            }.getOrDefault(false)
-                        )
+                        AlbumGetLinkNavKey(albumId = albumId.id)
                     } else {
                         AlbumGetMultipleLinksNavKey(
                             albumIds = uiState.value.selectedUserAlbums.map { it.id.id }.toSet(),

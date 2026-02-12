@@ -29,11 +29,11 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = AlbumGetLinkViewModel.Factory::class)
 class AlbumGetLinkViewModel @AssistedInject constructor(
@@ -47,8 +47,8 @@ class AlbumGetLinkViewModel @AssistedInject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase,
     @Assisted private val albumId: Long?,
-    @Assisted private val hasSensitiveElement: Boolean?,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumGetLinkState())
     val stateFlow = state.asStateFlow()
@@ -72,7 +72,7 @@ class AlbumGetLinkViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val showCopyright = shouldShowCopyrightUseCase()
             val hasSensitiveElement =
-                savedStateHandle.get<Boolean>(HAS_SENSITIVE_ELEMENT) ?: hasSensitiveElement ?: false
+                albumId?.let { albumHasSensitiveContentUseCase(AlbumId(it)) } ?: false
             if (!showCopyright && !hasSensitiveElement) {
                 fetchAlbum()
             }
@@ -184,7 +184,7 @@ class AlbumGetLinkViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(albumId: Long?, hasSensitiveElement: Boolean?): AlbumGetLinkViewModel
+        fun create(albumId: Long?): AlbumGetLinkViewModel
     }
 
     companion object {

@@ -65,7 +65,7 @@ data class AlbumContentUiState(
     val showRemoveLinkConfirmation: StateEvent = consumed,
     val linkRemovedSuccessEvent: StateEvent = consumed,
     val paywallEvent: StateEvent = consumed,
-    val manageLinkEvent: StateEventWithContent<ManageLinkEvent?> = consumed(),
+    val manageLinkEvent: StateEventWithContent<MediaAlbum.User?> = consumed(),
     val selectAlbumCoverEvent: StateEventWithContent<AlbumId?> = consumed(),
     val albumSortConfiguration: AlbumSortConfiguration = AlbumSortConfiguration(
         sortOption = AlbumSortOption.Modified,
@@ -81,8 +81,3 @@ data class AlbumContentUiState(
     val isRemovingPhotosProgressCompleted: Boolean
         get() = !isRemovingPhotos && totalRemovedPhotos > 0
 }
-
-data class ManageLinkEvent(
-    val album: MediaAlbum.User,
-    val hasSensitiveContent: Boolean
-)

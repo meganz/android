@@ -234,10 +234,7 @@ data class LegacyPhotoSelectionNavKey(
 }
 
 @Serializable
-data class AlbumGetLinkNavKey(
-    val albumId: Long,
-    val hasSensitiveContent: Boolean,
-) : NavKey
+data class AlbumGetLinkNavKey(val albumId: Long) : NavKey
 
 @Serializable
 data class AlbumGetMultipleLinksNavKey(val albumIds: Set<Long>) : NavKey

@@ -168,12 +168,9 @@ fun AlbumContentScreen(
         hideRemoveLinkConfirmation = viewModel::resetRemoveLinkConfirmation,
         removeLink = viewModel::disableExportAlbum,
         resetLinkRemovedSuccessEvent = viewModel::resetLinkRemovedSuccess,
-        openGetLink = { albumId, hasSensitiveContent ->
+        openGetLink = { albumId ->
             navigationHandler.navigate(
-                AlbumGetLinkNavKey(
-                    albumId = albumId.id,
-                    hasSensitiveContent = hasSensitiveContent
-                )
+                AlbumGetLinkNavKey(albumId = albumId.id)
             )
         },
         handleAction = viewModel::handleAction,
@@ -225,7 +222,7 @@ internal fun AlbumContentScreen(
     hideRemoveLinkConfirmation: () -> Unit,
     removeLink: () -> Unit,
     resetLinkRemovedSuccessEvent: () -> Unit,
-    openGetLink: (AlbumId, Boolean) -> Unit,
+    openGetLink: (AlbumId) -> Unit,
     handleAction: (AlbumContentSelectionAction) -> Unit,
     navigateToPaywall: () -> Unit,
     resetPaywallEvent: () -> Unit,
@@ -305,9 +302,9 @@ internal fun AlbumContentScreen(
     EventEffect(
         event = uiState.manageLinkEvent,
         onConsumed = resetManageLink,
-        action = { event ->
-            event?.let {
-                openGetLink(event.album.id, event.hasSensitiveContent)
+        action = { album ->
+            album?.let {
+                openGetLink(it.id)
             }
         }
     )
@@ -800,7 +797,7 @@ private fun AlbumContentScreenPreview() {
             hideRemoveLinkConfirmation = {},
             removeLink = {},
             resetLinkRemovedSuccessEvent = {},
-            openGetLink = { _, _ -> },
+            openGetLink = { _ -> },
             navigateToPaywall = {},
             resetPaywallEvent = {},
             sortPhotos = {},

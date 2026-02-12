@@ -82,7 +82,7 @@ fun AlbumGetLinkScreen(
     modifier: Modifier = Modifier,
     albumGetLinkViewModel: AlbumGetLinkViewModel =
         hiltViewModel<AlbumGetLinkViewModel, AlbumGetLinkViewModel.Factory> {
-            it.create(null, null)
+            it.create(null)
         },
 ) {
     val state by albumGetLinkViewModel.stateFlow.collectAsStateWithLifecycle()
