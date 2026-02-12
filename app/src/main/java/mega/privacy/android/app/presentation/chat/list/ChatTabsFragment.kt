@@ -165,9 +165,7 @@ class ChatTabsFragment : Fragment() {
     private val startConversationLauncher: ActivityResultLauncher<Intent?> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val intentData = result.data
-            if (result.resultCode == Activity.RESULT_CANCELED) {
-                activity?.finish()
-            } else if (result.resultCode == Activity.RESULT_OK && intentData != null) {
+            if (result.resultCode == Activity.RESULT_OK && intentData != null) {
                 val isNewMeeting =
                     intentData.getBooleanExtra(EXTRA_NEW_MEETING, false)
                 val isJoinMeeting =
