@@ -59,6 +59,7 @@ import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -502,6 +503,7 @@ private fun PhotoCard(
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                 contentDescription = null,
                 modifier = Modifier.clickable { onClickMenu(nodeId) },
+                tint = IconColor.Primary
             )
         },
         enableClick = true,
