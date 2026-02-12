@@ -3,7 +3,7 @@
     <application>
         <activity
             android:name="mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity"
-            android:label="@string/choose_account_fragment"
+            android:label="Choose account"
             android:launchMode="singleTop" />
     </application>
 </manifest>

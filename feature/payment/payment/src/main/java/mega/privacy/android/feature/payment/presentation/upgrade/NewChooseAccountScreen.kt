@@ -26,10 +26,8 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -45,7 +43,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getString
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
@@ -62,7 +59,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
-import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
 import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
@@ -106,7 +102,6 @@ fun NewChooseAccountScreen(
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val locale = Locale.getDefault()
-    val coroutineScope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
     val topBarHeightPx =
@@ -291,7 +286,7 @@ fun NewChooseAccountScreen(
                         onClick = {
                             isMonthly = true
                         },
-                        content = stringResource(id = R.string.subscription_type_monthly),
+                        content = stringResource(id = sharedR.string.subscription_type_monthly),
                         leadingPainter = if (isMonthly) {
                             rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
                         } else null
@@ -303,7 +298,7 @@ fun NewChooseAccountScreen(
                         onClick = {
                             isMonthly = false
                         },
-                        content = stringResource(id = R.string.subscription_type_yearly),
+                        content = stringResource(id = sharedR.string.subscription_type_yearly),
                         leadingPainter = if (!isMonthly) {
                             rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
                         } else null

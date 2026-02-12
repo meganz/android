@@ -2314,4 +2314,16 @@
     <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
     <!-- Error message when folder is already part of a sync or backup -->
     <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Buy Pro&#160;Lite</string>
+    <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_i">Buy Pro&#160;I</string>
+    <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Buy Pro&#160;II</string>
+    <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Buy Pro&#160;III</string>
+    <!-- Label for chip to select monthly billing on Choose account screen where user can choose subscription plan. -->
+    <string name="subscription_type_monthly">Monthly</string>
+    <!-- Label for chip to select yearly billing on Choose account screen where user can choose subscription plan. -->
+    <string name="subscription_type_yearly">Yearly</string>
 </resources>
