@@ -124,11 +124,6 @@ class PushMessageWorker @AssistedInject constructor(
         // legacy support, other places need to know logging in happen
         val pushMessage = getPushMessageFromWorkerData(inputData)
         val isRequiredLogin = isRequiredLogin(pushMessage)
-        Timber.d("Is required login: $isRequiredLogin")
-        if (loginMutex.isLocked && isRequiredLogin) {
-            Timber.w("Logging already running.")
-            return@withContext Result.failure()
-        }
 
         pushMessage?.let {
             if (it is CallPushMessage) {
@@ -142,6 +137,12 @@ class PushMessageWorker @AssistedInject constructor(
                     Timber.e(exception)
                 }
             }
+        }
+
+        Timber.d("Is required login: $isRequiredLogin")
+        if (loginMutex.isLocked && isRequiredLogin) {
+            Timber.w("Logging already running.")
+            return@withContext Result.failure()
         }
 
         if (isRequiredLogin) {

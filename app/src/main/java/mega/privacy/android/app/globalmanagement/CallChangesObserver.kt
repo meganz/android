@@ -193,6 +193,10 @@ class CallChangesObserver @Inject constructor(
         if (call.callCompositionChange == CallCompositionChanges.Added && numberOfParticipants > 1) {
             Timber.d("Handle call")
             if (getMyUserHandleUseCase() == call.peerIdCallCompositionChange) {
+                callPushMessageNotificationManager.remove(
+                    call.chatId
+                )
+                setFakeIncomingCallUseCase(chatId = call.chatId, type = null)
                 CallUtil.clearIncomingCallNotification(call.callId)
                 chatManagement.removeValues(call.chatId)
             }
