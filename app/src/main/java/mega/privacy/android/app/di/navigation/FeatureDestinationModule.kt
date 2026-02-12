@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import mega.privacy.android.app.activities.destinations.LegacyCoreActivityFeatureGraph
+import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
@@ -22,6 +24,7 @@ import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestina
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -85,4 +88,8 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideScanDestination(): FeatureDestination = SaveScannedDocumentsDestination()
+
+    @Provides
+    @Singleton
+    fun provideFetchNodeProvider(): FetchNodeProvider = FetchNodeProviderImpl()
 }

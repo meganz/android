@@ -23,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
@@ -247,6 +248,7 @@ internal class LoginViewModelTest {
             getCookieSettingsUseCase = getCookieSettingsUseCase,
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
+            fetchNodeProvider = mock(),
             isInSingleActivity = false
         )
     }

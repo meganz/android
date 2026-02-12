@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
@@ -43,10 +44,7 @@ class PendingBackStackNavigationHandlerTest {
 
     private val initialSession = "initial"
 
-    private val getFetchNodeDestinationFunction: (String, Boolean, RefreshEvent?) -> NavKey =
-        { sessionValue, fromLogin, refreshEvent ->
-            FetchingContentNavKey(sessionValue, fromLogin, refreshEvent)
-        }
+    private val fetchNodeProvider: FetchNodeProvider = FetchNodeProviderImpl()
 
     @BeforeEach
     fun setUp() {
@@ -73,7 +71,7 @@ class PendingBackStackNavigationHandlerTest {
             defaultLandingScreen = DefaultLandingScreen,
             defaultLoginDestination = DefaultLoginDestination,
             initialLoginDestination = InitialLoginDestination,
-            fetchRootNodeDestination = getFetchNodeDestinationFunction,
+            fetchNodeProvider = fetchNodeProvider,
             isPasscodeLocked = isPasscodeLocked,
             passcodeDestination = PasscodeDestination,
             navigationResultManager = navigationResultManager,
@@ -417,7 +415,7 @@ class PendingBackStackNavigationHandlerTest {
             underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn)
             val newSession = "ANewSession"
             underTest.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(newSession))
-            assertThat(backStack).containsExactly(FetchingContentNavKey(newSession, true))
+            assertThat(backStack).containsExactly(FetchingContentNavKey(newSession, false))
         }
 
     @Test
@@ -457,7 +455,7 @@ class PendingBackStackNavigationHandlerTest {
         tempHandler.onPasscodeStateChanged(true)
         assertThat(tempBackStack).containsExactly(InitialLoginDestination)
         tempHandler.onLoginChange(PendingBackStackNavigationHandler.AuthStatus.LoggedIn(session))
-        assertThat(tempBackStack).containsExactly(FetchingContentNavKey(session, true))
+        assertThat(tempBackStack).containsExactly(FetchingContentNavKey(session, false))
         tempHandler.onRootNodeChange(RootNodeState(exists = true))
         assertThat(tempBackStack).containsExactly(PasscodeDestination)
     }

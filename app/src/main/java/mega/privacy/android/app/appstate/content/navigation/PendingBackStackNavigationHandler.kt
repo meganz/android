@@ -1,7 +1,6 @@
 package mega.privacy.android.app.appstate.content.navigation
 
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -23,10 +22,15 @@ class PendingBackStackNavigationHandler(
     private val passcodeDestination: NavKey,
     private val defaultLoginDestination: NoSessionNavKey,
     initialLoginDestination: NoSessionNavKey,
-    private val fetchRootNodeDestination: (session: String, fromLogin: Boolean, RefreshEvent?) -> NavKey,
+    private val fetchNodeProvider: FetchNodeProvider,
     private val navigationResultManager: NavigationResultManager,
 ) : NavigationHandler, NavigationResultsHandler by navigationResultManager {
-    private var fromLogin = false
+
+    /**
+     * Returns true if [navKey] is the fetch-root-node destination.
+     * Exposed so callers (e.g. UI) can branch without depending on concrete destination types.
+     */
+    fun isFetchNodeDestination(navKey: NavKey): Boolean = fetchNodeProvider.isFetchNodeDestination(navKey)
 
     init {
         Timber.d("PendingBackStackNavigationHandler::init")
@@ -135,9 +139,7 @@ class PendingBackStackNavigationHandler(
         Timber.d("PendingBackStackNavigationHandler::onLoginChange")
         if (currentAuthStatus == authStatus) return
 
-        if (authStatus.isLoggedIn) {
-            fromLogin = true
-        } else {
+        if (!authStatus.isLoggedIn) {
             hasRootNode = false
         }
 
@@ -162,7 +164,7 @@ class PendingBackStackNavigationHandler(
         this.hasRootNode = rootNodeState.exists
 
         if (this.hasRootNode) {
-            backstack.removeAll { it is FetchingContentNavKey }
+            backstack.removeAll { fetchNodeProvider.isFetchNodeDestination(it) }
             if (isPasscodeLocked) {
                 showPasscodeScreen()
             } else {
@@ -245,11 +247,7 @@ class PendingBackStackNavigationHandler(
         currentAuthStatus: AuthStatus,
         refreshEvent: RefreshEvent? = null,
     ) = currentAuthStatus.sessionOrNull()?.let {
-        fetchRootNodeDestination(
-            it,
-            fromLogin,
-            refreshEvent
-        )
+        fetchNodeProvider.getDestination(it, refreshEvent)
     }?.takeIf { isConnected }
 
     private fun AuthStatus?.sessionOrNull(): String? =

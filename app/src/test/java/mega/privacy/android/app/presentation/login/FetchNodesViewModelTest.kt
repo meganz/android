@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.triggeredContent
 import mega.privacy.android.domain.entity.AccountBlockedEvent
@@ -77,6 +78,7 @@ class FetchNodesViewModelTest {
     }
     private val getUserDataUseCase: GetUserDataUseCase = mock()
     private val globalInitialiser = mock<GlobalInitialiser>()
+    private val fetchNodeProvider = mock<FetchNodeProvider>()
     private val applicationScope = CoroutineScope(UnconfinedTestDispatcher())
 
     @BeforeAll
@@ -104,7 +106,8 @@ class FetchNodesViewModelTest {
             monitorAccountBlockedUseCase,
             isMegaApiLoggedInUseCase,
             getUserDataUseCase,
-            globalInitialiser
+            globalInitialiser,
+            fetchNodeProvider
         )
     }
 
@@ -128,6 +131,7 @@ class FetchNodesViewModelTest {
             isMegaApiLoggedInUseCase = isMegaApiLoggedInUseCase,
             getUserDataUseCase = getUserDataUseCase,
             globalInitialiser = globalInitialiser,
+            fetchNodeProvider = fetchNodeProvider,
             args = args,
             applicationScope = applicationScope,
         )

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.newError
@@ -63,6 +64,7 @@ class FetchNodesViewModel @AssistedInject constructor(
     private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val globalInitialiser: GlobalInitialiser,
+    private val fetchNodeProvider: FetchNodeProvider,
     @Assisted val args: Args,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
@@ -290,6 +292,7 @@ class FetchNodesViewModel @AssistedInject constructor(
             runCatching {
                 fetchNodesUseCase().collectLatest { update ->
                     if (update.progress?.floatValue == 1F) {
+                        fetchNodeProvider.clearLoginByAccount()
                         Timber.d("fetch nodes finished")
                         _state.update {
                             it.copy(

@@ -30,6 +30,7 @@ import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
@@ -186,6 +187,7 @@ class LoginViewModel @AssistedInject constructor(
     private val monitorMiscLoadedUseCase: MonitorMiscLoadedUseCase,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
+    private val fetchNodeProvider: FetchNodeProvider,
     @Assisted val isInSingleActivity: Boolean,
 ) : ViewModel() {
 
@@ -715,6 +717,7 @@ class LoginViewModel @AssistedInject constructor(
             with(state.value) {
                 val email = typedEmail ?: accountSession?.email ?: return@launch
                 val password = typedPassword ?: this.password ?: return@launch
+                fetchNodeProvider.setLoginByAccount()
 
                 runCatching {
                     loginUseCase(
@@ -757,6 +760,7 @@ class LoginViewModel @AssistedInject constructor(
             with(state.value) {
                 runCatching {
                     val email = accountSession?.email ?: return@launch
+                    fetchNodeProvider.setLoginByAccount()
                     loginWith2FAUseCase(
                         email,
                         password ?: return@launch,

@@ -53,8 +53,8 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
-import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.content.model.NavigationGraphState
+import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStack
 import mega.privacy.android.app.appstate.content.navigation.PendingBackStackNavigationHandler
@@ -128,6 +128,9 @@ class MegaActivity : FragmentActivity() {
 
     @Inject
     lateinit var inAppUpdateHandler: InAppUpdateHandler
+
+    @Inject
+    lateinit var fetchNodeProvider: FetchNodeProvider
 
     private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
 
@@ -322,7 +325,7 @@ class MegaActivity : FragmentActivity() {
                         isConnected = globalState.isConnected,
                         isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                         passcodeDestination = PasscodeNavKey,
-                        fetchRootNodeDestination = ::FetchingContentNavKey,
+                        fetchNodeProvider = fetchNodeProvider,
                         navigationResultManager = navigationResultManager,
                     )
                 }
@@ -399,7 +402,10 @@ class MegaActivity : FragmentActivity() {
                                 CompositionLocalProvider(
                                     LocalSnackBarHostState provides snackbarHostState
                                 ) {
-                                    if (currentNavKey !is FetchingContentNavKey) {
+                                    if (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                            currentNavKey
+                                        )
+                                    ) {
                                         SnackbarLifetimeController()
                                     }
                                     NavDisplay(
@@ -448,7 +454,10 @@ class MegaActivity : FragmentActivity() {
                                         onConsumeEvent = appTransferViewModel::consumedTransferEvent,
                                     )
 
-                                    if (currentNavKey !is HomeScreensNavKey && currentNavKey !is FetchingContentNavKey) {
+                                    if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
+                                            currentNavKey
+                                        ))
+                                    ) {
                                         RequestStatusProgressContainer(
                                             viewModel = requestStatusProgressViewModel,
                                             modifier = Modifier
