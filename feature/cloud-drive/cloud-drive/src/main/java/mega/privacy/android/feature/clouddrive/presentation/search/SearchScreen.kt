@@ -3,7 +3,6 @@ package mega.privacy.android.feature.clouddrive.presentation.search
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -320,8 +319,6 @@ fun SearchContent(
                 dateAddedFilterOption = uiState.dateAddedFilterOption,
                 onFilterClicked = onFilterClicked,
             )
-        } else {
-            Spacer(modifier = Modifier.padding(bottom = 12.dp))
         }
 
         when {
@@ -348,6 +345,7 @@ fun SearchContent(
 
             uiState.isLoading -> {
                 NodesViewSkeleton(
+                    contentPadding = PaddingValues(top = 8.dp),
                     isListView = isListView,
                     spanCount = spanCount,
                 )
@@ -365,6 +363,7 @@ fun SearchContent(
                     .fillMaxWidth()
                     .testTag(SEARCH_CONTENT_RESULTS_TAG),
                 listContentPadding = PaddingValues(
+                    top = 8.dp,
                     bottom = contentPadding.calculateBottomPadding() + 100.dp,
                 ),
                 spanCount = spanCount,
@@ -421,6 +420,7 @@ private fun SearchContentEmptyPreview() {
                 searchText = "test",
                 searchedQuery = "test",
                 nodesLoadingState = NodesLoadingState.FullyLoaded,
+                isHiddenNodeSettingsLoading = false
             ),
             contentPadding = PaddingValues(0.dp),
             isListView = true,
