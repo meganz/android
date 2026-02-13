@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCa
 import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
@@ -52,6 +53,7 @@ internal class AlbumsTabViewModelTest {
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -63,6 +65,8 @@ internal class AlbumsTabViewModelTest {
             removeAlbumsUseCase,
             snackbarEventQueue,
             getNextDefaultAlbumNameUseCase,
+            monitorThemeModeUseCase,
+            monitorShowHiddenItemsUseCase
         )
     }
 
@@ -76,6 +80,7 @@ internal class AlbumsTabViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
     }
 
@@ -159,6 +164,7 @@ internal class AlbumsTabViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
 
         underTest.uiState.test {

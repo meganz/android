@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
@@ -32,14 +33,9 @@ import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.Boolean
-import kotlin.String
 import kotlin.collections.contains
 import kotlin.collections.minus
 import kotlin.collections.plus
-import kotlin.onFailure
-import kotlin.onSuccess
-import kotlin.runCatching
 import kotlin.sequences.contains
 
 @HiltViewModel
@@ -52,6 +48,7 @@ class AlbumsTabViewModel @Inject constructor(
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
@@ -59,8 +56,18 @@ class AlbumsTabViewModel @Inject constructor(
     private var addNewAlbumJob: Job? = null
 
     init {
+        monitorShowHiddenItems()
         monitorThemeMode()
         monitorAlbums()
+    }
+
+    private fun monitorShowHiddenItems() {
+        monitorShowHiddenItemsUseCase()
+            .catch { Timber.e(it) }
+            .onEach { showHiddenItems ->
+                uiState.update { it.copy(showHiddenItems = showHiddenItems) }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun monitorThemeMode() {

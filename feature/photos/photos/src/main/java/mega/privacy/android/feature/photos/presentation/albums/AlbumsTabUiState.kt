@@ -17,6 +17,7 @@ data class AlbumsTabUiState(
     val navigationEvent: StateEventWithContent<NavKey> = consumed(),
     val deleteAlbumsConfirmationEvent: StateEvent = consumed,
     val themeMode: ThemeMode = ThemeMode.System,
+    val showHiddenItems: Boolean = false
 ) {
     val selectedUserAlbumsCount
         get() = selectedUserAlbums.size

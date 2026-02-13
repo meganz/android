@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -286,6 +287,8 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
     private suspend fun List<Photo>.toUIPhotos(selectedPhotoIds: Set<Long>): List<PhotosNodeContentType> =
         withContext(defaultDispatcher) {
             flatMapIndexed { index, photo ->
+                val isHiddenNodesEnabled =
+                    _state.value.accountType?.isPaid == true && !_state.value.isBusinessAccountExpired
                 val comparePeriods = {
                     val currentDate = photo.modificationTime.toLocalDate()
                     val previousDate = get(index - 1).modificationTime.toLocalDate()
@@ -304,7 +307,7 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
                     PhotosNodeContentType.PhotoNodeItem(
                         node = PhotoNodeUiState(
                             photo = photoUiState,
-                            isSensitive = photo.isSensitive || photo.isSensitiveInherited,
+                            isSensitive = isHiddenNodesEnabled && (photo.isSensitive || photo.isSensitiveInherited),
                             isSelected = isSelected,
                             defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                         )
