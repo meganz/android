@@ -17,14 +17,12 @@ import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -50,6 +48,7 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
+import mega.privacy.android.domain.extension.mapAsync
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -69,6 +68,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndUpdateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -128,6 +128,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val legacyPhotosSortMapper: LegacyPhotosSortMapper,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     @ApplicationContext private val context: Context,
     @Assisted private val navKey: AlbumContentNavKey?,
 ) : ViewModel() {
@@ -193,9 +194,15 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    private fun monitorShowHiddenItems() = monitorShowHiddenItemsUseCase()
-        .onEach {
-            showHiddenItems = it
+    private fun monitorShowHiddenItems() {
+        combine(
+            monitorHiddenNodesEnabledUseCase()
+                .catch { Timber.e(it) },
+            monitorShowHiddenItemsUseCase()
+                .catch { Timber.e(it) },
+            ::Pair
+        ).onEach { (enabled, show) ->
+            showHiddenItems = show && enabled
             if (_state.value.isLoading) return@onEach
 
             val filteredPhotos = filterNonSensitivePhotos(photos = sourcePhotos.orEmpty())
@@ -205,6 +212,7 @@ class AlbumContentViewModel @AssistedInject constructor(
 
             updateSelection(filteredPhotos)
         }.launchIn(viewModelScope)
+    }
 
     private fun monitorAccountDetail() {
         monitorAccountDetailUseCase()
@@ -702,6 +710,8 @@ class AlbumContentViewModel @AssistedInject constructor(
     }
 
     fun hideNodes() {
+        val selectedPhotos = _state.value.selectedPhotos
+
         viewModelScope.launch {
             val isHiddenNodesOnboarded =
                 runCatching { isHiddenNodesOnboardedUseCase() }.getOrDefault(false)
@@ -715,7 +725,10 @@ class AlbumContentViewModel @AssistedInject constructor(
                 }
             } else if (isHiddenNodesOnboarded) {
                 // User is onboarded, proceed with hiding
-                updateNodeSensitivity(isSensitive = true) { count ->
+                updateNodeSensitivity(
+                    selectedPhotos = selectedPhotos,
+                    isSensitive = true
+                ) { count ->
                     val message = LocalizedText.PluralsRes(
                         resId = R.plurals.hidden_nodes_result_message,
                         quantity = count,
@@ -735,12 +748,17 @@ class AlbumContentViewModel @AssistedInject constructor(
     }
 
     fun unhideNodes() {
+        val selectedPhotos = _state.value.selectedPhotos
+
         viewModelScope.launch {
             val isPaid = _state.value.accountType?.isPaid ?: false
             val isBusinessAccountExpired = _state.value.isBusinessAccountExpired
 
             if (isPaid && !isBusinessAccountExpired) {
-                updateNodeSensitivity(isSensitive = false) { count ->
+                updateNodeSensitivity(
+                    selectedPhotos = selectedPhotos,
+                    isSensitive = false
+                ) { count ->
                     val message = LocalizedText.PluralsRes(
                         resId = sharedResR.plurals.unhidden_nodes_result_message,
                         quantity = count,
@@ -753,22 +771,21 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend inline fun CoroutineScope.updateNodeSensitivity(
+    private suspend fun updateNodeSensitivity(
+        selectedPhotos: Set<PhotoUiState>,
         isSensitive: Boolean,
-        action: (Int) -> Unit,
+        action: suspend (Int) -> Unit,
     ) {
-        val photoIds = _state.value.selectedPhotos.map { it.id }
+        val photoIds = selectedPhotos.map { it.id }
         val count = photoIds.size
-        photoIds.map { id ->
-            async {
-                runCatching {
-                    updateNodeSensitiveUseCase(
-                        nodeId = NodeId(id),
-                        isSensitive = isSensitive
-                    )
-                }.onFailure { Timber.e("Update sensitivity failed: $it") }
+        photoIds.mapAsync { id ->
+            runCatching {
+                updateNodeSensitiveUseCase(
+                    nodeId = NodeId(id),
+                    isSensitive = isSensitive
+                )
             }
-        }.awaitAll()
+        }
 
         action(count)
     }
