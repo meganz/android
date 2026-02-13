@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -41,6 +43,8 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
+import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
+import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
@@ -133,52 +137,68 @@ fun HomeScreens(
                         homeScreenStacks.topLevelKey::class == destination::class
                     },
                     navContent = { navigationUiController ->
+                        var isSelectionMode by remember { mutableStateOf(false) }
                         Column(Modifier.fillMaxSize()) {
-                            NavDisplay(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
-                                backStack = homeScreenStacks.backStack,
-                                onBack = { homeScreenStacks.removeLast() },
-                                entryDecorators = listOf(
-                                    rememberSaveableStateHolderNavEntryDecorator(),
-                                    rememberViewModelStoreNavEntryDecorator(),
-                                    rememberAnalyticNavEntryDecorator()
-                                ),
-                                entryProvider = entryProvider({
-                                    fallback(
-                                        unknownKey = it,
-                                        outerNavigationHandler = outerNavigationHandler,
-                                        innerNavigationHandler = innerNavigationHandler
-                                    )
-                                }) {
-                                    currentState.mainNavScreens.forEach { screenProvider ->
-                                        screenProvider(
-                                            innerNavigationHandler,
-                                            navigationUiController,
-                                            transferHandler
+                            val selectionModeController = remember(isSelectionMode) {
+                                SelectionModeController(
+                                    isSelectionModeActive = isSelectionMode,
+                                    onSelectionModeChanged = { isSelectionMode = it },
+                                )
+                            }
+                            CompositionLocalProvider(
+                                LocalSelectionModeController provides selectionModeController
+                            ) {
+                                NavDisplay(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
+                                    backStack = homeScreenStacks.backStack,
+                                    onBack = { homeScreenStacks.removeLast() },
+                                    entryDecorators = listOf(
+                                        rememberSaveableStateHolderNavEntryDecorator(),
+                                        rememberViewModelStoreNavEntryDecorator(),
+                                        rememberAnalyticNavEntryDecorator()
+                                    ),
+                                    entryProvider = entryProvider({
+                                        fallback(
+                                            unknownKey = it,
+                                            outerNavigationHandler = outerNavigationHandler,
+                                            innerNavigationHandler = innerNavigationHandler
                                         )
-                                    }
-                                },
-                                transitionSpec = { fadeTransition },
-                                popTransitionSpec = { fadeTransition },
-                                predictivePopTransitionSpec = { fadeTransition }
-                            )
+                                    }) {
+                                        currentState.mainNavScreens.forEach { screenProvider ->
+                                            screenProvider(
+                                                innerNavigationHandler,
+                                                navigationUiController,
+                                                transferHandler
+                                            )
+                                        }
+                                    },
+                                    transitionSpec = { fadeTransition },
+                                    popTransitionSpec = { fadeTransition },
+                                    predictivePopTransitionSpec = { fadeTransition }
+                                )
+                            }
                             var isMiniPlayerVisible by remember { mutableStateOf(false) }
                             Box(
                                 contentAlignment = Alignment.TopCenter
                             ) {
-                                MiniAudioPlayerView(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    onVisibilityChanged = { isVisible ->
-                                        isMiniPlayerVisible = isVisible
-                                    }
-                                )
+                                if (!isSelectionMode) {
+                                    MiniAudioPlayerView(
+                                        modifier = Modifier
+                                            .fillMaxWidth(),
+                                        onVisibilityChanged = { isVisible ->
+                                            isMiniPlayerVisible = isVisible
+                                        }
+                                    )
+                                }
                                 RequestStatusProgressContainer(
                                     viewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
                                     modifier = Modifier
-                                        .conditional(!isMiniPlayerVisible && LocalNavigationRailVisible.current) {
+                                        .conditional(
+                                            (!isMiniPlayerVisible || isSelectionMode) &&
+                                                    LocalNavigationRailVisible.current
+                                        ) {
                                             navigationBarsPadding()
                                         }
                                 )
