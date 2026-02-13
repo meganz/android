@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.call
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -22,7 +23,7 @@ class MonitorCallSessionOnRecordingUseCase @Inject constructor(
     /**
      * Invoke.
      */
-    operator fun invoke(chatId: Long) = monitorChatSessionUpdatesUseCase()
+    operator fun invoke(chatId: Long): Flow<CallRecordingEvent> = monitorChatSessionUpdatesUseCase()
         .filter {
             chatId == it.call?.chatId && it.session?.changes != null
                     && (it.session.hasChanged(ChatSessionChanges.SessionOnRecording)
@@ -31,22 +32,30 @@ class MonitorCallSessionOnRecordingUseCase @Inject constructor(
             it.session?.let { session ->
                 if (session.hasChanged(ChatSessionChanges.Status)) {
                     // I started participating in the call and it is being recorded
-                    CallRecordingEvent(isSessionOnRecording = true)
+                    CallRecordingEvent.PreexistingRecording(chatId = chatId)
                 } else {
                     // I'm participating in the call and started to be recorded or stopped being recorded
-                    CallRecordingEvent(
-                        isSessionOnRecording = session.isRecording,
-                        participantRecording = getParticipantFullNameUseCase(session.peerId)
-                    )
+                    if (session.isRecording) {
+                        CallRecordingEvent.Recording(
+                            chatId = chatId,
+                            participantRecording = getParticipantFullNameUseCase(session.peerId)
+                        )
+                    } else {
+                        CallRecordingEvent.NotRecording
+                    }
                 }
-            }
+            } ?: CallRecordingEvent.NotRecording
         }.onStart {
             getChatCallUseCase(chatId)?.sessionByClientId
                 ?.filter { it.value.isRecording }
                 ?.let {
                     if (it.values.isNotEmpty()) {
                         // I'm participating in the call and it is being recorded
-                        emit(CallRecordingEvent(isSessionOnRecording = true))
+                        emit(
+                            CallRecordingEvent.PreexistingRecording(
+                                chatId = chatId,
+                            )
+                        )
                     }
                 }
         }

@@ -5,28 +5,26 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ParticipantsCountChange
 import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdatesUseCase
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.stub
-import org.mockito.kotlin.whenever
-import mega.privacy.android.domain.repository.CallRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AmIAloneOnAnyCallUseCaseTest {
@@ -109,7 +107,7 @@ class AmIAloneOnAnyCallUseCaseTest {
         mode = EnumSource.Mode.INCLUDE
     )
     fun `test statuses with no result`(currentStatus: ChatCallStatus) = runTest {
-        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
         val call = mock<ChatCall> {
             on { changes } doReturn listOf()
             on { status } doReturn currentStatus
@@ -134,7 +132,7 @@ class AmIAloneOnAnyCallUseCaseTest {
         runTest {
             val thisChatId = 12L
             val callId = 123L
-            whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
 
             val call = mock<ChatCall> {
                 on { chatId } doReturn thisChatId
@@ -226,9 +224,9 @@ class AmIAloneOnAnyCallUseCaseTest {
             )
             on { callId } doReturn thisCallId
         }
-        whenever(callRepository.getCallHandleList(ChatCallStatus.Connecting)).thenReturn(emptyList())
-        whenever(callRepository.getCallHandleList(ChatCallStatus.Joining)).thenReturn(emptyList())
-        whenever(callRepository.getCallHandleList(ChatCallStatus.InProgress)).thenReturn(
+        whenever(callRepository.getCallChatIdList(ChatCallStatus.Connecting)).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(ChatCallStatus.Joining)).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(ChatCallStatus.InProgress)).thenReturn(
             listOf(
                 thisCallId
             )
@@ -258,7 +256,7 @@ class AmIAloneOnAnyCallUseCaseTest {
         val myHandle = 42L
         val thisCallId = 123L
 
-        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
 
         val peerList = if (isAlone) listOf(myHandle) else listOf(myHandle, 1L)
 

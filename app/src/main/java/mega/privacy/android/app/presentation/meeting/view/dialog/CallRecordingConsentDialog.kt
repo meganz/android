@@ -14,7 +14,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.entity.call.CallRecordingEvent
 import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
 import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
@@ -111,7 +110,7 @@ fun CallRecordingConsentDialogPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         CallRecordingConsentDialog(
             uiState = CallRecordingUIState(
-                callRecordingEvent = CallRecordingEvent(isSessionOnRecording = true),
+                isSessionOnRecording = true,
             ),
             onConfirm = {},
             onDismiss = {},

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase.chat
+package mega.privacy.android.domain.usecase.call
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -24,9 +24,9 @@ import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class MonitorHasActiveCallUseCaseTest {
+internal class MonitorActiveCallUseCaseTest {
 
-    private lateinit var underTest: MonitorHasActiveCallUseCase
+    private lateinit var underTest: MonitorActiveCallUseCase
 
     private val sharedMonitorCallUpdatesFlow = MutableSharedFlow<ChatCall>()
 
@@ -34,10 +34,11 @@ internal class MonitorHasActiveCallUseCaseTest {
         on { invoke() } doReturn sharedMonitorCallUpdatesFlow
     }
     private val callRepository = mock<CallRepository>()
+    private val mockChatCall = mock<ChatCall>()
 
     @BeforeAll
     fun setup() {
-        underTest = MonitorHasActiveCallUseCase(
+        underTest = MonitorActiveCallUseCase(
             monitorChatCallUpdatesUseCase,
             callRepository
         )
@@ -46,7 +47,7 @@ internal class MonitorHasActiveCallUseCaseTest {
     @BeforeEach
     fun resetMocks() = runTest {
         reset(callRepository)
-        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
     }
 
     @ParameterizedTest
@@ -56,13 +57,15 @@ internal class MonitorHasActiveCallUseCaseTest {
     )
     fun `test that initial state is true when there is an active call with valid status`(status: ChatCallStatus) =
         runTest {
-            whenever(callRepository.getCallHandleList(any()))
+            whenever(callRepository.getCallChatIdList(any()))
                 .thenReturn(emptyList())
-            whenever(callRepository.getCallHandleList(status))
-                .thenReturn(listOf(123L))
+            val chatId = 123L
+            whenever(callRepository.getCallChatIdList(status))
+                .thenReturn(listOf(chatId))
+            whenever(callRepository.getChatCall(chatId)).thenReturn(mockChatCall)
             underTest().test {
                 val result = awaitItem()
-                assertThat(result).isTrue()
+                assertThat(result).isNotNull()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -74,16 +77,17 @@ internal class MonitorHasActiveCallUseCaseTest {
     )
     fun `test that returns true when there is an update with active call with valid status`(status: ChatCallStatus) {
         runTest {
-            whenever(callRepository.getCallHandleList(any()))
+            whenever(callRepository.getCallChatIdList(any()))
                 .thenReturn(emptyList())
+            whenever(callRepository.getChatCall(any())).thenReturn(mockChatCall)
             underTest().test {
-                assertThat(awaitItem()).isFalse() // check initial to be sure test is working
-                whenever(callRepository.getCallHandleList(status))
+                assertThat(awaitItem()).isNull() // check initial to be sure test is working
+                whenever(callRepository.getCallChatIdList(status))
                     .thenReturn(listOf(123L))
                 sharedMonitorCallUpdatesFlow.emit(statusUpdate)
 
                 val result = awaitItem()
-                assertThat(result).isTrue()
+                assertThat(result).isNotNull()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -92,27 +96,28 @@ internal class MonitorHasActiveCallUseCaseTest {
 
     @Test
     fun `test that initial state is false when there are no active calls`() = runTest {
-        whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+        whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
 
         underTest().test {
             val result = awaitItem()
-            assertThat(result).isFalse()
+            assertThat(result).isNull()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that returns false when there is an update with no active calls`() = runTest {
-        whenever(callRepository.getCallHandleList(any()))
+        whenever(callRepository.getCallChatIdList(any()))
             .thenReturn(listOf(123L))
+        whenever(callRepository.getChatCall(any())).thenReturn(mockChatCall)
         underTest().test {
-            assertThat(awaitItem()).isTrue() // check initial to be sure test is working
-            whenever(callRepository.getCallHandleList(any()))
+            assertThat(awaitItem()).isNotNull() // check initial to be sure test is working
+            whenever(callRepository.getCallChatIdList(any()))
                 .thenReturn(emptyList())
             sharedMonitorCallUpdatesFlow.emit(statusUpdate)
 
             val result = awaitItem()
-            assertThat(result).isFalse()
+            assertThat(result).isNull()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -124,7 +129,7 @@ internal class MonitorHasActiveCallUseCaseTest {
     )
     fun `test that does not emit new value when update is not a Status change`(change: ChatCallChanges) =
         runTest {
-            whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
 
             val nonStatusUpdate = mock<ChatCall> {
                 on { this.changes } doReturn listOf(change)
@@ -132,7 +137,7 @@ internal class MonitorHasActiveCallUseCaseTest {
 
             underTest().test {
                 val initialResult = awaitItem()
-                assertThat(initialResult).isFalse()
+                assertThat(initialResult).isNull()
 
                 // clear initial repository calls to later check that there are no more interactions
                 clearInvocations(callRepository)
@@ -152,7 +157,7 @@ internal class MonitorHasActiveCallUseCaseTest {
     )
     fun `test that returns true without calling repository when ChatCall has active status`(status: ChatCallStatus) =
         runTest {
-            whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
 
             val activeStatusUpdate = mock<ChatCall> {
                 on { this.status } doReturn status
@@ -161,7 +166,7 @@ internal class MonitorHasActiveCallUseCaseTest {
 
             underTest().test {
                 val initialResult = awaitItem()
-                assertThat(initialResult).isFalse()
+                assertThat(initialResult).isNull()
 
                 // clear initial repository calls to later check that there are no more interactions
                 clearInvocations(callRepository)
@@ -169,7 +174,7 @@ internal class MonitorHasActiveCallUseCaseTest {
                 sharedMonitorCallUpdatesFlow.emit(activeStatusUpdate)
 
                 val result = awaitItem()
-                assertThat(result).isTrue()
+                assertThat(result).isNotNull()
                 cancelAndIgnoreRemainingEvents()
             }
 

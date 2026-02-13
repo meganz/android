@@ -2,7 +2,7 @@ package mega.privacy.android.feature.chat.meeting.recording
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.call.ChatSession
 import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
-import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
+import mega.privacy.android.domain.usecase.call.MonitorRecordedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
 import org.junit.jupiter.api.BeforeAll
@@ -49,8 +49,8 @@ class CallRecordingViewModelTest {
         MutableStateFlow<CallRecordingConsentStatus>(CallRecordingConsentStatus.None)
     private val callFlow = MutableSharedFlow<ChatCall?>()
 
-    private val monitorCallSessionOnRecordingUseCase: MonitorCallSessionOnRecordingUseCase = mock {
-        onBlocking { invoke(chatId) } doReturn recordingFlow
+    private val monitorRecordedChatsUseCase: MonitorRecordedChatsUseCase = mock {
+        onBlocking { invoke() } doReturn recordingFlow
     }
     private val hangChatCallByChatIdUseCase = mock<HangChatCallByChatIdUseCase>()
     private val broadcastCallRecordingConsentEventUseCase =
@@ -73,7 +73,7 @@ class CallRecordingViewModelTest {
 
     private fun init() {
         underTest = CallRecordingViewModel(
-            monitorCallSessionOnRecordingUseCase = monitorCallSessionOnRecordingUseCase,
+            monitorRecordedChatsUseCase = monitorRecordedChatsUseCase,
             hangChatCallByChatIdUseCase = hangChatCallByChatIdUseCase,
             broadcastCallRecordingConsentEventUseCase = broadcastCallRecordingConsentEventUseCase,
             monitorCallRecordingConsentEventUseCase = monitorCallRecordingConsentEventUseCase,
@@ -89,7 +89,7 @@ class CallRecordingViewModelTest {
             broadcastCallRecordingConsentEventUseCase,
             savedStateHandle
         )
-        wheneverBlocking { monitorCallSessionOnRecordingUseCase(chatId) }.thenReturn(recordingFlow)
+        wheneverBlocking { monitorRecordedChatsUseCase() }.thenReturn(recordingFlow)
         wheneverBlocking { monitorCallRecordingConsentEventUseCase() }.thenReturn(consentFlow)
         wheneverBlocking { monitorCallInChatUseCase(chatId) }.thenReturn(callFlow)
         whenever(savedStateHandle.get<Long>(ChatNavKey.Companion.LEGACY_CHAT_ID)).thenReturn(chatId)
@@ -99,15 +99,17 @@ class CallRecordingViewModelTest {
     fun `test that call recording event is updated and broadcast consent event is not invoked when recording starts`() =
         runTest {
             val event =
-                CallRecordingEvent(isSessionOnRecording = true, participantRecording = "name")
+                CallRecordingEvent.Recording(chatId = chatId, participantRecording = "name")
 
-            whenever(monitorCallSessionOnRecordingUseCase(chatId)).thenReturn(recordingFlow)
+            whenever(monitorRecordedChatsUseCase()).thenReturn(recordingFlow)
 
             init()
             testScheduler.advanceUntilIdle()
             recordingFlow.emit(event)
-            underTest.state.map { it.callRecordingEvent }.test {
-                Truth.assertThat(awaitItem()).isEqualTo(event)
+            underTest.state.test {
+                val actual = awaitItem()
+                assertThat(actual.isSessionOnRecording).isEqualTo(event.isSessionOnRecording)
+                assertThat(actual.participantRecording).isEqualTo(event.participantRecording)
             }
             verifyNoInteractions(broadcastCallRecordingConsentEventUseCase)
         }
@@ -116,15 +118,15 @@ class CallRecordingViewModelTest {
     fun `test that call recording event is updated and broadcast consent event is invoked if recording stops`() =
         runTest {
             val event =
-                CallRecordingEvent(isSessionOnRecording = false, participantRecording = "name")
+                CallRecordingEvent.RecordingEnded(chatId = chatId)
 
-            whenever(monitorCallSessionOnRecordingUseCase(chatId)).thenReturn(recordingFlow)
+            whenever(monitorRecordedChatsUseCase()).thenReturn(recordingFlow)
 
             init()
             testScheduler.advanceUntilIdle()
             recordingFlow.emit(event)
-            underTest.state.map { it.callRecordingEvent }.test {
-                Truth.assertThat(awaitItem()).isEqualTo(event)
+            underTest.state.map { it.isSessionOnRecording }.test {
+                assertThat(awaitItem()).isFalse()
             }
             verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
                 CallRecordingConsentStatus.None
@@ -145,7 +147,7 @@ class CallRecordingViewModelTest {
             else CallRecordingConsentStatus.Denied(chatId)
         )
         underTest.state.map { it.isRecordingConsentAccepted }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(accepted)
+            assertThat(awaitItem()).isEqualTo(accepted)
         }
     }
 
@@ -159,9 +161,9 @@ class CallRecordingViewModelTest {
         consentFlow.emit(CallRecordingConsentStatus.None)
         underTest.state.test {
             val item = awaitItem()
-            Truth.assertThat(item.callRecordingEvent.isSessionOnRecording).isEqualTo(false)
-            Truth.assertThat(item.callRecordingEvent.participantRecording).isNull()
-            Truth.assertThat(item.isRecordingConsentAccepted).isNull()
+            assertThat(item.isSessionOnRecording).isEqualTo(false)
+            assertThat(item.participantRecording).isNull()
+            assertThat(item.isRecordingConsentAccepted).isNull()
         }
     }
 
@@ -169,17 +171,17 @@ class CallRecordingViewModelTest {
     fun `test that set participant recording consumed updates state`() = runTest {
         val name = "name"
         val event =
-            CallRecordingEvent(isSessionOnRecording = true, participantRecording = name)
+            CallRecordingEvent.Recording(chatId = chatId, participantRecording = name)
 
-        whenever(monitorCallSessionOnRecordingUseCase(chatId)).thenReturn(recordingFlow)
+        whenever(monitorRecordedChatsUseCase()).thenReturn(recordingFlow)
 
         init()
         testScheduler.advanceUntilIdle()
         recordingFlow.emit(event)
-        underTest.state.map { it.callRecordingEvent.participantRecording }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(name)
+        underTest.state.map { it.participantRecording }.test {
+            assertThat(awaitItem()).isEqualTo(name)
             underTest.setParticipantRecordingConsumed()
-            Truth.assertThat(awaitItem()).isNull()
+            assertThat(awaitItem()).isNull()
         }
     }
 
@@ -191,7 +193,7 @@ class CallRecordingViewModelTest {
             consentFlow.emit(CallRecordingConsentStatus.Granted(chatId))
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.isRecordingConsentAccepted }.test {
-                Truth.assertThat(awaitItem()).isTrue()
+                assertThat(awaitItem()).isTrue()
             }
             verify(broadcastCallRecordingConsentEventUseCase).invoke(
                 CallRecordingConsentStatus.Granted(
@@ -209,7 +211,7 @@ class CallRecordingViewModelTest {
             consentFlow.emit(CallRecordingConsentStatus.Denied(chatId))
             testScheduler.advanceUntilIdle()
             underTest.state.map { it.isRecordingConsentAccepted }.test {
-                Truth.assertThat(awaitItem()).isFalse()
+                assertThat(awaitItem()).isFalse()
             }
             verify(broadcastCallRecordingConsentEventUseCase).invoke(
                 CallRecordingConsentStatus.Denied(
@@ -239,7 +241,7 @@ class CallRecordingViewModelTest {
         callFlow.emit(call)
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.isParticipatingInCall }.test {
-            Truth.assertThat(awaitItem()).isFalse()
+            assertThat(awaitItem()).isFalse()
         }
         verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
             CallRecordingConsentStatus.None
@@ -271,7 +273,7 @@ class CallRecordingViewModelTest {
         callFlow.emit(call)
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.isParticipatingInCall }.test {
-            Truth.assertThat(awaitItem()).isTrue()
+            assertThat(awaitItem()).isTrue()
         }
         verifyNoInteractions(broadcastCallRecordingConsentEventUseCase)
     }
@@ -301,7 +303,7 @@ class CallRecordingViewModelTest {
         callFlow.emit(call)
         testScheduler.advanceUntilIdle()
         underTest.state.map { it.isParticipatingInCall }.test {
-            Truth.assertThat(awaitItem()).isTrue()
+            assertThat(awaitItem()).isTrue()
         }
         verify(broadcastCallRecordingConsentEventUseCase, atLeastOnce()).invoke(
             CallRecordingConsentStatus.None
@@ -333,8 +335,8 @@ class CallRecordingViewModelTest {
         init()
         callFlow.emit(call)
         testScheduler.advanceUntilIdle()
-        underTest.state.map { it.callRecordingEvent.isSessionOnRecording }.test {
-            Truth.assertThat(awaitItem()).isTrue()
+        underTest.state.map { it.isSessionOnRecording }.test {
+            assertThat(awaitItem()).isTrue()
         }
     }
 
@@ -363,8 +365,8 @@ class CallRecordingViewModelTest {
         init()
         callFlow.emit(call)
         testScheduler.advanceUntilIdle()
-        underTest.state.map { it.callRecordingEvent.isSessionOnRecording }.test {
-            Truth.assertThat(awaitItem()).isFalse()
+        underTest.state.map { it.isSessionOnRecording }.test {
+            assertThat(awaitItem()).isFalse()
         }
     }
 }

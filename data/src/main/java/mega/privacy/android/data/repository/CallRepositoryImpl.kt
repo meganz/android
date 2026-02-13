@@ -456,7 +456,7 @@ internal class CallRepositoryImpl @Inject constructor(
             .mapNotNull { ResultOccurrenceUpdate(it.chatId, it.append) }
             .flowOn(dispatcher)
 
-    override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
+    override suspend fun getCallChatIdList(state: ChatCallStatus) = withContext(dispatcher) {
         megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(state))
             ?.let { handleListMapper(it) } ?: emptyList()
     }

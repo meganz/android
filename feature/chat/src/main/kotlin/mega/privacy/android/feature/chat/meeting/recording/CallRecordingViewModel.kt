@@ -9,13 +9,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.call.CallRecordingConsentStatus
+import mega.privacy.android.domain.entity.call.CallRecordingEvent
 import mega.privacy.android.domain.usecase.call.BroadcastCallRecordingConsentEventUseCase
 import mega.privacy.android.domain.usecase.call.HangChatCallByChatIdUseCase
 import mega.privacy.android.domain.usecase.call.MonitorCallRecordingConsentEventUseCase
-import mega.privacy.android.domain.usecase.call.MonitorCallSessionOnRecordingUseCase
+import mega.privacy.android.domain.usecase.call.MonitorRecordedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorCallInChatUseCase
 import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
@@ -30,7 +32,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CallRecordingViewModel @Inject constructor(
-    private val monitorCallSessionOnRecordingUseCase: MonitorCallSessionOnRecordingUseCase,
+    private val monitorRecordedChatsUseCase: MonitorRecordedChatsUseCase,
     private val hangChatCallByChatIdUseCase: HangChatCallByChatIdUseCase,
     private val broadcastCallRecordingConsentEventUseCase: BroadcastCallRecordingConsentEventUseCase,
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase,
@@ -79,17 +81,19 @@ class CallRecordingViewModel @Inject constructor(
     private fun monitorCallSessionOnRecording(chatId: Long) {
         monitorCallSessionOnRecordingJob?.cancel()
         monitorCallSessionOnRecordingJob = viewModelScope.launch {
-            monitorCallSessionOnRecordingUseCase(chatId)
+            monitorRecordedChatsUseCase().filter { it.chatId == chatId }
                 .catch { Timber.d(it) }
                 .collectLatest { callRecordingEvent ->
-                    callRecordingEvent?.let {
-                        _state.update { state ->
-                            state.copy(callRecordingEvent = callRecordingEvent)
-                        }
-                        if (!it.isSessionOnRecording) {
-                            broadcastCallRecordingConsentEvent(CallRecordingConsentStatus.None)
-                        }
+                    _state.update { state ->
+                        state.copy(
+                            isSessionOnRecording = callRecordingEvent.isSessionOnRecording,
+                            participantRecording = (callRecordingEvent as? CallRecordingEvent.Recording)?.participantRecording,
+                        )
                     }
+                    if (callRecordingEvent.isSessionOnRecording.not()) {
+                        broadcastCallRecordingConsentEvent(CallRecordingConsentStatus.None)
+                    }
+
                 }
         }
     }
@@ -111,9 +115,7 @@ class CallRecordingViewModel @Inject constructor(
                             }
 
                             state.copy(
-                                callRecordingEvent = state.callRecordingEvent.copy(
-                                    isSessionOnRecording = isRecording
-                                ),
+                                isSessionOnRecording = isRecording,
                                 isParticipatingInCall = isParticipatingInCall,
                             )
                         } ?: CallRecordingUIState()
@@ -128,7 +130,7 @@ class CallRecordingViewModel @Inject constructor(
     fun setParticipantRecordingConsumed() {
         _state.update { state ->
             state.copy(
-                callRecordingEvent = state.callRecordingEvent.copy(participantRecording = null)
+                participantRecording = null,
             )
         }
     }

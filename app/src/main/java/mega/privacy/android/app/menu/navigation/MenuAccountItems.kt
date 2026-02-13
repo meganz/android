@@ -1,9 +1,11 @@
 package mega.privacy.android.app.menu.navigation
 
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.call.MonitorActiveCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorHasActiveCallUseCase
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.DefaultIconBadge
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
@@ -31,6 +33,7 @@ import mega.privacy.mobile.analytics.event.MyMenuSharedItemsNavigationItemEvent
 import mega.privacy.mobile.analytics.event.MyMenuStorageNavigationItemEvent
 import mega.privacy.mobile.analytics.event.MyMenuTransfersNavigationItemEvent
 import mega.privacy.mobile.analytics.event.MyMenuUpgradeNavigationItemEvent
+import timber.log.Timber
 
 object CurrentPlanItem : NavDrawerItem.Account(
     destination = UpgradeAccountNavKey(),
@@ -70,13 +73,19 @@ object SharedItemsItem : NavDrawerItem.Account(
 
 class ChatItem(
     getNumUnreadChatsUseCase: GetNumUnreadChatsUseCase,
-    monitorHasActiveCallUseCase: MonitorHasActiveCallUseCase,
+    monitorActiveCallUseCase: MonitorActiveCallUseCase,
 ) : NavDrawerItem.Account(
     destination = ChatListNavKey(),
     icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
     title = sharedR.string.general_chat,
     badge = combine(
-        monitorHasActiveCallUseCase(),
+        monitorActiveCallUseCase()
+            .onEach {
+                Timber.d("ChatMenuItem Active call event: $it")
+            }
+            .map {
+                it != null
+            },
         getNumUnreadChatsUseCase()
     ) { ongoingCall, unreadChats ->
         if (ongoingCall) {

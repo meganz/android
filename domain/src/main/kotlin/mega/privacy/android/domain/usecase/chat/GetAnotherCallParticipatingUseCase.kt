@@ -20,7 +20,7 @@ class GetAnotherCallParticipatingUseCase @Inject constructor(
     suspend operator fun invoke(chatId: Long): Long {
         listOf(ChatCallStatus.InProgress, ChatCallStatus.Joining, ChatCallStatus.Connecting)
             .forEach {
-                callRepository.getCallHandleList(it).find { id -> id != chatId }
+                callRepository.getCallChatIdList(it).find { id -> id != chatId }
                     ?.let { id ->
                         return id
                     }

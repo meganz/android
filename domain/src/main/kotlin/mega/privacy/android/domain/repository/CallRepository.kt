@@ -301,11 +301,11 @@ interface CallRepository {
      *
      * @param state handle list will be fetched with the calls having this state
      *              Instance of [ChatCallStatus]
-     * @return List [Long] of call handles which user is participating
+     * @return List [Long] of chat handles which user is participating
      *         empty list is output is null or throws any errors
      *         returns all calls regardless their state if state is [ChatCallStatus.Unknown]
      */
-    suspend fun getCallHandleList(state: ChatCallStatus): List<Long>
+    suspend fun getCallChatIdList(state: ChatCallStatus): List<Long>
 
     /**
      * Get a list with the ids of active calls

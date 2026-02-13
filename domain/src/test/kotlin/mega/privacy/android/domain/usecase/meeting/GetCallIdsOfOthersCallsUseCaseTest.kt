@@ -28,7 +28,7 @@ class GetCallIdsOfOthersCallsUseCaseTest {
     @Test
     fun `test that empty lists return empty`() = runTest {
         callRepository.stub {
-            onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
+            onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
         }
 
         Truth.assertThat(underTest(chatId)).isEqualTo(emptyList<Long>())
@@ -37,7 +37,7 @@ class GetCallIdsOfOthersCallsUseCaseTest {
     @Test
     fun `test that call in current chat is not returned`() = runTest {
         callRepository.stub {
-            onBlocking { getCallHandleList(any()) }.thenReturn(listOf(chatId))
+            onBlocking { getCallChatIdList(any()) }.thenReturn(listOf(chatId))
         }
 
         Truth.assertThat(underTest(chatId)).isEqualTo(emptyList<Long>())
@@ -51,8 +51,8 @@ class GetCallIdsOfOthersCallsUseCaseTest {
     internal fun `test value returned`(type: ChatCallStatus) = runTest {
         val expected = listOf(1234L)
         callRepository.stub {
-            onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
-            onBlocking { getCallHandleList(type) }.thenReturn(expected)
+            onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
+            onBlocking { getCallChatIdList(type) }.thenReturn(expected)
         }
 
         Truth.assertThat(underTest(chatId)).isEqualTo(expected)
@@ -68,8 +68,8 @@ class GetCallIdsOfOthersCallsUseCaseTest {
             val received = listOf(chatId, 1234L)
             val expected = listOf(1234L)
             callRepository.stub {
-                onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
-                onBlocking { getCallHandleList(type) }.thenReturn(received)
+                onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
+                onBlocking { getCallChatIdList(type) }.thenReturn(received)
             }
 
             Truth.assertThat(underTest(chatId)).isEqualTo(expected)
@@ -83,8 +83,8 @@ class GetCallIdsOfOthersCallsUseCaseTest {
     internal fun `test value returned with two calls`(type: ChatCallStatus) = runTest {
         val expected = listOf(1234L, 2345L)
         callRepository.stub {
-            onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
-            onBlocking { getCallHandleList(type) }.thenReturn(expected)
+            onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
+            onBlocking { getCallChatIdList(type) }.thenReturn(expected)
         }
 
         Truth.assertThat(underTest(chatId)).isEqualTo(expected)
@@ -100,8 +100,8 @@ class GetCallIdsOfOthersCallsUseCaseTest {
             val received = listOf(chatId, 1234L, 2345L)
             val expected = listOf(1234L, 2345L)
             callRepository.stub {
-                onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
-                onBlocking { getCallHandleList(type) }.thenReturn(received)
+                onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
+                onBlocking { getCallChatIdList(type) }.thenReturn(received)
             }
 
             Truth.assertThat(underTest(chatId)).isEqualTo(expected)
@@ -115,8 +115,8 @@ class GetCallIdsOfOthersCallsUseCaseTest {
     internal fun `test value returned with three calls`(type: ChatCallStatus) = runTest {
         val expected = listOf(1234L, 23445L, 3456L)
         callRepository.stub {
-            onBlocking { getCallHandleList(any()) }.thenReturn(emptyList())
-            onBlocking { getCallHandleList(type) }.thenReturn(expected)
+            onBlocking { getCallChatIdList(any()) }.thenReturn(emptyList())
+            onBlocking { getCallChatIdList(type) }.thenReturn(expected)
         }
 
         Truth.assertThat(underTest(chatId)).isEqualTo(expected)

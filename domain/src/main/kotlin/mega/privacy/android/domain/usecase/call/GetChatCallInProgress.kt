@@ -17,19 +17,19 @@ class GetChatCallInProgress @Inject constructor(
      * @return                  [ChatCall]
      */
     suspend operator fun invoke(): ChatCall? = with(callRepository) {
-        getCall(getCallHandleList(ChatCallStatus.Initial))?.let {
+        getCall(getCallChatIdList(ChatCallStatus.Initial))?.let {
             return@with it
         }
 
-        getCall(getCallHandleList(ChatCallStatus.Connecting))?.let {
+        getCall(getCallChatIdList(ChatCallStatus.Connecting))?.let {
             return@with it
         }
 
-        getCall(getCallHandleList(ChatCallStatus.Joining))?.let {
+        getCall(getCallChatIdList(ChatCallStatus.Joining))?.let {
             return@with it
         }
 
-        getCall(getCallHandleList(ChatCallStatus.InProgress))?.let {
+        getCall(getCallChatIdList(ChatCallStatus.InProgress))?.let {
             return@with it
         }
 

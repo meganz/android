@@ -37,7 +37,7 @@ internal class GetAnotherCallParticipatingUseCaseTest {
     @Test
     fun `test that an invalid chat handle is returned when the call handle list is empty`() =
         runTest {
-            whenever(callRepository.getCallHandleList(any())).thenReturn(emptyList())
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(emptyList())
             whenever(chatRepository.getChatInvalidHandle()).thenReturn(-1L)
             Truth.assertThat(underTest(1)).isEqualTo(-1L)
         }
@@ -46,7 +46,7 @@ internal class GetAnotherCallParticipatingUseCaseTest {
     fun `test that an invalid chat handle is returned when the call handle list only contains a single chat id`() =
         runTest {
             val chatId = 1L
-            whenever(callRepository.getCallHandleList(any())).thenReturn(listOf(chatId))
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(listOf(chatId))
             whenever(chatRepository.getChatInvalidHandle()).thenReturn(-1L)
             Truth.assertThat(underTest(chatId)).isEqualTo(-1L)
         }
@@ -55,7 +55,7 @@ internal class GetAnotherCallParticipatingUseCaseTest {
     fun `test that the correct chat handle is returned when the call handle list does not contain the chat id`() =
         runTest {
             val chatId = 1L
-            whenever(callRepository.getCallHandleList(any())).thenReturn(listOf(2L, 3L))
+            whenever(callRepository.getCallChatIdList(any())).thenReturn(listOf(2L, 3L))
             whenever(chatRepository.getChatInvalidHandle()).thenReturn(-1L)
             Truth.assertThat(underTest(chatId)).isEqualTo(2L)
         }

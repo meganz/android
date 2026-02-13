@@ -17,5 +17,5 @@ class GetCallHandleListUseCase @Inject constructor(
      *
      * @param status
      */
-    suspend operator fun invoke(status: ChatCallStatus) = repository.getCallHandleList(status)
+    suspend operator fun invoke(status: ChatCallStatus) = repository.getCallChatIdList(status)
 }
