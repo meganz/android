@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
@@ -70,6 +71,9 @@ fun RecentsBucketScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    ReportSelectionMode(isInSelectionMode = uiState.isInSelectionMode)
+
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }

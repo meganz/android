@@ -52,6 +52,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.Clou
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -86,6 +87,9 @@ internal fun DriveSyncScreen(
     initialTabIndex: Int = 0,
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
+
+    ReportSelectionMode(isInSelectionMode = cloudDriveUiState.isInSelectionMode)
+
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
