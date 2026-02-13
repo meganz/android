@@ -204,21 +204,28 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             val videoInputTrack = getAndSelectVideoTrackIndex(videoExtractor)
             val inputFormat = videoExtractor.getTrackFormat(videoInputTrack)
             val metadataRetriever = MediaMetadataRetriever()
-            metadataRetriever.setDataSource(inputUriPath.value)
-            getOriginalWidthAndHeight(metadataRetriever)
-            val bitrate = getBitrate(
-                (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
-                    ?: return@suspendCancellableCoroutine)
-                    .toInt(), config.videoQuality
-            )
-            val frameRate =
-                if (inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)) inputFormat.getInteger(
-                    MediaFormat.KEY_FRAME_RATE
-                ) else OUTPUT_VIDEO_FRAME_RATE
-            val duration =
-                (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    ?: return@suspendCancellableCoroutine).toLong()
-            videoAttachment.totalDuration = duration
+            val bitrate: Int
+            val frameRate: Int
+            val duration: Long
+            try {
+                metadataRetriever.setDataSource(inputUriPath.value)
+                getOriginalWidthAndHeight(metadataRetriever)
+                bitrate = getBitrate(
+                    (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
+                        ?: return@suspendCancellableCoroutine)
+                        .toInt(), config.videoQuality
+                )
+                frameRate =
+                    if (inputFormat.containsKey(MediaFormat.KEY_FRAME_RATE)) inputFormat.getInteger(
+                        MediaFormat.KEY_FRAME_RATE
+                    ) else OUTPUT_VIDEO_FRAME_RATE
+                duration =
+                    (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        ?: return@suspendCancellableCoroutine).toLong()
+                videoAttachment.totalDuration = duration
+            } finally {
+                metadataRetriever.release()
+            }
 
             Timber.d("Video result width: ${config.resultWidth}, result height: ${config.resultHeight}, encode bitrate: $bitrate, encode frame rate: $frameRate")
 
