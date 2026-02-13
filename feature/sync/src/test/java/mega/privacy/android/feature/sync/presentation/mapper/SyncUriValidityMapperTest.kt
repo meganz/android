@@ -5,10 +5,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -16,7 +18,7 @@ import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
-import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityResult
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -41,6 +43,7 @@ class SyncUriValidityMapperTest {
     private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase = mock()
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: SyncUriValidityMapper
 
@@ -53,10 +56,10 @@ class SyncUriValidityMapperTest {
             getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
-
 
     @AfterEach
     fun resetAndTearDown() {
@@ -67,8 +70,41 @@ class SyncUriValidityMapperTest {
             getSecondaryFolderPathUseCase,
             getPrimaryFolderPathUseCase,
             isCameraUploadsEnabledUseCase,
-            isMediaUploadsEnabledUseCase
+            isMediaUploadsEnabledUseCase,
+            getFeatureFlagValueUseCase
         )
+    }
+
+    /**
+     * Common stub method to reduce boilerplate in tests.
+     * Provides default values that can be overridden for specific test cases.
+     */
+    private suspend fun stubCommonMocks(
+        documentUri: String,
+        documentPath: String? = null,
+        dcimPath: String = "",
+        cameraUploadsPath: String = "",
+        mediaUploadPath: String = "",
+        isCameraUploadsEnabled: Boolean = false,
+        isMediaUploadsEnabled: Boolean = false,
+        folderPairs: List<FolderPair> = emptyList(),
+        folderPathOverrides: Map<String, String?> = emptyMap(),
+        isDCIMSelectionEnabled: Boolean = false,
+    ) {
+        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(documentPath)
+        whenever(getLocalDCIMFolderPathUseCase()).thenReturn(dcimPath)
+        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsPath)
+        whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(isCameraUploadsEnabled)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(isMediaUploadsEnabled)
+        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+            .thenReturn(isDCIMSelectionEnabled)
+
+        // Override path mappings for specific URIs (useful for folder pair paths)
+        folderPathOverrides.forEach { (uri, path) ->
+            whenever(getPathByDocumentContentUriUseCase(uri)).thenReturn(path)
+        }
     }
 
     @Test
@@ -77,18 +113,21 @@ class SyncUriValidityMapperTest {
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
         val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(dcimPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn(dcimPath)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
 
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = dcimPath,
+            dcimPath = dcimPath,
+            cameraUploadsPath = cameraUploadsFolder,
+            mediaUploadPath = mediaUploadPath,
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
     }
 
@@ -98,17 +137,21 @@ class SyncUriValidityMapperTest {
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
         val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(dcimPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn(dcimPath)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = dcimPath,
+            dcimPath = dcimPath,
+            cameraUploadsPath = cameraUploadsFolder,
+            mediaUploadPath = mediaUploadPath,
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
     }
 
@@ -118,17 +161,21 @@ class SyncUriValidityMapperTest {
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
         val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(dcimPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn(dcimPath)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = dcimPath,
+            dcimPath = dcimPath,
+            cameraUploadsPath = cameraUploadsFolder,
+            mediaUploadPath = mediaUploadPath,
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
     }
 
@@ -139,11 +186,6 @@ class SyncUriValidityMapperTest {
         val folderPath = "/storage/emulated/0/Photos"
         val dcimPath = "/storage/emulated/0/DCIM"
         val cameraUploadsPath = "/emulated/0/SHARED_PHOTOS"
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn(dcimPath)
-        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsPath)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
         val folderPairs = listOf(
             FolderPair(
                 id = 1234L,
@@ -158,13 +200,21 @@ class SyncUriValidityMapperTest {
             SyncType.TYPE_BACKUP -> sharedR.string.sync_local_device_folder_currently_backed_up_message
             else -> sharedR.string.sync_local_device_folder_currently_synced_message
         }
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath,
+            dcimPath = dcimPath,
+            cameraUploadsPath = cameraUploadsPath,
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true,
+            folderPairs = folderPairs
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(snackbarMessage)
     }
 
@@ -174,18 +224,20 @@ class SyncUriValidityMapperTest {
         val folderPath = "/storage/emulated/0/Photos"
         val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
         val mediaUploadPath = "content://storage/emulated/0/SHARED_PHOTOS"
-        whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-        whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath,
+            cameraUploadsPath = cameraUploadsFolder,
+            mediaUploadPath = mediaUploadPath,
+            isCameraUploadsEnabled = true,
+            isMediaUploadsEnabled = true
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.localFolderUri.value).isEqualTo(documentUri)
         assertThat(validResult.folderName).isEqualTo("Photos")
     }
@@ -193,11 +245,15 @@ class SyncUriValidityMapperTest {
     @Test
     fun `test that invalid folder returns invalid result`() = runTest {
         val documentUri = "content://invalid/path"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(null)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = null
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
+        assertThat(result).isEqualTo(SyncValidityResult.Invalid)
     }
 
     @Test
@@ -215,21 +271,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
-            folderPath
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://storage/emulated/0/Photos" to folderPath)
         )
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
     }
 
@@ -249,21 +301,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
-        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
-            localPath
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = externalPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://storage/emulated/0/Photos" to localPath)
         )
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.general_sync_active_sync_below_path)
     }
 
@@ -283,21 +331,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
-        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos/Vacation")).thenReturn(
-            localPath
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = externalPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://storage/emulated/0/Photos/Vacation" to localPath)
         )
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder)
     }
 
@@ -317,21 +361,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
-        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
-            localPath
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = externalPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://storage/emulated/0/Photos" to localPath)
         )
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ShowSnackbar::class.java)
-        val snackbarResult = result as SyncUriValidityResult.ShowSnackbar
+        assertThat(result).isInstanceOf(SyncValidityResult.ShowSnackbar::class.java)
+        val snackbarResult = result as SyncValidityResult.ShowSnackbar
         assertThat(snackbarResult.messageResId).isEqualTo(sharedR.string.sync_local_device_folder_currently_backed_up_message)
     }
 
@@ -351,21 +391,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(externalPath)
-        whenever(getPathByDocumentContentUriUseCase("content://storage/emulated/0/Photos")).thenReturn(
-            localPath
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = externalPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://storage/emulated/0/Photos" to localPath)
         )
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("Photos2")
     }
 
@@ -376,18 +412,20 @@ class SyncUriValidityMapperTest {
             val folderPath = "/storage/emulated/0/DCIM_PHOTOS"
             val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
             val mediaUploadPath = "content://storage/emulated/0/SHARED_PHOTOS"
-            whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-            whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-            whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-            whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+
+            stubCommonMocks(
+                documentUri = documentUri,
+                documentPath = folderPath,
+                cameraUploadsPath = cameraUploadsFolder,
+                mediaUploadPath = mediaUploadPath,
+                isCameraUploadsEnabled = false,
+                isMediaUploadsEnabled = true
+            )
 
             val result = underTest(documentUri)
 
-            assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-            val validResult = result as SyncUriValidityResult.ValidFolderSelected
+            assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+            val validResult = result as SyncValidityResult.ValidFolderSelected
             assertThat(validResult.folderName).isEqualTo("DCIM_PHOTOS")
         }
 
@@ -398,18 +436,20 @@ class SyncUriValidityMapperTest {
             val folderPath = "/storage/emulated/0/PHOTOS"
             val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
             val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-            whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-            whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-            whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-            whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-            whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
-            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+            stubCommonMocks(
+                documentUri = documentUri,
+                documentPath = folderPath,
+                cameraUploadsPath = cameraUploadsFolder,
+                mediaUploadPath = mediaUploadPath,
+                isCameraUploadsEnabled = true,
+                isMediaUploadsEnabled = false
+            )
 
             val result = underTest(documentUri)
 
-            assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-            val validResult = result as SyncUriValidityResult.ValidFolderSelected
+            assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+            val validResult = result as SyncValidityResult.ValidFolderSelected
             assertThat(validResult.folderName).isEqualTo("PHOTOS")
         }
 
@@ -420,18 +460,18 @@ class SyncUriValidityMapperTest {
             val folderPath = "/storage/emulated/0/DCIM_PHOTOS"
             val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
             val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-            whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-            whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-            whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-            whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+            stubCommonMocks(
+                documentUri = documentUri,
+                documentPath = folderPath,
+                cameraUploadsPath = cameraUploadsFolder,
+                mediaUploadPath = mediaUploadPath
+            )
 
             val result = underTest(documentUri)
 
-            assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-            val validResult = result as SyncUriValidityResult.ValidFolderSelected
+            assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+            val validResult = result as SyncValidityResult.ValidFolderSelected
             assertThat(validResult.folderName).isEqualTo("DCIM_PHOTOS")
         }
 
@@ -442,69 +482,63 @@ class SyncUriValidityMapperTest {
             val folderPath = "/storage/emulated/0/PHOTOS"
             val cameraUploadsFolder = "/storage/emulated/0/DCIM_PHOTOS"
             val mediaUploadPath = "content://storage/emulated/0/PHOTOS"
-            whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-            whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-            whenever(getPrimaryFolderPathUseCase()).thenReturn(cameraUploadsFolder)
-            whenever(getSecondaryFolderPathUseCase()).thenReturn(mediaUploadPath)
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+            stubCommonMocks(
+                documentUri = documentUri,
+                documentPath = folderPath,
+                cameraUploadsPath = cameraUploadsFolder,
+                mediaUploadPath = mediaUploadPath
+            )
 
             val result = underTest(documentUri)
 
-            assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-            val validResult = result as SyncUriValidityResult.ValidFolderSelected
+            assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+            val validResult = result as SyncValidityResult.ValidFolderSelected
             assertThat(validResult.folderName).isEqualTo("PHOTOS")
         }
 
     @Test
     fun `test that empty folder path returns invalid result`() = runTest {
         val documentUri = "content://storage/emulated/0/"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn("")
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = ""
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
+        assertThat(result).isEqualTo(SyncValidityResult.Invalid)
     }
 
     @Test
     fun `test that folder path with only separator returns invalid result`() = runTest {
         val documentUri = "content://storage/emulated/0/"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn("/")
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = "/"
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
+        assertThat(result).isEqualTo(SyncValidityResult.Invalid)
     }
 
     @Test
     fun `test that folder path with trailing slash is handled correctly`() = runTest {
         val documentUri = "content://storage/emulated/0/Photos/"
         val folderPath = "/storage/emulated/0/Photos/"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("Photos")
     }
 
@@ -512,18 +546,16 @@ class SyncUriValidityMapperTest {
     fun `test that folder path with multiple trailing slashes is handled correctly`() = runTest {
         val documentUri = "content://storage/emulated/0/Photos///"
         val folderPath = "/storage/emulated/0/Photos///"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("Photos")
     }
 
@@ -531,18 +563,16 @@ class SyncUriValidityMapperTest {
     fun `test that folder path with spaces in name is handled correctly`() = runTest {
         val documentUri = "content://storage/emulated/0/My Photos/"
         val folderPath = "/storage/emulated/0/My Photos/"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("My Photos")
     }
 
@@ -550,18 +580,16 @@ class SyncUriValidityMapperTest {
     fun `test that folder path with special characters is handled correctly`() = runTest {
         val documentUri = "content://storage/emulated/0/Photos-2024/"
         val folderPath = "/storage/emulated/0/Photos-2024/"
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("Photos-2024")
     }
 
@@ -573,13 +601,14 @@ class SyncUriValidityMapperTest {
 
             val result = underTest(documentUri)
 
-            assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
+            assertThat(result).isEqualTo(SyncValidityResult.Invalid)
         }
 
     @Test
     fun `test that exception in getFolderPairsUseCase returns invalid result`() = runTest {
         val documentUri = "content://storage/emulated/0/Photos"
         val folderPath = "/storage/emulated/0/Photos"
+
         whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
         whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
         whenever(getPrimaryFolderPathUseCase()).thenReturn("")
@@ -590,7 +619,7 @@ class SyncUriValidityMapperTest {
 
         val result = underTest(documentUri)
 
-        assertThat(result).isEqualTo(SyncUriValidityResult.Invalid)
+        assertThat(result).isEqualTo(SyncValidityResult.Invalid)
     }
 
     @Test
@@ -608,19 +637,17 @@ class SyncUriValidityMapperTest {
             )
         )
 
-        whenever(getPathByDocumentContentUriUseCase(documentUri)).thenReturn(folderPath)
-        whenever(getPathByDocumentContentUriUseCase("content://invalid/path")).thenReturn(null)
-        whenever(getFolderPairsUseCase()).thenReturn(folderPairs)
-        whenever(getLocalDCIMFolderPathUseCase()).thenReturn("")
-        whenever(getPrimaryFolderPathUseCase()).thenReturn("")
-        whenever(getSecondaryFolderPathUseCase()).thenReturn("")
-        whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
-        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+        stubCommonMocks(
+            documentUri = documentUri,
+            documentPath = folderPath,
+            folderPairs = folderPairs,
+            folderPathOverrides = mapOf("content://invalid/path" to null)
+        )
 
         val result = underTest(documentUri)
 
-        assertThat(result).isInstanceOf(SyncUriValidityResult.ValidFolderSelected::class.java)
-        val validResult = result as SyncUriValidityResult.ValidFolderSelected
+        assertThat(result).isInstanceOf(SyncValidityResult.ValidFolderSelected::class.java)
+        val validResult = result as SyncValidityResult.ValidFolderSelected
         assertThat(validResult.folderName).isEqualTo("Photos")
     }
 

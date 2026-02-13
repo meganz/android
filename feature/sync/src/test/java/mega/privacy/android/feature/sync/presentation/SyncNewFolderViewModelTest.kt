@@ -30,7 +30,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCa
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
-import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityResult
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderState
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
@@ -100,7 +100,7 @@ internal class SyncNewFolderViewModelTest {
                 selectedFolderName = folderName
             )
             whenever(syncUriValidityMapper(localFolderUri)).thenReturn(
-                SyncUriValidityResult.ValidFolderSelected(
+                SyncValidityResult.ValidFolderSelected(
                     localFolderUri = UriPath(localFolderUri),
                     folderName = folderName
                 )
@@ -128,7 +128,7 @@ internal class SyncNewFolderViewModelTest {
         whenever(uri.toString()).thenReturn(localFolderUri)
         whenever(documentFile.uri).thenReturn(uri)
         whenever(syncUriValidityMapper(localFolderUri)).thenReturn(
-            SyncUriValidityResult.ShowSnackbar(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
+            SyncValidityResult.ShowSnackbar(sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message)
         )
 
         underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(documentFile))
@@ -158,7 +158,7 @@ internal class SyncNewFolderViewModelTest {
             else -> sharedR.string.sync_local_device_folder_currently_synced_message
         }
         whenever(syncUriValidityMapper(localFolderUri)).thenReturn(
-            SyncUriValidityResult.ShowSnackbar(snackbarMessage)
+            SyncValidityResult.ShowSnackbar(snackbarMessage)
         )
         underTest.handleAction(SyncNewFolderAction.LocalFolderSelected(documentFile))
 

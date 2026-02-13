@@ -2,10 +2,12 @@ package mega.privacy.android.feature.sync.ui.mapper.sync
 
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.usecase.GetLocalDCIMFolderPathUseCase
@@ -14,17 +16,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-
-/**
- * Interface for validating the URI of a sync folder.
- */
-sealed interface SyncUriValidityResult {
-    data class ShowSnackbar(val messageResId: Int) : SyncUriValidityResult
-    data class ValidFolderSelected(val localFolderUri: UriPath, val folderName: String) :
-        SyncUriValidityResult
-
-    object Invalid : SyncUriValidityResult
-}
 
 /**
  * Mapper class for validating the URI of a sync folder.
@@ -37,28 +28,29 @@ class SyncUriValidityMapper @Inject constructor(
     private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase,
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
 
-    suspend operator fun invoke(documentUri: String): SyncUriValidityResult {
+    suspend operator fun invoke(documentUri: String): SyncValidityResult {
         runCatching {
             val externalPath =
                 getPathByDocumentContentUriUseCase(documentUri)
             externalPath?.let { path ->
                 if (path.isEmpty() || path == "/" || path == File.separator) {
-                    return SyncUriValidityResult.Invalid
+                    return SyncValidityResult.Invalid
                 }
                 val localDCIMFolderPath = getLocalDCIMFolderPathUseCase()
-                val primaryFolderPathUseCase = getPrimaryFolderPathUseCase().removeSuffix("/")
-                val mediaUploadPath = getSecondaryFolderPathUseCase().removeSuffix("/")
+                val primaryFolderPath = getPrimaryFolderPathUseCase()
+                val mediaUploadPath = getSecondaryFolderPathUseCase()
                 val folderPairs = getFolderPairsUseCase()
                 if (checkIfPathIsAlreadySynced(
                         path,
                         localDCIMFolderPath,
-                        primaryFolderPathUseCase,
+                        primaryFolderPath,
                         mediaUploadPath
                     )
                 ) {
-                    return SyncUriValidityResult.ShowSnackbar(
+                    return SyncValidityResult.ShowSnackbar(
                         messageResId = sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message
                     )
                 }
@@ -92,38 +84,48 @@ class SyncUriValidityMapper @Inject constructor(
                         }
                     }
                     snackbarMessage?.let {
-                        return SyncUriValidityResult.ShowSnackbar(messageResId = snackbarMessage)
+                        return SyncValidityResult.ShowSnackbar(messageResId = snackbarMessage)
                     }
                 }
                 val folderName = extractFolderName(path)
                 if (folderName.isEmpty()) {
-                    return SyncUriValidityResult.Invalid
+                    return SyncValidityResult.Invalid
                 }
-                return SyncUriValidityResult.ValidFolderSelected(
+                return SyncValidityResult.ValidFolderSelected(
                     localFolderUri = UriPath(documentUri),
                     folderName = folderName
                 )
             }
         }.onFailure {
             Timber.e(it)
-            return SyncUriValidityResult.Invalid
+            return SyncValidityResult.Invalid
         }
-        return SyncUriValidityResult.Invalid
+        return SyncValidityResult.Invalid
     }
+
 
     private suspend fun checkIfPathIsAlreadySynced(
         path: String,
         localDCIMFolderPath: String,
-        primaryFolderPathUseCase: String,
+        primaryFolderPath: String,
         mediaUploadPath: String,
     ): Boolean {
-        return (localDCIMFolderPath.isNotEmpty() && path.contains(localDCIMFolderPath))
-                || (isCameraUploadsEnabledUseCase() && (primaryFolderPathUseCase.isNotEmpty() && path.contains(
-            primaryFolderPathUseCase
-        )))
-                || (isMediaUploadsEnabledUseCase() && (mediaUploadPath.isNotEmpty() && path.contains(
-            mediaUploadPath
-        )))
+        val isNewDCIMLogicEnabled =
+            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+
+        val isCameraMatch = isCameraUploadsEnabledUseCase() &&
+                primaryFolderPath.isNotEmpty() &&
+                path.startsWith(primaryFolderPath)
+
+        val isMediaMatch = isMediaUploadsEnabledUseCase() &&
+                mediaUploadPath.isNotEmpty() &&
+                path.startsWith(mediaUploadPath)
+
+        val isLegacyDCIMMatch = !isNewDCIMLogicEnabled &&
+                localDCIMFolderPath.isNotEmpty() &&
+                path.startsWith(localDCIMFolderPath)
+
+        return isCameraMatch || isMediaMatch || isLegacyDCIMMatch
     }
 
     private suspend fun findDetailedMatchingFolderPair(
@@ -151,24 +153,12 @@ class SyncUriValidityMapper @Inject constructor(
 
         return when {
             normalizedLocal == normalizedExternal -> PathRelationship.EXACT_MATCH
-            isSubPath(
-                normalizedExternal,
-                normalizedLocal
-            ) -> PathRelationship.LOCAL_CONTAINS_EXTERNAL
+            UriPath(normalizedExternal).isSubPathOf(UriPath(normalizedLocal)) -> PathRelationship.LOCAL_CONTAINS_EXTERNAL
 
-            isSubPath(
-                normalizedLocal,
-                normalizedExternal
-            ) -> PathRelationship.EXTERNAL_CONTAINS_LOCAL
+            UriPath(normalizedLocal).isSubPathOf(UriPath(normalizedExternal)) -> PathRelationship.EXTERNAL_CONTAINS_LOCAL
 
             else -> PathRelationship.NO_MATCH
         }
-    }
-
-    private fun isSubPath(childPath: String, parentPath: String): Boolean {
-        val normalizedParent = parentPath.trimEnd('/', File.separatorChar)
-        return childPath.startsWith("$normalizedParent${File.separator}") ||
-                childPath.startsWith("$normalizedParent/")
     }
 
     private fun extractFolderName(path: String): String {

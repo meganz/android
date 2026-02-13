@@ -30,7 +30,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCa
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
-import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityResult
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = SyncNewFolderViewModel.SyncNewFolderViewModelFactory::class)
@@ -131,13 +131,13 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                     val documentFile = action.documentFile
                     val validityResult = syncUriValidityMapper(documentFile.uri.toString())
                     when (validityResult) {
-                        is SyncUriValidityResult.ShowSnackbar -> {
+                        is SyncValidityResult.ShowSnackbar -> {
                             _state.update { state ->
                                 state.copy(showSnackbar = triggered(validityResult.messageResId))
                             }
                         }
 
-                        is SyncUriValidityResult.ValidFolderSelected -> {
+                        is SyncValidityResult.ValidFolderSelected -> {
                             _state.update { state ->
                                 state.copy(
                                     selectedLocalFolder = validityResult.localFolderUri.value,
@@ -146,7 +146,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                             }
                         }
 
-                        SyncUriValidityResult.Invalid -> {
+                        SyncValidityResult.Invalid -> {
                             Timber.d("Invalid folder selected")
                             _state.update { state ->
                                 state.copy(
