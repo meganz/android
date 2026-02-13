@@ -60,6 +60,7 @@ fun <T : TypedNode> NodeListView(
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     inSelectionMode: Boolean = false,
     isContactVerificationOn: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
     bannerHeader: (@Composable () -> Unit)? = null,
 ) {
     FastScrollLazyColumn(
@@ -100,6 +101,7 @@ fun <T : TypedNode> NodeListView(
             NodeListViewItem(
                 nodeUiItem = nodeUiItemList[it],
                 isInSelectionMode = inSelectionMode,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
                 highlightText = highlightText,
                 onMoreClicked = onMenuClick,
                 onItemClicked = onItemClicked,

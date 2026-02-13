@@ -57,6 +57,7 @@ fun <T : TypedNode> NodeGridView(
     spanCount: Int = 2,
     showChangeViewType: Boolean = true,
     inSelectionMode: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
     listContentPadding: PaddingValues = PaddingValues(0.dp),
     bannerHeader: (@Composable () -> Unit)? = null,
 ) {
@@ -105,6 +106,7 @@ fun <T : TypedNode> NodeGridView(
             NodeGridViewItem(
                 nodeUiItem = nodeUiItems[it],
                 isInSelectionMode = inSelectionMode,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
                 highlightText = highlightText,
                 onItemClicked = onItemClicked,
                 onLongClicked = onLongClicked,

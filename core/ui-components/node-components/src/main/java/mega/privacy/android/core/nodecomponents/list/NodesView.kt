@@ -126,6 +126,7 @@ fun <T : TypedNode> NodesView(
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
             isContactVerificationOn = isContactVerificationOn,
+            isHiddenNodesEnabled = isHiddenNodesEnabled,
             bannerHeader = bannerHeader,
         )
     } else {
@@ -154,6 +155,7 @@ fun <T : TypedNode> NodesView(
             gridState = gridState,
             showMediaDiscoveryButton = showMediaDiscoveryButton,
             inSelectionMode = inSelectionMode,
+            isHiddenNodesEnabled = isHiddenNodesEnabled,
             bannerHeader = bannerHeader,
         )
     }
