@@ -489,18 +489,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    private fun getManageLinkEvent(): ManageLinkEvent? {
-        val userAlbum = (_state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User) ?: return null
-        val hasSensitiveMedia = sourcePhotos
-            ?.any { it.isSensitive || it.isSensitiveInherited }
-            ?: false
-
-        return ManageLinkEvent(
-            album = userAlbum,
-            hasSensitiveContent = hasSensitiveMedia
-        )
-    }
-
     fun resetManageLink() {
         _state.update {
             it.copy(manageLinkEvent = consumed())
@@ -822,7 +810,11 @@ class AlbumContentViewModel @AssistedInject constructor(
 
                     is AlbumContentSelectionAction.ManageLink, is AlbumContentSelectionAction.ShareLink -> {
                         _state.update {
-                            it.copy(manageLinkEvent = triggered(getManageLinkEvent()))
+                            it.copy(
+                                manageLinkEvent = triggered(
+                                    _state.value.uiAlbum?.mediaAlbum as? MediaAlbum.User
+                                )
+                            )
                         }
                     }
 

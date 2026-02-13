@@ -52,7 +52,6 @@ internal class AlbumsTabViewModelTest {
     private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
-    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase = mock()
 
     @BeforeEach
     fun setUp() {
@@ -64,7 +63,6 @@ internal class AlbumsTabViewModelTest {
             removeAlbumsUseCase,
             snackbarEventQueue,
             getNextDefaultAlbumNameUseCase,
-            albumHasSensitiveContentUseCase
         )
     }
 
@@ -78,7 +76,6 @@ internal class AlbumsTabViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
-            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase
         )
     }
 
@@ -162,7 +159,6 @@ internal class AlbumsTabViewModelTest {
             snackbarEventQueue = snackbarEventQueue,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
-            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase
         )
 
         underTest.uiState.test {
@@ -291,7 +287,6 @@ internal class AlbumsTabViewModelTest {
         runTest {
             whenever(mockAlbumsDataProvider.order).thenReturn(1)
             whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(emptyList()))
-            whenever(albumHasSensitiveContentUseCase(any(), eq(false))).thenReturn(false)
 
             initViewModel()
 
@@ -302,8 +297,9 @@ internal class AlbumsTabViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.navigationEvent).isEqualTo(
-                    triggered(AlbumGetLinkNavKey(albumId = 1L, hasSensitiveContent = false))
+                    triggered(AlbumGetLinkNavKey(albumId = 1L))
                 )
+
                 assertThat(state.selectedUserAlbums).isEmpty()
             }
         }

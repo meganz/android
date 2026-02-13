@@ -327,7 +327,7 @@ fun EntryProviderScope<NavKey>.albumGetLink(
         val context = LocalContext.current
         val albumGetLinkViewModel =
             hiltViewModel<AlbumGetLinkViewModel, AlbumGetLinkViewModel.Factory> {
-                it.create(args.albumId, args.hasSensitiveContent)
+                it.create(args.albumId)
             }
         AlbumGetLinkScreen(
             albumGetLinkViewModel = albumGetLinkViewModel,

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
+import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import org.junit.jupiter.api.Test
@@ -35,6 +36,7 @@ class AlbumGetLinkViewModelTest {
     private val shouldShowCopyrightUseCase: ShouldShowCopyrightUseCase = mock()
     private val setShowCopyrightUseCase: SetShowCopyrightUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
+    private val albumHasSensitiveContentUseCase: AlbumHasSensitiveContentUseCase = mock()
 
     @Test
     fun `test that fetch link works correctly`() = runTest {
@@ -60,8 +62,8 @@ class AlbumGetLinkViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase,
             albumId = 1L,
-            hasSensitiveElement = false
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))
@@ -74,6 +76,9 @@ class AlbumGetLinkViewModelTest {
             .thenReturn(listOf(AlbumIdLink(userAlbum.id, expectedLink)))
 
         whenever(shouldShowCopyrightUseCase())
+            .thenReturn(false)
+
+        whenever(albumHasSensitiveContentUseCase(userAlbum.id))
             .thenReturn(false)
 
         // when
@@ -109,8 +114,8 @@ class AlbumGetLinkViewModelTest {
             defaultDispatcher = UnconfinedTestDispatcher(),
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorThemeModeUseCase = monitorThemeModeUseCase,
+            albumHasSensitiveContentUseCase = albumHasSensitiveContentUseCase,
             albumId = 1L,
-            hasSensitiveElement = false
         )
 
         whenever(getUserAlbumUseCase(userAlbum.id))
@@ -123,6 +128,9 @@ class AlbumGetLinkViewModelTest {
             .thenReturn(listOf())
 
         whenever(shouldShowCopyrightUseCase())
+            .thenReturn(false)
+
+        whenever(albumHasSensitiveContentUseCase(userAlbum.id))
             .thenReturn(false)
 
         // when
