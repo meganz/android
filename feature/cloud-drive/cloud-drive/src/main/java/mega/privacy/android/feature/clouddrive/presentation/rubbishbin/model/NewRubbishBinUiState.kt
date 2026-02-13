@@ -44,7 +44,6 @@ data class NewRubbishBinUiState(
     val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
     val accountType: AccountType? = null,
     val isBusinessAccountExpired: Boolean = false,
-    val isHiddenNodesEnabled: Boolean = false,
     val isSelecting: Boolean = false,
     val messageEvent: StateEventWithContent<LocalizedText> = consumed(),
     val openedFileNode: TypedFileNode? = null,

@@ -273,10 +273,8 @@ internal fun RubbishBinScreen(
                     onSortOrderClick = { showSortBottomSheet = true },
                     onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
                     spanCount = spanCount,
-                    showHiddenNodes = uiState.isHiddenNodesEnabled
-                            && uiState.accountType?.isPaid == true
-                            && !uiState.isBusinessAccountExpired,
-                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                    showHiddenNodes = true, // always show hidden nodes on Rubbish Bin
+                    isHiddenNodesEnabled = true, // always enable hidden nodes on Rubbish Bin
                     inSelectionMode = uiState.isInSelectionMode,
                 )
             }

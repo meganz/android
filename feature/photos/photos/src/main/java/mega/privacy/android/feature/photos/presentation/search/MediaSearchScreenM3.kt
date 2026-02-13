@@ -22,11 +22,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -45,7 +42,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.delay
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -76,7 +72,6 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.shared.resources.R as sharedR
-import kotlin.time.Duration.Companion.milliseconds
 
 private typealias PhotoDownload =
         suspend (isPreview: Boolean, photo: Photo, callback: (success: Boolean) -> Unit) -> Unit
@@ -106,11 +101,11 @@ fun MediaSearchScreenM3(
                 selectedQuery = state.selectedQuery,
                 onUpdateQuery = updateQuery,
                 onSelectedQueryRead = { updateSelectedQuery(null) },
-                onSaveQuery = {
+                onSearch = {
+                    searchPhotos(it)
                     updateRecentQueries(it)
                     keyboardController?.hide()
                 },
-                onSearch = searchPhotos,
                 onCloseScreen = onCloseScreen,
             )
         },
@@ -141,22 +136,15 @@ private fun MediaSearchTopAppBar(
     selectedQuery: String?,
     onUpdateQuery: (String) -> Unit,
     onSelectedQueryRead: () -> Unit,
-    onSaveQuery: (String) -> Unit,
     onSearch: (String) -> Unit,
     onCloseScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var text by rememberSaveable { mutableStateOf("") }
-
-    LaunchedEffect(text) {
-        if (text.isNotBlank()) {
-            delay(300.milliseconds)
-        }
-        onSearch(text)
-    }
-
     LaunchedEffect(selectedQuery) {
-        selectedQuery?.let { text = it }
+        selectedQuery?.let {
+            onUpdateQuery(it)
+            onSearch(it)
+        }
         onSelectedQueryRead()
     }
 
@@ -171,11 +159,8 @@ private fun MediaSearchTopAppBar(
             }
         },
         searchPlaceholder = stringResource(sharedR.string.search_bar_placeholder_text),
-        onSearchAction = onSaveQuery,
-        onQueryChanged = {
-            text = it
-            onUpdateQuery(it)
-        },
+        onSearchAction = onSearch,
+        onQueryChanged = onUpdateQuery,
         isSearchingMode = true
     )
 }
