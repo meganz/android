@@ -36,12 +36,13 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
             // prevents long waiting time, worst case is that it will use a different cover
             .timeout(2.seconds)
             .firstOrNull()
-        val isPaid = accountDetail?.levelDetail?.accountType?.isPaid ?: false
+        val isPaid = accountDetail?.levelDetail?.accountType?.isPaid == true
         val isHiddenEnabled = showHiddenItems && isPaid
         val cover = findValidCover(
             albumPhotos = albumPhotos,
             selectedCoverId = selectedCoverId,
             isHiddenEnabled = isHiddenEnabled,
+            isPaid = isPaid,
             refresh = refresh,
         ) ?: return null
 
@@ -52,6 +53,7 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
         albumPhotos: List<AlbumPhotoId>,
         selectedCoverId: Long?,
         isHiddenEnabled: Boolean,
+        isPaid: Boolean,
         refresh: Boolean,
     ): Photo? {
         // Try selected cover first
@@ -62,7 +64,7 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
                     albumPhotoId = albumPhotoId,
                     refresh = refresh,
                 )
-                if (photo != null && isPhotoVisible(photo, isHiddenEnabled)) {
+                if (photo != null && isPhotoVisible(photo, isHiddenEnabled, isPaid)) {
                     return photo
                 }
             }
@@ -75,7 +77,7 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
                 albumPhotoId = albumPhotoId,
                 refresh = refresh,
             )
-            if (photo != null && isPhotoVisible(photo, isHiddenEnabled)) {
+            if (photo != null && isPhotoVisible(photo, isHiddenEnabled, isPaid)) {
                 return photo
             }
         }
@@ -83,6 +85,11 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
         return null
     }
 
-    private fun isPhotoVisible(photo: Photo, isHiddenEnabled: Boolean): Boolean =
-        isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited)
+    /**
+     * Determines if a photo should be visible for album cover selection.
+     * isSensitive and isSensitiveInherited only apply when isPaid is true.
+     * For free accounts, all photos are considered visible.
+     */
+    private fun isPhotoVisible(photo: Photo, isHiddenEnabled: Boolean, isPaid: Boolean): Boolean =
+        if (!isPaid) true else (isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited))
 }

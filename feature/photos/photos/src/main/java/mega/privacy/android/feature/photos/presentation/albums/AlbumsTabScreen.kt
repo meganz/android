@@ -130,7 +130,7 @@ internal fun AlbumsTabScreen(
                 val userAlbum = album.mediaAlbum as? MediaAlbum.User
                 val isSelected = userAlbum?.let { uiState.selectedUserAlbums.contains(it) } ?: false
                 val isSensitive =
-                    album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true
+                    uiState.showHiddenItems && (album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true)
 
                 AlbumGridItem(
                     modifier = Modifier
