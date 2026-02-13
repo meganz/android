@@ -2027,8 +2027,6 @@
     <string name="recovering_info">불러오는 중&#8230;</string>
     <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
     <string name="general_hi">안녕하세요</string>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">이름</string>
+    <string name="general_last_name">성</string>
 </resources>

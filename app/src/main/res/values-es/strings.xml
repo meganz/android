@@ -148,10 +148,6 @@
     <string name="login_before_share">Inicia sesión para poder compartir en MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tu enlace de confirmación ya no es válido. Es posible que tu cuenta ya esté activa o que hayas cancelado el registro.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Nombre</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Apellido(s)</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Entiendo que [B]si olvido mi contraseña, puedo perder mis datos[/B]. Más información sobre el [A]cifrado punto a punto de MEGA[/A].</string>
     <!-- warning dialog -->

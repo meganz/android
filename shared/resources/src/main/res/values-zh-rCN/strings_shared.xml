@@ -2043,8 +2043,6 @@
     <string name="offline_screen_empty_state_description">无离线文件</string>
     <string name="general_install_label">安装</string>
     <string name="general_app_update_download_success_message">应用更新已下载</string>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">名</string>
+    <string name="general_last_name">姓</string>
 </resources>

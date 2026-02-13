@@ -2145,8 +2145,6 @@
     <string name="offline_screen_empty_state_description">No hay archivos en Sin conexión</string>
     <string name="general_install_label">Instalar</string>
     <string name="general_app_update_download_success_message">Actualización de la aplicación descargada</string>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">Nombre</string>
+    <string name="general_last_name">Apellido(s)</string>
 </resources>

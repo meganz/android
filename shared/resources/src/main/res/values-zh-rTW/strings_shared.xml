@@ -2034,8 +2034,6 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">名字</string>
+    <string name="general_last_name">姓氏</string>
 </resources>

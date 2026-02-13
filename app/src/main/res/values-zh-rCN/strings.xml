@@ -144,10 +144,6 @@
     <string name="login_before_share">登入以使用MEGA共享</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的确认链接已失效。您的帐户可能已被激活，或者您可能已经取消注册。</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">名</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">姓</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">我了解[B]如果我忘记密码，则可能失去所有数据[/B]。了解更多关于[A]MEGA的端到端加密技术[/A]。</string>
     <!-- warning dialog -->

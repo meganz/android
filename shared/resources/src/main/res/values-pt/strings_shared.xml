@@ -2181,8 +2181,6 @@
     <string name="offline_screen_empty_state_description">Não há arquivos salvos para uso offline</string>
     <string name="general_install_label">Instalar</string>
     <string name="general_app_update_download_success_message">Foi feito o download da atualização do aplicativo</string>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">Nome</string>
+    <string name="general_last_name">Sobrenome</string>
 </resources>

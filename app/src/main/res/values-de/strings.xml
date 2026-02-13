@@ -146,10 +146,6 @@
     <string name="login_before_share">Einloggen, um Freigaben in MEGA zu erstellen</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Ihr Bestätigungslink ist nicht mehr gültig. Möglicherweise ist Ihr Account bereits aktiviert oder Sie haben Ihre Registrierung abgebrochen.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Vorname(n)</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Familienname</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Mir ist bekannt, dass ich [B]ohne mein Passwort alle meine Daten verliere[/B] Weitere Informationen über unsere [A]Ende-zu-Ende-Verschlüsselung[/A].</string>
     <!-- warning dialog -->

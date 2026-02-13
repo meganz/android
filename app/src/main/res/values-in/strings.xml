@@ -144,10 +144,6 @@
     <string name="login_before_share">Masuk untuk berbagi dengan MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Tautan konfirmasi anda tidak lagi valid. Akun anda mungkin sudah diaktifkan atau anda mungkin telah membatalkan pendaftaran anda.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Nama depan</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Nama belakang</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Saya mengerti bahwa [B]jika saya kehilangan kata sandi, saya mungkin kehilangan data saya[/B].  Baca lebih lanjut tentang [A]enkripsi ujung-ke-ujung MEGA[/A].</string>
     <!-- warning dialog -->

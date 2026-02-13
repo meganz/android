@@ -2172,8 +2172,6 @@
     <string name="offline_screen_empty_state_description">Niciun fișier salvat pentru offline</string>
     <string name="general_install_label">Instalează</string>
     <string name="general_app_update_download_success_message">Actualizare aplicație descărcată</string>
-    <!-- Label for First Name -->
-    <string name="general_first_name">First name</string>
-    <!-- Label for Last name -->
-    <string name="general_last_name">Last name</string>
+    <string name="general_first_name">Prenume</string>
+    <string name="general_last_name">Nume de familie</string>
 </resources>

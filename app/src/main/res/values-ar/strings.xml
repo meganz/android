@@ -154,10 +154,6 @@
     <string name="login_before_share">قم بتسجيل الدخول للمشاركة مع ميغا MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">رابط التأكيد الخاص بك لم يعد صالحًا. ربما تم تفعيل حسابك بالفعل أو ربما قمت بإلغاء اشتراكك.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">الاسم الأول</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">اسم العائلة</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">أدرك أنه[B] إذا فقدت كلمة المرور الخاصة بي، قد أفقد بياناتي[/B]. اقرأ المزيد حول [A]تشفير ميغا MEGA من طرف إلى طرف[/A].</string>
     <!-- warning dialog -->

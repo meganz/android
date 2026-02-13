@@ -144,10 +144,6 @@
     <string name="login_before_share">MEGA로 공유하려면 로그인하세요</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">확인 링크가 더 이상 유효하지 않습니다. 계정이 이미 활성화되었거나 가입을 취소했을 수 있습니다.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">이름</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">성</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">[B]내가 암호를 잊으면, 내 데이터를 잃는다[/B]는 것을 이해하였습니다. [A]MEGA의 종단간 암호화[/A]에 대하여 더 알아보기.</string>
     <!-- warning dialog -->
@@ -2217,7 +2213,7 @@
     <!-- The message of progress dialog when loading web content -->
     <string name="embed_web_browser_loading_message">잠시만 기다리세요&#8230;</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="business_label">기업용</string>
+    <string name="business_label">비즈니스</string>
     <!-- General label to show the status of something or someone -->
     <string name="status_label">상태</string>
     <!-- Business account status. Payment is overdue, but the account still active in grace period -->

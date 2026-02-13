@@ -144,10 +144,6 @@
     <string name="login_before_share">ลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">ลิงก์ยืนยันของคุณไม่สามารถใช้งานได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานแล้ว หรือคุณอาจยกเลิกการสมัครใช้งานของคุณ</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">ชื่อ</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">สกุล</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">ฉันเข้าใจว่า[B]ถ้าฉันทำรหัสผ่านหาย[/B] ฉันอาจสูญเสียข้อมูลของฉันได้ อ่านเพิ่มเติมเกี่ยวกับ[A]การเข้ารหัสลับแบบต้นทางถึงปลายทาง MEGA[/A] ได้</string>
     <!-- warning dialog -->

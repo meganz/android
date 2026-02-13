@@ -146,10 +146,6 @@
     <string name="login_before_share">Log in om te delen met MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">Uw bevestigingslink is niet langer geldig. Uw account is mogelijk al geactiveerd of u heeft uw aanmelding geannuleerd.</string>
-    <!-- First Name of the user -->
-    <string name="first_name_text">Voornaam</string>
-    <!-- Last name of the user -->
-    <string name="lastname_text">Achternaam</string>
     <!-- Text placed on the checkbox to make sure user agree that understand the danger of losing password -->
     <string name="top">Ik begrijp dat [B] als ik mijn wachtwoord verlies, ik mijn gegevens kan verliezen[/B]. Lees meer over [A]MEGA’s end-to-end codering[/A].</string>
     <!-- warning dialog -->
