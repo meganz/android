@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
     implementation(project(":shared:original-core-ui"))
@@ -41,6 +42,8 @@ dependencies {
     implementation(lib.mega.analytics)
     implementation(lib.mega.core.ui)
     implementation(lib.logging.timber)
+    implementation(lib.coil3)
+    implementation(lib.coil.compose)
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus

@@ -31,9 +31,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.achievements.referral.model.ReferralBonusesUIState
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.ReferralBonusAchievements
 import mega.privacy.android.domain.entity.contacts.ContactData

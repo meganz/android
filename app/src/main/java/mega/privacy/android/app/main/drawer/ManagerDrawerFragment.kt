@@ -32,8 +32,8 @@ import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.NavigationDrawerManager
 import mega.privacy.android.app.main.mapper.UserChatStatusIconMapper
 import mega.privacy.android.app.myAccount.MyAccountActivity
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.UnreadUserAlertsCheckType

@@ -1,18 +1,18 @@
-package mega.privacy.android.app.presentation.avatar.mapper
+package mega.privacy.android.feature.myaccount.presentation.mapper
 
 import android.content.Context
 import androidx.compose.ui.unit.TextUnit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
-import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
 import java.io.File
 import javax.inject.Inject
 
@@ -47,7 +47,7 @@ class AvatarContentMapperImpl @Inject constructor(
 
     private fun mapNameToAvatarText(name: String?) = avatarWrapper.getFirstLetter(
         name
-            ?: "${context.getString(R.string.first_name_text)} ${context.getString(R.string.lastname_text)}"
+            ?: "${context.getString(sharedR.string.general_first_name)} ${context.getString(sharedR.string.general_last_name)}"
     )
 
     private suspend fun mapAvatarTextToEmoji(

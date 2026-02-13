@@ -1,11 +1,11 @@
-package mega.privacy.android.app.di.avatar
+package mega.privacy.android.feature.myaccount.di
 
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapperImpl
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapperImpl
 
 /**
  * DI to provide avatar mapper

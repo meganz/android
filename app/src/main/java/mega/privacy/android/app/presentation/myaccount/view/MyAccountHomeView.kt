@@ -71,9 +71,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.apiserver.view.ChangeApiServerDialog
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.changepassword.view.Constants
 import mega.privacy.android.app.presentation.meeting.view.dialog.ChangeSFUIdDialog
 import mega.privacy.android.app.presentation.myaccount.MyAccountHomeViewActions

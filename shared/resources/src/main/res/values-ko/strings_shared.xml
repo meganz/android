@@ -1979,7 +1979,7 @@
         <item quantity="other">[복호화 되지 않은 파일]</item>
     </plurals>
     <string name="free_account">무료</string>
-    <string name="business_label">기업용</string>
+    <string name="business_label">비즈니스</string>
     <string name="home_recents_options_menu_hide_activity">최근 활동 숨기기</string>
     <string name="home_recents_empty_button_upload">업로드</string>
     <string name="home_recents_hidden_button_show_activity">활동 보기</string>
@@ -2024,4 +2024,11 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
+    <string name="recovering_info">불러오는 중&#8230;</string>
+    <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
+    <string name="general_hi">안녕하세요</string>
+    <!-- Label for First Name -->
+    <string name="general_first_name">First name</string>
+    <!-- Label for Last name -->
+    <string name="general_last_name">Last name</string>
 </resources>

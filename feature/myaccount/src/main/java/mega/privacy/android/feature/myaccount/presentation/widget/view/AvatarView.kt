@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.avatar.view
+package mega.privacy.android.feature.myaccount.presentation.widget.view
 
 import android.content.res.Configuration
 import androidx.annotation.ColorInt
@@ -34,11 +34,11 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.addLastModifiedToFileCacheKey
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.theme.dark_grey
 import mega.privacy.android.shared.original.core.ui.theme.white
@@ -212,7 +212,7 @@ fun PreviewEmojiAvatar() {
         EmojiAvatar(
             modifier = Modifier.size(30.dp),
             avatarBgColor = Color.Blue.toArgb(),
-            resId = R.drawable.emoji_twitter_1f604,
+            resId = iconPackR.drawable.emoji_twitter_1f604,
             showBorder = true
         )
     }

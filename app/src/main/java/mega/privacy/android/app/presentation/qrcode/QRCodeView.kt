@@ -68,9 +68,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.presentation.extensions.dialogContent
 import mega.privacy.android.app.presentation.extensions.dialogTitle
 import mega.privacy.android.app.presentation.extensions.printEmail

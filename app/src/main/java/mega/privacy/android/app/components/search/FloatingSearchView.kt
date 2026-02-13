@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
-import androidx.annotation.NonNull
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -27,9 +26,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.SearchQuerySectionBinding
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.app.utils.Util
 
 /**

@@ -18,8 +18,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult

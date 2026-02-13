@@ -1844,7 +1844,7 @@
     <string name="search_bar_placeholder_text">搜索&#8230;</string>
     <string name="payment_ads_free_intro_title">想要无广告的MEGA吗？</string>
     <plurals name="remove_links_warning_text">
-        <item quantity="other">链接将无法再被公开访问</item>
+        <item quantity="other">链接将无法再被公开访问。</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="other">取消共享 %1$d个 文件夹？</item>
@@ -2004,4 +2004,47 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d个文件夹&#160;·&#160;</item>
     </plurals>
+    <string name="albums_multiple_delete_success_message">%d个相册已删除</string>
+    <string name="home_screen_no_network_desc">您已离线。\n如果您将文件设为离线可用，您仍然可以在没有网络连接的情况下访问它们。</string>
+    <string name="home_screen_no_network_desc_with_offline_files">您现在为离线状态。\n您为离线使用保存的项目仍然可用。</string>
+    <string name="home_screen_no_network_view_offline_files_button">查看离线文件</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">更新权限</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">为了确保我们不会错过您所有的回忆，MEGA需要完全访问您的照片库。</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">电量过低。请为设备充电以开启相机上传。</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">相机上传已是最新状态</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="general_clear_all">全部清除</string>
+    <string name="section_banners">横幅</string>
+    <string name="shares_screen_links_section_empty">[B]无[/B][A]公开链接[/A]</string>
+    <string name="general_invalid_dot_name_warning">名称“.”不可用</string>
+    <string name="general_invalid_double_dot_name_warning">名称“..”不可用</string>
+    <string name="transfers_upload_started_snackbar">上传已开始。请查看通知以获取详细信息。</string>
+    <string name="search_landing_title">在找点什么吗？</string>
+    <string name="search_landing_subtitle">搜索文件和文件夹</string>
+    <string name="offline_screen_empty_state_description">无离线文件</string>
+    <string name="general_install_label">安装</string>
+    <string name="general_app_update_download_success_message">应用更新已下载</string>
+    <!-- Label for First Name -->
+    <string name="general_first_name">First name</string>
+    <!-- Label for Last name -->
+    <string name="general_last_name">Last name</string>
 </resources>

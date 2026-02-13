@@ -2052,4 +2052,8 @@
     <string name="offline_screen_empty_state_description">ไม่มีไฟล์ในบันทึกออฟไลน์</string>
     <string name="general_install_label">ติดตั้ง</string>
     <string name="general_app_update_download_success_message">ดาวน์โหลดตัวอัปเดตแอปเสร็จแล้ว</string>
+    <!-- Label for First Name -->
+    <string name="general_first_name">First name</string>
+    <!-- Label for Last name -->
+    <string name="general_last_name">Last name</string>
 </resources>

@@ -321,8 +321,8 @@ class MyAccountViewModel @Inject constructor(
                 it.copy(
                     name = getCurrentUserFullName(
                         forceRefresh = forceRefresh,
-                        defaultFirstName = context.getString(R.string.first_name_text),
-                        defaultLastName = context.getString(R.string.lastname_text),
+                        defaultFirstName = context.getString(sharedR.string.general_first_name),
+                        defaultLastName = context.getString(sharedR.string.general_last_name),
                     )
                 )
             }

@@ -2216,4 +2216,8 @@
         <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
         <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
+    <!-- Label for First Name -->
+    <string name="general_first_name">First name</string>
+    <!-- Label for Last name -->
+    <string name="general_last_name">Last name</string>
 </resources>

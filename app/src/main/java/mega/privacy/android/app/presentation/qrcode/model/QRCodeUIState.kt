@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.qrcode.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.avatar.model.AvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest

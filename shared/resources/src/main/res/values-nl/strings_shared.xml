@@ -2121,4 +2121,8 @@
     <string name="offline_screen_empty_state_description">Geen bestanden opgeslagen voor Offline gebruik</string>
     <string name="general_install_label">Installeren</string>
     <string name="general_app_update_download_success_message">Applicatie update gedownload</string>
+    <!-- Label for First Name -->
+    <string name="general_first_name">First name</string>
+    <!-- Label for Last name -->
+    <string name="general_last_name">Last name</string>
 </resources>

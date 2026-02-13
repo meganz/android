@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.avatar.mapper
+package mega.privacy.android.feature.myaccount.presentation.mapper
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
@@ -8,12 +8,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
-import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
-import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.data.wrapper.AvatarWrapper
+import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.thirdpartylib.twemoji.wrapper.EmojiManagerWrapper
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -62,7 +63,7 @@ class AvatarContentMapperImplTest {
     fun `test that an emoji avatar content is returned when there is emoji at begin of name and no local avatar file`() =
         runTest {
             whenever(avatarWrapper.getFirstLetter(any())).thenReturn("L")
-            whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(R.drawable.emoji_twitter_0033_fe0f_20e3)
+            whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(iconPackR.drawable.emoji_twitter_1f604)
 
             val result = underTest(
                 fullName = "full name",
@@ -83,8 +84,10 @@ class AvatarContentMapperImplTest {
                 "F"
             )
             whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(null)
-            whenever(context.getString(R.string.first_name_text)).thenReturn(defaultFirstName)
-            whenever(context.getString(R.string.lastname_text)).thenReturn(defaultLastName)
+            whenever(context.getString(sharedR.string.general_first_name)).thenReturn(
+                defaultFirstName
+            )
+            whenever(context.getString(sharedR.string.general_last_name)).thenReturn(defaultLastName)
 
             val result = underTest(
                 fullName = null,

@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.TEST_USER_ACCOUNT
-import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.app.presentation.mapper.AccountTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountType

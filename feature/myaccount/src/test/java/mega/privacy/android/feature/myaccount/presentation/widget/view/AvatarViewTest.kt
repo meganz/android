@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.avatar.view
+package mega.privacy.android.feature.myaccount.presentation.widget.view
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -7,19 +7,17 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
-import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
-import mega.privacy.android.app.presentation.avatar.view.Avatar
+import mega.privacy.android.feature.myaccount.presentation.model.EmojiAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@HiltAndroidTest
+
 @RunWith(AndroidJUnit4::class)
 @Ignore("The test is Flaky")
 class AvatarViewTest {
@@ -31,9 +29,9 @@ class AvatarViewTest {
     fun `test that emoji avatar is shown when there is emoji at beginning of name`() = runTest {
         composeTestRule.setContent {
             Avatar(
-                modifier = Modifier,
+                modifier = Modifier.Companion,
                 content = EmojiAvatarContent(
-                    emojiContent = R.drawable.emoji_twitter_0033_fe0f_20e3,
+                    emojiContent = iconPackR.drawable.emoji_twitter_1f604,
                     backgroundColor = Color.Red.toArgb(),
                 )
             )
@@ -47,7 +45,7 @@ class AvatarViewTest {
     fun `test that text avatar is shown when there is no emoji at beginning of name`() = runTest {
         composeTestRule.setContent {
             Avatar(
-                modifier = Modifier,
+                modifier = Modifier.Companion,
                 content = TextAvatarContent(
                     avatarText = "R",
                     backgroundColor = Color.Red.toArgb(),
@@ -63,7 +61,7 @@ class AvatarViewTest {
     fun `test that photo avatar is shown when local photo avatar is available`() = runTest {
         composeTestRule.setContent {
             Avatar(
-                modifier = Modifier,
+                modifier = Modifier.Companion,
                 content = PhotoAvatarContent(
                     path = "file:/path/to/avatar/file.jpg",
                     size = 0L

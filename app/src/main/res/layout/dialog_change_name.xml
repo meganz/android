@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:hint="@string/first_name_text"
+            android:hint="@string/general_first_name"
             android:theme="@style/Widget.Mega.TextInputLayout"
             app:errorEnabled="true"
             app:layout_constraintTop_toTopOf="parent">
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:hint="@string/lastname_text"
+            android:hint="@string/general_last_name"
             android:theme="@style/Widget.Mega.TextInputLayout"
             app:errorEnabled="true"
             app:layout_constraintTop_toBottomOf="@+id/first_name_error_icon">

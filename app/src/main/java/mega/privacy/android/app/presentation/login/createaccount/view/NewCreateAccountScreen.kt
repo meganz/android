@@ -349,7 +349,7 @@ internal fun NewCreateAccountScreen(
                             start = LocalSpacing.current.x16,
                             end = LocalSpacing.current.x16
                         ),
-                    label = stringResource(id = R.string.first_name_text),
+                    label = stringResource(id = sharedR.string.general_first_name),
                     keyboardType = KeyboardType.Text,
                     maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
@@ -382,7 +382,7 @@ internal fun NewCreateAccountScreen(
                             start = LocalSpacing.current.x16,
                             end = LocalSpacing.current.x16
                         ),
-                    label = stringResource(id = R.string.lastname_text),
+                    label = stringResource(id = sharedR.string.general_last_name),
                     keyboardType = KeyboardType.Text,
                     maxCharLimit = NAME_CHAR_LIMIT,
                     onValueChanged = {
