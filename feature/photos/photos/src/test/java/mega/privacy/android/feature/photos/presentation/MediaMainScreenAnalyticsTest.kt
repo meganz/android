@@ -153,7 +153,6 @@ class MediaMainScreenAnalyticsTest {
                     onTimelineApplyFilterClick = {},
                     navigateToMediaSearch = {},
                     onTimelinePhotoSelected = onTimelinePhotoSelected,
-                    onAllTimelinePhotosSelected = {},
                     onClearTimelinePhotosSelection = {},
                     onNavigateToTimelinePhotoPreview = {},
                     onNavigateToAddToAlbum = {},

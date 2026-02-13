@@ -20,7 +20,6 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.theme.values.IconColor
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
@@ -43,6 +42,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.shared.resources.R as SharedR
+import java.util.Locale
 
 @Composable
 internal fun MediaTopBar(
@@ -59,10 +59,7 @@ internal fun MediaTopBar(
     selectedTimePeriod: PhotoModificationTimePeriod,
     videosTabQuery: String?,
     playlistsTabQuery: String?,
-    onAllTimelinePhotosSelected: () -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
-    areAllAlbumsSelected: () -> Boolean,
-    onAllAlbumsSelected: () -> Unit,
     onClearAlbumsSelection: () -> Unit,
     onAllVideosSelected: () -> Unit,
     onClearVideosSelection: () -> Unit,
@@ -84,18 +81,6 @@ internal fun MediaTopBar(
         derivedStateOf {
             selectedTimePeriod == PhotoModificationTimePeriod.All && !mediaCameraUploadUiState.enableCameraUploadPageShowing
         }
-    }
-    val areAllTimelinePhotosSelected by remember(
-        timelineTabUiState.selectedPhotoCount,
-        timelineTabUiState.displayedPhotos
-    ) {
-        derivedStateOf { timelineTabUiState.selectedPhotoCount == timelineTabUiState.displayedPhotos.size }
-    }
-    val areAllAlbumsSelected by remember(
-        albumsTabUiState.selectedUserAlbums,
-        albumsTabUiState.albums
-    ) {
-        derivedStateOf { areAllAlbumsSelected() }
     }
     val areAllVideosSelected by remember(videosTabUiState) {
         derivedStateOf {
@@ -130,21 +115,15 @@ internal fun MediaTopBar(
 
     when {
         selectionModeType == MediaSelectionModeType.Timeline -> {
-            NodeSelectionModeAppBar(
+            BasicMediaTopBar(
                 count = timelineTabUiState.selectedPhotoCount,
-                isAllSelected = areAllTimelinePhotosSelected,
-                isSelecting = false,
-                onSelectAllClicked = onAllTimelinePhotosSelected,
                 onCancelSelectionClicked = onClearTimelinePhotosSelection
             )
         }
 
         selectionModeType == MediaSelectionModeType.Albums -> {
-            NodeSelectionModeAppBar(
+            BasicMediaTopBar(
                 count = albumsTabUiState.selectedUserAlbumsCount,
-                isAllSelected = areAllAlbumsSelected,
-                isSelecting = false,
-                onSelectAllClicked = onAllAlbumsSelected,
                 onCancelSelectionClicked = onClearAlbumsSelection
             )
         }
@@ -284,4 +263,17 @@ internal fun MediaTopBar(
             }
         )
     }
+}
+
+@Composable
+private fun BasicMediaTopBar(
+    count: Int,
+    onCancelSelectionClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    MegaTopAppBar(
+        modifier = modifier,
+        navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
+        title = String.format(Locale.ROOT, "%s", count),
+    )
 }
