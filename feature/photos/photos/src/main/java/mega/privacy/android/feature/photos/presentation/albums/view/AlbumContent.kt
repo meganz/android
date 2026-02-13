@@ -111,7 +111,7 @@ internal fun AlbumPhotoContainer(
                     .padding(4.dp)
                     .size(20.dp)
                     .clip(RoundedCornerShape(2.dp)),
-                surfaceColor = SurfaceColor.Inverse
+                surfaceColor = SurfaceColor.SurfaceTransparent
             ) {
                 MegaIcon(
                     modifier = Modifier.align(Alignment.Center),
@@ -148,7 +148,7 @@ internal fun AlbumPhotoContainer(
                     .padding(4.dp)
                     .size(20.dp)
                     .clip(RoundedCornerShape(2.dp)),
-                surfaceColor = SurfaceColor.Inverse
+                surfaceColor = SurfaceColor.SurfaceTransparent
             ) {
                 MegaIcon(
                     modifier = Modifier.align(Alignment.Center),

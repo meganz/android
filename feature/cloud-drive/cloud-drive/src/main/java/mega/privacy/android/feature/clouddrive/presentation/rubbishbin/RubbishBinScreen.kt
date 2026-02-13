@@ -274,7 +274,6 @@ internal fun RubbishBinScreen(
                     onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
                     spanCount = spanCount,
                     showHiddenNodes = true, // always show hidden nodes on Rubbish Bin
-                    isHiddenNodesEnabled = true, // always enable hidden nodes on Rubbish Bin
                     inSelectionMode = uiState.isInSelectionMode,
                 )
             }

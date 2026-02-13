@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.media.GetUserAlbumCoverPhotoUseCase
 import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndUpdateUserAlbumUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -135,6 +136,7 @@ class AlbumContentViewModelTest {
     private val themeModeFlow = MutableStateFlow(ThemeMode.System)
     private val testDispatcher = UnconfinedTestDispatcher()
     private val context: Context = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
 
     @BeforeAll
     fun setup() {
@@ -178,7 +180,8 @@ class AlbumContentViewModelTest {
             snackbarEventQueue,
             monitorThemeModeUseCase,
             monitorStorageStateEventUseCase,
-            legacyPhotosSortMapper
+            legacyPhotosSortMapper,
+            monitorHiddenNodesEnabledUseCase
         )
         stubCommon()
         Analytics.initialise(analyticsTracker)
@@ -193,6 +196,7 @@ class AlbumContentViewModelTest {
         }
         mockMonitorStorageStateEvent(StorageState.Green)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         whenever(observeAlbumPhotosAddingProgress(mock())).thenReturn(emptyFlow())
         whenever(observeAlbumPhotosRemovingProgress(mock())).thenReturn(emptyFlow())
@@ -235,6 +239,7 @@ class AlbumContentViewModelTest {
             legacyPhotosSortMapper = legacyPhotosSortMapper,
             defaultDispatcher = testDispatcher,
             context = context,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             navKey = navKey,
         )
     }

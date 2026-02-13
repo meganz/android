@@ -34,7 +34,6 @@ import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.BooleanProvider
@@ -199,12 +198,18 @@ private fun BasicPhotosNode(
         }
 
         if (isSelected) {
-            Checkbox(
-                modifier = Modifier.padding(top = 1.dp, start = 1.dp),
-                checked = true,
-                onCheckStateChanged = {},
-                tapTargetArea = false,
-                clickable = false,
+            MegaIcon(
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 4.dp)
+                    .background(
+                        color = DSTokens.colors.background.surfaceTransparent,
+                        shape = RoundedCornerShape(2.dp)
+                    )
+                    .padding(2.dp)
+                    .align(Alignment.TopStart),
+                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.Check),
+                contentDescription = "check icon",
+                tint = IconColor.OnColor,
             )
         }
     }
