@@ -99,6 +99,9 @@ class PendingBackStackNavigationHandler(
             }
 
             else -> {
+                if (destinations.any { it.isHomeScreenKey() }) {
+                    backstack.removeAll { it.isHomeScreenKey() }
+                }
                 backstack.addAll(destinations)
             }
         }
