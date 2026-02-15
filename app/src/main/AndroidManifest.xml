@@ -177,7 +177,7 @@
             android:exported="true"
             android:theme="@style/Theme.Mega.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            android:launchMode="singleTask">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
