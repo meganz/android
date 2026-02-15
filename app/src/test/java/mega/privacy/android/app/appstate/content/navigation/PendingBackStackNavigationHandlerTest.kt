@@ -11,6 +11,8 @@ import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
+import mega.privacy.android.navigation.destination.MediaMainNavKey
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -424,7 +426,12 @@ class PendingBackStackNavigationHandlerTest {
             val navTree = listOf(Destination1, Destination2)
             backStack.addAll(navTree)
             underTest.onPasscodeStateChanged(true)
-            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2, PasscodeDestination)
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
             assertThat(backStack.pending).isEmpty()
         }
 
@@ -435,7 +442,12 @@ class PendingBackStackNavigationHandlerTest {
             backStack.addAll(navTree)
             underTest.onPasscodeStateChanged(true)
 
-            assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2, PasscodeDestination)
+            assertThat(backStack).containsExactly(
+                DefaultLandingScreen,
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
 
             underTest.onPasscodeStateChanged(false)
             assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1, Destination2)
@@ -470,7 +482,11 @@ class PendingBackStackNavigationHandlerTest {
                 backStack = tempBackStack,
                 isPasscodeLocked = true,
             )
-            assertThat(tempBackStack).containsExactly(Destination1, Destination2, PasscodeDestination)
+            assertThat(tempBackStack).containsExactly(
+                Destination1,
+                Destination2,
+                PasscodeDestination
+            )
             assertThat(tempBackStack.pending).isEmpty()
         }
 
@@ -498,7 +514,12 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             backStack.addAll(listOf(Destination1, Destination3))
 
-            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.ManualRefresh))
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ManualRefresh
+                )
+            )
 
             val lastDestination = backStack.last() as? FetchingContentNavKey
             assertThat(lastDestination).isNotNull()
@@ -545,12 +566,23 @@ class PendingBackStackNavigationHandlerTest {
         runTest {
             backStack.addAll(listOf(Destination1, Destination2))
 
-            underTest.onRootNodeChange(RootNodeState(exists = false, refreshEvent = RefreshEvent.ManualRefresh))
+            underTest.onRootNodeChange(
+                RootNodeState(
+                    exists = false,
+                    refreshEvent = RefreshEvent.ManualRefresh
+                )
+            )
 
             val lastDestination = backStack.last() as? FetchingContentNavKey
             assertThat(lastDestination).isNotNull()
             assertThat(lastDestination?.refreshEvent).isEqualTo(RefreshEvent.ManualRefresh)
-            assertThat(backStack).containsExactly(FetchingContentNavKey(initialSession, false, RefreshEvent.ManualRefresh))
+            assertThat(backStack).containsExactly(
+                FetchingContentNavKey(
+                    initialSession,
+                    false,
+                    RefreshEvent.ManualRefresh
+                )
+            )
         }
 
     @Test
@@ -573,4 +605,15 @@ class PendingBackStackNavigationHandlerTest {
             )
         }
 
+    @Test
+    fun `test that home screens are removed if a new home screen is pushed`() = runTest {
+        val initialHomeScreen = HomeScreensNavKey()
+        val expectedHomeScreen = HomeScreensNavKey(MediaMainNavKey)
+
+        backStack.add(initialHomeScreen)
+        underTest.navigate(expectedHomeScreen)
+
+        assertThat(backStack).doesNotContain(initialHomeScreen)
+        assertThat(backStack).contains(expectedHomeScreen)
+    }
 }

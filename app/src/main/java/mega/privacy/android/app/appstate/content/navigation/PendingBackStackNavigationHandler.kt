@@ -30,7 +30,8 @@ class PendingBackStackNavigationHandler(
      * Returns true if [navKey] is the fetch-root-node destination.
      * Exposed so callers (e.g. UI) can branch without depending on concrete destination types.
      */
-    fun isFetchNodeDestination(navKey: NavKey): Boolean = fetchNodeProvider.isFetchNodeDestination(navKey)
+    fun isFetchNodeDestination(navKey: NavKey): Boolean =
+        fetchNodeProvider.isFetchNodeDestination(navKey)
 
     init {
         Timber.d("PendingBackStackNavigationHandler::init")
@@ -103,6 +104,9 @@ class PendingBackStackNavigationHandler(
             }
 
             else -> {
+                if (destinations.any { it.isHomeScreenKey() }) {
+                    backstack.removeAll { it.isHomeScreenKey() }
+                }
                 backstack.addAll(destinations)
             }
         }

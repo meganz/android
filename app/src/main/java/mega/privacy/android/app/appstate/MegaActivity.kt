@@ -273,6 +273,7 @@ class MegaActivity : FragmentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("MegaActivity created ${this.hashCode()}")
         val splashScreen = installSplashScreen()
         var keepSplashScreen by mutableStateOf(true)
         super.onCreate(savedInstanceState)
