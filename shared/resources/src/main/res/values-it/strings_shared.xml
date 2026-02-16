@@ -2070,14 +2070,15 @@
     </plurals>
     <string name="general_first_name">Nome</string>
     <string name="general_last_name">Cognome</string>
-    <!-- Title of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_title">This call is being recorded</string>
-    <!-- Message of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
-    <!-- Label for the positive or confirm button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_positive_button">OK, got it</string>
-    <!-- Label for the negative or cancel button of the call recording consent dialog -->
-    <string name="meetings_call_recording_consent_dialog_negative_button">Leave call</string>
-    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
-    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
+    <string name="meetings_call_recording_consent_dialog_title">La registrazione di questa chiamata è in corso</string>
+    <string name="meetings_call_recording_consent_dialog_message">Rimanendo all\’interno della chiamata dai il permesso ad essere presente nella registrazione. La registrazione è archiviata solo sul dispositivo della persona che sta registrando.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">OK, capito</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">Lascia la chiamata</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Scopri di più[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>
