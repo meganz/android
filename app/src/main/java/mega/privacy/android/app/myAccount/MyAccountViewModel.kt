@@ -1237,7 +1237,7 @@ class MyAccountViewModel @Inject constructor(
                     if (Patterns.EMAIL_ADDRESS.matcher(newEmail).find()) {
                         Timber.d("Successfully changed the email address associated to the Account")
                         snackBarHandler.postSnackbarMessage(
-                            resId = R.string.email_changed, newEmail,
+                            message = context.getString(R.string.email_changed, newEmail),
                             snackbarDuration = MegaSnackbarDuration.Long,
                         )
                     } else {
