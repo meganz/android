@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.SnackbarDuration
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.core.sharedcomponents.snackbar.MegaSnackbarDuration
@@ -138,7 +139,7 @@ class SnackBarHandlerImpl @Inject constructor(
         )
 
         // Await for the feature flag to be evaluated
-        if (isSingleActivityEnabled.first { it != null } == true) {
+        if (activityLifecycleHandler.getCurrentActivity() is MegaActivity) {
             snackbarEventQueue.queueMessage(
                 SnackbarAttributes(
                     message = message,
