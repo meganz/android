@@ -160,4 +160,10 @@ class CallRecordingViewModel @Inject constructor(
             broadcastCallRecordingConsentEventUseCase(accepted)
         }
     }
+
+    fun consentDialogDisplayed() {
+        chatId?.let {
+            broadcastCallRecordingConsentEvent(CallRecordingConsentStatus.Requested(it))
+        }
+    }
 }

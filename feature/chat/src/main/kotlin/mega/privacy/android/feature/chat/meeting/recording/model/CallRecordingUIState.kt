@@ -21,6 +21,7 @@ data class CallRecordingUIState(
         is CallRecordingConsentStatus.Granted -> true
         CallRecordingConsentStatus.None -> null
         is CallRecordingConsentStatus.Pending -> null
+        is CallRecordingConsentStatus.Requested -> null
     }
 
     /**

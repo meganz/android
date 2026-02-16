@@ -8,6 +8,7 @@ sealed interface CallRecordingConsentStatus {
     }
 
     data class Pending(override val chatId: Long) : CallRecordingConsentStatus
+    data class Requested(override val chatId: Long) : CallRecordingConsentStatus
     data class Granted(override val chatId: Long) : CallRecordingConsentStatus
     data class Denied(override val chatId: Long) : CallRecordingConsentStatus
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -47,7 +48,8 @@ fun CallRecordingConsentDialog(
         },
         onPrivacyLinkClick = {
             openWebView(privacyUrl)
-        }
+        },
+        onDisplayed = viewModel::consentDialogDisplayed,
     )
 }
 
@@ -63,8 +65,12 @@ private fun CallRecordingConsentDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
     onPrivacyLinkClick: () -> Unit,
+    onDisplayed: () -> Unit,
 ) = with(uiState) {
     if (requiresRecordingConsent) {
+        LaunchedEffect(Unit) {
+            onDisplayed()
+        }
         ConfirmationDialog(
             title = stringResource(id = R.string.meetings_call_recording_consent_dialog_title),
             text = {
@@ -115,6 +121,7 @@ fun CallRecordingConsentDialogPreview() {
             onConfirm = {},
             onDismiss = {},
             onPrivacyLinkClick = {},
+            onDisplayed = {},
         )
     }
 }
