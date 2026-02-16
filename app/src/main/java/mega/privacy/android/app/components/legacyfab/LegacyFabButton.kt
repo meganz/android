@@ -38,7 +38,7 @@ abstract class LegacyFabButton @JvmOverloads constructor(
                 setContent {
                     AndroidTheme(isDark = isSystemInDarkTheme()) {
                         MegaFab(
-                            onClick = clickListener,
+                            onClick = { clickListener() },
                             painter = rememberVectorPainter(iconImageVector),
                         )
                     }
@@ -59,9 +59,8 @@ abstract class LegacyFabButton @JvmOverloads constructor(
     }
 
     override fun setOnClickListener(l: OnClickListener?) {
-        legacyView?.setOnClickListener(l) ?: run {
-            clickListener = { l?.onClick(legacyView) }
-        }
+        legacyView?.setOnClickListener(l)
+        clickListener = { l?.onClick(composeView) }
     }
 
     fun show() {
