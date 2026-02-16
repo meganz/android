@@ -2183,4 +2183,14 @@
     <string name="general_app_update_download_success_message">Foi feito o download da atualização do aplicativo</string>
     <string name="general_first_name">Nome</string>
     <string name="general_last_name">Sobrenome</string>
+    <!-- Title of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_title">This call is being recorded</string>
+    <!-- Message of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_message">By staying in the call you give permission to be recorded. The recording is only stored on the device of the person who records it.</string>
+    <!-- Label for the positive or confirm button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_positive_button">OK, got it</string>
+    <!-- Label for the negative or cancel button of the call recording consent dialog -->
+    <string name="meetings_call_recording_consent_dialog_negative_button">Leave call</string>
+    <!-- Label option of the call recording consent dialog, indicating if it is pressed, an explanation will be shown with more details. The [A][/A] format placeholders are required to make the text as clickable link to show more information -->
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Learn more[/A]</string>
 </resources>
