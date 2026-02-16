@@ -1,8 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.model
 
-import androidx.compose.ui.graphics.Color
 import mega.privacy.android.domain.entity.StorageState
-import java.io.File
 
 /**
  * UI state for MyAccount widget
@@ -21,8 +19,7 @@ import java.io.File
 data class MyAccountWidgetUiState(
     val name: String? = null,
     val accountTypeNameResource: Int = 0,
-    val avatarFile: File? = null,
-    val avatarColor: Color = Color.Unspecified,
+    val avatarContent: AvatarContent? = null,
     val usedStorage: Long = 0,
     val totalStorage: Long = 0,
     val usedStoragePercentage: Int = 0,

@@ -23,9 +23,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
-import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.android.core.ui.components.surface.CardSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.modifiers.shimmerEffect
@@ -37,6 +37,8 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.feature.myaccount.presentation.widget.view.MyAccountHorizontalProgressBar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R
@@ -175,12 +177,16 @@ internal fun MyAccountWidget(
                     state.name?.let { EmojiUtilsShortcodes.emojify(it) }.orEmpty()
                 }
                 // Avatar
-                MediumProfilePicture(
-                    modifier = Modifier.testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
-                    imageFile = state.avatarFile,
-                    contentDescription = state.name,
-                    name = emojifiedName,
-                    avatarColor = state.avatarColor
+                Avatar(
+                    modifier = Modifier.size(32.dp).testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
+                    content = state.avatarContent ?: TextAvatarContent(
+                        avatarText = state.name?.trim()?.firstOrNull()?.uppercaseChar()
+                            ?.toString()
+                            ?: "?",
+                        backgroundColor = 0,
+                        showBorder = false,
+                        textSize = 18.sp,
+                    )
                 )
 
                 Spacer(modifier = Modifier.width(12.dp))

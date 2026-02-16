@@ -40,6 +40,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
@@ -51,7 +52,6 @@ import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.list.SecondaryHeaderListItem
-import mega.android.core.ui.components.profile.MediumProfilePicture
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.BooleanProvider
@@ -61,6 +61,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.AVATAR
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
@@ -70,6 +71,8 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVA
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialogM3NavKey
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.widget.view.Avatar
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -188,11 +191,16 @@ fun MenuHomeScreenUi(
                     title = emojifiedName,
                     subtitle = uiState.email.orEmpty(),
                     leadingElement = {
-                        MediumProfilePicture(
-                            imageFile = uiState.avatar,
-                            contentDescription = uiState.name,
-                            name = emojifiedName,
-                            avatarColor = uiState.avatarColor
+                        Avatar(
+                            modifier = Modifier.testTag(AVATAR),
+                            content = uiState.avatarContent ?: TextAvatarContent(
+                                avatarText = uiState.name?.trim()?.firstOrNull()?.uppercaseChar()
+                                    ?.toString()
+                                    ?: "?",
+                                backgroundColor = 0,
+                                showBorder = false,
+                                textSize = 18.sp,
+                            )
                         )
                     },
                     enableClick = uiState.isConnectedToNetwork,
@@ -463,4 +471,5 @@ internal object MenuHomeScreenUiTestTags {
     const val PRIVACY_SUITE_ITEM = "$MENU_HOME_SCREEN:privacy_suite_item"
     const val LOGOUT_BUTTON = "$MENU_HOME_SCREEN:logout_button"
     const val BADGE = "$MENU_HOME_SCREEN:badge"
+    const val AVATAR = "$MENU_HOME_SCREEN:avatar"
 }

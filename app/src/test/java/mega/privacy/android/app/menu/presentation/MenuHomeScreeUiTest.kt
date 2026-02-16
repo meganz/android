@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
@@ -16,6 +15,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.parcelize.Parcelize
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.ACCOUNT_ITEM
+import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.AVATAR
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.BADGE
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.LOGOUT_BUTTON
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.MY_ACCOUNT_ITEM
@@ -33,6 +34,7 @@ import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.NOTIF
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_HEADER
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.PRIVACY_SUITE_ITEM
 import mega.privacy.android.app.menu.presentation.MenuHomeScreenUiTestTags.TOOLBAR
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.navigation.contract.DefaultNumberBadge
 import mega.privacy.android.navigation.contract.MainNavItemBadge
 import mega.privacy.android.navigation.contract.NavDrawerItem
@@ -115,8 +117,7 @@ class MenuHomeScreeUiTest {
         privacySuiteItems = privacySuiteItems,
         email = "test@example.com",
         name = "Test User",
-        avatar = null,
-        avatarColor = Color.Blue,
+        avatarContent = null,
         isConnectedToNetwork = true,
         showTestPasswordScreenEvent = consumed,
         showLogoutConfirmationEvent = consumed,
@@ -151,6 +152,50 @@ class MenuHomeScreeUiTest {
     fun `test that user email is displayed in profile section`() {
         setupRule()
         composeRule.onNodeWithText("test@example.com").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed in profile section`() {
+        setupRule()
+        composeRule.onNodeWithTag(AVATAR, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed when avatarContent is null with name fallback`() {
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                name = "Alice",
+                avatarContent = null,
+            )
+        )
+        composeRule.onNodeWithTag(AVATAR, useUnmergedTree = true).assertIsDisplayed()
+        composeRule.onNodeWithText("Alice").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed when avatarContent is provided`() {
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                avatarContent = TextAvatarContent(
+                    avatarText = "J",
+                    backgroundColor = 0,
+                    showBorder = false,
+                    textSize = 18.sp,
+                ),
+            )
+        )
+        composeRule.onNodeWithTag(AVATAR, useUnmergedTree = true).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed when name is null showing fallback initial`() {
+        setupRule(
+            uiState = createDefaultMenuUiState().copy(
+                name = null,
+                avatarContent = null,
+            )
+        )
+        composeRule.onNodeWithTag(AVATAR, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test

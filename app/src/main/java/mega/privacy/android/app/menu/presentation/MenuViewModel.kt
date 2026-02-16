@@ -1,12 +1,11 @@
 package mega.privacy.android.app.menu.presentation
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -15,7 +14,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
@@ -29,7 +28,6 @@ import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetUserFullNameUseCase
@@ -45,6 +43,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import timber.log.Timber
 import javax.inject.Inject
@@ -70,7 +69,7 @@ class MenuViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val avatarContentMapper: AvatarContentMapper,
 ) : ViewModel() {
     // Flows for items that need dynamic subtitles
     private val currentPlanSubtitleFlow = MutableStateFlow<String?>(null)
@@ -174,7 +173,6 @@ class MenuViewModel @Inject constructor(
                         UserChanges.Lastname,
                             -> {
                             refreshUserName()
-                            getUserAvatarOrDefault(true)
                         }
 
                         else -> Unit
@@ -232,39 +230,38 @@ class MenuViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
-        val avatarFile = runCatching { getMyAvatarFileUseCase(isForceRefresh) }
-            .onFailure { Timber.e(it) }.getOrNull()
-        val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
-        _uiState.update {
-            it.copy(
-                avatar = avatarFile,
-                avatarColor = color?.let { color -> Color(color) } ?: Color.Unspecified,
-            )
-        }
-    }
-
     private fun monitorUserDataAndAvatar() {
-        viewModelScope.launch {
+        combine(
+            uiState.map { it.name }.distinctUntilChanged(),
             monitorMyAvatarFile().onStart {
                 // emit from cache first and then from remote
-                emit(getMyAvatarFileUseCase(isForceRefresh = false))
-                emit(getMyAvatarFileUseCase(isForceRefresh = true))
-            }.map { file ->
-                file to (file?.lastModified() ?: 0L)
-            }.flowOn(ioDispatcher).catch { Timber.e(it) }
-                .collectLatest { (avatarFile, lastModified) ->
-                    val color = runCatching { getMyAvatarColorUseCase() }.getOrNull()
+                emit(runCatching { getMyAvatarFileUseCase(isForceRefresh = false) }.getOrNull())
+                emit(runCatching { getMyAvatarFileUseCase(isForceRefresh = true) }.getOrNull())
+            }.catch { e ->
+                Timber.e(e, "Error monitoring avatar file: $e")
+                emit(null)
+            }, transform = { name, file ->
+                if (!name.isNullOrEmpty()) {
+                    val avatarColor =
+                        runCatching { getMyAvatarColorUseCase() }.getOrDefault(0)
+                    val avatarContent = avatarContentMapper(
+                        fullName = name,
+                        localFile = file,
+                        showBorder = false,
+                        textSize = 18.sp,
+                        backgroundColor = avatarColor,
+                    )
                     _uiState.update {
                         it.copy(
-                            avatar = avatarFile,
-                            avatarColor = color?.let { color -> Color(color) }
-                                ?: Color.Unspecified,
-                            lastModifiedTime = lastModified
+                            avatarContent = avatarContent,
+                            lastModifiedTime = file?.lastModified() ?: 0L,
                         )
                     }
                 }
-        }
+            }
+        ).catch { e ->
+            Timber.e(e, "Error loading avatar data")
+        }.launchIn(viewModelScope)
     }
 
 

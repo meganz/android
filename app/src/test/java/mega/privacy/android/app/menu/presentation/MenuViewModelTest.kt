@@ -4,7 +4,7 @@ import android.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -52,6 +52,9 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
+import mega.privacy.android.feature.myaccount.presentation.model.PhotoAvatarContent
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import org.junit.jupiter.api.AfterAll
@@ -94,13 +97,14 @@ class MenuViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
-    private val ioDispatcher = UnconfinedTestDispatcher()
+    private val avatarContentMapper = mock<AvatarContentMapper>()
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private object TestDestination : NavKey
 
     @BeforeAll
     fun initialisation() {
-        Dispatchers.setMain(ioDispatcher)
+        Dispatchers.setMain(testDispatcher)
     }
 
     @AfterAll
@@ -128,6 +132,7 @@ class MenuViewModelTest {
             monitorNodeUpdatesUseCase,
             getRubbishNodeUseCase,
             getSpecificAccountDetailUseCase,
+            avatarContentMapper,
         )
     }
 
@@ -144,7 +149,7 @@ class MenuViewModelTest {
         assertThat(initialState.privacySuiteItems).isEmpty()
         assertThat(initialState.email).isNull()
         assertThat(initialState.name).isNull()
-        assertThat(initialState.avatar).isNull()
+        assertThat(initialState.avatarContent).isNull()
         assertThat(initialState.isConnectedToNetwork).isFalse()
     }
 
@@ -354,54 +359,81 @@ class MenuViewModelTest {
         }
 
     @Test
-    fun `test that avatar color is fetched and updates state`() = runTest {
-        stubDefaultDependencies()
-        val expectedColor = -16711936 // Green color value
-        getMyAvatarColorUseCase.stub {
-            onBlocking { invoke() }.thenReturn(expectedColor)
-        }
+    fun `test that avatar content is mapped and updates state when name and file are available`() =
+        runTest {
+            stubDefaultDependencies()
+            val avatarFile = File("/path/to/avatar.jpg")
+            val expectedContent = PhotoAvatarContent(
+                path = avatarFile.absolutePath,
+                size = 1234L,
+                showBorder = false,
+            )
 
-        initUnderTest()
+            whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+            monitorMyAvatarFile.stub {
+                on { invoke() }.thenReturn(flowOf(avatarFile))
+            }
+            whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+            whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+            whenever(getMyAvatarColorUseCase()).thenReturn(-16711936)
+            whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenReturn(expectedContent)
 
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.avatarColor).isEqualTo(Color(expectedColor))
-            cancelAndIgnoreRemainingEvents()
+            initUnderTest()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.avatarContent).isEqualTo(expectedContent)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
-    fun `test that avatar color fetch failure is handled gracefully`() = runTest {
-        stubDefaultDependencies()
-        getMyAvatarColorUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Color fetch failed"))
-        }
-
-        initUnderTest()
-
-        // Should not crash and state should remain with default values
-        val state = underTest.uiState.value
-        assertThat(state.avatarColor).isEqualTo(Color.Unspecified)
-    }
-
-    @Test
-    fun `test that avatar file is monitored and updates state`() = runTest {
+    fun `test that avatar content mapper is invoked with correct parameters`() = runTest {
         stubDefaultDependencies()
         val avatarFile = File("/path/to/avatar.jpg")
+        val expectedContent = TextAvatarContent(
+            avatarText = "J",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
 
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("John Doe")
         monitorMyAvatarFile.stub {
             on { invoke() }.thenReturn(flowOf(avatarFile))
         }
+        whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+        whenever(getMyAvatarColorUseCase()).thenReturn(0)
+        whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenReturn(expectedContent)
 
-        getMyAvatarFileUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(avatarFile)
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
         }
+
+        verify(avatarContentMapper).invoke(
+            "John Doe",
+            avatarFile,
+            false,
+            18.sp,
+            0,
+        )
+    }
+
+    @Test
+    fun `test that avatar content is not updated when name is null or empty`() = runTest {
+        stubDefaultDependencies()
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn(null)
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.avatar).isEqualTo(avatarFile)
+            assertThat(state.avatarContent).isNull()
+            verify(avatarContentMapper, times(0)).invoke(any(), any(), any(), any(), any())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -431,9 +463,30 @@ class MenuViewModelTest {
 
         // Should not crash despite error in avatar file monitoring
         val state = underTest.uiState.value
-        assertThat(state.avatar).isNull()
+        assertThat(state.avatarContent).isNull()
     }
 
+    @Test
+    fun `test that avatarContentMapper throwing in transform does not crash`() = runTest {
+        stubDefaultDependencies()
+        val avatarFile = File("/path/to/avatar.jpg")
+        whenever(getUserFullNameUseCase(forceRefresh = true)).thenReturn("Test User")
+        whenever(getMyAvatarFileUseCase(false)).thenReturn(avatarFile)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(avatarFile)
+        monitorMyAvatarFile.stub {
+            on { invoke() }.thenReturn(flowOf(avatarFile))
+        }
+        whenever(getMyAvatarColorUseCase()).thenReturn(0)
+        whenever(avatarContentMapper(any(), any(), any(), any(), any())).thenThrow(
+            RuntimeException("Mapper error")
+        )
+
+        initUnderTest()
+
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        assertThat(state.avatarContent).isNull()
+    }
     @Test
     fun `test that account details are processed correctly and update subtitle flows`() = runTest {
         stubDefaultDependencies()
@@ -700,6 +753,7 @@ class MenuViewModelTest {
         }
 
         whenever(getMyAvatarFileUseCase(false)).thenReturn(null)
+        whenever(getMyAvatarFileUseCase(true)).thenReturn(null)
 
         monitorAccountDetailUseCase.stub {
             on { invoke() }.thenReturn(flow { emit(AccountDetail()) })
@@ -746,7 +800,7 @@ class MenuViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
-            ioDispatcher = ioDispatcher,
+            avatarContentMapper = avatarContentMapper,
         )
     }
 

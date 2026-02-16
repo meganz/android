@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.widget
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,8 +23,11 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.QuotaLevelMapper
+import mega.privacy.android.feature.myaccount.presentation.model.AvatarContent
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -56,6 +59,7 @@ class MyAccountWidgetViewModelTest {
     private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val accountTypeNameMapper = mock<AccountTypeNameMapper>()
     private val quotaLevelMapper = mock<QuotaLevelMapper>()
+    private val avatarContentMapper = mock<AvatarContentMapper>()
 
     @BeforeEach
     fun setUp() {
@@ -69,6 +73,7 @@ class MyAccountWidgetViewModelTest {
             getMyAvatarColorUseCase,
             accountTypeNameMapper,
             quotaLevelMapper,
+            avatarContentMapper,
         )
     }
 
@@ -81,8 +86,7 @@ class MyAccountWidgetViewModelTest {
         val initialState = underTest.uiState.value
         assertThat(initialState.isLoading).isTrue() // isLoading is set to false after account data loads
         assertThat(initialState.name).isNull() // Name is loaded in init
-        assertThat(initialState.avatarFile).isNull()
-        assertThat(initialState.avatarColor).isEqualTo(Color.Unspecified)
+        assertThat(initialState.avatarContent).isNull()
         assertThat(initialState.usedStorage).isEqualTo(0L)
         assertThat(initialState.totalStorage).isEqualTo(0L)
         assertThat(initialState.usedStoragePercentage).isEqualTo(0)
@@ -253,27 +257,28 @@ class MyAccountWidgetViewModelTest {
     }
 
     @Test
-    fun `test that avatar file and color are loaded correctly`() = runTest {
+    fun `test that avatar content is mapped and loaded correctly`() = runTest {
         val avatarFile = File("/path/to/avatar.jpg")
-        val avatarColor = -16711936 // Green color value
+        val expectedContent = TextAvatarContent(
+            avatarText = "T",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
 
         stubDefaultDependencies(
             avatarFileFlow = flowOf(avatarFile),
             avatarFileCached = avatarFile,
             avatarFileRemote = avatarFile,
-            avatarColor = avatarColor
+            avatarColor = 0,
+            avatarContent = expectedContent,
         )
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.avatarFile).isEqualTo(avatarFile)
-            assertThat(state.avatarColor).isEqualTo(Color(avatarColor))
-            // Note: getMyAvatarFileUseCase is called 3 times total:
-            // 1. onStart with isForceRefresh=false
-            // 2. onStart with isForceRefresh=true  
-            // 3. From monitorMyAvatarFile flow emission
+            assertThat(state.avatarContent).isEqualTo(expectedContent)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -282,17 +287,23 @@ class MyAccountWidgetViewModelTest {
     fun `test that avatar loading uses onStart to emit cached then remote`() = runTest {
         val cachedAvatar = File("/path/to/cached_avatar.jpg")
         val remoteAvatar = File("/path/to/remote_avatar.jpg")
+        val expectedContent = TextAvatarContent(
+            avatarText = "T",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
 
         stubDefaultDependencies(
             avatarFileFlow = flowOf(remoteAvatar),
             avatarFileCached = cachedAvatar,
-            avatarFileRemote = remoteAvatar
+            avatarFileRemote = remoteAvatar,
+            avatarContent = expectedContent,
         )
 
         initUnderTest()
 
         underTest.uiState.test {
-            // Verify both cached and remote calls are made
             awaitItem()
             verify(getMyAvatarFileUseCase).invoke(isForceRefresh = false)
             verify(getMyAvatarFileUseCase).invoke(isForceRefresh = true)
@@ -302,20 +313,26 @@ class MyAccountWidgetViewModelTest {
     @Test
     fun `test that avatar color fetch failure is handled gracefully`() = runTest {
         val avatarFile = File("/path/to/avatar.jpg")
+        val expectedContent = TextAvatarContent(
+            avatarText = "T",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
 
         stubDefaultDependencies(
             avatarFileFlow = flowOf(avatarFile),
             avatarFileCached = avatarFile,
             avatarFileRemote = avatarFile,
-            avatarColorThrows = RuntimeException("Color fetch failed")
+            avatarColorThrows = RuntimeException("Color fetch failed"),
+            avatarContent = expectedContent,
         )
 
         initUnderTest()
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.avatarFile).isEqualTo(avatarFile)
-            assertThat(state.avatarColor).isEqualTo(Color.Unspecified) // Color should be default on error
+            assertThat(state.avatarContent).isEqualTo(expectedContent)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -328,9 +345,28 @@ class MyAccountWidgetViewModelTest {
 
         initUnderTest()
 
-        // Should not crash despite error
         val state = underTest.uiState.value
-        assertThat(state.avatarFile).isNull()
+        assertThat(state).isNotNull()
+        assertThat(state.avatarContent).isNull()
+    }
+
+    @Test
+    fun `test that avatarContentMapper throwing is handled gracefully`() = runTest {
+        val avatarFile = File("/path/to/avatar.jpg")
+        stubDefaultDependencies(
+            avatarFileFlow = flowOf(avatarFile),
+            avatarFileCached = avatarFile,
+            avatarFileRemote = avatarFile,
+        )
+        whenever(
+            avatarContentMapper(any(), any(), any(), any(), any())
+        ).thenThrow(RuntimeException("Mapper error"))
+
+        initUnderTest()
+
+        val state = underTest.uiState.value
+        assertThat(state).isNotNull()
+        assertThat(state.avatarContent).isNull()
     }
 
     @ParameterizedTest(name = "storageState: {0}, expected: {1}")
@@ -391,6 +427,7 @@ class MyAccountWidgetViewModelTest {
         avatarFileRemote: File? = null,
         avatarColor: Int? = null,
         avatarColorThrows: Throwable? = null,
+        avatarContent: AvatarContent? = null,
         accountTypeMapper: ((AccountType?) -> Int)? = null,
         quotaLevelMapperFunc: ((StorageState?) -> QuotaLevel)? = null,
     ) {
@@ -421,6 +458,22 @@ class MyAccountWidgetViewModelTest {
             whenever(getMyAvatarColorUseCase()).thenReturn(avatarColor ?: 0)
         }
 
+        val defaultAvatarContent = TextAvatarContent(
+            avatarText = "T",
+            backgroundColor = 0,
+            showBorder = false,
+            textSize = 18.sp,
+        )
+        whenever(
+            avatarContentMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+            )
+        ).thenReturn(avatarContent ?: defaultAvatarContent)
+
         whenever(accountTypeNameMapper(any())).thenAnswer { invocation ->
             accountTypeMapper?.invoke(invocation.getArgument(0)) ?: 0
         }
@@ -447,6 +500,7 @@ class MyAccountWidgetViewModelTest {
             getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             accountTypeNameMapper = accountTypeNameMapper,
             quotaLevelMapper = quotaLevelMapper,
+            avatarContentMapper = avatarContentMapper,
         )
     }
 

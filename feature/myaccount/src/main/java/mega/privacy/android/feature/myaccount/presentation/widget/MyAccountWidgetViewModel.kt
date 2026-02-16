@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.myaccount.presentation.widget
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
 import mega.privacy.android.feature.myaccount.presentation.mapper.AccountTypeNameMapper
+import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentMapper
 import mega.privacy.android.feature.myaccount.presentation.mapper.QuotaLevelMapper
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
@@ -38,6 +39,7 @@ class MyAccountWidgetViewModel @Inject constructor(
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val accountTypeNameMapper: AccountTypeNameMapper,
     private val quotaLevelMapper: QuotaLevelMapper,
+    private val avatarContentMapper: AvatarContentMapper,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<MyAccountWidgetUiState> by lazy {
@@ -64,7 +66,15 @@ class MyAccountWidgetViewModel @Inject constructor(
             val usedPercentage = storageDetail?.usedPercentage ?: 0
             val userName =
                 runCatching { getUserFirstNameUseCase(forceRefresh = false) }.getOrNull() ?: ""
-            val avatarColor = runCatching { getMyAvatarColorUseCase() }.getOrNull()
+            val avatarColor = runCatching { getMyAvatarColorUseCase() }.getOrDefault(0)
+
+            val avatarContent = avatarContentMapper(
+                fullName = userName,
+                localFile = avatarFile,
+                showBorder = false,
+                textSize = 18.sp,
+                backgroundColor = avatarColor,
+            )
 
             MyAccountWidgetUiState(
                 name = userName,
@@ -74,8 +84,7 @@ class MyAccountWidgetViewModel @Inject constructor(
                 storageState = storageState,
                 storageQuotaLevel = quotaLevelMapper(storageState),
                 accountTypeNameResource = accountTypeNameMapper(accountDetail.levelDetail?.accountType),
-                avatarFile = avatarFile,
-                avatarColor = avatarColor?.let { color -> Color(color) } ?: Color.Unspecified,
+                avatarContent = avatarContent,
                 isLoading = false,
                 isBusinessAccount = accountDetail.levelDetail?.accountType?.isBusinessAccount
                     ?: false

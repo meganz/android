@@ -7,9 +7,11 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.myaccount.presentation.model.MyAccountWidgetUiState
 import mega.privacy.android.feature.myaccount.presentation.model.QuotaLevel
+import mega.privacy.android.feature.myaccount.presentation.model.TextAvatarContent
 import mega.privacy.android.shared.resources.R
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -298,5 +300,32 @@ class MyAccountWidgetTest {
         composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_PROGRESS_BAR_TEST_TAG, useUnmergedTree = true)
             .assertExists()
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed when avatarContent is provided`() {
+        val testState = createBasicState(name = "Jane").copy(
+            avatarContent = TextAvatarContent(
+                avatarText = "J",
+                backgroundColor = 0,
+                showBorder = false,
+                textSize = 18.sp,
+            ),
+        )
+        setWidgetContent(testState)
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that avatar is displayed when avatarContent is null with name fallback`() {
+        setWidgetContent(createBasicState(name = "Alice"))
+
+        composeTestRule.onNodeWithTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG, useUnmergedTree = true)
+            .assertExists()
+            .assertIsDisplayed()
+        assertGreetingText("Alice")
     }
 }
