@@ -29,6 +29,7 @@ import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolde
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import timber.log.Timber
@@ -48,6 +49,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase,
     private val syncUriValidityMapper: SyncUriValidityMapper,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val syncRemoteFolderValidityMapper: SyncRemoteFolderValidityMapper,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -129,8 +131,7 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
             is SyncNewFolderAction.LocalFolderSelected -> {
                 viewModelScope.launch {
                     val documentFile = action.documentFile
-                    val validityResult = syncUriValidityMapper(documentFile.uri.toString())
-                    when (validityResult) {
+                    when (val validityResult = syncUriValidityMapper(documentFile.uri.toString())) {
                         is SyncValidityResult.ShowSnackbar -> {
                             _state.update { state ->
                                 state.copy(showSnackbar = triggered(validityResult.messageResId))
@@ -165,6 +166,40 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
                         _state.update { state ->
                             state.copy(isLoading = true)
                         }
+
+                        // NEW: Validate remote folder against Camera/Media Uploads for Sync types ONLY
+                        // Backup types auto-create folders, so skip validation
+                        if (state.value.syncType != SyncType.TYPE_BACKUP) {
+                            state.value.selectedMegaFolder?.let { remoteFolder ->
+                                val validationResult = syncRemoteFolderValidityMapper(
+                                    nodeId = remoteFolder.id
+                                )
+
+                                when (validationResult) {
+                                    is SyncValidityResult.ShowSnackbar -> {
+                                        _state.update { state ->
+                                            state.copy(
+                                                showSnackbar = triggered(validationResult.messageResId),
+                                                isLoading = false
+                                            )
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.Invalid -> {
+                                        _state.update { state ->
+                                            state.copy(isLoading = false)
+                                        }
+                                        return@launch
+                                    }
+
+                                    is SyncValidityResult.ValidFolderSelected -> {
+                                        // Continue with existing validation logic
+                                    }
+                                }
+                            }
+                        }
+
                         when {
                             isStorageOverQuotaUseCase() -> {
                                 _state.update { state ->
@@ -205,12 +240,38 @@ internal class SyncNewFolderViewModel @AssistedInject constructor(
 
                                     else -> {
                                         state.value.selectedMegaFolder?.let { remoteFolder ->
-                                            syncFolderPairUseCase(
-                                                syncType = state.value.syncType,
-                                                name = remoteFolder.name,
-                                                localPath = state.value.selectedLocalFolder,
-                                                remotePath = remoteFolder,
+                                            val validationResult = syncRemoteFolderValidityMapper(
+                                                nodeId = remoteFolder.id
                                             )
+                                            when (validationResult) {
+                                                is SyncValidityResult.ShowSnackbar -> {
+                                                    _state.update { state ->
+                                                        state.copy(
+                                                            showSnackbar = triggered(
+                                                                validationResult.messageResId
+                                                            ),
+                                                            isLoading = false
+                                                        )
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.Invalid -> {
+                                                    _state.update { state ->
+                                                        state.copy(isLoading = false)
+                                                    }
+                                                    return@launch
+                                                }
+
+                                                is SyncValidityResult.ValidFolderSelected -> {
+                                                    syncFolderPairUseCase(
+                                                        syncType = state.value.syncType,
+                                                        name = remoteFolder.name,
+                                                        localPath = state.value.selectedLocalFolder,
+                                                        remotePath = remoteFolder,
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

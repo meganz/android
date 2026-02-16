@@ -4,7 +4,9 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeRelationship
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import javax.inject.Inject
 
@@ -16,12 +18,22 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
     private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
     private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
     suspend operator fun invoke(
         nodeId: NodeId,
         shouldCheckCameraUploads: Boolean,
         shouldExcludeCurrentDevice: Boolean,
     ): FolderUsageResult {
+        // Check if DCIMSelectionAsSyncBackup feature flag is enabled
+        val isFeatureEnabled = runCatching {
+            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+        }.getOrElse {
+            false
+        }
+        if (isFeatureEnabled.not()) {
+            return FolderUsageResult.NotUsed
+        }
         if (shouldCheckCameraUploads) {
             // Check if the folder is related to Camera Uploads or Media Uploads
             getCameraUploadsSyncHandlesUseCase()?.let { (primaryHandle, secondaryHandle) ->

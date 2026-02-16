@@ -29,6 +29,7 @@ import mega.privacy.android.feature.sync.domain.usecase.backup.SetMyBackupsFolde
 import mega.privacy.android.feature.sync.domain.usecase.sync.SyncFolderPairUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.ClearSelectedMegaFolderUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSelectedMegaFolderUseCase
+import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncUriValidityMapper
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncValidityResult
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderAction
@@ -43,7 +44,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.reset
+import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
@@ -62,6 +65,7 @@ internal class SyncNewFolderViewModelTest {
     private val myBackupsFolderExistsUseCase: MyBackupsFolderExistsUseCase = mock()
     private val setMyBackupsFolderUseCase: SetMyBackupsFolderUseCase = mock()
     private val syncUriValidityMapper: SyncUriValidityMapper = mock()
+    private val syncRemoteFolderValidityMapper: SyncRemoteFolderValidityMapper = mock()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private lateinit var underTest: SyncNewFolderViewModel
 
@@ -77,6 +81,7 @@ internal class SyncNewFolderViewModelTest {
             myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase,
             syncUriValidityMapper,
+            syncRemoteFolderValidityMapper,
             monitorAccountDetailUseCase
         )
     }
@@ -207,6 +212,15 @@ internal class SyncNewFolderViewModelTest {
                 awaitCancellation()
             })
             whenever(myBackupsFolderExistsUseCase()).thenReturn(true)
+            // Mock remote folder validation for non-BACKUP sync types
+            if (syncType == SyncType.TYPE_TWOWAY) {
+                whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+                    SyncValidityResult.ValidFolderSelected(
+                        localFolderUri = UriPath(""),
+                        folderName = "folder"
+                    )
+                )
+            }
             whenever(
                 syncFolderPairUseCase.invoke(
                     syncType = syncType,
@@ -450,6 +464,85 @@ internal class SyncNewFolderViewModelTest {
         verify(isStorageOverQuotaUseCase).invoke() // once on account detail change
     }
 
+
+    @Test
+    fun `test that when sync type is TWO_WAY and remote folder validation returns ShowSnackbar, snackbar is displayed`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(123L), "someFolder")
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            })
+            whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+                SyncValidityResult.ShowSnackbar(sharedR.string.sync_local_device_folder_currently_synced_message)
+            )
+
+            initViewModel(syncType = SyncType.TYPE_TWOWAY)
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.isLoading).isFalse()
+                assertThat((result.showSnackbar as StateEventWithContentTriggered).content)
+                    .isEqualTo(sharedR.string.sync_local_device_folder_currently_synced_message)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when sync type is TWO_WAY and remote folder validation returns Invalid, loading is stopped`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(123L), "someFolder")
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            })
+            whenever(syncRemoteFolderValidityMapper(nodeId = remoteFolder.id)).thenReturn(
+                SyncValidityResult.Invalid
+            )
+
+            initViewModel(syncType = SyncType.TYPE_TWOWAY)
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+            underTest.state.test {
+                val result = awaitItem()
+                assertThat(result.isLoading).isFalse()
+                assertThat(result.openSyncListScreen).isEqualTo(consumed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when sync type is BACKUP, remote folder validation is skipped`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(-1L), "")
+            whenever(isStorageOverQuotaUseCase()).thenReturn(false)
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow {
+                emit(remoteFolder)
+                awaitCancellation()
+            })
+            whenever(myBackupsFolderExistsUseCase()).thenReturn(true)
+            whenever(
+                syncFolderPairUseCase.invoke(
+                    syncType = SyncType.TYPE_BACKUP,
+                    name = null,
+                    localPath = "",
+                    remotePath = remoteFolder,
+                )
+            ).thenReturn(true)
+
+            initViewModel(syncType = SyncType.TYPE_BACKUP)
+
+            underTest.handleAction(SyncNewFolderAction.NextClicked)
+
+            verify(syncRemoteFolderValidityMapper, never()).invoke(
+                any()
+            )
+            assertThat(underTest.state.value.openSyncListScreen).isEqualTo(triggered)
+        }
+
     private fun initViewModel(
         syncType: SyncType,
         remoteFolderHandle: NodeId? = null,
@@ -468,7 +561,8 @@ internal class SyncNewFolderViewModelTest {
             myBackupsFolderExistsUseCase = myBackupsFolderExistsUseCase,
             setMyBackupsFolderUseCase = setMyBackupsFolderUseCase,
             syncUriValidityMapper = syncUriValidityMapper,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            syncRemoteFolderValidityMapper = syncRemoteFolderValidityMapper
         )
     }
 
