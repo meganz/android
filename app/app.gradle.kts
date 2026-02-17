@@ -88,6 +88,7 @@ android {
             keyPassword = "android"
         }
     }
+    project.downloadGoogleServicesJsonIfNeeded()
 
     buildTypes {
         debug {
@@ -488,6 +489,31 @@ tasks.register("printAppVersionNameChannel") {
 }
 
 /**
+ * Downloads google-services.json from Artifactory if it does not exist locally.
+ */
+fun Project.downloadGoogleServicesJsonIfNeeded() {
+    val googleServicesFile = file("src/gms/google-services.json")
+    val artifactoryHost = System.getenv("ARTIFACTORY_BASE_URL")
+    if (!googleServicesFile.exists() && !artifactoryHost.isNullOrBlank()) {
+        println("Downloading google-services.json")
+        val proxyArgs = detectCurlProxyArgs()
+        exec {
+            commandLine(
+                listOf(
+                    "curl",
+                    "--fail",
+                    "--location",
+                ) + proxyArgs + listOf(
+                    "$artifactoryHost:443/artifactory/android-mega/cicd/firebase/google-services.json",
+                    "-o",
+                    googleServicesFile.absolutePath
+                )
+            )
+        }
+    }
+}
+
+/**
  * Downloads the debug keystore from Artifactory if it does not exist locally.
  */
 fun Project.downloadDebugKeyStoreIfNeeded(debugKeyStoreFile: File) {
@@ -520,11 +546,11 @@ fun Project.detectCurlProxyArgs(): List<String> {
 
     if (!socksHost.isNullOrBlank() && !socksPort.isNullOrBlank()) {
         val args = listOf("--socks5-hostname", "$socksHost:$socksPort")
-        logger.lifecycle("Detected SOCKS proxy: $socksHost:$socksPort -> curl args: $args")
+        println("Detected SOCKS proxy: $socksHost:$socksPort -> curl args: $args")
         return args
     }
 
-    logger.lifecycle("No proxy detected, curl will connect directly")
+    println("No proxy detected, curl will connect directly")
     return emptyList()
 }
 

@@ -265,7 +265,13 @@ resolutionStrategy {
 
 In `lib.versions.toml`, replace dependencies of **Telephoto** and **uCrop** with their publicly available versions from their official GitHub repositories.
 
-### 7.6 Run the Project
+### 7.6 Firebase (GMS build only)
+
+1. Copy `app/src/gms/google-services.json.example` to `app/src/gms/google-services.json`
+2. Create a Firebase project and add Android apps for `mega.privacy.android.app` and `mega.privacy.android.app.qa`
+3. Replace the placeholder values in `google-services.json` with your project's config
+
+### 7.7 Run the Project
 
 Open the project with Android Studio, let it build the project, and click **Run**.
 

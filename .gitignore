@@ -79,3 +79,4 @@ replay_pid*
 .idea/copilot*
 
 *.keystore
+google-services.json
