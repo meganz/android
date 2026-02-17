@@ -389,4 +389,7 @@ data class ContactAttachmentNavKey(
 data object BusinessExpiredAlertNavKey : NavKey
 
 @Serializable
-data object LeftMeetingNavKey : NoSessionNavKey.Optional
+data class LeftMeetingNavKey(
+    val callEndedDueToFreePlanLimits: Boolean = false,
+    val callEndedDueToTooManyParticipants: Boolean = false,
+) : NoSessionNavKey.Optional

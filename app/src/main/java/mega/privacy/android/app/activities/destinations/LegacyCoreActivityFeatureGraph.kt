@@ -98,6 +98,6 @@ class LegacyCoreActivityFeatureGraph(
             legacyImagePreview(navigationHandler::back)
             contactAttachmentLegacyDestination(navigationHandler::remove)
             businessExpiredAlertLegacyDestination(navigationHandler::back)
-            leftMeetingDestination(navigationHandler::back)
+            leftMeetingDestination(navigationHandler::remove)
         }
 }
