@@ -11,15 +11,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/cab_menu_share_folder"
-        android:icon="@drawable/ic_folder_users_medium_thin_outline"
-        android:orderInCategory="110"
-        android:title="@string/context_share_folder"
-        android:visible="true"
-        app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/cab_menu_send_file"
         android:icon="@drawable/ic_message_arrow_up_medium_thin_outline"
         android:orderInCategory="100"

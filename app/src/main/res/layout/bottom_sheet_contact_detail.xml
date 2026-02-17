@@ -72,12 +72,6 @@
                 android:text="@string/context_send_contact"
                 app:drawableStartCompat="@drawable/ic_user_right_medium_thin_outline" />
 
-            <TextView
-                android:id="@+id/option_share_folder"
-                style="@style/BottomSheetOption"
-                android:text="@string/context_share_folder"
-                app:drawableStartCompat="@drawable/ic_folder_users_medium_thin_outline" />
-
             <View
                 android:id="@+id/divider_share"
                 android:layout_width="match_parent"

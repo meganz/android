@@ -32,7 +32,6 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
@@ -58,7 +57,6 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -113,8 +111,6 @@ class LegacyContactInfoViewModelTest {
     }
     private val monitorChatRetentionTimeUpdateUseCase =
         mock<MonitorChatRetentionTimeUpdateUseCase>()
-    private var createShareKeyUseCase: CreateShareKeyUseCase = mock()
-    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private var checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase = mock()
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private var openOrStartCallUseCase: OpenOrStartCallUseCase = mock()
@@ -174,7 +170,6 @@ class LegacyContactInfoViewModelTest {
             monitorChatOnlineStatusUseCase,
             monitorChatPresenceLastGreenUpdatesUseCase,
             isChatConnectedToInitiateCallUseCase,
-            createShareKeyUseCase,
             checkNodesNameCollisionUseCase,
             copyNodesUseCase,
             openOrStartCallUseCase,
@@ -203,11 +198,9 @@ class LegacyContactInfoViewModelTest {
             monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
             createChatRoomUseCase = createChatRoomUseCase,
-            getNodeByIdUseCase = getNodeByIdUseCase,
             startConversationUseCase = startConversationUseCase,
             ioDispatcher = standardDispatcher,
             applicationScope = testScope,
-            createShareKeyUseCase = createShareKeyUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorChatConnectionStateUseCase = monitorChatConnectionStateUseCase,
             monitorChatOnlineStatusUseCase = monitorChatOnlineStatusUseCase,

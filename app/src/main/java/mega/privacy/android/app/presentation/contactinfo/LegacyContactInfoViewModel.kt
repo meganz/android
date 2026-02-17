@@ -33,15 +33,12 @@ import mega.privacy.android.domain.entity.call.ChatSessionChanges
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeChanges
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoomUseCase
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.call.IsChatConnectedToInitiateCallUseCase
@@ -67,9 +64,7 @@ import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
-import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -116,8 +111,6 @@ class LegacyContactInfoViewModel @Inject constructor(
     private val startConversationUseCase: StartConversationUseCase,
     private val createChatRoomUseCase: CreateChatRoomUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase,
     private val monitorChatOnlineStatusUseCase: MonitorChatOnlineStatusUseCase,
     private val monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase,
@@ -713,19 +706,6 @@ class LegacyContactInfoViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    /**
-     * Init share key
-     *
-     * @param node
-     */
-    suspend fun initShareKey(node: MegaNode) = runCatching {
-        val typedNode = getNodeByIdUseCase(NodeId(node.handle))
-        require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
-        createShareKeyUseCase(typedNode)
-    }.onFailure {
-        Timber.e(it)
     }
 
     /**

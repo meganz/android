@@ -1,7 +1,6 @@
 package mega.privacy.android.app.contacts.list.dialog
 
 import android.Manifest
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,24 +12,19 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import coil3.asImage
 import coil3.load
 import coil3.request.transformations
 import coil3.transform.CircleCropTransformation
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
-import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.contacts.list.ContactListViewModel
 import mega.privacy.android.app.contacts.list.data.ContactItem
 import mega.privacy.android.app.databinding.BottomSheetContactDetailBinding
-import mega.privacy.android.app.main.FileExplorerActivity.Companion.EXTRA_SELECTED_FOLDER
-import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.transfers.attach.NodeAttachmentViewModel
@@ -38,7 +32,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.NODE_HANDLES
 import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
-import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.Constants.SELECTED_USERS
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.node.NodeId
@@ -58,10 +51,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     companion object {
         private const val TAG = "ContactBottomSheetDialogFragment"
         private const val USER_HANDLE = "USER_HANDLE"
-        private const val INVALID_ITEM = -1
         private const val STATE_SHOW_REMOVE_DIALOG = "STATE_SHOW_REMOVE_DIALOG"
-        private const val STATE_NODE_FOLDER = "STATE_NODE_FOLDER"
-        private const val STATE_NODE_CONTACTS = "STATE_NODE_CONTACTS"
 
         /**
          * Main method to create a ContactBottomSheetDialogFragment.
@@ -94,13 +84,9 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>(ownerProducer = { requireParentFragment() })
     private var removeContactDialog: AlertDialog? = null
-    private var nodePermissionsDialog: AlertDialog? = null
-    private var selectedContacts: ArrayList<String>? = null
-    private var folderHandle: Long? = null
 
     private lateinit var binding: BottomSheetContactDetailBinding
     private lateinit var selectFileLauncher: ActivityResultLauncher<String>
-    private lateinit var selectFolderLauncher: ActivityResultLauncher<String>
     private lateinit var selectChatLauncher: ActivityResultLauncher<Long>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -119,15 +105,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         }
                         dismiss()
                     }
-                }
-            }
-
-        selectFolderLauncher =
-            registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
-                if (result != null) {
-                    selectedContacts = result.getStringArrayListExtra(SELECTED_CONTACTS)
-                    folderHandle = result.getLongExtra(EXTRA_SELECTED_FOLDER, 0)
-                    showNodePermissionsDialog()
                 }
             }
 
@@ -175,11 +152,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     showRemoveContactDialog(it)
                 }
             }
-            if (savedInstanceState?.containsKey(STATE_NODE_FOLDER) == true) {
-                folderHandle = savedInstanceState.getLong(STATE_NODE_FOLDER)
-                selectedContacts = savedInstanceState.getStringArrayList(STATE_NODE_CONTACTS)
-                showNodePermissionsDialog()
-            }
         }
 
         super.onViewCreated(view, savedInstanceState)
@@ -187,16 +159,11 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean(STATE_SHOW_REMOVE_DIALOG, removeContactDialog?.isShowing ?: false)
-        if (nodePermissionsDialog?.isShowing == true && folderHandle != null) {
-            outState.putLong(STATE_NODE_FOLDER, folderHandle!!)
-            outState.putStringArrayList(STATE_NODE_CONTACTS, selectedContacts)
-        }
         super.onSaveInstanceState(outState)
     }
 
     override fun onDestroyView() {
         removeContactDialog?.dismiss()
-        nodePermissionsDialog?.dismiss()
         super.onDestroyView()
     }
 
@@ -261,10 +228,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             selectChatLauncher.launch(contactHandle)
         }
 
-        binding.optionShareFolder.setOnClickListener {
-            selectFolderLauncher.launch(contactEmail)
-        }
-
         binding.optionRemove.setOnClickListener { showRemoveContactDialog(contactEmail) }
     }
 
@@ -285,40 +248,6 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismiss()
             }
             .show()
-    }
-
-    /**
-     * Show node permission dialog to ask for Node permissions.
-     */
-    private fun showNodePermissionsDialog() {
-        if (nodePermissionsDialog?.isShowing == true) nodePermissionsDialog?.dismiss()
-
-        val node = megaApi.getNodeByHandle(folderHandle!!)
-        if (node?.isFolder == true) {
-            val permissions = arrayOf(
-                getString(R.string.file_properties_shared_folder_read_only),
-                getString(R.string.file_properties_shared_folder_read_write),
-                getString(R.string.file_properties_shared_folder_full_access)
-            )
-
-            nodePermissionsDialog = MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                .setSingleChoiceItems(
-                    permissions,
-                    INVALID_ITEM
-                ) { dialog: DialogInterface, item: Int ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.initShareKey(node)
-                        NodeController(requireActivity()).shareFolder(node, selectedContacts, item)
-                        folderHandle = null
-                        selectedContacts = null
-
-                        dialog.dismiss()
-                        dismiss()
-                    }
-                }
-                .show()
-        }
     }
 
     /**

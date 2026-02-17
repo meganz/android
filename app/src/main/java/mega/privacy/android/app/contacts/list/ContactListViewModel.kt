@@ -30,18 +30,13 @@ import mega.privacy.android.app.contacts.mapper.ContactItemDataMapper
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.call.MonitorSFUServerUpgradeUseCase
 import mega.privacy.android.domain.usecase.call.StartCallUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.icon.pack.R as IconPackR
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -55,8 +50,6 @@ import javax.inject.Inject
  * @property chatApiGateway MegaChatApiGateway object.
  * @property setChatVideoInDeviceUseCase Use case to set chat video in device.
  * @property chatManagement ChatManagement object.
- * @property createShareKeyUseCase Use case to create a share key.
- * @property getNodeByIdUseCase Use case to get a node by id.
  * @property monitorSFUServerUpgradeUseCase Use case to monitor SFU server upgrade.
  * @property monitorContactRequestsUseCase Use case to monitor contact requests.
  * @property contactItemDataMapper Mapper to map ContactItem to ContactItem.Data.
@@ -71,8 +64,6 @@ internal class ContactListViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     private val chatManagement: ChatManagement,
-    private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val monitorSFUServerUpgradeUseCase: MonitorSFUServerUpgradeUseCase,
     private val monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
     private val contactItemDataMapper: ContactItemDataMapper,
@@ -315,19 +306,6 @@ internal class ContactListViewModel @Inject constructor(
      */
     fun onForceUpdateDialogDismissed() {
         state.update { it.copy(showForceUpdateDialog = false) }
-    }
-
-    /**
-     * Init share key
-     *
-     * @param node
-     */
-    suspend fun initShareKey(node: MegaNode) = runCatching {
-        val typedNode = getNodeByIdUseCase(NodeId(node.handle))
-        require(typedNode is FolderNode) { "Cannot create a share key for a non-folder node" }
-        createShareKeyUseCase(typedNode)
-    }.onFailure {
-        Timber.e(it)
     }
 
     fun getContactEmail(userHandle: Long) =

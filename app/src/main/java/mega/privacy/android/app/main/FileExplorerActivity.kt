@@ -786,15 +786,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             val title: String?
 
             when (intent.action) {
-                ACTION_SELECT_FOLDER_TO_SHARE -> {
-                    Timber.d("action = ACTION_SELECT_FOLDER_TO_SHARE")
-                    //Just show Cloud Drive, no INCOMING tab , no need of tabhost
-                    mode = SELECT
-                    title = getString(R.string.title_share_folder_explorer)
-                    setView(CLOUD_TAB, false)
-                    tabShown = NO_TABS
-                }
-
                 ACTION_MULTISELECT_FILE -> {
                     Timber.d("action = ACTION_MULTISELECT_FILE")
                     //Just show Cloud Drive, no INCOMING tab , no need of tabhost
@@ -2874,12 +2865,6 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
          */
         @JvmField
         var ACTION_PICK_IMPORT_FOLDER = "ACTION_PICK_IMPORT_FOLDER"
-
-        /**
-         * Intent action for selecting a folder to share.
-         */
-        @JvmField
-        var ACTION_SELECT_FOLDER_TO_SHARE = "ACTION_SELECT_FOLDER_TO_SHARE"
 
         /**
          * Intent action for choosing a folder to sync.

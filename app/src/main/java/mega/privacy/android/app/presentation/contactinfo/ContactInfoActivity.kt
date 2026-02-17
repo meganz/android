@@ -37,13 +37,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
@@ -51,16 +49,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFileToShareActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
-import mega.privacy.android.app.activities.contract.SelectFolderToShareActivityContract
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
-import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -167,7 +162,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private val waitingRoomManagementViewModel by viewModels<WaitingRoomManagementViewModel>()
     private val nodeAttachmentViewModel by viewModels<NodeAttachmentViewModel>()
 
-    private var permissionsDialog: AlertDialog? = null
     private var statusDialog: AlertDialog? = null
     private var setNicknameDialog: AlertDialog? = null
 
@@ -192,7 +186,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var bottomSheetDialogFragment: ContactFileListBottomSheetDialogFragment? = null
     private var contactNicknameBottomSheetDialogFragment: ContactNicknameBottomSheetDialogFragment? =
         null
-    private lateinit var selectFolderResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFileResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFolderToCopyLauncher: ActivityResultLauncher<LongArray>
     private val nameCollisionActivityLauncher = registerForActivityResult(
@@ -379,7 +372,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun configureActivityLaunchers() {
-        configureFolderToShareLauncher()
         configureFileToShareLauncher()
         configureFolderToCopyLauncher()
     }
@@ -404,56 +396,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             email = email
                         )
                     }
-                }
-            }
-    }
-
-    private fun configureFolderToShareLauncher() {
-        selectFolderResultLauncher =
-            registerForActivityResult(SelectFolderToShareActivityContract()) { result ->
-                if (result == null) return@registerForActivityResult
-                if (viewModel.isOnline()) {
-                    val selectedContacts =
-                        result.getStringArrayListExtra(Constants.SELECTED_CONTACTS)
-                    val folderHandle =
-                        result.getLongExtra(FileExplorerActivity.EXTRA_SELECTED_FOLDER, 0)
-                    val parent = megaApi.getNodeByHandle(folderHandle)
-                    if (parent?.isFolder == true) {
-                        val dialogBuilder = MaterialAlertDialogBuilder(this)
-                        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                        val items = arrayOf<CharSequence>(
-                            getString(R.string.file_properties_shared_folder_read_only),
-                            getString(
-                                R.string.file_properties_shared_folder_read_write
-                            ),
-                            getString(R.string.file_properties_shared_folder_full_access)
-                        )
-                        dialogBuilder.setSingleChoiceItems(items, -1) { _, item ->
-                            statusDialog = createProgressDialog(
-                                this, getString(
-                                    R.string.context_sharing_folder
-                                )
-                            )
-                            permissionsDialog?.dismiss()
-                            lifecycleScope.launch {
-                                statusDialog?.show()
-                                viewModel.initShareKey(parent)
-                                NodeController(this@ContactInfoActivity).shareFolder(
-                                    parent,
-                                    selectedContacts,
-                                    item
-                                )
-                            }
-                        }
-                        permissionsDialog = dialogBuilder.create()
-                        permissionsDialog?.show()
-                    }
-                } else {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_server_connection_problem),
-                        -1
-                    )
                 }
             }
     }
@@ -842,7 +784,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         Timber.d("onOptionsItemSelected")
         when (item.itemId) {
             android.R.id.home -> finish()
-            R.id.cab_menu_share_folder -> pickFolderToShare()
             R.id.cab_menu_send_file -> {
                 if (!viewModel.isOnline()) {
                     showSnackbar(
@@ -1146,20 +1087,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
 
             Constants.REQUEST_CAMERA -> verifyPermissionAndJoinCall()
-        }
-    }
-
-    private fun pickFolderToShare() {
-        Timber.d("pickFolderToShare")
-        viewModel.userEmail?.let {
-            selectFolderResultLauncher.launch(it)
-        } ?: run {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_sharing_folder),
-                -1
-            )
-            Timber.w("Error sharing folder")
         }
     }
 
