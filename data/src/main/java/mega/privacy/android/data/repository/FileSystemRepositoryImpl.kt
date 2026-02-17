@@ -420,9 +420,6 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun canReadUri(stringUri: String) =
         fileGateway.canReadUri(stringUri)
 
-    override suspend fun getOfflineFilesRootFolder(): File =
-        File(fileGateway.getOfflineFilesRootPath())
-
     override suspend fun getFileStorageTypeName(path: String?) = withContext(ioDispatcher) {
         fileGateway.getFileStorageTypeName(path)
     }

@@ -499,11 +499,6 @@ interface FileSystemRepository {
     suspend fun canReadUri(stringUri: String): Boolean
 
     /**
-     * Returns Offline Files Root Folder
-     */
-    suspend fun getOfflineFilesRootFolder(): File
-
-    /**
      * Returns device model or SD Card based on file location
      */
     suspend fun getFileStorageTypeName(path: String?): FileStorageType
