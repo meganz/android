@@ -1115,7 +1115,7 @@
     <!-- General month label -->
     <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">按年收费%1$s</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n每年收费</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">%1$d个项目取消隐藏</item>
@@ -1686,11 +1686,11 @@
     <string name="campaign_name_special_offer">特别优惠：%1$d%%折扣</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">前%2$d个月仅需%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n首%2$d个月</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">前%2$d年仅需%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n首%2$d年</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 隐私工具</string>
@@ -1723,9 +1723,9 @@
         <item quantity="other">奖励将在%1$d天后到期</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">第一个月仅需%1$s</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\n首月</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">第一年仅需%1$s</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\n首年</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">只有您可以显示隐藏的文件，您可以单个操作或者在帐户[A]设置[/A]中选择暂时显示隐藏项目。</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2056,4 +2056,5 @@
     <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
     <!-- Error message when folder is already part of a sync or backup -->
     <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="choose_account_screen_only_price_per_month">仅%1$s/月</string>
 </resources>

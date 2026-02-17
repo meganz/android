@@ -1134,8 +1134,8 @@
     <string name="choose_account_screen_transfer_quota_label">%1$s transfer</string>
     <!-- General month label -->
     <string name="general_month">/month</string>
-    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s charged yearly</string>
+    <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 charged yearly. [B] and [/B] are span tags for bold styling. -->
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nCharged yearly</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d item unhidden</item>
@@ -1741,15 +1741,15 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in days full format -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. &#10; is a line break. -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s for the first %2$d month</item>
-        <item quantity="other">%1$s for the first %2$d months</item>
+        <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
+        <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. &#10; is a line break. -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s for the first %2$d year</item>
-        <item quantity="other">%1$s for the first %2$d years</item>
+        <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
+        <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA privacy suite</string>
@@ -1783,10 +1783,10 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s for the first month</string>
-    <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s for the first year</string>
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. &#10; is a line break before "For the first month". -->
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. &#10; is a line break before "For the first year". -->
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2294,6 +2294,8 @@
     <string name="general_install_label">Install</string>
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_download_success_message">App update downloaded</string>
+    <!-- Promotional monthly price label for discounted plans. Placeholder is the price, e.g. Only $34.22/month -->
+    <string name="choose_account_screen_only_price_per_month">Only %1$s/month</string>
     <!-- Label for First Name -->
     <string name="general_first_name">First name</string>
     <!-- Label for Last name -->
