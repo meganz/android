@@ -9,6 +9,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.R
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,7 +28,7 @@ class NodeThumbnailViewTest {
     private val listSize = ThumbnailLayoutType.List.placeholderSize
 
     private fun setContent(
-        data: Any? = null,
+        data: ThumbnailData? = null,
         defaultImage: Int = R.drawable.illustration_mega_anniversary,
         contentDescription: String? = "Test Thumbnail",
         blurImage: Boolean = false,
@@ -75,7 +78,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that error state shows placeholder with correct size`() {
         setContent(
-            data = "invalid://url",
+            data = ThumbnailUriRequest(UriPath("invalid://url")),
             layoutType = ThumbnailLayoutType.Grid
         )
 
@@ -88,7 +91,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that error state shows placeholder for list layout`() {
         setContent(
-            data = "invalid://url",
+            data = ThumbnailUriRequest(UriPath("invalid://url")),
             layoutType = ThumbnailLayoutType.List
         )
 
@@ -112,7 +115,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that default image is shown for MediaGrid when error state`() {
         setContent(
-            data = "invalid://url",
+            data = ThumbnailUriRequest(UriPath("invalid://url")),
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 
@@ -123,7 +126,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that placeholder is shown for Grid layout when loading`() {
         setContent(
-            data = "https://example.com/image.jpg",
+            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
             layoutType = ThumbnailLayoutType.Grid
         )
 
@@ -136,7 +139,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that placeholder is shown for List layout when loading`() {
         setContent(
-            data = "https://example.com/image.jpg",
+            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
             layoutType = ThumbnailLayoutType.List
         )
 
@@ -182,7 +185,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that shimmer is not shown for Grid layout when loading`() {
         setContent(
-            data = "https://example.com/image.jpg",
+            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
             layoutType = ThumbnailLayoutType.Grid
         )
 
@@ -193,7 +196,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that shimmer is not shown for List layout when loading`() {
         setContent(
-            data = "https://example.com/image.jpg",
+            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
             layoutType = ThumbnailLayoutType.List
         )
 
@@ -204,7 +207,7 @@ class NodeThumbnailViewTest {
     @Test
     fun `test that shimmer is not shown for MediaGrid when error state`() {
         setContent(
-            data = "invalid://url",
+            data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 

@@ -243,6 +243,7 @@ class NodeUiItemMapperTest {
         assertThat(nodeUiItem.isSensitive).isFalse()
         assertThat(nodeUiItem.showBlurEffect).isFalse()
         assertThat(nodeUiItem.duration).isNull()
+        assertThat(nodeUiItem.thumbnailData).isNull()
     }
 
     @Test

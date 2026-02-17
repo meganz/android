@@ -31,6 +31,9 @@ import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 
 
 /**
@@ -46,7 +49,7 @@ import mega.android.core.ui.tokens.theme.DSTokens
  */
 @Composable
 fun NodeThumbnailView(
-    data: Any?,
+    data: ThumbnailData?,
     @DrawableRes defaultImage: Int,
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
@@ -74,6 +77,7 @@ fun NodeThumbnailView(
                 contentScale = ContentScale.Fit,
             )
         }
+
     } else {
         val context = LocalContext.current
         val imageRequest = remember(data, context) {
@@ -185,7 +189,7 @@ private fun NodeThumbnailViewListPreview() {
 private fun NodeThumbnailViewGridWithDataPreview() {
     NodeThumbnailView(
         contentDescription = "Thumbnail",
-        data = "https://www.mega.com/favicon.ico",
+        data = null,
         defaultImage = mega.privacy.android.icon.pack.R.drawable.illustration_notification_permission,
         layoutType = ThumbnailLayoutType.Grid
     )
@@ -196,7 +200,7 @@ private fun NodeThumbnailViewGridWithDataPreview() {
 private fun NodeThumbnailViewMediaGridWithDataPreview() {
     NodeThumbnailView(
         contentDescription = "Thumbnail",
-        data = "https://www.mega.com/favicon.ico",
+        data = ThumbnailUriRequest(UriPath("https://example.com/image.jpg")),
         defaultImage = mega.privacy.android.icon.pack.R.drawable.illustration_notification_permission,
         layoutType = ThumbnailLayoutType.MediaGrid
     )
