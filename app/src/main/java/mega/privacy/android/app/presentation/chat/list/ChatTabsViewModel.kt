@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.chat.GetCurrentChatStatusUseCase
 import mega.privacy.android.domain.usecase.chat.GetMeetingTooltipsUseCase
 import mega.privacy.android.domain.usecase.chat.HasArchivedChatsUseCase
 import mega.privacy.android.domain.usecase.chat.LeaveChatUseCase
+import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.MonitorLeaveChatUseCase
 import mega.privacy.android.domain.usecase.chat.SetNextMeetingTooltipUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorHasAnyContactUseCase
@@ -121,6 +122,7 @@ class ChatTabsViewModel @Inject constructor(
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase,
     private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
 ) : ViewModel() {
 
     private val state = MutableStateFlow(ChatsTabState())
@@ -146,6 +148,19 @@ class ChatTabsViewModel @Inject constructor(
             monitorScheduledMeetingCanceledUseCase().conflate()
                 .collect { messageResId -> triggerSnackbarMessage(messageResId) }
         }
+        monitorArchivedChats()
+    }
+
+    private fun monitorArchivedChats() {
+        viewModelScope.launch {
+            monitorChatArchivedUseCase().conflate().collect { chatTitle ->
+                state.update { it.copy(titleChatArchivedEvent = triggered(chatTitle)) }
+            }
+        }
+    }
+
+    fun onTitleChatArchivedEventConsumed() {
+        state.update { it.copy(titleChatArchivedEvent = consumed()) }
     }
 
     private fun monitorHasAnyContact() {

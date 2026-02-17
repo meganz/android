@@ -51,7 +51,8 @@ data class ChatsTabState(
     val onlyNoteToSelfChat: Boolean = false,
     val areChatsOrMeetingLoading: Boolean = true,
     val isEmptyChatsOrMeetings: Boolean = false,
-    val isSingleActivityEnabled: Boolean = false
+    val isSingleActivityEnabled: Boolean = false,
+    val titleChatArchivedEvent: StateEventWithContent<String> = consumed(),
 ) {
     /**
      * Check if the chats list is empty

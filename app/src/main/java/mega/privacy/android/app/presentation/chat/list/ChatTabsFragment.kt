@@ -411,7 +411,8 @@ class ChatTabsFragment : Fragment() {
                                             ArchivedChatsActivity::class.java
                                         )
                                     )
-                                }
+                                },
+                                onTitleChatArchivedEventConsumed = viewModel::onTitleChatArchivedEventConsumed,
                             )
                         }
                     }
