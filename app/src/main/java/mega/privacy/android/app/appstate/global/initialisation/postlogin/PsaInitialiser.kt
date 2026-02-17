@@ -3,6 +3,7 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
@@ -46,6 +47,7 @@ class PsaInitialiser(
                 }
             }.filterNotNull()
                 .filterNot { it is PsaState.NoPsa }
+                .distinctUntilChanged()
                 .collect {
                     when (it) {
                         is PsaState.InfoPsa -> {
