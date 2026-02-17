@@ -85,6 +85,7 @@ import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
@@ -175,6 +176,8 @@ fun MediaMainRoute(
             selectionModeType == MediaSelectionModeType.None && !showTimelineFilter
         }
     }
+
+    ReportSelectionMode(isInSelectionMode = selectionModeType != MediaSelectionModeType.None)
 
     LaunchedEffect(shouldShowNavigationItem) {
         setNavigationItemVisibility(shouldShowNavigationItem)
