@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -189,18 +188,16 @@ fun NodeListViewItem(
             vertical = DSTokens.spacings.s3
         ),
         leadingElement = {
-            key(label, icon) {
-                NodeThumbnailView(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .testTag(ICON_TAG),
-                    layoutType = ThumbnailLayoutType.List,
-                    data = thumbnailData,
-                    defaultImage = icon,
-                    contentDescription = "Thumbnail",
-                    blurImage = showBlurEffect
-                )
-            }
+            NodeThumbnailView(
+                modifier = Modifier
+                    .size(32.dp)
+                    .testTag(ICON_TAG),
+                layoutType = ThumbnailLayoutType.List,
+                data = thumbnailData,
+                defaultImage = icon,
+                contentDescription = "Thumbnail",
+                blurImage = showBlurEffect
+            )
         },
         title = {
             Row(

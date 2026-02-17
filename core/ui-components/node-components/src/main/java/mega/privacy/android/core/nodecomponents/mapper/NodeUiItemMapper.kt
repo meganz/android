@@ -84,6 +84,7 @@ class NodeUiItemMapper @Inject constructor(
                 NodeSourceType.OUTGOING_SHARES,
                 NodeSourceType.LINKS,
             ) && (node.isMarkedSensitive || node.isSensitiveInherited)
+            val isFolder = node is TypedFolderNode
             NodeUiItem(
                 node = node,
                 isSelected = selectedNodeIds?.contains(node.id) ?: false,
@@ -100,7 +101,7 @@ class NodeUiItemMapper @Inject constructor(
                 thumbnailData = ThumbnailRequest(
                     id = node.id,
                     isPublicNode = isPublicNodes
-                ),
+                ).takeIf { !isFolder }, // folders will use iconRes
                 accessPermissionIcon = (node as? ShareFolderNode)
                     .getSharesIcon(isContactVerificationOn),
                 showIsVerified = isContactVerificationOn && node.isIncomingShare
@@ -109,7 +110,7 @@ class NodeUiItemMapper @Inject constructor(
                 showFavourite = node.isFavourite && node.isIncomingShare.not(),
                 isSensitive = isSensitive,
                 showBlurEffect = shouldShowBlurEffect(isSensitive, node),
-                isFolderNode = node is TypedFolderNode,
+                isFolderNode = isFolder,
                 isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,
                 duration = duration,
             )
