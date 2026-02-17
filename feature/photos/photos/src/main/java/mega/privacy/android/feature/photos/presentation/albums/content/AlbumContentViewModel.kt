@@ -638,19 +638,6 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun selectAllPhotos() {
-        val photos = _state.value.photos
-        val selectedPhotos = when (_state.value.currentMediaType) {
-            FilterMediaType.ALL_MEDIA -> photos
-            FilterMediaType.IMAGES -> photos.filterIsInstance<PhotoUiState.Image>()
-            FilterMediaType.VIDEOS -> photos.filterIsInstance<PhotoUiState.Video>()
-        }
-        _state.update {
-            it.copy(selectedPhotos = selectedPhotos.toImmutableSet())
-        }
-        updateBottomBarActionVisibility()
-    }
-
     fun clearSelectedPhotos() {
         _state.update {
             it.copy(selectedPhotos = persistentSetOf())
