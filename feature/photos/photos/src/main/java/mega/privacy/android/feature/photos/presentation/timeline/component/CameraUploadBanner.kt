@@ -53,6 +53,7 @@ internal fun CameraUploadsBanner(
     onEnableCameraUploads: () -> Unit,
     onDismissRequest: (status: CUStatusUiState) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
+    onRequestNotificationPermission: () -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
     onNavigateUpgradeScreen: () -> Unit,
@@ -94,6 +95,13 @@ internal fun CameraUploadsBanner(
             FullStorageBanner(onUpgradeClicked = onNavigateUpgradeScreen)
         }
 
+        CUStatusUiState.Warning.NotificationNotGranted -> {
+            NotificationNotGrantedBanner(
+                onClick = onRequestNotificationPermission,
+                onClose = { onDismissRequest(status) }
+            )
+        }
+
         else -> Unit
     }
 }
@@ -109,6 +117,23 @@ private fun CameraUploadsNoFullAccessBanner(
         title = null,
         body = stringResource(sharedR.string.timeline_tab_cu_permission_warning_banner_description),
         actionButtonText = stringResource(sharedR.string.timeline_tab_cu_permission_warning_banner_action),
+        showCancelButton = true,
+        onActionButtonClick = onClick,
+        onCancelButtonClick = onClose
+    )
+}
+
+@Composable
+private fun NotificationNotGrantedBanner(
+    onClick: () -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    TopWarningBanner(
+        modifier = modifier.testTag(TIMELINE_CAMERA_UPLOADS_NOTIFICATION_NOT_GRANTED_BANNER_TEST_TAG),
+        title = null,
+        body = stringResource(sharedR.string.cu_warning_banner_notification_disabled_warning),
+        actionButtonText = stringResource(sharedR.string.notification_permission_enable_button_text),
         showCancelButton = true,
         onActionButtonClick = onClick,
         onCancelButtonClick = onClose
@@ -413,6 +438,12 @@ private fun PreviewFullStorageBanner() {
  */
 const val TIMELINE_CAMERA_UPLOADS_NO_FULL_ACCESS_BANNER_TEST_TAG =
     "timeline_camera_uploads_no_full_access_banner_test_tag"
+
+/**
+ * Test tag for camera uploads notification not granted banner
+ */
+const val TIMELINE_CAMERA_UPLOADS_NOTIFICATION_NOT_GRANTED_BANNER_TEST_TAG =
+    "timeline_camera_uploads_notification_not_granted_test_tag"
 
 /**
  * Test tag for camera uploads device charging not met banner

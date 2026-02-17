@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.permisison.HasCameraUploadsPermissionUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
+import mega.privacy.android.domain.usecase.permisison.HasNotificationPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.photos.ResetEnableCameraUploadBannerVisibilityUseCase
@@ -67,6 +68,7 @@ class MediaCameraUploadViewModelTest {
     private var cameraUploadShownFlow = MutableStateFlow(false)
     private var enableCameraUploadBannerVisibilityFlow = MutableStateFlow(false)
     private var isCameraUploadsEnabledFlow = MutableStateFlow(false)
+    private val hasNotificationPermissionUseCase: HasNotificationPermissionUseCase = mock()
 
     @BeforeEach
     fun setup() = runTest {
@@ -97,7 +99,8 @@ class MediaCameraUploadViewModelTest {
             monitorEnableCameraUploadBannerVisibilityUseCase = monitorEnableCameraUploadBannerVisibilityUseCase,
             resetEnableCameraUploadBannerVisibilityUseCase = resetEnableCameraUploadBannerVisibilityUseCase,
             setEnableCameraUploadBannerDismissedTimestampUseCase = setEnableCameraUploadBannerDismissedTimestampUseCase,
-            hasCameraUploadsPermissionUseCase = hasCameraUploadsPermissionUseCase
+            hasCameraUploadsPermissionUseCase = hasCameraUploadsPermissionUseCase,
+            hasNotificationPermissionUseCase = hasNotificationPermissionUseCase
         )
     }
 
@@ -115,7 +118,8 @@ class MediaCameraUploadViewModelTest {
             monitorEnableCameraUploadBannerVisibilityUseCase,
             resetEnableCameraUploadBannerVisibilityUseCase,
             setEnableCameraUploadBannerDismissedTimestampUseCase,
-            hasCameraUploadsPermissionUseCase
+            hasCameraUploadsPermissionUseCase,
+            hasNotificationPermissionUseCase
         )
     }
 

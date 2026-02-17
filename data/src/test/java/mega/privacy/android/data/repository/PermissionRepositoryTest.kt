@@ -1,6 +1,5 @@
 package mega.privacy.android.data.repository
 
-import android.Manifest
 import android.os.Build
 import android.os.Environment
 import app.cash.turbine.test
@@ -195,7 +194,6 @@ class PermissionRepositoryTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             whenever(
                 permissionGateway.hasPermissions(
-                    Manifest.permission.POST_NOTIFICATIONS,
                     permissionGateway.getImagePermissionByVersion(),
                     permissionGateway.getVideoPermissionByVersion(),
                     permissionGateway.getPartialMediaPermission(),
@@ -213,7 +211,6 @@ class PermissionRepositoryTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             whenever(
                 permissionGateway.hasPermissions(
-                    Manifest.permission.POST_NOTIFICATIONS,
                     permissionGateway.getImagePermissionByVersion(),
                     permissionGateway.getVideoPermissionByVersion(),
                     permissionGateway.getPartialMediaPermission(),
@@ -231,7 +228,6 @@ class PermissionRepositoryTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             whenever(
                 permissionGateway.hasPermissions(
-                    Manifest.permission.POST_NOTIFICATIONS,
                     permissionGateway.getImagePermissionByVersion(),
                     permissionGateway.getVideoPermissionByVersion()
                 )
@@ -248,7 +244,6 @@ class PermissionRepositoryTest {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             whenever(
                 permissionGateway.hasPermissions(
-                    Manifest.permission.POST_NOTIFICATIONS,
                     permissionGateway.getImagePermissionByVersion(),
                     permissionGateway.getVideoPermissionByVersion()
                 )

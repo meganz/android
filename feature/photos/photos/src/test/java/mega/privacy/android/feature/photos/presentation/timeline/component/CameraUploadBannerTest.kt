@@ -81,6 +81,15 @@ class CameraUploadBannerTest {
     }
 
     @Test
+    fun `test that the notification not granted access banner is displayed`() {
+        composeRuleScope {
+            setBanner(status = CUStatusUiState.Warning.NotificationNotGranted)
+
+            onNodeWithTag(TIMELINE_CAMERA_UPLOADS_NOTIFICATION_NOT_GRANTED_BANNER_TEST_TAG).assertIsDisplayed()
+        }
+    }
+
+    @Test
     fun `test that the permission is successfully changed`() {
         composeRuleScope {
             val onChangeCameraUploadsPermissions = mock<() -> Unit>()
@@ -161,6 +170,7 @@ class CameraUploadBannerTest {
         onEnableCameraUploads: () -> Unit = {},
         onDismissRequest: (status: CUStatusUiState) -> Unit = {},
         onChangeCameraUploadsPermissions: () -> Unit = {},
+        onRequestNotificationPermission: () -> Unit = {},
         onNavigateToCameraUploadsSettings: () -> Unit = {},
         onNavigateMobileDataSetting: () -> Unit = {},
         onNavigateUpgradeScreen: () -> Unit = {},
@@ -171,6 +181,7 @@ class CameraUploadBannerTest {
                 onEnableCameraUploads = onEnableCameraUploads,
                 onDismissRequest = onDismissRequest,
                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                onRequestNotificationPermission = onRequestNotificationPermission,
                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                 onNavigateUpgradeScreen = onNavigateUpgradeScreen

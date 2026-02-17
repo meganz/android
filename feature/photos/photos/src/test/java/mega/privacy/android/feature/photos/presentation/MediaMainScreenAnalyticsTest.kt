@@ -174,7 +174,8 @@ class MediaMainScreenAnalyticsTest {
                     viewModel = mediaMainViewModel,
                     albumsTabViewModel = albumsTabViewModel,
                     showTimelineFilter = false,
-                    onTimelineFilterVisibilityChange = {}
+                    onTimelineFilterVisibilityChange = {},
+                    handleNotificationPermissionResult = {}
                 )
             }
         }

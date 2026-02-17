@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsStatusInfoUseCase
 import mega.privacy.android.domain.usecase.permisison.HasCameraUploadsPermissionUseCase
 import mega.privacy.android.domain.usecase.permisison.HasMediaPermissionUseCase
+import mega.privacy.android.domain.usecase.permisison.HasNotificationPermissionUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorEnableCameraUploadBannerVisibilityUseCase
 import mega.privacy.android.domain.usecase.photos.ResetEnableCameraUploadBannerVisibilityUseCase
@@ -57,6 +58,7 @@ class MediaCameraUploadViewModel @Inject constructor(
     private val resetEnableCameraUploadBannerVisibilityUseCase: ResetEnableCameraUploadBannerVisibilityUseCase,
     private val setEnableCameraUploadBannerDismissedTimestampUseCase: SetEnableCameraUploadBannerDismissedTimestampUseCase,
     private val hasCameraUploadsPermissionUseCase: HasCameraUploadsPermissionUseCase,
+    private val hasNotificationPermissionUseCase: HasNotificationPermissionUseCase,
 ) : ViewModel() {
 
     // Due to time constraint, this approach will be updated to the lazy approach in phase 2.
@@ -69,86 +71,97 @@ class MediaCameraUploadViewModel @Inject constructor(
     private var isCameraUploadsFirstSyncTriggered = false
 
     private val permissionsStateFlow = MutableStateFlow(MediaCUPermissionsState.Unknown)
+    private val notificationPermissionFlow = MutableStateFlow<Boolean?>(null)
     private val cuStatusInfoFlow = MutableStateFlow<CameraUploadsStatusInfo?>(null)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val cuStatusFlow: StateFlow<CUStatusUiState> =
         combine(
             flow = permissionsStateFlow,
-            flow2 = cuStatusInfoFlow,
-            transform = ::Pair
+            flow2 = notificationPermissionFlow,
+            flow3 = cuStatusInfoFlow,
+            transform = ::Triple
         ).scan(
             initial = CUStatusFlowTransition(
                 permissionsState = MediaCUPermissionsState.Unknown,
+                notificationPermissionGranted = null,
                 previousStatus = null,
                 currentStatus = null
             )
-        ) { acc, (permissionsState, currentStatus) ->
+        ) { acc, (permissionsState, notificationGranted, currentStatus) ->
             CUStatusFlowTransition(
                 permissionsState = permissionsState,
                 previousStatus = acc.currentStatus,
-                currentStatus = currentStatus
+                currentStatus = currentStatus,
+                notificationPermissionGranted = notificationGranted
             )
         }.flatMapLatest { transition ->
-            if (transition.permissionsState == MediaCUPermissionsState.Denied) {
-                flowOf(CUStatusUiState.Warning.HasLimitedAccess)
-            } else {
-                val previousStatus = transition.previousStatus
-                val currentStatus = transition.currentStatus
-                when (currentStatus) {
-                    is CameraUploadsStatusInfo.CheckFilesForUpload -> {
-                        flowOf(CUStatusUiState.Sync)
-                    }
+            when {
+                transition.permissionsState == MediaCUPermissionsState.Denied -> {
+                    flowOf(CUStatusUiState.Warning.HasLimitedAccess)
+                }
 
-                    is CameraUploadsStatusInfo.UploadProgress -> {
-                        flowOf(
-                            CUStatusUiState.UploadInProgress(
-                                progress = currentStatus.progress.floatValue,
-                                pending = currentStatus.totalToUpload - currentStatus.totalUploaded,
-                            )
-                        )
-                    }
+                transition.notificationPermissionGranted == false -> {
+                    flowOf(CUStatusUiState.Warning.NotificationNotGranted)
+                }
 
-                    is CameraUploadsStatusInfo.Finished -> {
-                        val isCameraUploadsUploading =
-                            currentStatus.reason == CameraUploadsFinishedReason.COMPLETED &&
-                                    previousStatus is CameraUploadsStatusInfo.UploadProgress
-                        if (isCameraUploadsUploading) {
-                            flow {
-                                emit(
-                                    value = CUStatusUiState.UploadComplete(
-                                        totalUploaded = previousStatus.totalToUpload
-                                    )
-                                )
-                                delay(4.seconds)
-                                emit(CUStatusUiState.UpToDate)
-                            }
-                        } else {
-                            val status = when (currentStatus.reason) {
-                                CameraUploadsFinishedReason.COMPLETED -> CUStatusUiState.UpToDate
-                                CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
-                                    CUStatusUiState.Warning.DeviceChargingRequirementNotMet
-                                }
-
-                                CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
-                                    CUStatusUiState.Warning.BatteryLevelTooLow
-                                }
-
-                                CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
-                                    CUStatusUiState.Warning.NetworkConnectionRequirementNotMet
-                                }
-
-                                CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA -> {
-                                    CUStatusUiState.Warning.AccountStorageOverQuota
-                                }
-
-                                else -> CUStatusUiState.None
-                            }
-                            flowOf(status)
+                else -> {
+                    val previousStatus = transition.previousStatus
+                    when (val currentStatus = transition.currentStatus) {
+                        is CameraUploadsStatusInfo.CheckFilesForUpload -> {
+                            flowOf(CUStatusUiState.Sync)
                         }
-                    }
 
-                    else -> flowOf(CUStatusUiState.None)
+                        is CameraUploadsStatusInfo.UploadProgress -> {
+                            flowOf(
+                                CUStatusUiState.UploadInProgress(
+                                    progress = currentStatus.progress.floatValue,
+                                    pending = currentStatus.totalToUpload - currentStatus.totalUploaded,
+                                )
+                            )
+                        }
+
+                        is CameraUploadsStatusInfo.Finished -> {
+                            val isCameraUploadsUploading =
+                                currentStatus.reason == CameraUploadsFinishedReason.COMPLETED &&
+                                        previousStatus is CameraUploadsStatusInfo.UploadProgress
+                            if (isCameraUploadsUploading) {
+                                flow {
+                                    emit(
+                                        value = CUStatusUiState.UploadComplete(
+                                            totalUploaded = previousStatus.totalToUpload
+                                        )
+                                    )
+                                    delay(4.seconds)
+                                    emit(CUStatusUiState.UpToDate)
+                                }
+                            } else {
+                                val status = when (currentStatus.reason) {
+                                    CameraUploadsFinishedReason.COMPLETED -> CUStatusUiState.UpToDate
+                                    CameraUploadsFinishedReason.DEVICE_CHARGING_REQUIREMENT_NOT_MET -> {
+                                        CUStatusUiState.Warning.DeviceChargingRequirementNotMet
+                                    }
+
+                                    CameraUploadsFinishedReason.BATTERY_LEVEL_TOO_LOW -> {
+                                        CUStatusUiState.Warning.BatteryLevelTooLow
+                                    }
+
+                                    CameraUploadsFinishedReason.NETWORK_CONNECTION_REQUIREMENT_NOT_MET -> {
+                                        CUStatusUiState.Warning.NetworkConnectionRequirementNotMet
+                                    }
+
+                                    CameraUploadsFinishedReason.ACCOUNT_STORAGE_OVER_QUOTA -> {
+                                        CUStatusUiState.Warning.AccountStorageOverQuota
+                                    }
+
+                                    else -> CUStatusUiState.None
+                                }
+                                flowOf(status)
+                            }
+                        }
+
+                        else -> flowOf(CUStatusUiState.None)
+                    }
                 }
             }
         }.asUiStateFlow(
@@ -158,6 +171,11 @@ class MediaCameraUploadViewModel @Inject constructor(
 
     init {
         startMonitoring()
+    }
+
+    internal fun updateNotificationPermission() {
+        val isEnabled = hasNotificationPermissionUseCase()
+        notificationPermissionFlow.update { isEnabled }
     }
 
     private fun startMonitoring() {

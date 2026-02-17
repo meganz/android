@@ -5,8 +5,12 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+import android.app.Activity
+import android.content.Intent
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.os.Build
+import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -47,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -83,6 +88,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenAllFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
+import timber.log.Timber
 
 @Composable
 internal fun TimelineTabRoute(
@@ -100,6 +106,7 @@ internal fun TimelineTabRoute(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
+    handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
@@ -124,6 +131,7 @@ internal fun TimelineTabRoute(
         onPhotoClick = onPhotoClick,
         onPhotoSelected = onPhotoSelected,
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+        handleNotificationPermissionResult = handleNotificationPermissionResult,
         onCUBannerDismissRequest = onCUBannerDismissRequest,
         onTabsVisibilityChange = onTabsVisibilityChange,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
@@ -147,6 +155,7 @@ internal fun TimelineTabScreen(
     onPhotoClick: (node: PhotoNodeUiState) -> Unit,
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
+    handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
@@ -154,6 +163,7 @@ internal fun TimelineTabScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    val activity = LocalActivity.current
     val resource = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
     val scope = rememberCoroutineScope()
@@ -176,6 +186,10 @@ internal fun TimelineTabScreen(
     val cameraUploadsPermissionsLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             handleCameraUploadsPermissionsResult()
+        }
+    val notificationPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+            handleNotificationPermissionResult()
         }
 
     if (uiState.isLoading.not()) {
@@ -302,6 +316,21 @@ internal fun TimelineTabScreen(
                     val cameraUploadsPermissions = getCameraUploadsPermissions()
                     cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
                 },
+                onRequestNotificationPermission = exit@{
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val activity = activity ?: return@exit
+
+                        val shouldShowRationale = ActivityCompat
+                            .shouldShowRequestPermissionRationale(activity, POST_NOTIFICATIONS)
+
+                        // Open notification in settings when permission has been exhausted
+                        if (shouldShowRationale) {
+                            notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+                        } else {
+                            activity.openNotificationSettings()
+                        }
+                    }
+                },
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
                 onNavigateToCameraUploadsSettings = {
                     onNavigateToCameraUploadsSettings(
@@ -380,6 +409,7 @@ private fun TimelineTabContent(
     onPhotoSelected: (node: PhotoNodeUiState) -> Unit,
     onPhotosNodeListCardClick: (photo: PhotosNodeListCard) -> Unit,
     onChangeCameraUploadsPermissions: () -> Unit,
+    onRequestNotificationPermission: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToCameraUploadsSettings: () -> Unit,
     onNavigateMobileDataSetting: () -> Unit,
@@ -415,6 +445,7 @@ private fun TimelineTabContent(
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                                onRequestNotificationPermission = onRequestNotificationPermission,
                                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                                 onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
@@ -445,6 +476,7 @@ private fun TimelineTabContent(
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
                                 onDismissRequest = onCUBannerDismissRequest,
                                 onChangeCameraUploadsPermissions = onChangeCameraUploadsPermissions,
+                                onRequestNotificationPermission = onRequestNotificationPermission,
                                 onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
                                 onNavigateMobileDataSetting = onNavigateMobileDataSetting,
                                 onNavigateUpgradeScreen = onNavigateToUpgradeScreen,
@@ -516,14 +548,12 @@ private fun PhotoModificationTimePeriodSelector(
 private fun getCameraUploadsPermissions() =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         arrayOf(
-            POST_NOTIFICATIONS,
             getImagePermissionByVersion(),
             getVideoPermissionByVersion(),
             READ_MEDIA_VISUAL_USER_SELECTED,
         )
     } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
-            POST_NOTIFICATIONS,
             getImagePermissionByVersion(),
             getVideoPermissionByVersion()
         )
@@ -568,6 +598,18 @@ private fun trackTimePeriodSelection(timePeriod: PhotoModificationTimePeriod) {
     }
 }
 
+private fun Activity?.openNotificationSettings() {
+    try {
+        this?.startActivity(
+            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
+    } catch (e: Exception) {
+        Timber.e(e, "Failed to open notification settings")
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun TimelineTabScreenPreview() {
@@ -588,6 +630,7 @@ private fun TimelineTabScreenPreview() {
             onPhotoClick = {},
             onPhotoSelected = {},
             handleCameraUploadsPermissionsResult = {},
+            handleNotificationPermissionResult = {},
             onCUBannerDismissRequest = {},
             onTabsVisibilityChange = {},
             onNavigateToUpgradeAccount = {},

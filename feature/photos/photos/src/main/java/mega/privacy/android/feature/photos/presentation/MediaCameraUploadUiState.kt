@@ -42,6 +42,8 @@ sealed interface CUStatusUiState {
         data object NetworkConnectionRequirementNotMet : Warning
 
         data object HasLimitedAccess : Warning
+
+        data object NotificationNotGranted : Warning
     }
 }
 
@@ -53,6 +55,7 @@ enum class MediaCUPermissionsState {
 
 data class CUStatusFlowTransition(
     val permissionsState: MediaCUPermissionsState,
+    val notificationPermissionGranted: Boolean?,
     val previousStatus: CameraUploadsStatusInfo?,
     val currentStatus: CameraUploadsStatusInfo?,
 )

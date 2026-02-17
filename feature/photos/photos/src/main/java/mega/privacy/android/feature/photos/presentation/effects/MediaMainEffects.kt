@@ -15,11 +15,17 @@ internal fun MediaMainEffects(
     timelineFilterUiState: TimelineFilterUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     checkCameraUploadsPermissions: () -> Unit,
+    checkNotificationPermission: () -> Unit,
     updateCUPageEnablementBasedOnDisplayedPhotos: suspend (photos: List<PhotosNodeContentType>) -> Unit,
     updateSortActionEnablement: (isEnableCameraUploadPageShowing: Boolean, mediaSource: FilterMediaSource) -> Unit,
 ) {
     LifecycleResumeEffect(Unit) {
         checkCameraUploadsPermissions()
+        onPauseOrDispose {}
+    }
+
+    LifecycleResumeEffect(Unit) {
+        checkNotificationPermission()
         onPauseOrDispose {}
     }
 

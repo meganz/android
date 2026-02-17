@@ -2328,4 +2328,6 @@
     <string name="subscription_type_monthly">Monthly</string>
     <!-- Label for chip to select yearly billing on Choose account screen where user can choose subscription plan. -->
     <string name="subscription_type_yearly">Yearly</string>
+    <!-- CU Warning banner warning text when notification is disabled -->
+    <string name="cu_warning_banner_notification_disabled_warning">Turn on notifications to know if uploads fail or stop syncing.</string>
 </resources>
