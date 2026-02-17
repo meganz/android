@@ -220,7 +220,15 @@ internal fun VideoSectionComposeView(
                     menuItems = toolbarState.toolbarMenuItems,
                     handler = handler,
                     navHostController = navHostController,
-                    clearSelection = videoSectionViewModel::clearAllSelectedVideos,
+                    clearSelection = {
+                        videoSectionViewModel.clearAllSelectedVideos()
+                        if (uiState.searchState == SearchWidgetState.EXPANDED) {
+                            videoSectionViewModel.exitSearch()
+                        }
+                    },
+                    selectAllAction = {
+                        videoSectionViewModel.selectAllNodes()
+                    }
                 )
             } else {
                 VideoSectionTopBar(

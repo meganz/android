@@ -13,6 +13,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.node.model.menuaction.SelectAllMenuAction
 import mega.privacy.android.app.presentation.node.view.ToolbarMenuItem
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionMenuAction
 import mega.privacy.android.app.presentation.videosection.model.VideoSectionTab
@@ -38,20 +39,28 @@ internal fun VideoSectionTopBar(
     handler: NodeActionHandler,
     navHostController: NavHostController,
     clearSelection: () -> Unit,
+    selectAllAction: () -> Unit = { },
 ) {
     val coroutineScope = rememberCoroutineScope()
     when {
         isActionMode -> {
             if (tab == VideoSectionTab.All) {
                 val actions = menuItems.map {
+                    val actionClick = it.control(
+                        clearSelection,
+                        handler::handleAction,
+                        navHostController,
+                        coroutineScope
+                    )
                     MenuActionWithClick(
                         menuAction = it.action,
-                        onClick = it.control(
-                            clearSelection,
-                            handler::handleAction,
-                            navHostController,
-                            coroutineScope
-                        )
+                        onClick = {
+                            if (it.action is SelectAllMenuAction) {
+                                selectAllAction()
+                            } else {
+                                actionClick()
+                            }
+                        }
                     )
                 }
                 SelectModeAppBar(
