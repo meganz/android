@@ -1965,15 +1965,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 viewModel.markHandleShow2FADialog()
             }
 
-            if (managerState.titleChatArchivedEvent != null) {
-                showSnackbar(
-                    SNACKBAR_TYPE,
-                    getString(R.string.success_archive_chat, managerState.titleChatArchivedEvent),
-                    MEGACHAT_INVALID_HANDLE
-                )
-                viewModel.onChatArchivedEventConsumed()
-            }
-
             if (managerState.message != null) {
                 showSnackbar(content = managerState.message.getInfo(this))
                 viewModel.markHandledMessage()

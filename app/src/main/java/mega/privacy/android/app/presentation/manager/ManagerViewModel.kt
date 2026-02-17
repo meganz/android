@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -86,7 +85,6 @@ import mega.privacy.android.domain.usecase.call.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -167,7 +165,6 @@ import javax.inject.Inject
  * @property getNodeByIdUseCase Use case for getting a node by its ID.
  * @property deleteOldestCompletedTransfersUseCase Use case for deleting the oldest completed transfers.
  * @property getIncomingContactRequestsUseCase Use case for getting incoming contact requests.
- * @property monitorChatArchivedUseCase Use case for monitoring chat archived events.
  * @property restoreNodesUseCase Use case for restoring nodes.
  * @property checkNodesNameCollisionUseCase Use case for checking nodes name collision.
  * @property monitorBackupFolder Use case for monitoring backup folder.
@@ -230,7 +227,6 @@ class ManagerViewModel @Inject constructor(
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     monitorOfflineNodeAvailabilityUseCase: MonitorOfflineFileAvailabilityUseCase,
-    private val monitorChatArchivedUseCase: MonitorChatArchivedUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
     private val monitorBackupFolder: MonitorBackupFolder,
@@ -395,12 +391,6 @@ class ManagerViewModel @Inject constructor(
         }
         viewModelScope.launch {
             updateIncomingContactRequests()
-        }
-
-        viewModelScope.launch {
-            monitorChatArchivedUseCase().conflate().collect { chatTitle ->
-                _state.update { it.copy(titleChatArchivedEvent = chatTitle) }
-            }
         }
 
         monitorCallInChatJob?.cancel()
@@ -847,12 +837,6 @@ class ManagerViewModel @Inject constructor(
     }.onFailure {
         Timber.e(it)
     }
-
-    /**
-     * Consume chat archive event
-     */
-    fun onChatArchivedEventConsumed() =
-        _state.update { it.copy(titleChatArchivedEvent = null) }
 
 
     /**

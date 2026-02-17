@@ -56,7 +56,6 @@ data class ManagerState(
     val showSyncSection: Boolean = false,
     val show2FADialog: Boolean = false,
     val isPushNotificationSettingsUpdatedEvent: Boolean = false,
-    val titleChatArchivedEvent: String? = null,
     val restoreNodeResult: Result<RestoreNodeResult>? = null,
     val nodeNameCollisionsResult: NodeNameCollisionsResult? = null,
     val moveRequestResult: Result<MoveRequestResult>? = null,

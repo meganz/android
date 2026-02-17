@@ -93,6 +93,7 @@ fun ChatTabsView(
     onDoNotDisturbActionClick: () -> Unit = {},
     onOpenLinkActionClick: () -> Unit = {},
     onArchivedActionClick: () -> Unit = {},
+    onTitleChatArchivedEventConsumed: () -> Unit = {},
 ) {
     val initialPage = if (showMeetingTab) ChatTab.MEETINGS.ordinal else ChatTab.CHATS.ordinal
     val context = LocalContext.current
@@ -247,6 +248,15 @@ fun ChatTabsView(
                 onConsumed = onResetManagementStateSnackbarMessage
             ) {
                 scaffoldState.snackbarHostState.showAutoDurationSnackbar(it)
+            }
+
+            EventEffect(
+                event = state.titleChatArchivedEvent,
+                onConsumed = onTitleChatArchivedEventConsumed
+            ) {
+                scaffoldState.snackbarHostState.showAutoDurationSnackbar(
+                    context.getString(R.string.success_archive_chat, it)
+                )
             }
         }
     }

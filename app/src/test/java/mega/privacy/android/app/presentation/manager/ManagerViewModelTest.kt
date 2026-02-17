@@ -97,7 +97,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleU
 import mega.privacy.android.domain.usecase.camerauploads.MonitorCameraUploadsFolderDestinationUseCase
 import mega.privacy.android.domain.usecase.chat.GetNoteToSelfChatUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
-import mega.privacy.android.domain.usecase.chat.MonitorChatArchivedUseCase
 import mega.privacy.android.domain.usecase.chat.link.GetChatLinkContentUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
@@ -284,9 +283,6 @@ class ManagerViewModelTest {
     private val monitorOfflineNodeAvailabilityUseCase =
         mock<MonitorOfflineFileAvailabilityUseCase>()
     private val getIncomingContactRequestUseCase = mock<GetIncomingContactRequestsUseCase>()
-    private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
-        onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
-    }
     private val getFullAccountInfoUseCase = mock<GetFullAccountInfoUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
@@ -383,7 +379,6 @@ class ManagerViewModelTest {
             },
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             monitorOfflineNodeAvailabilityUseCase = monitorOfflineNodeAvailabilityUseCase,
-            monitorChatArchivedUseCase = monitorChatArchivedUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
             monitorBackupFolder = monitorBackupFolder,
@@ -470,7 +465,6 @@ class ManagerViewModelTest {
             rtcAudioManagerGateway,
             chatManagement,
             hangChatCallUseCase,
-            monitorChatArchivedUseCase,
             monitorPushNotificationSettingsUpdate,
             getUsersCallLimitRemindersUseCase,
             setUsersCallLimitRemindersUseCase,
@@ -488,7 +482,6 @@ class ManagerViewModelTest {
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         whenever(getUsersCallLimitRemindersUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(true)
-        whenever(monitorChatArchivedUseCase()).thenReturn(flowOf("Chat Title"))
         whenever(monitorPushNotificationSettingsUpdate()).thenReturn(flowOf(true))
         wheneverBlocking { getPrimarySyncHandleUseCase() }.thenReturn(0L)
         wheneverBlocking { getSecondarySyncHandleUseCase() }.thenReturn(0L)
@@ -933,31 +926,6 @@ class ManagerViewModelTest {
             }
         }
     }
-
-    @Test
-    fun `test that when a chat is archived state is updated`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-            verify(monitorChatArchivedUseCase).invoke()
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.titleChatArchivedEvent).isNotNull()
-            }
-        }
-
-    @Test
-    fun `test that when onChatArchivedEventConsumed is called then state is also updated`() =
-        runTest {
-            testScheduler.advanceUntilIdle()
-            verify(monitorChatArchivedUseCase).invoke()
-            underTest.state.test {
-                val state = awaitItem()
-                assertThat(state.titleChatArchivedEvent).isNotNull()
-                underTest.onChatArchivedEventConsumed()
-                val updatedState = awaitItem()
-                assertThat(updatedState.titleChatArchivedEvent).isNull()
-            }
-        }
 
     @Test
     fun `test that restoreNodeResult updated when calling restoreNodes successfully`() = runTest {
