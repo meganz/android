@@ -1125,7 +1125,7 @@
     <!-- General month label -->
     <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">按年收费%1$s</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n每年收费</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">%1$d个项目取消隐藏</item>
@@ -1698,11 +1698,11 @@
     <string name="campaign_name_special_offer">特别优惠：%1$d%%折扣</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">前%2$d个月仅需%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n首%2$d个月</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">前%2$d年仅需%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n首%2$d年</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 隐私工具</string>
@@ -1737,9 +1737,9 @@
         <item quantity="other">奖励将在%1$d天后到期</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">第一个月仅需%1$s</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\n首月</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">第一年仅需%1$s</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\n首年</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">只有您可以显示隐藏的文件，您可以单个操作或者在帐户[A]设置[/A]中选择暂时显示隐藏项目。</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2018,4 +2018,57 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d个文件夹&#160;·&#160;</item>
     </plurals>
+    <string name="albums_multiple_delete_success_message">%d个相册已删除</string>
+    <string name="home_screen_no_network_desc">您已离线。\n如果您将文件设为离线可用，您仍然可以在没有网络连接的情况下访问它们。</string>
+    <string name="home_screen_no_network_desc_with_offline_files">您现在为离线状态。\n您为离线使用保存的项目仍然可用。</string>
+    <string name="home_screen_no_network_view_offline_files_button">查看离线文件</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">更新权限</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">为了确保我们不会错过您所有的回忆，MEGA需要完全访问您的照片库。</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">电量过低。请为设备充电以开启相机上传。</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">相机上传已是最新状态</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="general_clear_all">全部清除</string>
+    <string name="section_banners">横幅</string>
+    <string name="shares_screen_links_section_empty">[B]无[/B][A]公开链接[/A]</string>
+    <string name="general_invalid_dot_name_warning">名称“.”不可用</string>
+    <string name="general_invalid_double_dot_name_warning">名称“..”不可用</string>
+    <string name="transfers_upload_started_snackbar">上传已开始。请查看通知以获取详细信息。</string>
+    <string name="search_landing_title">在找点什么吗？</string>
+    <string name="search_landing_subtitle">搜索文件和文件夹</string>
+    <string name="offline_screen_empty_state_description">无离线文件</string>
+    <string name="general_install_label">安装</string>
+    <string name="general_app_update_download_success_message">应用更新已下载</string>
+    <string name="general_first_name">名</string>
+    <string name="general_last_name">姓</string>
+    <string name="meetings_call_recording_consent_dialog_title">此通话正在录音</string>
+    <string name="meetings_call_recording_consent_dialog_message">继续通话即表示您允许录音。录音仅存储在录制者的设备上。</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">好的，明白了</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">离开通话</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]了解更多[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="choose_account_screen_only_price_per_month">仅%1$s/月</string>
 </resources>

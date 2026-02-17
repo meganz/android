@@ -1145,7 +1145,7 @@
     <!-- General month label -->
     <string name="general_month">/aylık</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">Yıllık %1$s faturalandırılır</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nYıllık faturalandırılır</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d öğenin gizliliği kaldırıldı</item>
@@ -1743,13 +1743,13 @@
     <string name="campaign_name_special_offer">Özel teklif: %%%1$d indirim</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">İlk %2$d ay için %1$s</item>
-        <item quantity="other">İlk %2$d ay için %1$s</item>
+        <item quantity="one">İlk ay için\n[B]%1$s[/B]</item>
+        <item quantity="other">İlk %2$d ay için\n[B]%1$s[/B]</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">İlk %2$d yıl için %1$s</item>
-        <item quantity="other">İlk %2$d yıl için %1$s</item>
+        <item quantity="one">İlk yıl için\n[B]%1$s[/B]</item>
+        <item quantity="other">İlk %2$d yıl için\n[B]%1$s[/B]</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA gizlilik paketi</string>
@@ -1786,9 +1786,9 @@
         <item quantity="other">Bonusun süresi %1$d gün sonra doluyor</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">İlk ay için %1$s</string>
+    <string name="label_first_time_in_months_full_singular">İlk ay için\n[B]%1$s[/B]</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">İlk yıl için %1$s</string>
+    <string name="label_first_time_in_years_full_singular">İlk yıl için\n[B]%1$s[/B]</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Gizli dosyaları yalnızca siz; ister tek tek, ister [A]ayarlardan[/A] gizli öğeleri geçici olarak göstererek ortaya çıkarabilirsiniz.</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2137,4 +2137,18 @@
     </plurals>
     <string name="general_install_label">Yükle</string>
     <string name="general_app_update_download_success_message">Uygulama güncellemesi indirildi</string>
+    <string name="choose_account_screen_only_price_per_month">Ayda sadece %1$s</string>
+    <string name="general_first_name">Adı</string>
+    <string name="general_last_name">Soyadı</string>
+    <string name="meetings_call_recording_consent_dialog_title">Bu arama kaydediliyor</string>
+    <string name="meetings_call_recording_consent_dialog_message">Aramada kalarak kayıt altına alınmasına izin vermiş olursunuz. Kayıt yalnızca kaydeden kişinin cihazında saklanır.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Tamam</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">Aramadan ayrıl</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Daha fazlasını öğren[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>

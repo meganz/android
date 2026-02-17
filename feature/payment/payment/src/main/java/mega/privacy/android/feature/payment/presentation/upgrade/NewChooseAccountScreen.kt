@@ -378,7 +378,7 @@ fun NewChooseAccountScreen(
                         isUpgradeAccount = isUpgradeAccount
                     )
 
-                    val billingInfo = if (!isMonthly) {
+                    val yearlyBillingInfo = if (!isMonthly) {
                         if (!isCurrentPlan && discountedPriceYearly != null
                             && discountPercentage != null && offerPeriod != null
                         ) {
@@ -406,7 +406,7 @@ fun NewChooseAccountScreen(
                         storage = storageString,
                         transfer = transferString,
                         price = yearlyPricePerMonth?.price ?: totalPrice.price,
-                        billingInfo = billingInfo,
+                        yearlyBillingInfo = yearlyBillingInfo,
                         offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
                             getCampaignName(
                                 context = context,

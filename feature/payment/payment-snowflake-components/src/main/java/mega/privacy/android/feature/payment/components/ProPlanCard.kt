@@ -18,9 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.button.MegaRadioButton
@@ -44,12 +47,13 @@ fun ProPlanCard(
     storage: String,
     transfer: String,
     price: String,
-    billingInfo: String?,
+    yearlyBillingInfo: String?,
     offerName: String? = null,
     discountedPrice: String? = null,
     isCurrentPlan: Boolean = false,
     onSelected: () -> Unit = {},
 ) {
+    val isYearlyPlan = !yearlyBillingInfo.isNullOrEmpty()
     Column(
         modifier = modifier
             .border(
@@ -131,7 +135,8 @@ fun ProPlanCard(
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -167,41 +172,71 @@ fun ProPlanCard(
                         modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_ORIGINAL_PRICE)
                     )
                 }
-                Row(verticalAlignment = Alignment.Bottom) {
+                if (isYearlyPlan) {
                     MegaText(
-                        text = actualPrice,
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        textColor = TextColor.Primary,
+                        text = stringResource(
+                            shareR.string.choose_account_screen_only_price_per_month,
+                            actualPrice
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        textColor = TextColor.Brand,
                         modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_PRICE)
                     )
-                    MegaText(
-                        text = stringResource(shareR.string.general_month),
-                        style = MaterialTheme.typography.bodyMedium,
-                        textColor = TextColor.Secondary,
-                        modifier = Modifier
-                            .padding(start = 2.dp, bottom = 2.dp)
-                            .testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
-                    )
                 }
-                if (!billingInfo.isNullOrEmpty()) {
-                    SpannedText(
-                        value = billingInfo,
-                        baseTextColor = TextColor.Secondary,
-                        baseStyle = MaterialTheme.typography.bodySmall,
-                        spanStyles = mapOf(
-                            SpanIndicator('A') to MegaSpanStyle.DefaultColorStyle(
-                                androidx.compose.ui.text.SpanStyle(
-                                    textDecoration = TextDecoration.LineThrough
-                                )
-                            )
-                        ),
-                        modifier = Modifier
-                            .padding(top = 2.dp)
-                            .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
-                    )
+                if (isYearlyPlan) {
+                    YearlyBillingInfo(yearlyBillingInfo)
+                } else {
+                    MonthlyBillingInfo(actualPrice)
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun YearlyBillingInfo(yearlyBillingInfo: String) {
+    SpannedText(
+        value = yearlyBillingInfo,
+        baseTextColor = TextColor.Secondary,
+        baseStyle = MaterialTheme.typography.bodySmall.copy(
+            textAlign = TextAlign.End
+        ),
+        spanStyles = mapOf(
+            SpanIndicator('A') to MegaSpanStyle.DefaultColorStyle(
+                SpanStyle(
+                    textDecoration = TextDecoration.LineThrough
+                )
+            ),
+            SpanIndicator('B') to MegaSpanStyle.DefaultColorStyle(
+                SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp
+                )
+            )
+        ),
+        modifier = Modifier
+            .padding(top = 6.dp)
+            .testTag(TEST_TAG_PRO_PLAN_CARD_BILLING_INFO)
+    )
+}
+
+@Composable
+private fun MonthlyBillingInfo(actualPrice: String) {
+    Row(verticalAlignment = Alignment.Bottom) {
+        MegaText(
+            text = actualPrice,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            textColor = TextColor.Primary,
+            modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_PRICE)
+        )
+        MegaText(
+            text = stringResource(shareR.string.general_month),
+            style = MaterialTheme.typography.bodyMedium,
+            textColor = TextColor.Secondary,
+            modifier = Modifier
+                .padding(start = 2.dp, bottom = 2.dp)
+                .testTag(TEST_TAG_PRO_PLAN_CARD_PRICE_UNIT)
+        )
     }
 }
 
@@ -210,7 +245,7 @@ fun ProPlanCard(
 private fun ProPlanCardPreview() {
     AndroidTheme(isSystemInDarkTheme()) {
         Column {
-            // Card with discount
+            // Card with discount - billingInfo uses [A] for strikethrough, [B] for bold
             ProPlanCard(
                 modifier = Modifier.padding(16.dp),
                 planName = "Pro I",
@@ -219,9 +254,9 @@ private fun ProPlanCardPreview() {
                 storage = "2 TB storage",
                 transfer = "24 TB transfer",
                 price = "€9.99",
-                billingInfo = "€99.99 $49.99 for first year",
-                offerName = "Black Friday offer",
-                discountedPrice = "€4.99",
+                yearlyBillingInfo = "[A]€99.99[/A] [B]€49.99[/B]\nFor the first year",
+                offerName = "Black Friday deal: 50% off",
+                discountedPrice = "$34.22",
                 isCurrentPlan = false
             )
 
@@ -234,7 +269,7 @@ private fun ProPlanCardPreview() {
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
-                billingInfo = "€199.99 billed yearly",
+                yearlyBillingInfo = "[B]€199.99[/B]\nbilled yearly",
                 isCurrentPlan = false
             )
 
@@ -247,7 +282,7 @@ private fun ProPlanCardPreview() {
                 storage = "8 TB storage",
                 transfer = "96 TB transfer",
                 price = "€16.67",
-                billingInfo = null,
+                yearlyBillingInfo = null,
                 isCurrentPlan = true
             )
         }

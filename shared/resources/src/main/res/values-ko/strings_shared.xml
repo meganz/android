@@ -1125,7 +1125,7 @@
     <!-- General month label -->
     <string name="general_month">/월</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">매년 %1$s 청구</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n연간 결제</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">항목 %1$d개 숨김 해제</item>
@@ -1670,11 +1670,11 @@
     <string name="campaign_name_special_offer">특별 할인: %1$d%% 할인</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">첫 %2$d개월 동안 %1$s</item>
+        <item quantity="other">첫 %2$d개월 동안\n[B]%1$s[/B]</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">첫 %2$d년 동안 %1$s</item>
+        <item quantity="other">첫 %2$d년 동안\n[B]%1$s[/B]</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 프라이버시 스위트</string>
@@ -1709,9 +1709,9 @@
         <item quantity="other">%1$d일 내에 보너스가 만료됩니다</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">첫 한 달만 %1$s</string>
+    <string name="label_first_time_in_months_full_singular">첫 달만\n[B]%1$s[/B]</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">첫 1년만 %1$s</string>
+    <string name="label_first_time_in_years_full_singular">첫 해만\n[B]%1$s[/B]</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">당신만 숨긴 파일을 [A]설정[/A]에서 개별적으로 또는 일시적으로 숨겨진 항목들을 나타나게 할 수 있습니다.</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2038,4 +2038,21 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
     </plurals>
+    <string name="choose_account_screen_only_price_per_month">단돈 월 %1$s</string>
+    <string name="recovering_info">불러오는 중&#8230;</string>
+    <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
+    <string name="general_hi">안녕하세요</string>
+    <string name="general_first_name">이름</string>
+    <string name="general_last_name">성</string>
+    <string name="meetings_call_recording_consent_dialog_title">이 통화는 녹음되고 있습니다</string>
+    <string name="meetings_call_recording_consent_dialog_message">통화를 계속하는 것은 녹음할 권한을 주는 것입니다. 녹음은 녹음한 사람의 장치에만 저장됩니다.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">알겠습니다</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">통화 떠나기</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]더 알아보기[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>

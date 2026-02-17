@@ -1151,7 +1151,7 @@
     <!-- General month label -->
     <string name="general_month">/mes</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s cobrados anualmente</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nFacturado anualmente</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d elemento visible</item>
@@ -1884,14 +1884,14 @@
     <string name="campaign_name_cyber_monday">Oferta de Cyber Monday: %1$d%% de descuento</string>
     <string name="campaign_name_special_offer">Oferta especial: %1$d%% de descuento</string>
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s para el primer %2$d mes</item>
-        <item quantity="many">%1$s para los primeros %2$d meses</item>
-        <item quantity="other">%1$s para los primeros %2$d meses</item>
+        <item quantity="one">[B]%1$s[/B]\nPara el primer %2$d mes</item>
+        <item quantity="many">[B]%1$s[/B]\nPara los primeros %2$d meses</item>
+        <item quantity="other">[B]%1$s[/B]\nPara los primeros %2$d meses</item>
     </plurals>
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s durante el primer %2$d año</item>
-        <item quantity="many">%1$s durante los primeros %2$d años</item>
-        <item quantity="other">%1$s durante los primeros %2$d años</item>
+        <item quantity="one">[B]%1$s[/B]\nPara el primer %2$d año</item>
+        <item quantity="many">[B]%1$s[/B]\nPara los primeros %2$d años</item>
+        <item quantity="other">[B]%1$s[/B]\nPara los primeros %2$d años</item>
     </plurals>
     <string name="account_upgrade_account_label_save_at_least">Ahorra al menos un 16% con un plan anual</string>
     <string name="mega_vpn_achievement_awarded_storage_text_permanent">Obtén %1$s de almacenamiento gratuito al iniciar una prueba gratuita de MEGA&#160;VPN, válido de forma permanente</string>
@@ -1901,8 +1901,8 @@
         <item quantity="many">Quedan %1$d de días</item>
         <item quantity="other">Quedan %1$d días</item>
     </plurals>
-    <string name="label_first_time_in_months_full_singular">%1$s por el primer mes</string>
-    <string name="label_first_time_in_years_full_singular">%1$s por el primer año</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nPara el primer mes</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nPara el primer año</string>
     <string name="hidden_nodes_description_control_visibility_tag">Solo tú puedes revelar los archivos ocultos, ya sea de forma individual o mostrando temporalmente los elementos ocultos en los [A]ajustes[/A].</string>
     <string name="preview_not_available_undecrypted_files">La vista previa no está disponible para archivos sin descifrar</string>
     <plurals name="delete_album_confirmation_dialog_title">
@@ -2144,4 +2144,33 @@
         <item quantity="many">%1$d de carpetas&#160;·&#160;</item>
         <item quantity="other">%1$d carpetas&#160;·&#160;</item>
     </plurals>
+    <string name="home_recents_snackbar_activity_hidden">Tu actividad reciente ha sido ocultada</string>
+    <string name="home_recents_button_view_all">Ver todo</string>
+    <string name="home_recents_options_menu_show_activity">Mostrar actividad reciente</string>
+    <string name="home_recents_empty_text_description">Aquí aparecerá toda la actividad reciente de tus archivos y carpetas</string>
+    <string name="home_recents_hidden_text_description">Actividad reciente oculta</string>
+    <string name="home_recents_bucket_subtitle_added_to">Añadido a %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Estos archivos ya no están disponibles</string>
+    <string name="shares_screen_links_section_empty">[B]No hay [/B][A]enlaces públicos[/A]</string>
+    <string name="general_invalid_dot_name_warning">El nombre “.” no es válido</string>
+    <string name="general_invalid_double_dot_name_warning">El nombre “..” no es válido</string>
+    <string name="search_landing_title">¿Buscas algo?</string>
+    <string name="search_landing_subtitle">Buscar archivos y carpetas</string>
+    <string name="offline_screen_empty_state_description">No hay archivos en Sin conexión</string>
+    <string name="general_install_label">Instalar</string>
+    <string name="general_app_update_download_success_message">Actualización de la aplicación descargada</string>
+    <string name="choose_account_screen_only_price_per_month">Solo %1$s/mes</string>
+    <string name="general_first_name">Nombre</string>
+    <string name="general_last_name">Apellido(s)</string>
+    <string name="meetings_call_recording_consent_dialog_title">Esta llamada se está grabando</string>
+    <string name="meetings_call_recording_consent_dialog_message">Al permanecer en la llamada, das permiso para que se te grabe. La grabación solo se almacena en el dispositivo de la persona que la graba.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Entendido</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">Abandonar llamada</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Más información[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>

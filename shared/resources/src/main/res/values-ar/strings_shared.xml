@@ -1205,7 +1205,7 @@
     <!-- General month label -->
     <string name="general_month">/شهر</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">يتم تحصيل رسوم %1$s سنويًا</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nيُفرض سنويًا</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="zero">%1$d عنصر غير مخفي</item>
@@ -1874,23 +1874,23 @@
     <string name="campaign_name_cyber_monday">صفقة الاثنين الالكتروني: خصم %1$d%%</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">عرض خاص: خصم %1$d%%</string>
-    <!-- Label for first time period in days full format -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. &#10; is a line break. -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="zero">%1$s لأول %2$d شهر</item>
-        <item quantity="one">%1$s لأول %2$d شهر</item>
-        <item quantity="two">%1$s لأول %2$d شهرين</item>
-        <item quantity="few">%1$s لأول %2$d شهور</item>
-        <item quantity="many">%1$s لأول %2$d شهر</item>
-        <item quantity="other">%1$s لأول %2$d شهر</item>
+        <item quantity="zero">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
+        <item quantity="one">[B]%1$s[/B]\nلأول %2$d شهر</item>
+        <item quantity="two">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
     </plurals>
-    <!-- Label for first time period in years full format -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. &#10; is a line break. -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="zero">%1$s لأول %2$d سنة</item>
-        <item quantity="one">%1$s لأول %2$d سنة</item>
-        <item quantity="two">%1$s لأول %2$d سنتين</item>
-        <item quantity="few">%1$s لأول %2$d سنوات</item>
-        <item quantity="many">%1$s لأول %2$d سنة</item>
-        <item quantity="other">%1$s لأول %2$d سنة</item>
+        <item quantity="zero">[B]%1$s[/B]\nلأول %2$d سنوات</item>
+        <item quantity="one">[B]%1$s[/B]\nلأول %2$d سنة</item>
+        <item quantity="two">[B]%1$s[/B]\nلأول %2$d سنوات</item>
+        <item quantity="few"></item>
+        <item quantity="many"></item>
+        <item quantity="other">[B]%1$s[/B]\nلأول %2$d سنوات</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">مجموعة الخصوصية من ميغا MEGA</string>
@@ -1935,9 +1935,9 @@
         <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s للشهر الأول</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nلأول شهر</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s للسنة الأولى</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nلأول سنة</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">يمكنك فقط الكشف عن الملفات المخفية إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من [A]إعدادات[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2230,4 +2230,18 @@
         <item quantity="many">%1$d مجلداً&#160;.&#160;</item>
         <item quantity="other">%1$d مجلد&#160;.&#160;</item>
     </plurals>
+    <string name="choose_account_screen_only_price_per_month">فقط %1$s/شهر</string>
+    <string name="general_first_name">الاسم الأول</string>
+    <string name="general_last_name">اسم العائلة</string>
+    <string name="meetings_call_recording_consent_dialog_title">هذا الاتصال يتم تسجيله</string>
+    <string name="meetings_call_recording_consent_dialog_message">من خلال البقاء في المكالمة فإنك تمنح الإذن بالتسجيل. يتم تخزين التسجيل فقط على جهاز الشخص الذي يقوم بتسجيله.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">إغلاق</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">غادر المكالمة</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]اعرف المزيد[/A]</string>
+    <!-- Error message when folder is already part of Camera Uploads -->
+    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of Media Uploads -->
+    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
+    <!-- Error message when folder is already part of a sync or backup -->
+    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>
