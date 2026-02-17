@@ -53,7 +53,7 @@ fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
             onShowChat = {
                 key.chatId?.let {
                     navigate(ChatNavKey(it, ACTION_CHAT_SHOW_MESSAGES))
-                } ?: navigate(LeftMeetingNavKey)
+                } ?: navigate(LeftMeetingNavKey())
             },
         )
     }

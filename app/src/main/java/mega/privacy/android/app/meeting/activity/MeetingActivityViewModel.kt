@@ -362,6 +362,18 @@ class MeetingActivityViewModel @Inject constructor(
                     }
                 }
         }
+
+        checkSingleActivity()
+    }
+
+    private fun checkSingleActivity() {
+        viewModelScope.launch {
+            val isSingleActivityEnabled =
+                runCatching { getFeatureFlagValueUseCase(AppFeatures.SingleActivity) }
+                    .getOrDefault(false)
+
+            _state.update { state -> state.copy(isSingleActivityEnabled = isSingleActivityEnabled) }
+        }
     }
 
     private fun startMonitoringAudioOutput() {

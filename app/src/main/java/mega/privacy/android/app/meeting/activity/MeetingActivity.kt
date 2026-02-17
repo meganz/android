@@ -18,12 +18,14 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -41,9 +43,7 @@ import mega.privacy.android.app.meeting.fragments.MeetingBaseFragment
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
-import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
 import mega.privacy.android.app.presentation.meeting.WaitingRoomManagementViewModel
-import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.app.presentation.meeting.model.MeetingState
 import mega.privacy.android.app.presentation.meeting.model.WaitingRoomManagementState
 import mega.privacy.android.app.presentation.meeting.view.ParticipantsFullListView
@@ -54,7 +54,11 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil.getAppropriateStringForScheduledMeetingDate
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.meeting.ParticipantsSection
+import mega.privacy.android.feature.chat.meeting.recording.CallRecordingViewModel
+import mega.privacy.android.feature.chat.meeting.recording.model.CallRecordingUIState
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.LeftMeetingNavKey
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import timber.log.Timber
@@ -113,6 +117,9 @@ class MeetingActivity : PasscodeActivity() {
      */
     @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
+
+    @Inject
+    lateinit var navigationEventQueue: NavigationEventQueue
 
     lateinit var binding: ActivityMeetingBinding
     private lateinit var pipBuilderParams: PictureInPictureParams.Builder
@@ -350,15 +357,30 @@ class MeetingActivity : PasscodeActivity() {
         collectFlow(meetingViewModel.state) { state: MeetingState ->
 
             if (state.shouldLaunchLeftMeetingActivity) {
-                startActivity(
-                    Intent(this, LeftMeetingActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        .putExtra(MEETING_FREE_PLAN_USERS_LIMIT, state.callEndedDueToFreePlanLimits)
-                        .putExtra(
-                            MEETING_PARTICIPANTS_LIMIT,
-                            state.callEndedDueToTooManyParticipants
+                if (state.isSingleActivityEnabled) {
+                    lifecycleScope.launch {
+                        navigationEventQueue.emit(
+                            LeftMeetingNavKey(
+                                callEndedDueToFreePlanLimits = state.callEndedDueToFreePlanLimits,
+                                callEndedDueToTooManyParticipants = state.callEndedDueToTooManyParticipants,
+                            )
                         )
-                )
+                        finish()
+                    }
+                } else {
+                    startActivity(
+                        Intent(this, LeftMeetingActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                            .putExtra(
+                                MEETING_FREE_PLAN_USERS_LIMIT,
+                                state.callEndedDueToFreePlanLimits
+                            )
+                            .putExtra(
+                                MEETING_PARTICIPANTS_LIMIT,
+                                state.callEndedDueToTooManyParticipants
+                            )
+                    )
+                }
             }
 
             if (state.callEndedDueToFreePlanLimits) {
