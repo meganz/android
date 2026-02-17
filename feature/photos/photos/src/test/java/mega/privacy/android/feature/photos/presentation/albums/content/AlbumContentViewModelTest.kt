@@ -8,7 +8,6 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -66,7 +65,6 @@ import mega.privacy.android.feature.photos.mapper.LegacyPhotosSortMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
-import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
@@ -513,22 +511,6 @@ class AlbumContentViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.sendPhotosToChatEvent).isEqualTo(consumed())
-        }
-    }
-
-    @Test
-    fun `test that selectAllPhotos selects all photos when filter is ALL_MEDIA`() = runTest {
-        createViewModel()
-        val photo1 = mock<PhotoUiState.Image>()
-        val photo2 = mock<PhotoUiState.Video>()
-        whenever(photo1.id).thenReturn(1L)
-        whenever(photo2.id).thenReturn(2L)
-
-        underTest.selectAllPhotos()
-
-        underTest.state.test {
-            val state = awaitItem()
-            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.ALL_MEDIA)
         }
     }
 

@@ -9,7 +9,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,10 +25,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -48,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.extensions.toTrackingEvent
@@ -484,7 +482,7 @@ fun MediaMainScreen(
                     }
                 }
             )
-        }
+        },
     ) { paddingValues ->
         val tabEntries = remember(mediaMainUiState.isMediaRevampPhase2Enabled) {
             if (mediaMainUiState.isMediaRevampPhase2Enabled) {
@@ -500,12 +498,7 @@ fun MediaMainScreen(
             MegaScrollableTabRow(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        PaddingValues(
-                            top = paddingValues.calculateTopPadding(),
-                            end = paddingValues.calculateEndPadding(layoutDirection = LocalLayoutDirection.current)
-                        )
-                    ),
+                    .padding(top = paddingValues.calculateTopPadding()),
                 beyondViewportPageCount = 1,
                 hideTabs = selectionModeType.isAnActiveSelection() || shouldHideTabs,
                 pagerScrollEnabled = selectionModeType == MediaSelectionModeType.None,
@@ -524,14 +517,8 @@ fun MediaMainScreen(
                                 tabItem = getTabItem(),
                                 content = { _, modifier ->
                                     MediaContent(
-                                        modifier = modifier.fillMaxSize(),
-                                        timelineContentPadding = PaddingValues(
-                                            bottom = if (selectionModeType.isAnActiveSelection()) {
-                                                paddingValues.calculateBottomPadding()
-                                            } else {
-                                                50.dp
-                                            }
-                                        ),
+                                        modifier = modifier,
+                                        timelineContentPadding = paddingValues.excludeTopPadding(),
                                         mainViewModel = viewModel,
                                         albumsTabViewModel = albumsTabViewModel,
                                         timelineTabUiState = timelineTabUiState,
@@ -695,12 +682,7 @@ private fun MediaScreen.MediaContent(
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
                 onNavigate = navigationHandler::navigate,
                 viewModel = albumsTabViewModel,
-                contentPadding = PaddingValues(
-                    start = 8.dp,
-                    end = 8.dp,
-                    top = 8.dp,
-                    bottom = 100.dp
-                )
+                contentPadding = timelineContentPadding
             )
         }
 

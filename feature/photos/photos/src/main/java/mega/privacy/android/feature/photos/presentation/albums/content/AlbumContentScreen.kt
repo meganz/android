@@ -4,7 +4,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -68,6 +67,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -140,7 +140,6 @@ fun AlbumContentScreen(
         actionHandler = selectionModeActionHandler::invoke,
         onBack = navigationHandler::back,
         togglePhotoSelection = viewModel::togglePhotoSelection,
-        selectAll = viewModel::selectAllPhotos,
         deselectAll = viewModel::clearSelectedPhotos,
         savePhotosToDevice = viewModel::savePhotosToDevice,
         resetSavePhotosToDeviceEvent = viewModel::resetSavePhotosToDevice,
@@ -198,7 +197,6 @@ internal fun AlbumContentScreen(
     actionHandler: (MenuAction, List<TypedNode>) -> Unit,
     onBack: () -> Unit,
     togglePhotoSelection: (PhotoUiState) -> Unit,
-    selectAll: () -> Unit,
     deselectAll: () -> Unit,
     savePhotosToDevice: () -> Unit,
     resetSavePhotosToDeviceEvent: () -> Unit,
@@ -371,13 +369,6 @@ internal fun AlbumContentScreen(
                         .testTag(ALBUM_CONTENT_SCREEN_SELECTION_TOOLBAR),
                     title = uiState.selectedPhotos.size.toString(),
                     navigationType = AppBarNavigationType.Close(deselectAll),
-                    actions = listOf(AlbumContentSelectionAction.SelectAll),
-                    onActionPressed = { action ->
-                        when (action) {
-                            is AlbumContentSelectionAction.SelectAll -> selectAll()
-                            else -> return@MegaTopAppBar
-                        }
-                    }
                 )
             } else {
                 MegaTopAppBar(
@@ -455,7 +446,7 @@ internal fun AlbumContentScreen(
                     handleAction(AlbumContentSelectionAction.AddItems)
                 }
             )
-        }
+        },
     ) { innerPadding ->
         val isLoadingEmpty =
             uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)
@@ -507,7 +498,7 @@ internal fun AlbumContentScreen(
                         shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                                 && uiState.accountType?.isPaid == true
                                 && !uiState.isBusinessAccountExpired,
-                        contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
+                        contentPadding = innerPadding.excludeTopPadding(),
                         onSortOrderClick = {
                             showSortBottomSheet = true
                         },
@@ -773,7 +764,6 @@ private fun AlbumContentScreenPreview() {
             actionHandler = { _, _ -> },
             onBack = {},
             togglePhotoSelection = {},
-            selectAll = {},
             deselectAll = {},
             savePhotosToDevice = {},
             resetSavePhotosToDeviceEvent = {},

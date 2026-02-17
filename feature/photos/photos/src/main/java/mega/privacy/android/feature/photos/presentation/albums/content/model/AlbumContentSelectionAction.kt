@@ -34,17 +34,6 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical)
     }
 
-    data object SelectAll : AlbumContentSelectionAction {
-        override val testTag: String = "album_content_selection_action:select_all"
-
-        @Composable
-        override fun getDescription() = stringResource(sharedR.string.action_select_all)
-
-        @Composable
-        override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
-    }
-
     data object Rename : AlbumContentSelectionAction {
         override val testTag: String = "album_content_selection_action:rename"
 

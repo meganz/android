@@ -5,6 +5,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
@@ -46,7 +48,7 @@ fun AlbumsTabRoute(
     viewModel: AlbumsTabViewModel = hiltViewModel(),
     showNewAlbumDialogEvent: StateEvent = consumed,
     resetNewAlbumDialogEvent: () -> Unit = {},
-    contentPadding: PaddingValues = PaddingValues()
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -84,7 +86,7 @@ internal fun AlbumsTabScreen(
     resetDeleteAlbumsConfirmationEvent: () -> Unit = {},
     onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {},
     getPresetNewAlbumName: (String) -> String = { "" },
-    contentPadding: PaddingValues = PaddingValues()
+    contentPadding: PaddingValues = PaddingValues(),
 ) {
     val placeholder = if (uiState.themeMode.isDarkMode()) {
         painterResource(R.drawable.ic_album_cover_d)
@@ -111,7 +113,10 @@ internal fun AlbumsTabScreen(
         action = onNavigate
     )
 
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .padding(contentPadding.excludingBottomPadding())
+    ) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(100.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),

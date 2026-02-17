@@ -60,6 +60,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
@@ -389,7 +390,11 @@ private fun TimelineTabContent(
     val shouldShowCUBanner by remember(uiState.selectedPhotoCount) {
         derivedStateOf { uiState.selectedPhotoCount == 0 }
     }
-    Box(modifier = modifier) {
+
+    Box(
+        modifier = modifier
+            .padding(contentPadding.excludingBottomPadding())
+    ) {
         when (selectedTimePeriod) {
             PhotoModificationTimePeriod.All -> {
                 PhotosNodeGridView(

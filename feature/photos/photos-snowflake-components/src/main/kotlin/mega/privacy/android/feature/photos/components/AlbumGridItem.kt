@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.photos.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -113,12 +115,18 @@ fun AlbumGridItem(
             }
 
             if (isSelected) {
-                Checkbox(
-                    modifier = Modifier.padding(top = 1.dp, start = 1.dp),
-                    checked = true,
-                    onCheckStateChanged = {},
-                    tapTargetArea = false,
-                    clickable = false,
+                MegaIcon(
+                    modifier = Modifier
+                        .padding(top = 4.dp, start = 4.dp)
+                        .background(
+                            color = DSTokens.colors.background.surfaceTransparent,
+                            shape = RoundedCornerShape(2.dp)
+                        )
+                        .padding(2.dp)
+                        .align(Alignment.TopStart),
+                    painter = rememberVectorPainter(IconPack.Small.Thin.Outline.Check),
+                    contentDescription = "check icon",
+                    tint = IconColor.OnColor,
                 )
             }
         }
