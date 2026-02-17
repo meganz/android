@@ -174,11 +174,15 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
 
     private suspend fun List<PhotoUiState>.toUIPhotos(): List<PhotosNodeContentType> =
         withContext(defaultDispatcher) {
+            val isPaid = _state.value.accountType?.isPaid == true
+            val isBusinessExpired = _state.value.isBusinessAccountExpired
             this@toUIPhotos.map { photo ->
                 PhotosNodeContentType.PhotoNodeItem(
                     node = PhotoNodeUiState(
                         photo = photo,
-                        isSensitive = photo.isSensitive || photo.isSensitiveInherited,
+                        isSensitive = isPaid &&
+                                !isBusinessExpired &&
+                                (photo.isSensitive || photo.isSensitiveInherited),
                         isSelected = false,
                         defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                     )
