@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import mega.privacy.android.feature.chat.meeting.view.MeetingHasEndedDialog
 import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test

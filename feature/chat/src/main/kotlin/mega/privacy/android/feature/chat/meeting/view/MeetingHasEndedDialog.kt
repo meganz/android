@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.chat.dialog
+package mega.privacy.android.feature.chat.meeting.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

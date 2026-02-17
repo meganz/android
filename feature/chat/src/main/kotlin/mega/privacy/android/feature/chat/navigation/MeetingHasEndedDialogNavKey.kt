@@ -5,9 +5,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
-import mega.privacy.android.feature.chat.dialog.MeetingHasEndedDialog
-import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
+import mega.privacy.android.feature.chat.meeting.view.MeetingHasEndedDialog
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
@@ -20,17 +18,6 @@ import mega.privacy.android.navigation.destination.LeftMeetingNavKey
 data class MeetingHasEndedDialogNavKey(
     val chatId: Long?,
 ) : NoSessionNavKey.Optional, DialogNavKey
-
-data object MeetingHasEndedDialogDestinations : AppDialogDestinations {
-    override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
-        { navigationHandler, onHandled ->
-            meetingHasEndedDialog(
-                navigateBack = navigationHandler::back,
-                navigate = navigationHandler::navigate,
-                onDialogHandled = onHandled
-            )
-        }
-}
 
 fun EntryProviderScope<DialogNavKey>.meetingHasEndedDialog(
     navigateBack: () -> Unit,

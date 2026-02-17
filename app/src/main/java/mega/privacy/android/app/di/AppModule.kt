@@ -29,7 +29,6 @@ import mega.privacy.android.app.nav.MegaNavigatorImpl
 import mega.privacy.android.app.presentation.business.BusinessAccountExpiredDialogDestinations
 import mega.privacy.android.app.presentation.business.BusinessGraceDialogDestinations
 import mega.privacy.android.app.presentation.contact.link.dialog.ContactLinkDialogDestinations
-import mega.privacy.android.app.presentation.twofactorauthentication.Enable2FADialogDestinations
 import mega.privacy.android.app.presentation.contact.navigation.ContactsDeepLinkHandler
 import mega.privacy.android.app.presentation.container.MegaAppContainerProvider
 import mega.privacy.android.app.presentation.filelink.FileLinkDeepLinkHandler
@@ -47,6 +46,7 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.storage.OverQuotaDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
+import mega.privacy.android.app.presentation.twofactorauthentication.Enable2FADialogDestinations
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
@@ -55,7 +55,7 @@ import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
-import mega.privacy.android.feature.chat.navigation.MeetingHasEndedDialogDestinations
+import mega.privacy.android.feature.chat.navigation.ChatDialogDestinations
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -193,7 +193,7 @@ internal class AppModule {
             TransferOverQuotaDialogDestinations,
             RemoteLogoutDialogDestinations,
             ContactLinkDialogDestinations,
-            MeetingHasEndedDialogDestinations,
+            ChatDialogDestinations,
             DeepLinksDialogDestinations,
             OverQuotaDialogDestinations,
             PurchaseResultDialogDestinations,
