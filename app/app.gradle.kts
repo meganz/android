@@ -37,9 +37,6 @@ plugins {
 }
 
 android {
-    androidResources {
-        generateLocaleConfig = true
-    }
     defaultConfig {
         applicationId = "mega.privacy.android.app"
 

@@ -52,9 +52,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
                     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-                    // Removed setupLanguageResources to allow AGP to automatically detect all locales
-                    // when generateLocaleConfig = true is enabled
-                    // setupLanguageResources(target)
+                    setupLanguageResources(target)
                 }
                 setupSourceSet()
                 setupJniLibsPackaging()
