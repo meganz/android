@@ -11,12 +11,16 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -28,6 +32,30 @@ import mega.privacy.android.feature.photos.presentation.playlists.videoselect.vi
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+
+
+@Composable
+fun SelectVideosForPlaylistRoute(
+    onNavigateToFolder: (Long, String) -> Unit,
+    onBack: () -> Unit,
+    viewModel: SelectVideosForPlaylistViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val navigateToFolderEvent by viewModel.navigateToFolderEvent.collectAsStateWithLifecycle()
+
+    EventEffect(
+        event = navigateToFolderEvent,
+        onConsumed = viewModel::resetNavigateToFolderEvent
+    ) {
+        onNavigateToFolder(it.id.longValue, it.name)
+    }
+
+    SelectVideosForPlaylistScreen(
+        uiState = uiState,
+        onItemClicked = viewModel::itemClicked,
+        onBackPressed = onBack
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

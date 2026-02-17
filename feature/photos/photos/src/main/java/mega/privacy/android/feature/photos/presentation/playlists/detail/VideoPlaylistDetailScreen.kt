@@ -37,6 +37,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -60,6 +61,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
@@ -93,6 +95,9 @@ fun VideoPlaylistDetailRoute(
         onLongClick = viewModel::onItemLongClicked,
         selectAll = viewModel::selectAllVideos,
         clearSelection = viewModel::clearSelection,
+        selectVideos = {
+            navigationHandler.navigate(SelectVideosForPlaylistNavKey())
+        },
         onBack = navigationHandler::back
     )
 }
@@ -115,6 +120,7 @@ fun VideoPlaylistDetailScreen(
     onLongClick: (item: VideoUiEntity) -> Unit = {},
     selectAll: () -> Unit = {},
     clearSelection: () -> Unit = {},
+    selectVideos: () -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
@@ -135,9 +141,16 @@ fun VideoPlaylistDetailScreen(
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
+        floatingActionButton = {
+            AddContentFab(
+                modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
+                visible = selectedNodes.isEmpty(),
+                onClick = selectVideos
+            )
+        },
         topBar = {
             MegaTopAppBar(
                 modifier = Modifier
@@ -198,7 +211,7 @@ fun VideoPlaylistDetailScreen(
     ) { innerPadding ->
         when (uiState) {
             is VideoPlaylistDetailUiState.Loading -> NodesViewSkeleton(
-                modifier = modifier
+                modifier = Modifier
                     .padding(innerPadding)
                     .testTag(VIDEO_PLAYLIST_DETAIL_LOADING_VIEW_TEST_TAG),
                 isListView = true,
@@ -247,14 +260,16 @@ fun VideoPlaylistDetailScreen(
                         title = playlistDetail?.uiEntity?.title,
                         totalDuration = playlistDetail?.uiEntity?.totalDuration,
                         numberOfVideos = playlistDetail?.uiEntity?.numberOfVideos,
-                        modifier = modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding)
                     )
                 } else {
                     val items = uiState.playlistDetail.videos
                     FastScrollLazyColumn(
                         state = lazyListState,
                         totalItems = items.size,
-                        contentPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding()),
+                        contentPadding = PaddingValues(
+                            bottom = innerPadding.calculateBottomPadding() + 100.dp
+                        ),
                         modifier = Modifier
                             .padding(
                                 PaddingValues(
@@ -442,3 +457,8 @@ const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG = "video_playlist_detail:b
  */
 const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlist_detail:dialog_delete_video_playlist"
+
+/**
+ * Test tag for adding video to playlist FAB
+ */
+const val VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG = "video_playlist_detail:add_video_fab"

@@ -39,3 +39,10 @@ data object AlbumDecryptionKeyNavKey : NavKey
 @Serializable
 @Parcelize
 data object CameraUploadsProgressNavKey : NavKey, Parcelable
+
+@Serializable
+@Parcelize
+data class SelectVideosForPlaylistNavKey(
+    val nodeHandle: Long = -1L,
+    val nodeName: String? = null,
+) : NavKey, Parcelable

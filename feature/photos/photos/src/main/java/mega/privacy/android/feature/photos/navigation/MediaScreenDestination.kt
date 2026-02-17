@@ -38,6 +38,8 @@ import mega.privacy.android.feature.photos.presentation.albums.photosselection.A
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosForPlaylistRoute
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosForPlaylistViewModel
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
@@ -56,6 +58,7 @@ import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
+import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -379,6 +382,26 @@ fun EntryProviderScope<NavKey>.albumGetMultipleLinks(
                     startActivity(shareIntent)
                 }
             },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<SelectVideosForPlaylistNavKey> { key ->
+        val viewModel =
+            hiltViewModel<SelectVideosForPlaylistViewModel, SelectVideosForPlaylistViewModel.Factory> {
+                it.create(key.nodeHandle, key.nodeName)
+            }
+        SelectVideosForPlaylistRoute(
+            onNavigateToFolder = { handle, name ->
+                navigationHandler.navigate(
+                    SelectVideosForPlaylistNavKey(handle, name)
+                )
+            },
+            onBack = navigationHandler::back,
+            viewModel = viewModel
         )
     }
 }
