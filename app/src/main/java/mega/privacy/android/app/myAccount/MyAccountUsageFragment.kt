@@ -132,6 +132,10 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
             .distinctUntilChanged()) {
             setupAccountDetails()
         }
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.isProFlexiAccount }
+            .distinctUntilChanged()) {
+            setupAccountDetails()
+        }
         viewLifecycleOwner.collectFlow(viewModel.monitorMyAccountUpdate) {
             if (it.action == MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS) {
                 setupAccountDetails()
