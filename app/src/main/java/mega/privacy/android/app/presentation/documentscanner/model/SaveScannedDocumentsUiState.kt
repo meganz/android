@@ -4,6 +4,7 @@ import android.net.Uri
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 
 /**
  * The UI State for Save Scanned Documents
@@ -34,6 +35,7 @@ internal data class SaveScannedDocumentsUiState(
     val snackbarMessage: StateEventWithContent<ScanFilenameValidationStatus> = consumed(),
     val soloImageUri: Uri? = null,
     val uploadScansEvent: StateEventWithContent<Uri> = consumed(),
+    val uploadScanUri: UriPath? = null,
 ) {
 
     /**

@@ -19,6 +19,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.documentscanner.ValidateScanFilenameUseCase
@@ -132,7 +133,13 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
                             )
                         }.onSuccess { renamedFile ->
                             logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
-                            _uiState.update { it.copy(uploadScansEvent = triggered(renamedFile.toUri())) }
+                            _uiState.update {
+                                val uri = renamedFile.toUri()
+                                it.copy(
+                                    uploadScansEvent = triggered(uri),
+                                    uploadScanUri = uri.toUriPath(),
+                                )
+                            }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")
                         }
