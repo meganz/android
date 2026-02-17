@@ -22,8 +22,10 @@ import mega.privacy.android.app.menu.navigation.SharedItemsItem
 import mega.privacy.android.app.menu.navigation.StorageItem
 import mega.privacy.android.app.menu.navigation.TransferItItem
 import mega.privacy.android.app.menu.navigation.TransfersItem
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.call.MonitorActiveCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
+import mega.privacy.android.domain.usecase.notifications.MonitorNotSeenUserAlertsCountUseCase
 import mega.privacy.android.navigation.contract.MainNavItem
 import mega.privacy.android.navigation.contract.NavDrawerItem
 
@@ -32,8 +34,11 @@ import mega.privacy.android.navigation.contract.NavDrawerItem
 class NavigationModule {
     @Provides
     @IntoSet
-    fun provideMenuNavItem(menuItems: Map<Int, @JvmSuppressWildcards NavDrawerItem>): MainNavItem =
-        MenuNavItem(menuItems)
+    fun provideMenuNavItem(
+        menuItems: Map<Int, @JvmSuppressWildcards NavDrawerItem>,
+        monitorNotSeenUserAlertsCountUseCase: MonitorNotSeenUserAlertsCountUseCase,
+    ): MainNavItem =
+        MenuNavItem(menuItems, monitorNotSeenUserAlertsCountUseCase)
 
     @Provides
     @IntoMap
@@ -48,7 +53,9 @@ class NavigationModule {
     @Provides
     @IntoMap
     @IntKey(30)
-    fun provideContactsItem(): NavDrawerItem = ContactsItem
+    fun provideContactsItem(
+        monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
+    ): NavDrawerItem = ContactsItem(monitorContactRequestsUseCase)
 
     @Provides
     @IntoMap

@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.account.contactrequest.MonitorContactRequestsUseCase
 import mega.privacy.android.domain.usecase.call.MonitorActiveCallUseCase
 import mega.privacy.android.domain.usecase.chat.GetNumUnreadChatsUseCase
 import mega.privacy.android.icon.pack.IconPack
@@ -50,10 +51,16 @@ object StorageItem : NavDrawerItem.Account(
     analyticsEventIdentifier = MyMenuStorageNavigationItemEvent,
 )
 
-object ContactsItem : NavDrawerItem.Account(
+class ContactsItem(
+    monitorContactRequestsUseCase: MonitorContactRequestsUseCase,
+) : NavDrawerItem.Account(
     destination = ContactsNavKey(ContactsNavKey.NavType.List),
     icon = IconPack.Medium.Thin.Outline.UserSquare,
     title = sharedR.string.general_section_contacts,
+    badge = monitorContactRequestsUseCase().map { contactRequestLists ->
+        val count = contactRequestLists.incomingContactRequests.size
+        if (count > 0) DefaultNumberBadge(count) else null
+    },
     analyticsEventIdentifier = MyMenuContactsNavigationItemEvent,
 )
 
