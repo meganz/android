@@ -15,12 +15,15 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
+import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.transfers.active.UpdateActiveTransfersAndCleanGroupsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -38,6 +41,7 @@ class DeleteOldestCompletedTransfersWorkerTest {
     private val workProgressUpdater = mock<ProgressUpdater>()
     private val updateActiveTransfersAndCleanGroupsUseCase =
         mock<UpdateActiveTransfersAndCleanGroupsUseCase>()
+    private val transfersRepository = mock<TransferRepository>()
 
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
@@ -73,6 +77,7 @@ class DeleteOldestCompletedTransfersWorkerTest {
             ),
             megaLocalRoomGateway,
             updateActiveTransfersAndCleanGroupsUseCase,
+            transfersRepository,
         )
     }
 
@@ -83,6 +88,7 @@ class DeleteOldestCompletedTransfersWorkerTest {
             workProgressUpdater,
             megaLocalRoomGateway,
             updateActiveTransfersAndCleanGroupsUseCase,
+            transfersRepository,
         )
     }
 
@@ -94,10 +100,19 @@ class DeleteOldestCompletedTransfersWorkerTest {
         }
 
     @Test
-    fun `test that delete Oldest Completed Transfers is invoked when worker start work`() =
+    fun `test that delete Oldest Completed Transfers is invoked when worker start work and there are no active transfers`() =
         runTest {
+            whenever(transfersRepository.getActiveTransfers()) doReturn emptyList()
             underTest.doWork()
             verify(megaLocalRoomGateway).deleteOldestCompletedTransfers()
+        }
+
+    @Test
+    fun `test that delete Oldest Completed Transfers is not invoked when worker start work and there are active transfers`() =
+        runTest {
+            whenever(transfersRepository.getActiveTransfers()) doReturn listOf(mock())
+            underTest.doWork()
+            verify(megaLocalRoomGateway, never()).deleteOldestCompletedTransfers()
         }
 
     @Test

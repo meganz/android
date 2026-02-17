@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.transfers.active
 
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
@@ -56,8 +57,9 @@ class UpdateActiveTransfersUseCaseTest {
 
         whenever(getInProgressTransfersUseCase()).thenReturn(inProgressTransfers)
 
-        underTest()
+        val actual = underTest()
 
+        assertThat(actual).isTrue()
         verify(transferRepository).putActiveTransfers(
             argThat { this.size == 2 && this.containsAll(inProgressTransfers) }
         )
@@ -87,8 +89,9 @@ class UpdateActiveTransfersUseCaseTest {
         whenever(transferRepository.getCompletedTransfers()).thenReturn(completedTransfers)
         whenever(transferRepository.getActiveTransferGroups()).thenReturn(activeTransferGroups)
 
-        underTest()
+        val actual = underTest()
 
+        assertThat(actual).isFalse()
         verify(transferRepository).putActiveTransfers(
             argThat { transfers ->
                 transfers.size == 2 &&

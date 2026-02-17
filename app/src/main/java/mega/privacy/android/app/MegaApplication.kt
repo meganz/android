@@ -111,8 +111,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * @property globalChatListener
  * @property localIpAddress
  * @property globalNetworkStateHandler
- * @property monitorAndHandleTransferEventsUseCase
- * @property monitorTransferEventsToStartWorkersIfNeededUseCase
  * @property applicationScope
  */
 @HiltAndroidApp
@@ -212,13 +210,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     @Inject
-    lateinit var monitorAndHandleTransferEventsUseCase: MonitorAndHandleTransferEventsUseCase
-
-
-    @Inject
-    lateinit var monitorTransferEventsToStartWorkersIfNeededUseCase: MonitorTransferEventsToStartWorkersIfNeededUseCase
-
-    @Inject
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
@@ -295,8 +286,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
 
-        monitorTransferEvents()
-        monitorTransferEventsToStartWorkersIfNeeded()
         setupMegaChatApi()
         getMiscFlagsIfNeeded()
         applicationScope.launch {
@@ -438,42 +427,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
             monitorCallSoundsUseCase()
                 .collectLatest { next: CallSoundType ->
                     soundsController.playSound(next)
-                }
-        }
-    }
-
-    private fun monitorTransferEvents() {
-        applicationScope.launch(Dispatchers.IO) {
-            var reconnectDelay = Duration.ZERO
-            monitorAndHandleTransferEventsUseCase()
-                .retry {
-                    // In case of an error we need to keep monitoring the events, but we add a exponential delay before retrying to avoid potential infinite sync loops in case of recurrent error
-                    Timber.e(it, "Error monitoring transfer events, retrying in $reconnectDelay")
-                    delay(reconnectDelay)
-                    reconnectDelay = (reconnectDelay * 2).coerceAtLeast(100.milliseconds)
-                    true
-                }
-                .collect {
-                    // reset the delay on each successful collect
-                    reconnectDelay = Duration.ZERO
-                    Timber.v("$it transfer events processed")
-                }
-        }
-    }
-
-    private fun monitorTransferEventsToStartWorkersIfNeeded() {
-        applicationScope.launch(Dispatchers.IO) {
-            var reconnectDelay = Duration.ZERO
-            monitorTransferEventsToStartWorkersIfNeededUseCase()
-                .retry {
-                    Timber.e(it, "Error starting Workers, retrying in $reconnectDelay")
-                    delay(reconnectDelay)
-                    reconnectDelay = (reconnectDelay * 2).coerceAtLeast(100.milliseconds)
-                    true
-                }
-                .collect {
-                    reconnectDelay = Duration.ZERO
-                    Timber.v("Worker started for $it")
                 }
         }
     }

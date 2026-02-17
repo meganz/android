@@ -19,8 +19,9 @@ class UpdateActiveTransfersUseCase @Inject constructor(
 ) {
     /**
      * invoke
+     * @return true if transfers have been added from SDK in progress transfers
      */
-    suspend operator fun invoke() {
+    suspend operator fun invoke(): Boolean {
         val inProgressTransfers: List<Transfer> = getInProgressTransfersUseCase()
         val completedTransfers: List<CompletedTransfer> = transferRepository.getCompletedTransfers()
         val transferGroupIds =
@@ -31,5 +32,6 @@ class UpdateActiveTransfersUseCase @Inject constructor(
         if (activeTransfers.isNotEmpty()) {
             transferRepository.putActiveTransfers(activeTransfers)
         }
+        return inProgressTransfers.isNotEmpty()
     }
 }

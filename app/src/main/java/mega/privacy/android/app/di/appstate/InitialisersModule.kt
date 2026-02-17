@@ -11,6 +11,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.CheckBu
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.DeleteOldestCompletedTransfersInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.Enable2FAInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.MeetingEventsPostLoginInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.MonitorTransferEventsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.NotificationTopicsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OfflineSyncPostLoginInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.OnboardingPaymentInitialiser
@@ -23,6 +24,8 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.ReloadC
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SecurityUpgradeInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.SetupLegacyViewsInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartCameraUploadsAfterStorageStateEventInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartTransferWorkerInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.UpdateActiveTransfersInitializer
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
@@ -171,5 +174,20 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideSetupLegacyViewsInitializer(initialiser: SetupLegacyViewsInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideStartTransferWorkerInitializer(initialiser: StartTransferWorkerInitializer): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideMonitorTransferEventsInitializer(initialiser: MonitorTransferEventsInitializer): AppStartInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideUpdateActiveTransfersInitializer(initialiser: UpdateActiveTransfersInitializer): PostLoginInitialiser =
         initialiser
 }
