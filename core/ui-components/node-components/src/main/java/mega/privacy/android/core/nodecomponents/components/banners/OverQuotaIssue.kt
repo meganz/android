@@ -7,9 +7,10 @@ data class OverQuotaStatus(
     val storage: OverQuotaIssue.Storage = OverQuotaIssue.Storage.None,
     val transfer: OverQuotaIssue.Transfer = OverQuotaIssue.Transfer.None,
 ) {
-    val severity = listOf(storage.severity, transfer.severity).maxBy { it.ordinal }
+    val severity = listOf(storage.severity, transfer.severity).maxBy { it.priority }
     val hasStorageIssue = storage != OverQuotaIssue.Storage.None
     val hasTransferIssue = transfer != OverQuotaIssue.Transfer.None
+    val hasIssues = hasStorageIssue || hasTransferIssue
 }
 
 /**
@@ -20,17 +21,23 @@ interface OverQuotaIssue {
 
     sealed class Storage(override val severity: Severity) : OverQuotaIssue {
         object None : Storage(Severity.None)
-        object AlmostFull : Storage(Severity.Warning)
+        object AlmostFull : Storage(Severity.Warning.NonBlocking)
         object Full : Storage(Severity.Error)
     }
 
     sealed class Transfer(override val severity: Severity) : OverQuotaIssue {
         object None : Transfer(Severity.None)
-        object TransferOverQuotaFreeUser : Transfer(Severity.Warning)
+        object TransferOverQuotaFreeUser : Transfer(Severity.Warning.Blocking)
         object TransferOverQuota : Transfer(Severity.Error)
     }
 
-    enum class Severity {
-        None, Warning, Error
+    sealed class Severity(val priority: Int) {
+        data object None : Severity(0)
+        sealed class Warning(priority: Int) : Severity(priority) {
+            data object NonBlocking : Warning(1)
+            data object Blocking : Warning(2)
+        }
+
+        data object Error : Severity(3)
     }
 }

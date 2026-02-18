@@ -311,7 +311,8 @@ internal fun TransfersView(
                             isTransferOverQuota = isTransferOverQuota,
                             isStorageOverQuota = isStorageOverQuota,
                             hasInternetConnection = hasInternetConnection,
-                            quotaWarning = quotaWarning,
+                            overQuotaStatus = overQuotaStatus,
+                            isTabSelected = selectedTab == 0,
                             areTransfersPaused = areTransfersPaused,
                             enableSwipeToDismiss = !isInSelectTransfersMode,
                             onPlayPauseClicked = { tag ->

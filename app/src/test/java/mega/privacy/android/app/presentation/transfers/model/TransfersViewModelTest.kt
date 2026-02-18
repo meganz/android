@@ -17,9 +17,15 @@ import mega.privacy.android.app.extensions.asHotFlow
 import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel.Companion.MAX_COMPLETED_TRANSFER_FOR_STATE
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -33,7 +39,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.chat.ChatUploadNotRetriedException
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -69,6 +76,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -83,8 +91,10 @@ class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
 
     private val monitorInProgressTransfersUseCase = mock<MonitorInProgressTransfersUseCase>()
-    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
+    private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
+    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val overQuotaStatusMapper = spy<OverQuotaStatusMapper>()
     private val monitorPausedTransfersUseCase = mock<MonitorPausedTransfersUseCase>()
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
@@ -144,6 +154,7 @@ class TransfersViewModelTest {
         on { type } doReturn TransferType.GENERAL_UPLOAD
         on { this.appData } doReturn originalUriPathAppData
         on { this.originalPath } doReturn originalPath
+        on { this.fileName } doReturn fileName
     }
     private val typedNode = mock<TypedNode>()
     private val offlineStartEvent = TransferTriggerEvent.StartDownloadForOffline(
@@ -155,7 +166,7 @@ class TransfersViewModelTest {
         downloadLocation = "downloadLocation",
     )
     private val uploadStartEvent = TransferTriggerEvent.StartUpload.Files(
-        mapOf(originalPath to null),
+        mapOf(originalPath to fileName),
         NodeId(failedUpload.parentHandle),
         pitagTrigger = PitagTrigger.NotApplicable,
     )
@@ -180,12 +191,15 @@ class TransfersViewModelTest {
             getTransferByUniqueIdUseCase,
             isTransferInErrorStatusUseCase,
             monitorConnectivityUseCase,
+            monitorStorageStateUseCase,
+            monitorAccountDetailUseCase,
         )
         wheneverBlocking { monitorInProgressTransfersUseCase() }.thenReturn(emptyFlow())
-        wheneverBlocking { monitorStorageStateEventUseCase() } doReturn MutableStateFlow(
-            StorageStateEvent(1L, StorageState.Unknown)
+        wheneverBlocking { monitorStorageStateUseCase() }.thenReturn(flowOf(StorageState.Unknown))
+        wheneverBlocking { monitorAccountDetailUseCase() }.thenReturn(
+            flowOf(createAccountDetail(isPaid = false))
         )
-        wheneverBlocking { monitorTransferOverQuotaUseCase() }.thenReturn(emptyFlow())
+        wheneverBlocking { monitorTransferOverQuotaUseCase() }.thenReturn(flowOf(false))
         wheneverBlocking { monitorPausedTransfersUseCase() }.thenReturn(emptyFlow())
         wheneverBlocking {
             monitorCompletedTransfersByStateWithLimitUseCase(
@@ -201,7 +215,7 @@ class TransfersViewModelTest {
         underTest = TransfersViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
             monitorInProgressTransfersUseCase = monitorInProgressTransfersUseCase,
-            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             monitorPausedTransfersUseCase = monitorPausedTransfersUseCase,
             pauseTransferByTagUseCase = pauseTransferByTagUseCase,
@@ -220,9 +234,25 @@ class TransfersViewModelTest {
             clearTransferErrorStatusUseCase = clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase = getTransferByUniqueIdUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            overQuotaStatusMapper = overQuotaStatusMapper,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
             initialTab = TransfersNavKey.Tab.Active,
         )
+    }
+
+    private fun createAccountDetail(isPaid: Boolean): AccountDetail {
+        val accountType = if (isPaid) AccountType.PRO_I else AccountType.FREE
+        val accountLevelDetail = AccountLevelDetail(
+            accountType = accountType,
+            subscriptionStatus = null,
+            subscriptionRenewTime = 0L,
+            accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+            proExpirationTime = 0L,
+            accountPlanDetail = null,
+            accountSubscriptionDetailList = emptyList(),
+        )
+        return AccountDetail(levelDetail = accountLevelDetail)
     }
 
     @Test
@@ -251,46 +281,35 @@ class TransfersViewModelTest {
 
     @ParameterizedTest(name = " when isStorageOverQuota: {0}")
     @EnumSource(StorageState::class)
-    fun `test that MonitorStorageStateEventUseCase updates state with storage state`(
+    fun `test that MonitorStorageStateUseCase updates state with storage state`(
         storageState: StorageState,
     ) = runTest {
-        val flow = MutableStateFlow(
-            StorageStateEvent(
-                1L,
-                storageState = StorageState.Unknown,
-            )
-        )
+        val flow = MutableStateFlow(StorageState.Unknown)
 
-        whenever(monitorStorageStateEventUseCase()).thenReturn(flow)
+        whenever(monitorStorageStateUseCase()).thenReturn(flow)
 
         initTestClass()
 
         underTest.uiState.test {
             var actual = awaitItem()
             assertThat(actual.isStorageOverQuota).isFalse()
-            assertThat(actual.quotaWarning).isNull()
-            flow.emit(
-                StorageStateEvent(
-                    1L,
-                    storageState = storageState,
-                )
-            )
+            assertThat(actual.overQuotaStatus.hasIssues).isFalse()
+            flow.emit(storageState)
             advanceUntilIdle()
 
             if (storageState == StorageState.Red || storageState == StorageState.PayWall) {
                 actual = awaitItem()
                 assertThat(actual.isStorageOverQuota).isTrue()
-                assertThat(actual.quotaWarning).isEqualTo(QuotaWarning.Storage)
-                flow.emit(
-                    StorageStateEvent(
-                        1L,
-                        storageState = StorageState.Green,
-                    )
+                assertThat(actual.overQuotaStatus).isEqualTo(
+                    OverQuotaStatus(storage = OverQuotaIssue.Storage.Full)
                 )
+                flow.emit(StorageState.Green)
 
                 actual = awaitItem()
                 assertThat(actual.isStorageOverQuota).isFalse()
-                assertThat(actual.quotaWarning).isNull()
+                assertThat(actual.overQuotaStatus.hasIssues).isFalse()
+            } else {
+                cancelAndIgnoreRemainingEvents()
             }
         }
     }
@@ -307,15 +326,17 @@ class TransfersViewModelTest {
             underTest.uiState.test {
                 var actual = awaitItem()
                 assertThat(actual.isTransferOverQuota).isFalse()
-                assertThat(actual.quotaWarning).isNull()
+                assertThat(actual.overQuotaStatus.hasIssues).isFalse()
                 flow.emit(true)
                 actual = awaitItem()
                 assertThat(actual.isTransferOverQuota).isTrue()
-                assertThat(actual.quotaWarning).isEqualTo(QuotaWarning.Transfer)
+                assertThat(actual.overQuotaStatus).isEqualTo(
+                    OverQuotaStatus(transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser)
+                )
                 flow.emit(false)
                 actual = awaitItem()
                 assertThat(actual.isTransferOverQuota).isFalse()
-                assertThat(actual.quotaWarning).isNull()
+                assertThat(actual.overQuotaStatus.hasIssues).isFalse()
             }
         }
 
@@ -341,36 +362,35 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that MonitorTransferOverQuotaUseCase and MonitorStorageStateEventUseCase updates state with quotaWarning`() =
+    fun `test that MonitorTransferOverQuotaUseCase and MonitorStorageStateUseCase updates state with overQuotaStatus`() =
         runTest {
             val transferQuotaFlow = MutableStateFlow(false)
-            val storageQuotaflow = MutableStateFlow(
-                StorageStateEvent(
-                    1L,
-                    storageState = StorageState.Unknown,
-                )
-            )
+            val storageQuotaFlow = MutableStateFlow(StorageState.Unknown)
 
             whenever(monitorTransferOverQuotaUseCase()).thenReturn(transferQuotaFlow)
-            whenever(monitorStorageStateEventUseCase()).thenReturn(storageQuotaflow)
+            whenever(monitorStorageStateUseCase()).thenReturn(storageQuotaFlow)
 
             initTestClass()
 
-            underTest.uiState.map { it.quotaWarning }.test {
-                assertThat(awaitItem()).isNull()
+            underTest.uiState.map { it.overQuotaStatus }.test {
+                assertThat(awaitItem().hasIssues).isFalse()
                 transferQuotaFlow.emit(true)
-                assertThat(awaitItem()).isEqualTo(QuotaWarning.Transfer)
-                storageQuotaflow.emit(
-                    StorageStateEvent(
-                        1L,
-                        storageState = StorageState.Red,
+                assertThat(awaitItem()).isEqualTo(
+                    OverQuotaStatus(transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser)
+                )
+                storageQuotaFlow.emit(StorageState.Red)
+                assertThat(awaitItem()).isEqualTo(
+                    OverQuotaStatus(
+                        storage = OverQuotaIssue.Storage.Full,
+                        transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser,
                     )
                 )
-                assertThat(awaitItem()).isEqualTo(QuotaWarning.StorageAndTransfer)
                 transferQuotaFlow.emit(false)
-                assertThat(awaitItem()).isEqualTo(QuotaWarning.Storage)
+                assertThat(awaitItem()).isEqualTo(
+                    OverQuotaStatus(storage = OverQuotaIssue.Storage.Full)
+                )
                 underTest.onConsumeQuotaWarning()
-                assertThat(awaitItem()).isNull()
+                assertThat(awaitItem().hasIssues).isFalse()
             }
         }
 

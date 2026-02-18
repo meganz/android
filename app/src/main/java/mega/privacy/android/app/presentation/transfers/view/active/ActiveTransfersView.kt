@@ -26,16 +26,16 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollForLazyCol
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.snackbar.SnackbarHostStateWrapper
 import mega.privacy.android.app.presentation.snackbar.showAutoDurationSnackbar
-import mega.privacy.android.app.presentation.transfers.model.QuotaWarning
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
 import mega.privacy.android.app.presentation.transfers.view.EmptyTransfersView
 import mega.privacy.android.app.presentation.transfers.view.TEST_TAG_ACTIVE_TAB
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaBanner
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.transfers.extension.getProgressPercentString
 import mega.privacy.android.core.transfers.extension.getProgressSizeString
 import mega.privacy.android.core.transfers.extension.getSpeedString
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.feature.transfers.components.ActiveTransferItem
-import mega.privacy.android.feature.transfers.components.OverQuotaBanner
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPauseButtonButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ActiveTransfersIndividualPlayButtonButtonPressedEvent
@@ -49,7 +49,7 @@ internal fun ActiveTransfersView(
     isTransferOverQuota: Boolean,
     isStorageOverQuota: Boolean,
     hasInternetConnection: Boolean,
-    quotaWarning: QuotaWarning?,
+    overQuotaStatus: OverQuotaStatus,
     areTransfersPaused: Boolean,
     enableSwipeToDismiss: Boolean,
     onPlayPauseClicked: (tag: Int) -> Unit,
@@ -61,6 +61,7 @@ internal fun ActiveTransfersView(
     onCancelActiveTransfer: (InProgressTransfer) -> Unit,
     onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
     onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    isTabSelected: Boolean,
     modifier: Modifier = Modifier,
     lazyListState: LazyListState = rememberLazyListState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
@@ -80,15 +81,14 @@ internal fun ActiveTransfersView(
         )
     } else {
         Column {
-            quotaWarning?.let {
-                OverQuotaBanner(
-                    modifier = Modifier.testTag(OVER_QUOTA_BANNER_TAG),
-                    isTransferOverQuota = it is QuotaWarning.Transfer || it is QuotaWarning.StorageAndTransfer,
-                    isStorageOverQuota = it is QuotaWarning.Storage || it is QuotaWarning.StorageAndTransfer,
-                    onUpgradeClick = onUpgradeClick,
-                    onCancelButtonClick = onConsumeQuotaWarning,
-                )
-            }
+            OverQuotaBanner(
+                overQuotaStatus = overQuotaStatus,
+                modifier = Modifier.testTag(OVER_QUOTA_BANNER_TAG),
+                isBlockingAware = true,
+                forceRiceTopAppBar = isTabSelected,
+                onUpgradeClicked = onUpgradeClick,
+                onDismissed = onConsumeQuotaWarning,
+            )
             FastScrollForLazyColumn(
                 totalItems = activeTransfers.size,
                 modifier = modifier.fillMaxSize(),

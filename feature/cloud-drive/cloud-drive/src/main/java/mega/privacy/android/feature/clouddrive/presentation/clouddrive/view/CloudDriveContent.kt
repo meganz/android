@@ -198,7 +198,7 @@ internal fun CloudDriveContent(
         val showContactVerificationBanner =
             !uiState.isLoading && uiState.showContactNotVerifiedBanner && uiState.title.text.isNotEmpty()
         val showOverQuotaWarning =
-            uiState.overQuotaStatus.severity == OverQuotaIssue.Severity.Warning && uiState.shouldShowWarning
+            uiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && uiState.shouldShowWarning
         val topPadding =
             if ((showContactVerificationBanner || isTabContent) && !showOverQuotaWarning) 12.dp else 0.dp
 

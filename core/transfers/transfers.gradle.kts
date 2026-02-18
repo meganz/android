@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":core:analytics:analytics-tracker"))
+    implementation(project(":core:ui-components:node-components"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
     implementation(lib.kotlin.ktx)

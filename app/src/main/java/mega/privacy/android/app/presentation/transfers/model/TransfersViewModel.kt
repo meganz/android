@@ -15,9 +15,12 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
@@ -25,6 +28,8 @@ import mega.privacy.android.app.extensions.moveElement
 import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
+import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel.Companion.waitTimeToShowOffline
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
@@ -37,7 +42,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.extension.skipUnstable
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.chat.message.pendingmessages.RetryChatUploadUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfers.CancelTransferByTagUseCase
@@ -69,7 +75,7 @@ import timber.log.Timber
 class TransfersViewModel @AssistedInject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorInProgressTransfersUseCase: MonitorInProgressTransfersUseCase,
-    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val monitorPausedTransfersUseCase: MonitorPausedTransfersUseCase,
     private val pauseTransferByTagUseCase: PauseTransferByTagUseCase,
@@ -88,6 +94,8 @@ class TransfersViewModel @AssistedInject constructor(
     private val clearTransferErrorStatusUseCase: ClearTransferErrorStatusUseCase,
     private val getTransferByUniqueIdUseCase: GetTransferByUniqueIdUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val overQuotaStatusMapper: OverQuotaStatusMapper,
     isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
     @Assisted initialTab: TransfersNavKey.Tab?,
 ) : ViewModel() {
@@ -108,8 +116,7 @@ class TransfersViewModel @AssistedInject constructor(
         }
         updateSelectedTab(initialTabIndex)
         monitorActiveTransfers()
-        monitorStorageOverQuota()
-        monitorTransferOverQuota()
+        monitorOverQuota()
         monitorPausedTransfers()
         monitorCompletedTransfers()
         monitorConnectivity()
@@ -142,55 +149,29 @@ class TransfersViewModel @AssistedInject constructor(
         }
     }
 
-    private fun monitorStorageOverQuota() {
+    private fun monitorOverQuota() {
         viewModelScope.launch {
-            monitorStorageStateEventUseCase()
-                .collectLatest { storageState ->
-                    _uiState.update { state ->
-                        val isStorageOverQuota = storageState.storageState == StorageState.Red
-                                || storageState.storageState == StorageState.PayWall
-                        val quotaWarning = getQuotaWarning(
-                            isStorageOverQuota = isStorageOverQuota,
-                            isTransferOverQuota = state.isTransferOverQuota
-                        )
-
-                        state.copy(
-                            isStorageOverQuota = isStorageOverQuota,
-                            quotaWarning = quotaWarning,
+            combine(
+                monitorStorageStateUseCase(),
+                monitorTransferOverQuotaUseCase(),
+                monitorAccountDetailUseCase().map { it.levelDetail?.accountType?.isPaid == false }
+            )
+            { storageState: StorageState, transferOverQuota: Boolean, isFreeAccount: Boolean ->
+                overQuotaStatusMapper(
+                    storageState = storageState,
+                    transferOverQuota = transferOverQuota,
+                    freeAccount = isFreeAccount,
+                )
+            }.catch { Timber.e(it) }
+                .collectLatest { overQuotaStatus ->
+                    _uiState.update {
+                        it.copy(
+                            overQuotaStatus = overQuotaStatus,
+                            isStorageOverQuota = overQuotaStatus.hasStorageIssue,
+                            isTransferOverQuota = overQuotaStatus.hasTransferIssue,
                         )
                     }
                 }
-        }
-    }
-
-    private fun monitorTransferOverQuota() {
-        viewModelScope.launch {
-            monitorTransferOverQuotaUseCase()
-                .collectLatest { isTransferOverQuota ->
-                    _uiState.update { state ->
-                        val quotaWarning = getQuotaWarning(
-                            isStorageOverQuota = state.isStorageOverQuota,
-                            isTransferOverQuota = isTransferOverQuota,
-                        )
-
-                        state.copy(
-                            isTransferOverQuota = isTransferOverQuota,
-                            quotaWarning = quotaWarning,
-                        )
-                    }
-                }
-        }
-    }
-
-    private fun getQuotaWarning(
-        isStorageOverQuota: Boolean,
-        isTransferOverQuota: Boolean,
-    ): QuotaWarning? {
-        return when {
-            isStorageOverQuota && isTransferOverQuota -> QuotaWarning.StorageAndTransfer
-            isStorageOverQuota -> QuotaWarning.Storage
-            isTransferOverQuota -> QuotaWarning.Transfer
-            else -> null
         }
     }
 
@@ -198,7 +179,7 @@ class TransfersViewModel @AssistedInject constructor(
      * Consume quota warning.
      */
     fun onConsumeQuotaWarning() {
-        _uiState.update { state -> state.copy(quotaWarning = null) }
+        _uiState.update { state -> state.copy(overQuotaStatus = OverQuotaStatus()) }
     }
 
     private fun monitorPausedTransfers() {
