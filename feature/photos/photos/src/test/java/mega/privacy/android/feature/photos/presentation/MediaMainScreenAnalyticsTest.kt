@@ -142,6 +142,7 @@ class MediaMainScreenAnalyticsTest {
                     playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
                     nodeActionUiState = NodeActionState(),
                     selectionModeType = selectionModeType,
+                    selectedPhotoIds = setOf(),
                     selectedPhotosInTypedNode = selectedPhotosInTypedNode,
                     selectedTimePeriod = PhotoModificationTimePeriod.All,
                     multiNodeActionHandler = mock<MultiNodeActionHandler>(),

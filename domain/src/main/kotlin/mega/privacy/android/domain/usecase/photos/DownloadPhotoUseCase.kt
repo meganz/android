@@ -9,6 +9,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodeTh
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import javax.inject.Inject
 
+@Deprecated("Replace with PhotoThumbnailFetcher.")
 class DownloadPhotoUseCase @Inject constructor(
     private val downloadThumbnailUseCase: DownloadThumbnailUseCase,
     private val downloadPreviewUseCase: DownloadPreviewUseCase,

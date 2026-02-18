@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -49,7 +48,7 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
@@ -237,7 +236,7 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
 
             val uiPhotos = filteredPhotos.toUIPhotos(selectedPhotoIds)
             _state.update {
-                it.copy(photosNodeContentTypes = uiPhotos)
+                it.copy(photosNodeContentItems = uiPhotos)
             }
         }
     }
@@ -284,7 +283,7 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
         filterPhotos()
     }
 
-    private suspend fun List<Photo>.toUIPhotos(selectedPhotoIds: Set<Long>): List<PhotosNodeContentType> =
+    private suspend fun List<Photo>.toUIPhotos(selectedPhotoIds: Set<Long>): List<PhotosNodeContentItem> =
         withContext(defaultDispatcher) {
             flatMapIndexed { index, photo ->
                 val isHiddenNodesEnabled =
@@ -297,18 +296,15 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
                 val showDateSeparator = index == 0 || !comparePeriods()
 
                 val photoUiState = photoUiStateMapper(photo)
-                val isSelected = photo.id in selectedPhotoIds
 
                 listOfNotNull(
-                    PhotosNodeContentType.HeaderItem(
-                        time = photo.modificationTime,
-                        shouldShowGridSizeSettings = false,
+                    PhotosNodeContentItem.HeaderItem(
+                        time = photo.modificationTime
                     ).takeIf { showDateSeparator },
-                    PhotosNodeContentType.PhotoNodeItem(
+                    PhotosNodeContentItem.PhotoNodeItem(
                         node = PhotoNodeUiState(
                             photo = photoUiState,
                             isSensitive = isHiddenNodesEnabled && (photo.isSensitive || photo.isSensitiveInherited),
-                            isSelected = isSelected,
                             defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                         )
                     ),
@@ -333,71 +329,31 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
     fun selectAllPhotos() = viewModelScope.launch {
         _state.update {
             val selectedPhotoIds = withContext(defaultDispatcher) {
-                val photoIds = it.photosNodeContentTypes
-                    .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+                val photoIds = it.photosNodeContentItems
+                    .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
                     .map { item -> item.node.photo.id }
                 it.selectedPhotoIds + photoIds
             }
-            val updatedPhotosNodeContentTypes =
-                it.photosNodeContentTypes.withSelection(selectedPhotoIds)
-            it.copy(
-                selectedPhotoIds = selectedPhotoIds,
-                photosNodeContentTypes = updatedPhotosNodeContentTypes,
-            )
+            it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 
     fun clearSelection() {
-        _state.update {
-            val updatedPhotosNodeContentTypes = it.photosNodeContentTypes.withSelection(setOf())
-            it.copy(
-                selectedPhotoIds = setOf(),
-                photosNodeContentTypes = updatedPhotosNodeContentTypes,
-            )
-        }
+        _state.update { it.copy(selectedPhotoIds = setOf()) }
     }
 
     fun selectPhoto(photo: PhotoUiState) {
         synchronized(Unit) {
             if (_state.value.selectedPhotoIds.size < MAX_SELECTION_NUM) {
                 val selectedPhotoIds = _state.value.selectedPhotoIds + photo.id
-                _state.update {
-                    val updatedPhotosNodeContentTypes =
-                        it.photosNodeContentTypes.withSelection(selectedPhotoIds)
-                    it.copy(
-                        selectedPhotoIds = selectedPhotoIds,
-                        photosNodeContentTypes = updatedPhotosNodeContentTypes,
-                    )
-                }
+                _state.update { it.copy(selectedPhotoIds = selectedPhotoIds) }
             }
         }
     }
 
     fun unselectPhoto(photo: PhotoUiState) {
         val selectedPhotoIds = _state.value.selectedPhotoIds - photo.id
-        _state.update {
-            val updatedPhotosNodeContentTypes =
-                it.photosNodeContentTypes.withSelection(selectedPhotoIds)
-            it.copy(
-                selectedPhotoIds = selectedPhotoIds,
-                photosNodeContentTypes = updatedPhotosNodeContentTypes,
-            )
-        }
-    }
-
-    private fun List<PhotosNodeContentType>.withSelection(
-        selectedPhotoIds: Set<Long>,
-    ): List<PhotosNodeContentType> {
-        return this.map { contentType ->
-            when (contentType) {
-                is PhotosNodeContentType.PhotoNodeItem -> {
-                    val isSelected = contentType.node.photo.id in selectedPhotoIds
-                    contentType.copy(node = contentType.node.copy(isSelected = isSelected))
-                }
-
-                is PhotosNodeContentType.HeaderItem -> contentType
-            }
-        }
+        _state.update { it.copy(selectedPhotoIds = selectedPhotoIds) }
     }
 
     fun addPhotos(album: Album.UserAlbum, selectedPhotoIds: Set<Long>) {

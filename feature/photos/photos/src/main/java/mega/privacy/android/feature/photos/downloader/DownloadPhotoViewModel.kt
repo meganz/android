@@ -23,6 +23,7 @@ import javax.inject.Inject
  *
  * @property downloadPhotoUseCase [DownloadPhotoUseCase].
  */
+@Deprecated("Replace with PhotoThumbnailFetcher.")
 @HiltViewModel
 class DownloadPhotoViewModel @Inject constructor(
     private val downloadPhotoUseCase: DownloadPhotoUseCase,

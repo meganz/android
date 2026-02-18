@@ -13,7 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -36,8 +36,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -87,10 +87,21 @@ internal fun PhotosNodeListCardListView(
                     .padding(horizontal = 8.dp)
                     .clip(shape = RoundedCornerShape(16.dp))
             ) {
-                val downloadResult by photo.photoItem.photo.downloadAsStateWithLifecycle(isPreview = true)
-                val filePath = when (val result = downloadResult) {
-                    is DownloadPhotoResult.Success -> result.previewFilePath
-                    else -> null
+                val context = LocalContext.current
+                val request = remember(photo) {
+                    ImageRequest.Builder(context)
+                        .data(
+                            MediaThumbnailRequest(
+                                id = photo.photoItem.photo.id,
+                                isPreview = true,
+                                thumbnailFilePath = photo.photoItem.photo.thumbnailFilePath,
+                                previewFilePath = photo.photoItem.photo.previewFilePath,
+                                isPublicNode = false,
+                                fileExtension = photo.photoItem.photo.fileTypeInfo.extension
+                            )
+                        )
+                        .crossfade(enable = true)
+                        .build()
                 }
                 AsyncImage(
                     modifier = Modifier
@@ -99,10 +110,7 @@ internal fun PhotosNodeListCardListView(
                         .alpha(0.5f.takeIf { photo.photoItem.isMarkedSensitive } ?: 1f)
                         .blur(16.dp.takeIf { photo.photoItem.isMarkedSensitive } ?: 0.dp)
                         .testTag(PHOTOS_NODE_LIST_CARD_LIST_VIEW_IMAGE_TAG),
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(filePath)
-                        .crossfade(true)
-                        .build(),
+                    model = request,
                     contentDescription = null,
                     placeholder = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),
                     error = rememberAsyncImagePainter(model = IconPackR.drawable.ic_image_medium_solid),

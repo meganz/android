@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -42,7 +41,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
@@ -80,7 +79,8 @@ class TimelineTabViewModel @Inject constructor(
      * uiState when this property changes.
      */
     internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
-    private val selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(value = emptySet())
+    private val _selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(value = emptySet())
+    internal val selectedPhotoIds = _selectedPhotoIdsFlow.asStateFlow()
     private val _selectedPhotosInTypedNodesFlow =
         MutableStateFlow<List<TypedNode>>(value = emptyList())
     internal val selectedPhotosInTypedNodesFlow = _selectedPhotosInTypedNodesFlow.asStateFlow()
@@ -124,47 +124,38 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorPhotos() = combine(
+    private fun monitorPhotos() =
+        combine(
+            flow = photosFlow(),
+            flow2 = gridSizeFlow,
+            transform = ::Pair
+        ).map { (photos, gridSize) ->
+            buildTimelineTabUiState(
+                allPhotos = photos.first,
+                sortResult = photos.second,
+                gridSize = gridSize,
+            )
+        }
+
+    private fun photosFlow() = combine(
         flow = monitorTimelinePhotosUseCase(
             request = TimelinePhotosRequest(
                 selectedFilterFlow = selectedFilterFlow
             )
         ),
-        flow2 = sortOptionsFlow
+        flow2 = sortOptionsFlow,
     ) { photosResult, sortOptions ->
         val sortResult = monitorTimelinePhotosUseCase.sortPhotos(
             photos = photosResult.nonSensitivePhotos,
             sortOrder = sortOptions.sortOrder
         )
         Pair(photosResult.allPhotos, sortResult)
-    }.flatMapLatest { (allPhotos, sortResult) ->
-        buildUiState(
-            allPhotos = allPhotos,
-            sortResult = sortResult
-        )
-    }
-
-    private fun buildUiState(
-        allPhotos: List<PhotoResult>,
-        sortResult: TimelineSortedPhotosResult,
-    ) = combine(
-        flow = gridSizeFlow,
-        flow2 = selectedPhotoIdsFlow,
-        transform = ::Pair
-    ).map { (gridSize, selectedPhotoIds) ->
-        buildTimelineTabUiState(
-            allPhotos = allPhotos,
-            sortResult = sortResult,
-            gridSize = gridSize,
-            selectedPhotoIds = selectedPhotoIds,
-        )
     }
 
     private suspend fun buildTimelineTabUiState(
         allPhotos: List<PhotoResult>,
         sortResult: TimelineSortedPhotosResult,
         gridSize: TimelineGridSize,
-        selectedPhotoIds: Set<Long>,
     ): TimelineTabUiState = coroutineScope {
         val displayedPhotos = async {
             buildList {
@@ -176,18 +167,16 @@ class TimelineTabViewModel @Inject constructor(
                     )
                     if (shouldShowDate) {
                         add(
-                            PhotosNodeContentType.HeaderItem(
-                                time = photoResult.photo.modificationTime,
-                                shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty()
+                            PhotosNodeContentItem.HeaderItem(
+                                time = photoResult.photo.modificationTime
                             )
                         )
                     }
                     add(
-                        PhotosNodeContentType.PhotoNodeItem(
+                        PhotosNodeContentItem.PhotoNodeItem(
                             node = PhotoNodeUiState(
                                 photo = photoUiStateMapper(photoResult.photo),
                                 isSensitive = photoResult.isMarkedSensitive,
-                                isSelected = photoResult.photo.id in selectedPhotoIds,
                                 defaultIcon = fileTypeIconMapper(photoResult.photo.fileTypeInfo.extension)
                             )
                         )
@@ -212,7 +201,6 @@ class TimelineTabViewModel @Inject constructor(
             monthsCardPhotos = monthsCardPhotos.await(),
             yearsCardPhotos = yearsCardPhotos.await(),
             gridSize = gridSize,
-            selectedPhotoCount = selectedPhotoIds.size,
             currentSort = sortOptionsFlow.value,
         )
     }
@@ -221,14 +209,10 @@ class TimelineTabViewModel @Inject constructor(
         current: Photo,
         previous: Photo,
         gridSize: TimelineGridSize,
-    ): Boolean {
-        val currentDate = current.modificationTime.toLocalDate()
-        val previousDate = previous.modificationTime.toLocalDate()
-        return if (gridSize == TimelineGridSize.Large) {
-            currentDate != previousDate
-        } else {
-            currentDate.month != previousDate.month
-        }
+    ): Boolean = if (gridSize == TimelineGridSize.Large) {
+        current.modificationTime != previous.modificationTime
+    } else {
+        current.modificationTime.month != previous.modificationTime.month
     }
 
     internal fun onSortOptionsChange(value: TimelineTabSortOptions) {
@@ -322,12 +306,12 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal fun onPhotoSelected(node: PhotoNodeUiState) {
-        if (node.photo.id in selectedPhotoIdsFlow.value) {
-            selectedPhotoIdsFlow.update {
+        if (node.photo.id in _selectedPhotoIdsFlow.value) {
+            _selectedPhotoIdsFlow.update {
                 it - node.photo.id
             }
         } else {
-            selectedPhotoIdsFlow.update {
+            _selectedPhotoIdsFlow.update {
                 it + node.photo.id
             }
         }
@@ -338,13 +322,13 @@ class TimelineTabViewModel @Inject constructor(
     internal fun onSelectAllPhotos() {
         val notAddedIds = uiState.value
             .displayedPhotos
-            .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
-            .filter { it.node.photo.id !in selectedPhotoIdsFlow.value }
+            .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
+            .filter { it.node.photo.id !in _selectedPhotoIdsFlow.value }
             .map { it.node.photo.id }
 
         if (notAddedIds.isEmpty()) return
 
-        selectedPhotoIdsFlow.update {
+        _selectedPhotoIdsFlow.update {
             it.toMutableSet().apply {
                 addAll(notAddedIds)
             }
@@ -354,17 +338,17 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal fun onDeselectAllPhotos() {
-        if (selectedPhotoIdsFlow.value.isEmpty()) return
-        selectedPhotoIdsFlow.update { setOf() }
+        if (_selectedPhotoIdsFlow.value.isEmpty()) return
+        _selectedPhotoIdsFlow.update { setOf() }
         updateSelectionModeActions()
     }
 
     private fun updateSelectionModeActions() {
-        if (selectedPhotoIdsFlow.value.isEmpty()) return
+        if (_selectedPhotoIdsFlow.value.isEmpty()) return
 
         viewModelScope.launch {
             val selectedPhotosInTypedNodes = async {
-                val selectedPhotoIds = selectedPhotoIdsFlow.value
+                val selectedPhotoIds = _selectedPhotoIdsFlow.value
                 if (selectedPhotoIds.isNotEmpty()) {
                     retrieveTypedNodeFromSelection(ids = selectedPhotoIds.map { NodeId(longValue = it) })
                 } else emptyList()
@@ -380,7 +364,7 @@ class TimelineTabViewModel @Inject constructor(
 
             val bottomSheetActions = buildList {
                 val selectedNodes = uiState.value.allPhotos.filter {
-                    it.photo.id in selectedPhotoIdsFlow.value
+                    it.photo.id in _selectedPhotoIdsFlow.value
                 }
                 val selectedTypedNodes = selectedPhotosInTypedNodes.await()
                 val shouldShowRemoveLink =

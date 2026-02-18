@@ -30,14 +30,13 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.retry
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.FcmManager
+import mega.privacy.android.app.fetcher.MediaThumbnailFetcher
+import mega.privacy.android.app.fetcher.MediaThumbnailKeyer
 import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
@@ -71,8 +70,6 @@ import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorAndHandleTransferEventsUseCase
-import mega.privacy.android.domain.usecase.transfers.active.MonitorTransferEventsToStartWorkersIfNeededUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
@@ -84,8 +81,6 @@ import org.webrtc.ContextUtils
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Provider
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Mega application
@@ -207,6 +202,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
+    internal lateinit var photoThumbnailFactory: MediaThumbnailFetcher.Factory
+
+    @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     @Inject
@@ -321,8 +319,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 add(SvgDecoder.Factory())
                 add(thumbnailFactory)
                 add(avatarFactory)
+                add(photoThumbnailFactory)
                 add(MegaThumbnailKeyer)
                 add(MegaAvatarKeyer)
+                add(MediaThumbnailKeyer)
             }
             .build()
     }

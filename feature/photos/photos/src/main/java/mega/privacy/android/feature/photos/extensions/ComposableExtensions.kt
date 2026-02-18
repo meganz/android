@@ -19,6 +19,7 @@ import mega.privacy.android.feature.photos.model.PhotoUiState
 @SuppressLint("ComposeCompositionLocalUsage")
 val LocalDownloadPhotoResultMock = compositionLocalOf<DownloadPhotoResult?> { null }
 
+@Deprecated("Replace with PhotoThumbnailRequest. Check PhotoThumbnailFetcher.")
 @SuppressLint("ComposeViewModelInjection")
 @Composable
 fun PhotoUiState.downloadAsStateWithLifecycle(isPreview: Boolean): State<DownloadPhotoResult> {

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
@@ -16,7 +16,7 @@ internal fun MediaMainEffects(
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     checkCameraUploadsPermissions: () -> Unit,
     checkNotificationPermission: () -> Unit,
-    updateCUPageEnablementBasedOnDisplayedPhotos: suspend (photos: List<PhotosNodeContentType>) -> Unit,
+    updateCUPageEnablementBasedOnDisplayedPhotos: suspend (photos: List<PhotosNodeContentItem>) -> Unit,
     updateSortActionEnablement: (isEnableCameraUploadPageShowing: Boolean, mediaSource: FilterMediaSource) -> Unit,
 ) {
     LifecycleResumeEffect(Unit) {

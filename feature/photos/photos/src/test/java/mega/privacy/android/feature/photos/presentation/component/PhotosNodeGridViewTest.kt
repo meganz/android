@@ -9,15 +9,17 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.robolectric.annotation.Config
 import java.time.LocalDateTime
@@ -32,14 +34,12 @@ class PhotosNodeGridViewTest {
     @Test
     fun `test that header item is successfully displayed`() {
         val time = LocalDateTime.now()
-        val items = persistentListOf(
-            PhotosNodeContentType.HeaderItem(
-                time = time,
-                shouldShowGridSizeSettings = true
-            )
-        )
+        val items = persistentListOf(PhotosNodeContentItem.HeaderItem(time = time))
         composeRuleScope {
-            setView(items = items)
+            setView(
+                items = items,
+                selectedPhotoIds = setOf()
+            )
 
             onNodeWithTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG).assertIsDisplayed()
         }
@@ -47,19 +47,28 @@ class PhotosNodeGridViewTest {
 
     @Test
     fun `test that image photos node is successfully displayed`() {
-        val photoUiState = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photoUiState = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val items = persistentListOf(
-            PhotosNodeContentType.PhotoNodeItem(
+            PhotosNodeContentItem.PhotoNodeItem(
                 node = PhotoNodeUiState(
                     photo = photoUiState,
                     isSensitive = false,
-                    isSelected = false,
                     defaultIcon = mega.privacy.android.icon.pack.R.drawable.ic_3d_medium_solid,
                 )
             )
         )
         composeRuleScope {
-            setView(items = items)
+            setView(
+                items = items,
+                selectedPhotoIds = setOf(photoId),
+            )
 
             onNodeWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG).assertIsDisplayed()
         }
@@ -69,9 +78,8 @@ class PhotosNodeGridViewTest {
     fun `test that the grid size settings icon is displayed`() {
         val time = LocalDateTime.now()
         val items = persistentListOf(
-            PhotosNodeContentType.HeaderItem(
-                time = time,
-                shouldShowGridSizeSettings = true
+            PhotosNodeContentItem.HeaderItem(
+                time = time
             )
         )
         composeRuleScope {
@@ -84,14 +92,12 @@ class PhotosNodeGridViewTest {
     @Test
     fun `test that the grid size settings menu is displayed`() {
         val time = LocalDateTime.now()
-        val items = persistentListOf(
-            PhotosNodeContentType.HeaderItem(
-                time = time,
-                shouldShowGridSizeSettings = true
-            )
-        )
+        val items = persistentListOf(PhotosNodeContentItem.HeaderItem(time = time))
         composeRuleScope {
-            setView(items = items)
+            setView(
+                items = items,
+                selectedPhotoIds = setOf()
+            )
 
             onNodeWithTag(PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_ICON_TAG).performClick()
 
@@ -106,7 +112,8 @@ class PhotosNodeGridViewTest {
     }
 
     private fun ComposeContentTestRule.setView(
-        items: ImmutableList<PhotosNodeContentType> = persistentListOf(),
+        items: ImmutableList<PhotosNodeContentItem> = persistentListOf(),
+        selectedPhotoIds: Set<Long> = setOf(),
         gridSize: TimelineGridSize = TimelineGridSize.Large,
         onGridSizeChange: (value: TimelineGridSize) -> Unit = {},
         onClick: (node: PhotoNodeUiState) -> Unit = {},
@@ -117,6 +124,7 @@ class PhotosNodeGridViewTest {
             CompositionLocalProvider(LocalDownloadPhotoResultMock provides downloadPhotoResult) {
                 PhotosNodeGridView(
                     items = items,
+                    selectedPhotoIds = selectedPhotoIds,
                     gridSize = gridSize,
                     onGridSizeChange = onGridSizeChange,
                     onClick = onClick,

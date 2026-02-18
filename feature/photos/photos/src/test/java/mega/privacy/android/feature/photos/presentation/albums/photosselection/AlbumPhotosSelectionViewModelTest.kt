@@ -5,7 +5,6 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -36,10 +35,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
-import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
-import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.BeforeEach
@@ -133,11 +129,11 @@ class AlbumPhotosSelectionViewModelTest {
         underTest.state.test {
             // Wait for photos to be loaded
             var state = awaitItem()
-            while (state.photosNodeContentTypes.isEmpty() || state.isLoading) {
+            while (state.photosNodeContentItems.isEmpty() || state.isLoading) {
                 state = awaitItem()
             }
-            val photoNodes = state.photosNodeContentTypes
-                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            val photoNodes = state.photosNodeContentItems
+                .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
             assertThat(photoNodes.size).isEqualTo(3)
         }
     }
@@ -163,12 +159,12 @@ class AlbumPhotosSelectionViewModelTest {
         // Wait for photos to be loaded and photosNodeContentTypes to be populated
         underTest.state.test {
             var state = awaitItem()
-            var photoNodes = state.photosNodeContentTypes
-                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            var photoNodes = state.photosNodeContentItems
+                .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
             while (photoNodes.size < 3 || state.isLoading) {
                 state = awaitItem()
-                photoNodes = state.photosNodeContentTypes
-                    .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+                photoNodes = state.photosNodeContentItems
+                    .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
             }
             // Verify photos are loaded before selecting
             assertThat(photoNodes.size).isEqualTo(3)
@@ -280,11 +276,11 @@ class AlbumPhotosSelectionViewModelTest {
         underTest.state.test {
             // Wait for photos to be loaded
             var state = awaitItem()
-            while (state.photosNodeContentTypes.isEmpty() || state.isLoading) {
+            while (state.photosNodeContentItems.isEmpty() || state.isLoading) {
                 state = awaitItem()
             }
-            val photoNodes = state.photosNodeContentTypes
-                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+            val photoNodes = state.photosNodeContentItems
+                .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
             assertThat(photoNodes.size).isEqualTo(3)
         }
     }

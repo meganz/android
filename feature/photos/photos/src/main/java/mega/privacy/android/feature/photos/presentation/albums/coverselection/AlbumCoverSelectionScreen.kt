@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,6 +48,9 @@ fun AlbumCoverSelectionScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val lazyGridState = rememberLazyGridState()
+    var selectedId by rememberSaveable(state.currentCoverId) {
+        mutableStateOf(state.currentCoverId)
+    }
 
     if (state.isInvalidAlbum) onBackClicked()
 
@@ -66,20 +72,25 @@ fun AlbumCoverSelectionScreen(
         content = { padding ->
             PhotosNodeGridView(
                 modifier = Modifier.fillMaxSize(),
-                items = state.photosNodeContentTypes,
+                items = state.photosNodeContentItems,
+                selectedPhotoIds = selectedId?.let { setOf(it) } ?: emptySet(),
                 gridSize = TimelineGridSize.Default,
                 onGridSizeChange = {},
-                onClick = { viewModel.selectPhoto(it.photo) },
-                onLongClick = { viewModel.selectPhoto(it.photo) },
+                onClick = { selectedId = it.photo.id },
+                onLongClick = { selectedId = it.photo.id },
                 lazyGridState = lazyGridState,
                 contentPadding = padding
             )
         },
         bottomBar = {
             AlbumCoverSelectionFooter(
-                hasSelectedPhoto = state.hasSelectedPhoto,
+                hasSelectedPhoto = selectedId != null,
                 onBackClicked = onBackClicked,
-                onUpdateCover = viewModel::updateCover,
+                onUpdateCover = {
+                    selectedId?.let {
+                        viewModel.updateCover(selectedId = it)
+                    }
+                },
             )
         }
     )

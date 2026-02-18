@@ -122,20 +122,21 @@ fun MediaMainRoute(
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val selectedPhotoIds by timelineViewModel.selectedPhotoIds.collectAsStateWithLifecycle()
 
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
     )
     val selectionModeType by remember(
-        timelineTabUiState.selectedPhotoCount,
+        selectedPhotoIds,
         albumsTabUiState.selectedUserAlbums,
         videosTabUiState,
         playlistsTabUiState
     ) {
         derivedStateOf {
             getSelectionModeType(
-                timelineSelectedPhotoCount = timelineTabUiState.selectedPhotoCount,
+                timelineSelectedPhotoCount = selectedPhotoIds.size,
                 albumsSelectedUserAlbumsCount = albumsTabUiState.selectedUserAlbums.size,
                 videosTabUiState = videosTabUiState,
                 playlistsTabUiState = playlistsTabUiState
@@ -246,6 +247,7 @@ fun MediaMainRoute(
         videosTabUiState = videosTabUiState,
         playlistsTabUiState = playlistsTabUiState,
         nodeActionUiState = nodeActionUiState,
+        selectedPhotoIds = selectedPhotoIds,
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         showTimelineFilter = showTimelineFilter,
@@ -307,6 +309,7 @@ fun MediaMainScreen(
     videosTabUiState: VideosTabUiState,
     playlistsTabUiState: VideoPlaylistsTabUiState,
     nodeActionUiState: NodeActionState,
+    selectedPhotoIds: Set<Long>,
     selectionModeType: MediaSelectionModeType,
     selectedPhotosInTypedNode: () -> List<TypedNode>,
     selectedTimePeriod: PhotoModificationTimePeriod,
@@ -410,12 +413,12 @@ fun MediaMainScreen(
                 selectionModeType = selectionModeType,
                 mediaMainUiState = mediaMainUiState,
                 albumsTabUiState = albumsTabUiState,
-                timelineTabUiState = timelineTabUiState,
                 timelineTabActionUiState = timelineTabActionUiState,
                 timelineFilterUiState = timelineFilterUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 videosTabUiState = videosTabUiState,
                 playlistsTabUiState = playlistsTabUiState,
+                timelineSelectedCount = selectedPhotoIds.size,
                 selectedTimePeriod = selectedTimePeriod,
                 videosTabQuery = videosTabQuery,
                 playlistsTabQuery = playlistsTabQuery,
@@ -530,6 +533,7 @@ fun MediaMainScreen(
                                         timelineTabUiState = timelineTabUiState,
                                         timelineFilterUiState = timelineFilterUiState,
                                         mediaCameraUploadUiState = mediaCameraUploadUiState,
+                                        selectedPhotoIds = selectedPhotoIds,
                                         showTimelineSortDialog = showTimelineSortDialog,
                                         selectedTimePeriod = selectedTimePeriod,
                                         setEnableCUPage = setEnableCUPage,
@@ -633,6 +637,7 @@ private fun MediaScreen.MediaContent(
     timelineTabUiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
+    selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: PhotoModificationTimePeriod,
     setEnableCUPage: (Boolean) -> Unit,
@@ -665,6 +670,7 @@ private fun MediaScreen.MediaContent(
                 uiState = timelineTabUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 timelineFilterUiState = timelineFilterUiState,
+                selectedPhotoIds = selectedPhotoIds,
                 showTimelineSortDialog = showTimelineSortDialog,
                 selectedTimePeriod = selectedTimePeriod,
                 clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
@@ -727,6 +733,7 @@ private fun PhotosMainScreenPreview() {
             timelineTabActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
+            selectedPhotoIds = setOf(),
             selectedTimePeriod = PhotoModificationTimePeriod.All,
             showTimelineFilter = false,
             selectedPhotosInTypedNode = { emptyList() },

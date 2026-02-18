@@ -38,7 +38,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUse
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import timber.log.Timber
 import java.io.File
 
@@ -66,7 +66,7 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
     @VisibleForTesting
     internal var showHiddenItems: Boolean? = null
 
-    private var selectedCover: PhotoUiState? = null
+    private var currentCoverId: Long? = null
 
     private val currentAlbumId: Long?
         get() = savedStateHandle["album_id"] ?: albumId
@@ -113,7 +113,7 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
     private fun updateAlbum(album: Album.UserAlbum?) {
         val showHiddenItems = showHiddenItems ?: true
         val isPaid = _state.value.accountType?.isPaid ?: false
-        selectedCover = album
+        currentCoverId = album
             ?.cover
             ?.let { photo ->
                 if (showHiddenItems || !isPaid) {
@@ -121,8 +121,7 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
                 } else {
                     photo.takeIf { !it.isSensitive && !it.isSensitiveInherited }
                 }
-            }
-            ?.let(photoUiStateMapper::invoke)
+            }?.id
 
         _state.update { state ->
             state.copy(
@@ -144,14 +143,12 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
         val sortedPhotos = sortPhotos(photos)
         val nonSensitivePhotos = filterNonSensitivePhotos(sortedPhotos)
         val uiPhotos = nonSensitivePhotos.toUIPhotos()
-        val selectedPhotoId = selectedCover?.id ?: nonSensitivePhotos.firstOrNull()?.id
-        val updatedPhotosNodeContentTypes = uiPhotos.withSelection(selectedPhotoId)
 
         _state.update { state ->
             state.copy(
                 photos = sortedPhotos,
-                photosNodeContentTypes = updatedPhotosNodeContentTypes,
-                hasSelectedPhoto = selectedPhotoId != null,
+                photosNodeContentItems = uiPhotos,
+                currentCoverId = currentCoverId ?: nonSensitivePhotos.firstOrNull()?.id
             )
         }
     }
@@ -172,18 +169,17 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun List<PhotoUiState>.toUIPhotos(): List<PhotosNodeContentType> =
+    private suspend fun List<PhotoUiState>.toUIPhotos(): List<PhotosNodeContentItem> =
         withContext(defaultDispatcher) {
             val isPaid = _state.value.accountType?.isPaid == true
             val isBusinessExpired = _state.value.isBusinessAccountExpired
             this@toUIPhotos.map { photo ->
-                PhotosNodeContentType.PhotoNodeItem(
+                PhotosNodeContentItem.PhotoNodeItem(
                     node = PhotoNodeUiState(
                         photo = photo,
                         isSensitive = isPaid &&
                                 !isBusinessExpired &&
                                 (photo.isSensitive || photo.isSensitiveInherited),
-                        isSelected = false,
                         defaultIcon = fileTypeIconMapper(photo.fileTypeInfo.extension),
                     )
                 )
@@ -204,40 +200,12 @@ class AlbumCoverSelectionViewModel @AssistedInject constructor(
         }
     }
 
-    fun selectPhoto(photo: PhotoUiState) {
-        val selectedPhotoId = photo.id
-        _state.update { state ->
-            val updatedPhotosNodeContentTypes =
-                state.photosNodeContentTypes.withSelection(selectedPhotoId)
-            state.copy(
-                photosNodeContentTypes = updatedPhotosNodeContentTypes,
-                hasSelectedPhoto = true,
-            )
-        }
-    }
-
-    private fun List<PhotosNodeContentType>.withSelection(
-        selectedPhotoId: Long?,
-    ): List<PhotosNodeContentType> {
-        if (selectedPhotoId == null) return this
-        return this.map { contentType ->
-            when (contentType) {
-                is PhotosNodeContentType.PhotoNodeItem -> {
-                    val isSelected = contentType.node.photo.id == selectedPhotoId
-                    contentType.copy(node = contentType.node.copy(isSelected = isSelected))
-                }
-
-                is PhotosNodeContentType.HeaderItem -> contentType
-            }
-        }
-    }
-
-    fun updateCover() {
+    fun updateCover(selectedId: Long) {
         val currentState = _state.value
-        val selectedPhotoNode = currentState.photosNodeContentTypes
+        val selectedPhotoNode = currentState.photosNodeContentItems
             .firstOrNull {
-                it is PhotosNodeContentType.PhotoNodeItem && it.node.isSelected
-            } as? PhotosNodeContentType.PhotoNodeItem ?: return
+                it is PhotosNodeContentItem.PhotoNodeItem && it.node.photo.id == selectedId
+            } as? PhotosNodeContentItem.PhotoNodeItem ?: return
         val albumId = currentState.album?.id ?: return
         val elementId = selectedPhotoNode.node.photo.albumPhotoId?.let { NodeId(it) } ?: return
 

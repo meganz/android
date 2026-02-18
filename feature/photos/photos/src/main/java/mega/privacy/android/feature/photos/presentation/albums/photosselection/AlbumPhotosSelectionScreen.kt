@@ -279,7 +279,8 @@ private fun AlbumPhotosSelectionContent(
         )
     } else {
         PhotosNodeGridView(
-            items = state.photosNodeContentTypes,
+            items = state.photosNodeContentItems,
+            selectedPhotoIds = state.selectedPhotoIds,
             gridSize = TimelineGridSize.Default,
             onGridSizeChange = {},
             onClick = { node ->

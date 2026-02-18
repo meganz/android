@@ -37,7 +37,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
@@ -240,74 +240,6 @@ class TimelineTabViewModelTest {
                 assertThat(expectMostRecentItem().gridSize).isEqualTo(gridSize)
             }
         }
-
-    @Test
-    fun `test that the first displayed header item shows the grid size settings`() = runTest {
-        val photosResult = mock<TimelinePhotosResult> {
-            on { allPhotos } doReturn emptyList()
-            on { nonSensitivePhotos } doReturn emptyList()
-        }
-        whenever(
-            monitorTimelinePhotosUseCase.invoke(request = any())
-        ) doReturn flowOf(photosResult)
-        val now = LocalDateTime.now()
-        val mockFileTypeInfo = mock<VideoFileTypeInfo>()
-        val photo1 = mock<Photo.Image> {
-            on { id } doReturn 1L
-            on { modificationTime } doReturn now
-            on { fileTypeInfo } doReturn mockFileTypeInfo
-        }
-        val photoResult1 = PhotoResult(
-            photo = photo1,
-            isMarkedSensitive = false
-        )
-        val photo1UiState = mock<PhotoUiState.Image>()
-        whenever(
-            photoUiStateMapper.invoke(photo = photo1)
-        ) doReturn photo1UiState
-        val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
-        val photo2 = mock<Photo.Image> {
-            on { id } doReturn 2L
-            on { modificationTime } doReturn now.plusMonths(2)
-            on { fileTypeInfo } doReturn mockTextFileTypeInfo
-        }
-        val photoResult2 = PhotoResult(
-            photo = photo2,
-            isMarkedSensitive = false
-        )
-        val photo2UiState = mock<PhotoUiState.Image>()
-        whenever(
-            photoUiStateMapper.invoke(photo = photo2)
-        ) doReturn photo2UiState
-        val sortResult = mock<TimelineSortedPhotosResult> {
-            on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
-        }
-        whenever(
-            monitorTimelinePhotosUseCase.sortPhotos(
-                photos = eq(emptyList()),
-                sortOrder = any()
-            )
-        ) doReturn sortResult
-        whenever(
-            photosNodeListCardMapper.invoke(photosDateResults = any())
-        ) doReturn persistentListOf()
-
-        underTest.uiState.test {
-            val item = expectMostRecentItem()
-            assertThat(item.displayedPhotos[0]).isEqualTo(
-                PhotosNodeContentType.HeaderItem(
-                    time = photoResult1.photo.modificationTime,
-                    shouldShowGridSizeSettings = true
-                )
-            )
-            assertThat(item.displayedPhotos[2]).isEqualTo(
-                PhotosNodeContentType.HeaderItem(
-                    time = photoResult2.photo.modificationTime,
-                    shouldShowGridSizeSettings = false
-                )
-            )
-        }
-    }
 
     @Test
     fun `test that the sort toolbar action is disabled when grid size is changed and the camera upload page is displayed and the media source is not cloud drive`() =
@@ -773,16 +705,19 @@ class TimelineTabViewModelTest {
             photosNodeListCardMapper.invoke(photosDateResults = any())
         ) doReturn persistentListOf()
 
+        var selectedPhoto: PhotosNodeContentItem? = null
         underTest.uiState.test {
-            val selectedPhoto =
-                awaitItem().displayedPhotos.find { it is PhotosNodeContentType.PhotoNodeItem }
-            underTest.onPhotoSelected((selectedPhoto as PhotosNodeContentType.PhotoNodeItem).node)
-
-            val item = expectMostRecentItem()
-            assertThat(item.selectedPhotoCount).isEqualTo(1)
-            val selectedPhotoFinal =
-                item.displayedPhotos.find { it is PhotosNodeContentType.PhotoNodeItem }
-            assertThat((selectedPhotoFinal as PhotosNodeContentType.PhotoNodeItem).node.isSelected).isTrue()
+            selectedPhoto =
+                awaitItem().displayedPhotos.find { it is PhotosNodeContentItem.PhotoNodeItem }
+            underTest.onPhotoSelected((selectedPhoto as PhotosNodeContentItem.PhotoNodeItem).node)
+            cancelAndIgnoreRemainingEvents()
+        }
+        underTest.selectedPhotoIds.test {
+            assertThat(expectMostRecentItem()).isEqualTo(
+                setOf(
+                    (selectedPhoto as PhotosNodeContentItem.PhotoNodeItem).node.photo.id
+                )
+            )
         }
     }
 
@@ -845,15 +780,13 @@ class TimelineTabViewModelTest {
 
         underTest.uiState.test {
             val photo =
-                awaitItem().displayedPhotos.find { it is PhotosNodeContentType.PhotoNodeItem } as PhotosNodeContentType.PhotoNodeItem
+                awaitItem().displayedPhotos.find { it is PhotosNodeContentItem.PhotoNodeItem } as PhotosNodeContentItem.PhotoNodeItem
             underTest.onPhotoSelected(photo.node) // Selection
             underTest.onPhotoSelected(photo.node) // Deselection
-
-            val item = expectMostRecentItem()
-            assertThat(item.selectedPhotoCount).isEqualTo(0)
-            val latestPhoto =
-                item.displayedPhotos.find { it is PhotosNodeContentType.PhotoNodeItem }
-            assertThat((latestPhoto as PhotosNodeContentType.PhotoNodeItem).node.isSelected).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+        underTest.selectedPhotoIds.test {
+            assertThat(expectMostRecentItem()).isEqualTo(emptySet<Long>())
         }
     }
 
@@ -916,13 +849,12 @@ class TimelineTabViewModelTest {
 
         underTest.uiState.test {
             underTest.onSelectAllPhotos()
-
-            val item = expectMostRecentItem()
-            assertThat(item.selectedPhotoCount).isEqualTo(2)
-            val selectedPhotos = item.displayedPhotos.filter {
-                it is PhotosNodeContentType.PhotoNodeItem && it.node.isSelected
-            }
-            assertThat(selectedPhotos.size).isEqualTo(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+        underTest.selectedPhotoIds.test {
+            assertThat(expectMostRecentItem()).isEqualTo(
+                setOf(photo1Id, photo2Id)
+            )
         }
     }
 
@@ -984,7 +916,8 @@ class TimelineTabViewModelTest {
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
 
-            underTest.uiState.test {
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            underTest.selectedPhotoIds.test {
                 awaitItem()
                 underTest.onSelectAllPhotos()
                 awaitItem()
@@ -1052,18 +985,14 @@ class TimelineTabViewModelTest {
                 photosNodeListCardMapper.invoke(photosDateResults = any())
             ) doReturn persistentListOf()
 
-            underTest.uiState.test {
+            underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+            underTest.selectedPhotoIds.test {
                 awaitItem()
                 underTest.onSelectAllPhotos()
                 awaitItem()
                 underTest.onDeselectAllPhotos()
 
-                val item = expectMostRecentItem()
-                assertThat(item.selectedPhotoCount).isEqualTo(0)
-                val selectedPhotos = item.displayedPhotos.filter {
-                    it is PhotosNodeContentType.PhotoNodeItem && it.node.isSelected
-                }
-                assertThat(selectedPhotos.size).isEqualTo(0)
+                assertThat(expectMostRecentItem().size).isEqualTo(0)
             }
         }
 
@@ -1211,8 +1140,8 @@ class TimelineTabViewModelTest {
 
             underTest.uiState.test {
                 val selectedPhoto =
-                    awaitItem().displayedPhotos.find { it is PhotosNodeContentType.PhotoNodeItem }
-                underTest.onPhotoSelected((selectedPhoto as PhotosNodeContentType.PhotoNodeItem).node)
+                    awaitItem().displayedPhotos.find { it is PhotosNodeContentItem.PhotoNodeItem }
+                underTest.onPhotoSelected((selectedPhoto as PhotosNodeContentItem.PhotoNodeItem).node)
                 cancelAndIgnoreRemainingEvents()
             }
 
