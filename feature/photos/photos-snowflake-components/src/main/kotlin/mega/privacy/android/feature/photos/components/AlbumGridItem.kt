@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,7 +29,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
@@ -133,7 +131,11 @@ fun AlbumGridItem(
 
         MegaText(
             modifier = Modifier
-                .fillMaxWidth()
+                // Fraction is required here because of the Marquee effect. A bug was reported that
+                // the hidden portion of the marqueed text can leak to other screen on the same group
+                // of tabs inside a View Pager. This temporary fix will make sure that max width is set,
+                // so that it doesn't exceed the view bounds
+                .fillMaxWidth(fraction = 0.99F)
                 .align(Alignment.CenterHorizontally),
             text = title,
             textColor = TextColor.Primary,
