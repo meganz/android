@@ -13,6 +13,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOncePerAppEffect
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerDisplayedEvent
@@ -79,9 +80,17 @@ fun OverQuotaErrorBanner(
     forceRiceTopAppBar: Boolean = true,
 ) {
     if (overQuotaStatus.severity == OverQuotaIssue.Severity.Error) {
-        LaunchedOnceEffect(overQuotaStatus.storage.severity) {
-            if (overQuotaStatus.storage == OverQuotaIssue.Storage.Full)
-                Analytics.tracker.trackEvent(FullStorageOverQuotaBannerDisplayedEvent)
+        val analyticsEvent = when (overQuotaStatus.storage) {
+            OverQuotaIssue.Storage.Full -> {
+                FullStorageOverQuotaBannerDisplayedEvent
+            }
+
+            else -> null
+        }
+        if (analyticsEvent != null) {
+            LaunchedOncePerAppEffect(analyticsEvent) {
+                Analytics.tracker.trackEvent(analyticsEvent)
+            }
         }
         val title: String
         val body: String?
@@ -145,9 +154,17 @@ fun OverQuotaWarningBanner(
     forceRiceTopAppBar: Boolean = true,
 ) {
     if (overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && (!isBlockingAware || overQuotaStatus.severity is OverQuotaIssue.Severity.Warning.Blocking)) {
-        LaunchedOnceEffect(overQuotaStatus.storage.severity) {
-            if (overQuotaStatus.storage == OverQuotaIssue.Storage.AlmostFull)
-                Analytics.tracker.trackEvent(AlmostFullStorageOverQuotaBannerDisplayedEvent)
+        val analyticsEvent = when (overQuotaStatus.storage) {
+            OverQuotaIssue.Storage.AlmostFull -> {
+                AlmostFullStorageOverQuotaBannerDisplayedEvent
+            }
+
+            else -> null
+        }
+        if (analyticsEvent != null) {
+            LaunchedOncePerAppEffect(analyticsEvent) {
+                Analytics.tracker.trackEvent(analyticsEvent)
+            }
         }
         val title: String
         val body: String?

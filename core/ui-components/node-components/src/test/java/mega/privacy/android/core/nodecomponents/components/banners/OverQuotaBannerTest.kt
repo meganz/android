@@ -3,14 +3,17 @@ package mega.privacy.android.core.nodecomponents.components.banners
 import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.core.sharedcomponents.coroutine.resetLaunchedOncePerAppEffect
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerUpgradeButtonPressedEvent
@@ -81,11 +84,34 @@ class OverQuotaBannerTest {
 
     @Test
     fun `test that FullStorageOverQuotaBannerDisplayedEvent is tracked when error banner with Full storage is displayed`() {
+        resetLaunchedOncePerAppEffect(FullStorageOverQuotaBannerDisplayedEvent)
         setContent(overQuotaStatus = OverQuotaStatus(OverQuotaIssue.Storage.Full))
 
         composeTestRule.waitForIdle()
 
         assertThat(analyticsRule.events).contains(FullStorageOverQuotaBannerDisplayedEvent)
+    }
+
+    @Test
+    fun `test that analytics event is tracked only once`() {
+        resetLaunchedOncePerAppEffect(FullStorageOverQuotaBannerDisplayedEvent)
+
+        composeTestRule.setContent {
+            OverQuotaBanner(
+                overQuotaStatus = OverQuotaStatus(OverQuotaIssue.Storage.AlmostFull),
+                onDismissed = {},
+                onUpgradeClicked = {},
+            )
+            OverQuotaBanner(
+                overQuotaStatus = OverQuotaStatus(OverQuotaIssue.Storage.AlmostFull),
+                onDismissed = {},
+                onUpgradeClicked = {},
+            )
+        }
+        composeTestRule.waitForIdle()
+
+
+        assertThat(analyticsRule.events).containsNoDuplicates()
     }
 
     @Test
@@ -103,6 +129,7 @@ class OverQuotaBannerTest {
 
     @Test
     fun `test that AlmostFullStorageOverQuotaBannerDisplayedEvent is tracked when warning banner with AlmostFull is displayed`() {
+        resetLaunchedOncePerAppEffect(AlmostFullStorageOverQuotaBannerDisplayedEvent)
         setContent(
             overQuotaStatus = OverQuotaStatus(OverQuotaIssue.Storage.AlmostFull),
         )
