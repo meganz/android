@@ -121,7 +121,12 @@ internal fun AlbumsTabScreen(
             columns = GridCells.Adaptive(100.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = contentPadding
+            contentPadding = PaddingValues(
+                top = 8.dp,
+                start = 8.dp,
+                end = 8.dp,
+                bottom = 100.dp
+            )
         ) {
             items(
                 count = uiState.albums.size,
