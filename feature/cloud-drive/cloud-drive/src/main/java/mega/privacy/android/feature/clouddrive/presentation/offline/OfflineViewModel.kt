@@ -32,9 +32,7 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
-import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
-import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 
@@ -52,7 +50,6 @@ class OfflineViewModel @AssistedInject constructor(
     private val setViewType: SetViewType,
     @Assisted private val navKey: OfflineNavKey,
     private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase,
-    private val snackbarEventQueue: SnackbarEventQueue,
     private val setOfflineSortOrder: SetOfflineSortOrder,
     private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
@@ -349,13 +346,8 @@ class OfflineViewModel @AssistedInject constructor(
             }.onFailure {
                 Timber.e(it)
             }.onSuccess {
-                if (handles.size > 1) {
-                    snackbarEventQueue.queueMessage(
-                        sharedR.string.offline_remove_multiple_item_success_message,
-                        handles.size
-                    )
-                } else {
-                    snackbarEventQueue.queueMessage(sharedR.string.offline_remove_singular_item_success_message)
+                _uiState.update { state ->
+                    state.copy(removeNodesSuccessEvent = triggered(handles.size))
                 }
             }
         }

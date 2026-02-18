@@ -848,6 +848,7 @@ class OfflineScreenTest {
                         openFileInformation = openFileInformation,
                         onSortNodes = onSortNodes,
                         onChangeViewType = onChangeViewType,
+                        snackbarEventQueue = mock()
                     )
                 }
             }

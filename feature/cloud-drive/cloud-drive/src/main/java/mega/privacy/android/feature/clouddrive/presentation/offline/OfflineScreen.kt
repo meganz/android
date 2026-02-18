@@ -5,14 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
@@ -31,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -70,6 +64,8 @@ import mega.privacy.android.feature.clouddrive.presentation.offline.model.Offlin
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineSelectionAction
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
@@ -108,6 +104,7 @@ fun OfflineScreen(
 
     OfflineScreen(
         uiState = uiState,
+        snackbarEventQueue = rememberSnackBarQueue(),
         onBack = onBack,
         selectAll = viewModel::selectAll,
         deselectAll = viewModel::clearSelection,
@@ -159,8 +156,10 @@ internal fun OfflineScreen(
     onChangeViewType: () -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
     modifier: Modifier = Modifier,
+    snackbarEventQueue: SnackbarEventQueue = rememberSnackBarQueue(),
     consumeOpenFolderEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
+    consumeRemoveEvent: () -> Unit = {},
 ) {
     var isSearchMode by rememberSaveable { mutableStateOf(false) }
     var showRemoveDialog by rememberSaveable { mutableStateOf(false) }
@@ -187,6 +186,20 @@ internal fun OfflineScreen(
         onConsumed = consumeOpenFileEvent
     ) { file ->
         onOpenFile(file)
+    }
+
+    EventEffect(
+        event = uiState.removeNodesSuccessEvent,
+        onConsumed = consumeRemoveEvent
+    ) { size ->
+        if (size > 1) {
+            snackbarEventQueue.queueMessage(
+                sharedR.string.offline_remove_multiple_item_success_message,
+                size
+            )
+        } else {
+            snackbarEventQueue.queueMessage(sharedR.string.offline_remove_singular_item_success_message)
+        }
     }
 
     BackHandler(uiState.selectedNodeHandles.isNotEmpty()) {
