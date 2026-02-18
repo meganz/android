@@ -2019,7 +2019,7 @@
         <item quantity="other">%1$d öğe</item>
     </plurals>
     <string name="section_saved_for_offline_new">Çevrim dışı</string>
-    <string name="title_bucket">%1$s ve %2$d tane daha</string>
+    <string name="title_bucket">%1$s ve %2$d adet daha</string>
     <string name="create_action_bucket">%s [A]tarafından oluşturuldu[/A]</string>
     <string name="update_action_bucket">%s [A]tarafından güncellendi[/A]</string>
     <string name="label_yesterday">Dün</string>
@@ -2131,10 +2131,7 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">Tamam</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Aramadan ayrıl</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Daha fazlasını öğren[/A]</string>
-    <!-- Error message when folder is already part of Camera Uploads -->
-    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of Media Uploads -->
-    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of a sync or backup -->
-    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="error_folder_part_of_camera_uploads">Bu klasör zaten Kamera yüklemelerinin bir parçası. Başka bir tane seçin.</string>
+    <string name="error_folder_part_of_media_uploads">Bu klasör zaten Medya yüklemelerinin bir parçası. Başka bir tane seçin.</string>
+    <string name="error_folder_part_of_sync_or_backup">Bu klasör zaten bir senkronizasyonun veya yedeklemenin parçası. Başka bir tane seçin.</string>
 </resources>

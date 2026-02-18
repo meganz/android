@@ -2245,10 +2245,4 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">Закрыть</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Покинуть звонок</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Подробнее[/A]</string>
-    <!-- Error message when folder is already part of Camera Uploads -->
-    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of Media Uploads -->
-    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of a sync or backup -->
-    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
 </resources>

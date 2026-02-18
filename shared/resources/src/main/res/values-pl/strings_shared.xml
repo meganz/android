@@ -2251,10 +2251,7 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">OK, rozumiem</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Opuść połączenie</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Dowiedz się więcej[/A]</string>
-    <!-- Error message when folder is already part of Camera Uploads -->
-    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of Media Uploads -->
-    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of a sync or backup -->
-    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="error_folder_part_of_camera_uploads">Ten folder jest już częścią Camera Uploads. Wybierz inny.</string>
+    <string name="error_folder_part_of_media_uploads">Ten folder jest już częścią Media Uploads. Wybierz inny folder.</string>
+    <string name="error_folder_part_of_sync_or_backup">Ten folder jest już częścią synchronizacji lub kopii zapasowej. Wybierz inny.</string>
 </resources>
