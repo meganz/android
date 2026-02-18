@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -404,7 +406,12 @@ private fun TimelineTabContent(
                         .fillMaxSize()
                         .testTag(TIMELINE_TAB_CONTENT_GRID_VIEW_TAG),
                     lazyGridState = lazyGridState,
-                    contentPadding = contentPadding,
+                    contentPadding = PaddingValues(
+                        top = contentPadding.calculateTopPadding(),
+                        start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        bottom = contentPadding.calculateBottomPadding() + 80.dp
+                    ),
                     items = uiState.displayedPhotos,
                     selectedPhotoIds = selectedPhotoIds,
                     gridSize = uiState.gridSize,
