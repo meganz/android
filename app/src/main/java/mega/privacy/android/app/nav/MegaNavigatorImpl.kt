@@ -213,7 +213,9 @@ internal class MegaNavigatorImpl @Inject constructor(
             activityLifecycleHandler.getCurrentActivity() is MegaActivity
         if (!isMegaActivity) {
             context.startActivity(
-                Intent(context, MegaActivity::class.java)
+                Intent(context, MegaActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or FLAG_ACTIVITY_CLEAR_TOP)
+                }
             )
         }
     }
