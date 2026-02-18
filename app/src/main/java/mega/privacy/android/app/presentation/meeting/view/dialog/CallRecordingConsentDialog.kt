@@ -31,6 +31,7 @@ private const val privacyUrl = "https://mega.io/privacy"
 /**
  * Show call recording consent dialog
  */
+@Deprecated("Call recording consent is already handled in MegaActivity. Do not use this dialog or associated logic in refactors")
 @Composable
 fun CallRecordingConsentDialog(
     viewModel: CallRecordingViewModel = hiltViewModel(),
