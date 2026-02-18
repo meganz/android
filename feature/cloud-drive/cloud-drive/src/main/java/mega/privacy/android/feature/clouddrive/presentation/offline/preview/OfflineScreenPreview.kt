@@ -9,6 +9,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.OfflineScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 
 @CombinedThemePreviews
 @Composable
@@ -33,6 +34,7 @@ private fun PreviewOfflineScreenList() {
                 searchQuery = null,
                 showOfflineWarning = true,
             ),
+            snackbarEventQueue = rememberSnackBarQueue(),
             selectAll = {},
             deselectAll = {},
             onItemClicked = {},

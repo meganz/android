@@ -28,7 +28,6 @@ import mega.privacy.android.domain.usecase.sortorder.GetSortOrderByNodeSourceTyp
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
-import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import org.junit.Before
 import org.junit.Test
@@ -56,7 +55,6 @@ class OfflineViewModelTest {
     private val monitorViewType: MonitorViewType = mock()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val removeOfflineNodesUseCase: RemoveOfflineNodesUseCase = mock()
-    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val setOfflineSortOrder: SetOfflineSortOrder = mock()
     private val getSortOrderByNodeSourceTypeUseCase: GetSortOrderByNodeSourceTypeUseCase = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -90,7 +88,6 @@ class OfflineViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorViewType = monitorViewType,
             removeOfflineNodesUseCase = removeOfflineNodesUseCase,
-            snackbarEventQueue = snackbarEventQueue,
             setOfflineSortOrder = setOfflineSortOrder,
             getSortOrderByNodeSourceTypeUseCase = getSortOrderByNodeSourceTypeUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
@@ -442,6 +439,11 @@ class OfflineViewModelTest {
 
             underTest.removeOfflineNodes(selectedHandles)
 
+            underTest.uiState.test {
+                assertThat(awaitItem().removeNodesSuccessEvent)
+                    .isEqualTo(StateEventWithContentTriggered(selectedHandles.size))
+            }
+
             verify(removeOfflineNodesUseCase).invoke(selectedHandles.map { NodeId(it) })
         }
 
@@ -603,8 +605,12 @@ class OfflineViewModelTest {
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(emptyFlow())
         whenever(monitorViewType()).thenReturn(emptyFlow())
         whenever(monitorConnectivityUseCase()).thenReturn(emptyFlow())
-        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(NodeSortConfiguration.default)
+        whenever(getSortOrderByNodeSourceTypeUseCase(NodeSourceType.OFFLINE, true)).thenReturn(
+            SortOrder.ORDER_DEFAULT_ASC
+        )
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
+            NodeSortConfiguration.default
+        )
         whenever(nodeSortConfigurationUiMapper(any<NodeSortConfiguration>())).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
 }

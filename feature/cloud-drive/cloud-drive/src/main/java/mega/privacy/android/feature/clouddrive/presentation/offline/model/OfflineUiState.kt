@@ -40,6 +40,7 @@ data class OfflineUiState(
     val openOfflineNodeEvent: StateEventWithContent<OfflineFileInformation> = consumed(),
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
+    val removeNodesSuccessEvent: StateEventWithContent<Int> = consumed()
 ) {
 
     /**
