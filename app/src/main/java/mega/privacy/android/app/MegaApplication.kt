@@ -38,6 +38,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.fcm.FcmManager
+import mega.privacy.android.app.fetcher.MediaThumbnailFetcher
+import mega.privacy.android.app.fetcher.MediaThumbnailKeyer
 import mega.privacy.android.app.fetcher.MegaAvatarFetcher
 import mega.privacy.android.app.fetcher.MegaAvatarKeyer
 import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
@@ -209,6 +211,9 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
 
     @Inject
+    internal lateinit var photoThumbnailFactory: MediaThumbnailFetcher.Factory
+
+    @Inject
     internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
 
     @Inject
@@ -332,8 +337,10 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 add(SvgDecoder.Factory())
                 add(thumbnailFactory)
                 add(avatarFactory)
+                add(photoThumbnailFactory)
                 add(MegaThumbnailKeyer)
                 add(MegaAvatarKeyer)
+                add(MediaThumbnailKeyer)
             }
             .build()
     }

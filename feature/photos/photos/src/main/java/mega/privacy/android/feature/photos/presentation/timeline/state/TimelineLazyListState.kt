@@ -12,8 +12,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType.PhotoNodeItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.PhotoNodeItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import java.time.LocalDateTime
@@ -100,7 +100,7 @@ internal class TimelineLazyListState(
 
     internal fun calculateScrollIndexBasedOnItemClick(
         photo: PhotosNodeListCard,
-        displayedPhotos: List<PhotosNodeContentType>,
+        displayedPhotos: List<PhotosNodeContentItem>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
     ): Int = when (photo) {
@@ -132,7 +132,7 @@ internal class TimelineLazyListState(
 
     internal fun calculateScrollIndexBasedOnTimePeriodClick(
         targetPeriod: PhotoModificationTimePeriod,
-        displayedPhotos: List<PhotosNodeContentType>,
+        displayedPhotos: List<PhotosNodeContentItem>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
         yearsCardPhotos: List<PhotosNodeListCard>,
@@ -187,7 +187,7 @@ internal class TimelineLazyListState(
         isCUBannerVisible: Boolean,
         targetPeriod: PhotoModificationTimePeriod,
         targetModificationTime: LocalDateTime,
-        displayedPhotos: List<PhotosNodeContentType>,
+        displayedPhotos: List<PhotosNodeContentItem>,
         daysCardPhotos: List<PhotosNodeListCard>,
         monthsCardPhotos: List<PhotosNodeListCard>,
         yearsCardPhotos: List<PhotosNodeListCard>,
@@ -216,7 +216,7 @@ internal class TimelineLazyListState(
 
             PhotoModificationTimePeriod.All -> {
                 val firstVisibleGridItem =
-                    findFirstVisibleGridItem<PhotosNodeContentType.HeaderItem>(
+                    findFirstVisibleGridItem<PhotosNodeContentItem.HeaderItem>(
                         isCUBannerVisible = isCUBannerVisible,
                         firstVisibleItemIndex = if (isCUBannerVisible) 1 else 0,
                         displayedPhotos = displayedPhotos,
@@ -229,10 +229,10 @@ internal class TimelineLazyListState(
         }
     }
 
-    private inline fun <reified T : PhotosNodeContentType> findFirstVisibleGridItem(
+    private inline fun <reified T : PhotosNodeContentItem> findFirstVisibleGridItem(
         isCUBannerVisible: Boolean,
         firstVisibleItemIndex: Int,
-        displayedPhotos: List<PhotosNodeContentType>,
+        displayedPhotos: List<PhotosNodeContentItem>,
         filter: (T) -> Boolean = { true },
     ): GridFirstVisibleItemResult? {
         val startIndex = if (isCUBannerVisible) {
@@ -251,7 +251,7 @@ internal class TimelineLazyListState(
                         modificationTime = item.node.photo.modificationTime
                     )
 
-                    is PhotosNodeContentType.HeaderItem -> GridFirstVisibleItemResult(
+                    is PhotosNodeContentItem.HeaderItem -> GridFirstVisibleItemResult(
                         index = i,
                         modificationTime = item.time
                     )

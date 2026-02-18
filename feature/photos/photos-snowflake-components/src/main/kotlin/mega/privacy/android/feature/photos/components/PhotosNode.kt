@@ -1,36 +1,29 @@
 package mega.privacy.android.feature.photos.components
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
@@ -42,31 +35,21 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.icon.pack.IconPack
-
-@Immutable
-sealed interface PhotosNodeThumbnailData {
-    data object Loading : PhotosNodeThumbnailData
-
-    data class Placeholder(@DrawableRes val imageResId: Int) : PhotosNodeThumbnailData
-
-    data class File(
-        val path: String,
-        val isSensitive: Boolean,
-        val alpha: Float = DefaultAlpha,
-    ) : PhotosNodeThumbnailData
-}
 
 @Composable
 fun ImagePhotosNode(
-    thumbnailData: PhotosNodeThumbnailData,
+    thumbnailRequest: MediaThumbnailRequest,
+    isSensitive: Boolean,
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
 ) {
     BasicPhotosNode(
         modifier = modifier,
-        thumbnailData = thumbnailData,
+        thumbnailRequest = thumbnailRequest,
+        isSensitive = isSensitive,
         isSelected = isSelected,
         shouldShowFavourite = shouldShowFavourite
     )
@@ -75,7 +58,8 @@ fun ImagePhotosNode(
 @Composable
 fun VideoPhotosNode(
     duration: String,
-    thumbnailData: PhotosNodeThumbnailData,
+    thumbnailRequest: MediaThumbnailRequest,
+    isSensitive: Boolean,
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
@@ -83,7 +67,8 @@ fun VideoPhotosNode(
     Box(modifier = modifier) {
         BasicPhotosNode(
             modifier = Modifier.fillMaxSize(),
-            thumbnailData = thumbnailData,
+            thumbnailRequest = thumbnailRequest,
+            isSensitive = isSensitive,
             isSelected = isSelected,
             shouldShowFavourite = shouldShowFavourite
         )
@@ -114,7 +99,8 @@ fun VideoPhotosNode(
 
 @Composable
 private fun BasicPhotosNode(
-    thumbnailData: PhotosNodeThumbnailData,
+    thumbnailRequest: MediaThumbnailRequest,
+    isSensitive: Boolean,
     isSelected: Boolean,
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
@@ -132,53 +118,27 @@ private fun BasicPhotosNode(
                     .clip(RoundedCornerShape(4.dp))
             }
     ) {
-        when (thumbnailData) {
-            is PhotosNodeThumbnailData.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .background(DSTokens.colors.background.surface2)
-                        .fillMaxSize()
-                        .testTag(BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG),
-                )
-            }
-
-            is PhotosNodeThumbnailData.Placeholder -> {
-                Image(
-                    modifier = Modifier
-                        .height(172.dp)
-                        .fillMaxWidth()
-                        .align(Alignment.Center)
-                        .padding(vertical = 34.dp)
-                        .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_PLACEHOLDER_TAG),
-                    painter = painterResource(thumbnailData.imageResId),
-                    contentDescription = "default icon",
-                    contentScale = ContentScale.Fit,
-                )
-            }
-
-            is PhotosNodeThumbnailData.File -> {
-                AsyncImage(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .conditional(thumbnailData.isSensitive) {
-                            this
-                                .alpha(0.5f)
-                                .blur(16.dp)
-                        }
-                        .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG),
-                    model = ImageRequest
-                        .Builder(LocalContext.current)
-                        .data(thumbnailData.path)
-                        .crossfade(true)
-                        .diskCachePolicy(CachePolicy.ENABLED)
-                        .build(),
-                    placeholder = ColorPainter(DSTokens.colors.background.surface2),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    alpha = thumbnailData.alpha
-                )
-            }
+        val context = LocalContext.current
+        val request = remember(thumbnailRequest) {
+            ImageRequest.Builder(context)
+                .data(thumbnailRequest)
+                .crossfade(enable = true)
+                .build()
         }
+        AsyncImage(
+            modifier = Modifier
+                .aspectRatio(1f)
+                .conditional(isSensitive) {
+                    this
+                        .alpha(0.5f)
+                        .blur(16.dp)
+                }
+                .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG),
+            model = request,
+            placeholder = ColorPainter(DSTokens.colors.background.surface2),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
 
         if (shouldShowFavourite) {
             MegaIcon(
@@ -223,7 +183,15 @@ private fun ImagePhotosNodePreview(
     AndroidThemeForPreviews {
         ImagePhotosNode(
             modifier = Modifier.size(137.dp),
-            thumbnailData = PhotosNodeThumbnailData.Placeholder(mega.privacy.android.icon.pack.R.drawable.ic_usp_2),
+            thumbnailRequest = MediaThumbnailRequest(
+                id = 1L,
+                isPreview = false,
+                thumbnailFilePath = "node.photo.thumbnailFilePath",
+                previewFilePath = "node.photo.previewFilePath",
+                isPublicNode = false,
+                fileExtension = "jpg"
+            ),
+            isSensitive = false,
             isSelected = isTrue,
             shouldShowFavourite = isTrue
         )
@@ -239,7 +207,15 @@ private fun VideoPhotosNodePreview(
         VideoPhotosNode(
             modifier = Modifier.size(137.dp),
             duration = "2.50",
-            thumbnailData = PhotosNodeThumbnailData.Placeholder(mega.privacy.android.icon.pack.R.drawable.ic_usp_2),
+            thumbnailRequest = MediaThumbnailRequest(
+                id = 1L,
+                isPreview = false,
+                thumbnailFilePath = "node.photo.thumbnailFilePath",
+                previewFilePath = "node.photo.previewFilePath",
+                isPublicNode = false,
+                fileExtension = "mov"
+            ),
+            isSensitive = false,
             isSelected = isTrue,
             shouldShowFavourite = isTrue
         )
@@ -254,22 +230,17 @@ private fun BasicPhotosNodePreview(
     AndroidThemeForPreviews {
         BasicPhotosNode(
             modifier = Modifier.size(137.dp),
-            thumbnailData = PhotosNodeThumbnailData.Placeholder(mega.privacy.android.icon.pack.R.drawable.ic_usp_2),
+            thumbnailRequest = MediaThumbnailRequest(
+                id = 1L,
+                isPreview = false,
+                thumbnailFilePath = "node.photo.thumbnailFilePath",
+                previewFilePath = "node.photo.previewFilePath",
+                isPublicNode = false,
+                fileExtension = "jpg"
+            ),
+            isSensitive = false,
             isSelected = isTrue,
             shouldShowFavourite = isTrue
-        )
-    }
-}
-
-@CombinedThemePreviews
-@Composable
-private fun BasicPhotosNodeLoadingPreview(){
-    AndroidThemeForPreviews {
-        BasicPhotosNode(
-            modifier = Modifier.size(137.dp),
-            thumbnailData = PhotosNodeThumbnailData.Loading,
-            isSelected = false,
-            shouldShowFavourite = false
         )
     }
 }

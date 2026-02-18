@@ -45,17 +45,16 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.components.ImagePhotosNode
-import mega.privacy.android.feature.photos.components.PhotosNodeThumbnailData
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.components.VideoPhotosNode
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType.HeaderItem
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType.PhotoNodeItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.HeaderItem
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem.PhotoNodeItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
@@ -69,7 +68,8 @@ import kotlin.time.Duration
 
 @Composable
 fun PhotosNodeGridView(
-    items: List<PhotosNodeContentType>,
+    items: List<PhotosNodeContentItem>,
+    selectedPhotoIds: Set<Long>,
     gridSize: TimelineGridSize,
     onGridSizeChange: (value: TimelineGridSize) -> Unit,
     onClick: (node: PhotoNodeUiState) -> Unit,
@@ -126,7 +126,7 @@ fun PhotosNodeGridView(
         itemsIndexed(
             items = items,
             key = { _, item -> item.key },
-            contentType = { _, item -> item },
+            contentType = { _, item -> item.type },
             span = { _, item ->
                 when (item) {
                     is HeaderItem -> GridItemSpan(maxLineSpan)
@@ -146,7 +146,7 @@ fun PhotosNodeGridView(
                             .padding(horizontal = 16.dp)
                             .testTag(PHOTOS_NODE_GRID_VIEW_HEADER_BODY_TAG),
                         time = contentType.time,
-                        shouldShowGridSizeSettings = contentType.shouldShowGridSizeSettings,
+                        shouldShowGridSizeSettings = index == 0 && selectedPhotoIds.isEmpty(),
                         gridSize = gridSize,
                         onGridSizeChange = onGridSizeChange
                     )
@@ -163,7 +163,7 @@ fun PhotosNodeGridView(
                         spanCount = spanCount,
                         node = contentType.node,
                         isPreview = isPreview,
-                        isSelected = contentType.node.isSelected,
+                        isSelected = contentType.node.photo.id in selectedPhotoIds,
                         shouldShowFavourite = contentType.node.photo.isFavourite
                     )
                 }
@@ -279,38 +279,21 @@ private fun PhotoNodeBody(
             (windowInfo.containerSize.width / spanCount).toDp()
         }
     }
-    val downloadResult by node.photo.downloadAsStateWithLifecycle(isPreview = isPreview)
-    val thumbnailData by remember(downloadResult) {
-        mutableStateOf(
-            value = when (downloadResult) {
-                is DownloadPhotoResult.Success -> {
-                    val path = if (isPreview) {
-                        node.photo.previewFilePath
-                    } else {
-                        node.photo.thumbnailFilePath
-                    }
-                    path?.let {
-                        PhotosNodeThumbnailData.File(
-                            path = it,
-                            isSensitive = node.isSensitive
-                        )
-                    } ?: run {
-                        PhotosNodeThumbnailData.Placeholder(imageResId = node.defaultIcon)
-                    }
-                }
-
-                is DownloadPhotoResult.Idle -> PhotosNodeThumbnailData.Loading
-                else -> PhotosNodeThumbnailData.Placeholder(imageResId = node.defaultIcon)
-            }
-        )
-    }
     when (node.photo) {
         is PhotoUiState.Image -> {
             ImagePhotosNode(
                 modifier = modifier
                     .size(photosNodeSize)
                     .testTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG),
-                thumbnailData = thumbnailData,
+                thumbnailRequest = MediaThumbnailRequest(
+                    id = node.photo.id,
+                    isPreview = isPreview,
+                    thumbnailFilePath = node.photo.thumbnailFilePath,
+                    previewFilePath = node.photo.previewFilePath,
+                    isPublicNode = false,
+                    fileExtension = node.photo.fileTypeInfo.extension
+                ),
+                isSensitive = node.isSensitive,
                 isSelected = isSelected,
                 shouldShowFavourite = shouldShowFavourite
             )
@@ -322,7 +305,15 @@ private fun PhotoNodeBody(
                     .size(photosNodeSize)
                     .testTag(VIDEO_NODE_BODY_IMAGE_NODE_TAG),
                 duration = node.photo.duration,
-                thumbnailData = thumbnailData,
+                thumbnailRequest = MediaThumbnailRequest(
+                    id = node.photo.id,
+                    isPreview = isPreview,
+                    thumbnailFilePath = node.photo.thumbnailFilePath,
+                    previewFilePath = node.photo.previewFilePath,
+                    isPublicNode = false,
+                    fileExtension = node.photo.fileTypeInfo.extension
+                ),
+                isSensitive = node.isSensitive,
                 isSelected = isSelected,
                 shouldShowFavourite = shouldShowFavourite
             )
@@ -373,10 +364,7 @@ private fun PhotosNodeGridViewPreview() {
         CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
             PhotosNodeGridView(
                 items = persistentListOf(
-                    HeaderItem(
-                        time = LocalDateTime.now(),
-                        shouldShowGridSizeSettings = true
-                    ),
+                    HeaderItem(time = LocalDateTime.now()),
                     PhotoNodeItem(
                         node = PhotoNodeUiState(
                             photo = PhotoUiState.Image(
@@ -400,7 +388,6 @@ private fun PhotosNodeGridViewPreview() {
                             ),
                             defaultIcon = R.drawable.ic_3d_medium_solid,
                             isSensitive = false,
-                            isSelected = true
                         )
                     ),
                     PhotoNodeItem(
@@ -427,10 +414,10 @@ private fun PhotosNodeGridViewPreview() {
                             ),
                             defaultIcon = R.drawable.ic_3d_medium_solid,
                             isSensitive = true,
-                            isSelected = false
                         )
                     )
                 ),
+                selectedPhotoIds = setOf(),
                 gridSize = TimelineGridSize.Default,
                 onGridSizeChange = {},
                 onClick = {},

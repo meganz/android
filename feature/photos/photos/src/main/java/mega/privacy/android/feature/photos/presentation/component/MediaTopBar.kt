@@ -33,7 +33,6 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylists
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTabAppBar
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadStatusToolbarAction
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
@@ -50,12 +49,12 @@ internal fun MediaTopBar(
     selectionModeType: MediaSelectionModeType,
     mediaMainUiState: MediaMainUiState,
     albumsTabUiState: AlbumsTabUiState,
-    timelineTabUiState: TimelineTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     timelineFilterUiState: TimelineFilterUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosTabUiState: VideosTabUiState,
     playlistsTabUiState: VideoPlaylistsTabUiState,
+    timelineSelectedCount: Int,
     selectedTimePeriod: PhotoModificationTimePeriod,
     videosTabQuery: String?,
     playlistsTabQuery: String?,
@@ -116,7 +115,7 @@ internal fun MediaTopBar(
     when {
         selectionModeType == MediaSelectionModeType.Timeline -> {
             BasicMediaTopBar(
-                count = timelineTabUiState.selectedPhotoCount,
+                count = timelineSelectedCount,
                 onCancelSelectionClicked = onClearTimelinePhotosSelection
             )
         }

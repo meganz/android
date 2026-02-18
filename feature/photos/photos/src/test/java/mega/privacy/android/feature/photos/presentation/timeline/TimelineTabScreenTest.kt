@@ -15,12 +15,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
@@ -34,6 +35,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
@@ -174,12 +176,12 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentType.HeaderItem(
-                            time = LocalDateTime.now(),
-                            shouldShowGridSizeSettings = true
+                        PhotosNodeContentItem.HeaderItem(
+                            time = LocalDateTime.now()
                         )
                     )
                 ),
+                selectedPhotoIds = setOf(),
                 selectedTimePeriod = selectedTimePeriod
             )
 
@@ -195,12 +197,12 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentType.HeaderItem(
-                            time = LocalDateTime.now(),
-                            shouldShowGridSizeSettings = true
+                        PhotosNodeContentItem.HeaderItem(
+                            time = LocalDateTime.now()
                         )
                     )
                 ),
+                selectedPhotoIds = setOf(),
                 selectedTimePeriod = selectedTimePeriod
             )
 
@@ -215,12 +217,12 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentType.HeaderItem(
-                            time = LocalDateTime.now(),
-                            shouldShowGridSizeSettings = true
+                        PhotosNodeContentItem.HeaderItem(
+                            time = LocalDateTime.now()
                         )
                     )
                 ),
+                selectedPhotoIds = setOf(),
             )
 
             onNodeWithTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG).assertIsDisplayed()
@@ -234,13 +236,12 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentType.HeaderItem(
+                        PhotosNodeContentItem.HeaderItem(
                             time = LocalDateTime.now(),
-                            shouldShowGridSizeSettings = true
                         )
                     ),
-                    selectedPhotoCount = 10
                 ),
+                selectedPhotoIds = setOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L),
             )
 
             onNodeWithTag(TIMELINE_TAB_CONTENT_PHOTO_MODIFICATION_TIME_PERIOD_SELECTOR_TAG).assertDoesNotExist()
@@ -264,11 +265,17 @@ class TimelineTabScreenTest {
 
     @Test
     fun `test that the photo is successfully clicked`() {
-        val photoUiState = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photoUiState = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val node = PhotoNodeUiState(
             photo = photoUiState,
             isSensitive = false,
-            isSelected = false,
             defaultIcon = mega.privacy.android.icon.pack.R.drawable.ic_3d_medium_solid,
         )
         composeRuleScope {
@@ -276,7 +283,7 @@ class TimelineTabScreenTest {
             setScreen(
                 uiState = TimelineTabUiState(
                     isLoading = false,
-                    displayedPhotos = listOf(PhotosNodeContentType.PhotoNodeItem(node = node))
+                    displayedPhotos = listOf(PhotosNodeContentItem.PhotoNodeItem(node = node))
                 ),
                 onPhotoClick = onPhotoClick,
             )
@@ -297,12 +304,12 @@ class TimelineTabScreenTest {
                 uiState = TimelineTabUiState(
                     isLoading = false,
                     displayedPhotos = listOf(
-                        PhotosNodeContentType.HeaderItem(
+                        PhotosNodeContentItem.HeaderItem(
                             time = LocalDateTime.now(),
-                            shouldShowGridSizeSettings = true
                         )
                     ),
                 ),
+                selectedPhotoIds = setOf(),
                 onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
 
@@ -325,6 +332,7 @@ class TimelineTabScreenTest {
         uiState: TimelineTabUiState = TimelineTabUiState(),
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
         timelineFilterUiState: TimelineFilterUiState = TimelineFilterUiState(),
+        selectedPhotoIds: Set<Long> = setOf(),
         showTimelineSortDialog: Boolean = false,
         selectedTimePeriod: PhotoModificationTimePeriod = PhotoModificationTimePeriod.All,
         clearCameraUploadsCompletedMessage: () -> Unit = {},
@@ -347,6 +355,7 @@ class TimelineTabScreenTest {
                     uiState = uiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                     timelineFilterUiState = timelineFilterUiState,
+                    selectedPhotoIds = selectedPhotoIds,
                     showTimelineSortDialog = showTimelineSortDialog,
                     selectedTimePeriod = selectedTimePeriod,
                     clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,

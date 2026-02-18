@@ -19,6 +19,7 @@ dependencies {
 
     implementation(project(":icon-pack"))
     implementation(project(":shared:resources"))
+    implementation(project(":domain"))
 
     //core components
     implementation(lib.mega.core.ui)

@@ -13,6 +13,7 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoUiState
@@ -21,6 +22,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNod
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
@@ -34,7 +36,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the correct dates are displayed`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val firstDate = "firstDate"
         val secondDate = "secondDate"
         val thirdDate = "thirdDate"
@@ -75,7 +84,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the image item is displayed`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Days(
                 date = "2 September",
@@ -97,7 +113,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the photo count is displayed when the photos count is greater than 1 and the period is days`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Days(
                 date = "2 September",
@@ -119,7 +142,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the photo count does not exist when the photos count is less than 1 and the period is days`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Days(
                 date = "2 September",
@@ -139,7 +169,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the photo count does not exist when the photos count equals to 1 and the period is days`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Days(
                 date = "2 September",
@@ -159,7 +196,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the photo count does not exist when the period is not days`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Years(
                 date = "2025",
@@ -178,7 +222,14 @@ class PhotosNodeListCardListViewTest {
 
     @Test
     fun `test that the photo counter for days is successfully clicked`() {
-        val photo = mock<PhotoUiState.Image>()
+        val photoId = 1L
+        val photo = mock<PhotoUiState.Image> {
+            on { id } doReturn photoId
+            on { fileTypeInfo } doReturn StaticImageFileTypeInfo(
+                mimeType = "",
+                extension = "jpg"
+            )
+        }
         val photos = persistentListOf(
             PhotosNodeListCard.Days(
                 date = "2 September",

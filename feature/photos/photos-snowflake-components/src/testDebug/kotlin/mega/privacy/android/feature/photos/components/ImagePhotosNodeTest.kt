@@ -6,6 +6,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,43 +16,6 @@ class ImagePhotosNodeTest {
 
     @get:Rule
     val composeRule = createComposeRule()
-
-    @Test
-    fun `test that the thumbnail placeholder image is displayed when the thumbnail data is for placeholder`() {
-        composeRuleScope {
-            val thumbnailData = PhotosNodeThumbnailData.Placeholder(
-                mega.privacy.android.icon.pack.R.drawable.ic_usp_2
-            )
-
-            setNode(thumbnailData = thumbnailData)
-
-            onNodeWithTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_PLACEHOLDER_TAG).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that the loading skeleton is displayed when the thumbnail data is for loading state`() {
-        composeRuleScope {
-            val thumbnailData = PhotosNodeThumbnailData.Loading
-            setNode(thumbnailData = thumbnailData)
-
-            onNodeWithTag(BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG).assertIsDisplayed()
-        }
-    }
-
-    @Test
-    fun `test that the thumbnail with file path is displayed when the thumbnail data is for file`() {
-        composeRuleScope {
-            val thumbnailData = PhotosNodeThumbnailData.File(
-                path = "path",
-                isSensitive = false
-            )
-
-            setNode(thumbnailData = thumbnailData)
-
-            onNodeWithTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG).assertIsDisplayed()
-        }
-    }
 
     @Test
     fun `test that the favourite icon is displayed when the node is added to favourite`() {
@@ -78,15 +42,22 @@ class ImagePhotosNodeTest {
     }
 
     private fun ComposeContentTestRule.setNode(
-        thumbnailData: PhotosNodeThumbnailData = PhotosNodeThumbnailData.Placeholder(
-            mega.privacy.android.icon.pack.R.drawable.ic_usp_2
+        thumbnailRequest: MediaThumbnailRequest = MediaThumbnailRequest(
+            id = 1L,
+            isPreview = false,
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            isPublicNode = false,
+            fileExtension = "",
         ),
+        isSensitive: Boolean = false,
         isSelected: Boolean = false,
         shouldShowFavourite: Boolean = false,
     ) {
         setContent {
             ImagePhotosNode(
-                thumbnailData = thumbnailData,
+                thumbnailRequest = thumbnailRequest,
+                isSensitive = isSensitive,
                 isSelected = isSelected,
                 shouldShowFavourite = shouldShowFavourite
             )

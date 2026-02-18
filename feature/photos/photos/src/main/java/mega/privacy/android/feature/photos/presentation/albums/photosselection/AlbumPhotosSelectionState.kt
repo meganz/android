@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.model.AlbumFlow
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 
 data class AlbumPhotosSelectionState(
@@ -17,7 +17,7 @@ data class AlbumPhotosSelectionState(
     val sourcePhotos: List<Photo> = listOf(),
     val photos: List<Photo> = listOf(),
     val filteredPhotoIds: Set<Long> = setOf(),
-    val photosNodeContentTypes: List<PhotosNodeContentType> = listOf(),
+    val photosNodeContentItems: List<PhotosNodeContentItem> = listOf(),
     val selectedPhotoIds: Set<Long> = setOf(),
     val selectedLocation: TimelinePhotosSource = TimelinePhotosSource.ALL_PHOTOS,
     val isLocationDetermined: Boolean = false,
@@ -31,8 +31,8 @@ data class AlbumPhotosSelectionState(
     /**
      * Flag to check if all nodes are selected
      */
-    val areAllNodesSelected: Boolean = photosNodeContentTypes
-        .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
+    val areAllNodesSelected: Boolean = photosNodeContentItems
+        .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
         .size == selectedPhotoIds.size
 }
 

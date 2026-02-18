@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.photos.SetCameraUploadShownUseCase
 import mega.privacy.android.domain.usecase.photos.SetEnableCameraUploadBannerDismissedTimestampUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -265,9 +265,8 @@ class MediaCameraUploadViewModelTest {
     @Test
     fun `test that CU page is not displayed when the photos are not empty`() = runTest {
         val photos = persistentListOf(
-            PhotosNodeContentType.HeaderItem(
-                time = LocalDateTime.now(),
-                shouldShowGridSizeSettings = true
+            PhotosNodeContentItem.HeaderItem(
+                time = LocalDateTime.now()
             )
         )
         whenever(isCameraUploadsEnabledUseCase()) doReturn false

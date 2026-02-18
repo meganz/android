@@ -89,6 +89,7 @@ internal fun TimelineTabRoute(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
+    selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -113,6 +114,7 @@ internal fun TimelineTabRoute(
         uiState = uiState,
         timelineFilterUiState = timelineFilterUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
+        selectedPhotoIds = selectedPhotoIds,
         showTimelineSortDialog = showTimelineSortDialog,
         selectedTimePeriod = selectedTimePeriod,
         clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
@@ -136,6 +138,7 @@ internal fun TimelineTabScreen(
     uiState: TimelineTabUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
+    selectedPhotoIds: Set<Long>,
     showTimelineSortDialog: Boolean,
     selectedTimePeriod: PhotoModificationTimePeriod,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -267,6 +270,7 @@ internal fun TimelineTabScreen(
                 contentPadding = contentPadding,
                 uiState = uiState,
                 cuStatusUiState = mediaCameraUploadUiState.status,
+                selectedPhotoIds = selectedPhotoIds,
                 lazyGridState = timelineLazyListState.lazyGridState,
                 lazyListState = timelineLazyListState.lazyListState,
                 selectedTimePeriod = selectedTimePeriod,
@@ -370,6 +374,7 @@ private fun EmptyBodyContent(modifier: Modifier = Modifier) {
 private fun TimelineTabContent(
     uiState: TimelineTabUiState,
     cuStatusUiState: CUStatusUiState,
+    selectedPhotoIds: Set<Long>,
     lazyGridState: LazyGridState,
     lazyListState: LazyListState,
     selectedTimePeriod: PhotoModificationTimePeriod,
@@ -387,10 +392,6 @@ private fun TimelineTabContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
-    val shouldShowCUBanner by remember(uiState.selectedPhotoCount) {
-        derivedStateOf { uiState.selectedPhotoCount == 0 }
-    }
-
     Box(
         modifier = modifier
             .padding(contentPadding.excludingBottomPadding())
@@ -404,12 +405,13 @@ private fun TimelineTabContent(
                     lazyGridState = lazyGridState,
                     contentPadding = contentPadding,
                     items = uiState.displayedPhotos,
+                    selectedPhotoIds = selectedPhotoIds,
                     gridSize = uiState.gridSize,
                     onGridSizeChange = onGridSizeChange,
                     onClick = onPhotoClick,
                     onLongClick = onPhotoSelected,
                     header = {
-                        if (shouldShowCUBanner) {
+                        if (selectedPhotoIds.isEmpty()) {
                             CameraUploadsBanner(
                                 status = cuStatusUiState,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
@@ -439,7 +441,7 @@ private fun TimelineTabContent(
                     photos = items,
                     onClick = onPhotosNodeListCardClick,
                     header = {
-                        if (shouldShowCUBanner) {
+                        if (selectedPhotoIds.isEmpty()) {
                             CameraUploadsBanner(
                                 status = cuStatusUiState,
                                 onEnableCameraUploads = onNavigateToCameraUploadsSettings,
@@ -455,7 +457,7 @@ private fun TimelineTabContent(
             }
         }
 
-        if (uiState.selectedPhotoCount == 0) {
+        if (selectedPhotoIds.isEmpty()) {
             PhotoModificationTimePeriodSelector(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -577,6 +579,7 @@ private fun TimelineTabScreenPreview() {
             uiState = TimelineTabUiState(isLoading = false),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
+            selectedPhotoIds = setOf(),
             showTimelineSortDialog = false,
             selectedTimePeriod = PhotoModificationTimePeriod.All,
             clearCameraUploadsCompletedMessage = {},

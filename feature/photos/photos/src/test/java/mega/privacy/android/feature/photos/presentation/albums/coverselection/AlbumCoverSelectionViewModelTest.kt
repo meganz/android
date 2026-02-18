@@ -6,13 +6,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -25,8 +22,8 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
@@ -120,64 +117,6 @@ class AlbumCoverSelectionViewModelTest {
                 expectedPhotoUiStates.sortedByDescending { it.modificationTime }
             assertThat(expectedSortedPhotoUiStates.map { it.id })
                 .isEqualTo(actual.photos.map { it.id })
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that select photo returns correct result`() = runTest {
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
-        whenever(
-            fileTypeIconMapper(
-                any(),
-                any()
-            )
-        ).thenReturn(iconPackR.drawable.ic_image_medium_solid)
-
-        val album = createUserAlbum(id = AlbumId(1L))
-        val photo = createImage(id = 1L)
-        val photoUiState = createPhotoUiState(photo)
-        whenever(photoUiStateMapper(photo)).thenReturn(photoUiState)
-
-        val underTest = AlbumCoverSelectionViewModel(
-            savedStateHandle = SavedStateHandle(mapOf("album_id" to 1L)),
-            getUserAlbum = { flowOf(album) },
-            getAlbumPhotos = { flowOf(listOf(photo)) },
-            downloadThumbnailUseCase = mock(),
-            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
-            defaultDispatcher = UnconfinedTestDispatcher(),
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            getBusinessStatusUseCase = mock(),
-            photoUiStateMapper = photoUiStateMapper,
-            fileTypeIconMapper = fileTypeIconMapper,
-            albumId = null,
-        )
-
-        // load initial state
-        underTest.state.test {
-            awaitCondition { it.photosNodeContentTypes.isNotEmpty() }
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // when - select the photo
-        underTest.selectPhoto(photoUiState)
-
-        // then - verify the photo's isSelected flag is true in photosNodeContentTypes
-        underTest.state.test {
-            val stateAfterSelection =
-                awaitCondition { it.hasSelectedPhoto && it.photosNodeContentTypes.isNotEmpty() }
-            assertThat(stateAfterSelection.hasSelectedPhoto).isTrue()
-
-            val selectedPhotoNode = stateAfterSelection.photosNodeContentTypes
-                .filterIsInstance<PhotosNodeContentType.PhotoNodeItem>()
-                .firstOrNull { it.node.photo.id == photoUiState.id }
-
-            assertThat(selectedPhotoNode).isNotNull()
-            assertThat(selectedPhotoNode?.node?.isSelected).isTrue()
-            assertThat(selectedPhotoNode?.node?.photo?.id).isEqualTo(photoUiState.id)
-
             cancelAndIgnoreRemainingEvents()
         }
     }
