@@ -39,6 +39,7 @@ class MegaAppContainerProvider @Inject constructor(
     override fun buildSharedAppContainer(
         context: Context,
         useLegacyStatusBarColor: Boolean,
+        includePsa: Boolean,
         content: @Composable (() -> Unit),
     ): ComposeView =
         ComposeView(context).apply {

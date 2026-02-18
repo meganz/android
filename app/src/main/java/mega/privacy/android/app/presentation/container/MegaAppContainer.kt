@@ -6,11 +6,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.app.main.dialog.businessgrace.BusinessAccountContainer
-import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.app.presentation.psa.MegaPsaContainer
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
+import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 
@@ -64,6 +64,8 @@ fun MegaAppContainer(
  *
  * @param themeMode
  * @param passcodeCryptObjectFactory
+ * @param useLegacyStatusBarColor
+ * @param includePsa
  * @param content
  *
  */
@@ -72,30 +74,35 @@ fun SharedAppContainer(
     themeMode: ThemeMode,
     passcodeCryptObjectFactory: PasscodeCryptObjectFactory,
     useLegacyStatusBarColor: Boolean = true,
+    includePsa: Boolean = true,
     content: @Composable () -> Unit,
 ) {
-    val containers: List<@Composable (@Composable () -> Unit) -> Unit> = listOf(
-        { MegaPsaContainer(content = it) },
-        {
-            PasscodeContainer(
-                passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                content = it
-            )
-        },
-        {
-            val darkMode = themeMode.isDarkMode()
-            CompositionLocalProvider(
-                LocalIsDarkTheme provides darkMode
-            ) {
-                AndroidTheme(
-                    isDark = darkMode,
-                    content = it,
-                    useLegacyStatusBarColor = useLegacyStatusBarColor
+    val containers: List<@Composable (@Composable () -> Unit) -> Unit> = buildList {
+        if (includePsa) add({ MegaPsaContainer(content = it) })
+        add(
+            {
+                PasscodeContainer(
+                    passcodeCryptObjectFactory = passcodeCryptObjectFactory,
+                    content = it
                 )
             }
-        },
-        { SessionContainer(content = it) },
-    )
+        )
+        add(
+            {
+                val darkMode = themeMode.isDarkMode()
+                CompositionLocalProvider(
+                    LocalIsDarkTheme provides darkMode
+                ) {
+                    AndroidTheme(
+                        isDark = darkMode,
+                        content = it,
+                        useLegacyStatusBarColor = useLegacyStatusBarColor
+                    )
+                }
+            }
+        )
+        add({ SessionContainer(content = it) })
+    }
 
     AppContainer(
         containers = containers,
