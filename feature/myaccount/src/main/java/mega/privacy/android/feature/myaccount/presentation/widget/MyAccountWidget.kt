@@ -212,15 +212,15 @@ internal fun MyAccountWidget(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    // User name - allow 2 lines with ellipsis so large font doesn't clip
+                    // User name - allow 1 lines with ellipsis so large font doesn't clip
                     MegaText(
                         text = "${stringResource(R.string.general_hi)} $emojifiedName!",
                         style = titleStyle,
                         modifier = Modifier
                             .heightIn(min = minTitleHeight)
                             .testTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        maxLines = 1,
+                        overflow = TextOverflow.MiddleEllipsis
                     )
 
                     // Account type
