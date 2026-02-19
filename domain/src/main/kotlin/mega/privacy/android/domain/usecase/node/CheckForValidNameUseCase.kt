@@ -1,6 +1,9 @@
 package mega.privacy.android.domain.usecase.node
 
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.InvalidNameType
+import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -39,7 +42,9 @@ class CheckForValidNameUseCase @Inject constructor(
                 val extension = newName.substringAfterLast('.', "")
 
                 when {
-                    extension.isBlank() -> InvalidNameType.NO_EXTENSION
+                    extension.isBlank() && node.type.isValidTextFileType()
+                        .not() -> InvalidNameType.NO_EXTENSION
+
                     extension.equals(node.type.extension, true)
                         .not() -> InvalidNameType.DIFFERENT_EXTENSION
 
@@ -55,5 +60,8 @@ class CheckForValidNameUseCase @Inject constructor(
         fun String.isInvalidDotName() = this == "."
 
         fun String.isInvalidDoubleDotName() = this == ".."
+
+        fun FileTypeInfo.isValidTextFileType() =
+            this is TextFileTypeInfo || this is UnMappedFileTypeInfo
     }
 }

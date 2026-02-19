@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.InvalidNameType
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -107,6 +108,27 @@ class CheckForValidNameUseCaseTest {
                 .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
 
             verifyNoInteractions(nodeExistsInParentUseCase)
+        }
+
+    @Test
+    fun `test that if a text file without extension is renamed without extension, the type is valid`() =
+        runTest {
+            val textType = TextFileTypeInfo("whatever", "")
+            val fileNode = mock<FileNode> {
+                on { type } doReturn textType
+            }
+            val providedName = "File"
+
+            whenever(nodeExistsInParentUseCase(fileNode, providedName)).thenReturn(false)
+
+            assertThat(
+                underTest(
+                    providedName,
+                    fileNode
+                )
+            ).isEqualTo(InvalidNameType.VALID)
+
+            verifyNoInteractions(nodeExistsInCurrentLocationUseCase)
         }
 
     private fun provideParams() =
