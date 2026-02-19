@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.login.FetchNodesViewModel
 import mega.privacy.android.app.presentation.login.view.FetchNodesContent
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.destination.MyAccountNavKey
 
 @Serializable
 data class FetchingContentNavKey(
@@ -22,7 +23,9 @@ data class FetchingContentNavKey(
     val refreshEvent: RefreshEvent? = null,
 ) : NoNodeNavKey
 
-fun EntryProviderScope<NavKey>.fetchingContentDestination() {
+fun EntryProviderScope<NavKey>.fetchingContentDestination(
+    navigate: (NavKey) -> Unit,
+) {
     entry<FetchingContentNavKey>(
         metadata = NavDisplay.transitionSpec {
             EnterTransition.None togetherWith ExitTransition.None
@@ -40,6 +43,10 @@ fun EntryProviderScope<NavKey>.fetchingContentDestination() {
             }
         )
         val state by viewModel.state.collectAsStateWithLifecycle()
+
+        if (state.isRefreshSession) {
+            navigate(MyAccountNavKey())
+        }
 
         FetchNodesContent(
             isRequestStatusInProgress = state.isRequestStatusInProgress,

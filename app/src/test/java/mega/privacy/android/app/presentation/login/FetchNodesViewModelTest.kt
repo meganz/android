@@ -469,6 +469,38 @@ class FetchNodesViewModelTest {
     }
 
     @Test
+    fun `test that refresh event Refresh triggers fetch nodes with refresh session and updates state when finished`() =
+        runTest {
+            val update = FetchNodesUpdate(Progress(1F))
+            // Setup mocks
+            whenever(loginMutex.isLocked).thenReturn(false)
+            whenever(monitorRequestStatusProgressEventUseCase()).thenReturn(emptyFlow())
+            whenever(monitorAccountBlockedUseCase()).thenReturn(emptyFlow())
+            wheneverBlocking { isMegaApiLoggedInUseCase() }.thenReturn(true)
+            val fetchNodesFlow = MutableStateFlow(update)
+            whenever(fetchNodesUseCase()).thenReturn(fetchNodesFlow)
+
+            initViewModel(
+                args = FetchNodesViewModel.Args(
+                    session = "test-session",
+                    isFromLogin = false,
+                    refreshEvent = RefreshEvent.ManualRefresh
+                )
+            )
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                // When refresh event is Refresh, it should call fetchNodes with isRefreshSession = true
+                // which resets the fetchNodesUpdate to clean state
+                assertThat(state.fetchNodesUpdate).isEqualTo(update)
+                assertThat(state.isRefreshSession).isTrue()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that refresh event ChangeEnvironment triggers fast login with refreshChatUrl true`() =
         runTest {
             // Setup mocks

@@ -296,7 +296,8 @@ class FetchNodesViewModel @AssistedInject constructor(
                         Timber.d("fetch nodes finished")
                         _state.update {
                             it.copy(
-                                fetchNodesUpdate = update
+                                fetchNodesUpdate = update,
+                                isRefreshSession = args.refreshEvent == RefreshEvent.ManualRefresh,
                             )
                         }
                     } else {
