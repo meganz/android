@@ -12,6 +12,6 @@ class MainNavigationFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
             homeScreens(navigationHandler = navigationHandler, transferHandler = transferHandler)
-            fetchingContentDestination()
+            fetchingContentDestination(navigationHandler::navigate)
         }
 }

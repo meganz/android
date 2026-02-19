@@ -667,18 +667,17 @@ class MyAccountViewModel @Inject constructor(
      * @param activity
      */
     suspend fun refresh(activity: Activity) = runCatching {
-        val intent = if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
+        if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
             Intent(activity, MegaActivity::class.java).apply {
                 action = ACTION_REFRESH
-            }
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            }.also { activity.startActivity(it) }
         } else {
             Intent(activity, LoginActivity::class.java).apply {
                 putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)
                 action = ACTION_REFRESH
-            }
+            }.also { activity.startActivityForResult(it, REQUEST_CODE_REFRESH) }
         }
-
-        activity.startActivityForResult(intent, REQUEST_CODE_REFRESH)
     }.onFailure {
         Timber.e(it, "Error refreshing account")
     }

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.login.TemporaryWaitingError
  * @param snackbarMessage The message to show in the Snackbar, if any.
  * @param isFastLogin Indicates if it's fast login flow
  * @param isFromLogin Indicates if the login is initiated from the login screen
+ * @param isRefreshSession Indicates if the fetch nodes is performed because of a refresh session action.
  */
 data class FetchNodesUiState(
     val fetchNodesUpdate: FetchNodesUpdate? = null,
@@ -27,6 +28,7 @@ data class FetchNodesUiState(
     val snackbarMessage: StateEventWithContent<Int> = consumed(),
     val isFastLogin: Boolean = false,
     val isFromLogin: Boolean = false,
+    val isRefreshSession: Boolean = false,
 ) {
     /**
      * True if the request status progress event is being processed
