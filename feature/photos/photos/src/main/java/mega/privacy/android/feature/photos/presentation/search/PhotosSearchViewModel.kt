@@ -237,8 +237,7 @@ class PhotosSearchViewModel @Inject constructor(
             listOf()
         } else {
             _state.value.photosSource.filter {
-                val ext = ".${it.fileTypeInfo.extension}"
-                it.name.replace(ext, "").contains(query, ignoreCase = true)
+                it.name.contains(query, ignoreCase = true)
             }.let { photos ->
                 if (showHiddenItems || accountType?.isPaid == false || isBusinessAccountExpired) {
                     photos
