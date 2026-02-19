@@ -394,6 +394,7 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
             hiltViewModel<SelectVideosForPlaylistViewModel, SelectVideosForPlaylistViewModel.Factory> {
                 it.create(key.nodeHandle, key.nodeName)
             }
+
         SelectVideosForPlaylistRoute(
             onNavigateToFolder = { handle, name ->
                 navigationHandler.navigate(

@@ -33,6 +33,7 @@ sealed interface SelectVideosForPlaylistUiState {
         val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val showHiddenItems: Boolean = false,
+        val query: String? = null,
     ) : SelectVideosForPlaylistUiState
 }
 

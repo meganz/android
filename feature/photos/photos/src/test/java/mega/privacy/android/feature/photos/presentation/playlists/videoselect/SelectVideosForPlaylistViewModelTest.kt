@@ -11,17 +11,24 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mapper.SelectVideoItemUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import org.junit.jupiter.api.AfterEach
@@ -35,6 +42,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -52,6 +60,10 @@ class SelectVideosForPlaylistViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
     private val selectVideoItemUiEntityMapper = mock<SelectVideoItemUiEntityMapper>()
+    private val nodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
+    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
+    private val setViewTypeUseCase = mock<SetViewType>()
+    private val monitorViewTypeUseCase = mock<MonitorViewType>()
 
     private val rootNodeId = NodeId(0L)
     private val folderNodeId = NodeId(100L)
@@ -75,7 +87,20 @@ class SelectVideosForPlaylistViewModelTest {
             onBlocking { invoke() }.thenReturn(flow { awaitCancellation() })
         }
         monitorSortCloudOrderUseCase.stub {
-            onBlocking { invoke() }.thenReturn(flow { awaitCancellation() })
+            onBlocking { invoke() }.thenReturn(
+                flow {
+                    emit(SortOrder.ORDER_DEFAULT_ASC)
+                    awaitCancellation()
+                }
+            )
+        }
+        monitorViewTypeUseCase.stub {
+            onBlocking { invoke() }.thenReturn(
+                flow {
+                    emit(ViewType.LIST)
+                    awaitCancellation()
+                }
+            )
         }
     }
 
@@ -89,6 +114,9 @@ class SelectVideosForPlaylistViewModelTest {
             monitorNodeUpdatesUseCase,
             monitorSortCloudOrderUseCase,
             selectVideoItemUiEntityMapper,
+            setCloudSortOrderUseCase,
+            setViewTypeUseCase,
+            monitorViewTypeUseCase,
         )
     }
 
@@ -98,6 +126,7 @@ class SelectVideosForPlaylistViewModelTest {
         nodesWithHasMore: Pair<List<TypedNode>, Boolean> = emptyList<TypedNode>() to false,
         isHiddenNodesEnabled: Boolean = true,
         showHiddenItems: Boolean = false,
+        viewType: ViewType = ViewType.LIST,
     ) {
         if (nodeHandle == -1L) {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
@@ -127,6 +156,12 @@ class SelectVideosForPlaylistViewModelTest {
                 awaitCancellation()
             }
         )
+        whenever(monitorViewTypeUseCase()).thenReturn(
+            flow {
+                emit(viewType)
+                awaitCancellation()
+            }
+        )
         underTest = SelectVideosForPlaylistViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
@@ -135,6 +170,10 @@ class SelectVideosForPlaylistViewModelTest {
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             selectVideoItemUiEntityMapper = selectVideoItemUiEntityMapper,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+            setViewTypeUseCase = setViewTypeUseCase,
+            monitorViewTypeUseCase = monitorViewTypeUseCase,
             nodeHandle = nodeHandle,
             nodeName = nodeName,
         )
@@ -276,4 +315,112 @@ class SelectVideosForPlaylistViewModelTest {
             }
     }
 
+    @Test
+    fun `test that searchQuery updates query in uiState`() = runTest {
+        stubInitialValues()
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            val initial = awaitItem()
+            assertThat(initial.query).isNull()
+
+            underTest.searchQuery("test")
+            advanceUntilIdle()
+            val afterSearch = awaitItem()
+            assertThat(afterSearch.query).isEqualTo("test")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that items are filtered by query`() = runTest {
+        val testName = "match.mp4"
+        val typedFolder = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn(testName)
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val testVideoEntity = SelectVideoItemUiEntity(
+            id = NodeId(1L),
+            name = testName,
+            title = LocalizedText.Literal(testName),
+            isFolder = false,
+        )
+        whenever(selectVideoItemUiEntityMapper(any())).thenReturn(testVideoEntity)
+        stubInitialValues(
+            nodesWithHasMore = listOf<TypedNode>(typedFolder) to false,
+        )
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            val initial = awaitItem()
+            assertThat(initial.items).hasSize(1)
+
+            underTest.searchQuery("match")
+            advanceUntilIdle()
+            assertThat(awaitItem().items).hasSize(1)
+
+            underTest.searchQuery("nomatch")
+            advanceUntilIdle()
+            assertThat(awaitItem().items).isEmpty()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that setCloudSortOrder invokes setCloudSortOrderUseCase`() = runTest {
+        stubInitialValues()
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            awaitItem()
+            val config = NodeSortConfiguration.default
+            underTest.setCloudSortOrder(config)
+            advanceUntilIdle()
+            verify(setCloudSortOrderUseCase).invoke(any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that changeViewTypeClicked invokes setViewTypeUseCase with toggled view type`() =
+        runTest {
+            stubInitialValues(viewType = ViewType.LIST)
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.changeViewTypeClicked()
+                advanceUntilIdle()
+                verify(setViewTypeUseCase).invoke(ViewType.GRID)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that changeViewTypeClicked when current is GRID invokes setViewTypeUseCase with LIST`() =
+        runTest {
+            stubInitialValues(viewType = ViewType.GRID)
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.changeViewTypeClicked()
+                advanceUntilIdle()
+                verify(setViewTypeUseCase).invoke(ViewType.LIST)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @ParameterizedTest(name = "when viewType is {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that uiState currentViewType is from monitorViewTypeUseCase`(
+        useGrid: Boolean,
+    ) = runTest {
+        val viewType = if (useGrid) ViewType.GRID else ViewType.LIST
+        stubInitialValues(viewType = viewType)
+
+        underTest.uiState
+            .filterIsInstance<SelectVideosForPlaylistUiState.Data>()
+            .test {
+                val actual = awaitItem()
+                assertThat(actual.currentViewType).isEqualTo(viewType)
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
 }

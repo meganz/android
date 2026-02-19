@@ -124,7 +124,6 @@ fun VideoPlaylistDetailScreen(
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
-    val context = LocalContext.current
     val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
     var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -236,7 +235,7 @@ fun VideoPlaylistDetailScreen(
                     action = { deletedVideoPlaylistTitles ->
                         if (deletedVideoPlaylistTitles.isNotEmpty()) {
                             val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
-                                context.getString(
+                                resources.getString(
                                     sharedR.string.video_section_playlists_delete_playlists_message_singular,
                                     deletedVideoPlaylistTitles[0]
                                 )

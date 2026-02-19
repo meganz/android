@@ -10,8 +10,12 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -25,11 +29,17 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoGridView
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
+import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -43,6 +53,8 @@ fun SelectVideosForPlaylistRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigateToFolderEvent by viewModel.navigateToFolderEvent.collectAsStateWithLifecycle()
 
+    val dataState = uiState as? SelectVideosForPlaylistUiState.Data
+
     EventEffect(
         event = navigateToFolderEvent,
         onConsumed = viewModel::resetNavigateToFolderEvent
@@ -52,6 +64,10 @@ fun SelectVideosForPlaylistRoute(
 
     SelectVideosForPlaylistScreen(
         uiState = uiState,
+        searchQuery = dataState?.query,
+        updateSearchQuery = viewModel::searchQuery,
+        onSortNodes = viewModel::setCloudSortOrder,
+        onChangeViewTypeClick = viewModel::changeViewTypeClicked,
         onItemClicked = viewModel::itemClicked,
         onBackPressed = onBack
     )
@@ -61,6 +77,10 @@ fun SelectVideosForPlaylistRoute(
 @Composable
 fun SelectVideosForPlaylistScreen(
     uiState: SelectVideosForPlaylistUiState,
+    searchQuery: String?,
+    updateSearchQuery: (String?) -> Unit,
+    onSortNodes: (NodeSortConfiguration) -> Unit,
+    onChangeViewTypeClick: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
@@ -71,6 +91,18 @@ fun SelectVideosForPlaylistScreen(
     BackHandler(dataState?.isCloudDriveRoot != true) {
         onBackPressed()
     }
+
+    var isSearchBarVisible by rememberSaveable { mutableStateOf(false) }
+    BackHandler(isSearchBarVisible) {
+        if (isSearchBarVisible) {
+            isSearchBarVisible = false
+            updateSearchQuery(null)
+        }
+    }
+
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
@@ -84,13 +116,15 @@ fun SelectVideosForPlaylistScreen(
                 } else {
                     dataState?.title?.text ?: ""
                 },
-                query = null,
-                onQueryChanged = {
-                    //TODO implement search functionality
+                query = searchQuery,
+                onQueryChanged = updateSearchQuery,
+                onSearchingModeChanged = { isSearching ->
+                    isSearchBarVisible = isSearching
+                    if (!isSearching) {
+                        updateSearchQuery(null)
+                    }
                 },
-                onSearchingModeChanged = {
-                    //TODO implement search functionality
-                },
+                isSearchingMode = isSearchBarVisible,
                 actions = emptyList()
             )
         }
@@ -116,12 +150,8 @@ fun SelectVideosForPlaylistScreen(
                             items = uiState.items,
                             listState = listState,
                             sortConfiguration = uiState.selectedSortConfiguration,
-                            onChangeViewTypeClick = {
-                                //TODO implement change view type functionality
-                            },
-                            onSortOrderClick = {
-                                //TODO implement sort order functionality
-                            },
+                            onChangeViewTypeClick = onChangeViewTypeClick,
+                            onSortOrderClick = { showSortBottomSheet = true },
                             onItemsClicked = onItemClicked,
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
                             showHiddenItems = uiState.showHiddenItems
@@ -133,14 +163,37 @@ fun SelectVideosForPlaylistScreen(
                             gridState = gridState,
                             onItemClicked = onItemClicked,
                             sortConfiguration = uiState.selectedSortConfiguration,
-                            onChangeViewTypeClick = {
-                                //TODO implement change view type functionality
-                            },
-                            onSortOrderClick = {
-                                //TODO implement change view type functionality
-                            },
+                            onChangeViewTypeClick = onChangeViewTypeClick,
+                            onSortOrderClick = { showSortBottomSheet = true },
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
                             showHiddenItems = uiState.showHiddenItems
+                        )
+                    }
+
+                    if (showSortBottomSheet) {
+                        SortBottomSheet(
+                            modifier = Modifier.testTag(VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG),
+                            title = stringResource(sharedR.string.action_sort_by_header),
+                            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+                            sheetState = sortBottomSheetState,
+                            selectedSort = SortBottomSheetResult(
+                                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                                sortDirection = uiState.selectedSortConfiguration.sortDirection
+                            ),
+                            onSortOptionSelected = { result ->
+                                result?.let {
+                                    onSortNodes(
+                                        NodeSortConfiguration(
+                                            sortOption = it.sortOptionItem,
+                                            sortDirection = it.sortDirection
+                                        )
+                                    )
+                                    showSortBottomSheet = false
+                                }
+                            },
+                            onDismissRequest = {
+                                showSortBottomSheet = false
+                            }
                         )
                     }
                 }
