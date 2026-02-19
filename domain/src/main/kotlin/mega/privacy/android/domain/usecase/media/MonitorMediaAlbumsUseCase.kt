@@ -59,7 +59,6 @@ class MonitorMediaAlbumsUseCase @Inject constructor(
                 .map { set ->
                     val cover = getUserAlbumCoverPhotoUseCase(
                         albumId = AlbumId(set.id),
-                        selectedCoverId = set.cover,
                         refresh = changedSets.any { it.id == set.id }
                     )
 
@@ -71,7 +70,6 @@ class MonitorMediaAlbumsUseCase @Inject constructor(
                         modificationTime = set.modificationTime,
                         isExported = set.isExported,
                     )
-                }
-                .sortedByDescending { it.modificationTime }
+                }.sortedByDescending { it.creationTime }
         }
 }

@@ -74,7 +74,6 @@ internal class MonitorMediaAlbumsUseCaseTest {
             whenever(
                 getUserAlbumCoverPhotoUseCase(
                     albumId = AlbumId(set.id),
-                    selectedCoverId = set.cover,
                     refresh = true
                 )
             ).thenReturn(null)
@@ -83,7 +82,6 @@ internal class MonitorMediaAlbumsUseCaseTest {
             whenever(
                 getUserAlbumCoverPhotoUseCase(
                     albumId = AlbumId(set.id),
-                    selectedCoverId = set.cover,
                     refresh = isChanged
                 )
             ).thenReturn(null)
@@ -123,7 +121,6 @@ internal class MonitorMediaAlbumsUseCaseTest {
             whenever(
                 getUserAlbumCoverPhotoUseCase(
                     albumId = AlbumId(set.id),
-                    selectedCoverId = set.cover,
                     refresh = true
                 )
             ).thenReturn(null)
@@ -132,7 +129,6 @@ internal class MonitorMediaAlbumsUseCaseTest {
             whenever(
                 getUserAlbumCoverPhotoUseCase(
                     albumId = AlbumId(set.id),
-                    selectedCoverId = set.cover,
                     refresh = false
                 )
             ).thenReturn(null)

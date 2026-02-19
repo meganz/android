@@ -251,9 +251,11 @@ internal class MonitorMediaSystemAlbumsUseCaseTest {
     }
 
     @Test
-    fun `test that free account filters out sensitive photos`() = runTest {
+    fun `test that free account includes all photos regardless of sensitive status`() = runTest {
         val mockPhotos = createMockPhotosWithSensitive()
-        val nonSensitiveGifPhoto = mockPhotos[0] // Non-sensitive GIF photo
+        val gifPhoto = mockPhotos[0]
+        val rawPhoto = mockPhotos[1]
+        val favouritePhoto = mockPhotos[2]
 
         whenever(photosRepository.monitorPhotos()).thenReturn(flowOf(mockPhotos))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
@@ -266,11 +268,10 @@ internal class MonitorMediaSystemAlbumsUseCaseTest {
 
             assertThat(result).hasSize(3)
             assertThat(result[0]).isInstanceOf(MediaAlbum.System::class.java)
-            // Should only find non-sensitive photos
-            assertThat(result[0].cover).isEqualTo(nonSensitiveGifPhoto)
-            // Sensitive photos should be filtered out
-            assertThat(result[1].cover).isNull() // RAW photo is sensitive
-            assertThat(result[2].cover).isNull() // Favourite photo is sensitive
+            // For free accounts, all photos are visible regardless of sensitive status
+            assertThat(result[0].cover).isEqualTo(gifPhoto)
+            assertThat(result[1].cover).isEqualTo(rawPhoto)
+            assertThat(result[2].cover).isEqualTo(favouritePhoto)
 
             awaitComplete()
         }
@@ -330,9 +331,37 @@ internal class MonitorMediaSystemAlbumsUseCaseTest {
             }
         }
 
+    @Test
+    fun `test that null levelDetail defaults to free account and includes all photos`() = runTest {
+        val mockPhotos = createMockPhotosWithSensitive()
+        val gifPhoto = mockPhotos[0]
+        val rawPhoto = mockPhotos[1]
+        val favouritePhoto = mockPhotos[2]
+
+        whenever(photosRepository.monitorPhotos()).thenReturn(flowOf(mockPhotos))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(AccountDetail(levelDetail = null)))
+
+        initUseCase()
+
+        underTest().test {
+            val result = awaitItem()
+
+            assertThat(result).hasSize(3)
+            assertThat(result[0]).isInstanceOf(MediaAlbum.System::class.java)
+            // When levelDetail is null, isPaid defaults to false - all photos visible
+            assertThat(result[0].cover).isEqualTo(gifPhoto)
+            assertThat(result[1].cover).isEqualTo(rawPhoto)
+            assertThat(result[2].cover).isEqualTo(favouritePhoto)
+
+            awaitComplete()
+        }
+    }
+
     private fun createMockSystemAlbum(resId: Int, filter: (Photo) -> Boolean): SystemAlbum {
         return object : SystemAlbum {
             override val albumNameResId = resId
+            override val hideWhenEmpty: Boolean = false
             override suspend fun filter(photo: Photo): Boolean = filter(photo)
         }
     }

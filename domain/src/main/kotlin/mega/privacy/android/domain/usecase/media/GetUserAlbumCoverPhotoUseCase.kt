@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.timeout
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.PhotosRepository
@@ -24,11 +23,18 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
     @OptIn(FlowPreview::class)
     suspend operator fun invoke(
         albumId: AlbumId,
-        selectedCoverId: Long? = null,
         refresh: Boolean = false,
     ): Photo? {
-        val albumPhotos = albumRepository.getAlbumElementIDs(albumId = albumId, refresh = refresh)
-        if (albumPhotos.isEmpty()) return null
+        val albumPhotos = albumRepository
+            .getAlbumElementIDs(albumId = albumId, refresh = refresh)
+            .takeIf { it.isNotEmpty() }
+            ?.mapNotNull { albumPhotoId ->
+                photosRepository.getPhotoFromNodeID(
+                    nodeId = albumPhotoId.nodeId,
+                    albumPhotoId = albumPhotoId,
+                    refresh = refresh,
+                )
+            } ?: return null
 
         val showHiddenItems = monitorShowHiddenItemsUseCase().first()
         val accountDetail = monitorAccountDetailUseCase()
@@ -40,49 +46,34 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
         val isHiddenEnabled = showHiddenItems && isPaid
         val cover = findValidCover(
             albumPhotos = albumPhotos,
-            selectedCoverId = selectedCoverId,
+            selectedCoverId = albumRepository.getUserSet(albumId)?.cover,
             isHiddenEnabled = isHiddenEnabled,
             isPaid = isPaid,
-            refresh = refresh,
         ) ?: return null
 
         return cover
     }
 
-    private suspend fun findValidCover(
-        albumPhotos: List<AlbumPhotoId>,
+    private fun findValidCover(
+        albumPhotos: List<Photo>,
         selectedCoverId: Long?,
         isHiddenEnabled: Boolean,
         isPaid: Boolean,
-        refresh: Boolean,
     ): Photo? {
         // Try selected cover first
-        selectedCoverId?.let { coverId ->
-            albumPhotos.find { it.id == coverId }?.let { albumPhotoId ->
-                val photo = photosRepository.getPhotoFromNodeID(
-                    nodeId = albumPhotoId.nodeId,
-                    albumPhotoId = albumPhotoId,
-                    refresh = refresh,
-                )
-                if (photo != null && isPhotoVisible(photo, isHiddenEnabled, isPaid)) {
-                    return photo
-                }
-            }
-        }
-
-        // Fall back to last visible photo
-        for (albumPhotoId in albumPhotos.asReversed()) {
-            val photo = photosRepository.getPhotoFromNodeID(
-                nodeId = albumPhotoId.nodeId,
-                albumPhotoId = albumPhotoId,
-                refresh = refresh,
-            )
-            if (photo != null && isPhotoVisible(photo, isHiddenEnabled, isPaid)) {
+        albumPhotos.find { it.id == selectedCoverId }?.let { photo ->
+            if (isPhotoVisible(photo, isHiddenEnabled, isPaid)) {
                 return photo
             }
         }
 
-        return null
+        return albumPhotos
+            .sortedWith(
+                compareByDescending<Photo> {
+                    it.modificationTime
+                }.thenByDescending { it.id }
+            )
+            .firstOrNull { isPhotoVisible(it, isHiddenEnabled, isPaid) }
     }
 
     /**

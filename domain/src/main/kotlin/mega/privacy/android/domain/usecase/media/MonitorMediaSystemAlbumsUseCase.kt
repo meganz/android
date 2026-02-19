@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.media.SystemAlbum
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -52,17 +53,23 @@ class MonitorMediaSystemAlbumsUseCase @Inject constructor(
         monitorAccountDetailUseCase()
     ) { photos, showHiddenItems, accountDetail ->
         val isPaid = accountDetail.levelDetail?.accountType?.isPaid ?: false
-        val isHiddenEnabled = (showHiddenItems && isPaid)
 
-        systemAlbums.map { albumType ->
-            val cover = photos
-                .filter { photo ->
-                    isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited)
+        systemAlbums
+            .mapNotNull map@{ systemAlbum ->
+                val filteredPhotos = photos
+                    .filter {
+                        systemAlbum.filter(it) &&
+                                isPhotoVisible(it, showHiddenItems, isPaid)
+                    }
+
+                if (systemAlbum.hideWhenEmpty && filteredPhotos.isEmpty()) {
+                    return@map null
                 }
-                .firstOrNull { photo ->
-                    albumType.filter(photo)
-                }
-            MediaAlbum.System(id = albumType, cover = cover)
-        }
+
+                MediaAlbum.System(id = systemAlbum, cover = filteredPhotos.firstOrNull())
+            }
     }.flowOn(defaultDispatcher)
+
+    private fun isPhotoVisible(photo: Photo, isHiddenEnabled: Boolean, isPaid: Boolean): Boolean =
+        if (!isPaid) true else (isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited))
 }

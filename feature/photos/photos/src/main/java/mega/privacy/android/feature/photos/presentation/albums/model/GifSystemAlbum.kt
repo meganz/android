@@ -15,5 +15,7 @@ class GifSystemAlbum @Inject constructor(
 
     override val albumNameResId: Int = sharedResR.string.system_album_gif_title
 
+    override val hideWhenEmpty: Boolean = true
+
     override suspend fun filter(photo: Photo): Boolean = filterGIFUseCase()(photo)
 }
