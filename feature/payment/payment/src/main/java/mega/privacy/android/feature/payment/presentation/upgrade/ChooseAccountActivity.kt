@@ -35,7 +35,8 @@ open class ChooseAccountActivity : AppCompatActivity() {
         setContentView(
             appContainerProvider.buildSharedAppContainer(
                 context = this,
-                useLegacyStatusBarColor = false
+                useLegacyStatusBarColor = false,
+                includePsa = false,
             ) {
                 ChooseAccountRoute(
                     isNewCreationAccount = intent.getBooleanExtra(

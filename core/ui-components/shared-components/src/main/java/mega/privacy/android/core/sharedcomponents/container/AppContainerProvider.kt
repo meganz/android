@@ -25,12 +25,15 @@ interface AppContainerProvider {
      * Creates the shared app container using updated UI components and theme.
      * This is similar to [AppContainer] but uses the newer AndroidTheme.
      *
+     * @param context
      * @param useLegacyStatusBarColor Whether to use legacy status bar color
+     * @param includePsa Whether to include PSA in the container
      * @param content The content to wrap with the container
      */
     fun buildSharedAppContainer(
         context: Context,
         useLegacyStatusBarColor: Boolean = true,
+        includePsa: Boolean = true,
         content: @Composable () -> Unit,
     ): ComposeView
 }
