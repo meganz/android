@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,8 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
@@ -76,7 +79,7 @@ private fun MyAccountWidgetShimmerView() {
                 MegaText(
                     text = " ",
                     style = AppTheme.typography.titleMedium,
-                    modifier = Modifier.height(24.dp)
+                    modifier = Modifier.heightIn(min = 24.dp)
                 )
                 Spacer(
                     modifier = Modifier
@@ -93,7 +96,7 @@ private fun MyAccountWidgetShimmerView() {
                 MegaText(
                     text = " ",
                     style = AppTheme.typography.bodyMedium,
-                    modifier = Modifier.height(20.dp)
+                    modifier = Modifier.heightIn(min = 20.dp)
                 )
                 Spacer(
                     modifier = Modifier
@@ -110,7 +113,7 @@ private fun MyAccountWidgetShimmerView() {
                 MegaText(
                     text = " ",
                     style = AppTheme.typography.bodySmall,
-                    modifier = Modifier.height(20.dp)
+                    modifier = Modifier.heightIn(min = 20.dp)
                 )
                 Spacer(
                     modifier = Modifier
@@ -156,6 +159,20 @@ internal fun MyAccountWidget(
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
+    val density = LocalDensity.current
+    val titleStyle = AppTheme.typography.titleMedium
+    val bodyStyle = AppTheme.typography.bodyMedium
+    val bodySmallStyle = AppTheme.typography.bodySmall
+    val minTitleHeight = with(density) {
+        titleStyle.lineHeight.toDp().coerceAtLeast(24.dp)
+    }
+    val minBodyHeight = with(density) {
+        bodyStyle.lineHeight.toDp().coerceAtLeast(20.dp)
+    }
+    val minBodySmallHeight = with(density) {
+        bodySmallStyle.lineHeight.toDp().coerceAtLeast(20.dp)
+    }
+
     CardSurface(
         modifier = modifier
             .padding(horizontal = 16.dp)
@@ -178,7 +195,9 @@ internal fun MyAccountWidget(
                 }
                 // Avatar
                 Avatar(
-                    modifier = Modifier.size(32.dp).testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
+                    modifier = Modifier
+                        .size(32.dp)
+                        .testTag(MY_ACCOUNT_WIDGET_AVATAR_TEST_TAG),
                     content = state.avatarContent ?: TextAvatarContent(
                         avatarText = state.name?.trim()?.firstOrNull()?.uppercaseChar()
                             ?.toString()
@@ -193,23 +212,24 @@ internal fun MyAccountWidget(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    // User name
+                    // User name - allow 2 lines with ellipsis so large font doesn't clip
                     MegaText(
                         text = "${stringResource(R.string.general_hi)} $emojifiedName!",
-                        style = AppTheme.typography.titleMedium,
+                        style = titleStyle,
                         modifier = Modifier
-                            .height(24.dp)
+                            .heightIn(min = minTitleHeight)
                             .testTag(MY_ACCOUNT_WIDGET_USER_NAME_TEST_TAG),
-                        maxLines = 1
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
 
                     // Account type
                     if (state.accountTypeNameResource != 0) {
                         MegaText(
                             text = stringResource(state.accountTypeNameResource),
-                            style = AppTheme.typography.bodyMedium,
+                            style = bodyStyle,
                             modifier = Modifier
-                                .height(20.dp)
+                                .heightIn(min = minBodyHeight)
                                 .testTag(MY_ACCOUNT_WIDGET_ACCOUNT_TYPE_TEST_TAG)
                         )
                     }
@@ -222,9 +242,9 @@ internal fun MyAccountWidget(
                             formatFileSize(state.totalStorage, context)
                         ),
                         textColor = TextColor.Secondary,
-                        style = AppTheme.typography.bodySmall,
+                        style = bodySmallStyle,
                         modifier = Modifier
-                            .height(20.dp)
+                            .heightIn(min = minBodySmallHeight)
                             .testTag(MY_ACCOUNT_WIDGET_STORAGE_USAGE_TEST_TAG)
                     )
 
