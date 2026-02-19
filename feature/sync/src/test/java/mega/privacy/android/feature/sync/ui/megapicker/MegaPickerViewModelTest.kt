@@ -8,24 +8,33 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.exception.MegaSyncException
+import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
+import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
+import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.sync.DeviceFolderUINodeErrorMessageMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -60,6 +69,10 @@ internal class MegaPickerViewModelTest {
     private val createFolderNodeUseCase: CreateFolderNodeUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase =
+        mock()
+    private val getBackupInfoUseCase: GetBackupInfoUseCase = mock()
+    private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
     private val childrenNodes: List<TypedNode> = emptyList()
@@ -80,7 +93,10 @@ internal class MegaPickerViewModelTest {
             getMyChatsFilesFolderIdUseCase,
             createFolderNodeUseCase,
             getFeatureFlagValueUseCase,
-            nodeExistsInCurrentLocationUseCase
+            nodeExistsInCurrentLocationUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            getBackupInfoUseCase,
+            determineNodeRelationshipUseCase
         )
     }
 
@@ -1148,6 +1164,443 @@ internal class MegaPickerViewModelTest {
             }
         }
 
+    @Test
+    fun `test that error is shown when selected folder is used by camera uploads`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = currentFolderId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false
+            )
+        ).thenReturn(FolderUsageResult.UsedByCameraUpload)
+
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        val event = underTest.state.value.errorMessageId
+        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_camera_uploads)
+        verifyNoInteractions(tryNodeSyncUseCase)
+    }
+
+    @Test
+    fun `test that error is shown when selected folder is used by media uploads`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = currentFolderId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false
+            )
+        ).thenReturn(FolderUsageResult.UsedByMediaUpload)
+
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        val event = underTest.state.value.errorMessageId
+        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_media_uploads)
+        verifyNoInteractions(tryNodeSyncUseCase)
+    }
+
+    @Test
+    fun `test that error is shown when selected folder is used by sync or backup`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = currentFolderId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false
+            )
+        ).thenReturn(FolderUsageResult.UsedBySyncOrBackup(deviceId = "device123"))
+
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        val event = underTest.state.value.errorMessageId
+        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_sync_or_backup)
+        verifyNoInteractions(tryNodeSyncUseCase)
+    }
+
+    @Test
+    fun `test that error is shown when selected folder is parent of camera uploads`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = currentFolderId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false
+            )
+        ).thenReturn(FolderUsageResult.UsedByCameraUploadParent)
+
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        val event = underTest.state.value.errorMessageId
+        assertThat(event).isEqualTo(sharedR.string.error_folder_part_of_camera_uploads)
+        verifyNoInteractions(tryNodeSyncUseCase)
+    }
+
+    @Test
+    fun `test that folder selection proceeds when isFolderUsedBySyncOrBackupAcrossDevicesUseCase throws`() =
+        runTest {
+            val currentFolderId = NodeId(2323L)
+            val currentFolderName = "some folder"
+            val currentFolder: TypedFolderNode = mock {
+                on { id } doReturn currentFolderId
+                on { name } doReturn currentFolderName
+            }
+            whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+                emit(childrenNodes)
+                awaitCancellation()
+            })
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+            whenever(tryNodeSyncUseCase(currentFolderId)).thenReturn(Unit)
+            whenever(
+                isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = currentFolderId,
+                    shouldCheckCameraUploads = true,
+                    shouldExcludeCurrentDevice = false
+                )
+            ).thenThrow(RuntimeException("API error"))
+
+            initViewModel()
+
+            underTest.handleAction(
+                MegaPickerAction.CurrentFolderSelected(
+                    allFilesAccessPermissionGranted = true,
+                    disableBatteryOptimizationPermissionGranted = true
+                )
+            )
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.navigateNextEvent).isEqualTo(triggered)
+                assertThat(state.errorMessageId).isNull()
+            }
+        }
+
+    @Test
+    fun `test that folder selection proceeds when folder is not used`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flow {
+            emit(childrenNodes)
+            awaitCancellation()
+        })
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(tryNodeSyncUseCase(currentFolderId)).thenReturn(Unit)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = currentFolderId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false
+            )
+        ).thenReturn(FolderUsageResult.NotUsed)
+
+        initViewModel()
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.navigateNextEvent).isEqualTo(triggered)
+            assertThat(state.errorMessageId).isNull()
+        }
+    }
+
+    @Test
+    fun `test that child nodes are disabled when they match backup or sync folders`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val backupFolderId = NodeId(999L)
+        val clickedFolderId = NodeId(555L)
+        val childFolderId = NodeId(789L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        val clickedFolder: TypedFolderNode = mock {
+            on { id } doReturn clickedFolderId
+        }
+        val childFolder: TypedNode = mock {
+            on { id } doReturn childFolderId
+        }
+        val childrenNodesWithFolder = listOf(childFolder)
+        val backupInfo: BackupInfo = mock {
+            on { type } doReturn BackupInfoType.BACKUP_UPLOAD
+            on { rootHandle } doReturn backupFolderId
+        }
+
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+            emit(emptyList())
+            awaitCancellation()
+        })
+
+        initViewModel()
+
+        // Set up feature flag and backup info after initViewModel
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)).thenReturn(
+            true
+        )
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+        whenever(
+            determineNodeRelationshipUseCase(childFolderId, backupFolderId)
+        ).thenReturn(NodeRelationship.ExactMatch)
+        whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
+            emit(childrenNodesWithFolder)
+            awaitCancellation()
+        })
+
+        underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nodes).isNotNull()
+            assertThat(state.nodes?.size).isEqualTo(1)
+            assertThat(state.nodes?.first()?.isDisabled).isEqualTo(true)
+        }
+    }
+
+    @Test
+    fun `test that child nodes are not disabled when feature flag is disabled`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val childFolderId = NodeId(789L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        val childFolder: TypedNode = mock {
+            on { id } doReturn childFolderId
+        }
+        val childrenNodesWithFolder = listOf(childFolder)
+
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+            emit(childrenNodesWithFolder)
+            awaitCancellation()
+        })
+        // Feature flag is disabled by default in initViewModel
+
+        initViewModel()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nodes).isNotNull()
+            assertThat(state.nodes?.size).isEqualTo(1)
+            assertThat(state.nodes?.first()?.isDisabled).isEqualTo(false)
+        }
+        verifyNoInteractions(getBackupInfoUseCase)
+        verifyNoInteractions(determineNodeRelationshipUseCase)
+    }
+
+    @Test
+    fun `test that child nodes are not disabled when getBackupInfoUseCase fails`() = runTest {
+        val rootFolderId = NodeId(123456L)
+        val clickedFolderId = NodeId(555L)
+        val childFolderId = NodeId(789L)
+        val rootFolder: FolderNode = mock {
+            on { id } doReturn rootFolderId
+        }
+        val clickedFolder: TypedFolderNode = mock {
+            on { id } doReturn clickedFolderId
+        }
+        val childFolder: TypedNode = mock {
+            on { id } doReturn childFolderId
+        }
+        val childrenNodesWithFolder = listOf(childFolder)
+
+        whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+        whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+        whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+        whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+        whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+        whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+            emit(emptyList())
+            awaitCancellation()
+        })
+
+        initViewModel()
+
+        // Set up feature flag and backup info failure after initViewModel
+        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)).thenReturn(
+            true
+        )
+        whenever(getBackupInfoUseCase()).thenThrow(RuntimeException("Backup info error"))
+        whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
+            emit(childrenNodesWithFolder)
+            awaitCancellation()
+        })
+
+        underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nodes).isNotNull()
+            assertThat(state.nodes?.size).isEqualTo(1)
+            assertThat(state.nodes?.first()?.isDisabled).isEqualTo(false)
+        }
+    }
+
+    @Test
+    fun `test that child nodes are not disabled when determineNodeRelationshipUseCase returns NoMatch`() =
+        runTest {
+            val rootFolderId = NodeId(123456L)
+            val backupFolderId = NodeId(999L)
+            val clickedFolderId = NodeId(555L)
+            val childFolderId = NodeId(789L)
+            val rootFolder: FolderNode = mock {
+                on { id } doReturn rootFolderId
+            }
+            val clickedFolder: TypedFolderNode = mock {
+                on { id } doReturn clickedFolderId
+            }
+            val childFolder: TypedNode = mock {
+                on { id } doReturn childFolderId
+            }
+            val childrenNodesWithFolder = listOf(childFolder)
+            val backupInfo: BackupInfo = mock {
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { rootHandle } doReturn backupFolderId
+            }
+
+            whenever(getRootNodeUseCase()).thenReturn(rootFolder)
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
+            whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flow {
+                emit(emptyList())
+                awaitCancellation()
+            })
+
+            initViewModel()
+
+            // Set up feature flag and backup info after initViewModel
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)).thenReturn(
+                true
+            )
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(
+                determineNodeRelationshipUseCase(childFolderId, backupFolderId)
+            ).thenReturn(NodeRelationship.NoMatch)
+            whenever(getTypedNodesFromFolder(clickedFolderId)).thenReturn(flow {
+                emit(childrenNodesWithFolder)
+                awaitCancellation()
+            })
+
+            underTest.handleAction(MegaPickerAction.FolderClicked(clickedFolder))
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.nodes).isNotNull()
+                assertThat(state.nodes?.size).isEqualTo(1)
+                assertThat(state.nodes?.first()?.isDisabled).isEqualTo(false)
+            }
+        }
+
     private fun initViewModel(isStopBackup: Boolean = false, folderName: String? = null) {
         wheneverBlocking { getFeatureFlagValueUseCase.invoke(any()) }.thenReturn(false)
         underTest = MegaPickerViewModel(
@@ -1164,7 +1617,10 @@ internal class MegaPickerViewModelTest {
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
             createFolderNodeUseCase = createFolderNodeUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase
+            nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            getBackupInfoUseCase = getBackupInfoUseCase,
+            determineNodeRelationshipUseCase = determineNodeRelationshipUseCase,
         )
     }
 }
