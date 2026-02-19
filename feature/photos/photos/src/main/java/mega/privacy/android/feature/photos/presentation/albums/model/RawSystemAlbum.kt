@@ -15,5 +15,7 @@ class RawSystemAlbum @Inject constructor(
 
     override val albumNameResId: Int = sharedResR.string.system_album_raw_title
 
+    override val hideWhenEmpty: Boolean = true
+
     override suspend fun filter(photo: Photo): Boolean = filterRAWUseCase()(photo)
 }

@@ -15,5 +15,7 @@ class FavouriteSystemAlbum @Inject constructor(
 
     override val albumNameResId: Int = sharedResR.string.system_album_favourites_title
 
+    override val hideWhenEmpty: Boolean = false
+
     override suspend fun filter(photo: Photo): Boolean = filterFavouriteUseCase()(photo)
 }

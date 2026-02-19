@@ -80,7 +80,6 @@ import mega.privacy.android.feature.photos.mapper.LegacyMediaSystemAlbumMapper
 import mega.privacy.android.feature.photos.mapper.LegacyPhotosSortMapper
 import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
-import mega.privacy.android.feature.photos.model.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
@@ -388,12 +387,10 @@ class AlbumContentViewModel @AssistedInject constructor(
                     .map(::filterNonSensitivePhotos)
                     .onEach(::updateSelection)
                     .collectLatest { photos ->
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                photos = photos,
-                            )
-                        }
+                        sortPhotos(
+                            sortConfiguration = _state.value.albumSortConfiguration,
+                            photos = photos
+                        )
                     }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -531,9 +528,11 @@ class AlbumContentViewModel @AssistedInject constructor(
         }
     }
 
-    fun sortPhotos(sortConfiguration: AlbumSortConfiguration) {
+    fun sortPhotos(
+        sortConfiguration: AlbumSortConfiguration,
+        photos: List<PhotoUiState> = _state.value.photos,
+    ) {
         viewModelScope.launch {
-            val currentPhotos = _state.value.photos
             val sortedPhotosUiState = withContext(defaultDispatcher) {
                 val comparator = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
                     compareBy<PhotoUiState> { it.modificationTime }
@@ -541,13 +540,14 @@ class AlbumContentViewModel @AssistedInject constructor(
                     compareByDescending { it.modificationTime }
                 }.thenByDescending { it.id }
 
-                currentPhotos.sortedWith(comparator).toImmutableList()
+                photos.sortedWith(comparator).toImmutableList()
             }
 
             _state.update {
                 it.copy(
                     albumSortConfiguration = sortConfiguration,
-                    photos = sortedPhotosUiState
+                    photos = sortedPhotosUiState,
+                    isLoading = false
                 )
             }
         }

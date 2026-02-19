@@ -4,9 +4,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -33,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -67,7 +70,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
-import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -361,6 +363,7 @@ internal fun AlbumContentScreen(
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
             .semantics { testTagsAsResourceId = true },
         topBar = {
             if (uiState.selectedPhotos.isNotEmpty()) {
@@ -498,7 +501,11 @@ internal fun AlbumContentScreen(
                         shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                                 && uiState.accountType?.isPaid == true
                                 && !uiState.isBusinessAccountExpired,
-                        contentPadding = innerPadding.excludeTopPadding(),
+                        contentPadding = PaddingValues(
+                            start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateRightPadding(LayoutDirection.Ltr),
+                            bottom = innerPadding.calculateBottomPadding() + 100.dp
+                        ),
                         onSortOrderClick = {
                             showSortBottomSheet = true
                         },

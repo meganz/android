@@ -202,9 +202,13 @@ class AlbumUiStateMapperTest {
         assertThat(actual.title).isEqualTo(LocalizedText.Literal(title))
     }
 
-    private fun createMockSystemAlbum(albumNameResId: Int, filter: (Photo) -> Boolean): SystemAlbum {
+    private fun createMockSystemAlbum(
+        albumNameResId: Int,
+        filter: (Photo) -> Boolean,
+    ): SystemAlbum {
         return object : SystemAlbum {
             override val albumNameResId = albumNameResId
+            override val hideWhenEmpty: Boolean = true
             override suspend fun filter(photo: Photo): Boolean = filter(photo)
         }
     }

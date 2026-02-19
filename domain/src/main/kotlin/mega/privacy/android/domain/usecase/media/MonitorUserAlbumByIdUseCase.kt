@@ -32,7 +32,7 @@ class MonitorUserAlbumByIdUseCase @Inject constructor(
             MediaAlbum.User(
                 id = AlbumId(set.id),
                 title = set.name,
-                cover = getAlbumCoverPhotoUseCase(albumId, set.cover, refresh),
+                cover = getAlbumCoverPhotoUseCase(albumId, refresh),
                 creationTime = set.creationTime,
                 modificationTime = set.modificationTime,
                 isExported = set.isExported,
