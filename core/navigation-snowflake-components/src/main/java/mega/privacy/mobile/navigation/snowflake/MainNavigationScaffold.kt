@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
@@ -35,6 +36,7 @@ import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastFirst
 import androidx.navigation3.runtime.NavKey
@@ -152,6 +154,8 @@ private fun MegaNavigationSuite(
     val scaffoldColors = NavigationScaffoldColors.scaffoldColors()
     val itemColors = NavigationScaffoldColors.itemColors()
     val borderColor = DSTokens.colors.border.subtle
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     NavigationSuite(
         layoutType = navSuiteType,
         colors = scaffoldColors,
@@ -208,7 +212,17 @@ private fun MegaNavigationSuite(
                 label = {
                     Text(
                         text = stringResource(navItem.label),
-                        modifier = Modifier.testTag("${navItem.testTag}:label")
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .let { modifier ->
+                                if (isPortrait && navSuiteType == NavigationSuiteType.NavigationBar) {
+                                    modifier.widthIn(max = 80.dp)
+                                } else {
+                                    modifier
+                                }
+                            }
+                            .testTag("${navItem.testTag}:label")
                     )
                 },
                 selected = selected,
