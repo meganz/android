@@ -32,7 +32,7 @@ class SSLErrorViewModel @Inject constructor(
 
     val state by lazy {
         flow<SSLDialogState> {
-            emit(SSLDialogState.Ready(webUrl = getDomainNameUseCase()))
+            emit(SSLDialogState.Ready(webUrl = "https://${getDomainNameUseCase()}/"))
         }.catch {
             Timber.e(it, "Error fetching domain name for SSL verification")
         }.asUiStateFlow(viewModelScope, SSLDialogState.Loading)

@@ -2330,4 +2330,8 @@
     <string name="subscription_type_yearly">Yearly</string>
     <!-- CU Warning banner warning text when notification is disabled -->
     <string name="cu_warning_banner_notification_disabled_warning">Turn on notifications to know if uploads fail or stop syncing.</string>
+    <!-- Title of the SSL error dialog when secure connection fails (Compose dialog; app module keeps ssl_error_dialog_title for legacy). -->
+    <string name="ssl_error_dialog_secure_connection_failed_title">Secure connection failed</string>
+    <!-- Body of the SSL error dialog. [A]Learn more[/A] is a clickable link to the help article. -->
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA couldn\’t connect securely.\n\nIf you\’re on public Wi-Fi, try signing in through your browser first.\n\nYour ISP or security software might also be interfering with the connection.\n\n[A]Learn more[/A]</string>
 </resources>

@@ -21,7 +21,7 @@ data object SSLAppDialogDestinations : AppDialogDestinations {
     override val navigationGraph: EntryProviderScope<DialogNavKey>.(NavigationHandler, () -> Unit) -> Unit =
         { navigationHandler, onHandled ->
             sslDialogDestination(
-                navigateBack = navigationHandler::back,
+                remove = navigationHandler::remove,
                 navigateAndClear = navigationHandler::navigateAndClearTo,
                 onDialogHandled = onHandled
             )
@@ -29,13 +29,13 @@ data object SSLAppDialogDestinations : AppDialogDestinations {
 }
 
 fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
-    navigateBack: () -> Unit,
+    remove: (NavKey) -> Unit,
     navigateAndClear: (NavKey, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<SSLErrorDialog>(
         metadata = DialogSceneStrategy.dialog()
-    ) {
+    ) { key ->
         val viewModel = hiltViewModel<SSLErrorViewModel>()
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
@@ -45,7 +45,7 @@ fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
                 SSLErrorDialog(
                     closeDialog = {
                         onDialogHandled()
-                        navigateBack()
+                        remove(key)
                     },
                     onRetry = viewModel::onRetry,
                     onOpenBrowser = {
@@ -59,7 +59,6 @@ fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
                 )
             }
         }
-
     }
 }
 

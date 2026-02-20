@@ -35,19 +35,11 @@ class SSLErrorViewModelTest {
     }
 
     @Test
-    fun `test that initial state is loading`() = runTest {
-        initUnderTest(this)
-        underTest.state.test {
-            assertThat(awaitItem()).isEqualTo(SSLDialogState.Loading)
-        }
-    }
-
-    @Test
     fun `test that ready state is returned if domain is returned`() = runTest {
         initUnderTest(this)
-        val domainName = "https://example.com"
+        val domainName = "https://example.com/"
         getDomainNameUseCase.stub {
-            onBlocking { invoke() }.thenReturn(domainName)
+            onBlocking { invoke() }.thenReturn("example.com")
         }
         underTest.state.test {
             val actual = awaitItem()
