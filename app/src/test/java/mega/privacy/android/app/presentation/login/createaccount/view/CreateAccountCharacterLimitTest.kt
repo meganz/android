@@ -78,6 +78,7 @@ class CreateAccountCharacterLimitTest {
         )
 
         setupRule(state = state)
+        composeRule.waitForIdle()
 
         composeRule.onNode(hasTestTag(FIRST_NAME))
             .onChildren()
@@ -91,6 +92,7 @@ class CreateAccountCharacterLimitTest {
         )
 
         setupRule(state = state)
+        composeRule.waitForIdle()
 
         composeRule.onNode(hasTestTag(LAST_NAME))
             .onChildren()
@@ -106,10 +108,11 @@ class CreateAccountCharacterLimitTest {
             )
 
             setupRule(state = state)
+            composeRule.waitForIdle()
 
             composeRule.onNode(hasTestTag(FIRST_NAME))
                 .onChildren()
-                .assertAny(hasAnyChild(hasText("Enter a first name")))
+                .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_first_name_text_field_error_message))))
         }
 
     @Test
@@ -121,10 +124,11 @@ class CreateAccountCharacterLimitTest {
             )
 
             setupRule(state = state)
+            composeRule.waitForIdle()
 
             composeRule.onNode(hasTestTag(LAST_NAME))
                 .onChildren()
-                .assertAny(hasAnyChild(hasText("Enter a last name")))
+                .assertAny(hasAnyChild(hasText(context.getString(R.string.sign_up_last_name_text_field_error_message))))
         }
 
     @Test
@@ -159,6 +163,7 @@ class CreateAccountCharacterLimitTest {
         )
 
         setupRule(state = state)
+        composeRule.waitForIdle()
 
         composeRule.onNode(hasTestTag(FIRST_NAME))
             .onChildren()
@@ -178,6 +183,7 @@ class CreateAccountCharacterLimitTest {
         )
 
         setupRule(state = state)
+        composeRule.waitForIdle()
 
         composeRule.onNode(hasTestTag(FIRST_NAME))
             .onChildren()
