@@ -30,5 +30,6 @@ class SearchCategoryIntMapperTest {
         Arguments.of(SearchCategory.PDF, MegaApiAndroid.FILE_TYPE_PDF),
         Arguments.of(SearchCategory.PRESENTATION, MegaApiAndroid.FILE_TYPE_PRESENTATION),
         Arguments.of(SearchCategory.SPREADSHEET, MegaApiAndroid.FILE_TYPE_SPREADSHEET),
+        Arguments.of(SearchCategory.ALL_MEDIA, MegaApiAndroid.FILE_TYPE_ALL_VISUAL_MEDIA),
     )
 }

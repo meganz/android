@@ -281,27 +281,34 @@ internal class DefaultPhotosRepository @Inject constructor(
         populateNodesJob?.cancel()
         populateNodesJob = appScope.launch {
             monitorPhotosMutex.withLock {
-                val (imageNodes, videoNodes) = fetchNodes()
-                updatePhotos(imageNodes, videoNodes)
-                updateImageNodes(imageNodes, videoNodes)
+                val mediaNodes = fetchMedia()
+                updatePhotos(mediaNodes)
+                launch { updateImageNodes(mediaNodes) }
             }
         }
     }
 
-    private suspend fun fetchNodes(): List<List<MegaNode>> = withContext(ioDispatcher) {
-        awaitAll(
-            async { fetchImageNodes() },
-            async { fetchVideoNodes() },
-        )
-    }
+    private suspend fun fetchMedia(): List<Pair<MediaType, MegaNode>> =
+        withContext(ioDispatcher) {
+            val nodes = getMegaNodeByCategory(searchCategory = SearchCategory.ALL_MEDIA)
+            nodes.mapNotNull { node ->
+                if (!node.isFile) return@mapNotNull null
 
-    private suspend fun fetchImageNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        getMegaNodeByCategory(searchCategory = SearchCategory.IMAGES).filter { isImageNodeValid(it) }
-    }
+                val isNodeInRubbishBin = nodeRepository.isNodeInRubbishBin(NodeId(node.handle))
+                if (isNodeInRubbishBin) return@mapNotNull null
 
-    private suspend fun fetchVideoNodes(): List<MegaNode> = withContext(ioDispatcher) {
-        getMegaNodeByCategory(searchCategory = SearchCategory.VIDEO).filter { isVideoNodeValid(it) }
-    }
+                when (
+                    val fileType = fileTypeInfoMapper(
+                        fileName = node.name,
+                        duration = node.duration
+                    )
+                ) {
+                    is ImageFileTypeInfo if fileType !is SvgFileTypeInfo -> MediaType.Image to node
+                    is VideoFileTypeInfo -> MediaType.Video to node
+                    else -> null
+                }
+            }
+        }
 
     private suspend fun isImageNodeValid(
         node: MegaNode,
@@ -325,15 +332,14 @@ internal class DefaultPhotosRepository @Inject constructor(
                 && (!nodeRepository.isNodeInRubbishBin(NodeId(node.handle)) || includeRubbishBin)
     }
 
-    private suspend fun updatePhotos(
-        imageNodes: List<MegaNode>,
-        videoNodes: List<MegaNode>,
-    ) {
+    private suspend fun updatePhotos(mediaNodes: List<Pair<MediaType, MegaNode>>) {
         withContext(ioDispatcher) {
-            val photos = awaitAll(
-                async { imageNodes.map { mapMegaNodeToImage(it) } },
-                async { videoNodes.map { mapMegaNodeToVideo(it) } },
-            ).flatten()
+            val photos = mediaNodes.mapAsync { (type, node) ->
+                when (type) {
+                    MediaType.Image -> mapMegaNodeToImage(megaNode = node)
+                    MediaType.Video -> mapMegaNodeToVideo(megaNode = node)
+                }
+            }
 
             withContext(photosDispatcher) {
                 photos.forEach { photosCache[NodeId(it.id)] = it }
@@ -342,12 +348,9 @@ internal class DefaultPhotosRepository @Inject constructor(
         }
     }
 
-    private suspend fun updateImageNodes(
-        imageNodes: List<MegaNode>,
-        videoNodes: List<MegaNode>,
-    ) {
+    private suspend fun updateImageNodes(mediaNodes: List<Pair<MediaType, MegaNode>>) {
         withContext(ioDispatcher) {
-            val nodes = (imageNodes + videoNodes).map { node ->
+            val nodes = mediaNodes.mapAsync { (_, node) ->
                 imageNodeMapper(
                     megaNode = node,
                     requireSerializedData = true,
@@ -1176,6 +1179,10 @@ internal class DefaultPhotosRepository @Inject constructor(
         withContext(ioDispatcher) {
             mediaTimelinePreferencesGateway.resetEnableCameraUploadBannerDismissedTimestamp()
         }
+    }
+
+    private enum class MediaType {
+        Image, Video
     }
 
     companion object {
