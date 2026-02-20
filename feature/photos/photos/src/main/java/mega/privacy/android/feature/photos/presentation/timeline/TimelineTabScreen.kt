@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -67,7 +68,6 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
@@ -425,8 +425,10 @@ private fun TimelineTabContent(
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     Box(
-        modifier = modifier
-            .padding(contentPadding.excludingBottomPadding())
+        modifier = modifier.padding(
+            start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
+            end = contentPadding.calculateEndPadding(LayoutDirection.Ltr),
+        )
     ) {
         when (selectedTimePeriod) {
             PhotoModificationTimePeriod.All -> {
@@ -436,10 +438,11 @@ private fun TimelineTabContent(
                         .testTag(TIMELINE_TAB_CONTENT_GRID_VIEW_TAG),
                     lazyGridState = lazyGridState,
                     contentPadding = PaddingValues(
-                        top = contentPadding.calculateTopPadding(),
-                        start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        bottom = contentPadding.calculateBottomPadding() + 80.dp
+                        bottom = if (selectedPhotoIds.isEmpty()) {
+                            contentPadding.calculateBottomPadding() + 90.dp
+                        } else {
+                            contentPadding.calculateBottomPadding()
+                        }
                     ),
                     items = uiState.displayedPhotos,
                     selectedPhotoIds = selectedPhotoIds,

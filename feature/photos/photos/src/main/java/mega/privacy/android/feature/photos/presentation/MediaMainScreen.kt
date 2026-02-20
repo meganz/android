@@ -527,7 +527,7 @@ fun MediaMainScreen(
                                 content = { _, modifier ->
                                     MediaContent(
                                         modifier = modifier,
-                                        timelineContentPadding = paddingValues.excludeTopPadding(),
+                                        timelineContentPadding = paddingValues,
                                         mainViewModel = viewModel,
                                         albumsTabViewModel = albumsTabViewModel,
                                         timelineTabUiState = timelineTabUiState,
@@ -697,7 +697,7 @@ private fun MediaScreen.MediaContent(
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
                 onNavigate = navigationHandler::navigate,
                 viewModel = albumsTabViewModel,
-                contentPadding = timelineContentPadding
+                contentPadding = timelineContentPadding.excludeTopPadding()
             )
         }
 
