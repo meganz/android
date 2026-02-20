@@ -181,6 +181,7 @@ internal abstract class RepositoryModule {
      * Bind recent actions repository
      */
     @Binds
+    @Singleton
     abstract fun bindRecentActionsRepository(repository: DefaultRecentActionsRepository): RecentActionsRepository
 
     @Binds

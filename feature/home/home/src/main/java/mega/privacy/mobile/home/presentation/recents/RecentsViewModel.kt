@@ -6,6 +6,8 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +25,18 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.recentactions.ClearRecentActivityUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.recentactions.MonitorRecentActivityClearedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
 import timber.log.Timber
+import java.time.Instant
 
 @HiltViewModel(assistedFactory = RecentsViewModel.Factory::class)
 class RecentsViewModel @AssistedInject constructor(
@@ -37,11 +44,14 @@ class RecentsViewModel @AssistedInject constructor(
     private val getRecentActionsUseCase: GetRecentActionsUseCase,
     private val recentActionUiItemMapper: RecentActionUiItemMapper,
     private val setHideRecentActivityUseCase: SetHideRecentActivityUseCase,
+    private val clearRecentActivityUseCase: ClearRecentActivityUseCase,
     private val monitorHideRecentActivityUseCase: MonitorHideRecentActivityUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val monitorRecentActivityClearedUseCase: MonitorRecentActivityClearedUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RecentsUiState())
@@ -54,6 +64,15 @@ class RecentsViewModel @AssistedInject constructor(
         monitorHideRecentActivity()
         monitorNodeUpdates()
         monitorFetchNodesFinish()
+        monitorRecentActivityCleared()
+    }
+
+    private fun monitorRecentActivityCleared() {
+        viewModelScope.launch {
+            monitorRecentActivityClearedUseCase()
+                .catch { Timber.e(it) }
+                .collect { loadRecents() }
+        }
     }
 
     private fun monitorFetchNodesFinish() {
@@ -174,6 +193,33 @@ class RecentsViewModel @AssistedInject constructor(
             }.onFailure {
                 Timber.e(it, "Failed to show recent activity")
             }
+        }
+    }
+
+    /**
+     * Clear recent activity
+     */
+    fun clearRecentActivity() {
+        viewModelScope.launch {
+            runCatching {
+                clearRecentActivityUseCase(Instant.now().epochSecond)
+            }.onSuccess {
+                _uiState.update {
+                    it.copy(recentsClearedEvent = triggered)
+                }
+                snackbarEventQueue.queueMessage(sharedR.string.home_recents_snackbar_activity_cleared)
+            }.onFailure {
+                Timber.e(it, "Failed to clear recent activity")
+            }
+        }
+    }
+
+    /**
+     * Consume recent activity cleared event
+     */
+    fun onRecentsClearedEventConsumed() {
+        _uiState.update {
+            it.copy(recentsClearedEvent = consumed)
         }
     }
 

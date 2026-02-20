@@ -1,6 +1,9 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.getRequestListener
@@ -31,6 +34,7 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 ) : RecentActionsRepository {
 
     private val systemZoneId = ZoneId.systemDefault()
+    private val recentActivityCleared = MutableSharedFlow<Unit>()
 
     override suspend fun getRecentActions(
         excludeSensitives: Boolean,
@@ -56,6 +60,19 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         }
         return@withContext emptyList()
     }
+
+    override suspend fun clearRecentActions(until: Long): Long = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("clearRecentActions") {
+                it.number
+            }
+            megaApiGateway.clearRecentActions(until, listener)
+        }.also {
+            recentActivityCleared.emit(Unit)
+        }
+    }
+
+    override fun monitorRecentActivityCleared(): Flow<Unit> = recentActivityCleared.asSharedFlow()
 
     override suspend fun getNodeInfo(nodeId: NodeId) = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {

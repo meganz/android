@@ -2334,4 +2334,10 @@
     <string name="ssl_error_dialog_secure_connection_failed_body">MEGA couldn\’t connect securely.\n\nIf you\’re on public Wi-Fi, try signing in through your browser first.\n\nYour ISP or security software might also be interfering with the connection.\n\n[A]Learn more[/A]</string>
     <!-- Warning shown on Upgrade screen when Google Play subscriptions are not available in the user's region -->
     <string name="choose_account_screen_subscriptions_not_available_via_google_play">Subscriptions are not available via Google Play in your region.</string>
+    <!-- Snackbar message shown when recent activity is cleared in recents widget -->
+    <string name="home_recents_snackbar_activity_cleared">Your recent activity has been cleared</string>
+    <!-- Menu option to clear recent activity in recents options bottom sheet -->
+    <string name="home_recents_options_menu_clear">Clear recent activity</string>
+    <!-- Clear recents confirmation dialog message -->
+    <string name="home_recents_clear_dialog_message">Are you sure you want to clear all recent activity? This cannot be undone.</string>
 </resources>

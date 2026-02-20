@@ -712,6 +712,10 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.getRecentActionsAsync(days, maxNodes, excludeSensitives, listener)
 
+    override fun clearRecentActions(until: Long, listener: MegaRequestListenerInterface) {
+        megaApi.clearRecentActionHistory(until, listener)
+    }
+
     override fun copyNode(
         nodeToCopy: MegaNode,
         newNodeParent: MegaNode,

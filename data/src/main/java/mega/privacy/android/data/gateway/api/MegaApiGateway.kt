@@ -1171,6 +1171,14 @@ interface MegaApiGateway {
     )
 
     /**
+     * Clear the recent actions up to given timestamp
+     *
+     * @param until Epoch time (in seconds). Recent actions up to this time will be cleared
+     * @param listener [MegaRequestListenerInterface]
+     */
+    fun clearRecentActions(until: Long, listener: MegaRequestListenerInterface)
+
+    /**
      * Copy a [MegaNode] and move it to a new [MegaNode] while updating its name if set
      *
      * @param nodeToCopy the [MegaNode] to copy

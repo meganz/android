@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -145,7 +146,16 @@ fun RecentsScreen(
                 snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
             }
         },
+        onClearRecentActivity = viewModel::clearRecentActivity
+
     )
+
+    EventEffect(
+        event = uiState.recentsClearedEvent,
+        onConsumed = viewModel::onRecentsClearedEventConsumed
+    ) {
+        onBack()
+    }
 }
 
 @Composable

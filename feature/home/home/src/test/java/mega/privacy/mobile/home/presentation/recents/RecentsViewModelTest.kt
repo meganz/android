@@ -2,6 +2,8 @@ package mega.privacy.mobile.home.presentation.recents
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -17,10 +19,14 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.recentactions.ClearRecentActivityUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionsUseCase
+import mega.privacy.android.domain.usecase.recentactions.MonitorRecentActivityClearedUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorHideRecentActivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.SetHideRecentActivityUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentActionUiItemMapper
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiItem
 import mega.privacy.mobile.home.presentation.recents.model.RecentsUiState
@@ -52,6 +58,9 @@ class RecentsViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
+    private val clearRecentActivityUseCase = mock<ClearRecentActivityUseCase>()
+    private val monitorRecentActivityClearedUseCase = mock<MonitorRecentActivityClearedUseCase>()
+    private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     private val bucket1 = createMockRecentActionBucket(
         timestamp = 1000L,
@@ -94,6 +103,7 @@ class RecentsViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorRecentActivityClearedUseCase()).thenReturn(emptyFlow())
     }
 
     private fun initViewModel() {
@@ -106,6 +116,9 @@ class RecentsViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            clearRecentActivityUseCase = clearRecentActivityUseCase,
+            monitorRecentActivityClearedUseCase = monitorRecentActivityClearedUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             maxBucketCount = 4
         )
     }
@@ -287,6 +300,9 @@ class RecentsViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
+            clearRecentActivityUseCase = clearRecentActivityUseCase,
+            monitorRecentActivityClearedUseCase = monitorRecentActivityClearedUseCase,
+            snackbarEventQueue = snackbarEventQueue,
             maxBucketCount = testMaxBucketCount
         )
         advanceUntilIdle()
@@ -529,6 +545,21 @@ class RecentsViewModelTest {
     }
 
     @Test
+    fun `test that recents are reloaded when recent activity is cleared`() = runTest {
+        val clearedFlow = MutableSharedFlow<Unit>()
+        whenever(monitorRecentActivityClearedUseCase()).thenReturn(clearedFlow)
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+        initViewModel()
+        advanceUntilIdle()
+
+        clearedFlow.emit(Unit)
+        advanceUntilIdle()
+
+        verify(getRecentActionsUseCase, times(2)).invoke(excludeSensitives = false, maxBucketCount = 4)
+    }
+
+    @Test
     fun `test that duplicate items with same key are filtered by distinctBy`() = runTest {
         val duplicateBucket1 = createMockRecentActionBucket(
             timestamp = 1000L,
@@ -563,6 +594,41 @@ class RecentsViewModelTest {
             assertThat(state.recentActionItems).contains(duplicateUiItem1)
             assertThat(state.recentActionItems).contains(uniqueUiItem)
             assertThat(state.recentActionItems).doesNotContain(duplicateUiItem2)
+        }
+    }
+
+    @Test
+    fun `test that clearRecentActivity calls use case and triggers event`() = runTest {
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+        whenever(clearRecentActivityUseCase(any())).thenReturn(1L)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.clearRecentActivity()
+        advanceUntilIdle()
+
+        verify(clearRecentActivityUseCase).invoke(any())
+        verify(snackbarEventQueue).queueMessage(sharedR.string.home_recents_snackbar_activity_cleared)
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.recentsClearedEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that onRecentsClearedEventConsumed sets event to consumed`() = runTest {
+        whenever(getRecentActionsUseCase(any(), any())).thenReturn(emptyList())
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.onRecentsClearedEventConsumed()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.recentsClearedEvent).isEqualTo(consumed)
         }
     }
 }

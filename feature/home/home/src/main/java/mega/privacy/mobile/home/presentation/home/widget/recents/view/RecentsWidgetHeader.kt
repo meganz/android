@@ -1,10 +1,12 @@
 package mega.privacy.mobile.home.presentation.home.widget.recents.view
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +20,8 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun RecentsWidgetHeader(
@@ -41,17 +43,23 @@ internal fun RecentsWidgetHeader(
                 .weight(1f)
                 .testTag(TITLE_TEST_TAG)
         )
-        MegaIcon(
-            imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-            contentDescription = "3 dots",
-            tint = IconColor.Secondary,
+        Box(
             modifier = Modifier
                 .size(16.dp)
-                .clickable {
-                    onOptionsClicked()
-                }
-                .testTag(RECENTS_MENU_TEST_TAG)
-        )
+                .wrapContentSize(unbounded = true, align = Alignment.Center)
+                .size(48.dp)
+                .clickable { onOptionsClicked() }
+                .testTag(RECENTS_MENU_TEST_TAG),
+            contentAlignment = Alignment.Center
+        ) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                contentDescription = "3 dots",
+                tint = IconColor.Secondary,
+                modifier = Modifier
+                    .size(16.dp)
+            )
+        }
     }
 }
 

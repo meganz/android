@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -412,6 +413,30 @@ class DefaultRecentActionsRepositoryTest {
 
             assertThat(result).isNull()
         }
+
+    @Test
+    fun `test that monitorRecentActivityCleared emits after clearRecentActions succeeds`() = runTest {
+        val megaApiJava = mock<MegaApiJava>()
+        val timestamp = 1234567890L
+        val request = mock<MegaRequest> { on { number }.thenReturn(timestamp) }
+        val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+        whenever(megaApiGateway.clearRecentActions(any(), any())).thenAnswer {
+            (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
+                megaApiJava,
+                request,
+                error
+            )
+        }
+
+        val emissions = mutableListOf<Unit>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            underTest.monitorRecentActivityCleared().collect { emissions.add(it) }
+        }
+
+        underTest.clearRecentActions(timestamp)
+
+        assertThat(emissions).hasSize(1)
+    }
 
     @Test
     fun `test that getRecentActionBucketByIdentifier only fetches nodes for matching bucket`() =

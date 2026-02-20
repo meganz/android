@@ -148,6 +148,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                     snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
                 }
             },
+            onClearRecentActivity = viewModel::clearRecentActivity
         )
 
         HandleNodeOptionsActionResult(

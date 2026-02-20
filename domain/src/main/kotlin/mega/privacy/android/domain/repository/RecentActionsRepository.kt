@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.recentactions.NodeInfoForRecentActions
@@ -25,6 +26,21 @@ interface RecentActionsRepository {
         excludeSensitives: Boolean,
         maxBucketCount: Int,
     ): List<RecentActionBucketUnTyped>
+
+    /**
+     * Clear the recent actions up to given timestamp
+     *
+     * @param until Epoch time (in seconds). Recent actions up to this time will be cleared.
+     * @return The timestamp up to which recent actions were cleared
+     */
+    suspend fun clearRecentActions(until: Long): Long
+
+    /**
+     * Monitor when recent activity has been cleared
+     *
+     * @return a flow that emits [Unit] whenever recent actions are cleared
+     */
+    fun monitorRecentActivityCleared(): Flow<Unit>
 
     /**
      * Gets the node info required for recent action only

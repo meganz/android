@@ -24,7 +24,8 @@ class RecentsOptionsBottomSheetTest {
                 RecentsOptionsBottomSheetContent(
                     isHideRecentsEnabled = false,
                     onShowRecentActivity = {},
-                    onHideRecentActivity = {}
+                    onHideRecentActivity = {},
+                    onClearRecentActivity = {}
                 )
             }
         }
@@ -40,7 +41,8 @@ class RecentsOptionsBottomSheetTest {
                 RecentsOptionsBottomSheetContent(
                     isHideRecentsEnabled = true,
                     onShowRecentActivity = {},
-                    onHideRecentActivity = {}
+                    onHideRecentActivity = {},
+                    onClearRecentActivity = {}
                 )
             }
         }
@@ -58,7 +60,8 @@ class RecentsOptionsBottomSheetTest {
                 RecentsOptionsBottomSheetContent(
                     isHideRecentsEnabled = false,
                     onShowRecentActivity = {},
-                    onHideRecentActivity = { hideClicked = true }
+                    onHideRecentActivity = { hideClicked = true },
+                    onClearRecentActivity = {}
                 )
             }
         }
@@ -79,7 +82,8 @@ class RecentsOptionsBottomSheetTest {
                 RecentsOptionsBottomSheetContent(
                     isHideRecentsEnabled = true,
                     onShowRecentActivity = { showClicked = true },
-                    onHideRecentActivity = {}
+                    onHideRecentActivity = {},
+                    onClearRecentActivity = {}
                 )
             }
         }
@@ -89,6 +93,45 @@ class RecentsOptionsBottomSheetTest {
 
         composeRule.waitForIdle()
         assertThat(showClicked).isTrue()
+    }
+
+    @Test
+    fun `test that clear menu item is displayed`() {
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsOptionsBottomSheetContent(
+                    isHideRecentsEnabled = false,
+                    onShowRecentActivity = {},
+                    onHideRecentActivity = {},
+                    onClearRecentActivity = {}
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(CLEAR_RECENT_MENU_ITEM_TEST_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that onClearRecentActivity is called when clear menu item is clicked`() {
+        var clearClicked = false
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                RecentsOptionsBottomSheetContent(
+                    isHideRecentsEnabled = false,
+                    onShowRecentActivity = {},
+                    onHideRecentActivity = {},
+                    onClearRecentActivity = { clearClicked = true }
+                )
+            }
+        }
+
+        composeRule.onNodeWithTag(CLEAR_RECENT_MENU_ITEM_TEST_TAG, useUnmergedTree = true)
+            .performClick()
+
+        composeRule.waitForIdle()
+        assertThat(clearClicked).isTrue()
     }
 }
 
