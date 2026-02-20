@@ -45,6 +45,13 @@ internal interface BillingGateway {
     suspend fun launchPurchaseFlow(activity: Activity, productId: String, offerId: String?)
 
     /**
+     * Check if subscription feature is available on this device (e.g. Google Play supports subscriptions).
+     *
+     * @return [Boolean] true if subscriptions are supported, false otherwise
+     */
+    suspend fun isSubscriptionFeatureAvailable(): Boolean
+
+    /**
      * Check if external content links billing program is available.
      *
      * @return [Boolean] true if external content links are available, false otherwise

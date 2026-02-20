@@ -146,12 +146,20 @@ fun ChooseAccountRoute(
         isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
         userAgeComplianceStatus = uiState.userAgeComplianceStatus,
         clearExternalPurchaseError = billingViewModel::clearExternalPurchaseError,
+        onSubscriptionUnavailableLearnMoreClick = {
+            activity?.let {
+                megaNavigator.launchUrl(it, SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL)
+            }
+        },
         onBack = {
             Analytics.tracker.trackEvent(BackButtonPressedEvent)
             onBack()
         },
     )
 }
+
+private const val SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL =
+    "https://help.mega.io/plans-storage"
 
 
 private fun sendAccountTypeAnalytics(

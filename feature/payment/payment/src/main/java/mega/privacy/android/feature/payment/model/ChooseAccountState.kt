@@ -25,6 +25,7 @@ data class ChooseAccountState(
     val isExternalCheckoutEnabled: Boolean = false,
     val isExternalCheckoutDefault: Boolean = false,
     val isSingleActivityEnabled: Boolean = false,
+    val isSubscriptionFeatureAvailable: Boolean? = null,
 ) {
     // checking if there is any discount available it's different from current plan
     fun hasDiscount() = localisedSubscriptionsList.any {

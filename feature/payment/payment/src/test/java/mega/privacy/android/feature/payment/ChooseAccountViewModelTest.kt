@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
+import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -72,6 +73,8 @@ class ChooseAccountViewModelTest {
         mock<GetRecommendedSubscriptionUseCase>()
     private val isExternalContentLinkSupportedUseCase =
         mock<IsExternalContentLinkSupportedUseCase>()
+    private val isSubscriptionFeatureAvailableUseCase =
+        mock<IsSubscriptionFeatureAvailableUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val ageSignalUseCase = mock<AgeSignalUseCase>()
@@ -85,11 +88,13 @@ class ChooseAccountViewModelTest {
             formattedSizeMapper,
             getRecommendedSubscriptionUseCase,
             isExternalContentLinkSupportedUseCase,
+            isSubscriptionFeatureAvailableUseCase,
             getPricing,
             monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase,
             ageSignalUseCase,
         )
+        wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(true)
     }
 
     private fun initViewModel() {
@@ -99,6 +104,7 @@ class ChooseAccountViewModelTest {
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             isExternalContentLinkSupportedUseCase = isExternalContentLinkSupportedUseCase,
+            isSubscriptionFeatureAvailableUseCase = isSubscriptionFeatureAvailableUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ageSignalUseCase = ageSignalUseCase,

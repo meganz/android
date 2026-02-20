@@ -21,6 +21,7 @@ import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
+import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -46,6 +47,7 @@ class ChooseAccountViewModel @Inject constructor(
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
     private val isExternalContentLinkSupportedUseCase: IsExternalContentLinkSupportedUseCase,
+    private val isSubscriptionFeatureAvailableUseCase: IsSubscriptionFeatureAvailableUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val ageSignalUseCase: AgeSignalUseCase,
@@ -104,14 +106,23 @@ class ChooseAccountViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
+            val isSubscriptionFeatureAvailable =
+                runCatching { isSubscriptionFeatureAvailableUseCase() }.getOrElse { false }
+            _state.update {
+                it.copy(
+                    isSubscriptionFeatureAvailable = isSubscriptionFeatureAvailable
+                )
+            }
+        }
+        viewModelScope.launch {
             runCatching {
                 val isExternalCheckoutEnabled =
                     getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers)
                 val isExternalCheckoutDefault = getFeatureFlagValueUseCase(ABTestFeatures.ande)
-                val isExternalContentLinkSupportedUseCase = isExternalContentLinkSupportedUseCase()
+                val isExternalContentLinkSupported = isExternalContentLinkSupportedUseCase()
                 _state.update {
                     it.copy(
-                        isExternalCheckoutEnabled = isExternalCheckoutEnabled && isExternalContentLinkSupportedUseCase,
+                        isExternalCheckoutEnabled = isExternalCheckoutEnabled && isExternalContentLinkSupported,
                         isExternalCheckoutDefault = isExternalCheckoutDefault,
                     )
                 }

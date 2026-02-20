@@ -29,9 +29,13 @@ import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccoun
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITIONAL_BENEFITS
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SAVE_UP_TO_BADGE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_TERMS_AND_POLICIES
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_YEARLY_CHIP
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -424,6 +428,7 @@ class NewChooseAccountScreenTest {
         setContent(
             uiState = ChooseAccountState(
                 localisedSubscriptionsList = emptyList(),
+                isSubscriptionFeatureAvailable = true,
             )
         )
 
@@ -521,6 +526,102 @@ class NewChooseAccountScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun `test that subscription unavailable banner is shown when isSubscriptionFeatureAvailable is false`() {
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isSubscriptionFeatureAvailable = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER))
+        composeRule.onNodeWithTag(TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that pro plan cards are not shown when isSubscriptionFeatureAvailable is false`() {
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isSubscriptionFeatureAvailable = false,
+            )
+        )
+
+        composeRule.onNodeWithTag("${TEST_TAG_PRO_PLAN_CARD}0")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that bottom bar is not shown when isSubscriptionFeatureAvailable is false`() {
+        setContent(
+            isUpgradeAccount = true,
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isExternalCheckoutEnabled = true,
+                isSubscriptionFeatureAvailable = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
+            .assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that subscription period chips are not shown when isSubscriptionFeatureAvailable is false`() {
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isSubscriptionFeatureAvailable = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_MONTHLY_CHIP)
+            .assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_YEARLY_CHIP)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that save up to badge is not shown when isSubscriptionFeatureAvailable is false`() {
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isSubscriptionFeatureAvailable = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_SAVE_UP_TO_BADGE)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that onSubscriptionUnavailableLearnMoreClick is called when Learn more is clicked`() {
+        var learnMoreClicked = false
+        setContent(
+            uiState = ChooseAccountState(
+                localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+                isSubscriptionFeatureAvailable = false,
+            ),
+            onSubscriptionUnavailableLearnMoreClick = { learnMoreClicked = true }
+        )
+
+        val learnMoreText = InstrumentationRegistry.getInstrumentation().targetContext
+            .getString(sharedR.string.general_learn_more)
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER))
+        composeRule.onNodeWithText(learnMoreText)
+            .performScrollTo()
+            .performClick()
+
+        assert(learnMoreClicked) { "onSubscriptionUnavailableLearnMoreClick should be called when Learn more is clicked" }
+    }
+
     private fun setContent(
         isUpgradeAccount: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
@@ -529,6 +630,7 @@ class NewChooseAccountScreenTest {
         isExternalCheckoutEnabled: Boolean = false,
         isExternalCheckoutDefault: Boolean = false,
         onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
+        onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
         billingUIState: BillingUIState = BillingUIState(),
         clearExternalPurchaseError: () -> Unit = {},
         userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
@@ -536,6 +638,7 @@ class NewChooseAccountScreenTest {
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
             isExternalCheckoutDefault = isExternalCheckoutDefault,
+            isSubscriptionFeatureAvailable = true,
         ),
     ) = composeRule.setContent {
         NewChooseAccountScreen(
@@ -550,6 +653,7 @@ class NewChooseAccountScreenTest {
             isExternalCheckoutEnabled = isExternalCheckoutEnabled,
             isExternalCheckoutDefault = isExternalCheckoutDefault,
             onExternalCheckoutClick = onExternalCheckoutClick,
+            onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
             userAgeComplianceStatus = userAgeComplianceStatus
         )
     }

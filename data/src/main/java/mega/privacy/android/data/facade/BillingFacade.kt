@@ -299,6 +299,10 @@ internal class BillingFacade @Inject constructor(
         }
     }
 
+    override suspend fun isSubscriptionFeatureAvailable(): Boolean = withContext(ioDispatcher) {
+        areSubscriptionsSupported(ensureConnect())
+    }
+
     override suspend fun queryPurchase(): List<MegaPurchase> = withContext(ioDispatcher) {
         val client = ensureConnect()
         // check the caller still observer, sometime it takes time to connect to BillingClient
@@ -512,10 +516,12 @@ internal class BillingFacade @Inject constructor(
                         Timber.d("Successfully launched external content link.")
                         ExternalContentLinkResult.Success
                     }
+
                     BillingClient.BillingResponseCode.USER_CANCELED -> {
                         Timber.d("User cancelled external content link launch.")
                         ExternalContentLinkResult.Cancelled
                     }
+
                     else -> {
                         Timber.w(
                             "Failed to launch external content link, responseCode: ${billingResult.responseCode}, " +

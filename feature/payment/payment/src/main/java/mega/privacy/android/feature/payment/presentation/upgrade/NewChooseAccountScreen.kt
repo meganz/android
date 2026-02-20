@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -46,9 +43,6 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.badge.Badge
-import mega.android.core.ui.components.badge.BadgeType
-import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
@@ -64,10 +58,7 @@ import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
 import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
-import mega.privacy.android.feature.payment.components.ProPlanCard
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
-import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
-import mega.privacy.android.feature.payment.components.upgradeAccountSkeleton
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
@@ -97,6 +88,7 @@ fun NewChooseAccountScreen(
     isExternalCheckoutDefault: Boolean = false,
     onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
     clearExternalPurchaseError: () -> Unit = {},
+    onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
@@ -198,30 +190,32 @@ fun NewChooseAccountScreen(
             MegaSnackbar(snackBarHostState = snackBarHostState)
         },
         bottomBar = {
-            chosenPlan?.takeIf {
-                !isCurrentPlan(
-                    uiState = uiState,
-                    subscriptionAccountType = it,
-                    isMonthly = isMonthly,
-                    isUpgradeAccount = isUpgradeAccount
-                )
-            }?.let { accountType ->
-                val selectedSubscription = uiState.localisedSubscriptionsList
-                    .find { sub -> sub.accountType == chosenPlan }
+            if (uiState.isSubscriptionFeatureAvailable == true) {
+                chosenPlan?.takeIf {
+                    !isCurrentPlan(
+                        uiState = uiState,
+                        subscriptionAccountType = it,
+                        isMonthly = isMonthly,
+                        isUpgradeAccount = isUpgradeAccount
+                    )
+                }?.let { accountType ->
+                    val selectedSubscription = uiState.localisedSubscriptionsList
+                        .find { sub -> sub.accountType == chosenPlan }
 
-                BuyPlanBottomBar(
-                    accountType = accountType,
-                    isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                    isExternalCheckoutDefault = isExternalCheckoutDefault,
-                    userAgeComplianceStatus = userAgeComplianceStatus,
-                    selectedSubscription = selectedSubscription,
-                    isMonthly = isMonthly,
-                    onInAppCheckoutClick = onInAppCheckoutClick,
-                    onExternalCheckoutClick = { subscription ->
-                        onExternalCheckoutClick(subscription, isMonthly)
-                    },
-                    isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
-                )
+                    BuyPlanBottomBar(
+                        accountType = accountType,
+                        isExternalCheckoutEnabled = isExternalCheckoutEnabled,
+                        isExternalCheckoutDefault = isExternalCheckoutDefault,
+                        userAgeComplianceStatus = userAgeComplianceStatus,
+                        selectedSubscription = selectedSubscription,
+                        isMonthly = isMonthly,
+                        onInAppCheckoutClick = onInAppCheckoutClick,
+                        onExternalCheckoutClick = { subscription ->
+                            onExternalCheckoutClick(subscription, isMonthly)
+                        },
+                        isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -273,151 +267,20 @@ fun NewChooseAccountScreen(
                 )
             }
 
-            item("subscription_period") {
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 12.dp, horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    MegaChip(
-                        modifier = Modifier.testTag(TEST_TAG_MONTHLY_CHIP),
-                        selected = isMonthly,
-                        onClick = {
-                            isMonthly = true
-                        },
-                        content = stringResource(id = sharedR.string.subscription_type_monthly),
-                        leadingPainter = if (isMonthly) {
-                            rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
-                        } else null
-                    )
-
-                    MegaChip(
-                        modifier = Modifier.testTag(TEST_TAG_YEARLY_CHIP),
-                        selected = !isMonthly,
-                        onClick = {
-                            isMonthly = false
-                        },
-                        content = stringResource(id = sharedR.string.subscription_type_yearly),
-                        leadingPainter = if (!isMonthly) {
-                            rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
-                        } else null
-                    )
-                }
-            }
-
-            item("save_up_to_badge_${hasDiscount}") {
-                val label = if (hasDiscount) {
-                    stringResource(sharedR.string.account_upgrade_account_label_save_at_least)
-                } else {
-                    stringResource(sharedR.string.account_upgrade_account_label_save_up_to)
-                }
-                val badgeType = if (hasDiscount) {
-                    BadgeType.MegaSecondary
-                } else {
-                    BadgeType.Mega
-                }
-                Badge(
-                    badgeType = badgeType,
-                    text = label,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .testTag(TEST_TAG_SAVE_UP_TO_BADGE)
-                )
-            }
-
-            item("pro_plans_top_space") {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            if (uiState.localisedSubscriptionsList.isEmpty()) {
-                upgradeAccountSkeleton(itemCount = 3)
+            if (uiState.isSubscriptionFeatureAvailable == false) {
+                subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
             } else {
-                itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
-                    val isRecommended = !hasDiscount
-                            && uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
-                    val storageFormattedSize = subscription.formatStorageSize()
-                    val transferFormattedSize = subscription.formatTransferSize(isMonthly)
-
-                    val uiAccountType = subscription.accountType.toUIAccountType()
-
-                    val storageString = stringResource(
-                        id = sharedR.string.choose_account_screen_storage_label,
-                        stringResource(id = storageFormattedSize.unit, storageFormattedSize.size)
-                    )
-                    val transferString = stringResource(
-                        id = sharedR.string.choose_account_screen_transfer_quota_label,
-                        stringResource(id = transferFormattedSize.unit, transferFormattedSize.size)
-                    )
-                    val totalPrice =
-                        subscription.localisePriceCurrencyCode(locale, isMonthly)
-
-                    val yearlyPricePerMonth = if (!isMonthly) {
-                        subscription.localisePriceOfYearlyAmountPerMonth(locale)
-                    } else null
-
-                    val currentSubscription =
-                        if (isMonthly) subscription.monthlySubscription else subscription.yearlySubscription
-                    val discountPercentage = currentSubscription.discountedPercentage
-                    val offerPeriod = currentSubscription.offerPeriod
-                    val discountedPriceMonthly =
-                        subscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)
-                    val discountedPriceYearly =
-                        subscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)
-
-                    // in case subscriptionCycle is UNKNOWN and currentSubscriptionPlan is PRO level, we show it as current plan for both monthly and yearly
-                    val isCurrentPlan = isCurrentPlan(
-                        uiState = uiState,
-                        subscriptionAccountType = subscription.accountType,
-                        isMonthly = isMonthly,
-                        isUpgradeAccount = isUpgradeAccount
-                    )
-
-                    val yearlyBillingInfo = if (!isMonthly) {
-                        if (!isCurrentPlan && discountedPriceYearly != null
-                            && discountPercentage != null && offerPeriod != null
-                        ) {
-                            "[A]${totalPrice.price}[/A] ${
-                                getOfferPeriodLabel(
-                                    discountedPriceYearly.price,
-                                    offerPeriod
-                                )
-                            }"
-                        } else {
-                            stringResource(
-                                sharedR.string.choose_account_screen_billed_yearly,
-                                totalPrice.price
-                            )
-                        }
-                    } else null
-
-                    ProPlanCard(
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp)
-                            .testTag("$TEST_TAG_PRO_PLAN_CARD$index"),
-                        planName = stringResource(id = uiAccountType.textValue),
-                        isRecommended = isRecommended,
-                        isSelected = chosenPlan == subscription.accountType && !isCurrentPlan,
-                        storage = storageString,
-                        transfer = transferString,
-                        price = yearlyPricePerMonth?.price ?: totalPrice.price,
-                        yearlyBillingInfo = yearlyBillingInfo,
-                        offerName = discountPercentage?.takeIf { !isCurrentPlan }?.let {
-                            getCampaignName(
-                                context = context,
-                                offerId = currentSubscription.offerId,
-                                discountPercentage = discountPercentage
-                            )
-                        },
-                        discountedPrice = discountedPriceMonthly?.price?.takeIf { !isCurrentPlan },
-                        isCurrentPlan = isCurrentPlan,
-                        onSelected = {
-                            chosenPlan = subscription.accountType
-                        },
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+                subscriptionAvailableContent(
+                    uiState = uiState,
+                    isMonthly = isMonthly,
+                    onMonthlyChange = { isMonthly = it },
+                    chosenPlan = chosenPlan,
+                    onPlanSelected = { chosenPlan = it },
+                    hasDiscount = hasDiscount,
+                    context = context,
+                    locale = locale,
+                    isUpgradeAccount = isUpgradeAccount,
+                )
             }
 
             item("additional_benefits") {
@@ -646,6 +509,12 @@ internal const val TEST_TAG_FEATURE_ROW = "choose_account_screen:feature_row_"
  * Test tag for the "Save up to" badge
  */
 internal const val TEST_TAG_SAVE_UP_TO_BADGE = "choose_account_screen:save_up_to_badge"
+
+/**
+ * Test tag for the subscription unavailable banner (Google Play not available in region)
+ */
+internal const val TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER =
+    "choose_account_screen:subscription_unavailable_banner"
 
 /**
  * Test tag for the additional benefits section
