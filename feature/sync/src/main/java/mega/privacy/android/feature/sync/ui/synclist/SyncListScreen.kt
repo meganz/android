@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.AppBarDefaults
@@ -244,7 +245,9 @@ internal fun SyncListScreen(
                                 },
                             ),
                         ),
-                        modifier = Modifier.testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB),
+                        modifier = Modifier
+                            .testTag(TEST_TAG_SYNC_LIST_SCREEN_FAB)
+                            .navigationBarsPadding(),
                         multiFabState = multiFabState,
                         onStateChanged = { state ->
                             if (state == MultiFloatingActionButtonState.EXPANDED) {
