@@ -1,23 +1,18 @@
 package mega.privacy.android.app.sslverification.view
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.style.TextDecoration
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
 import mega.android.core.ui.components.dialogs.VERTICAL
 import mega.android.core.ui.components.text.SpannableText
-import mega.android.core.ui.model.MegaSpanStyle
-import mega.android.core.ui.model.SpanIndicator
-import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.model.linkText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.app.R
-import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -29,25 +24,15 @@ internal fun SSLErrorDialog(
     onRetry: () -> Unit,
     onOpenBrowser: () -> Unit,
     onDismiss: () -> Unit,
+    launchUrl: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     BasicDialog(
         modifier = Modifier,
         title = SpannableText(stringResource(id = sharedR.string.ssl_error_dialog_secure_connection_failed_title)),
-        description = SpannableText(
-            text = stringResource(id = sharedR.string.ssl_error_dialog_secure_connection_failed_body),
-            annotations = mapOf(
-                SpanIndicator('A') to SpanStyleWithAnnotation(
-                    megaSpanStyle = MegaSpanStyle.LinkColorStyle(
-                        SpanStyle(textDecoration = TextDecoration.Underline),
-                        LinkColor.Primary
-                    ),
-                    annotation = "A"
-                )
-            ),
-            onAnnotationClick = {
-                context.launchUrl(SSL_HELP_URL)
-            }
+        description = linkText(
+            stringResourceIdentifier = sharedR.string.ssl_error_dialog_secure_connection_failed_body,
+            onClick = launchUrl,
+            url = SSL_HELP_URL,
         ),
         buttons = persistentListOf(
             BasicDialogButton(
@@ -84,11 +69,14 @@ internal fun SSLErrorDialog(
 @Composable
 private fun SSLErrorDialogPreview() {
     AndroidThemeForPreviews {
-        SSLErrorDialog(
-            closeDialog = { },
-            onRetry = { },
-            onOpenBrowser = { },
-            onDismiss = { }
-        )
+        Column(modifier = Modifier.fillMaxHeight()) {
+            SSLErrorDialog(
+                closeDialog = { },
+                onRetry = { },
+                onOpenBrowser = { },
+                onDismiss = {},
+                launchUrl = {}
+            )
+        }
     }
 }

@@ -1,12 +1,14 @@
 package mega.privacy.android.app.sslverification
 
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import kotlinx.serialization.Serializable
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.sslverification.model.SSLDialogState
 import mega.privacy.android.app.sslverification.view.SSLErrorDialog
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -42,6 +44,7 @@ fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
         when (val state = uiState) {
             SSLDialogState.Loading -> {}
             is SSLDialogState.Ready -> {
+                val context = LocalContext.current
                 SSLErrorDialog(
                     closeDialog = {
                         onDialogHandled()
@@ -56,6 +59,7 @@ fun EntryProviderScope<DialogNavKey>.sslDialogDestination(
                         )
                     },
                     onDismiss = viewModel::onDismiss,
+                    launchUrl = context::launchUrl,
                 )
             }
         }
