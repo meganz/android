@@ -1,10 +1,14 @@
-package mega.privacy.android.app.presentation.photos.albums.importlink
+package mega.privacy.android.feature.photos.presentation.albums.importlink
 
+import android.content.Context
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,10 +25,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
-import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
@@ -35,53 +35,52 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
+private const val INVALID_CHARACTERS = "\" * / : < > ? \\ |"
+
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-@HiltViewModel
-internal class AlbumImportViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = AlbumImportViewModel.Factory::class)
+class AlbumImportViewModel @AssistedInject constructor(
+    private val photoUiStateMapper: PhotoUiStateMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
     private val getUserAlbums: GetUserAlbums,
     private val getPublicAlbumUseCase: GetPublicAlbumUseCase,
     private val getPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase,
-    private val downloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase,
-    private val downloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
-    private val getStringFromStringResMapper: GetStringFromStringResMapper,
     private val importPublicAlbumUseCase: ImportPublicAlbumUseCase,
     private val isAlbumLinkValidUseCase: IsAlbumLinkValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
     private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase,
+    private val getCurrentStorageStateUseCase: GetCurrentStorageStateUseCase,
+    @ApplicationContext private val context: Context,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    @Assisted private val albumLink: String?,
 ) : ViewModel() {
     private val state = MutableStateFlow(value = AlbumImportState())
     val stateFlow = state.asStateFlow()
 
-    private val albumLink: String?
-        get() = savedStateHandle[ALBUM_LINK]
-
     private var albumNameToImport: String = ""
 
-    private var photosToImport: Collection<Photo> = listOf()
+    private var photosToImport: Collection<PhotoUiState> = listOf()
 
     private var importAlbumJob: Job? = null
 
@@ -98,26 +97,35 @@ internal class AlbumImportViewModel @Inject constructor(
     var availableStorage: Long = 0
 
     init {
-        initialize()
+        viewModelScope.launch {
+            monitorNetworkConnection()
+            handleSharedAlbumLink()
+            validateLink()
+
+            val isLogin = hasCredentialsUseCase()
+            if (isLogin) {
+                getStorageState()
+                loadUserAlbums()
+                monitorAccountDetail()
+            }
+
+            state.update {
+                it.copy(
+                    isLogin = isLogin,
+                    isLocalAlbumsLoaded = !isLogin,
+                    isAvailableStorageCollected = it.isAvailableStorageCollected || !isLogin,
+                )
+            }
+        }
     }
 
-    fun initialize() = viewModelScope.launch {
-        monitorNetworkConnection()
-        handleSharedAlbumLink(link = albumLink)
-        validateLink(link = albumLink)
-
-        val isLogin = hasCredentialsUseCase()
-        if (isLogin) {
-            loadUserAlbums()
-            monitorAccountDetail()
-        }
-
-        state.update {
-            it.copy(
-                isLogin = isLogin,
-                isLocalAlbumsLoaded = !isLogin,
-                isAvailableStorageCollected = it.isAvailableStorageCollected || !isLogin,
-            )
+    private suspend fun getStorageState() {
+        runCatching {
+            getCurrentStorageStateUseCase()
+        }.onSuccess { storageState ->
+            state.update {
+                it.copy(storageState = storageState)
+            }
         }
     }
 
@@ -146,17 +154,17 @@ internal class AlbumImportViewModel @Inject constructor(
         cancelImportAlbum()
     }
 
-    private suspend fun validateLink(link: String?) {
-        if (link == null) {
+    private suspend fun validateLink() {
+        if (albumLink == null) {
             state.update {
                 it.copy(showErrorAccessDialog = true)
             }
-        } else if (!link.contains("#")) {
+        } else if (!albumLink.contains("#")) {
             state.update {
                 it.copy(showInputDecryptionKeyDialog = true)
             }
         } else {
-            fetchPublicAlbum(link)
+            fetchPublicAlbum(albumLink)
         }
     }
 
@@ -191,19 +199,20 @@ internal class AlbumImportViewModel @Inject constructor(
         album: UserAlbum,
         photos: List<Photo>,
     ) {
-        val sortedPhotos = withContext(defaultDispatcher) {
-            photos.sortedByDescending { it.modificationTime }
+        val sortedPhotosUiState = withContext(defaultDispatcher) {
+            photos.map { photoUiStateMapper(it) }
+                .sortedByDescending { it.modificationTime }
         }
 
         val openedPhoto = state.value.folderSubHandle?.let { subHandle ->
-            sortedPhotos.firstOrNull { it.base64Id == subHandle }
+            sortedPhotosUiState.firstOrNull { it.base64Id == subHandle }
         }
 
         state.update {
             it.copy(
                 link = link,
                 album = album,
-                photos = sortedPhotos,
+                photos = sortedPhotosUiState,
                 openFileNodeEvent = if (openedPhoto != null) {
                     triggered(openedPhoto)
                 } else {
@@ -226,18 +235,6 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    fun downloadImage(
-        isPreview: Boolean,
-        photo: Photo,
-        callback: (Boolean) -> Unit,
-    ) = viewModelScope.launch {
-        if (isPreview) {
-            downloadPublicAlbumPhotoPreviewUseCase(photo, callback)
-        } else {
-            downloadPublicAlbumPhotoThumbnailUseCase(photo, callback)
-        }
-    }
-
     fun closeInputDecryptionKeyDialog() {
         state.update {
             it.copy(showInputDecryptionKeyDialog = false)
@@ -245,10 +242,10 @@ internal class AlbumImportViewModel @Inject constructor(
     }
 
     fun decryptLink(key: String) = viewModelScope.launch {
-        fetchPublicAlbum(link = "$albumLink#$key")
+        fetchPublicAlbum(link = "${albumLink}#$key")
     }
 
-    fun selectPhoto(photo: Photo) {
+    fun selectPhoto(photo: PhotoUiState) {
         state.update {
             it.copy(selectedPhotos = it.selectedPhotos + photo)
         }
@@ -260,7 +257,7 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    fun unselectPhoto(photo: Photo) {
+    fun unselectPhoto(photo: PhotoUiState) {
         state.update {
             it.copy(selectedPhotos = it.selectedPhotos - photo)
         }
@@ -281,108 +278,119 @@ internal class AlbumImportViewModel @Inject constructor(
         }
     }
 
-    fun validateAlbumName(albumName: String) = viewModelScope.launch {
-        val checkBlankName = {
-            val isInvalid = albumName.isBlank()
+    fun validateAlbumName(albumName: String) {
+        viewModelScope.launch {
+            val checkBlankName = {
+                val isInvalid = albumName.isBlank()
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = R.string.album_import_enter_album_name,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(renameAlbumErrorMessage = context.getString(sharedR.string.album_import_rename_album_dialog_empty_name_error))
+                    }
+                }
+
+                isInvalid
             }
-            isInvalid
-        }
 
-        val checkDotName = {
-            val isInvalid = albumName.isInvalidDotName()
+            val checkDotName = {
+                val isInvalid = albumName.isInvalidDotName()
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = sharedR.string.general_invalid_dot_name_warning,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(
+                            renameAlbumErrorMessage = context.getString(
+                                sharedR.string.general_invalid_dot_name_warning,
+                            ),
+                        )
+                    }
+                }
+                isInvalid
             }
-            isInvalid
-        }
 
-        val checkDoubleDotName = {
-            val isInvalid = albumName.isInvalidDoubleDotName()
+            val checkDoubleDotName = {
+                val isInvalid = albumName.isInvalidDoubleDotName()
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = sharedR.string.general_invalid_double_dot_name_warning,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(
+                            renameAlbumErrorMessage = context.getString(
+                                sharedR.string.general_invalid_double_dot_name_warning,
+                            ),
+                        )
+                    }
+                }
+                isInvalid
             }
-            isInvalid
-        }
 
-        val checkInvalidChar = {
-            val isInvalid = "[\\\\*/:<>?\"|]".toRegex().containsMatchIn(albumName)
+            val checkInvalidChar = {
+                val isInvalid = "[\\\\*/:<>?\"|]".toRegex().containsMatchIn(albumName)
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = sharedR.string.general_invalid_characters_defined,
-                        INVALID_CHARACTERS,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(
+                            renameAlbumErrorMessage = context.getString(
+                                sharedR.string.general_invalid_characters_defined,
+                                INVALID_CHARACTERS,
+                            ),
+                        )
+                    }
+                }
+                isInvalid
             }
-            isInvalid
-        }
 
-        val checkDuplicatedName = {
-            val isInvalid = albumName in localAlbumNames
+            val checkDuplicatedName = {
+                val isInvalid = albumName in localAlbumNames
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = R.string.photos_create_album_error_message_duplicate,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(
+                            renameAlbumErrorMessage = context.getString(
+                                sharedR.string.photos_create_album_duplicate_name_error,
+                            ),
+                        )
+                    }
+                }
+                isInvalid
             }
-            isInvalid
-        }
 
-        val checkProscribedName = suspend {
-            val proscribedNames = getProscribedAlbumNamesUseCase()
-            val isInvalid = albumName.lowercase() in proscribedNames.map { it.lowercase() }
+            val checkProscribedName = suspend {
+                val proscribedNames = getProscribedAlbumNamesUseCase()
+                val isInvalid = albumName.lowercase() in proscribedNames.map { it.lowercase() }
 
-            state.update {
-                it.copy(
-                    renameAlbumErrorMessage = getStringFromStringResMapper(
-                        stringId = R.string.photos_create_album_error_message_systems_album,
-                    ).takeIf { isInvalid },
-                )
+                if (isInvalid) {
+                    state.update {
+                        it.copy(
+                            renameAlbumErrorMessage = context.getString(
+                                sharedR.string.photos_create_album_proscribed_name_error,
+                            ),
+                        )
+                    }
+                }
+                isInvalid
             }
-            isInvalid
-        }
 
-        val constraints = listOf(
-            { checkBlankName() },
-            { checkDotName() },
-            { checkDoubleDotName() },
-            { checkInvalidChar() },
-            { checkDuplicatedName() },
-            suspend { checkProscribedName() },
-        )
-
-        for (constraint in constraints) {
-            if (constraint()) return@launch
-        }
-
-        albumNameToImport = albumName
-
-        state.update {
-            it.copy(
-                showRenameAlbumDialog = false,
-                isRenameAlbumValid = true,
-                renameAlbumErrorMessage = null,
+            val constraints = listOf(
+                { checkBlankName() },
+                { checkDotName() },
+                { checkDoubleDotName() },
+                { checkInvalidChar() },
+                { checkDuplicatedName() },
+                suspend { checkProscribedName() },
             )
+
+            for (constraint in constraints) {
+                if (constraint()) return@launch
+            }
+
+            albumNameToImport = albumName
+
+            state.update {
+                it.copy(
+                    showRenameAlbumDialog = false,
+                    isRenameAlbumValid = true,
+                    renameAlbumErrorMessage = null,
+                )
+            }
         }
     }
 
@@ -400,7 +408,7 @@ internal class AlbumImportViewModel @Inject constructor(
 
     fun validateImportConstraint(
         album: UserAlbum?,
-        photos: Collection<Photo>,
+        photos: Collection<PhotoUiState>,
     ) = viewModelScope.launch {
         albumNameToImport = album?.title.orEmpty()
         photosToImport = photos
@@ -447,9 +455,8 @@ internal class AlbumImportViewModel @Inject constructor(
         if (!isNetworkConnected) {
             state.update {
                 it.copy(
-                    importAlbumMessage = getStringFromStringResMapper(
-                        stringId = R.string.error_server_connection_problem,
-                    ),
+                    addToCloudDriveFinishedEvent = triggered,
+                    importAlbumMessage = context.getString(sharedR.string.photos_network_error_message),
                 )
             }
             return
@@ -468,6 +475,7 @@ internal class AlbumImportViewModel @Inject constructor(
                             showErrorAccessDialog = true,
                             showImportAlbumDialog = false,
                             isBackToHome = true,
+                            addToCloudDriveFinishedEvent = triggered
                         )
                     }
                     return@launch
@@ -485,9 +493,10 @@ internal class AlbumImportViewModel @Inject constructor(
             }.onFailure {
                 state.update {
                     it.copy(
+                        addToCloudDriveFinishedEvent = triggered,
                         showImportAlbumDialog = false,
-                        importAlbumMessage = getStringFromStringResMapper(
-                            stringId = R.string.album_import_error_message,
+                        importAlbumMessage = context.getString(
+                            sharedR.string.album_import_snackbar_error_message,
                             albumNameToImport,
                         ),
                     )
@@ -495,9 +504,10 @@ internal class AlbumImportViewModel @Inject constructor(
             }.onSuccess {
                 state.update {
                     it.copy(
+                        addToCloudDriveFinishedEvent = triggered,
                         showImportAlbumDialog = false,
-                        importAlbumMessage = getStringFromStringResMapper(
-                            stringId = R.string.album_import_success_message,
+                        importAlbumMessage = context.getString(
+                            sharedR.string.album_import_snackbar_success_message,
                             albumNameToImport,
                         ),
                     )
@@ -513,8 +523,8 @@ internal class AlbumImportViewModel @Inject constructor(
         state.update {
             it.copy(
                 showImportAlbumDialog = false,
-                importAlbumMessage = getStringFromStringResMapper(
-                    stringId = R.string.album_import_error_message,
+                importAlbumMessage = context.getString(
+                    sharedR.string.album_import_snackbar_error_message,
                     albumNameToImport,
                 ),
             )
@@ -572,18 +582,16 @@ internal class AlbumImportViewModel @Inject constructor(
     /**
      * Extract sub-handle from album link
      * Expected URL format: [ALBUM_LINK_REGEXS]
-     *
-     * @param link The album link to process, defaults to albumLink property
      */
-    private fun handleSharedAlbumLink(link: String? = albumLink) {
-        if (link.isNullOrBlank()) {
+    private fun handleSharedAlbumLink() {
+        if (albumLink.isNullOrBlank()) {
             Timber.e("Album link is null or empty")
             return
         }
 
-        Timber.d("Processing album URL: $link")
+        Timber.d("Processing album URL: $albumLink")
 
-        val subHandle = link.substringAfterLast("!", "")
+        val subHandle = albumLink.substringAfterLast("!", "")
             .takeIf { it.isNotBlank() }
             ?: run {
                 Timber.e("No sub-handle found in album URL")
@@ -595,12 +603,12 @@ internal class AlbumImportViewModel @Inject constructor(
     }
 
     /**
-     * Open file using Photo
+     * Open file using PhotoUiState
      * This method triggers the file opening event for the Compose view to handle
      *
-     * @param photo The Photo object representing the file to be opened
+     * @param photo The PhotoUiState representing the file to be opened
      */
-    fun openFile(photo: Photo) {
+    fun openFile(photo: PhotoUiState) {
         state.update {
             it.copy(openFileNodeEvent = triggered(photo))
         }
@@ -613,5 +621,20 @@ internal class AlbumImportViewModel @Inject constructor(
         state.update {
             it.copy(openFileNodeEvent = consumed())
         }
+    }
+
+    fun resetAlbumSelectionFinishedEvent() {
+        state.update {
+            it.copy(addToCloudDriveFinishedEvent = consumed)
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(albumLink: String?): AlbumImportViewModel
+    }
+
+    companion object {
+        const val ALBUM_LINK = "album_link"
     }
 }

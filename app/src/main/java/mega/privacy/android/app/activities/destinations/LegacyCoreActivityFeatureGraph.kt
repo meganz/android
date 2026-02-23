@@ -19,6 +19,7 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.nav
 import mega.privacy.android.app.presentation.contact.invite.navigation.inviteContactLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactAttachmentLegacyDestination
 import mega.privacy.android.app.presentation.contact.navigation.contactsLegacyDestination
+import mega.privacy.android.app.presentation.fileexplorer.fileExplorer
 import mega.privacy.android.app.presentation.filelink.legacyFileLinkScreen
 import mega.privacy.android.app.presentation.folderlink.legacyFolderLinkScreen
 import mega.privacy.android.app.presentation.imagepreview.legacyImageViewerScreen
@@ -70,7 +71,6 @@ class LegacyCoreActivityFeatureGraph(
             chatListLegacyDestination(navigationHandler::back)
             legacyAlbumCoverSelection(navigationHandler::returnResult)
             legacyAlbumPhotosSelection(navigationHandler::back, navigationHandler::returnResult)
-            legacyAlbumImport(navigationHandler::back)
             legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
             legacyImageViewerScreen(navigationHandler::back)
             legacyTextEditorScreen(navigationHandler::back)
@@ -99,5 +99,9 @@ class LegacyCoreActivityFeatureGraph(
             contactAttachmentLegacyDestination(navigationHandler::remove)
             businessExpiredAlertLegacyDestination(navigationHandler::back)
             leftMeetingDestination(navigationHandler::remove)
+            fileExplorer(
+                removeDestination = navigationHandler::remove,
+                returnResult = navigationHandler::returnResult
+            )
         }
 }

@@ -2344,4 +2344,42 @@
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s is available with yearly billing</string>
     <!-- Snackbar shown when user switches to yearly tab and the selected plan (e.g. Pro Lite) is only available with monthly billing. %1$s is the plan name. -->
     <string name="choose_account_screen_plan_available_monthly_billing">%1$s is available with monthly billing</string>
+    <!-- Top bar subtitle displayed when viewing a shared album link -->
+    <string name="album_import_screen_subtitle_album_link_text">Album link</string>
+    <!-- Error dialog title when the shared album link is invalid or deleted -->
+    <string name="album_import_error_access_dialog_title">Cannot access album</string>
+    <!-- Error dialog description when the shared album link is invalid or deleted -->
+    <string name="album_import_error_access_dialog_description">The link to the album has been removed or the album has been deleted. Contact the person who shared the link with you.</string>
+    <!-- Decryption key dialog title when album link requires a key to decrypt -->
+    <string name="album_import_input_decryption_key_dialog_title">Enter decryption key</string>
+    <!-- Decryption key dialog description when album link requires a key to decrypt -->
+    <string name="album_import_input_decryption_key_dialog_description">To access the album, enter the decryption key. If you don\’t have it, contact the person who shared the link with you.</string>
+    <!-- Rename dialog title when saving an album with a name that already exists -->
+    <string name="album_import_rename_album_dialog_title">Rename album</string>
+    <!-- Rename dialog description when saving an album with a name that already exists -->
+    <string name="album_import_rename_album_dialog_description">An album named \“%1$s\“ already exists in your Albums. Enter a new name for the album you\’re saving.</string>
+    <!-- Error message when user leaves the album name field empty in rename dialog -->
+    <string name="album_import_rename_album_dialog_empty_name_error">Enter an album name</string>
+    <!-- Progress text shown in the saving dialog while importing album to Cloud drive -->
+    <string name="album_import_saving_dialog_progress_text">Saving&#8230;</string>
+    <!-- Snackbar message shown when album is successfully saved to Cloud drive -->
+    <string name="album_import_snackbar_success_message">\“%1$s\“ saved to Cloud drive</string>
+    <!-- Snackbar message shown when album fails to save to Cloud drive -->
+    <string name="album_import_snackbar_error_message">\“%1$s\“ can\’t be saved to Cloud drive. Try again later and if the problem continues, contact the person who shared the link with you.</string>
+    <!-- Storage exceeded dialog title when user has insufficient storage for the album -->
+    <string name="album_import_storage_exceeded_dialog_title">Cannot save album</string>
+    <!-- Storage exceeded dialog description when user has insufficient storage for the album -->
+    <string name="album_import_storage_exceeded_dialog_description">You don\’t have enough storage to save this album to your Cloud drive. Upgrade now to get more storage.</string>
+    <!-- Brand name shown in empty/loading states (e.g. "MEGA - Loading") -->
+    <string name="photos_empty_screen_brand_name_text">MEGA</string>
+    <!-- Generic loading indicator text -->
+    <string name="photos_loading_indicator_text">Loading</string>
+    <!-- Error message shown when network is unavailable -->
+    <string name="photos_network_error_message">No network connection</string>
+    <!-- Save to Cloud drive button label in album import bottom bar -->
+    <string name="photos_save_to_cloud_drive_button_text">Save to Cloud drive</string>
+    <!-- Error message shown when user enters a duplicate album name -->
+    <string name="photos_create_album_duplicate_name_error">An album with this name already exists. Enter a different name.</string>
+    <!-- Error message shown when user enters a reserved/system album name -->
+    <string name="photos_create_album_proscribed_name_error">This album name is not allowed. Enter a different name.</string>
 </resources>

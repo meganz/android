@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
 data object MediaMainNavKey : MainNavItemNavKey
@@ -46,3 +47,6 @@ data class SelectVideosForPlaylistNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
 ) : NavKey, Parcelable
+
+@Serializable
+data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional

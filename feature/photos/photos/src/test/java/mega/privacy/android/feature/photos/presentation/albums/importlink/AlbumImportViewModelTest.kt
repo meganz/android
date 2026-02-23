@@ -1,6 +1,6 @@
-package mega.privacy.android.app.presentation.photos.albums.importlink
+package mega.privacy.android.feature.photos.presentation.albums.importlink
 
-import androidx.lifecycle.SavedStateHandle
+import android.content.Context
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -11,12 +11,10 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.TimberJUnit5Extension
-import mega.privacy.android.app.constants.StringsConstants.INVALID_CHARACTERS
-import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity.Companion.ALBUM_LINK
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -26,130 +24,110 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.ImportPublicAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.IsAlbumLinkValidUseCase
+import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
+import mega.privacy.android.feature.photos.model.PhotoUiState
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
-@ExtendWith(TimberJUnit5Extension::class)
+private const val INVALID_CHARACTERS = "\" * / : < > ? \\ |"
+
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AlbumImportViewModelTest {
+    private val testDispatcher = UnconfinedTestDispatcher()
+
     private lateinit var underTest: AlbumImportViewModel
 
-    private val mockSavedStateHandle: SavedStateHandle = mock()
-
-    private val mockHasCredentialsUseCaseUseCase: HasCredentialsUseCase = mock()
-
+    private val mockHasCredentialsUseCase: HasCredentialsUseCase = mock()
     private val mockGetUserAlbums: GetUserAlbums = mock()
-
     private val mockGetPublicAlbumUseCase: GetPublicAlbumUseCase = mock()
-
     private val mockGetPublicAlbumPhotoUseCase: GetPublicAlbumPhotoUseCase = mock()
-
-    private val mockDownloadPublicAlbumPhotoPreviewUseCase: DownloadPublicAlbumPhotoPreviewUseCase =
-        mock()
-
-    private val mockDownloadPublicAlbumPhotoThumbnailUseCase: DownloadPublicAlbumPhotoThumbnailUseCase =
-        mock()
-
     private val mockMonitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
-
     private val mockGetProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase = mock()
-
-    private val mockGetStringFromStringResMapper: GetStringFromStringResMapper = mock()
-
     private val mockImportPublicAlbumUseCase: ImportPublicAlbumUseCase = mock()
-
     private val mockIsAlbumLinkValidUseCase: IsAlbumLinkValidUseCase = mock()
-
     private val mockMonitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-
     private val mockGetPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase =
         mock()
-
-    private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase = mock()
+    private val mockGetPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase = mock()
+    private val mockGetCurrentStorageStateUseCase: GetCurrentStorageStateUseCase = mock()
+    private val mockContext: Context = mock()
+    private val mockPhotoUiStateMapper: PhotoUiStateMapper = mock()
 
     @BeforeEach
     fun setup() {
         whenever(mockMonitorConnectivityUseCase()).thenReturn(flowOf(false))
-        runBlocking { whenever(mockHasCredentialsUseCaseUseCase()).thenReturn(false) }
+        runBlocking { whenever(mockHasCredentialsUseCase()).thenReturn(false) }
+        whenever(mockContext.getString(any())).thenReturn("")
+        whenever(mockContext.getString(any(), anyOrNull())).thenReturn("")
         initUnderTest()
     }
 
-    private fun initUnderTest() {
+    private fun initUnderTest(albumLink: String? = null) {
         underTest = AlbumImportViewModel(
-            savedStateHandle = mockSavedStateHandle,
-            hasCredentialsUseCase = mockHasCredentialsUseCaseUseCase,
+            photoUiStateMapper = mockPhotoUiStateMapper,
+            hasCredentialsUseCase = mockHasCredentialsUseCase,
             getUserAlbums = mockGetUserAlbums,
             getPublicAlbumUseCase = mockGetPublicAlbumUseCase,
             getPublicAlbumPhotoUseCase = mockGetPublicAlbumPhotoUseCase,
-            downloadPublicAlbumPhotoPreviewUseCase = mockDownloadPublicAlbumPhotoPreviewUseCase,
-            downloadPublicAlbumPhotoThumbnailUseCase = mockDownloadPublicAlbumPhotoThumbnailUseCase,
-            monitorAccountDetailUseCase = mockMonitorAccountDetailUseCase,
             getProscribedAlbumNamesUseCase = mockGetProscribedAlbumNamesUseCase,
-            getStringFromStringResMapper = mockGetStringFromStringResMapper,
+            monitorAccountDetailUseCase = mockMonitorAccountDetailUseCase,
             importPublicAlbumUseCase = mockImportPublicAlbumUseCase,
             isAlbumLinkValidUseCase = mockIsAlbumLinkValidUseCase,
             monitorConnectivityUseCase = mockMonitorConnectivityUseCase,
-            defaultDispatcher = StandardTestDispatcher(),
             getPublicNodeFromSerializedDataUseCase = mockGetPublicNodeFromSerializedDataUseCase,
-            getPublicAlbumNodesDataUseCase = getPublicAlbumNodesDataUseCase,
+            getPublicAlbumNodesDataUseCase = mockGetPublicAlbumNodesDataUseCase,
+            getCurrentStorageStateUseCase = mockGetCurrentStorageStateUseCase,
+            context = mockContext,
+            defaultDispatcher = testDispatcher,
+            albumLink = albumLink,
         )
     }
 
     @AfterEach
     fun resetMocks() {
         reset(
-            mockSavedStateHandle,
-            mockHasCredentialsUseCaseUseCase,
+            mockHasCredentialsUseCase,
             mockGetUserAlbums,
             mockGetPublicAlbumUseCase,
             mockGetPublicAlbumPhotoUseCase,
-            mockDownloadPublicAlbumPhotoThumbnailUseCase,
             mockMonitorAccountDetailUseCase,
             mockGetProscribedAlbumNamesUseCase,
-            mockGetStringFromStringResMapper,
             mockImportPublicAlbumUseCase,
             mockIsAlbumLinkValidUseCase,
             mockMonitorConnectivityUseCase,
             mockGetPublicNodeFromSerializedDataUseCase,
-            getPublicAlbumNodesDataUseCase,
+            mockGetPublicAlbumNodesDataUseCase,
         )
     }
 
     @Test
     fun `test that show error access dialog if link is null`() = runTest {
-        // given
-        whenever(mockHasCredentialsUseCaseUseCase())
-            .thenReturn(false)
+        initUnderTest(albumLink = null)
 
-        // when
-        underTest.initialize()
-
-        // then
-        underTest.stateFlow.test {
-            val state = awaitItem()
-            assertThat(state.showErrorAccessDialog).isTrue()
+        underTest.stateFlow.drop(2).test {
+            assertThat(awaitItem().showErrorAccessDialog).isTrue()
         }
     }
 
@@ -157,56 +135,43 @@ class AlbumImportViewModelTest {
     fun `test that show decryption key dialog if link not contains key`() = runTest {
         val link = "https://mega.app/collection/handle"
 
-        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
-            .thenReturn(link)
+        whenever(mockHasCredentialsUseCase()).thenReturn(false)
 
-        whenever(mockHasCredentialsUseCaseUseCase())
-            .thenReturn(false)
+        initUnderTest(albumLink = link)
 
-        // when
-        underTest.initialize()
-
-        // then
-        underTest.stateFlow.drop(1).test {
-            val state = awaitItem()
-            assertThat(state.showInputDecryptionKeyDialog).isTrue()
+        underTest.stateFlow.drop(2).test {
+            assertThat(awaitItem().showInputDecryptionKeyDialog).isTrue()
         }
     }
 
     @Test
     fun `test that get public album works properly`() = runTest {
-        // given
         val link = "https://mega.app/collection/handle#key"
         val album = mock<UserAlbum>()
+        val photo = mock<Photo.Image>()
+        val photoUiState = mock<PhotoUiState.Image>()
 
-        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
-            .thenReturn(link)
-
-        whenever(mockHasCredentialsUseCaseUseCase())
-            .thenReturn(false)
+        whenever(mockHasCredentialsUseCase()).thenReturn(false)
 
         whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
             .thenReturn(album to listOf())
 
         whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
-            .thenReturn(listOf())
+            .thenReturn(listOf(photo))
 
-        // when
-        underTest.initialize()
+        whenever(mockPhotoUiStateMapper(photo)).thenReturn(photoUiState)
 
-        // then
-        underTest.stateFlow.drop(1).test {
-            val state = awaitItem()
-            assertThat(state.album).isEqualTo(album)
+        initUnderTest(albumLink = link)
+
+        underTest.stateFlow.drop(2).test {
+            assertThat(awaitItem().album).isEqualTo(album)
         }
     }
 
     @Test
     fun `test that close decryption key dialog works properly`() = runTest {
-        // when
         underTest.closeInputDecryptionKeyDialog()
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.showInputDecryptionKeyDialog).isFalse()
@@ -215,13 +180,10 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that select photo works properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
+        val photo = createPhotoUiState(id = 1L)
 
-        // when
         underTest.selectPhoto(photo)
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.selectedPhotos.size).isEqualTo(1)
@@ -230,13 +192,10 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that unselect photo works properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
+        val photo = createPhotoUiState(id = 1L)
 
-        // when
         underTest.unselectPhoto(photo)
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.selectedPhotos).doesNotContain(photo)
@@ -245,10 +204,8 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that clear selection works properly`() = runTest {
-        // when
         underTest.clearSelection()
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.selectedPhotos).isEmpty()
@@ -257,14 +214,10 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album name empty should show error`() = runTest {
-        // given
-        whenever(mockGetStringFromStringResMapper(any()))
-            .thenReturn("")
+        whenever(mockContext.getString(any())).thenReturn("error")
 
-        // when
         underTest.validateAlbumName(albumName = "")
 
-        // then
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
 
@@ -275,8 +228,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album name with dot should show error`() = runTest {
-        whenever(mockGetStringFromStringResMapper(any()))
-            .thenReturn(".")
+        whenever(mockContext.getString(any())).thenReturn(".")
 
         underTest.validateAlbumName(albumName = ".")
 
@@ -290,10 +242,10 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album name with double dot should show error`() = runTest {
-        whenever(mockGetStringFromStringResMapper(any()))
-            .thenReturn(".")
+        whenever(mockContext.getString(any())).thenReturn(".")
 
-        underTest.validateAlbumName(albumName = ".")
+        underTest.validateAlbumName(albumName = "..")
+
 
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
@@ -305,14 +257,11 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that album name contains invalid char should show error`() = runTest {
-        // given
-        whenever(mockGetStringFromStringResMapper(any(), any()))
-            .thenReturn("")
+        whenever(mockContext.getString(any(), anyOrNull())).thenReturn("error")
 
-        // when
         underTest.validateAlbumName(albumName = INVALID_CHARACTERS)
 
-        // then
+
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
 
@@ -323,17 +272,12 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that valid album name should not show error`() = runTest {
-        // given
-        whenever(mockGetProscribedAlbumNamesUseCase())
-            .thenReturn(listOf())
+        whenever(mockGetProscribedAlbumNamesUseCase()).thenReturn(listOf())
 
-        whenever(mockGetStringFromStringResMapper(any(), any()))
-            .thenReturn("")
+        whenever(mockContext.getString(any(), anyOrNull())).thenReturn("")
 
-        // when
         underTest.validateAlbumName(albumName = "My Album")
 
-        // then
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
 
@@ -344,10 +288,8 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that close rename album dialog works properly`() = runTest {
-        // when
         underTest.closeRenameAlbumDialog()
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.showRenameAlbumDialog).isFalse()
@@ -356,20 +298,17 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that conflict album name should show rename album dialog`() = runTest {
-        // given
         val conflictAlbumName = "My Album"
 
         val album = mock<UserAlbum> {
             on { title }.thenReturn(conflictAlbumName)
         }
-        val photos = listOf<Photo>()
+        val photos = listOf<PhotoUiState>()
 
         underTest.localAlbumNames = setOf(conflictAlbumName)
 
-        // when
         underTest.validateImportConstraint(album, photos)
 
-        // then
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
 
@@ -380,16 +319,12 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that import album works properly`() = runTest {
-        // given
         underTest.isNetworkConnected = true
 
-        whenever(mockGetStringFromStringResMapper(any(), any()))
-            .thenReturn("")
+        whenever(mockContext.getString(any(), anyOrNull())).thenReturn("")
 
-        // when
         underTest.importAlbum(targetParentFolderNodeId = NodeId(-1L))
 
-        // then
         underTest.stateFlow.test {
             repeat(2) { awaitItem() }
 
@@ -400,10 +335,8 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that clear import message works properly`() = runTest {
-        // when
         underTest.clearImportAlbumMessage()
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.importAlbumMessage).isNull()
@@ -412,26 +345,17 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that exceeds storage should show storage exceeds dialog`() = runTest {
-        // given
         val album = mock<UserAlbum>()
-        val photos = listOf<Photo>(
-            mock<Photo.Image> {
-                on { size }.thenReturn(100L)
-            },
-            mock<Photo.Image> {
-                on { size }.thenReturn(200L)
-            },
-            mock<Photo.Image> {
-                on { size }.thenReturn(300L)
-            }
+        val photos = listOf(
+            createPhotoUiState(id = 1L, size = 100L),
+            createPhotoUiState(id = 2L, size = 200L),
+            createPhotoUiState(id = 3L, size = 300L),
         )
 
         underTest.availableStorage = 500L
 
-        // when
         underTest.validateImportConstraint(album, photos)
 
-        // then
         underTest.stateFlow.test {
             repeat(1) { awaitItem() }
 
@@ -442,10 +366,8 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that close storage exceeded dialog works properly`() = runTest {
-        // when
         underTest.closeStorageExceededDialog()
 
-        // then
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.showStorageExceededDialog).isFalse()
@@ -456,9 +378,7 @@ class AlbumImportViewModelTest {
     fun `test that start download triggers the correct download event when start download is triggered`() =
         runTest {
             val handle = 1L
-            val photo = mock<Photo.Image> {
-                on { id } doReturn handle
-            }
+            val photo = createPhotoUiState(id = handle)
             val serializedData = "serializedNode"
             val megaNode = mock<MegaNode> {
                 on { serialize() } doReturn serializedData
@@ -466,12 +386,13 @@ class AlbumImportViewModelTest {
             underTest.selectPhoto(photo)
 
             val node = mock<PublicLinkFile>()
-            whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
+            whenever(mockGetPublicNodeFromSerializedDataUseCase(serializedData))
                 .thenReturn(node)
-            whenever(getPublicAlbumNodesDataUseCase())
+            whenever(mockGetPublicAlbumNodesDataUseCase())
                 .thenReturn(mapOf(NodeId(handle) to serializedData))
+
             underTest.stateFlow.test {
-                awaitItem() //initial
+                awaitItem()
                 underTest.startDownload()
                 val actual = awaitItem().downloadEvent
                 assertThat(actual).isInstanceOf(StateEventWithContentTriggered::class.java)
@@ -484,68 +405,53 @@ class AlbumImportViewModelTest {
         }
 
     @Test
-    fun `test that selection is cleared when start download is invoked and DownloadWorker feature flag is true`() =
-        runTest {
-            stubSelectedTypedNode()
-            underTest.stateFlow.test {
-                underTest.startDownload()
-                assertThat(awaitItem().selectedPhotos).isNotEmpty()
-                underTest.clearSelection()
-                val actual =
-                    (cancelAndConsumeRemainingEvents().last() as Event.Item).value.selectedPhotos
-                assertThat(actual).isEmpty()
-            }
+    fun `test that selection is cleared when start download is invoked`() = runTest {
+        stubSelectedTypedNode()
+        underTest.stateFlow.test {
+            underTest.startDownload()
+            assertThat(awaitItem().selectedPhotos).isNotEmpty()
+            underTest.clearSelection()
+            val actual =
+                (cancelAndConsumeRemainingEvents().last() as Event.Item).value.selectedPhotos
+            assertThat(actual).isEmpty()
         }
+    }
 
     @Test
-    fun `test that download event is consumed properly`() =
-        runTest {
-            stubSelectedTypedNode()
-            underTest.stateFlow.test {
-                awaitItem() //initial
-                underTest.startDownload()
-                assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
-                awaitItem() //clear selection
-                underTest.consumeDownloadEvent()
-                assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
-            }
+    fun `test that download event is consumed properly`() = runTest {
+        stubSelectedTypedNode()
+        underTest.stateFlow.test {
+            awaitItem()
+            underTest.startDownload()
+            assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentTriggered::class.java)
+            awaitItem()
+            underTest.consumeDownloadEvent()
+            assertThat(awaitItem().downloadEvent).isInstanceOf(StateEventWithContentConsumed::class.java)
         }
+    }
 
     @Test
     fun `test that handleSharedAlbumLink handles link without sub-handle`() = runTest {
         val album = mock<UserAlbum>()
         val albumLink = "https://mega.app/collection/handle#key!"
-        setupAlbumWithLink(albumLink, album, emptyList())
 
-        underTest.initialize()
+        whenever(mockHasCredentialsUseCase()).thenReturn(false)
+        whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(albumLink)))
+            .thenReturn(album to listOf())
+        whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+            .thenReturn(emptyList())
 
-        underTest.stateFlow.test {
-            val state = awaitItem()
-            assertThat(state.folderSubHandle).isNull()
-        }
-    }
-
-    @Test
-    fun `test that handleSharedAlbumLink handles link with empty sub-handle`() = runTest {
-        val album = mock<UserAlbum>()
-        val albumLink = "https://mega.app/collection/handle#key!"
-        setupAlbumWithLink(albumLink, album, emptyList())
-
-        underTest.initialize()
+        initUnderTest(albumLink = albumLink)
 
         underTest.stateFlow.test {
             val state = awaitItem()
             assertThat(state.folderSubHandle).isNull()
-            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `test that handleSharedAlbumLink handles null link`() = runTest {
-        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
-            .thenReturn(null)
-
-        underTest.initialize()
+        initUnderTest(albumLink = null)
 
         underTest.stateFlow.test {
             val state = awaitItem()
@@ -555,10 +461,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that handleSharedAlbumLink handles blank link`() = runTest {
-        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK))
-            .thenReturn("")
-
-        underTest.initialize()
+        initUnderTest(albumLink = "")
 
         underTest.stateFlow.test {
             val state = awaitItem()
@@ -568,7 +471,7 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that openFile triggers file opening event`() = runTest {
-        val photo = mock<Photo.Image>()
+        val photo = createPhotoUiState(id = 1L)
 
         underTest.openFile(photo)
 
@@ -582,8 +485,8 @@ class AlbumImportViewModelTest {
 
     @Test
     fun `test that openFile event can be triggered multiple times`() = runTest {
-        val photo1 = mock<Photo.Image>()
-        val photo2 = mock<Photo.Image>()
+        val photo1 = createPhotoUiState(id = 1L)
+        val photo2 = createPhotoUiState(id = 2L)
 
         underTest.stateFlow.test {
             awaitItem()
@@ -606,17 +509,18 @@ class AlbumImportViewModelTest {
     fun `test that album with sub-handle opens specific photo on initialization`() = runTest {
         val albumLink = "https://mega.app/collection/handle#key!subHandle123"
         val album = mock<UserAlbum>()
-        val photo1 = mock<Photo.Image> {
-            on { base64Id } doReturn "differentHandle"
-        }
-        val photo2 = mock<Photo.Image> {
-            on { base64Id } doReturn "subHandle123"
-        }
+        val photo1 = createPhotoUiState(id = 1L, base64Id = "differentHandle")
+        val photo2 = createPhotoUiState(id = 2L, base64Id = "subHandle123")
         val photos = listOf(photo1, photo2)
 
-        setupAlbumWithLink(albumLink, album, photos)
+        whenever(mockHasCredentialsUseCase()).thenReturn(false)
+        whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(albumLink)))
+            .thenReturn(album to listOf())
+        whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+            .thenReturn(listOf(mock<Photo.Image>(), mock<Photo.Image>()))
+        whenever(mockPhotoUiStateMapper(any())).thenReturn(photo1, photo2)
 
-        initUnderTest()
+        initUnderTest(albumLink = albumLink)
 
         underTest.stateFlow.drop(1).test {
             val state = awaitItem()
@@ -634,17 +538,17 @@ class AlbumImportViewModelTest {
     fun `test that album without matching sub-handle does not open any photo`() = runTest {
         val albumLink = "https://mega.app/collection/handle#key!nonexistentHandle"
         val album = mock<UserAlbum>()
-        val photo1 = mock<Photo.Image> {
-            on { base64Id } doReturn "handle1"
-        }
-        val photo2 = mock<Photo.Image> {
-            on { base64Id } doReturn "handle2"
-        }
-        val photos = listOf(photo1, photo2)
+        val photo1 = createPhotoUiState(id = 1L, base64Id = "handle1")
+        val photo2 = createPhotoUiState(id = 2L, base64Id = "handle2")
 
-        setupAlbumWithLink(albumLink, album, photos)
+        whenever(mockHasCredentialsUseCase()).thenReturn(false)
+        whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(albumLink)))
+            .thenReturn(album to listOf())
+        whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+            .thenReturn(listOf(mock<Photo.Image>(), mock<Photo.Image>()))
+        whenever(mockPhotoUiStateMapper(any())).thenReturn(photo1, photo2)
 
-        initUnderTest()
+        initUnderTest(albumLink = albumLink)
 
         underTest.stateFlow.drop(1).test {
             val state = awaitItem()
@@ -656,43 +560,51 @@ class AlbumImportViewModelTest {
         }
     }
 
-    private suspend fun setupAlbumWithLink(
-        albumLink: String,
-        album: UserAlbum,
-        photos: List<Photo>,
-    ) {
-        whenever(mockSavedStateHandle.get<String>(ALBUM_LINK)).thenReturn(albumLink)
-        whenever(mockHasCredentialsUseCaseUseCase()).thenReturn(false)
-        whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(albumLink)))
-            .thenReturn(album to listOf())
-        whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
-            .thenReturn(photos)
-    }
-
     private suspend fun stubSelectedTypedNode(): TypedNode {
-        val megaNode = stubSelectedMegaNode()
-        val node = mock<PublicLinkFile>()
-        whenever(mockGetPublicNodeFromSerializedDataUseCase(megaNode.serialize()))
-            .thenReturn(node)
-        return node
-    }
-
-    private fun stubSelectedMegaNode(): MegaNode {
         val handle = 1L
-        val photo = mock<Photo.Image> {
-            on { id } doReturn handle
-        }
+        val photo = createPhotoUiState(id = handle)
         val serializedData = "serializedNode"
         val megaNode = mock<MegaNode> {
             on { serialize() } doReturn serializedData
         }
+        val node = mock<PublicLinkFile>()
+        whenever(mockGetPublicNodeFromSerializedDataUseCase(serializedData))
+            .thenReturn(node)
+        whenever(mockGetPublicAlbumNodesDataUseCase())
+            .thenReturn(mapOf(NodeId(handle) to serializedData))
         underTest.selectPhoto(photo)
-        return megaNode
+        return node
+    }
+
+    private fun createPhotoUiState(
+        id: Long,
+        size: Long = 0L,
+        base64Id: String? = null,
+    ): PhotoUiState.Image {
+        return PhotoUiState.Image(
+            id = id,
+            albumPhotoId = null,
+            parentId = 0L,
+            name = "photo",
+            isFavourite = false,
+            creationTime = LocalDateTime.now(),
+            modificationTime = LocalDateTime.now(),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo("image/jpeg", "jpg"),
+            size = size,
+            isTakenDown = false,
+            isSensitive = false,
+            isSensitiveInherited = false,
+            base64Id = base64Id,
+        )
     }
 
     companion object {
+        private val testDispatcher = StandardTestDispatcher()
+
         @JvmField
         @RegisterExtension
-        val extension = CoroutineMainDispatcherExtension(StandardTestDispatcher())
+        val extension = CoroutineMainDispatcherExtension(testDispatcher)
     }
 }

@@ -240,9 +240,6 @@ data class AlbumGetLinkNavKey(val albumId: Long) : NavKey
 data class AlbumGetMultipleLinksNavKey(val albumIds: Set<Long>) : NavKey
 
 @Serializable
-data class LegacyAlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
-
-@Serializable
 data class LegacyPdfViewerNavKey(
     val nodeHandle: Long,
     val nodeContentUri: NodeContentUri,
@@ -393,3 +390,10 @@ data class LeftMeetingNavKey(
     val callEndedDueToFreePlanLimits: Boolean = false,
     val callEndedDueToTooManyParticipants: Boolean = false,
 ) : NoSessionNavKey.Optional
+
+@Serializable
+data class FileExplorerNavKey(val action: String) : NavKey {
+    companion object {
+        const val RESULT_FOLDER_HANDLE = "result_folder_handle"
+    }
+}

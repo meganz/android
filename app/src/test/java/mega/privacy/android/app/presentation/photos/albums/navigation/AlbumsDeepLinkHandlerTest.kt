@@ -5,7 +5,7 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
+import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -31,7 +31,7 @@ class AlbumsDeepLinkHandlerTest {
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "mega://albumLink"
-        val expected = LegacyAlbumImportNavKey(link = uriString)
+        val expected = AlbumImportNavKey(link = uriString)
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }

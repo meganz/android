@@ -39,5 +39,9 @@ class MediaFeatureDestination : FeatureDestination {
             albumGetLink(navigationHandler = navigationHandler)
             albumGetMultipleLinks(navigationHandler = navigationHandler)
             selectVideosForPlaylistScreen(navigationHandler = navigationHandler)
+            albumImports(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
         }
 }

@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
+import dagger.hilt.android.lifecycle.withCreationCallback
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -20,8 +21,8 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.passcode.model.PasscodeCryptObjectFactory
 import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
-import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportScreen
-import mega.privacy.android.app.presentation.photos.albums.importlink.AlbumImportViewModel
+import mega.privacy.android.feature.photos.presentation.albums.importlink.AlbumImportScreen
+import mega.privacy.android.feature.photos.presentation.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.app.presentation.photos.albums.importlink.ImagePreviewProvider
 import mega.privacy.android.app.presentation.psa.PsaContainer
 import mega.privacy.android.app.presentation.security.check.PasscodeContainer
@@ -191,10 +192,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                         }
                     },
                     onPreviewPhoto = {
-                        imagePreviewProvider.onPreviewPhoto(
-                            activity = this,
-                            photo = it,
-                        )
+                        // Todo: This screen will be removed
                     },
                     onNavigateFileExplorer = {
                         val intent = Intent(this, FileExplorerActivity::class.java).apply {
@@ -205,15 +203,11 @@ class AlbumScreenWrapperActivity : BaseActivity() {
                     onUpgradeAccount = {
                         megaNavigator.openUpgradeAccount(context = this)
                     },
-                    onBack = { isBackToHome ->
-                        if (isBackToHome) {
-                            megaNavigator.openManagerActivity(
-                                this,
-                                singleActivityDestination = null, //just go back to MegaActivity
-                            )
-                        }
-                        finish()
+                    onBack = { finish() },
+                    onTransfer = {
+                        // Todo: This screen will be removed
                     },
+                    showOverDiskQuotaPaywallWarning = ::showOverDiskQuotaPaywallWarning,
                 )
             }
 
@@ -238,7 +232,13 @@ class AlbumScreenWrapperActivity : BaseActivity() {
      * Start: Import album block
      */
 
-    private val albumImportViewModel: AlbumImportViewModel by viewModels()
+    private val albumImportViewModel: AlbumImportViewModel by viewModels(
+        extrasProducer = {
+            defaultViewModelCreationExtras.withCreationCallback<AlbumImportViewModel.Factory> { factory ->
+                factory.create(intent.getStringExtra(ALBUM_LINK))
+            }
+        }
+    )
 
     private val selectFolderLauncher =
         registerForActivityResult(StartActivityForResult()) exit@{ result ->
@@ -319,7 +319,7 @@ class AlbumScreenWrapperActivity : BaseActivity() {
             albumLink: AlbumLink,
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumImportScreen.name)
-            putExtra(ALBUM_LINK, albumLink.link)
+            putExtra(AlbumImportViewModel.ALBUM_LINK, albumLink.link)
         }
     }
 }

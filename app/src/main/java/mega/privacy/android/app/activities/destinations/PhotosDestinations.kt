@@ -2,7 +2,6 @@ package mega.privacy.android.app.activities.destinations
 
 import android.app.Activity
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
@@ -26,13 +25,11 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPL
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
-import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotoSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
@@ -89,30 +86,6 @@ fun EntryProviderScope<NavKey>.legacyAlbumPhotosSelection(
                 // Immediately pop this destination from the back stack
                 removeDestination()
             }
-        }
-    }
-}
-
-fun EntryProviderScope<NavKey>.legacyAlbumImport(
-    removeDestination: () -> Unit,
-) {
-    entry<LegacyAlbumImportNavKey>(
-        metadata = transparentMetadata()
-    ) { key ->
-        val context = LocalContext.current
-
-        LaunchedEffect(Unit) {
-            val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
-                context = context,
-                albumLink = AlbumLink(key.link.orEmpty()),
-            ).apply {
-                flags = FLAG_ACTIVITY_CLEAR_TOP
-            }
-
-            context.startActivity(intent)
-
-            // Immediately pop this destination from the back stack
-            removeDestination()
         }
     }
 }

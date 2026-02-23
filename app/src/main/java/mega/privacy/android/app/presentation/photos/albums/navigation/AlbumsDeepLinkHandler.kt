@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.ALBUM_LINK
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.LegacyAlbumImportNavKey
+import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import javax.inject.Inject
 
 class AlbumsDeepLinkHandler @Inject constructor(
@@ -17,7 +17,7 @@ class AlbumsDeepLinkHandler @Inject constructor(
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = when (regexPatternType) {
         ALBUM_LINK -> {
-            listOf(LegacyAlbumImportNavKey(uri.toString()))
+            listOf(AlbumImportNavKey(uri.toString()))
         }
 
         else -> {

@@ -14,12 +14,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
@@ -33,6 +36,8 @@ import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetL
 import mega.privacy.android.feature.photos.presentation.albums.getlink.AlbumGetLinkViewModel
 import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.feature.photos.presentation.albums.getmultiplelinks.AlbumGetMultipleLinksViewModel
+import mega.privacy.android.feature.photos.presentation.albums.importlink.AlbumImportScreen
+import mega.privacy.android.feature.photos.presentation.albums.importlink.AlbumImportViewModel
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
@@ -50,15 +55,20 @@ import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
 import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
+import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
+import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -324,7 +334,7 @@ fun EntryProviderScope<NavKey>.cameraUploadsProgressRoute(
 }
 
 fun EntryProviderScope<NavKey>.albumGetLink(
-    navigationHandler: NavigationHandler
+    navigationHandler: NavigationHandler,
 ) {
     entry<AlbumGetLinkNavKey> { args ->
         val context = LocalContext.current
@@ -357,7 +367,7 @@ fun EntryProviderScope<NavKey>.albumGetLink(
 }
 
 fun EntryProviderScope<NavKey>.albumGetMultipleLinks(
-    navigationHandler: NavigationHandler
+    navigationHandler: NavigationHandler,
 ) {
     entry<AlbumGetMultipleLinksNavKey> { args ->
         val context = LocalContext.current
@@ -403,6 +413,75 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
             },
             onBack = navigationHandler::back,
             viewModel = viewModel
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.albumImports(
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+) {
+    entry<AlbumImportNavKey> { args ->
+        val fileExplorerResultFlow by navigationHandler
+            .monitorResult<Long?>(FileExplorerNavKey.RESULT_FOLDER_HANDLE)
+            .collectAsStateWithLifecycle(null)
+        val context = LocalContext.current
+        val albumImportViewModel: AlbumImportViewModel =
+            hiltViewModel<AlbumImportViewModel, AlbumImportViewModel.Factory> {
+                it.create(args.link)
+            }
+        val uiState by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
+
+        LaunchedEffect(fileExplorerResultFlow) {
+            fileExplorerResultFlow?.let {
+                albumImportViewModel.importAlbum(NodeId(it))
+            }
+        }
+
+        EventEffect(
+            event = uiState.addToCloudDriveFinishedEvent,
+            onConsumed = albumImportViewModel::resetAlbumSelectionFinishedEvent,
+            action = {
+                navigationHandler.clearResult(FileExplorerNavKey.RESULT_FOLDER_HANDLE)
+                navigationHandler.navigateAndClearBackStack(DriveSyncNavKey())
+            }
+        )
+
+        AlbumImportScreen(
+            albumImportViewModel = albumImportViewModel,
+            onShareLink = { link ->
+                if (uiState.storageState == StorageState.PayWall) {
+                    navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
+                } else {
+                    with(context) {
+                        val intent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, link)
+                        }
+                        val shareIntent = Intent.createChooser(
+                            intent,
+                            getString(sharedR.string.general_share)
+                        )
+                        startActivity(shareIntent)
+                    }
+                }
+            },
+            onPreviewPhoto = {
+                navigationHandler.navigate(LegacyImagePreviewNavKey(setOf(it.id), it.id))
+            },
+            onNavigateFileExplorer = {
+                navigationHandler.navigate(
+                    FileExplorerNavKey(action = "ACTION_IMPORT_ALBUM")
+                )
+            },
+            onUpgradeAccount = {
+                navigationHandler.navigate(UpgradeAccountNavKey())
+            },
+            onBack = navigationHandler::back,
+            onTransfer = onTransfer,
+            showOverDiskQuotaPaywallWarning = {
+                navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
+            }
         )
     }
 }
