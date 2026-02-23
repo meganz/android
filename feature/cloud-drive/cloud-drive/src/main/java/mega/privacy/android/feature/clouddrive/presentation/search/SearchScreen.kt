@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.search
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +35,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
@@ -87,6 +89,9 @@ fun SearchScreen(
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator,
     )
+    BackHandler(enabled = uiState.isInSelectionMode) {
+        viewModel.processAction(SearchUiAction.DeselectAllItems)
+    }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val snackbarHostState = LocalSnackBarHostState.current
@@ -134,11 +139,12 @@ fun SearchScreen(
         }
     ) { contentPadding ->
         SearchContent(
-            modifier = Modifier.pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    localFocusManager.clearFocus()
-                })
-            },
+            modifier = Modifier
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = {
+                        localFocusManager.clearFocus()
+                    })
+                },
             uiState = uiState,
             contentPadding = contentPadding,
             isListView = isListView,
@@ -313,7 +319,9 @@ fun SearchContent(
     ) {
         if (uiState.isFilterAllowed) {
             SearchFilterChips(
-                modifier = Modifier.padding(vertical = 12.dp),
+                modifier = Modifier
+                    .applyScrollToHideBehavior()
+                    .padding(vertical = 12.dp),
                 typeFilterOption = uiState.typeFilterOption,
                 dateModifiedFilterOption = uiState.dateModifiedFilterOption,
                 dateAddedFilterOption = uiState.dateAddedFilterOption,

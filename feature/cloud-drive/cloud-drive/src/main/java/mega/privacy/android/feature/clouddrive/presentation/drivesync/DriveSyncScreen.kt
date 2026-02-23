@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -21,11 +20,12 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -34,11 +34,8 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
-import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
 import mega.privacy.android.core.sharedcomponents.extension.excludeTopPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
-import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
-import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -94,7 +91,6 @@ internal fun DriveSyncScreen(
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(initialTabIndex) }
     var showSyncSettings by rememberSaveable { mutableStateOf(false) }
-    val scrollToHideState = rememberScrollToHideState()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
@@ -169,11 +165,8 @@ internal fun DriveSyncScreen(
 
             AddContentFab(
                 modifier = Modifier
-                    .animateFloatingActionButton(
-                        visible = !scrollToHideState.shouldHide,
-                        alignment = Alignment.BottomEnd,
-                    )
-                    .testTag(DRIVE_SYNCS_FAB_TAG),
+                    .testTag(DRIVE_SYNCS_FAB_TAG)
+                    .applyScrollToHideFabBehavior(),
                 visible = showFab,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -182,13 +175,12 @@ internal fun DriveSyncScreen(
             )
         },
     ) { paddingValues ->
-        MegaScrollableTabRow(
+        MegaCollapsibleTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .scrollToHide(scrollToHideState)
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = cloudDriveUiState.isInSelectionMode || scrollToHideState.shouldHide,
+            hideTabs = cloudDriveUiState.isInSelectionMode,
             pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
@@ -261,13 +253,10 @@ internal fun DriveSyncScreen(
             },
             initialSelectedIndex = initialTabIndex,
             onTabSelected = {
-                if (selectedTabIndex != it) {
-                    scrollToHideState.show()
-                    selectedTabIndex = it
-                    when (selectedTabIndex) {
-                        0 -> Analytics.tracker.trackEvent(CloudDriveTabEvent)
-                        1 -> Analytics.tracker.trackEvent(SyncsTabEvent)
-                    }
+                selectedTabIndex = it
+                when (selectedTabIndex) {
+                    0 -> Analytics.tracker.trackEvent(CloudDriveTabEvent)
+                    1 -> Analytics.tracker.trackEvent(SyncsTabEvent)
                 }
                 true
             }
