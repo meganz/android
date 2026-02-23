@@ -23,9 +23,11 @@ internal class MediaRecorderFacade @Inject constructor(
 
     override fun stopRecording() {
         androidMediaRecorder?.let {
-            runCatching { it.stop() }
-            it.reset()
-            it.release()
+            runCatching {
+                it.stop()
+                it.reset()
+                it.release()
+            }
         }
         androidMediaRecorder = null
     }
