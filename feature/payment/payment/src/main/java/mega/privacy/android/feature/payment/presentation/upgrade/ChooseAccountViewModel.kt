@@ -68,15 +68,17 @@ class ChooseAccountViewModel @Inject constructor(
                     emptyList()
                 )
             }
-            val localisedSubscriptions = monthlySubscriptions.associateWith { monthlySubscription ->
-                yearlySubscriptions.firstOrNull { it.accountType == monthlySubscription.accountType }
-            }.mapNotNull { (monthlySubscription, yearlySubscription) ->
-                yearlySubscription?.let {
+            val allAccountTypes = (monthlySubscriptions.map { it.accountType } +
+                    yearlySubscriptions.map { it.accountType }).distinct().sorted()
+            val localisedSubscriptions = allAccountTypes.mapNotNull { accountType ->
+                val monthly = monthlySubscriptions.firstOrNull { it.accountType == accountType }
+                val yearly = yearlySubscriptions.firstOrNull { it.accountType == accountType }
+                if (monthly != null || yearly != null) {
                     localisedSubscriptionMapper(
-                        monthlySubscription = monthlySubscription,
-                        yearlySubscription = yearlySubscription
+                        monthlySubscription = monthly,
+                        yearlySubscription = yearly
                     )
-                }
+                } else null
             }
             _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
         }
@@ -88,10 +90,10 @@ class ChooseAccountViewModel @Inject constructor(
                 }
             _state.update {
                 it.copy(
-                    cheapestSubscriptionAvailable = cheapestSubscriptionAvailable?.let { cheapestSubscriptionAvailable ->
+                    cheapestSubscriptionAvailable = cheapestSubscriptionAvailable?.let { cheapest ->
                         localisedSubscriptionMapper(
-                            cheapestSubscriptionAvailable,
-                            cheapestSubscriptionAvailable
+                            monthlySubscription = cheapest,
+                            yearlySubscription = cheapest
                         )
                     }
                 )

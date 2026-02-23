@@ -31,12 +31,13 @@ data class ChooseAccountState(
     fun hasDiscount() = localisedSubscriptionsList.any {
         when (subscriptionCycle) {
             AccountSubscriptionCycle.MONTHLY ->
-                it.yearlySubscription.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
+                it.yearlySubscription?.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
 
             AccountSubscriptionCycle.YEARLY ->
-                it.monthlySubscription.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
+                it.monthlySubscription?.discountedAmountMonthly != null && it.accountType != currentSubscriptionPlan
 
-            else -> (it.monthlySubscription.discountedAmountMonthly != null || it.yearlySubscription.discountedAmountMonthly != null)
+            else -> (it.monthlySubscription?.discountedAmountMonthly != null ||
+                    it.yearlySubscription?.discountedAmountMonthly != null)
                     && it.accountType != currentSubscriptionPlan
         }
     }

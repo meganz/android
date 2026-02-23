@@ -123,10 +123,38 @@ fun NewChooseAccountScreen(
 
     val hasDiscount = remember(uiState) { uiState.hasDiscount() }
 
-    LaunchedEffect(uiState.localisedSubscriptionsList, uiState.currentSubscriptionPlan) {
+    // pre select discounted plan if user has discount and no plan is currently selected
+    LaunchedEffect(uiState.localisedSubscriptionsList) {
         if (chosenPlan == null) {
             uiState.localisedSubscriptionsList.find { it.hasDiscount }?.let {
                 chosenPlan = it.accountType
+            }
+        }
+    }
+
+    // if the user changes billing period, check if the currently selected plan is available for that period. If not, unselect the plan and show a message.
+    LaunchedEffect(uiState.localisedSubscriptionsList, isMonthly) {
+        val plan = chosenPlan
+        if (plan != null) {
+            val selectedSubscription = uiState.localisedSubscriptionsList.find {
+                it.accountType == plan
+            }
+            val isPlanAvailable = selectedSubscription?.hasSubscriptionFor(isMonthly) == true
+            if (!isPlanAvailable) {
+                val planName = context.getString(plan.toUIAccountType().textValue)
+                val message = if (selectedSubscription?.hasSubscriptionFor(true) == true) {
+                    context.getString(
+                        sharedR.string.choose_account_screen_plan_available_monthly_billing,
+                        planName
+                    )
+                } else {
+                    context.getString(
+                        sharedR.string.choose_account_screen_plan_available_yearly_billing,
+                        planName
+                    )
+                }
+                chosenPlan = null
+                snackBarHostState.showAutoDurationSnackbar(message)
             }
         }
     }
@@ -201,20 +229,23 @@ fun NewChooseAccountScreen(
                 }?.let { accountType ->
                     val selectedSubscription = uiState.localisedSubscriptionsList
                         .find { sub -> sub.accountType == chosenPlan }
+                    val subscriptionForPeriod = selectedSubscription?.getSubscription(isMonthly)
 
-                    BuyPlanBottomBar(
-                        accountType = accountType,
-                        isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                        isExternalCheckoutDefault = isExternalCheckoutDefault,
-                        userAgeComplianceStatus = userAgeComplianceStatus,
-                        selectedSubscription = selectedSubscription,
-                        isMonthly = isMonthly,
-                        onInAppCheckoutClick = onInAppCheckoutClick,
-                        onExternalCheckoutClick = { subscription ->
-                            onExternalCheckoutClick(subscription, isMonthly)
-                        },
-                        isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
-                    )
+                    if (subscriptionForPeriod != null) {
+                        BuyPlanBottomBar(
+                            accountType = accountType,
+                            isExternalCheckoutEnabled = isExternalCheckoutEnabled,
+                            isExternalCheckoutDefault = isExternalCheckoutDefault,
+                            userAgeComplianceStatus = userAgeComplianceStatus,
+                            selectedSubscription = selectedSubscription,
+                            isMonthly = isMonthly,
+                            onInAppCheckoutClick = onInAppCheckoutClick,
+                            onExternalCheckoutClick = { subscription ->
+                                onExternalCheckoutClick(subscription, isMonthly)
+                            },
+                            isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
+                        )
+                    }
                 }
             }
         }

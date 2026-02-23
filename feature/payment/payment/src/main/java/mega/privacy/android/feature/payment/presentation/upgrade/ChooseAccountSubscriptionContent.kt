@@ -118,7 +118,10 @@ internal fun LazyListScope.subscriptionAvailableContent(
     if (uiState.localisedSubscriptionsList.isEmpty() || uiState.isSubscriptionFeatureAvailable != true) {
         upgradeAccountSkeleton(itemCount = 3)
     } else {
-        itemsIndexed(uiState.localisedSubscriptionsList) { index, subscription ->
+        val subscriptionsForPeriod = uiState.localisedSubscriptionsList.filter {
+            it.hasSubscriptionFor(isMonthly)
+        }
+        itemsIndexed(subscriptionsForPeriod) { index, subscription ->
             val isRecommended = !hasDiscount
                     && uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
             val storageFormattedSize = subscription.formatStorageSize()
@@ -141,8 +144,7 @@ internal fun LazyListScope.subscriptionAvailableContent(
                 subscription.localisePriceOfYearlyAmountPerMonth(locale)
             } else null
 
-            val currentSubscription =
-                if (isMonthly) subscription.monthlySubscription else subscription.yearlySubscription
+            val currentSubscription = subscription.getSubscription(isMonthly)!!
             val discountPercentage = currentSubscription.discountedPercentage
             val offerPeriod = currentSubscription.offerPeriod
             val discountedPriceMonthly =

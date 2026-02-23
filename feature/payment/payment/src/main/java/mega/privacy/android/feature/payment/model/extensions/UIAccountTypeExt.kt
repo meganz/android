@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.payment.model.extensions
 
-import androidx.compose.runtime.Composable
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.model.UIAccountType
 
@@ -9,7 +8,6 @@ import mega.privacy.android.feature.payment.model.UIAccountType
  * Starter, Basic and Essential AccountType should not be mapped to any UIAccountType.
  * @return Converted UIAccountType.
  */
-@Composable
 fun AccountType.toUIAccountType(): UIAccountType {
     return when (this) {
         AccountType.FREE -> UIAccountType.FREE

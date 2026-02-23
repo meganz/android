@@ -143,6 +143,80 @@ class ChooseAccountViewModelTest {
     }
 
     @Test
+    fun `test that initial state includes plan available only with yearly billing`() = runTest {
+        val monthlyOnlyProIProIIProIII = listOf(
+            subscriptionProIMonthly,
+            subscriptionProIIMonthly,
+            subscriptionProIIIMonthly
+        )
+        val yearlyWithProLite = listOf(
+            subscriptionProLiteYearly,
+            subscriptionProIYearly,
+            subscriptionProIIYearly,
+            subscriptionProIIIYearly
+        )
+        val expectedList = listOf(
+            LocalisedSubscription(
+                monthlySubscription = null,
+                yearlySubscription = subscriptionProLiteYearly,
+                localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                formattedSize = formattedSizeMapper,
+            ),
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(monthlyOnlyProIProIIProIII, yearlyWithProLite)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+        }
+    }
+
+    @Test
+    fun `test that initial state includes plan available only with monthly billing`() = runTest {
+        val monthlyWithProLite = listOf(
+            subscriptionProLiteMonthly,
+            subscriptionProIMonthly,
+            subscriptionProIIMonthly,
+            subscriptionProIIIMonthly
+        )
+        val yearlyOnlyProIProIIProIII = listOf(
+            subscriptionProIYearly,
+            subscriptionProIIYearly,
+            subscriptionProIIIYearly
+        )
+        val expectedList = listOf(
+            LocalisedSubscription(
+                monthlySubscription = subscriptionProLiteMonthly,
+                yearlySubscription = null,
+                localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+                formattedSize = formattedSizeMapper,
+            ),
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(monthlyWithProLite, yearlyOnlyProIProIIProIII)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
+        initViewModel()
+        underTest.state.map { it.localisedSubscriptionsList }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expectedList)
+        }
+    }
+
+    @Test
     fun `test that initial state has cheapest Pro plan`() = runTest {
         val expectedResult = LocalisedSubscription(
             monthlySubscription = subscriptionProLiteMonthly,
