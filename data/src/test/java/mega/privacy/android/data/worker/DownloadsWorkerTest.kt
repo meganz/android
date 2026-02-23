@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.transfers.MonitorActiveAndPendingTran
 import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfersIfFinishedUseCase
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import org.junit.jupiter.api.AfterAll
@@ -95,7 +96,7 @@ class DownloadsWorkerTest {
         mock<TransfersActionGroupProgressNotificationBuilder>()
     private val transfersProgressNotificationSummaryBuilder =
         mock<TransfersProgressNotificationSummaryBuilder>()
-    private val displayPathFromUriCache = mock<HashMap<String, String>>()
+    private val clearCompletedTransfersCacheUseCase = mock<ClearCompletedTransfersCacheUseCase>()
 
     @BeforeAll
     fun setup() {
@@ -143,7 +144,7 @@ class DownloadsWorkerTest {
             transfersActionGroupProgressNotificationBuilder = transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder = transfersProgressNotificationSummaryBuilder,
             loginMutex = mock(),
-            displayPathFromUriCache = displayPathFromUriCache,
+            clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
             deleteActiveTransferGroupUseCase = mock(),
         )
     }
@@ -170,7 +171,7 @@ class DownloadsWorkerTest {
             transfersFinishNotificationSummaryBuilder,
             transfersActionGroupProgressNotificationBuilder,
             transfersProgressNotificationSummaryBuilder,
-            displayPathFromUriCache,
+            clearCompletedTransfersCacheUseCase,
         )
     }
 
@@ -296,7 +297,7 @@ class DownloadsWorkerTest {
             val transferTotal = mockActiveTransferTotals(true)
             commonStub(transferTotals = listOf(transferTotal))
             underTest.doWork()
-            verify(displayPathFromUriCache).clear()
+            verify(clearCompletedTransfersCacheUseCase).invoke()
         }
 
     @Test

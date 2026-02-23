@@ -39,6 +39,7 @@ import mega.privacy.android.domain.usecase.transfers.active.MonitorOngoingActive
 import mega.privacy.android.domain.usecase.transfers.chatuploads.ClearPendingMessagesCompressionProgressUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.PrepareAllPendingMessagesUseCase
 import mega.privacy.android.domain.usecase.transfers.chatuploads.StartUploadingAllPendingMessagesUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 
@@ -71,7 +72,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     notificationSamplePeriod: Long? = null,
     deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex loginMutex: Mutex,
-    @DisplayPathFromUriCache displayPathFromUriCache: HashMap<String, String>,
+    clearCompletedTransfersCacheUseCase: ClearCompletedTransfersCacheUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -88,7 +89,7 @@ class ChatUploadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
-    displayPathFromUriCache = displayPathFromUriCache,
+    clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
     deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
     override val updateNotificationId = NOTIFICATION_CHAT_UPLOAD

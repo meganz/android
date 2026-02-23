@@ -105,7 +105,6 @@ class ChatUploadsWorkerTest {
         mock<StartUploadingAllPendingMessagesUseCase>()
     private val monitorPendingMessagesByStateUseCase = mock<MonitorPendingMessagesByStateUseCase>()
     private val prepareAllPendingMessagesUseCase = mock<PrepareAllPendingMessagesUseCase>()
-    private val displayPathFromUriCache = mock<HashMap<String, String>>()
 
     @BeforeAll
     fun init() {
@@ -155,8 +154,8 @@ class ChatUploadsWorkerTest {
             foregroundSetter = setForeground,
             notificationSamplePeriod = 0L,
             loginMutex = mock(),
-            displayPathFromUriCache = displayPathFromUriCache,
             deleteActiveTransferGroupUseCase = mock(),
+            clearCompletedTransfersCacheUseCase = mock(),
         )
     }
 

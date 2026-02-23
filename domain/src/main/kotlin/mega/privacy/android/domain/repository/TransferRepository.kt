@@ -641,4 +641,9 @@ interface TransferRepository {
      * It should be set when the user sees the error (transfers section is opened)
      */
     fun clearTransferErrorStatus()
+
+    /**
+     * Clears cache related to completed transfers
+     */
+    fun clearCompletedTransfersCache()
 }

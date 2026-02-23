@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -24,6 +22,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
@@ -46,6 +45,9 @@ import mega.privacy.android.data.mapper.transfer.TransferMapper
 import mega.privacy.android.data.mapper.transfer.active.ActiveTransferTotalsMapper
 import mega.privacy.android.data.mapper.transfer.upload.MegaUploadOptionsMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
+import mega.privacy.android.data.qualifier.ParentNodeCache
+import mega.privacy.android.data.qualifier.TransferPathCache
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTarget
@@ -71,6 +73,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError.API_OK
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.COLLISION_CHECK_FINGERPRINT
 import nz.mega.sdk.MegaTransfer.COLLISION_RESOLUTION_NEW_WITH_N
@@ -116,6 +119,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val inProgressTransferMapper: InProgressTransferMapper,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val megaUploadOptionsMapper: MegaUploadOptionsMapper,
+    @DisplayPathFromUriCache private val displayPathFromUriCache: MapCache<String, String>,
+    @ParentNodeCache private val parentNodeCache: MapCache<Long, MegaNode?>,
+    @TransferPathCache private val transferPathCache: MapCache<Pair<Long, TransferType>, String>,
 ) : TransferRepository {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
@@ -459,7 +465,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                 if (event.transfer.state == TransferState.STATE_FAILED) {
                     monitorTransferInErrorStatus.update { true }
                 }
-                completedTransferMapper(event.transfer, event.error)
+                completedTransferMapper(event)
             }
             megaLocalRoomGateway.addCompletedTransfers(completedTransfers)
         }
@@ -878,4 +884,10 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     private fun MegaTransfer.isCUUpload() =
         appData?.contains(AppDataTypeConstants.CameraUpload.sdkTypeValue) == true
+
+    override fun clearCompletedTransfersCache() {
+        displayPathFromUriCache.clear()
+        parentNodeCache.clear()
+        transferPathCache.clear()
+    }
 }

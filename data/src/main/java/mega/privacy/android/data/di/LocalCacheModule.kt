@@ -7,6 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
+import mega.privacy.android.data.cache.LruLimitedCache
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.cache.PermanentCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
@@ -14,6 +16,8 @@ import mega.privacy.android.data.qualifier.FeatureFlagCache
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.data.qualifier.OriginalPathForNodeCache
 import mega.privacy.android.data.qualifier.OriginalPathForPendingMessageCache
+import mega.privacy.android.data.qualifier.ParentNodeCache
+import mega.privacy.android.data.qualifier.TransferPathCache
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.banner.Banner
@@ -23,13 +27,17 @@ import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.entity.psa.Psa
+import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.uri.UriPath
+import nz.mega.sdk.MegaNode
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 internal object LocalCacheModule {
+    private const val MAX_TRANSFER_CACHE_SIZE = 1000
+
     private val PAYMENT_METHODS_CACHE_TIMEOUT_MILLISECONDS = TimeUnit.MINUTES.toMillis(720)
     private val PRICING_CACHE_TIMEOUT_MILLISECONDS = TimeUnit.MINUTES.toMillis(720)
 
@@ -95,7 +103,20 @@ internal object LocalCacheModule {
     @Provides
     @Singleton
     @DisplayPathFromUriCache
-    fun provideDisplayPathFromUriCache(): HashMap<String, String> = hashMapOf()
+    fun provideDisplayPathFromUriCache(): MapCache<String, String> =
+        LruLimitedCache(MAX_TRANSFER_CACHE_SIZE)
+
+    @ParentNodeCache
+    @Provides
+    @Singleton
+    fun provideParentNodeCache(): MapCache<Long, MegaNode?> =
+        LruLimitedCache(MAX_TRANSFER_CACHE_SIZE)
+
+    @TransferPathCache
+    @Provides
+    @Singleton
+    fun provideTransferPathCache(): MapCache<Pair<Long, TransferType>, String> =
+        LruLimitedCache(MAX_TRANSFER_CACHE_SIZE)
 
     @FeatureFlagCache
     @Provides

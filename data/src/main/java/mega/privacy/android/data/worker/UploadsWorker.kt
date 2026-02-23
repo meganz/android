@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingUploadsUseCase
 import timber.log.Timber
@@ -63,7 +64,7 @@ class UploadsWorker @AssistedInject constructor(
     private val transfersActionGroupProgressNotificationBuilder: TransfersActionGroupProgressNotificationBuilder,
     private val transfersFinishNotificationSummaryBuilder: TransfersFinishNotificationSummaryBuilder,
     private val transfersActionGroupFinishNotificationBuilder: TransfersActionGroupFinishNotificationBuilder,
-    @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
+    clearCompletedTransfersCacheUseCase: ClearCompletedTransfersCacheUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -80,7 +81,7 @@ class UploadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
-    displayPathFromUriCache = displayPathFromUriCache,
+    clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
     deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
     override val finalNotificationId = NOTIFICATION_UPLOAD_FINAL

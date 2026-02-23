@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -57,6 +58,7 @@ import mega.privacy.android.domain.entity.transfer.pending.UpdatePendingTransfer
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransferData
@@ -116,6 +118,9 @@ class DefaultTransfersRepositoryTest {
     private val inProgressTransferMapper = mock<InProgressTransferMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase>()
     private val megaUploadOptionsMapper = mock<MegaUploadOptionsMapper>()
+    private val displayPathFromUriCache = mock<MapCache<String, String>>()
+    private val parentNodeCache = mock<MapCache<Long, MegaNode?>>()
+    private val transferPathCache = mock<MapCache<Pair<Long, TransferType>, String>>()
 
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -151,6 +156,9 @@ class DefaultTransfersRepositoryTest {
             inProgressTransferMapper = inProgressTransferMapper,
             monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
             megaUploadOptionsMapper = megaUploadOptionsMapper,
+            displayPathFromUriCache = displayPathFromUriCache,
+            parentNodeCache = parentNodeCache,
+            transferPathCache = transferPathCache
         )
     }
 
@@ -757,13 +765,11 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { it.state } doReturn TransferState.STATE_FAILED
             }
-            val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
-                on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            whenever(completedTransferMapper(event)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
         }
@@ -774,13 +780,11 @@ class DefaultTransfersRepositoryTest {
             val transfer = mock<Transfer> {
                 on { it.state } doReturn TransferState.STATE_COMPLETED
             }
-            val error = mock<MegaException>()
             val expected = listOf(mock<CompletedTransfer>())
             val event = mock<TransferEvent.TransferFinishEvent> {
                 on { it.transfer } doReturn transfer
-                on { it.error } doReturn error
             }
-            whenever(completedTransferMapper(transfer, error)).thenReturn(expected.first())
+            whenever(completedTransferMapper(event)).thenReturn(expected.first())
             underTest.addCompletedTransfers(listOf(event))
             verify(megaLocalRoomGateway).addCompletedTransfers(expected)
         }

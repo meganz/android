@@ -1,21 +1,22 @@
 package mega.privacy.android.data.mapper.transfer
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.node.NodePathMapper
 import mega.privacy.android.data.mapper.transfer.completed.API_EOVERQUOTA_FOREIGN
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
+import mega.privacy.android.data.qualifier.ParentNodeCache
+import mega.privacy.android.data.qualifier.TransferPathCache
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
@@ -28,16 +29,20 @@ import javax.inject.Inject
  * @param fileGateway
  * @param stringWrapper
  */
-class CompletedTransferMapper @Inject constructor(
+internal class CompletedTransferMapper @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val deviceGateway: DeviceGateway,
     private val fileGateway: FileGateway,
     private val documentFileWrapper: DocumentFileWrapper,
     private val stringWrapper: StringWrapper,
     private val nodePathMapper: NodePathMapper,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
+    @DisplayPathFromUriCache private val displayPathFromUriCache: MapCache<String, String>,
+    @ParentNodeCache private val parentNodeCache: MapCache<Long, MegaNode?>,
+    @TransferPathCache private val transferPathCache: MapCache<Pair<Long, TransferType>, String>,
 ) {
+
+    suspend operator fun invoke(finishEvent: TransferEvent.TransferFinishEvent) =
+        invoke(finishEvent.transfer, finishEvent.error)
 
     /**
      * Map a pair of [Transfer] and [MegaException] to [CompletedTransfer]
@@ -49,14 +54,18 @@ class CompletedTransferMapper @Inject constructor(
     suspend operator fun invoke(
         transfer: Transfer,
         error: MegaException?,
-    ) = withContext(ioDispatcher) {
+    ): CompletedTransfer {
         val isOffline = isOffline(transfer)
-        val parentNode = megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)
-        // If the parent node is not found because it was removed, we try to get it from the transfer node handle
-            ?: getParentNodeFromNodeHandle(transfer.nodeHandle)
-        val transferPath = formatTransferPath(transfer, parentNode, isOffline)
+        val parentNode = parentNodeCache.getOrPutAsync(transfer.parentHandle) {
+            megaApiGateway.getMegaNodeByHandle(transfer.parentHandle)
+                ?: getParentNodeFromNodeHandle(transfer.nodeHandle) // If the parent node is not found because it was removed, we try to get it from the transfer node handle
+        }
+        val transferPath =
+            transferPathCache.getOrPutAsync(transfer.parentHandle to transfer.transferType) {
+                formatTransferPath(transfer, parentNode, isOffline)
+            }
 
-        CompletedTransfer(
+        return CompletedTransfer(
             fileName = transfer.fileName,
             type = transfer.transferType,
             state = transfer.state,
@@ -66,11 +75,13 @@ class CompletedTransferMapper @Inject constructor(
             path = transferPath,
             timestamp = deviceGateway.now,
             error = error?.errorString,
-            errorCode = error?.let { getErrorCode(transfer, it) },
+            errorCode = error?.let
+            { getErrorCode(transfer, it) },
             originalPath = transfer.localPath,
             parentHandle = parentNode?.handle ?: transfer.parentHandle,
             appData = transfer.appData,
-            displayPath = getDisplayPath(transfer, isOffline).takeUnless { it.isNullOrEmpty() }
+            displayPath = getDisplayPath(transfer, isOffline).takeUnless
+            { it.isNullOrEmpty() }
                 ?: transferPath,
             uniqueId = transfer.uniqueId,
             totalBytes = transfer.totalBytes,
@@ -121,7 +132,7 @@ class CompletedTransferMapper @Inject constructor(
         isOffline: Boolean,
     ): String? =
         if (transfer.transferType == TransferType.DOWNLOAD && isOffline.not()) {
-            displayPathFromUriCache.getOrPut(transfer.parentPath) {
+            displayPathFromUriCache.getOrPutAsync(transfer.parentPath) {
                 documentFileWrapper.getDocumentFile(transfer.parentPath)?.let {
                     documentFileWrapper.getAbsolutePathFromContentUri(it.uri)
                 } ?: ""

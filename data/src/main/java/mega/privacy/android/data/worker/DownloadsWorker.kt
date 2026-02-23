@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupFinishNotificationBuilder
 import mega.privacy.android.data.mapper.transfer.TransfersActionGroupProgressNotificationBuilder
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.StartAllPendingDownloadsUseCase
 import timber.log.Timber
@@ -64,7 +66,7 @@ class DownloadsWorker @AssistedInject constructor(
     private val startAllPendingDownloadsUseCase: StartAllPendingDownloadsUseCase,
     deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex loginMutex: Mutex,
-    @DisplayPathFromUriCache private val displayPathFromUriCache: HashMap<String, String>,
+    clearCompletedTransfersCacheUseCase: ClearCompletedTransfersCacheUseCase,
 ) : AbstractTransfersWorker(
     context = context,
     workerParams = workerParams,
@@ -81,7 +83,7 @@ class DownloadsWorker @AssistedInject constructor(
     foregroundSetter = foregroundSetter,
     notificationSamplePeriod = notificationSamplePeriod,
     loginMutex = loginMutex,
-    displayPathFromUriCache = displayPathFromUriCache,
+    clearCompletedTransfersCacheUseCase = clearCompletedTransfersCacheUseCase,
     deleteActiveTransferGroupUseCase = deleteActiveTransferGroupUseCase,
 ) {
 

@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.cache.LruLimitedCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -34,6 +34,7 @@ import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.math.BigInteger
@@ -51,7 +52,9 @@ class CompletedTransferMapperTest {
     private val stringWrapper: StringWrapper = mock()
     private val nodePathMapper = mock<NodePathMapper>()
     private val documentFileWrapper = mock<DocumentFileWrapper>()
-    private val displayPathFromUriCache = hashMapOf<String, String>()
+    private val displayPathFromUriCache = LruLimitedCache<String, String>(10)
+    private val parentNodeCache = LruLimitedCache<Long, MegaNode?>(10)
+    private val transferPathCache = LruLimitedCache<Pair<Long, TransferType>, String>(10)
 
     @BeforeAll
     fun setup() {
@@ -62,8 +65,9 @@ class CompletedTransferMapperTest {
             documentFileWrapper = documentFileWrapper,
             stringWrapper = stringWrapper,
             nodePathMapper = nodePathMapper,
-            ioDispatcher = UnconfinedTestDispatcher(),
             displayPathFromUriCache = displayPathFromUriCache,
+            parentNodeCache = parentNodeCache,
+            transferPathCache = transferPathCache,
         )
     }
 
@@ -78,6 +82,8 @@ class CompletedTransferMapperTest {
             nodePathMapper,
         )
         displayPathFromUriCache.clear()
+        parentNodeCache.clear()
+        transferPathCache.clear()
     }
 
     @Test
@@ -327,6 +333,11 @@ class CompletedTransferMapperTest {
 
         assertThat(actual.displayPath).isEqualTo(expected)
         verifyNoMoreInteractions(documentFileWrapper)
+    }
+
+    @Test
+    fun `test that values are cached`() = runTest {
+
     }
 
     private fun provideDownloadParams() =

@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.transfers.active.ClearActiveTransfers
 import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.DeleteActiveTransferGroupUseCase
 import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTotalsUseCase
+import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
 import kotlin.time.Duration.Companion.milliseconds
@@ -61,7 +62,7 @@ abstract class AbstractTransfersWorker(
     protected val crashReporter: CrashReporter,
     private val foregroundSetter: ForegroundSetter?,
     private val notificationSamplePeriod: Long?,
-    private val displayPathFromUriCache: HashMap<String, String>,
+    private val clearCompletedTransfersCacheUseCase: ClearCompletedTransfersCacheUseCase,
     private val deleteActiveTransferGroupUseCase: DeleteActiveTransferGroupUseCase,
     @LoginMutex private val loginMutex: Mutex,
 ) : CoroutineWorker(context, workerParams) {
@@ -267,7 +268,7 @@ abstract class AbstractTransfersWorker(
         Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Stop work")
         notificationManager.cancel(updateNotificationId)
         clearActiveTransfersIfFinishedUseCase()
-        displayPathFromUriCache.clear()
+        clearCompletedTransfersCacheUseCase()
         performWorkJob.cancel()
     }
 
