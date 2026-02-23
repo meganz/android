@@ -876,6 +876,21 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }
     }
 
+    suspend fun onRemoveFromOfflineSuccess(size: Int) {
+        if (size > 1) {
+            snackbarEventQueue.queueMessage(
+                sharedResR.string.offline_remove_multiple_item_success_message,
+                size
+            )
+        } else {
+            snackbarEventQueue.queueMessage(
+                sharedResR.string.remove_from_offline_success_message
+            )
+        }
+
+        dismiss()
+    }
+
     fun viewFileInFolder(node: TypedNode) {
         viewModelScope.launch {
             runCatching {
