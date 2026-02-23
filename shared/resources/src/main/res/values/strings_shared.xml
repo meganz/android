@@ -2308,8 +2308,6 @@
     <string name="general_install_label">Install</string>
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_download_success_message">App update downloaded</string>
-    <!-- Promotional monthly price label for discounted plans. Placeholder is the price, e.g. Only $34.22/month -->
-    <string name="choose_account_screen_only_price_per_month">Only %1$s/month</string>
     <!-- Label for First Name -->
     <string name="general_first_name">First name</string>
     <!-- Label for Last name -->
