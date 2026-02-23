@@ -17,6 +17,9 @@
 .idea/other.xml
 .idea/AndroidProjectSystem.xml
 .idea/codeStyles/Project.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/markdown.xml
+.idea/studiobot.xml
 
 # User-specific stuff:
 .idea/workspace.xml
@@ -77,6 +80,11 @@ replay_pid*
 
 #copilot
 .idea/copilot*
+
+# ai files
+.cursor*
+.claude*
+.devcontainer*
 
 *.keystore
 google-services.json
