@@ -23,7 +23,9 @@ class RemoveOfflineActionClickHandler @Inject constructor(
                 runCatching {
                     removeOfflineNodeUseCase(nodeId = node.id)
                 }.onFailure { Timber.e(it) }
-                    .onSuccess { provider.viewModel.dismiss() }
+                    .onSuccess {
+                        provider.viewModel.onRemoveFromOfflineSuccess(1)
+                    }
             }
         }
     }
@@ -40,7 +42,9 @@ class RemoveOfflineActionClickHandler @Inject constructor(
                         removeOfflineNodeUseCase(nodeId = node.id)
                     }
                 }.onFailure { Timber.e(it) }
-                    .onSuccess { provider.viewModel.dismiss() }
+                    .onSuccess {
+                        provider.viewModel.onRemoveFromOfflineSuccess(nodes.size)
+                    }
             }
         }
     }
