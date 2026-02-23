@@ -29,6 +29,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -182,7 +183,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
     private val selectImportFolderLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val toHandle = result.data?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
-            if (toHandle == null) return@registerForActivityResult
+                ?: return@registerForActivityResult
             videoPlayerViewModel.importChatNode(newParentHandle = NodeId(toHandle))
         }
 
@@ -293,7 +294,7 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                         bottomSheetNavigator = bottomSheetNavigator,
                         scaffoldState = scaffoldState,
                         viewModel = videoPlayerViewModel,
-                        handleAutoReplayIfPaused = ::handleAutoReplayIfPaused,
+                        handleAutoReplayIfPaused = videoPlayerViewModel::handleAutoReplayIfPaused,
                         player = player
                     )
                 }
@@ -348,19 +349,6 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
         }
     }
 
-    private fun handleAutoReplayIfPaused() {
-        val uiState = videoPlayerViewModel.uiState.value
-
-        val shouldAutoReplay = uiState.mediaPlaybackState == MediaPlaybackState.Paused &&
-                uiState.isAutoReplay &&
-                !uiState.showSubtitleDialog &&
-                !uiState.showPlaybackDialog
-
-        if (shouldAutoReplay) {
-            videoPlayerViewModel.updatePlaybackStateWithReplay(true)
-        }
-    }
-
     private fun createPlayer(): ExoPlayer {
         val nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit =
             { title, artist, album ->
@@ -385,11 +373,15 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
                     videoPlayerViewModel.updateRepeatToggleMode(repeatToggleMode)
 
                 override fun onPlayWhenReadyChangedCallback(playWhenReady: Boolean, reason: Int) {
-                    videoPlayerViewModel.updatePlaybackState(
-                        if (playWhenReady)
+                    val isPausedByUser =
+                        reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST && !playWhenReady
+                    videoPlayerViewModel.onPlayWhenReadyChanged(
+                        state = if (playWhenReady) {
                             MediaPlaybackState.Playing
-                        else
+                        } else {
                             MediaPlaybackState.Paused
+                        },
+                        isPausedByUser = isPausedByUser
                     )
                 }
 
@@ -713,12 +705,12 @@ class VideoPlayerComposeActivity : PasscodeActivity() {
 
     override fun onStop() {
         super.onStop()
-        videoPlayerViewModel.updatePlaybackStateWithReplay(false)
+        videoPlayerViewModel.pauseForBackground()
     }
 
     override fun onStart() {
         super.onStart()
-        handleAutoReplayIfPaused()
+        videoPlayerViewModel.handleAutoReplayIfPaused()
     }
 
     override fun onDestroy() {

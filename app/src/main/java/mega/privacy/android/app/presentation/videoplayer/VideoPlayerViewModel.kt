@@ -361,6 +361,9 @@ class VideoPlayerViewModel @Inject constructor(
     private var playbackPositionStatus = PlaybackPositionStatus.Initial
     private var currentIntent: Intent? = null
 
+    private var isPausedByUser = false
+    private var isBackgroundPausing = false
+
     init {
         setupTransferListener()
 
@@ -380,7 +383,7 @@ class VideoPlayerViewModel @Inject constructor(
                 .conflate()
                 .catch {
                     Timber.e(it)
-                }.collectLatest { changes ->
+                }.collectLatest {
                     val actions = getMenuActionsForVideo(
                         launchSource = currentLaunchSources,
                         videoNodeHandle = uiState.value.currentPlayingHandle,
@@ -1105,6 +1108,9 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun onMediaItemTransition(handle: String?, isUpdateName: Boolean) {
         updateCurrentPlayingVideoSize(null)
         if (handle == null) return
+        if (isPausedByUser) {
+            isPausedByUser = false
+        }
         if (uiState.value.currentPlayingHandle != handle.toLong())
             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
         updateCurrentPlayingHandle(handle.toLong(), isUpdateName)
@@ -1218,7 +1224,7 @@ class VideoPlayerViewModel @Inject constructor(
         }
         playbackPositionStatus = PlaybackPositionStatus.Initial
 
-        if (!mediaPlayerGateway.getPlayWhenReady()) {
+        if (!mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {
             mediaPlayerGateway.setPlayWhenReady(true)
         }
     }
@@ -1237,6 +1243,7 @@ class VideoPlayerViewModel @Inject constructor(
                     && playbackPositionStatus == PlaybackPositionStatus.Initial
                     && !uiState.value.showPlaybackDialog
                     && !uiState.value.showSubtitleDialog
+                    && !isPausedByUser
                 ) {
                     mediaPlayerGateway.setPlayWhenReady(true)
                 }
@@ -1269,6 +1276,40 @@ class VideoPlayerViewModel @Inject constructor(
                 collectionId ?: 0L,
                 collectionTitle
             )
+        }
+    }
+
+    internal fun pauseForBackground() {
+        val wasPlaying = mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser
+        if (wasPlaying) {
+            isBackgroundPausing = true
+            mediaPlayerGateway.setPlayWhenReady(false)
+        }
+        uiState.update {
+            it.copy(
+                mediaPlaybackState = MediaPlaybackState.Paused,
+                isAutoReplay = wasPlaying,
+            )
+        }
+    }
+
+    internal fun onPlayWhenReadyChanged(state: MediaPlaybackState, isPausedByUser: Boolean) {
+        updatePlaybackState(state)
+        if (!isBackgroundPausing) {
+            this.isPausedByUser = isPausedByUser
+        }
+        isBackgroundPausing = false
+    }
+
+    internal fun handleAutoReplayIfPaused() {
+        val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&
+                uiState.value.isAutoReplay &&
+                !uiState.value.showSubtitleDialog &&
+                !uiState.value.showPlaybackDialog &&
+                !isPausedByUser
+
+        if (shouldAutoReplay) {
+            updatePlaybackStateWithReplay(true)
         }
     }
 

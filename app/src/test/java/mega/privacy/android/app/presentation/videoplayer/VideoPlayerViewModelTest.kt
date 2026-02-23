@@ -203,8 +203,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito.clearInvocations
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -1364,6 +1366,81 @@ class VideoPlayerViewModelTest {
             underTest.updatePlaybackState(testPausedState)
             assertThat(awaitItem().mediaPlaybackState).isEqualTo(testPausedState)
         }
+    }
+
+    @Test
+    fun `test that onPlayWhenReadyChanged updates mediaPlaybackState correctly`() = runTest {
+        initViewModel()
+        underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+        advanceUntilIdle()
+        underTest.uiState.test {
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Playing)
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Paused, isPausedByUser = true)
+            assertThat(awaitItem().mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that pauseForBackground sets Paused and isAutoReplay when player was playing`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+            initViewModel()
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(false)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that pauseForBackground does not set isAutoReplay when player was already paused`() =
+        runTest {
+            whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(false)
+            initViewModel()
+            underTest.pauseForBackground()
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Paused)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleAutoReplayIfPaused calls setPlayWhenReady when Paused and isAutoReplay`() =
+        runTest {
+            initViewModel()
+            underTest.updatePlaybackState(MediaPlaybackState.Paused)
+            underTest.updatePlaybackStateWithReplay(false)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+            underTest.handleAutoReplayIfPaused()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            underTest.uiState.test {
+                val actual = awaitItem()
+                assertThat(actual.mediaPlaybackState).isEqualTo(MediaPlaybackState.Playing)
+                assertThat(actual.isAutoReplay).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that handleAutoReplayIfPaused does not resume when not isAutoReplay`() = runTest {
+        initViewModel()
+        underTest.updatePlaybackState(MediaPlaybackState.Paused)
+        advanceUntilIdle()
+        clearInvocations(mediaPlayerGateway)
+        underTest.handleAutoReplayIfPaused()
+        advanceUntilIdle()
+        verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
     }
 
     @Test
