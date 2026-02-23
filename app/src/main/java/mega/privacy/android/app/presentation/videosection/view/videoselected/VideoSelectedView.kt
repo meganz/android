@@ -36,6 +36,7 @@ import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoGridView
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyViewWithImage
 import mega.privacy.android.shared.original.core.ui.model.rememberListGridNavigationState
@@ -150,29 +151,19 @@ internal fun VideoSelectedView(
                 } else {
                     val newList =
                         rememberNodeListForGrid(nodeUIItems = uiState.nodesList, spanCount = span)
-                    NodeGridView(
+                    VideoSelectedNodeGridView(
                         modifier = Modifier
                             .padding(top = 10.dp)
                             .testTag(VIDEO_SELECTED_GRID_VIEW_TEST_TAG),
                         listContentPadding = paddingValue,
                         nodeUIItems = newList,
-                        onMenuClick = {},
                         onItemClicked = onItemClicked,
-                        onLongClick = {},
-                        onEnterMediaDiscoveryClick = {},
-                        spanCount = span,
                         sortOrder = sortOrder,
                         onSortOrderClick = onSortOrderClick,
                         onChangeViewTypeClick = onChangeViewTypeClick,
                         showSortOrder = showSortOrder,
-                        showChangeViewType = showChangeViewType,
                         gridState = currentListState.lazyGridState,
-                        showMediaDiscoveryButton = showMediaDiscoveryButton,
-                        isPublicNode = false,
                         fileTypeIconMapper = fileTypeIconMapper,
-                        shouldApplySensitiveMode = uiState.hiddenNodeEnabled
-                                && uiState.accountType?.isPaid == true
-                                && !uiState.isBusinessAccountExpired,
                     )
                 }
             }
