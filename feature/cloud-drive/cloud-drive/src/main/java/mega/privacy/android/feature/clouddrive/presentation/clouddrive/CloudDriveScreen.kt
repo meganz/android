@@ -164,7 +164,7 @@ fun CloudDriveScreen(
                         visible = !scrollToHideState.shouldHide,
                         alignment = Alignment.BottomEnd
                     ),
-                visible = uiState.isUploadAllowed,
+                visible = uiState.isUploadAllowed && !uiState.isEmpty,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
                     showUploadOptionsBottomSheet = true

@@ -342,46 +342,6 @@ class CloudDriveUiStateTest {
     }
 
     @Test
-    fun `test that isUploadAllowed returns false when empty`() {
-        val items = createTestItems(
-            selected = listOf(),
-            sensitive = listOf()
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            hasWritePermission = true,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            nodesLoadingState = NodesLoadingState.FullyLoaded,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isUploadAllowed).isFalse()
-    }
-
-    @Test
-    fun `test that isUploadAllowed returns true when empty but loading`() {
-        val items = createTestItems(
-            selected = listOf(),
-            sensitive = listOf()
-        )
-
-        val state = CloudDriveUiState(
-            items = items,
-            hasWritePermission = true,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-            nodesLoadingState = NodesLoadingState.Loading,
-            isHiddenNodeSettingsLoading = false,
-            showHiddenNodes = false,
-            isHiddenNodesEnabled = true
-        )
-
-        assertThat(state.isUploadAllowed).isTrue()
-    }
-
-    @Test
     fun `test that isUploadAllowed returns false when multiple conditions fail`() {
         val items = createTestItems(
             selected = listOf(true),

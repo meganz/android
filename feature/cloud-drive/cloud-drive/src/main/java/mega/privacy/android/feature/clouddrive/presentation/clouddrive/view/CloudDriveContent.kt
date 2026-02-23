@@ -233,7 +233,7 @@ internal fun CloudDriveContent(
                         Analytics.tracker.trackEvent(CloudDriveEmptyStateAddFilesPressedEvent)
                         onToggleShowUploadOptionsBottomSheet(true)
                     },
-                    showAddItems = uiState.hasWritePermission
+                    showAddItems = uiState.isUploadAllowed
                 )
             }
 

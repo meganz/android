@@ -5,7 +5,6 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
@@ -122,7 +121,6 @@ data class CloudDriveUiState(
     val isUploadAllowed = hasWritePermission
             && nodeSourceType != NodeSourceType.RUBBISH_BIN
             && !isInSelectionMode
-            && !isEmpty
 }
 
 /**
