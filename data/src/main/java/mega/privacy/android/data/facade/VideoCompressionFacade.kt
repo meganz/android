@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import android.annotation.SuppressLint
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaCodecList
@@ -7,6 +8,8 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
+import android.os.ParcelFileDescriptor
+import android.util.Log
 import android.view.Surface
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.callbackFlow
@@ -207,8 +210,21 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             val bitrate: Int
             val frameRate: Int
             val duration: Long
+            var metadataPfd: ParcelFileDescriptor? = null
             try {
-                metadataRetriever.setDataSource(inputUriPath.value)
+                if (inputUriPath.isPath()) {
+                    metadataRetriever.setDataSource(inputUriPath.value)
+                } else {
+                    metadataPfd = fileGateway.getFileDescriptorSync(inputUriPath, false)
+                        ?: throw IOException("Cannot open content URI: ${inputUriPath.value}")
+                    val size = metadataPfd.statSize
+                    if (size <= 0L) throw IOException("Invalid size for: ${inputUriPath.value}")
+                    metadataRetriever.setDataSource(
+                        metadataPfd.fileDescriptor,
+                        0L,
+                        size
+                    )
+                }
                 getOriginalWidthAndHeight(metadataRetriever)
                 bitrate = getBitrate(
                     (metadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE)
@@ -225,6 +241,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                 videoAttachment.totalDuration = duration
             } finally {
                 metadataRetriever.release()
+                metadataPfd?.close()
             }
 
             Timber.d("Video result width: ${config.resultWidth}, result height: ${config.resultHeight}, encode bitrate: $bitrate, encode frame rate: $frameRate")
@@ -253,21 +270,26 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             inputSurface.makeCurrent()
             outputSurface = OutputSurface()
             videoDecoder = createVideoDecoder(inputFormat, outputSurface.surface)
-            audioExtractor = createExtractor(inputUriPath)
-            val audioInputTrack =
-                getAndSelectAudioTrackIndex(audioExtractor).takeIf { trackIndex -> trackIndex >= 0 }
-                    ?: throw RuntimeException("Audio information not found")
-            val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
-            val outputAudioFormat = MediaFormat.createAudioFormat(
-                inputAudioFormat.getString(MediaFormat.KEY_MIME)
-                    ?: return@suspendCancellableCoroutine,
-                inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
-                inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-            )
-            outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE)
-            outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
-            audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat)
-            audioDecoder = createAudioDecoder(inputAudioFormat)
+            val audioExtractorForAudio = createExtractor(inputUriPath)
+            val audioInputTrack = getAndSelectAudioTrackIndex(audioExtractorForAudio)
+            // some video with no audio track
+            if (audioInputTrack >= 0) {
+                audioExtractor = audioExtractorForAudio
+                val inputAudioFormat = audioExtractor.getTrackFormat(audioInputTrack)
+                val outputAudioFormat = MediaFormat.createAudioFormat(
+                    inputAudioFormat.getString(MediaFormat.KEY_MIME)
+                        ?: return@suspendCancellableCoroutine,
+                    inputAudioFormat.getInteger(MediaFormat.KEY_SAMPLE_RATE),
+                    inputAudioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+                )
+                outputAudioFormat.setInteger(MediaFormat.KEY_BIT_RATE, OUTPUT_AUDIO_BIT_RATE)
+                outputAudioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, OUTPUT_AUDIO_AAC_PROFILE)
+                audioEncoder = createAudioEncoder(audioCodecInfo, outputAudioFormat)
+                audioDecoder = createAudioDecoder(inputAudioFormat)
+            } else {
+                Timber.w("No audio track found, compressing video only")
+                audioExtractorForAudio.release()
+            }
             muxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             changeResolution(
                 videoExtractor = videoExtractor,
@@ -281,7 +303,8 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                 outputSurface = outputSurface,
                 video = videoAttachment,
             ) { progress ->
-                Timber.d("Current Video Compression Progress $progress")
+                @SuppressLint("LogNotTimber")
+                Log.d("VideoCompressionFacade", "Current Video Compression Progress $progress")
                 block(progress)
             }
         } catch (e: Exception) {
@@ -344,9 +367,9 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
         var videoDecoderDone = false
         var videoEncoderDone = false
 
-        var audioExtractorDone = false
-        var audioDecoderDone = false
-        var audioEncoderDone = false
+        var audioExtractorDone = audioExtractor == null
+        var audioDecoderDone = audioDecoder == null
+        var audioEncoderDone = audioEncoder == null
 
         var pendingAudioDecoderOutputBufferIndex = -1
         var muxing = false
@@ -417,6 +440,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     Timber.d("Current Video Format $decoderOutputVideoFormat")
                     break
                 }
+                if (decoderOutputBufferIndex < 0) break
                 if (videoDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     videoDecoder.releaseOutputBuffer(decoderOutputBufferIndex, false)
                     break
@@ -449,6 +473,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     Timber.d("Current Audio Format $decoderOutputAudioFormat")
                     break
                 }
+                if (decoderOutputBufferIndex < 0) break
                 if (audioDecoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     audioDecoder.releaseOutputBuffer(decoderOutputBufferIndex, false)
                     break
@@ -458,6 +483,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
             }
             while (audioEncoder != null && pendingAudioDecoderOutputBufferIndex != -1) {
                 val encoderInputBufferIndex = audioEncoder.dequeueInputBuffer(TIMEOUT_USEC.toLong())
+                if (encoderInputBufferIndex < 0) break
                 val encoderInputBuffer = audioEncoder.getInputBuffer(encoderInputBufferIndex)
                 val size = audioDecoderOutputBufferInfo.size
                 val presentationTime = audioDecoderOutputBufferInfo.presentationTimeUs
@@ -499,6 +525,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     encoderOutputVideoFormat = videoEncoder.outputFormat
                     break
                 }
+                if (encoderOutputBufferIndex < 0) break
                 val encoderOutputBuffer = videoEncoder.getOutputBuffer(encoderOutputBufferIndex)
                 if (videoEncoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     videoEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false)
@@ -528,6 +555,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     encoderOutputAudioFormat = audioEncoder.outputFormat
                     break
                 }
+                if (encoderOutputBufferIndex < 0) break
                 val encoderOutputBuffer = audioEncoder.getOutputBuffer(encoderOutputBufferIndex)
                 if (audioEncoderOutputBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG != 0) {
                     audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false)
@@ -547,9 +575,13 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                 audioEncoder.releaseOutputBuffer(encoderOutputBufferIndex, false)
                 break
             }
-            if (!muxing && encoderOutputVideoFormat != null && encoderOutputAudioFormat != null) {
+            if (!muxing && encoderOutputVideoFormat != null &&
+                (encoderOutputAudioFormat != null || audioEncoder == null)
+            ) {
                 outputVideoTrack = muxer.addTrack(encoderOutputVideoFormat)
-                outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat)
+                if (encoderOutputAudioFormat != null) {
+                    outputAudioTrack = muxer.addTrack(encoderOutputAudioFormat)
+                }
                 muxer.start()
                 muxing = true
             }
