@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
@@ -142,7 +141,10 @@ fun HomeScreens(
                             val selectionModeController = remember(isSelectionMode) {
                                 SelectionModeController(
                                     isSelectionModeActive = isSelectionMode,
-                                    onSelectionModeChanged = { isSelectionMode = it },
+                                    onSelectionModeChanged = {
+                                        isSelectionMode = it
+                                        navigationUiController.showNavigation(!isSelectionMode)
+                                    },
                                 )
                             }
                             CompositionLocalProvider(

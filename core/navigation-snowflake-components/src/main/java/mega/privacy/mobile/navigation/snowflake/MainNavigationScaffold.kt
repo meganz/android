@@ -97,8 +97,8 @@ fun MainNavigationScaffold(
     // Order items based on preferredSlot
     val orderedItems = orderNavigationItems(items = mainNavItems, availableSlots = availableSlots)
     var isNavigationVisible by rememberSaveable { mutableStateOf(true) }
-    val navUiController = NavigationUiController {
-        isNavigationVisible = it
+    val navUiController = remember {
+        NavigationUiController { isNavigationVisible = it }
     }
 
     MegaNavigationSuiteScaffoldLayout(
