@@ -17,15 +17,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -34,32 +37,49 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoGridView
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 
 @Composable
 fun SelectVideosForPlaylistRoute(
-    onNavigateToFolder: (Long, String) -> Unit,
+    onNavigateToFolder: (Long, String, Long) -> Unit,
+    returnResult: (String, Int) -> Unit,
+    backTo: (Long, PlaylistType) -> Unit,
     onBack: () -> Unit,
     viewModel: SelectVideosForPlaylistViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigateToFolderEvent by viewModel.navigateToFolderEvent.collectAsStateWithLifecycle()
+    val numberOfAddedVideosEvent by viewModel.numberOfAddedVideosEvent.collectAsStateWithLifecycle()
 
     val dataState = uiState as? SelectVideosForPlaylistUiState.Data
 
     EventEffect(
         event = navigateToFolderEvent,
         onConsumed = viewModel::resetNavigateToFolderEvent
-    ) {
-        onNavigateToFolder(it.id.longValue, it.name)
+    ) { (playlistHandle, item) ->
+        onNavigateToFolder(item.id.longValue, item.name, playlistHandle)
+    }
+
+    EventEffect(
+        event = numberOfAddedVideosEvent,
+        onConsumed = viewModel::resetNumberOfAddedVideosEvent,
+    ) { (playlistHandle, numberOfAddedVideos) ->
+        returnResult(SelectVideosForPlaylistNavKey.RESULT, numberOfAddedVideos)
+        if (dataState?.isCloudDriveRoot != true) {
+            backTo(playlistHandle, PlaylistType.User)
+        }
     }
 
     SelectVideosForPlaylistScreen(
@@ -69,6 +89,12 @@ fun SelectVideosForPlaylistRoute(
         onSortNodes = viewModel::setCloudSortOrder,
         onChangeViewTypeClick = viewModel::changeViewTypeClicked,
         onItemClicked = viewModel::itemClicked,
+        clearSelection = viewModel::clearSelection,
+        confirmAddVideos = {
+            dataState?.selectItemHandles?.takeIf { it.isNotEmpty() }?.let { handles ->
+                viewModel.addVideosToPlaylist(videoIDs = handles.map { NodeId(it) })
+            }
+        },
         onBackPressed = onBack
     )
 }
@@ -85,6 +111,8 @@ fun SelectVideosForPlaylistScreen(
     listState: LazyListState = rememberLazyListState(),
     gridState: LazyGridState = rememberLazyGridState(),
     onItemClicked: (SelectVideoItemUiEntity) -> Unit = {},
+    confirmAddVideos: () -> Unit = {},
+    clearSelection: () -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
     val dataState = uiState as? SelectVideosForPlaylistUiState.Data
@@ -100,6 +128,10 @@ fun SelectVideosForPlaylistScreen(
         }
     }
 
+    BackHandler(dataState?.selectItemHandles?.isNotEmpty() == true) {
+        clearSelection()
+    }
+
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -107,14 +139,24 @@ fun SelectVideosForPlaylistScreen(
         modifier = modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
+        floatingActionButton = {
+            if (dataState?.selectItemHandles?.isNotEmpty() == true) {
+                MegaFab(
+                    onClick = confirmAddVideos,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
+                )
+            }
+        },
         topBar = {
             MegaSearchTopAppBar(
                 modifier = Modifier.testTag(SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG),
                 navigationType = AppBarNavigationType.Back(onBackPressed),
-                title = if (dataState?.isCloudDriveRoot == true) {
-                    stringResource(sharedR.string.video_section_video_selected_top_bar_title)
-                } else {
-                    dataState?.title?.text ?: ""
+                title = when {
+                    dataState?.selectItemHandles?.isNotEmpty() == true ->
+                        dataState.selectItemHandles.size.toString()
+
+                    dataState?.isCloudDriveRoot == true -> stringResource(sharedR.string.video_section_video_selected_top_bar_title)
+                    else -> dataState?.title?.text ?: ""
                 },
                 query = searchQuery,
                 onQueryChanged = updateSearchQuery,
@@ -154,7 +196,10 @@ fun SelectVideosForPlaylistScreen(
                             onSortOrderClick = { showSortBottomSheet = true },
                             onItemsClicked = onItemClicked,
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                            showHiddenItems = uiState.showHiddenItems
+                            showHiddenItems = uiState.showHiddenItems,
+                            listContentPadding = PaddingValues(
+                                bottom = innerPadding.calculateBottomPadding() + 100.dp
+                            )
                         )
                     } else {
                         SelectVideoGridView(
@@ -166,7 +211,37 @@ fun SelectVideosForPlaylistScreen(
                             onChangeViewTypeClick = onChangeViewTypeClick,
                             onSortOrderClick = { showSortBottomSheet = true },
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                            showHiddenItems = uiState.showHiddenItems
+                            showHiddenItems = uiState.showHiddenItems,
+                            listContentPadding = PaddingValues(
+                                bottom = innerPadding.calculateBottomPadding() + 100.dp
+                            )
+                        )
+                    }
+
+                    if (showSortBottomSheet) {
+                        SortBottomSheet(
+                            modifier = Modifier.testTag(VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG),
+                            title = stringResource(sharedR.string.action_sort_by_header),
+                            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+                            sheetState = sortBottomSheetState,
+                            selectedSort = SortBottomSheetResult(
+                                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                                sortDirection = uiState.selectedSortConfiguration.sortDirection
+                            ),
+                            onSortOptionSelected = { result ->
+                                result?.let {
+                                    onSortNodes(
+                                        NodeSortConfiguration(
+                                            sortOption = it.sortOptionItem,
+                                            sortDirection = it.sortDirection
+                                        )
+                                    )
+                                    showSortBottomSheet = false
+                                }
+                            },
+                            onDismissRequest = {
+                                showSortBottomSheet = false
+                            }
                         )
                     }
 

@@ -179,14 +179,24 @@ fun EntryProviderScope<NavKey>.albumContentScreen(
 
 fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
     navigationHandler: NavigationHandler,
+    resultFlow: (String) -> Flow<Int?>,
 ) {
     entry<VideoPlaylistDetailNavKey> { args ->
+        val numberOfAddedVideos by resultFlow(SelectVideosForPlaylistNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
         val viewModel =
             hiltViewModel<VideoPlaylistDetailViewModel, VideoPlaylistDetailViewModel.Factory> { factory ->
                 factory.create(args.playlistHandle, args.type)
             }
 
-        VideoPlaylistDetailRoute(navigationHandler, viewModel)
+        VideoPlaylistDetailRoute(
+            numberOfAddedVideos = numberOfAddedVideos,
+            clearResult = navigationHandler::clearResult,
+            navigateToVideoPlayer = navigationHandler::navigate,
+            navigateToSelectVideos = navigationHandler::navigate,
+            onBack = navigationHandler::back,
+            viewModel = viewModel
+        )
     }
 }
 
@@ -402,14 +412,20 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
     entry<SelectVideosForPlaylistNavKey> { key ->
         val viewModel =
             hiltViewModel<SelectVideosForPlaylistViewModel, SelectVideosForPlaylistViewModel.Factory> {
-                it.create(key.nodeHandle, key.nodeName)
+                it.create(key.nodeHandle, key.nodeName, key.playlistHandle)
             }
 
         SelectVideosForPlaylistRoute(
-            onNavigateToFolder = { handle, name ->
+            onNavigateToFolder = { handle, name, playlistHandle ->
                 navigationHandler.navigate(
-                    SelectVideosForPlaylistNavKey(handle, name)
+                    SelectVideosForPlaylistNavKey(handle, name, playlistHandle)
                 )
+            },
+            returnResult = { key, numberOfAddedVideos ->
+                navigationHandler.returnResult(key, numberOfAddedVideos)
+            },
+            backTo = { playlistHandle, playlistType ->
+                navigationHandler.backTo(VideoPlaylistDetailNavKey(playlistHandle, playlistType))
             },
             onBack = navigationHandler::back,
             viewModel = viewModel

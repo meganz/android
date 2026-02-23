@@ -27,6 +27,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mapper.SelectVideoItemUiEntityMapper
@@ -50,7 +51,6 @@ import kotlin.time.Duration.Companion.seconds
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 class SelectVideosForPlaylistViewModelTest {
-
     private lateinit var underTest: SelectVideosForPlaylistViewModel
 
     private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
@@ -64,10 +64,12 @@ class SelectVideosForPlaylistViewModelTest {
     private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
     private val setViewTypeUseCase = mock<SetViewType>()
     private val monitorViewTypeUseCase = mock<MonitorViewType>()
+    private val addVideosToPlaylistUseCase = mock<AddVideosToPlaylistUseCase>()
 
     private val rootNodeId = NodeId(0L)
     private val folderNodeId = NodeId(100L)
     private val folderName = "Folder Name"
+    private val playlistHandle = 200L
     private val videoEntity = SelectVideoItemUiEntity(
         id = NodeId(1L),
         name = "video.mp4",
@@ -117,12 +119,14 @@ class SelectVideosForPlaylistViewModelTest {
             setCloudSortOrderUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
+            addVideosToPlaylistUseCase,
         )
     }
 
     private suspend fun stubInitialValues(
         nodeHandle: Long = folderNodeId.longValue,
         nodeName: String? = folderName,
+        playlistHandle: Long = this.playlistHandle,
         nodesWithHasMore: Pair<List<TypedNode>, Boolean> = emptyList<TypedNode>() to false,
         isHiddenNodesEnabled: Boolean = true,
         showHiddenItems: Boolean = false,
@@ -130,20 +134,13 @@ class SelectVideosForPlaylistViewModelTest {
     ) {
         if (nodeHandle == -1L) {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
-            whenever(getNodesByIdInChunkUseCase(rootNodeId, 500)).thenReturn(
-                flow {
-                    emit(nodesWithHasMore)
-                    awaitCancellation()
-                }
-            )
-        } else {
-            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
-                flow {
-                    emit(nodesWithHasMore)
-                    awaitCancellation()
-                }
-            )
         }
+        whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+            flow {
+                emit(nodesWithHasMore)
+                awaitCancellation()
+            }
+        )
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(
             flow {
                 emit(isHiddenNodesEnabled)
@@ -174,8 +171,10 @@ class SelectVideosForPlaylistViewModelTest {
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             setViewTypeUseCase = setViewTypeUseCase,
             monitorViewTypeUseCase = monitorViewTypeUseCase,
+            addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
             nodeHandle = nodeHandle,
             nodeName = nodeName,
+            playlistHandle = playlistHandle,
         )
     }
 
@@ -198,20 +197,23 @@ class SelectVideosForPlaylistViewModelTest {
         }
 
     @Test
-    fun `test that itemClicked with folder item triggers navigateToFolderEvent`() = runTest {
-        stubInitialValues()
+    fun `test that itemClicked with folder item when selection empty triggers navigateToFolderEvent`() =
+        runTest {
+            stubInitialValues()
 
-        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
-            awaitItem()
-            underTest.itemClicked(folderEntity)
-            advanceUntilIdle()
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.itemClicked(folderEntity)
+                advanceUntilIdle()
 
-            val event = underTest.navigateToFolderEvent.value
-            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-            assertThat((event as StateEventWithContentTriggered).content).isEqualTo(folderEntity)
-            cancelAndIgnoreRemainingEvents()
+                val event = underTest.navigateToFolderEvent.value
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val content = (event as StateEventWithContentTriggered).content
+                assertThat(content.first).isEqualTo(playlistHandle)
+                assertThat(content.second).isEqualTo(folderEntity)
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
 
     @Test
     fun `test that resetNavigateToFolderEvent resets event to consumed`() = runTest {
@@ -232,18 +234,43 @@ class SelectVideosForPlaylistViewModelTest {
     }
 
     @Test
-    fun `test that itemClicked with file item does not trigger navigateToFolderEvent`() = runTest {
-        stubInitialValues()
+    fun `test that itemClicked with folder when selection not empty does not trigger navigateToFolderEvent`() =
+        runTest {
+            stubInitialValues()
 
-        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
-            awaitItem()
-            underTest.itemClicked(videoEntity)
-            advanceUntilIdle()
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.itemClicked(videoEntity)
+                advanceUntilIdle()
+                assertThat(awaitItem().selectItemHandles).containsExactly(videoEntity.id.longValue)
 
-            assertThat(underTest.navigateToFolderEvent.value).isEqualTo(consumed())
-            cancelAndIgnoreRemainingEvents()
+                underTest.itemClicked(folderEntity)
+                advanceUntilIdle()
+                assertThat(underTest.navigateToFolderEvent.value).isEqualTo(consumed())
+                cancelAndIgnoreRemainingEvents()
+            }
         }
-    }
+
+    @Test
+    fun `test that itemClicked with file item toggles selection and does not trigger navigateToFolderEvent`() =
+        runTest {
+            stubInitialValues()
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                val initial = awaitItem()
+                assertThat(initial.selectItemHandles).isEmpty()
+
+                underTest.itemClicked(videoEntity)
+                advanceUntilIdle()
+                assertThat(awaitItem().selectItemHandles).containsExactly(videoEntity.id.longValue)
+                assertThat(underTest.navigateToFolderEvent.value).isEqualTo(consumed())
+
+                underTest.itemClicked(videoEntity)
+                advanceUntilIdle()
+                assertThat(awaitItem().selectItemHandles).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that nodesLoadingState is PartiallyLoaded when hasMore is true`() = runTest {
@@ -334,7 +361,7 @@ class SelectVideosForPlaylistViewModelTest {
     @Test
     fun `test that items are filtered by query`() = runTest {
         val testName = "match.mp4"
-        val typedFolder = mock<TypedFileNode> {
+        val typedVideo = mock<TypedFileNode> {
             on { id }.thenReturn(NodeId(1L))
             on { name }.thenReturn(testName)
             on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
@@ -347,7 +374,7 @@ class SelectVideosForPlaylistViewModelTest {
         )
         whenever(selectVideoItemUiEntityMapper(any())).thenReturn(testVideoEntity)
         stubInitialValues(
-            nodesWithHasMore = listOf<TypedNode>(typedFolder) to false,
+            nodesWithHasMore = listOf<TypedNode>(typedVideo) to false,
         )
 
         underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
@@ -422,5 +449,65 @@ class SelectVideosForPlaylistViewModelTest {
                 assertThat(actual.currentViewType).isEqualTo(viewType)
                 cancelAndIgnoreRemainingEvents()
             }
+    }
+
+    @Test
+    fun `test that selectItemHandles updates when file item clicked and clears when clearSelection called`() =
+        runTest {
+            stubInitialValues()
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.itemClicked(videoEntity)
+                advanceUntilIdle()
+                assertThat(awaitItem().selectItemHandles).containsExactly(videoEntity.id.longValue)
+
+                underTest.clearSelection()
+                advanceUntilIdle()
+                assertThat(awaitItem().selectItemHandles).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that addVideosToPlaylist invokes use case and triggers numberOfAddedVideosEvent`() =
+        runTest {
+            whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(2)
+            stubInitialValues()
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                awaitItem()
+                underTest.itemClicked(videoEntity)
+                advanceUntilIdle()
+                underTest.addVideosToPlaylist(videoIDs = listOf(videoEntity.id))
+                advanceUntilIdle()
+
+                val event = underTest.numberOfAddedVideosEvent.value
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((event as StateEventWithContentTriggered).content).isEqualTo(
+                    playlistHandle to 2
+                )
+                verify(addVideosToPlaylistUseCase).invoke(any(), any())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetNumberOfAddedVideosEvent resets event to consumed`() = runTest {
+        whenever(addVideosToPlaylistUseCase(any(), any())).thenReturn(1)
+        stubInitialValues()
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            awaitItem()
+            underTest.addVideosToPlaylist(videoIDs = listOf(videoEntity.id))
+            advanceUntilIdle()
+            assertThat(underTest.numberOfAddedVideosEvent.value).isInstanceOf(
+                StateEventWithContentTriggered::class.java
+            )
+
+            underTest.resetNumberOfAddedVideosEvent()
+            assertThat(underTest.numberOfAddedVideosEvent.value).isEqualTo(consumed())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

@@ -35,6 +35,7 @@ class VideoPlaylistDetailScreenTest {
     private fun setComposeContent(
         uiState: VideoPlaylistDetailUiState = VideoPlaylistDetailUiState.Data(),
         showRenameVideoPlaylistDialog: () -> Unit = {},
+        numberOfAddedVideos: Int? = null,
         videoPlaylistEditState: VideoPlaylistEditState = VideoPlaylistEditState(),
         updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
         resetErrorMessage: () -> Unit = {},
@@ -69,6 +70,7 @@ class VideoPlaylistDetailScreenTest {
                 clearSelection = clearSelection,
                 multiNodeActionHandler = mock(),
                 snackBarQueue = snackBarQueue,
+                numberOfAddedVideos = numberOfAddedVideos
             )
         }
     }

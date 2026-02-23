@@ -46,7 +46,12 @@ data object CameraUploadsProgressNavKey : NavKey, Parcelable
 data class SelectVideosForPlaylistNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
-) : NavKey, Parcelable
+    val playlistHandle: Long = -1L,
+) : NavKey, Parcelable {
+    companion object {
+        const val RESULT = "SelectVideosForPlaylistNavKey::result"
+    }
+}
 
 @Serializable
 data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional

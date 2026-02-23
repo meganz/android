@@ -32,6 +32,8 @@ class SelectVideosForPlaylistScreenTest {
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         onChangeViewTypeClick: () -> Unit = {},
         onItemClicked: (SelectVideoItemUiEntity) -> Unit = {},
+        confirmAddVideos: () -> Unit = {},
+        clearSelection: () -> Unit = {},
         onBackPressed: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
@@ -44,6 +46,8 @@ class SelectVideosForPlaylistScreenTest {
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 modifier = modifier,
                 onItemClicked = onItemClicked,
+                confirmAddVideos = confirmAddVideos,
+                clearSelection = clearSelection,
                 onBackPressed = onBackPressed,
             )
         }

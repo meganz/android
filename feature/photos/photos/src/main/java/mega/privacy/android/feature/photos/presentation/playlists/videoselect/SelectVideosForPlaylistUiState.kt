@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 
@@ -23,6 +24,8 @@ sealed interface SelectVideosForPlaylistUiState {
      * @property nodesLoadingState The current state of node loading
      * @property selectedSortConfiguration The selected sort configuration for the items
      * @property showHiddenItems Whether hidden items are shown
+     * @property query The current search query, if any
+     * @property selectItemHandles The list of selected item handles
      */
     data class Data(
         val title: LocalizedText = LocalizedText.Literal(""),
@@ -34,6 +37,7 @@ sealed interface SelectVideosForPlaylistUiState {
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val showHiddenItems: Boolean = false,
         val query: String? = null,
+        val selectItemHandles: Set<Long> = emptySet(),
     ) : SelectVideosForPlaylistUiState
 }
 

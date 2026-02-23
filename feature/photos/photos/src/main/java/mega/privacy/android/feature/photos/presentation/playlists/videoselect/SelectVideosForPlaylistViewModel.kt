@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.domain.usecase.videosection.AddVideosToPlaylistUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mapper.SelectVideoItemUiEntityMapper
@@ -62,15 +63,21 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
-    @Assisted private val nodeHandle: Long,
+    private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
+    @Assisted("nodeHandle") private val nodeHandle: Long,
     @Assisted private val nodeName: String?,
+    @Assisted("playlistHandle") private val playlistHandle: Long,
 ) : ViewModel() {
     private val queryFlow = MutableStateFlow<String?>(null)
+    private val selectedVideoHandlesFlow = MutableStateFlow<Set<Long>>(emptySet())
 
-    internal val navigateToFolderEvent: StateFlow<StateEventWithContent<SelectVideoItemUiEntity>>
-        field: MutableStateFlow<StateEventWithContent<SelectVideoItemUiEntity>> = MutableStateFlow(
+    internal val navigateToFolderEvent: StateFlow<StateEventWithContent<Pair<Long, SelectVideoItemUiEntity>>>
+        field: MutableStateFlow<StateEventWithContent<Pair<Long, SelectVideoItemUiEntity>>> = MutableStateFlow(
             consumed()
         )
+
+    internal val numberOfAddedVideosEvent: StateFlow<StateEventWithContent<Pair<Long, Int>>>
+        field: MutableStateFlow<StateEventWithContent<Pair<Long, Int>>> = MutableStateFlow(consumed())
 
     private val sortOrder: StateFlow<SortOrder> by lazy {
         monitorSortCloudOrderUseCase()
@@ -109,26 +116,42 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
             }
         }
 
-    private fun getShowHiddenItemsFlow(): Flow<Boolean> = combine(
-        monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
-        monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
-    ) { isHiddenNodesEnabled, isShowHiddenItems ->
-        isShowHiddenItems || !isHiddenNodesEnabled
+    private fun updatedNodesFlow(): Flow<Triple<List<SelectVideoItemUiEntity>, NodesLoadingState, Boolean>> =
+        combine(
+            getNodesFlow().catch { Timber.d(it) },
+            monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
+            monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
+        ) { (nodes, hasMore), isHiddenNodesEnabled, isShowHiddenItems ->
+            val showHiddenItems = isShowHiddenItems || !isHiddenNodesEnabled
+            val items = nodes.filterNonSensitiveItems(showHiddenItems).map {
+                selectVideoItemUiEntityMapper(it)
+            }
+            val loadingState = if (hasMore) {
+                NodesLoadingState.PartiallyLoaded
+            } else {
+                NodesLoadingState.FullyLoaded
+            }
+            Triple(items, loadingState, showHiddenItems)
+        }
+
+    private fun getUiConfigFlow(): Flow<Triple<String?, NodeSortConfiguration, ViewType>> = combine(
+        queryFlow,
+        sortOrder,
+        monitorViewTypeUseCase().catch { Timber.e(it) },
+    ) { query, sortOrder, viewType ->
+        val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+        Triple(query, sortOrderPair, viewType)
     }
 
     internal val uiState: StateFlow<SelectVideosForPlaylistUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            getNodesFlow().catch { Timber.d(it) },
-            sortOrder,
-            queryFlow,
-            getShowHiddenItemsFlow(),
-            monitorViewTypeUseCase().catch { Timber.e(it) },
-        ) { (nodes, hasMore), sortOrder, query, showHiddenItems, viewType ->
-            val items =
-                nodes.filterNonSensitiveItems(showHiddenItems).map {
-                    selectVideoItemUiEntityMapper(it)
-                }.queryItems(query ?: "")
-            val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+            updatedNodesFlow().catch { Timber.d(it) },
+            getUiConfigFlow(),
+            selectedVideoHandlesFlow,
+        ) { (entities, loadingState, showHiddenItems), (query, sortOrderPair, viewType), selectedHandles ->
+            val items = entities.queryItems(query ?: "")
+                .map { it.copy(isSelected = it.id.longValue in selectedHandles) }
+
             SelectVideosForPlaylistUiState.Data(
                 title = LocalizedText.Literal(nodeName ?: ""),
                 isCloudDriveRoot = nodeHandle == -1L,
@@ -137,11 +160,8 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 selectedSortConfiguration = sortOrderPair,
                 query = query,
                 currentViewType = viewType,
-                nodesLoadingState = if (hasMore) {
-                    NodesLoadingState.PartiallyLoaded
-                } else {
-                    NodesLoadingState.FullyLoaded
-                }
+                nodesLoadingState = loadingState,
+                selectItemHandles = selectedHandles
             )
         }.asUiStateFlow(
             viewModelScope,
@@ -162,10 +182,10 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
         }
 
     internal fun itemClicked(item: SelectVideoItemUiEntity) {
-        if (item.isFolder) {
-            navigateToFolderEvent.update { triggered(item) }
+        if (item.isFolder && selectedVideoHandlesFlow.value.isEmpty()) {
+            navigateToFolderEvent.update { triggered(playlistHandle to item) }
         } else {
-            //TODO click file item
+            toggleItemSelection(item)
         }
     }
 
@@ -210,8 +230,47 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
         }
     }
 
+    private fun toggleItemSelection(item: SelectVideoItemUiEntity) {
+        if (item.isFolder) return
+        val updatedSelectedHandles = selectedVideoHandlesFlow.value.toMutableSet()
+        if (item.id.longValue in updatedSelectedHandles) {
+            updatedSelectedHandles -= item.id.longValue
+        } else {
+            updatedSelectedHandles += item.id.longValue
+        }
+        selectedVideoHandlesFlow.update { updatedSelectedHandles }
+    }
+
+    internal fun clearSelection() {
+        selectedVideoHandlesFlow.update { emptySet() }
+    }
+
+    internal fun addVideosToPlaylist(
+        playlistID: NodeId = NodeId(playlistHandle),
+        videoIDs: List<NodeId>,
+    ) =
+        viewModelScope.launch {
+            runCatching {
+                addVideosToPlaylistUseCase(playlistID, videoIDs)
+            }.onSuccess { numberOfAddedVideos ->
+                numberOfAddedVideosEvent.update {
+                    triggered(playlistHandle to numberOfAddedVideos)
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    internal fun resetNumberOfAddedVideosEvent() {
+        numberOfAddedVideosEvent.update { consumed() }
+    }
+
     @AssistedFactory
     interface Factory {
-        fun create(nodeHandle: Long, nodeName: String?): SelectVideosForPlaylistViewModel
+        fun create(
+            @Assisted("nodeHandle") nodeHandle: Long,
+            nodeName: String?,
+            @Assisted("playlistHandle") playlistHandle: Long,
+        ): SelectVideosForPlaylistViewModel
     }
 }

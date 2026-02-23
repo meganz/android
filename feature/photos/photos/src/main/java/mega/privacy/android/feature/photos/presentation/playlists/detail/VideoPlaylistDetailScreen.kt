@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -27,6 +28,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -58,7 +60,6 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
@@ -67,7 +68,11 @@ import java.util.Locale
 
 @Composable
 fun VideoPlaylistDetailRoute(
-    navigationHandler: NavigationHandler,
+    numberOfAddedVideos: Int?,
+    clearResult: (key: String) -> Unit,
+    navigateToVideoPlayer: (navKey: NavKey) -> Unit,
+    navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit,
+    onBack: () -> Unit,
     viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -76,14 +81,14 @@ fun VideoPlaylistDetailRoute(
 
     NavigationEventEffect(
         event = navigateEvent,
-        onConsumed = viewModel::resetNavigateToVideoPlayer
-    ) {
-        navigationHandler.navigate(it)
-    }
+        onConsumed = viewModel::resetNavigateToVideoPlayer,
+        action = navigateToVideoPlayer
+    )
 
     VideoPlaylistDetailScreen(
         uiState = uiState,
         videoPlaylistEditState = videoPlaylistEditState,
+        numberOfAddedVideos = numberOfAddedVideos,
         showRenameVideoPlaylistDialog = viewModel::showUpdateVideoPlaylistDialog,
         updatedVideoPlaylistTitle = viewModel::updateVideoPlaylistTitle,
         resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
@@ -95,10 +100,9 @@ fun VideoPlaylistDetailRoute(
         onLongClick = viewModel::onItemLongClicked,
         selectAll = viewModel::selectAllVideos,
         clearSelection = viewModel::clearSelection,
-        selectVideos = {
-            navigationHandler.navigate(SelectVideosForPlaylistNavKey())
-        },
-        onBack = navigationHandler::back
+        clearResultFlow = clearResult,
+        navigateToSelectVideos = navigateToSelectVideos,
+        onBack = onBack
     )
 }
 
@@ -107,6 +111,7 @@ fun VideoPlaylistDetailRoute(
 fun VideoPlaylistDetailScreen(
     uiState: VideoPlaylistDetailUiState,
     videoPlaylistEditState: VideoPlaylistEditState,
+    numberOfAddedVideos: Int?,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     showRenameVideoPlaylistDialog: () -> Unit = {},
@@ -120,7 +125,8 @@ fun VideoPlaylistDetailScreen(
     onLongClick: (item: VideoUiEntity) -> Unit = {},
     selectAll: () -> Unit = {},
     clearSelection: () -> Unit = {},
-    selectVideos: () -> Unit = {},
+    navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit = {},
+    clearResultFlow: (key: String) -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
@@ -144,11 +150,18 @@ fun VideoPlaylistDetailScreen(
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         floatingActionButton = {
-            AddContentFab(
-                modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
-                visible = selectedNodes.isEmpty(),
-                onClick = selectVideos
-            )
+            if (dataState?.playlistDetail?.uiEntity?.isSystemVideoPlayer == false) {
+                AddContentFab(
+                    modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
+                    visible = selectedNodes.isEmpty(),
+                    onClick = {
+                        val playlistHandle = dataState.playlistDetail.uiEntity.id.longValue
+                        navigateToSelectVideos(
+                            SelectVideosForPlaylistNavKey(playlistHandle = playlistHandle)
+                        )
+                    }
+                )
+            }
         },
         topBar = {
             MegaTopAppBar(
@@ -251,6 +264,21 @@ fun VideoPlaylistDetailScreen(
                         onBack()
                     }
                 )
+
+                LaunchedEffect(numberOfAddedVideos) {
+                    val number = numberOfAddedVideos ?: 0
+                    if (number > 0) {
+                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.video_section_playlist_detail_add_videos_message,
+                            number,
+                            number,
+                            title
+                        )
+                        snackBarQueue.queueMessage(message)
+                        clearResultFlow(SelectVideosForPlaylistNavKey.RESULT)
+                    }
+                }
 
                 val playlistDetail = uiState.playlistDetail
                 if (playlistDetail == null || playlistDetail.videos.isEmpty()
