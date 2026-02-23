@@ -2,9 +2,6 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -25,8 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.extensions.matchOrderWithNewAtEnd
 import mega.privacy.android.app.extensions.moveElement
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
-import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
@@ -63,16 +58,16 @@ import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOv
 import mega.privacy.android.domain.usecase.transfers.paused.MonitorPausedTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
-import mega.privacy.android.navigation.destination.TransfersNavKey
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * ViewModel for Transfers screen.
  *
  * @property uiState [TransfersUiState] for UI state.
  */
-@HiltViewModel(assistedFactory = TransfersViewModel.Factory::class)
-class TransfersViewModel @AssistedInject constructor(
+@HiltViewModel()
+class TransfersViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorInProgressTransfersUseCase: MonitorInProgressTransfersUseCase,
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
@@ -97,24 +92,13 @@ class TransfersViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val overQuotaStatusMapper: OverQuotaStatusMapper,
     isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
-    @Assisted initialTab: TransfersNavKey.Tab?,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransfersUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
-        val initialTabIndex = when (initialTab) {
-            TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
-            TransfersNavKey.Tab.Completed -> COMPLETED_TAB_INDEX
-            TransfersNavKey.Tab.Failed -> FAILED_TAB_INDEX
-            null -> if (isTransferInErrorStatusUseCase()) {
-                FAILED_TAB_INDEX
-            } else {
-                ACTIVE_TAB_INDEX
-            }
-        }
-        updateSelectedTab(initialTabIndex)
+        _uiState.update { it.copy(transferInError = isTransferInErrorStatusUseCase()) }
         monitorActiveTransfers()
         monitorOverQuota()
         monitorPausedTransfers()
@@ -279,9 +263,6 @@ class TransfersViewModel @AssistedInject constructor(
      * Update selected tab.
      */
     fun updateSelectedTab(tabIndex: Int) {
-        _uiState.update { state ->
-            state.copy(selectedTab = tabIndex)
-        }
         if (tabIndex == FAILED_TAB_INDEX) {
             viewModelScope.launch { clearTransferErrorStatusUseCase() }
         }
@@ -763,11 +744,6 @@ class TransfersViewModel @AssistedInject constructor(
                 cancelActiveTransfer(pendingToCancel.tag, uniqueId)
             }
         }
-    }
-
-    @AssistedFactory
-    interface Factory {
-        fun create(initialTab: TransfersNavKey.Tab?): TransfersViewModel
     }
 
     companion object {

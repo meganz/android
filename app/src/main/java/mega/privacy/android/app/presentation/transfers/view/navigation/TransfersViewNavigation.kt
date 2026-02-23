@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.transfers.view.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,6 +11,9 @@ import androidx.navigation.toRoute
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.transfers.model.TransfersViewModel
+import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.COMPLETED_TAB_INDEX
+import mega.privacy.android.app.presentation.transfers.view.FAILED_TAB_INDEX
 import mega.privacy.android.app.presentation.transfers.view.TransfersView
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.TransfersNavKey
@@ -36,14 +40,26 @@ private fun TransferRoute(
     navigationHandler: NavigationHandler?,
     onNavigateToUpgradeAccount: () -> Unit,
 ) {
-    val viewModel = hiltViewModel<TransfersViewModel, TransfersViewModel.Factory>(
-        creationCallback = { factory ->
-            factory.create(args.tab)
-        }
-    )
+    val viewModel = hiltViewModel<TransfersViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val initialTabIndex = when (args.tab) {
+        TransfersNavKey.Tab.Active -> ACTIVE_TAB_INDEX
+        TransfersNavKey.Tab.Completed -> COMPLETED_TAB_INDEX
+        TransfersNavKey.Tab.Failed -> FAILED_TAB_INDEX
+        null -> if (uiState.transferInError) {
+            FAILED_TAB_INDEX
+        } else {
+            ACTIVE_TAB_INDEX
+        }
+    }
+
+    LaunchedEffect(initialTabIndex) {
+        viewModel.updateSelectedTab(initialTabIndex)
+    }
+
     TransfersView(
+        initialTabIndex = initialTabIndex,
         onBackPress = onBackPress,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         uiState = uiState,

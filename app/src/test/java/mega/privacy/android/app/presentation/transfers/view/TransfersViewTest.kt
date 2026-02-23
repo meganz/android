@@ -113,7 +113,10 @@ class TransfersViewTest {
 
     @Test
     fun `test that view is displayed correctly if there are no transfers`() {
-        initComposeTestRule(uiState = TransfersUiState())
+        initComposeTestRule(
+            uiState = TransfersUiState(),
+            selectedTab = ACTIVE_TAB_INDEX,
+        )
         with(composeTestRule) {
             val emptyText = activity.getString(sharedR.string.transfers_no_transfers_empty_text)
                 .replace("[A]", "").replace("[/A]", "")
@@ -128,9 +131,9 @@ class TransfersViewTest {
     fun `test that no TransferMenuAction is displayed if it is in the active tab but there are no active transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = emptyList(),
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
@@ -145,7 +148,8 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 activeTransfers = inProgressTransfers,
                 areTransfersPaused = false
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_PAUSE_ACTION).apply {
@@ -162,7 +166,8 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 activeTransfers = inProgressTransfers,
                 areTransfersPaused = true,
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_RESUME_ACTION).apply {
@@ -177,9 +182,9 @@ class TransfersViewTest {
     fun `test that more TransferMenuAction is displayed if it is the active tab, there are active transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
@@ -189,9 +194,9 @@ class TransfersViewTest {
     fun `test that no TransferMenuAction is displayed if it is in the completed tab but there are no completed transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 completedTransfers = emptyList(),
-            )
+            ),
+            selectedTab = COMPLETED_TAB_INDEX,
         )
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
@@ -204,9 +209,9 @@ class TransfersViewTest {
     fun `test that more TransferMenuAction is displayed if it is the completed tab, there are completed transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 completedTransfers = completedTransfers,
-            )
+            ),
+            selectedTab = COMPLETED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
@@ -216,9 +221,9 @@ class TransfersViewTest {
     fun `test that no TransferMenuAction is displayed if it is in the failed tab but there are no failed transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = emptyList(),
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
         with(composeTestRule) {
             onNodeWithTag(TEST_TAG_MORE_ACTION).assertDoesNotExist()
@@ -231,9 +236,9 @@ class TransfersViewTest {
     fun `test that more TransferMenuAction is displayed if it is the failed tab, there are failed transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).assertIsDisplayed()
@@ -243,12 +248,12 @@ class TransfersViewTest {
     fun `test that select all TransferMenuAction is displayed if it is the active tab and there are selected transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
                     .map { it.uniqueId },
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).assertIsDisplayed()
@@ -258,12 +263,12 @@ class TransfersViewTest {
     fun `test that cancel selected TransferMenuAction is displayed if it is the active tab and there are selected transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
                     .map { it.uniqueId },
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ACTION).assertIsDisplayed()
@@ -273,12 +278,12 @@ class TransfersViewTest {
     fun `test that select all TransferMenuAction is displayed if it is the failed tab and there are selected and unselected transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).assertIsDisplayed()
@@ -288,12 +293,12 @@ class TransfersViewTest {
     fun `test that clear selected TransferMenuAction is displayed if it is the failed tab and there are selected transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).assertIsDisplayed()
@@ -303,12 +308,12 @@ class TransfersViewTest {
     fun `test that retry selected TransferMenuAction is displayed if it is the failed tab and there are selected transfers`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_RETRY_ACTION).assertIsDisplayed()
@@ -317,7 +322,10 @@ class TransfersViewTest {
 
     @Test
     fun `test that screen view event is tracked when view is displayed`() {
-        initComposeTestRule(uiState = TransfersUiState())
+        initComposeTestRule(
+            uiState = TransfersUiState(),
+            selectedTab = ACTIVE_TAB_INDEX,
+        )
 
         assertThat(analyticsRule.events).contains(TransfersSectionScreenEvent)
     }
@@ -328,7 +336,8 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 activeTransfers = inProgressTransfers,
                 areTransfersPaused = false
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_PAUSE_ACTION).performClick()
@@ -342,7 +351,8 @@ class TransfersViewTest {
             uiState = TransfersUiState(
                 activeTransfers = inProgressTransfers,
                 areTransfersPaused = true
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_RESUME_ACTION).performClick()
@@ -354,9 +364,9 @@ class TransfersViewTest {
     fun `test that active transfers more options event is tracked when more action is clicked in active tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers
-            )
+            ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
@@ -368,9 +378,9 @@ class TransfersViewTest {
     fun `test that completed transfers more options event is tracked when more action is clicked in completed tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 completedTransfers = completedTransfers
-            )
+            ),
+            selectedTab = COMPLETED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
@@ -382,9 +392,9 @@ class TransfersViewTest {
     fun `test that failed transfers more options event is tracked when more action is clicked in failed tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers
-            )
+            ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_MORE_ACTION).performClick()
@@ -396,12 +406,12 @@ class TransfersViewTest {
     fun `test that active transfers select all event is tracked when select all action is clicked in active tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
                     .map { it.uniqueId },
             ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_SELECT_ALL_ACTION).performClick()
@@ -413,12 +423,12 @@ class TransfersViewTest {
     fun `test that active transfers cancel selected event is tracked when cancel selected action is clicked in active tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = ACTIVE_TAB_INDEX,
                 activeTransfers = inProgressTransfers,
                 selectedActiveTransfersIds = inProgressTransfers
                     .take(1)
                     .map { it.uniqueId },
             ),
+            selectedTab = ACTIVE_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_CANCEL_ACTION).performClick()
@@ -430,12 +440,12 @@ class TransfersViewTest {
     fun `test that completed transfers clear selected event is tracked when clear selected action is clicked in completed tab`() {
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 completedTransfers = completedTransfers,
                 selectedCompletedTransfersIds = completedTransfers
                     .take(1)
                     .mapNotNull { it.id },
             ),
+            selectedTab = COMPLETED_TAB_INDEX,
         )
 
         composeTestRule.onNodeWithTag(TEST_TAG_CLEAR_ACTION).performClick()
@@ -447,12 +457,12 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
             ),
+            selectedTab = FAILED_TAB_INDEX,
             onSelectAllFailedTransfers = onSelectAllFailedTransfers
         )
 
@@ -467,12 +477,12 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
             ),
+            selectedTab = FAILED_TAB_INDEX,
             onClearSelectedFailedTransfers = onClearSelectedFailedTransfers
         )
 
@@ -487,12 +497,12 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 selectedFailedTransfersIds = failedTransfers
                     .take(1)
                     .mapNotNull { it.id },
             ),
+            selectedTab = FAILED_TAB_INDEX,
             onRetrySelectedFailedTransfers = onRetrySelectedFailedTransfers
         )
 
@@ -506,10 +516,10 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 completedTransfers = completedTransfers,
             ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         with(composeTestRule) {
@@ -525,10 +535,10 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = FAILED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 completedTransfers = completedTransfers,
             ),
+            selectedTab = FAILED_TAB_INDEX,
         )
 
         with(composeTestRule) {
@@ -544,10 +554,10 @@ class TransfersViewTest {
 
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 completedTransfers = completedTransfers,
             ),
+            selectedTab = COMPLETED_TAB_INDEX,
         )
 
         with(composeTestRule) {
@@ -563,11 +573,11 @@ class TransfersViewTest {
         val onSelectTransfersClose = mock<() -> Unit>()
         initComposeTestRule(
             uiState = TransfersUiState(
-                selectedTab = COMPLETED_TAB_INDEX,
                 failedTransfers = failedTransfers,
                 completedTransfers = completedTransfers,
                 selectedActiveTransfersIds = mock(), //this sets selection mode on
             ),
+            selectedTab = COMPLETED_TAB_INDEX,
             onSelectTransfersClose = onSelectTransfersClose,
         )
 
@@ -578,6 +588,7 @@ class TransfersViewTest {
 
     private fun initComposeTestRule(
         uiState: TransfersUiState,
+        selectedTab: Int,
         onSelectAllActiveTransfers: () -> Unit = {},
         onCancelSelectedActiveTransfers: () -> Unit = {},
         onSelectAllCompletedTransfers: () -> Unit = {},
@@ -592,6 +603,7 @@ class TransfersViewTest {
                 TransfersView(
                     onBackPress = {},
                     onNavigateToUpgradeAccount = {},
+                    navigationHandler = null,
                     uiState = uiState,
                     onTabSelected = {},
                     onPlayPauseTransfer = onPlayPauseTransfer,
@@ -624,7 +636,7 @@ class TransfersViewTest {
                     onClearCompletedTransfer = {},
                     onSetActiveTransferToCancel = {},
                     onUndoCancelActiveTransfer = {},
-                    navigationHandler = null,
+                    initialTabIndex = selectedTab,
                 )
             }
         }

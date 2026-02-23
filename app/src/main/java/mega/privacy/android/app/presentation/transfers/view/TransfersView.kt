@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -121,6 +122,7 @@ internal fun TransfersView(
     onClearCompletedTransfer: (Int) -> Unit,
     onSetActiveTransferToCancel: (InProgressTransfer) -> Unit,
     onUndoCancelActiveTransfer: (InProgressTransfer) -> Unit,
+    initialTabIndex: Int,
 ) = with(uiState) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -143,6 +145,8 @@ internal fun TransfersView(
         },
     )
 
+    var selectedTab by rememberSaveable { mutableIntStateOf(initialTabIndex) }
+
     @OptIn(ExperimentalMaterial3Api::class)
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = Modifier
@@ -156,7 +160,7 @@ internal fun TransfersView(
             }
 
             if (!isInSelectTransfersMode) {
-                TransfersTopBar(onBackPress, getTransferActions(uiState)) { action ->
+                TransfersTopBar(onBackPress, getTransferActions(uiState, selectedTab)) { action ->
                     when (action) {
                         TransferMenuAction.Pause -> {
                             Analytics.tracker.trackEvent(ActiveTransfersGlobalPauseMenuItemEvent)
@@ -209,7 +213,7 @@ internal fun TransfersView(
                 SelectActiveTransfersTopBar(
                     onClose = onSelectTransfersClose,
                     selectedAmount = selectedTransfersAmount,
-                    actions = getTransferActions(uiState)
+                    actions = getTransferActions(uiState, selectedTab)
                 ) { action ->
                     when (action) {
                         TransferMenuAction.SelectAll -> {
@@ -376,6 +380,7 @@ internal fun TransfersView(
                     }?.let { tabSelectedEvent ->
                         Analytics.tracker.trackEvent(tabSelectedEvent)
                     }
+                    selectedTab = it
                     onTabSelected(it)
                     true
                 },
@@ -495,6 +500,7 @@ private fun TransfersViewPreview() {
         TransfersView(
             onBackPress = {},
             onNavigateToUpgradeAccount = {},
+            navigationHandler = null,
             uiState = TransfersUiState(),
             onTabSelected = {},
             onPlayPauseTransfer = {},
@@ -527,7 +533,7 @@ private fun TransfersViewPreview() {
             onClearCompletedTransfer = {},
             onSetActiveTransferToCancel = {},
             onUndoCancelActiveTransfer = {},
-            navigationHandler = null,
+            initialTabIndex = ACTIVE_TAB_INDEX,
         )
     }
 }
@@ -535,7 +541,7 @@ private fun TransfersViewPreview() {
 /**
  * Get the actions that should be shown given the ui state
  */
-private fun getTransferActions(uiState: TransfersUiState) = with(uiState) {
+private fun getTransferActions(uiState: TransfersUiState, selectedTab: Int) = with(uiState) {
     buildList<TransferMenuAction> {
         when {
             selectedTab == ACTIVE_TAB_INDEX && activeTransfers.isNotEmpty() -> {

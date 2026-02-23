@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.transfers.model
 
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
-import mega.privacy.android.app.presentation.transfers.view.ACTIVE_TAB_INDEX
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -11,7 +10,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 /**
  * UI state for Transfers screen.
  *
- * @property selectedTab Selected tab.
  * @property activeTransfers List of in progress transfers.
  * @property selectedActiveTransfersIds List of selected in progress transfers ids. If not null, even empty, indicates selected mode is on.
  * @property isStorageOverQuota Whether the storage is over quota.
@@ -27,7 +25,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property hasInternetConnection true if there is Internet connection
  */
 data class TransfersUiState(
-    val selectedTab: Int = ACTIVE_TAB_INDEX,
     val activeTransfers: List<InProgressTransfer> = listOf(),
     val selectedActiveTransfersIds: List<Long>? = null,
     val isStorageOverQuota: Boolean = false,
@@ -41,6 +38,7 @@ data class TransfersUiState(
     val startEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val transfersPendingToCancel: Map<Long, TransferPendingToCancel> = emptyMap(),
     val hasInternetConnection: Boolean = true,
+    val transferInError: Boolean = false,
 ) {
 
     /**
