@@ -12,14 +12,18 @@ import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOncePerAppEffect
 import mega.privacy.android.shared.resources.R
+import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
+import mega.privacy.mobile.analytics.event.AlmostFullStorageAndTransferOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerUpgradeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.FullStorageAndTransferOverQuotaErrorBannerDisplayeEvent
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.FullStorageOverQuotaBannerUpgradeButtonPressedEvent
+import mega.privacy.mobile.analytics.event.TransferOverQuotaErrorBannerDisplayedEvent
+import mega.privacy.mobile.analytics.event.TransferOverQuotaWarningBannerDisplayedEvent
 
 // Test tags for UI testing
 const val STORAGE_ERROR_BANNER_ROOT_TEST_TAG = "storage_over_quota_banner:root"
@@ -80,28 +84,19 @@ fun OverQuotaErrorBanner(
     forceRiceTopAppBar: Boolean = true,
 ) {
     if (overQuotaStatus.severity == OverQuotaIssue.Severity.Error) {
-        val analyticsEvent = when (overQuotaStatus.storage) {
-            OverQuotaIssue.Storage.Full -> {
-                FullStorageOverQuotaBannerDisplayedEvent
-            }
-
-            else -> null
-        }
-        if (analyticsEvent != null) {
-            LaunchedOncePerAppEffect(analyticsEvent) {
-                Analytics.tracker.trackEvent(analyticsEvent)
-            }
-        }
         val title: String
         val body: String?
+        val analyticsEvent: EventIdentifier
         when {
             overQuotaStatus.hasTransferIssue && overQuotaStatus.hasStorageIssue -> {
                 title =
                     stringResource(id = R.string.transfers_storage_and_transfer_quota_banner_title)
                 body = null
+                analyticsEvent = FullStorageAndTransferOverQuotaErrorBannerDisplayeEvent
             }
 
             overQuotaStatus.hasStorageIssue -> {
+                analyticsEvent = FullStorageOverQuotaBannerDisplayedEvent
                 title = stringResource(
                     id = if (isBlockingAware) {
                         R.string.transfers_storage_quota_banner_title
@@ -115,9 +110,13 @@ fun OverQuotaErrorBanner(
             }
 
             else -> {
+                analyticsEvent = TransferOverQuotaErrorBannerDisplayedEvent
                 title = stringResource(id = R.string.transfers_transfer_quota_banner_title)
                 body = null
             }
+        }
+        LaunchedOncePerAppEffect(analyticsEvent) {
+            Analytics.tracker.trackEvent(analyticsEvent)
         }
 
         TopErrorBanner(
@@ -154,18 +153,7 @@ fun OverQuotaWarningBanner(
     forceRiceTopAppBar: Boolean = true,
 ) {
     if (overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && (!isBlockingAware || overQuotaStatus.severity is OverQuotaIssue.Severity.Warning.Blocking)) {
-        val analyticsEvent = when (overQuotaStatus.storage) {
-            OverQuotaIssue.Storage.AlmostFull -> {
-                AlmostFullStorageOverQuotaBannerDisplayedEvent
-            }
-
-            else -> null
-        }
-        if (analyticsEvent != null) {
-            LaunchedOncePerAppEffect(analyticsEvent) {
-                Analytics.tracker.trackEvent(analyticsEvent)
-            }
-        }
+        val analyticsEvent: EventIdentifier
         val title: String
         val body: String?
         when {
@@ -173,6 +161,7 @@ fun OverQuotaWarningBanner(
                 title =
                     stringResource(id = R.string.transfers_storage_and_transfer_quota_banner_title)
                 body = null
+                analyticsEvent = AlmostFullStorageAndTransferOverQuotaBannerDisplayedEvent
             }
 
             overQuotaStatus.hasStorageIssue -> {
@@ -180,12 +169,17 @@ fun OverQuotaWarningBanner(
                     stringResource(id = R.string.account_storage_over_quota_inline_warning_banner_title)
                 body =
                     stringResource(id = R.string.account_storage_over_quota_inline_warning_banner_message)
+                analyticsEvent = AlmostFullStorageOverQuotaBannerDisplayedEvent
             }
 
             else -> {
                 title = stringResource(id = R.string.transfers_transfer_quota_banner_title)
                 body = null
+                analyticsEvent = TransferOverQuotaWarningBannerDisplayedEvent
             }
+        }
+        LaunchedOncePerAppEffect(analyticsEvent) {
+            Analytics.tracker.trackEvent(analyticsEvent)
         }
         TopWarningBanner(
             modifier = modifier.testTag(STORAGE_WARNING_BANNER_ROOT_TEST_TAG),

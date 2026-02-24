@@ -33,7 +33,7 @@ interface OverQuotaIssue {
 
     sealed class Severity(val priority: Int) {
         data object None : Severity(0)
-        sealed class Warning(priority: Int) : Severity(priority) {
+        sealed class Warning(severity: Int) : Severity(severity) {
             data object NonBlocking : Warning(1)
             data object Blocking : Warning(2)
         }
