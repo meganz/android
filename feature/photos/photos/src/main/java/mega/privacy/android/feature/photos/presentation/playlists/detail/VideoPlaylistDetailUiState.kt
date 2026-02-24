@@ -19,6 +19,7 @@ sealed interface VideoPlaylistDetailUiState {
      * @property isHiddenNodesEnabled Whether hidden nodes are enabled
      * @property selectedCount The count of selected items
      * @property areAllSelected Whether all items are selected
+     * @property selectedElementIds Element ids of selected videos (derived from playlistDetail.videos)
      */
     data class Data(
         val playlistDetail: VideoPlaylistDetailUiEntity? = null,
@@ -26,6 +27,12 @@ sealed interface VideoPlaylistDetailUiState {
         val showHiddenItems: Boolean = false,
         val isHiddenNodesEnabled: Boolean = false,
     ) : VideoPlaylistDetailUiState {
+        val selectedElementIds: Set<Long>
+            get() = playlistDetail?.videos
+                ?.filter { it.id in selectedTypedNodes.map { node -> node.id } }
+                ?.mapNotNull { it.elementID }
+                ?.toSet() ?: emptySet()
+
         val selectedCount: Int
             get() = selectedTypedNodes.size
 

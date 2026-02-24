@@ -10,6 +10,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -18,7 +19,6 @@ import mega.privacy.android.feature.photos.presentation.playlists.detail.model.V
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +47,8 @@ class VideoPlaylistDetailScreenTest {
         onLongClick: (VideoUiEntity) -> Unit = {},
         selectAll: () -> Unit = {},
         clearSelection: () -> Unit = {},
+        removeVideosFromPlaylist: (List<Long>) -> Unit = {},
+        resetRemoveVideosEvent: () -> Unit = {},
         snackBarQueue: SnackbarEventQueue = mock(),
         onBack: () -> Unit = {},
         modifier: Modifier = Modifier,
@@ -70,7 +72,9 @@ class VideoPlaylistDetailScreenTest {
                 clearSelection = clearSelection,
                 multiNodeActionHandler = mock(),
                 snackBarQueue = snackBarQueue,
-                numberOfAddedVideos = numberOfAddedVideos
+                numberOfAddedVideos = numberOfAddedVideos,
+                removeVideosFromPlaylist = removeVideosFromPlaylist,
+                resetRemoveVideosEvent = resetRemoveVideosEvent
             )
         }
     }

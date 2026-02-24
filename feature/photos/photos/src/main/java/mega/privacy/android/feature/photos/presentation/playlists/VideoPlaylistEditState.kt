@@ -12,6 +12,7 @@ import de.palm.composestateevents.consumed
  * @property editVideoPlaylistErrorMessage Error message to show when editing video playlist fails
  * @property videoPlaylistPlaceholderTitle Placeholder title for video playlist
  * @property playlistsRemovedEvent Event for playlists removed
+ * @property numberOfRemovedVideosEvent Event for number of videos removed from playlist
  */
 data class VideoPlaylistEditState(
     val showUpdateVideoPlaylistDialog: Boolean = false,
@@ -19,4 +20,5 @@ data class VideoPlaylistEditState(
     val editVideoPlaylistErrorMessage: String? = null,
     val videoPlaylistPlaceholderTitle: String = "",
     val playlistsRemovedEvent: StateEventWithContent<List<String>> = consumed(),
+    val numberOfRemovedVideosEvent: StateEventWithContent<Int> = consumed(),
 )

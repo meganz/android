@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
@@ -62,8 +63,8 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
-    @Assisted private val playlistHandle: Long,
-    @Assisted private val type: PlaylistType,
+    private val removeVideosFromPlaylistUseCase: RemoveVideosFromPlaylistUseCase,
+    @Assisted private val args: Args,
 ) : ViewModel() {
     private val selectedVideoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
 
@@ -76,7 +77,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
         monitorVideoPlaylistSetsUpdateUseCase()
             .filter {
-                playlistHandle in it
+                args.playlistHandle in it
             }.mapLatest { }
             .catch { Timber.e(it) },
         monitorNodeUpdatesUseCase()
@@ -89,7 +90,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private fun getVideoPlaylist() =
         combinedTriggerFlow().mapLatest {
             runCatching {
-                getVideoPlaylistByIdUseCase(NodeId(playlistHandle), type)
+                getVideoPlaylistByIdUseCase(NodeId(args.playlistHandle), args.type)
             }.getOrNull()
         }
 
@@ -105,12 +106,14 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 videoPlaylistDetailUiEntityMapper(it, showHiddenItems, selectedVideoIds)
             }
 
+            val selectedNodes = videoPlaylist?.videos?.filter {
+                it.id.longValue in selectedVideoIds
+            }?.toSet() ?: emptySet()
+
             VideoPlaylistDetailUiState.Data(
                 playlistDetail = videoPlaylistUiEntity,
                 showHiddenItems = showHiddenItems,
-                selectedTypedNodes = videoPlaylist?.videos?.filter {
-                    it.id.longValue in selectedVideoIds
-                }?.toSet() ?: emptySet(),
+                selectedTypedNodes = selectedNodes,
                 isHiddenNodesEnabled = isHiddenNodesEnabled
             )
         }.catch {
@@ -284,8 +287,39 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
         navigateToVideoPlayerEvent.update { consumed() }
     }
 
+    internal fun removeVideosFromPlaylist(
+        videoElementIDs: List<Long>,
+        handle: Long = args.playlistHandle,
+    ) =
+        viewModelScope.launch {
+            runCatching {
+                removeVideosFromPlaylistUseCase(NodeId(handle), videoElementIDs)
+            }.onSuccess { numberOfRemovedItems ->
+                videoPlaylistEditState.update {
+                    it.copy(
+                        numberOfRemovedVideosEvent = triggered(numberOfRemovedItems)
+                    )
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
+
+    internal fun resetNumberOfRemovedVideosEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                numberOfRemovedVideosEvent = consumed()
+            )
+        }
+    }
+
     @AssistedFactory
     interface Factory {
-        fun create(playlistHandle: Long, type: PlaylistType): VideoPlaylistDetailViewModel
+        fun create(args: Args): VideoPlaylistDetailViewModel
     }
+
+    data class Args(
+        val playlistHandle: Long,
+        val type: PlaylistType,
+    )
 }

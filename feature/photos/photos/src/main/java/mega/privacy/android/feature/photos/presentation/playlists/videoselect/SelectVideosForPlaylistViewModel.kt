@@ -64,9 +64,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
-    @Assisted("nodeHandle") private val nodeHandle: Long,
-    @Assisted private val nodeName: String?,
-    @Assisted("playlistHandle") private val playlistHandle: Long,
+    @Assisted private val args: Args,
 ) : ViewModel() {
     private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoHandlesFlow = MutableStateFlow<Set<Long>>(emptySet())
@@ -102,7 +100,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     private fun getNodesFlow(): Flow<Pair<List<TypedNode>, Boolean>> =
         combinedTriggerFlow().flatMapLatest {
-            val folderId = NodeId(nodeHandle)
+            val folderId = NodeId(args.nodeHandle)
             val folderOrRootNodeId = if (folderId.longValue == -1L) {
                 getRootNodeIdUseCase() ?: folderId
             } else {
@@ -153,8 +151,8 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 .map { it.copy(isSelected = it.id.longValue in selectedHandles) }
 
             SelectVideosForPlaylistUiState.Data(
-                title = LocalizedText.Literal(nodeName ?: ""),
-                isCloudDriveRoot = nodeHandle == -1L,
+                title = LocalizedText.Literal(args.nodeName ?: ""),
+                isCloudDriveRoot = args.nodeHandle == -1L,
                 items = items,
                 showHiddenItems = showHiddenItems,
                 selectedSortConfiguration = sortOrderPair,
@@ -183,7 +181,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     internal fun itemClicked(item: SelectVideoItemUiEntity) {
         if (item.isFolder && selectedVideoHandlesFlow.value.isEmpty()) {
-            navigateToFolderEvent.update { triggered(playlistHandle to item) }
+            navigateToFolderEvent.update { triggered(args.playlistHandle to item) }
         } else {
             toggleItemSelection(item)
         }
@@ -246,7 +244,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
     }
 
     internal fun addVideosToPlaylist(
-        playlistID: NodeId = NodeId(playlistHandle),
+        playlistID: NodeId = NodeId(args.playlistHandle),
         videoIDs: List<NodeId>,
     ) =
         viewModelScope.launch {
@@ -254,7 +252,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 addVideosToPlaylistUseCase(playlistID, videoIDs)
             }.onSuccess { numberOfAddedVideos ->
                 numberOfAddedVideosEvent.update {
-                    triggered(playlistHandle to numberOfAddedVideos)
+                    triggered(args.playlistHandle to numberOfAddedVideos)
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -267,10 +265,12 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            @Assisted("nodeHandle") nodeHandle: Long,
-            nodeName: String?,
-            @Assisted("playlistHandle") playlistHandle: Long,
-        ): SelectVideosForPlaylistViewModel
+        fun create(args: Args): SelectVideosForPlaylistViewModel
     }
+
+    data class Args(
+        val nodeHandle: Long,
+        val nodeName: String?,
+        val playlistHandle: Long,
+    )
 }

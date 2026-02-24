@@ -132,6 +132,11 @@ class SelectVideosForPlaylistViewModelTest {
         showHiddenItems: Boolean = false,
         viewType: ViewType = ViewType.LIST,
     ) {
+        val args = SelectVideosForPlaylistViewModel.Args(
+            nodeHandle = nodeHandle,
+            nodeName = nodeName,
+            playlistHandle = playlistHandle,
+        )
         if (nodeHandle == -1L) {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
         }
@@ -172,9 +177,7 @@ class SelectVideosForPlaylistViewModelTest {
             setViewTypeUseCase = setViewTypeUseCase,
             monitorViewTypeUseCase = monitorViewTypeUseCase,
             addVideosToPlaylistUseCase = addVideosToPlaylistUseCase,
-            nodeHandle = nodeHandle,
-            nodeName = nodeName,
-            playlistHandle = playlistHandle,
+            args = args,
         )
     }
 

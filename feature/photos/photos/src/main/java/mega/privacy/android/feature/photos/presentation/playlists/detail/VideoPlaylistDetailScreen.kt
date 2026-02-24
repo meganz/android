@@ -100,6 +100,8 @@ fun VideoPlaylistDetailRoute(
         onLongClick = viewModel::onItemLongClicked,
         selectAll = viewModel::selectAllVideos,
         clearSelection = viewModel::clearSelection,
+        resetRemoveVideosEvent = viewModel::resetNumberOfRemovedVideosEvent,
+        removeVideosFromPlaylist = viewModel::removeVideosFromPlaylist,
         clearResultFlow = clearResult,
         navigateToSelectVideos = navigateToSelectVideos,
         onBack = onBack
@@ -113,6 +115,7 @@ fun VideoPlaylistDetailScreen(
     videoPlaylistEditState: VideoPlaylistEditState,
     numberOfAddedVideos: Int?,
     onBack: () -> Unit,
+    removeVideosFromPlaylist: (List<Long>) -> Unit,
     modifier: Modifier = Modifier,
     showRenameVideoPlaylistDialog: () -> Unit = {},
     updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
@@ -127,6 +130,7 @@ fun VideoPlaylistDetailScreen(
     clearSelection: () -> Unit = {},
     navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit = {},
     clearResultFlow: (key: String) -> Unit = {},
+    resetRemoveVideosEvent: () -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
@@ -134,7 +138,8 @@ fun VideoPlaylistDetailScreen(
     val lazyListState = rememberLazyListState()
     var showPlaylistBottomSheet by rememberSaveable { mutableStateOf(false) }
     val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showRemovedDialog by rememberSaveable { mutableStateOf(false) }
+    var showRemovedPlaylistDialog by rememberSaveable { mutableStateOf(false) }
+    var showRemovedVideosDialog by rememberSaveable { mutableStateOf(false) }
 
     val dataState = uiState as? VideoPlaylistDetailUiState.Data
     val selectedNodes = dataState?.selectedTypedNodes ?: emptySet()
@@ -213,8 +218,7 @@ fun VideoPlaylistDetailScreen(
                         }
 
                         is VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist -> {
-                            //TODO Will implement in another ticket
-                            clearSelection()
+                            showRemovedVideosDialog = true
                         }
                     }
                 }
@@ -242,7 +246,7 @@ fun VideoPlaylistDetailScreen(
                 EventEffect(
                     event = videoPlaylistEditState.playlistsRemovedEvent,
                     onConsumed = {
-                        showRemovedDialog = false
+                        showRemovedPlaylistDialog = false
                         onConsumedPlaylistRemovedEvent()
                     },
                     action = { deletedVideoPlaylistTitles ->
@@ -264,6 +268,22 @@ fun VideoPlaylistDetailScreen(
                         onBack()
                     }
                 )
+
+                EventEffect(
+                    event = videoPlaylistEditState.numberOfRemovedVideosEvent,
+                    onConsumed = resetRemoveVideosEvent,
+                ) { number ->
+                    if (number > 0) {
+                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
+                        val message = resources.getQuantityString(
+                            sharedR.plurals.video_section_playlist_detail_remove_videos_message,
+                            number,
+                            number,
+                            title
+                        )
+                        snackBarQueue.queueMessage(message)
+                    }
+                }
 
                 LaunchedEffect(numberOfAddedVideos) {
                     val number = numberOfAddedVideos ?: 0
@@ -365,7 +385,7 @@ fun VideoPlaylistDetailScreen(
                             when (action) {
                                 is VideoPlaylistRenameMenuAction -> showRenameVideoPlaylistDialog()
                                 is VideoPlaylistsTrashMenuAction -> {
-                                    showRemovedDialog = true
+                                    showRemovedPlaylistDialog = true
                                     showPlaylistBottomSheet = false
                                 }
                             }
@@ -398,7 +418,7 @@ fun VideoPlaylistDetailScreen(
                     )
                 }
 
-                if (showRemovedDialog) {
+                if (showRemovedPlaylistDialog) {
                     BasicDialog(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
@@ -411,10 +431,31 @@ fun VideoPlaylistDetailScreen(
                             uiState.playlistDetail?.uiEntity?.let {
                                 onDeleteButtonClicked(setOf(it))
                             }
-                            showRemovedDialog = false
+                            showRemovedPlaylistDialog = false
                         },
-                        onNegativeButtonClicked = { showRemovedDialog = false },
-                        onDismiss = { showRemovedDialog = false }
+                        onNegativeButtonClicked = { showRemovedPlaylistDialog = false },
+                        onDismiss = { showRemovedPlaylistDialog = false }
+                    )
+                }
+
+                if (showRemovedVideosDialog) {
+                    BasicDialog(
+                        modifier = Modifier.testTag(
+                            VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG
+                        ),
+                        title = stringResource(id = sharedR.string.video_section_playlist_detail_remove_videos_dialog_title),
+                        description = null,
+                        positiveButtonText = stringResource(sharedR.string.video_section_playlist_detail_remove_videos_dialog_remove_button),
+                        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            dataState?.selectedElementIds?.takeIf { it.isNotEmpty() }?.let { ids ->
+                                removeVideosFromPlaylist(ids.toList())
+                            }
+                            showRemovedVideosDialog = false
+                            clearSelection()
+                        },
+                        onNegativeButtonClicked = { showRemovedVideosDialog = false },
+                        onDismiss = { showRemovedVideosDialog = false }
                     )
                 }
             }
@@ -484,6 +525,12 @@ const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG = "video_playlist_detail:b
  */
 const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlist_detail:dialog_delete_video_playlist"
+
+/**
+ * Test tag for removing videos dialog
+ */
+const val VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG =
+    "video_playlist_detail:dialog_remove_videos"
 
 /**
  * Test tag for adding video to playlist FAB

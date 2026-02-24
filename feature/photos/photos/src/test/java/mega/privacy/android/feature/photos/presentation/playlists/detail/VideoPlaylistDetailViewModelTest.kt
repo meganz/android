@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
+import mega.privacy.android.domain.usecase.videosection.RemoveVideosFromPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.UpdateVideoPlaylistTitleUseCase
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistDetailUiEntityMapper
 import mega.privacy.android.feature.photos.mapper.VideoPlaylistTitleValidationErrorMessageMapper
@@ -77,6 +78,7 @@ class VideoPlaylistDetailViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
+    private val removeVideosFromPlaylistUseCase = mock<RemoveVideosFromPlaylistUseCase>()
     private val nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper()
 
     private val testId = NodeId(123456L)
@@ -93,6 +95,10 @@ class VideoPlaylistDetailViewModelTest {
 
     @BeforeEach
     fun setUp() {
+        val args = VideoPlaylistDetailViewModel.Args(
+            playlistHandle = testId.longValue,
+            type = testType
+        )
         underTest = VideoPlaylistDetailViewModel(
             videoPlaylistDetailUiEntityMapper = videoPlaylistDetailUiEntityMapper,
             getVideoPlaylistByIdUseCase = getVideoPlaylistByIdUseCase,
@@ -105,8 +111,8 @@ class VideoPlaylistDetailViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             nodeSourceTypeToViewTypeMapper = nodeSourceTypeToViewTypeMapper,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
-            playlistHandle = testId.longValue,
-            type = testType
+            removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
+            args = args,
         )
     }
 
@@ -122,7 +128,8 @@ class VideoPlaylistDetailViewModelTest {
             removeVideoPlaylistsUseCase,
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
-            getNodeContentUriByHandleUseCase
+            getNodeContentUriByHandleUseCase,
+            removeVideosFromPlaylistUseCase
         )
     }
 
@@ -629,6 +636,47 @@ class VideoPlaylistDetailViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that selectedElementIds is derived from playlistDetail videos and selectedTypedNodes`() =
+        runTest {
+            val video1 = createVideoUiEntity(handle = 1L, elementID = 10L)
+            val video2 = createVideoUiEntity(handle = 2L, elementID = 20L)
+            val typedNode1 = createTypedVideoNode(video1)
+            val typedNode2 = createTypedVideoNode(video2)
+            val playlistWithVideos = createVideoPlaylist(
+                expectedPlaylistUiEntity,
+                videos = listOf(typedNode1, typedNode2)
+            )
+            val detailWithVideos = mock<VideoPlaylistDetailUiEntity> {
+                on { uiEntity }.thenReturn(expectedPlaylistUiEntity)
+                on { videos }.thenReturn(listOf(video1, video2))
+            }
+            stubInitialValues(
+                videoPlaylist = playlistWithVideos,
+                detailEntity = detailWithVideos
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    var actual = awaitItem()
+                    assertThat(actual.selectedElementIds).isEmpty()
+
+                    underTest.onItemLongClicked(video1)
+                    actual = awaitItem()
+                    assertThat(actual.selectedElementIds).containsExactly(10L)
+
+                    underTest.onItemLongClicked(video2)
+                    actual = awaitItem()
+                    assertThat(actual.selectedElementIds).containsExactlyElementsIn(setOf(10L, 20L))
+
+                    underTest.clearSelection()
+                    actual = awaitItem()
+                    assertThat(actual.selectedElementIds).isEmpty()
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
     @ParameterizedTest(name = "when showHiddenItems is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that uiState showHiddenItems is updated correctly`(showHiddenItems: Boolean) =
@@ -732,11 +780,78 @@ class VideoPlaylistDetailViewModelTest {
             }
     }
 
+    @Test
+    fun `test that removeVideosFromPlaylist invokes use case and triggers numberOfRemovedVideosEvent`() =
+        runTest {
+            stubInitialValues()
+            val elementIds = listOf(10L, 20L)
+            val numberOfRemoved = 2
+            whenever(removeVideosFromPlaylistUseCase(any(), any())).thenReturn(numberOfRemoved)
+
+            underTest.removeVideosFromPlaylist(elementIds)
+            advanceUntilIdle()
+
+            val event = underTest.videoPlaylistEditState.value.numberOfRemovedVideosEvent
+            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((event as StateEventWithContentTriggered).content).isEqualTo(numberOfRemoved)
+            verify(removeVideosFromPlaylistUseCase).invoke(testId, elementIds)
+        }
+
+    @Test
+    fun `test that removeVideosFromPlaylist with custom handle invokes use case with that handle`() =
+        runTest {
+            stubInitialValues()
+            val customHandle = 999L
+            val elementIds = listOf(1L)
+            whenever(removeVideosFromPlaylistUseCase(any(), any())).thenReturn(1)
+
+            underTest.removeVideosFromPlaylist(elementIds, handle = customHandle)
+            advanceUntilIdle()
+
+            verify(removeVideosFromPlaylistUseCase).invoke(NodeId(customHandle), elementIds)
+        }
+
+    @Test
+    fun `test that resetNumberOfRemovedVideosEvent resets event to consumed`() = runTest {
+        stubInitialValues()
+        whenever(removeVideosFromPlaylistUseCase(any(), any())).thenReturn(1)
+
+        underTest.removeVideosFromPlaylist(listOf(1L))
+        advanceUntilIdle()
+        assertThat(underTest.videoPlaylistEditState.value.numberOfRemovedVideosEvent)
+            .isInstanceOf(StateEventWithContentTriggered::class.java)
+
+        underTest.resetNumberOfRemovedVideosEvent()
+        assertThat(
+            underTest.videoPlaylistEditState.value.numberOfRemovedVideosEvent
+        ).isEqualTo(consumed())
+    }
+
+    @Test
+    fun `test that when removeVideosFromPlaylistUseCase fails numberOfRemovedVideosEvent is not triggered`() =
+        runTest {
+            stubInitialValues()
+            whenever(
+                removeVideosFromPlaylistUseCase(
+                    any(),
+                    any()
+                )
+            ).thenThrow(RuntimeException("test"))
+
+            underTest.removeVideosFromPlaylist(listOf(1L))
+            advanceUntilIdle()
+
+            assertThat(
+                underTest.videoPlaylistEditState.value.numberOfRemovedVideosEvent
+            ).isEqualTo(consumed())
+        }
+
     private fun createVideoUiEntity(
         handle: Long,
         parentHandle: Long = 50L,
         name: String = "video name $handle",
         duration: Duration = 1.minutes,
+        elementID: Long? = 1L,
         isSharedItems: Boolean = false,
         isMarkedSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
@@ -744,7 +859,7 @@ class VideoPlaylistDetailViewModelTest {
         id = NodeId(handle),
         name = name,
         parentId = NodeId(parentHandle),
-        elementID = 1L,
+        elementID = elementID,
         duration = duration,
         isSharedItems = isSharedItems,
         size = 100L,

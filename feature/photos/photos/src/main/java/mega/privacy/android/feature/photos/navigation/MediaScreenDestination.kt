@@ -180,12 +180,16 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
     navigationHandler: NavigationHandler,
     resultFlow: (String) -> Flow<Int?>,
 ) {
-    entry<VideoPlaylistDetailNavKey> { args ->
+    entry<VideoPlaylistDetailNavKey> { key ->
         val numberOfAddedVideos by resultFlow(SelectVideosForPlaylistNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
         val viewModel =
             hiltViewModel<VideoPlaylistDetailViewModel, VideoPlaylistDetailViewModel.Factory> { factory ->
-                factory.create(args.playlistHandle, args.type)
+                factory.create(
+                    VideoPlaylistDetailViewModel.Args(
+                        playlistHandle = key.playlistHandle, type = key.type
+                    )
+                )
             }
 
         VideoPlaylistDetailRoute(
@@ -411,9 +415,14 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
     entry<SelectVideosForPlaylistNavKey> { key ->
         val viewModel =
             hiltViewModel<SelectVideosForPlaylistViewModel, SelectVideosForPlaylistViewModel.Factory> {
-                it.create(key.nodeHandle, key.nodeName, key.playlistHandle)
+                it.create(
+                    SelectVideosForPlaylistViewModel.Args(
+                        nodeHandle = key.nodeHandle,
+                        nodeName = key.nodeName,
+                        playlistHandle = key.playlistHandle
+                    )
+                )
             }
-
         SelectVideosForPlaylistRoute(
             onNavigateToFolder = { handle, name, playlistHandle ->
                 navigationHandler.navigate(
