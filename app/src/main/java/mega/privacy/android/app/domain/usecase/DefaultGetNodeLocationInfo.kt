@@ -14,13 +14,11 @@ import javax.inject.Inject
 class DefaultGetNodeLocationInfo @Inject constructor(
     private val megaNodeUtilWrapper: MegaNodeUtilWrapper,
     private val nodeRepository: NodeRepository,
-    private val isAvailableOffline: IsAvailableOfflineUseCase,
 ) : GetNodeLocationInfo {
     override suspend fun invoke(typedNode: TypedNode): LocationInfo? {
         val fromIncomingShare = (nodeRepository.getOwnerIdFromInShare(typedNode.id, true) != null)
-        val fromOffline = isAvailableOffline(typedNode)
         return megaNodeUtilWrapper.getNodeLocationInfo(
-            if (fromOffline) Constants.OFFLINE_ADAPTER else -1,
+            -1,
             fromIncomingShare,
             typedNode.id.longValue
         )

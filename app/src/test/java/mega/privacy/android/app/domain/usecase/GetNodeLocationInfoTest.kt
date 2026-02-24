@@ -3,16 +3,12 @@ package mega.privacy.android.app.domain.usecase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
-import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +27,6 @@ class GetNodeLocationInfoTest {
     private lateinit var underTest: GetNodeLocationInfo
     private val megaNodeUtilWrapper = mock<MegaNodeUtilWrapper>()
     private val nodeRepository = mock<NodeRepository>()
-    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
 
     private val node = mock<TypedFolderNode> {
         on { id }.thenReturn(nodeId)
@@ -46,14 +41,12 @@ class GetNodeLocationInfoTest {
         underTest = DefaultGetNodeLocationInfo(
             megaNodeUtilWrapper,
             nodeRepository,
-            isAvailableOfflineUseCase,
         )
     }
 
     @Test
     fun `test if node has owner util wrapper is called with inComingShare true`() = runTest {
         whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(mock())
-        whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
         underTest(node)
         verify(megaNodeUtilWrapper).getNodeLocationInfo(any(), eq(true), eq(handle))
     }
@@ -61,29 +54,14 @@ class GetNodeLocationInfoTest {
     @Test
     fun `test if node has no owner util wrapper is called with inComingShare false`() = runTest {
         whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-        whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
         underTest(node)
         verify(megaNodeUtilWrapper).getNodeLocationInfo(any(), eq(false), eq(handle))
     }
 
     @Test
-    fun `test if node is available offline util wrapper is called with proper value as adapter type`() =
-        runTest {
-            whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-            whenever(isAvailableOfflineUseCase(node)).thenReturn(true)
-            underTest(node)
-            verify(megaNodeUtilWrapper).getNodeLocationInfo(
-                eq(Constants.OFFLINE_ADAPTER),
-                any(),
-                eq(handle)
-            )
-        }
-
-    @Test
     fun `test if node is not available offline util wrapper is called with proper value as adapter type`() =
         runTest {
             whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-            whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
             underTest(node)
             verify(megaNodeUtilWrapper).getNodeLocationInfo(
                 AdditionalMatchers.not(eq(Constants.OFFLINE_ADAPTER)),
