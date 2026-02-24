@@ -74,10 +74,9 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
@@ -682,10 +681,23 @@ internal fun AlbumOptionsBottomSheet(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val cover = albumUiState?.cover?.downloadAsStateWithLifecycle(isPreview = false)
-    val downloadedPhoto = when (val result = cover?.value) {
-        is DownloadPhotoResult.Success -> result.thumbnailFilePath
-        else -> null
+    val context = LocalContext.current
+    val request = remember(albumUiState?.cover) {
+        ImageRequest.Builder(context)
+            .data(
+                albumUiState?.cover?.let {
+                    MediaThumbnailRequest(
+                        id = it.id,
+                        isPreview = false,
+                        thumbnailFilePath = it.thumbnailFilePath,
+                        previewFilePath = it.previewFilePath,
+                        isPublicNode = false,
+                        fileExtension = it.fileTypeInfo.extension
+                    )
+                }
+            )
+            .crossfade(enable = true)
+            .build()
     }
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -726,10 +738,7 @@ internal fun AlbumOptionsBottomSheet(
                     title = albumUiState?.title?.text,
                     leadingElement = {
                         AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(downloadedPhoto)
-                                .crossfade(true)
-                                .build(),
+                            model = request,
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

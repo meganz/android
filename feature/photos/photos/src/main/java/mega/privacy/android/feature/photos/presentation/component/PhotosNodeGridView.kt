@@ -20,7 +20,6 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,12 +43,10 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.components.ImagePhotosNode
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.components.VideoPhotosNode
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
@@ -361,69 +358,67 @@ private fun dateText(
 @Composable
 private fun PhotosNodeGridViewPreview() {
     AndroidThemeForPreviews {
-        CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-            PhotosNodeGridView(
-                items = persistentListOf(
-                    HeaderItem(time = LocalDateTime.now()),
-                    PhotoNodeItem(
-                        node = PhotoNodeUiState(
-                            photo = PhotoUiState.Image(
-                                id = 1L,
-                                albumPhotoId = null,
-                                parentId = 0L,
-                                name = "",
-                                isFavourite = false,
-                                creationTime = LocalDateTime.now(),
-                                modificationTime = LocalDateTime.now(),
-                                thumbnailFilePath = null,
-                                previewFilePath = null,
-                                fileTypeInfo = StaticImageFileTypeInfo(
-                                    mimeType = "",
-                                    extension = "",
-                                ),
-                                size = 0L,
-                                isTakenDown = false,
-                                isSensitive = false,
-                                isSensitiveInherited = false
+        PhotosNodeGridView(
+            items = persistentListOf(
+                HeaderItem(time = LocalDateTime.now()),
+                PhotoNodeItem(
+                    node = PhotoNodeUiState(
+                        photo = PhotoUiState.Image(
+                            id = 1L,
+                            albumPhotoId = null,
+                            parentId = 0L,
+                            name = "",
+                            isFavourite = false,
+                            creationTime = LocalDateTime.now(),
+                            modificationTime = LocalDateTime.now(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            fileTypeInfo = StaticImageFileTypeInfo(
+                                mimeType = "",
+                                extension = "",
                             ),
-                            defaultIcon = R.drawable.ic_3d_medium_solid,
+                            size = 0L,
+                            isTakenDown = false,
                             isSensitive = false,
-                        )
-                    ),
-                    PhotoNodeItem(
-                        node = PhotoNodeUiState(
-                            photo = PhotoUiState.Video(
-                                id = 2L,
-                                albumPhotoId = null,
-                                parentId = 0L,
-                                name = "",
-                                isFavourite = false,
-                                creationTime = LocalDateTime.now(),
-                                modificationTime = LocalDateTime.now(),
-                                thumbnailFilePath = null,
-                                previewFilePath = null,
-                                fileTypeInfo = VideoFileTypeInfo(
-                                    mimeType = "",
-                                    extension = "",
-                                    duration = Duration.ZERO
-                                ),
-                                size = 0L,
-                                isTakenDown = false,
-                                isSensitive = false,
-                                isSensitiveInherited = false
-                            ),
-                            defaultIcon = R.drawable.ic_3d_medium_solid,
-                            isSensitive = true,
-                        )
+                            isSensitiveInherited = false
+                        ),
+                        defaultIcon = R.drawable.ic_3d_medium_solid,
+                        isSensitive = false,
                     )
                 ),
-                selectedPhotoIds = setOf(),
-                gridSize = TimelineGridSize.Default,
-                onGridSizeChange = {},
-                onClick = {},
-                onLongClick = {}
-            )
-        }
+                PhotoNodeItem(
+                    node = PhotoNodeUiState(
+                        photo = PhotoUiState.Video(
+                            id = 2L,
+                            albumPhotoId = null,
+                            parentId = 0L,
+                            name = "",
+                            isFavourite = false,
+                            creationTime = LocalDateTime.now(),
+                            modificationTime = LocalDateTime.now(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            fileTypeInfo = VideoFileTypeInfo(
+                                mimeType = "",
+                                extension = "",
+                                duration = Duration.ZERO
+                            ),
+                            size = 0L,
+                            isTakenDown = false,
+                            isSensitive = false,
+                            isSensitiveInherited = false
+                        ),
+                        defaultIcon = R.drawable.ic_3d_medium_solid,
+                        isSensitive = true,
+                    )
+                )
+            ),
+            selectedPhotoIds = setOf(),
+            gridSize = TimelineGridSize.Default,
+            onGridSizeChange = {},
+            onClick = {},
+            onLongClick = {}
+        )
     }
 }
 

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.albums.content
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -22,9 +21,7 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
@@ -106,52 +103,50 @@ class AlbumContentScreenComposeTest {
         consumeInfoToShowEvent: () -> Unit = {},
     ) {
         composeTestRule.setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-                AlbumContentScreen(
-                    uiState = uiState,
-                    actionState = actionState,
-                    actionHandler = actionHandler,
-                    onBack = onBack,
-                    togglePhotoSelection = togglePhotoSelection,
-                    deselectAll = deselectAll,
-                    savePhotosToDevice = savePhotosToDevice,
-                    resetSavePhotosToDeviceEvent = resetSavePhotosToDeviceEvent,
-                    sharePhotos = sharePhotos,
-                    resetSharePhotosEvent = resetSharePhotosEvent,
-                    sendPhotosToChatEvent = sendPhotosToChatEvent,
-                    resetSendPhotosToChatEvent = resetSendPhotosToChatEvent,
-                    hidePhotos = hidePhotosEvent,
-                    unhidePhotos = unhidePhotosEvent,
-                    removeFavourites = removeFavourites,
-                    removePhotos = removePhotos,
-                    deleteAlbum = deleteAlbum,
-                    hideDeleteConfirmation = hideDeleteConfirmation,
-                    renameAlbum = renameAlbum,
-                    resetUpdateAlbumNameErrorMessage = resetUpdateAlbumNameErrorMessage,
-                    resetShowUpdateAlbumName = resetShowUpdateAlbumName,
-                    resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
-                    selectAlbumCover = selectAlbumCover,
-                    resetSelectAlbumCoverEvent = resetSelectAlbumCoverEvent,
-                    resetManageLink = resetManageLink,
-                    hideRemoveLinkConfirmation = hideRemoveLinkConfirmation,
-                    removeLink = removeLink,
-                    resetLinkRemovedSuccessEvent = resetLinkRemovedSuccessEvent,
-                    openGetLink = openGetLink,
-                    handleAction = handleBottomSheetAction,
-                    navigateToPaywall = navigateToPaywall,
-                    resetPaywallEvent = resetPaywallEvent,
-                    sortPhotos = sortPhotos,
-                    previewPhoto = previewPhoto,
-                    resetPreviewPhoto = resetPreviewPhoto,
-                    navigateToPhotoPreview = navigateToPhotoPreview,
-                    resetAddMoreItems = resetAddMoreItems,
-                    navigateToPhotoSelection = navigateToPhotoSelection,
-                    onTransfer = onTransfer,
-                    consumeDownloadEvent = consumeDownloadEvent,
-                    consumeInfoToShowEvent = consumeInfoToShowEvent,
-                    snackbarQueue = snackbarEventQueue,
-                )
-            }
+            AlbumContentScreen(
+                uiState = uiState,
+                actionState = actionState,
+                actionHandler = actionHandler,
+                onBack = onBack,
+                togglePhotoSelection = togglePhotoSelection,
+                deselectAll = deselectAll,
+                savePhotosToDevice = savePhotosToDevice,
+                resetSavePhotosToDeviceEvent = resetSavePhotosToDeviceEvent,
+                sharePhotos = sharePhotos,
+                resetSharePhotosEvent = resetSharePhotosEvent,
+                sendPhotosToChatEvent = sendPhotosToChatEvent,
+                resetSendPhotosToChatEvent = resetSendPhotosToChatEvent,
+                hidePhotos = hidePhotosEvent,
+                unhidePhotos = unhidePhotosEvent,
+                removeFavourites = removeFavourites,
+                removePhotos = removePhotos,
+                deleteAlbum = deleteAlbum,
+                hideDeleteConfirmation = hideDeleteConfirmation,
+                renameAlbum = renameAlbum,
+                resetUpdateAlbumNameErrorMessage = resetUpdateAlbumNameErrorMessage,
+                resetShowUpdateAlbumName = resetShowUpdateAlbumName,
+                resetDeleteAlbumSuccessEvent = resetDeleteAlbumSuccessEvent,
+                selectAlbumCover = selectAlbumCover,
+                resetSelectAlbumCoverEvent = resetSelectAlbumCoverEvent,
+                resetManageLink = resetManageLink,
+                hideRemoveLinkConfirmation = hideRemoveLinkConfirmation,
+                removeLink = removeLink,
+                resetLinkRemovedSuccessEvent = resetLinkRemovedSuccessEvent,
+                openGetLink = openGetLink,
+                handleAction = handleBottomSheetAction,
+                navigateToPaywall = navigateToPaywall,
+                resetPaywallEvent = resetPaywallEvent,
+                sortPhotos = sortPhotos,
+                previewPhoto = previewPhoto,
+                resetPreviewPhoto = resetPreviewPhoto,
+                navigateToPhotoPreview = navigateToPhotoPreview,
+                resetAddMoreItems = resetAddMoreItems,
+                navigateToPhotoSelection = navigateToPhotoSelection,
+                onTransfer = onTransfer,
+                consumeDownloadEvent = consumeDownloadEvent,
+                consumeInfoToShowEvent = consumeInfoToShowEvent,
+                snackbarQueue = snackbarEventQueue,
+            )
         }
     }
 
@@ -400,15 +395,13 @@ class AlbumContentScreenComposeTest {
         val albumUiState = createMockAlbumUiState()
 
         composeTestRule.setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-                AlbumOptionsBottomSheet(
-                    isVisible = false,
-                    onDismiss = {},
-                    albumUiState = albumUiState,
-                    onAction = {},
-                    actions = AlbumContentSelectionAction.bottomBarItems
-                )
-            }
+            AlbumOptionsBottomSheet(
+                isVisible = false,
+                onDismiss = {},
+                albumUiState = albumUiState,
+                onAction = {},
+                actions = AlbumContentSelectionAction.bottomBarItems
+            )
         }
 
         composeTestRule
@@ -422,15 +415,13 @@ class AlbumContentScreenComposeTest {
         val albumUiState = createMockAlbumUiState(title = albumTitle)
 
         composeTestRule.setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-                AlbumOptionsBottomSheet(
-                    isVisible = true,
-                    onDismiss = {},
-                    albumUiState = albumUiState,
-                    onAction = {},
-                    actions = AlbumContentSelectionAction.bottomBarItems
-                )
-            }
+            AlbumOptionsBottomSheet(
+                isVisible = true,
+                onDismiss = {},
+                albumUiState = albumUiState,
+                onAction = {},
+                actions = AlbumContentSelectionAction.bottomBarItems
+            )
         }
 
         composeTestRule

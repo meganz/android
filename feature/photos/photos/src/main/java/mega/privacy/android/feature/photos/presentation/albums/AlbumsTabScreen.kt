@@ -28,10 +28,9 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
@@ -136,7 +135,6 @@ internal fun AlbumsTabScreen(
                 }
             ) { index ->
                 val album = uiState.albums[index]
-                val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
                 val userAlbum = album.mediaAlbum as? MediaAlbum.User
                 val isSelected = userAlbum?.let { uiState.selectedUserAlbums.contains(it) } ?: false
                 val isSensitive =
@@ -157,9 +155,15 @@ internal fun AlbumsTabScreen(
                                 userAlbum?.let(onAlbumSelectionToggle)
                             }
                         ),
-                    coverImage = when (val result = downloadResult?.value) {
-                        is DownloadPhotoResult.Success -> result.thumbnailFilePath
-                        else -> null
+                    coverImage = album.cover?.let {
+                        MediaThumbnailRequest(
+                            id = it.id,
+                            isPreview = false,
+                            thumbnailFilePath = it.thumbnailFilePath,
+                            previewFilePath = it.previewFilePath,
+                            isPublicNode = false,
+                            fileExtension = it.fileTypeInfo.extension
+                        )
                     },
                     title = HighlightedText(album.title.text),
                     placeholder = placeholder,

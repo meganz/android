@@ -64,12 +64,11 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.icon.pack.IconPack
@@ -403,7 +402,6 @@ private fun AlbumItem(
     onClickAlbum: (MediaAlbum) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val downloadResult = album.cover?.downloadAsStateWithLifecycle(isPreview = false)
     val placeholderPainter = painterResource(placeholder)
     val context = LocalContext.current
     val title = remember(album.title, query) {
@@ -419,9 +417,15 @@ private fun AlbumItem(
         modifier = modifier
             .width(104.dp)
             .clickable { onClickAlbum(album.mediaAlbum) },
-        coverImage = when (val result = downloadResult?.value) {
-            is DownloadPhotoResult.Success -> result.thumbnailFilePath
-            else -> null
+        coverImage = album.cover?.let {
+            MediaThumbnailRequest(
+                id = it.id,
+                isPreview = false,
+                thumbnailFilePath = it.thumbnailFilePath,
+                previewFilePath = it.previewFilePath,
+                isPublicNode = false,
+                fileExtension = it.fileTypeInfo.extension
+            )
         },
         title = title,
         placeholder = placeholderPainter,

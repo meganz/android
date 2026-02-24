@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.timeline
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -16,8 +15,6 @@ import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
@@ -351,30 +348,28 @@ class TimelineTabScreenTest {
         onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
     ) {
         setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-                TimelineTabScreen(
-                    uiState = uiState,
-                    mediaCameraUploadUiState = mediaCameraUploadUiState,
-                    timelineFilterUiState = timelineFilterUiState,
-                    selectedPhotoIds = selectedPhotoIds,
-                    showTimelineSortDialog = showTimelineSortDialog,
-                    selectedTimePeriod = selectedTimePeriod,
-                    clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                    onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                    setEnableCUPage = setEnableCUPage,
-                    onGridSizeChange = onGridSizeChange,
-                    onSortDialogDismissed = onSortDialogDismissed,
-                    onSortOptionChange = onSortOptionChange,
-                    onPhotoClick = onPhotoClick,
-                    onPhotoSelected = onPhotoSelected,
-                    handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                    handleNotificationPermissionResult = handleNotificationPermissionResult,
-                    onCUBannerDismissRequest = onCUBannerDismissRequest,
-                    onTabsVisibilityChange = onTabsVisibilityChange,
-                    onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                    onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
-                )
-            }
+            TimelineTabScreen(
+                uiState = uiState,
+                mediaCameraUploadUiState = mediaCameraUploadUiState,
+                timelineFilterUiState = timelineFilterUiState,
+                selectedPhotoIds = selectedPhotoIds,
+                showTimelineSortDialog = showTimelineSortDialog,
+                selectedTimePeriod = selectedTimePeriod,
+                clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                setEnableCUPage = setEnableCUPage,
+                onGridSizeChange = onGridSizeChange,
+                onSortDialogDismissed = onSortDialogDismissed,
+                onSortOptionChange = onSortOptionChange,
+                onPhotoClick = onPhotoClick,
+                onPhotoSelected = onPhotoSelected,
+                handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                handleNotificationPermissionResult = handleNotificationPermissionResult,
+                onCUBannerDismissRequest = onCUBannerDismissRequest,
+                onTabsVisibilityChange = onTabsVisibilityChange,
+                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
+            )
         }
     }
 }

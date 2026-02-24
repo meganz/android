@@ -26,9 +26,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
-import mega.privacy.android.feature.photos.downloader.DownloadPhotoViewModel
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
@@ -77,15 +74,12 @@ class MediaMainScreenAnalyticsTest {
     private val albumsTabViewModel = mock<AlbumsTabViewModel>()
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val downloadPhotoViewModel = mock<DownloadPhotoViewModel>()
-
     private val viewModelFactory = object : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return when (modelClass) {
                 MediaMainViewModel::class.java -> mediaMainViewModel as T
                 AlbumsTabViewModel::class.java -> albumsTabViewModel as T
-                DownloadPhotoViewModel::class.java -> downloadPhotoViewModel as T
                 else -> throw IllegalArgumentException(
                     "Unknown ViewModel class: ${modelClass.name}"
                 )
@@ -137,7 +131,6 @@ class MediaMainScreenAnalyticsTest {
         composeTestRule.setContent {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides viewModelStoreOwner,
-                LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle
             ) {
                 MediaMainScreen(
                     albumsTabUiState = AlbumsTabUiState(),

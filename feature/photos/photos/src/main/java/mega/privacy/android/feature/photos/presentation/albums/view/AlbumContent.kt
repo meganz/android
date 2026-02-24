@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -32,7 +35,6 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
-import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
@@ -40,9 +42,8 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.sharedcomponents.clipSelected
 import mega.privacy.android.core.sharedcomponents.selectedBorder
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.feature.photos.extensions.downloadAsStateWithLifecycle
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -56,27 +57,30 @@ internal fun AlbumPhotoItem(
     isPreview: Boolean = false,
     isSensitive: Boolean = false,
 ) {
-    val downloadResult by photo.downloadAsStateWithLifecycle(isPreview = isPreview)
-    val downloadedPhoto = remember(downloadResult) {
-        when (val result = downloadResult) {
-            is DownloadPhotoResult.Success -> if (isPreview) result.previewFilePath else result.thumbnailFilePath
-            else -> null
-        }
-    }
-
+    var shouldShowShimmer by rememberSaveable { mutableStateOf(true) }
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(downloadedPhoto)
+            .data(
+                MediaThumbnailRequest(
+                    id = photo.id,
+                    isPreview = isPreview,
+                    thumbnailFilePath = photo.thumbnailFilePath,
+                    previewFilePath = photo.previewFilePath,
+                    isPublicNode = false,
+                    fileExtension = photo.fileTypeInfo.extension
+                )
+            )
             .crossfade(true)
             .build(),
         contentDescription = null,
         error = painterResource(id = iconPackR.drawable.ic_image_medium_solid),
+        onSuccess = { shouldShowShimmer = false },
         contentScale = ContentScale.Crop,
         modifier = modifier
             .width(width)
             .height(height)
             .aspectRatio(1f)
-            .shimmerEffect(visible = downloadedPhoto.isNullOrBlank())
+            .shimmerEffect(visible = shouldShowShimmer)
             .alpha(1f.takeIf { !isSensitive } ?: 0.5f)
             .blur(0.dp.takeIf { !isSensitive } ?: 16.dp)
     )

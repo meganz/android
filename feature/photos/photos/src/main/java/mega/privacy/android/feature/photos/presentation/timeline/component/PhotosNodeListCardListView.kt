@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,9 +34,7 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -138,95 +135,93 @@ internal fun PhotosNodeListCardListView(
 @Composable
 private fun PhotosNodeListCardListViewPreview() {
     AndroidThemeForPreviews {
-        CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-            PhotosNodeListCardListView(
-                photos = persistentListOf(
-                    PhotosNodeListCard.Days(
-                        date = "2022-01-01",
-                        photoItem = PhotoNodeListCardItem(
-                            photo = PhotoUiState.Image(
-                                id = 1L,
-                                albumPhotoId = null,
-                                parentId = 0L,
-                                name = "test.jpg",
-                                isFavourite = false,
-                                creationTime = LocalDateTime.now(),
-                                modificationTime = LocalDateTime.now(),
-                                thumbnailFilePath = null,
-                                previewFilePath = null,
-                                fileTypeInfo = VideoFileTypeInfo(
-                                    mimeType = "video/mp4",
-                                    extension = "mp4",
-                                    duration = Duration.ZERO
-                                ),
-                                size = 0L,
-                                isTakenDown = false,
-                                isSensitive = false,
-                                isSensitiveInherited = false,
-                                base64Id = null,
+        PhotosNodeListCardListView(
+            photos = persistentListOf(
+                PhotosNodeListCard.Days(
+                    date = "2022-01-01",
+                    photoItem = PhotoNodeListCardItem(
+                        photo = PhotoUiState.Image(
+                            id = 1L,
+                            albumPhotoId = null,
+                            parentId = 0L,
+                            name = "test.jpg",
+                            isFavourite = false,
+                            creationTime = LocalDateTime.now(),
+                            modificationTime = LocalDateTime.now(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            fileTypeInfo = VideoFileTypeInfo(
+                                mimeType = "video/mp4",
+                                extension = "mp4",
+                                duration = Duration.ZERO
                             ),
-                            isMarkedSensitive = false
+                            size = 0L,
+                            isTakenDown = false,
+                            isSensitive = false,
+                            isSensitiveInherited = false,
+                            base64Id = null,
                         ),
-                        photosCount = 10
+                        isMarkedSensitive = false
                     ),
-                    PhotosNodeListCard.Months(
-                        date = "2022-01-02",
-                        photoItem = PhotoNodeListCardItem(
-                            photo = PhotoUiState.Image(
-                                id = 1L,
-                                albumPhotoId = null,
-                                parentId = 0L,
-                                name = "test.jpg",
-                                isFavourite = false,
-                                creationTime = LocalDateTime.now(),
-                                modificationTime = LocalDateTime.now(),
-                                thumbnailFilePath = null,
-                                previewFilePath = null,
-                                fileTypeInfo = VideoFileTypeInfo(
-                                    mimeType = "video/mp4",
-                                    extension = "mp4",
-                                    duration = Duration.ZERO
-                                ),
-                                size = 0L,
-                                isTakenDown = false,
-                                isSensitive = false,
-                                isSensitiveInherited = false,
-                                base64Id = null,
-                            ),
-                            isMarkedSensitive = true
-                        ),
-                    ),
-                    PhotosNodeListCard.Years(
-                        date = "2022-02-02",
-                        photoItem = PhotoNodeListCardItem(
-                            photo = PhotoUiState.Image(
-                                id = 1L,
-                                albumPhotoId = null,
-                                parentId = 0L,
-                                name = "test.jpg",
-                                isFavourite = false,
-                                creationTime = LocalDateTime.now(),
-                                modificationTime = LocalDateTime.now(),
-                                thumbnailFilePath = null,
-                                previewFilePath = null,
-                                fileTypeInfo = VideoFileTypeInfo(
-                                    mimeType = "video/mp4",
-                                    extension = "mp4",
-                                    duration = Duration.ZERO
-                                ),
-                                size = 0L,
-                                isTakenDown = false,
-                                isSensitive = false,
-                                isSensitiveInherited = false,
-                                base64Id = null,
-                            ),
-                            isMarkedSensitive = false
-                        ),
-                    )
+                    photosCount = 10
                 ),
-                onClick = {}
-            )
-        }
+                PhotosNodeListCard.Months(
+                    date = "2022-01-02",
+                    photoItem = PhotoNodeListCardItem(
+                        photo = PhotoUiState.Image(
+                            id = 1L,
+                            albumPhotoId = null,
+                            parentId = 0L,
+                            name = "test.jpg",
+                            isFavourite = false,
+                            creationTime = LocalDateTime.now(),
+                            modificationTime = LocalDateTime.now(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            fileTypeInfo = VideoFileTypeInfo(
+                                mimeType = "video/mp4",
+                                extension = "mp4",
+                                duration = Duration.ZERO
+                            ),
+                            size = 0L,
+                            isTakenDown = false,
+                            isSensitive = false,
+                            isSensitiveInherited = false,
+                            base64Id = null,
+                        ),
+                        isMarkedSensitive = true
+                    ),
+                ),
+                PhotosNodeListCard.Years(
+                    date = "2022-02-02",
+                    photoItem = PhotoNodeListCardItem(
+                        photo = PhotoUiState.Image(
+                            id = 1L,
+                            albumPhotoId = null,
+                            parentId = 0L,
+                            name = "test.jpg",
+                            isFavourite = false,
+                            creationTime = LocalDateTime.now(),
+                            modificationTime = LocalDateTime.now(),
+                            thumbnailFilePath = null,
+                            previewFilePath = null,
+                            fileTypeInfo = VideoFileTypeInfo(
+                                mimeType = "video/mp4",
+                                extension = "mp4",
+                                duration = Duration.ZERO
+                            ),
+                            size = 0L,
+                            isTakenDown = false,
+                            isSensitive = false,
+                            isSensitiveInherited = false,
+                            base64Id = null,
+                        ),
+                        isMarkedSensitive = false
+                    ),
+                )
+            ),
+            onClick = {}
+        )
     }
 }
 

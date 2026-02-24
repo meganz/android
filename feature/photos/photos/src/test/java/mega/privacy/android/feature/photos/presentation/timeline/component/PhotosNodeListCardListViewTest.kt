@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.timeline.component
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -14,8 +13,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoNodeListCardItem
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -263,12 +260,10 @@ class PhotosNodeListCardListViewTest {
         onClick: (photo: PhotosNodeListCard) -> Unit = {},
     ) {
         setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides DownloadPhotoResult.Idle) {
-                PhotosNodeListCardListView(
-                    photos = photos,
-                    onClick = onClick
-                )
-            }
+            PhotosNodeListCardListView(
+                photos = photos,
+                onClick = onClick
+            )
         }
     }
 }

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.component
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -11,7 +10,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
-import mega.privacy.android.feature.photos.extensions.LocalDownloadPhotoResultMock
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
@@ -121,16 +119,14 @@ class PhotosNodeGridViewTest {
         downloadPhotoResult: DownloadPhotoResult = DownloadPhotoResult.Idle,
     ) {
         setContent {
-            CompositionLocalProvider(LocalDownloadPhotoResultMock provides downloadPhotoResult) {
-                PhotosNodeGridView(
-                    items = items,
-                    selectedPhotoIds = selectedPhotoIds,
-                    gridSize = gridSize,
-                    onGridSizeChange = onGridSizeChange,
-                    onClick = onClick,
-                    onLongClick = onLongClick
-                )
-            }
+            PhotosNodeGridView(
+                items = items,
+                selectedPhotoIds = selectedPhotoIds,
+                gridSize = gridSize,
+                onGridSizeChange = onGridSizeChange,
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
         }
     }
 }
