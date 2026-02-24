@@ -508,7 +508,8 @@ internal fun AlbumContentScreen(
                         onSortOrderClick = {
                             showSortBottomSheet = true
                         },
-                        sortConfiguration = uiState.albumSortConfiguration
+                        sortConfiguration = uiState.albumSortConfiguration,
+                        isPublicAlbumPhoto = false
                     )
                 }
             }

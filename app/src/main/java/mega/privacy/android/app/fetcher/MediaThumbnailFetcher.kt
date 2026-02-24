@@ -13,6 +13,7 @@ import coil3.request.Options
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodeThumbnailUseCase
@@ -28,6 +29,7 @@ class MediaThumbnailFetcher(
     private val downloadPreviewUseCase: DownloadPreviewUseCase,
     private val downloadPublicNodeThumbnailUseCase: DownloadPublicNodeThumbnailUseCase,
     private val downloadPublicNodePreviewUseCase: DownloadPublicNodePreviewUseCase,
+    private val downloadPublicAlbumPhotoUseCase: DownloadPublicAlbumPhotoUseCase,
     private val isFolderPathExistingUseCase: IsFolderPathExistingUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
 ) : Fetcher {
@@ -50,11 +52,22 @@ class MediaThumbnailFetcher(
         }
 
         // download file
-        val isSuccess = if (request.isPublicNode) {
-            downloadPublicNodePhotoCover(nodeId = request.id)
-        } else {
-            downloadPhotoCover(nodeId = request.id)
+        val isSuccess = when {
+            request.isPublicAlbumPhoto -> {
+                downloadPublicAlbumPhotoUseCase(
+                    photoId = request.id,
+                    path = path,
+                    isPreview = request.isPreview
+                )
+            }
+
+            request.isPublicNode -> {
+                downloadPublicNodePhotoCover(nodeId = request.id)
+            }
+
+            else -> downloadPhotoCover(nodeId = request.id)
         }
+
         return if (isSuccess) {
             SourceFetchResult(
                 source = ImageSource(file = path.toPath(), fileSystem = FileSystem.SYSTEM),
@@ -75,12 +88,10 @@ class MediaThumbnailFetcher(
         )
     }
 
-    private suspend fun downloadPublicNodePhotoCover(nodeId: Long): Boolean {
-        return if (request.isPreview) {
-            downloadPublicNodePreviewUseCase(nodeId = nodeId)
-        } else {
-            downloadPublicNodeThumbnailUseCase(nodeId = nodeId)
-        }
+    private suspend fun downloadPublicNodePhotoCover(nodeId: Long) = if (request.isPreview) {
+        runCatching { downloadPublicNodePreviewUseCase(nodeId = nodeId) }.getOrDefault(false)
+    } else {
+        runCatching { downloadPublicNodeThumbnailUseCase(nodeId = nodeId) }.getOrDefault(false)
     }
 
     private suspend fun downloadPhotoCover(nodeId: Long): Boolean {
@@ -96,6 +107,7 @@ class MediaThumbnailFetcher(
         private val downloadPreviewUseCase: DownloadPreviewUseCase,
         private val downloadPublicNodeThumbnailUseCase: DownloadPublicNodeThumbnailUseCase,
         private val downloadPublicNodePreviewUseCase: DownloadPublicNodePreviewUseCase,
+        private val downloadPublicAlbumPhotoUseCase: DownloadPublicAlbumPhotoUseCase,
         private val isFolderPathExistingUseCase: IsFolderPathExistingUseCase,
         private val fileTypeIconMapper: FileTypeIconMapper,
     ) : Fetcher.Factory<MediaThumbnailRequest> {
@@ -111,6 +123,7 @@ class MediaThumbnailFetcher(
             downloadPreviewUseCase = downloadPreviewUseCase,
             downloadPublicNodeThumbnailUseCase = downloadPublicNodeThumbnailUseCase,
             downloadPublicNodePreviewUseCase = downloadPublicNodePreviewUseCase,
+            downloadPublicAlbumPhotoUseCase = downloadPublicAlbumPhotoUseCase,
             isFolderPathExistingUseCase = isFolderPathExistingUseCase,
             fileTypeIconMapper = fileTypeIconMapper
         )

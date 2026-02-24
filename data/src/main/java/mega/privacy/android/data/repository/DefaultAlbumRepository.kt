@@ -81,7 +81,7 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val imageNodeMapper: ImageNodeMapper,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val megaLocalRoomGateway: MegaLocalRoomGateway
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
 ) : AlbumRepository {
     private val userSets: MutableMap<Long, UserSet> = mutableMapOf()
 
@@ -257,7 +257,11 @@ internal class DefaultAlbumRepository @Inject constructor(
         userSetsFlow.tryEmit(userSets)
     }
 
-    override suspend fun addPhotosToAlbum(albumID: AlbumId, photoIDs: List<NodeId>, isAsync: Boolean) {
+    override suspend fun addPhotosToAlbum(
+        albumID: AlbumId,
+        photoIDs: List<NodeId>,
+        isAsync: Boolean,
+    ) {
         val progressFlow = getAlbumPhotosAddingProgressFlow(albumID)
         progressFlow.tryEmit(
             AlbumPhotosAddingProgress(
@@ -502,55 +506,61 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
-    override suspend fun downloadPublicThumbnail(photo: Photo, callback: (Boolean) -> Unit) {
+    override suspend fun downloadPublicThumbnail(
+        photoId: Long,
+        path: String?,
+    ) =
         withContext(ioDispatcher) {
-            val node = publicNodesMap[NodeId(photo.id)]
-            val thumbnailFilePath = photo.thumbnailFilePath
+            suspendCancellableCoroutine { continuation ->
+                val node = publicNodesMap[NodeId(photoId)]
 
-            if (thumbnailFilePath.isNullOrBlank()) {
-                callback(false)
-            } else if (File(thumbnailFilePath).exists()) {
-                callback(true)
-            } else if (node == null) {
-                callback(false)
-            } else {
-                megaApiGateway.getThumbnail(
-                    node = node,
-                    thumbnailFilePath = thumbnailFilePath,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { _, error ->
-                            callback(error.errorCode == MegaError.API_OK)
-                        },
-                    ),
-                )
+                if (path.isNullOrBlank()) {
+                    continuation.resumeWith(Result.success(false))
+                } else if (File(path).exists()) {
+                    continuation.resumeWith(Result.success(true))
+                } else if (node == null) {
+                    continuation.resumeWith(Result.success(false))
+                } else {
+                    megaApiGateway.getThumbnail(
+                        node = node,
+                        thumbnailFilePath = path,
+                        listener = OptionalMegaRequestListenerInterface(
+                            onRequestFinish = { _, error ->
+                                continuation.resumeWith(Result.success(error.errorCode == MegaError.API_OK))
+                            },
+                        ),
+                    )
+                }
             }
         }
-    }
 
-    override suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit) {
+    override suspend fun downloadPublicPreview(
+        photoId: Long,
+        path: String?,
+    ) =
         withContext(ioDispatcher) {
-            val node = publicNodesMap[NodeId(photo.id)]
-            val previewFilePath = photo.previewFilePath
+            suspendCancellableCoroutine { continuation ->
+                val node = publicNodesMap[NodeId(photoId)]
 
-            if (previewFilePath.isNullOrBlank()) {
-                callback(false)
-            } else if (File(previewFilePath).exists()) {
-                callback(true)
-            } else if (node == null) {
-                callback(false)
-            } else {
-                megaApiGateway.getPreview(
-                    node = node,
-                    previewFilePath = previewFilePath,
-                    listener = OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { _, error ->
-                            callback(error.errorCode == MegaError.API_OK)
-                        },
-                    ),
-                )
+                if (path.isNullOrBlank()) {
+                    continuation.resumeWith(Result.success(false))
+                } else if (File(path).exists()) {
+                    continuation.resumeWith(Result.success(true))
+                } else if (node == null) {
+                    continuation.resumeWith(Result.success(false))
+                } else {
+                    megaApiGateway.getPreview(
+                        node = node,
+                        previewFilePath = path,
+                        listener = OptionalMegaRequestListenerInterface(
+                            onRequestFinish = { _, error ->
+                                continuation.resumeWith(Result.success(error.errorCode == MegaError.API_OK))
+                            },
+                        ),
+                    )
+                }
             }
         }
-    }
 
     override fun getPublicAlbumNodesData(): Map<NodeId, String> =
         publicNodesMap.mapValues { it.value.serialize() }

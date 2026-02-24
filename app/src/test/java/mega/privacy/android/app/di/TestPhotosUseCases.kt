@@ -13,8 +13,7 @@ import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressComple
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.photos.AddPhotosToAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoPreviewUseCase
-import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoThumbnailUseCase
+import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
@@ -63,12 +62,7 @@ object TestPhotosUseCases {
     fun provideGetPublicAlbumUseCase(): GetPublicAlbumUseCase = mock()
 
     @Provides
-    fun provideDownloadPublicAlbumPhotoThumbnailUseCaseUseCase(): DownloadPublicAlbumPhotoThumbnailUseCase =
-        mock()
-
-    @Provides
-    fun provideDownloadPublicAlbumPhotoPreviewUseCaseUseCase(): DownloadPublicAlbumPhotoPreviewUseCase =
-        mock()
+    fun provideDownloadPublicAlbumPhotoUseCase(): DownloadPublicAlbumPhotoUseCase = mock()
 
     @Provides
     fun provideGetPublicAlbumNodesDataUseCase(): GetPublicAlbumNodesDataUseCase = mock()

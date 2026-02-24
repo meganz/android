@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.model.PhotoUiState
 
 private val gap = 1.dp
@@ -24,6 +23,7 @@ internal fun AlbumContentHighlightStart(
     photos: ImmutableList<PhotoUiState>,
     selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
+    isPublicAlbumPhoto: Boolean,
     modifier: Modifier = Modifier,
     onClick: (PhotoUiState) -> Unit = {},
     onLongPress: (PhotoUiState) -> Unit = {},
@@ -32,53 +32,47 @@ internal fun AlbumContentHighlightStart(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
-        AlbumPhotoContainer(
+        val firstPhoto = photos.first()
+
+        AlbumPhotoItem(
+            width = size * 2,
+            height = size * 2 + gap,
+            photo = firstPhoto,
+            isPreview = true,
+            isSensitive = shouldApplySensitiveMode && (firstPhoto.isSensitive || firstPhoto.isSensitiveInherited),
+            isSelected = firstPhoto in selectedPhotos,
+            isPublicAlbumPhoto = isPublicAlbumPhoto,
             onClick = onClick,
             onLongPress = onLongPress,
-            albumPhotoView = {
-                AlbumPhotoItem(
-                    width = size * 2,
-                    height = size * 2 + gap,
-                    photo = photos.first(),
-                    isPreview = true,
-                    isSensitive = shouldApplySensitiveMode && (photos.first().isSensitive || photos.first().isSensitiveInherited),
-                )
-            },
-            photo = photos.first(),
-            isSelected = photos.first() in selectedPhotos
         )
         if (photos.size >= 2) {
+            val secondPhoto = photos[1]
             Column(verticalArrangement = Arrangement.SpaceBetween) {
-                AlbumPhotoContainer(
+                AlbumPhotoItem(
+                    width = size,
+                    height = size,
+                    photo = secondPhoto,
+                    isSensitive = shouldApplySensitiveMode && (secondPhoto.isSensitive || secondPhoto.isSensitiveInherited),
+                    isSelected = secondPhoto in selectedPhotos,
+                    isPublicAlbumPhoto = isPublicAlbumPhoto,
                     onClick = onClick,
                     onLongPress = onLongPress,
-                    albumPhotoView = {
-                        AlbumPhotoItem(
-                            width = size,
-                            height = size,
-                            photo = photos[1],
-                            isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
-                        )
-                    },
-                    photo = photos[1],
-                    isSelected = photos[1] in selectedPhotos
                 )
+
                 if (photos.size == 3) {
+                    val thirdPhoto = photos[2]
+
                     Spacer(modifier = Modifier.height(1.dp))
 
-                    AlbumPhotoContainer(
+                    AlbumPhotoItem(
+                        width = size,
+                        height = size,
+                        photo = thirdPhoto,
+                        isSensitive = shouldApplySensitiveMode && (thirdPhoto.isSensitive || thirdPhoto.isSensitiveInherited),
+                        isSelected = thirdPhoto in selectedPhotos,
+                        isPublicAlbumPhoto = isPublicAlbumPhoto,
                         onClick = onClick,
                         onLongPress = onLongPress,
-                        albumPhotoView = {
-                            AlbumPhotoItem(
-                                width = size,
-                                height = size,
-                                photo = photos[2],
-                                isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
-                            )
-                        },
-                        photo = photos[2],
-                        isSelected = photos[2] in selectedPhotos
                     )
                 }
             }
@@ -92,61 +86,53 @@ internal fun AlbumContentUniform(
     photos: ImmutableList<PhotoUiState>,
     selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
+    isPublicAlbumPhoto: Boolean,
     modifier: Modifier = Modifier,
     onClick: (PhotoUiState) -> Unit = {},
     onLongPress: (PhotoUiState) -> Unit = {},
 ) {
+    val firstPhoto = photos.first()
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
-        AlbumPhotoContainer(
+        AlbumPhotoItem(
+            width = size,
+            height = size,
+            photo = firstPhoto,
+            isSensitive = shouldApplySensitiveMode && (firstPhoto.isSensitive || firstPhoto.isSensitiveInherited),
+            isSelected = firstPhoto in selectedPhotos,
+            isPublicAlbumPhoto = isPublicAlbumPhoto,
             onClick = onClick,
             onLongPress = onLongPress,
-            albumPhotoView = {
-                AlbumPhotoItem(
-                    width = size,
-                    height = size,
-                    photo = photos.first(),
-                    isSensitive = shouldApplySensitiveMode && (photos.first().isSensitive || photos.first().isSensitiveInherited),
-                )
-            },
-            photo = photos.first(),
-            isSelected = photos.first() in selectedPhotos
         )
         if (photos.size >= 2) {
-            AlbumPhotoContainer(
+            val secondPhoto = photos[1]
+            AlbumPhotoItem(
+                width = size,
+                height = size,
+                photo = secondPhoto,
+                isSensitive = shouldApplySensitiveMode && (secondPhoto.isSensitive || secondPhoto.isSensitiveInherited),
+                isSelected = secondPhoto in selectedPhotos,
+                isPublicAlbumPhoto = isPublicAlbumPhoto,
                 onClick = onClick,
                 onLongPress = onLongPress,
-                albumPhotoView = {
-                    AlbumPhotoItem(
-                        width = size,
-                        height = size,
-                        photo = photos[1],
-                        isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
-                    )
-                },
-                photo = photos[1],
-                isSelected = photos[1] in selectedPhotos,
             )
             if (photos.size == 2) {
                 Spacer(modifier = Modifier.size(size))
             }
         }
         if (photos.size == 3) {
-            AlbumPhotoContainer(
+            val thirdPhoto = photos[2]
+            AlbumPhotoItem(
+                width = size,
+                height = size,
+                photo = thirdPhoto,
+                isSensitive = shouldApplySensitiveMode && (thirdPhoto.isSensitive || thirdPhoto.isSensitiveInherited),
+                isSelected = thirdPhoto in selectedPhotos,
+                isPublicAlbumPhoto = isPublicAlbumPhoto,
                 onClick = onClick,
                 onLongPress = onLongPress,
-                albumPhotoView = {
-                    AlbumPhotoItem(
-                        width = size,
-                        height = size,
-                        photo = photos[2],
-                        isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
-                    )
-                },
-                photo = photos[2],
-                isSelected = photos[2] in selectedPhotos
             )
         }
     }
@@ -158,64 +144,56 @@ internal fun AlbumContentHighlightEnd(
     photos: ImmutableList<PhotoUiState>,
     selectedPhotos: ImmutableSet<PhotoUiState>,
     shouldApplySensitiveMode: Boolean,
+    isPublicAlbumPhoto: Boolean,
     modifier: Modifier = Modifier,
     onClick: (PhotoUiState) -> Unit = {},
     onLongPress: (PhotoUiState) -> Unit = {},
 ) {
+    val firstPhoto = photos.first()
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
         Column(verticalArrangement = Arrangement.SpaceBetween) {
-            AlbumPhotoContainer(
+            AlbumPhotoItem(
+                width = size,
+                height = size,
+                photo = firstPhoto,
+                isSensitive = shouldApplySensitiveMode && (firstPhoto.isSensitive || firstPhoto.isSensitiveInherited),
+                isSelected = firstPhoto in selectedPhotos,
+                isPublicAlbumPhoto = isPublicAlbumPhoto,
                 onClick = onClick,
                 onLongPress = onLongPress,
-                albumPhotoView = {
-                    AlbumPhotoItem(
-                        width = size,
-                        height = size,
-                        photo = photos.first(),
-                        isSensitive = shouldApplySensitiveMode && (photos.first().isSensitive || photos.first().isSensitiveInherited),
-                    )
-                },
-                photo = photos.first(),
-                isSelected = photos.first() in selectedPhotos
             )
 
             if (photos.size == 3) {
+                val thirdPhoto = photos[2]
                 Spacer(modifier = Modifier.height(1.dp))
 
-                AlbumPhotoContainer(
+                AlbumPhotoItem(
+                    width = size,
+                    height = size,
+                    photo = thirdPhoto,
+                    isSensitive = shouldApplySensitiveMode && (thirdPhoto.isSensitive || thirdPhoto.isSensitiveInherited),
+                    isSelected = thirdPhoto in selectedPhotos,
+                    isPublicAlbumPhoto = isPublicAlbumPhoto,
                     onClick = onClick,
                     onLongPress = onLongPress,
-                    albumPhotoView = {
-                        AlbumPhotoItem(
-                            width = size,
-                            height = size,
-                            photo = photos[2],
-                            isSensitive = shouldApplySensitiveMode && (photos[2].isSensitive || photos[2].isSensitiveInherited),
-                        )
-                    },
-                    photo = photos[2],
-                    isSelected = photos[2] in selectedPhotos
                 )
             }
         }
         if (photos.size >= 2) {
-            AlbumPhotoContainer(
+            val secondPhoto = photos[1]
+            AlbumPhotoItem(
+                width = size * 2,
+                height = size * 2 + gap,
+                photo = secondPhoto,
+                isPreview = true,
+                isSensitive = shouldApplySensitiveMode && (secondPhoto.isSensitive || secondPhoto.isSensitiveInherited),
+                isSelected = secondPhoto in selectedPhotos,
+                isPublicAlbumPhoto = isPublicAlbumPhoto,
                 onClick = onClick,
                 onLongPress = onLongPress,
-                albumPhotoView = {
-                    AlbumPhotoItem(
-                        width = size * 2,
-                        height = size * 2 + gap,
-                        photo = photos[1],
-                        isPreview = true,
-                        isSensitive = shouldApplySensitiveMode && (photos[1].isSensitive || photos[1].isSensitiveInherited),
-                    )
-                },
-                photo = photos[1],
-                isSelected = photos[1] in selectedPhotos
             )
         }
     }

@@ -412,28 +412,18 @@ class DefaultAlbumRepositoryTest {
 
     @Test
     fun `test that download public thumbnail executes properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
-
         // when
         underTest = createUnderTest(this)
-        underTest.downloadPublicThumbnail(photo) { isSuccess ->
-            // then
-            assertThat(isSuccess).isFalse()
-        }
+
+        assertThat(underTest.downloadPublicThumbnail(1, "path")).isFalse()
     }
 
     @Test
     fun `test that download public preview executes properly`() = runTest {
-        // given
-        val photo = mock<Photo.Image>()
-
         // when
         underTest = createUnderTest(this)
-        underTest.downloadPublicPreview(photo) { isSuccess ->
-            // then
-            assertThat(isSuccess).isFalse()
-        }
+
+        assertThat(underTest.downloadPublicPreview(1, "path")).isFalse()
     }
 
     @Test

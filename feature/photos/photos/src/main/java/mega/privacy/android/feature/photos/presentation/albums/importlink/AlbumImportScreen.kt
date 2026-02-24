@@ -52,7 +52,6 @@ import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.components.dialogs.MegaDialogProperties
 import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
-import mega.android.core.ui.components.indicators.LargeSpinnerIndicator
 import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.surface.RowSurface
 import mega.android.core.ui.components.surface.SurfaceColor
@@ -463,7 +462,8 @@ private fun AlbumImportContent(
                         onPhotoSelection(photoUiState)
                     }
                 },
-                onLongPress = onPhotoSelection
+                onLongPress = onPhotoSelection,
+                isPublicAlbumPhoto = true
             )
         }
     }

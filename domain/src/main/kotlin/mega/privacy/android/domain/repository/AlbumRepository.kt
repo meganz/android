@@ -189,7 +189,7 @@ interface AlbumRepository {
      * @param photo which the thumbnail to be downloaded
      * @param callback to notify if the operation is successful
      */
-    suspend fun downloadPublicThumbnail(photo: Photo, callback: (Boolean) -> Unit)
+    suspend fun downloadPublicThumbnail(photoId: Long, path: String?): Boolean
 
     /**
      * Download public preview
@@ -197,7 +197,7 @@ interface AlbumRepository {
      * @param photo which the preview to be downloaded
      * @param callback to notify if the operation is successful
      */
-    suspend fun downloadPublicPreview(photo: Photo, callback: (Boolean) -> Unit)
+    suspend fun downloadPublicPreview(photoId: Long, path: String?): Boolean
 
     /**
      * Get serialized MegaNode list

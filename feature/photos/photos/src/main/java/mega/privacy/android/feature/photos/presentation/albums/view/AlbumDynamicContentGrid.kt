@@ -31,7 +31,6 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.PhotoUiState
@@ -43,6 +42,7 @@ fun AlbumDynamicContentGrid(
     photos: ImmutableList<PhotoUiState>,
     smallWidth: Dp,
     selectedPhotos: ImmutableSet<PhotoUiState>,
+    isPublicAlbumPhoto: Boolean,
     modifier: Modifier = Modifier,
     sortConfiguration: AlbumSortConfiguration? = null,
     endSpacing: Dp = 0.dp,
@@ -120,6 +120,7 @@ fun AlbumDynamicContentGrid(
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
                         shouldApplySensitiveMode = shouldApplySensitiveMode,
+                        isPublicAlbumPhoto = isPublicAlbumPhoto,
                     )
                 }
 
@@ -131,6 +132,7 @@ fun AlbumDynamicContentGrid(
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
                         shouldApplySensitiveMode = shouldApplySensitiveMode,
+                        isPublicAlbumPhoto = isPublicAlbumPhoto,
                     )
                 }
 
@@ -142,6 +144,7 @@ fun AlbumDynamicContentGrid(
                         onLongPress = onLongPress,
                         selectedPhotos = selectedPhotos,
                         shouldApplySensitiveMode = shouldApplySensitiveMode,
+                        isPublicAlbumPhoto = isPublicAlbumPhoto,
                     )
                 }
             }
