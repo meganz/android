@@ -87,6 +87,11 @@ enum class NodeSourceType {
      * When node source is Recents Bucket
      */
     RECENTS_BUCKET,
+
+    /**
+     * When node source is Timeline
+     */
+    TIMELINE,
 }
 
 /**

@@ -1140,6 +1140,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.SEARCH,
         NodeSourceType.VIDEO_PLAYLISTS,
         NodeSourceType.RECENTS_BUCKET,
+        NodeSourceType.TIMELINE,
             -> MegaApiJava.INVALID_HANDLE
 
         NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE -> getRootNodeUseCase()?.id?.longValue

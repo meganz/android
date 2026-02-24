@@ -65,7 +65,6 @@ import mega.privacy.android.feature.photos.presentation.effects.MediaNodeActionE
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType.Companion.isAnActiveSelection
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModelHandler
-import mega.privacy.android.feature.photos.presentation.handler.timelineActionsHandler
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
@@ -77,7 +76,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
-import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineTabActionBottomSheet
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
@@ -86,7 +84,6 @@ import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewMode
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
-import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -99,7 +96,6 @@ fun MediaMainRoute(
     navigationHandler: NavigationHandler,
     setNavigationItemVisibility: (Boolean) -> Unit,
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
-    onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
@@ -122,21 +118,21 @@ fun MediaMainRoute(
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val selectedPhotoIds by timelineViewModel.selectedPhotoIds.collectAsStateWithLifecycle()
+    val timelineSelectedPhotoIds by timelineViewModel.selectedPhotoIds.collectAsStateWithLifecycle()
 
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler
     )
     val selectionModeType by remember(
-        selectedPhotoIds,
+        timelineSelectedPhotoIds,
         albumsTabUiState.selectedUserAlbums,
         videosTabUiState,
         playlistsTabUiState
     ) {
         derivedStateOf {
             getSelectionModeType(
-                timelineSelectedPhotoCount = selectedPhotoIds.size,
+                timelineSelectedPhotoCount = timelineSelectedPhotoIds.size,
                 albumsSelectedUserAlbumsCount = albumsTabUiState.selectedUserAlbums.size,
                 videosTabUiState = videosTabUiState,
                 playlistsTabUiState = playlistsTabUiState
@@ -194,6 +190,15 @@ fun MediaMainRoute(
         }
     }
 
+    LaunchedEffect(timelineSelectedPhotoIds) {
+        if (timelineSelectedPhotoIds.isNotEmpty()) {
+            nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+                selectedNodes = timelineViewModel.retrieveTypedNodeFromSelection().toSet(),
+                nodeSourceType = NodeSourceType.TIMELINE,
+            )
+        }
+    }
+
     MediaMainEffects(
         timelineTabUiState = timelineTabUiState,
         timelineFilterUiState = timelineFilterUiState,
@@ -206,9 +211,21 @@ fun MediaMainRoute(
 
     MediaNodeActionEffects(
         nodeActionState = nodeActionUiState,
-        onDismissRequest = videosTabViewModel::clearSelection,
+        onDismissRequest = {
+            when (selectionModeType) {
+                MediaSelectionModeType.Timeline -> timelineViewModel.onDeselectAllPhotos()
+                MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
+                else -> Unit
+            }
+        },
         onDismissEventConsumed = nodeOptionsActionViewModel::resetDismiss,
-        onActionTriggered = videosTabViewModel::clearSelection,
+        onActionTriggered = {
+            when (selectionModeType) {
+                MediaSelectionModeType.Timeline -> timelineViewModel.onDeselectAllPhotos()
+                MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
+                else -> Unit
+            }
+        },
         onActionTriggeredEventConsumed = nodeOptionsActionViewModel::resetActionTriggered,
         onAddVideoToPlaylistResult = { result ->
             scope.launch {
@@ -247,7 +264,7 @@ fun MediaMainRoute(
         videosTabUiState = videosTabUiState,
         playlistsTabUiState = playlistsTabUiState,
         nodeActionUiState = nodeActionUiState,
-        selectedPhotoIds = selectedPhotoIds,
+        selectedPhotoIds = timelineSelectedPhotoIds,
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         showTimelineFilter = showTimelineFilter,
@@ -275,7 +292,6 @@ fun MediaMainRoute(
         onTimelinePhotoSelected = timelineViewModel::onPhotoSelected,
         onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
-        onNavigateToAddToAlbum = onNavigateToAddToAlbum,
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
         multiNodeActionHandler = selectionModeActionHandler,
@@ -325,7 +341,6 @@ fun MediaMainScreen(
     onTimelinePhotoSelected: (nodes: PhotoNodeUiState) -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
     onNavigateToTimelinePhotoPreview: (key: MediaTimelinePhotoPreviewNavKey) -> Unit,
-    onNavigateToAddToAlbum: (key: LegacyAddToAlbumActivityNavKey) -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
     onNavigateToCameraUploadsSettings: (key: LegacySettingsCameraUploadsActivityNavKey) -> Unit,
     handleCameraUploadsPermissionsResult: () -> Unit,
@@ -349,7 +364,6 @@ fun MediaMainScreen(
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
-    var showBottomSheetActions by rememberSaveable { mutableStateOf(false) }
 
     var videosTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -440,7 +454,7 @@ fun MediaMainScreen(
                 },
                 onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
                 navigateToMediaSearch = { key ->
-                    MediaAppBarAction.Search.toTrackingEvent()
+                    (MediaAppBarAction.Search as MediaAppBarAction).toTrackingEvent()
                         ?.let { Analytics.tracker.trackEvent(it) }
                     navigateToMediaSearch(key)
                 },
@@ -460,12 +474,15 @@ fun MediaMainScreen(
             MediaBottomBar(
                 selectionModeType = selectionModeType,
                 nodeActionUiState = nodeActionUiState,
-                timelineActions = timelineTabActionUiState.selectionModeItem.bottomBarActions,
                 albumsActions = listOf(
                     AlbumSelectionAction.ManageLink,
                     AlbumSelectionAction.Delete
                 ),
-                selectedVideoNodes = selectedVideoNodes,
+                selectedNodes = when (selectionModeType) {
+                    MediaSelectionModeType.Timeline -> selectedPhotosInTypedNode()
+                    MediaSelectionModeType.Videos -> selectedVideoNodes
+                    else -> emptyList()
+                },
                 multiNodeActionHandler = multiNodeActionHandler,
                 onActionPressed = { mode, action ->
                     when (mode) {
@@ -473,14 +490,6 @@ fun MediaMainScreen(
                             action.toTrackingEvent()?.let { event ->
                                 Analytics.tracker.trackEvent(event)
                             }
-                            timelineActionsHandler(
-                                action = action,
-                                selectedPhotosInTypedNode = selectedPhotosInTypedNode,
-                                actionHandler = multiNodeActionHandler::invoke,
-                                onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
-                                onShowBottomSheet = { showBottomSheetActions = true },
-                                onNavigateToAddToAlbum = onNavigateToAddToAlbum
-                            )
                         }
 
                         MediaSelectionModeType.Albums -> {
@@ -598,26 +607,6 @@ fun MediaMainScreen(
             onClose = {
                 onTimelineFilterVisibilityChange(false)
             },
-        )
-    }
-
-    if (showBottomSheetActions) {
-        TimelineTabActionBottomSheet(
-            actions = timelineTabActionUiState.selectionModeItem.bottomSheetActions,
-            onDismissRequest = { showBottomSheetActions = false },
-            onActionPressed = { action ->
-                action.toTrackingEvent()?.let { event ->
-                    Analytics.tracker.trackEvent(event)
-                }
-                timelineActionsHandler(
-                    action = action,
-                    selectedPhotosInTypedNode = selectedPhotosInTypedNode,
-                    actionHandler = multiNodeActionHandler::invoke,
-                    onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
-                    onShowBottomSheet = { showBottomSheetActions = true },
-                    onNavigateToAddToAlbum = onNavigateToAddToAlbum
-                )
-            }
         )
     }
 }
@@ -744,7 +733,6 @@ private fun PhotosMainScreenPreview() {
             onTimelinePhotoSelected = {},
             onClearTimelinePhotosSelection = {},
             onNavigateToTimelinePhotoPreview = {},
-            onNavigateToAddToAlbum = {},
             clearCameraUploadsCompletedMessage = {},
             onNavigateToCameraUploadsSettings = {},
             multiNodeActionHandler = rememberMultiNodeActionHandler(),

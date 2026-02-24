@@ -136,7 +136,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             navigationHandler = navigationHandler,
             setNavigationItemVisibility = setNavigationItemVisibility,
             onNavigateToTimelinePhotoPreview = navigationHandler::navigate,
-            onNavigateToAddToAlbum = navigationHandler::navigate,
             onNavigateToCameraUploadsSettings = navigationHandler::navigate,
             onNavigateToUpgradeAccount = navigationHandler::navigate,
             onNavigateToCameraUploadsProgressScreen = {

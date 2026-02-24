@@ -47,5 +47,6 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()
+            NodeSourceType.TIMELINE -> SortOrder.ORDER_MODIFICATION_DESC
         }
 }

@@ -1,7 +1,19 @@
 package mega.privacy.android.feature.photos.extensions
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAddToAlbumButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenCopyButtonPressedEvent
@@ -29,7 +41,7 @@ internal class MenuActionExtTest {
     @ParameterizedTest(name = "when action is {0}, returns {1}")
     @MethodSource("provideMappedActions")
     fun `test that mapped actions return correct tracking events`(
-        action: TimelineSelectionMenuAction,
+        action: MenuActionWithIcon,
         expectedEvent: EventIdentifier,
     ) {
         val result = action.toTrackingEvent()
@@ -40,7 +52,7 @@ internal class MenuActionExtTest {
     @ParameterizedTest(name = "when action is {0}, returns null")
     @MethodSource("provideUnmappedActions")
     fun `test that unmapped actions return null`(
-        action: TimelineSelectionMenuAction,
+        action: MenuActionWithIcon,
     ) {
         val result = action.toTrackingEvent()
 
@@ -49,52 +61,52 @@ internal class MenuActionExtTest {
 
     private fun provideMappedActions() = Stream.of(
         Arguments.of(
-            TimelineSelectionMenuAction.Download,
+            DownloadMenuAction(),
             MediaScreenDownloadButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.ShareLink,
+            GetLinkMenuAction(),
             MediaScreenLinkButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.SendToChat,
+            SendToChatMenuAction(),
             MediaScreenRespondButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.Share,
+            ShareMenuAction(),
             MediaScreenShareButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.MoveToRubbishBin,
+            TrashMenuAction(),
             MediaScreenTrashButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.More,
+            NodeSelectionAction.More,
             MediaScreenMoreButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.AddToAlbum,
+            AddToAlbumMenuAction(),
             MediaScreenAddToAlbumButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.Copy,
+            CopyMenuAction(),
             MediaScreenCopyButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.Hide,
+            HideMenuAction(),
             MediaScreenHideButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.Move,
+            MoveMenuAction(),
             MediaScreenMoveButtonPressedEvent
         ),
         Arguments.of(
-            TimelineSelectionMenuAction.RemoveLink,
+            RemoveLinkMenuAction(),
             MediaScreenRemoveLinkButtonPressedEvent
         ),
     )
 
     private fun provideUnmappedActions() = Stream.of(
-        Arguments.of(TimelineSelectionMenuAction.Unhide),
+        Arguments.of(UnhideMenuAction()),
     )
 }

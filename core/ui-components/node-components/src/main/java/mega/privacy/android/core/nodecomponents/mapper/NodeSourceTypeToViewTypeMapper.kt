@@ -30,9 +30,9 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
         NodeSourceType.OTHER,
         NodeSourceType.OFFLINE,
         NodeSourceType.VIDEO_PLAYLISTS,
+        NodeSourceType.TIMELINE,
             -> null
 
         NodeSourceType.RECENTS_BUCKET -> NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
-        NodeSourceType.OTHER, NodeSourceType.OFFLINE -> null
     }
 }

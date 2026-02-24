@@ -15,29 +15,24 @@ import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionMo
 internal fun MediaBottomBar(
     selectionModeType: MediaSelectionModeType,
     nodeActionUiState: NodeActionState,
-    timelineActions: List<MenuActionWithIcon>,
     albumsActions: List<MenuActionWithIcon>,
-    selectedVideoNodes: List<TypedNode>,
+    selectedNodes: List<TypedNode>,
     multiNodeActionHandler: MultiNodeActionHandler,
     onActionPressed: (mode: MediaSelectionModeType, action: MenuActionWithIcon) -> Unit,
 ) {
     // We don’t use a when condition here because it would cause us to lose the animation for both bottom bars.
     SelectionModeBottomBar(
-        visible = selectionModeType == MediaSelectionModeType.Timeline || selectionModeType == MediaSelectionModeType.Albums,
-        actions = when (selectionModeType) {
-            MediaSelectionModeType.Timeline -> timelineActions
-            MediaSelectionModeType.Albums -> albumsActions
-            else -> emptyList()
-        },
+        visible = selectionModeType == MediaSelectionModeType.Albums,
+        actions = albumsActions,
         onActionPressed = { onActionPressed(selectionModeType, it) }
     )
 
     NodeSelectionModeBottomBar(
         availableActions = nodeActionUiState.availableActions,
         visibleActions = nodeActionUiState.visibleActions,
-        visible = nodeActionUiState.visibleActions.isNotEmpty() && selectionModeType == MediaSelectionModeType.Videos,
+        visible = nodeActionUiState.visibleActions.isNotEmpty() && (selectionModeType == MediaSelectionModeType.Videos || selectionModeType == MediaSelectionModeType.Timeline),
         multiNodeActionHandler = multiNodeActionHandler,
-        selectedNodes = selectedVideoNodes,
+        selectedNodes = selectedNodes,
         isSelecting = false,
         onActionPressed = { onActionPressed(selectionModeType, it) }
     )

@@ -35,6 +35,7 @@ import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.domain.qualifier.features.Timeline
 import javax.inject.Singleton
 
 @Module
@@ -142,7 +143,7 @@ abstract class NodeSelectionModeModule {
             disputeTakeDownSelectionMenuItem: DisputeTakeDownSelectionMenuItem,
             shareSelectionMenuItem: ShareSelectionMenuItem,
             addToSelectionMenuItem: AddToSelectionMenuItem,
-            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -174,7 +175,7 @@ abstract class NodeSelectionModeModule {
             sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
             renameSelectionMenuItem: RenameSelectionMenuItem,
             copySelectionModeMenuAction: CopySelectionMenuItem,
-            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
             copySelectionModeMenuAction,
             rubbishBinSelectionMenuAction,
@@ -185,6 +186,37 @@ abstract class NodeSelectionModeModule {
             removeLinkSelectionMenuItem,
             sendToChatSelectionMenuItem,
             shareSelectionMenuItem
+        )
+
+
+        @Provides
+        @ElementsIntoSet
+        @Timeline
+        @Singleton
+        fun provideTimelineToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            getLinkSelectionMenuItem: GetLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem: SendToChatSelectionMenuItem,
+            shareSelectionMenuItem: ShareSelectionMenuItem,
+            rubbishBinSelectionMenuAction: RubbishBinSelectionMenuItem,
+            removeLinkSelectionMenuItem: RemoveLinkSelectionMenuItem,
+            hideSelectionMenuItem: HideSelectionMenuItem,
+            unhideSelectionMenuItem: UnhideSelectionMenuItem,
+            moveSelectionModeMenuItem: MoveSelectionMenuItem,
+            copySelectionModeMenuAction: CopySelectionMenuItem,
+            addToAlbumSelectionMenuItem: AddToAlbumSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            getLinkSelectionMenuItem,
+            sendToChatSelectionMenuItem,
+            shareSelectionMenuItem,
+            rubbishBinSelectionMenuAction,
+            removeLinkSelectionMenuItem,
+            hideSelectionMenuItem,
+            unhideSelectionMenuItem,
+            moveSelectionModeMenuItem,
+            copySelectionModeMenuAction,
+            addToAlbumSelectionMenuItem
         )
     }
 }

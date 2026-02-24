@@ -87,6 +87,7 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         Arguments.of(NodeSourceType.SEARCH, mockCloudSortOrder),
         Arguments.of(NodeSourceType.OFFLINE, mockOfflineSortOrder),
         Arguments.of(NodeSourceType.VIDEO_PLAYLISTS, mockCloudSortOrder),
+        Arguments.of(NodeSourceType.TIMELINE, mockTimelineSortOrder),
     )
 
     companion object {
@@ -94,5 +95,6 @@ class GetSortOrderByNodeSourceTypeUseCaseTest {
         private val mockLinksSortOrder = SortOrder.ORDER_DEFAULT_DESC
         private val mockOthersSortOrder = SortOrder.ORDER_SIZE_DESC
         private val mockOfflineSortOrder = SortOrder.ORDER_LABEL_ASC
+        private val mockTimelineSortOrder = SortOrder.ORDER_MODIFICATION_DESC
     }
 }

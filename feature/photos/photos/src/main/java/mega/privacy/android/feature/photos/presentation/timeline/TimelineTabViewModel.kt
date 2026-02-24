@@ -20,9 +20,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
@@ -46,7 +43,6 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
@@ -315,8 +311,6 @@ class TimelineTabViewModel @Inject constructor(
                 it + node.photo.id
             }
         }
-
-        updateSelectionModeActions()
     }
 
     internal fun onSelectAllPhotos() {
@@ -333,84 +327,16 @@ class TimelineTabViewModel @Inject constructor(
                 addAll(notAddedIds)
             }
         }
-
-        updateSelectionModeActions()
     }
 
     internal fun onDeselectAllPhotos() {
         if (_selectedPhotoIdsFlow.value.isEmpty()) return
         _selectedPhotoIdsFlow.update { setOf() }
-        updateSelectionModeActions()
     }
 
-    private fun updateSelectionModeActions() {
-        if (_selectedPhotoIdsFlow.value.isEmpty()) return
-
-        viewModelScope.launch {
-            val selectedPhotosInTypedNodes = async {
-                val selectedPhotoIds = _selectedPhotoIdsFlow.value
-                if (selectedPhotoIds.isNotEmpty()) {
-                    retrieveTypedNodeFromSelection(ids = selectedPhotoIds.map { NodeId(longValue = it) })
-                } else emptyList()
-            }
-            val bottomBarActions = buildList {
-                add(TimelineSelectionMenuAction.Download)
-                add(TimelineSelectionMenuAction.ShareLink)
-                add(TimelineSelectionMenuAction.SendToChat)
-                add(TimelineSelectionMenuAction.Share)
-                add(TimelineSelectionMenuAction.MoveToRubbishBin)
-                add(TimelineSelectionMenuAction.More)
-            }
-
-            val bottomSheetActions = buildList {
-                val selectedNodes = uiState.value.allPhotos.filter {
-                    it.photo.id in _selectedPhotoIdsFlow.value
-                }
-                val selectedTypedNodes = selectedPhotosInTypedNodes.await()
-                val shouldShowRemoveLink =
-                    selectedTypedNodes.size == 1 && selectedTypedNodes.firstOrNull()?.exportedData != null
-                if (shouldShowRemoveLink) {
-                    add(TimelineSelectionMenuAction.RemoveLink)
-                }
-
-                val includeSensitiveInheritedNode = selectedNodes.any {
-                    it.photo.isSensitiveInherited
-                }
-                val hasNonSensitiveNode = selectedNodes.any { !it.isMarkedSensitive }
-                val isNodeHidden =
-                    isHiddenNodesEnabled && !hasNonSensitiveNode && !includeSensitiveInheritedNode
-                if (isNodeHidden) {
-                    add(TimelineSelectionMenuAction.Unhide)
-                } else {
-                    add(TimelineSelectionMenuAction.Hide)
-                }
-
-                add(TimelineSelectionMenuAction.Move)
-                add(TimelineSelectionMenuAction.Copy)
-
-                val isAbleToBeAddedToAlbum = selectedTypedNodes.filter { node ->
-                    val type = (node as? FileNode)?.type
-                    type is ImageFileTypeInfo || type is VideoFileTypeInfo
-                }.size == selectedNodes.size
-                if (isAbleToBeAddedToAlbum) {
-                    add(TimelineSelectionMenuAction.AddToAlbum)
-                }
-            }
-
-            actionFlow.update {
-                it.copy(
-                    selectionModeItem = TimelineTabSelectionModeActionUiState(
-                        bottomBarActions = bottomBarActions,
-                        bottomSheetActions = bottomSheetActions
-                    )
-                )
-            }
-        }
-    }
-
-    private suspend fun retrieveTypedNodeFromSelection(ids: List<NodeId>): List<TypedNode> {
+    internal suspend fun retrieveTypedNodeFromSelection(): List<TypedNode> {
         val nodes = runCatching {
-            getNodeListByIdsUseCase(nodeIds = ids)
+            getNodeListByIdsUseCase(nodeIds = _selectedPhotoIdsFlow.value.map { NodeId(longValue = it) })
         }.getOrDefault(defaultValue = emptyList())
         _selectedPhotosInTypedNodesFlow.update { nodes }
         return nodes

@@ -13,6 +13,7 @@ import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsPr
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.TimelineMenuOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideosMenuOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistryImpl
@@ -77,5 +78,11 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindVideosOptionsProvider(
         videosMenuOptionProvider: VideosMenuOptionProvider,
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindTimelineOptionsProvider(
+        timelineOptionsProvider: TimelineMenuOptionProvider,
     ): NodeMenuOptionsProvider
 }

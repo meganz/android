@@ -1,7 +1,17 @@
 package mega.privacy.android.feature.photos.extensions
 
-import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAddToAlbumButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenCopyButtonPressedEvent
@@ -15,17 +25,17 @@ import mega.privacy.mobile.analytics.event.MediaScreenRespondButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenShareButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenTrashButtonPressedEvent
 
-internal fun MenuAction.toTrackingEvent(): EventIdentifier? = when (this) {
-    is TimelineSelectionMenuAction.Download -> MediaScreenDownloadButtonPressedEvent
-    is TimelineSelectionMenuAction.ShareLink -> MediaScreenLinkButtonPressedEvent
-    is TimelineSelectionMenuAction.SendToChat -> MediaScreenRespondButtonPressedEvent
-    is TimelineSelectionMenuAction.Share -> MediaScreenShareButtonPressedEvent
-    is TimelineSelectionMenuAction.MoveToRubbishBin -> MediaScreenTrashButtonPressedEvent
-    is TimelineSelectionMenuAction.More -> MediaScreenMoreButtonPressedEvent
-    is TimelineSelectionMenuAction.AddToAlbum -> MediaScreenAddToAlbumButtonPressedEvent
-    is TimelineSelectionMenuAction.Copy -> MediaScreenCopyButtonPressedEvent
-    is TimelineSelectionMenuAction.Hide -> MediaScreenHideButtonPressedEvent
-    is TimelineSelectionMenuAction.Move -> MediaScreenMoveButtonPressedEvent
-    is TimelineSelectionMenuAction.RemoveLink -> MediaScreenRemoveLinkButtonPressedEvent
+internal fun MenuActionWithIcon.toTrackingEvent(): EventIdentifier? = when (this) {
+    is DownloadMenuAction -> MediaScreenDownloadButtonPressedEvent
+    is GetLinkMenuAction -> MediaScreenLinkButtonPressedEvent
+    is SendToChatMenuAction -> MediaScreenRespondButtonPressedEvent
+    is ShareMenuAction -> MediaScreenShareButtonPressedEvent
+    is TrashMenuAction -> MediaScreenTrashButtonPressedEvent
+    is NodeSelectionAction.More -> MediaScreenMoreButtonPressedEvent
+    is AddToAlbumMenuAction -> MediaScreenAddToAlbumButtonPressedEvent
+    is CopyMenuAction -> MediaScreenCopyButtonPressedEvent
+    is HideMenuAction -> MediaScreenHideButtonPressedEvent
+    is MoveMenuAction -> MediaScreenMoveButtonPressedEvent
+    is RemoveLinkMenuAction -> MediaScreenRemoveLinkButtonPressedEvent
     else -> null
 }

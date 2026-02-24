@@ -9,7 +9,6 @@ import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.Sort
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.shared.resources.R as sharedR
 
 data class TimelineTabUiState(
@@ -25,16 +24,10 @@ data class TimelineTabUiState(
 
 data class TimelineTabActionUiState(
     val normalModeItem: TimelineTabNormalModeActionUiState = TimelineTabNormalModeActionUiState(),
-    val selectionModeItem: TimelineTabSelectionModeActionUiState = TimelineTabSelectionModeActionUiState(),
 )
 
 data class TimelineTabNormalModeActionUiState(
     val enableSort: Boolean = true,
-)
-
-data class TimelineTabSelectionModeActionUiState(
-    val bottomBarActions: List<TimelineSelectionMenuAction> = emptyList(),
-    val bottomSheetActions: List<TimelineSelectionMenuAction> = emptyList(),
 )
 
 enum class TimelineTabSortOptions(

@@ -15,9 +15,16 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.GetLinkMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.DownloadPhotoResult
 import mega.privacy.android.feature.photos.downloader.DownloadPhotoViewModel
@@ -31,10 +38,8 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylists
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSelectionModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
-import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
@@ -127,6 +132,7 @@ class MediaMainScreenAnalyticsTest {
         selectedPhotosInTypedNode: () -> List<TypedNode> = { emptyList() },
         onTimelinePhotoSelected: (node: PhotoNodeUiState) -> Unit = {},
         mediaCameraUploadUiState: MediaCameraUploadUiState = MediaCameraUploadUiState(),
+        nodeActionUiState: NodeActionState = NodeActionState(),
     ) {
         composeTestRule.setContent {
             CompositionLocalProvider(
@@ -140,7 +146,7 @@ class MediaMainScreenAnalyticsTest {
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                     videosTabUiState = VideosTabUiState.Loading,
                     playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
-                    nodeActionUiState = NodeActionState(),
+                    nodeActionUiState = nodeActionUiState,
                     selectionModeType = selectionModeType,
                     selectedPhotoIds = setOf(),
                     selectedPhotosInTypedNode = selectedPhotosInTypedNode,
@@ -156,7 +162,6 @@ class MediaMainScreenAnalyticsTest {
                     onTimelinePhotoSelected = onTimelinePhotoSelected,
                     onClearTimelinePhotosSelection = {},
                     onNavigateToTimelinePhotoPreview = {},
-                    onNavigateToAddToAlbum = {},
                     clearCameraUploadsCompletedMessage = {},
                     onNavigateToCameraUploadsSettings = {},
                     handleCameraUploadsPermissionsResult = {},
@@ -183,17 +188,16 @@ class MediaMainScreenAnalyticsTest {
     }
 
     private fun testBottomBarActionTracking(
-        action: TimelineSelectionMenuAction,
+        action: MenuActionWithIcon,
         expectedEvent: EventIdentifier,
     ) {
-        val timelineTabActionUiState = TimelineTabActionUiState(
-            selectionModeItem = TimelineTabSelectionModeActionUiState(
-                bottomBarActions = listOf(action)
-            )
+        val nodeActionUiState = NodeActionState(
+            availableActions = listOf(action),
+            visibleActions = listOf(action)
         )
         setComposeContent(
             selectionModeType = MediaSelectionModeType.Timeline,
-            timelineTabActionUiState = timelineTabActionUiState
+            nodeActionUiState = nodeActionUiState
         )
 
         composeTestRule.onNodeWithTag(action.testTag).performClick()
@@ -225,7 +229,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that download button pressed event is tracked when download action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.Download,
+            action = DownloadMenuAction(),
             expectedEvent = MediaScreenDownloadButtonPressedEvent
         )
     }
@@ -233,7 +237,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that share link button pressed event is tracked when share link action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.ShareLink,
+            action = GetLinkMenuAction(),
             expectedEvent = MediaScreenLinkButtonPressedEvent
         )
     }
@@ -241,7 +245,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that send to chat button pressed event is tracked when send to chat action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.SendToChat,
+            action = SendToChatMenuAction(),
             expectedEvent = MediaScreenRespondButtonPressedEvent
         )
     }
@@ -249,7 +253,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that share button pressed event is tracked when share action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.Share,
+            action = ShareMenuAction(),
             expectedEvent = MediaScreenShareButtonPressedEvent
         )
     }
@@ -257,7 +261,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that trash button pressed event is tracked when move to rubbish bin action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.MoveToRubbishBin,
+            action = TrashMenuAction(),
             expectedEvent = MediaScreenTrashButtonPressedEvent
         )
     }
@@ -265,7 +269,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that more button pressed event is tracked when more action is clicked`() {
         testBottomBarActionTracking(
-            action = TimelineSelectionMenuAction.More,
+            action = NodeSelectionAction.More,
             expectedEvent = MediaScreenMoreButtonPressedEvent
         )
     }

@@ -11,7 +11,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import javax.inject.Inject
 
 class AddToAlbumSelectionMenuItem @Inject constructor(
-    override val menuAction: AddToAlbumMenuAction
+    override val menuAction: AddToAlbumMenuAction,
 ) : NodeSelectionMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         hasNodeAccessPermission: Boolean,
@@ -21,11 +21,24 @@ class AddToAlbumSelectionMenuItem @Inject constructor(
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
     ): Boolean {
-        val allFilesAreImageOrVideo = selectedNodes.all { node ->
-            node is FileNode && (node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo)
-        }
-        val allFilesAreVideo = selectedNodes.all { node ->
-            node is FileNode && node.type is VideoFileTypeInfo
+        var allFilesAreImageOrVideo = true
+        var allFilesAreVideo = true
+        for (node in selectedNodes) {
+            if (node !is FileNode) {
+                allFilesAreImageOrVideo = false
+                allFilesAreVideo = false
+                break
+            }
+
+            when (node.type) {
+                is VideoFileTypeInfo -> Unit
+                is ImageFileTypeInfo -> allFilesAreVideo = false
+                else -> {
+                    allFilesAreImageOrVideo = false
+                    allFilesAreVideo = false
+                    break
+                }
+            }
         }
         return allFilesAreImageOrVideo && !allFilesAreVideo
     }
