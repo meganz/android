@@ -34,14 +34,15 @@ import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.file.GetFileUriUseCase
 import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodeDataUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.resources.R as sharedResR
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * ViewModel for business logic regarding the toolbar.
@@ -58,6 +59,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val getPublicAlbumNodeDataUseCase: GetPublicAlbumNodeDataUseCase,
     private val getFileUriUseCase: GetFileUriUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val moveNodesToRubbishUseCase: MoveNodesToRubbishUseCase,
 ) : ViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -327,6 +329,42 @@ class MediaPlayerViewModel @Inject constructor(
                 Timber.e(it)
                 throwable.value = it
             }
+        }
+    }
+
+    fun moveNodeToRubbishBin(nodeHandle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                moveNodesToRubbishUseCase(listOf(nodeHandle))
+            }.onSuccess {
+                _itemToRemove.value = nodeHandle
+                snackbarMessage.value = sharedResR.string.node_moved_success_message
+                resetNodeToMoveToTrash()
+            }.onFailure { exception ->
+                Timber.e(exception, "Failed to move nodes to rubbish: $nodeHandle")
+                snackbarMessage.value = R.string.context_no_moved
+            }
+        }
+    }
+
+    fun showMoveToTrashDialog(nodeHandle: Long) {
+        _state.update {
+            it.copy(
+                nodeToMoveToTrash = nodeHandle,
+                showMoveToTrashDialog = true,
+            )
+        }
+    }
+
+    fun resetNodeToMoveToTrash() {
+        _state.update {
+            it.copy(nodeToMoveToTrash = null)
+        }
+    }
+
+    fun hideMoveToTrashDialog() {
+        _state.update {
+            it.copy(showMoveToTrashDialog = false)
         }
     }
 

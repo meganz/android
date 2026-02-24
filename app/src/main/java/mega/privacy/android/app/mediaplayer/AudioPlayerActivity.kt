@@ -513,11 +513,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             }
                         }
                     } else {
-                        MegaNodeDialogUtil.moveToRubbishOrRemove(
-                            handle = playingHandle,
-                            activity = this,
-                            snackbarShower = this
-                        )
+                        viewModel.showMoveToTrashDialog(playingHandle)
                     }
                 }
 

@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
@@ -64,6 +65,7 @@ internal class MediaPlayerViewModelTest {
     private val getPublicAlbumNodeDataUseCase = mock<GetPublicAlbumNodeDataUseCase>()
     private val getFileUriUseCase = mock<GetFileUriUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val moveNodesToRubbishUseCase = mock<MoveNodesToRubbishUseCase>()
     private val fakeMonitorShowHiddenItemsFlow = MutableSharedFlow<Boolean>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
 
@@ -88,7 +90,8 @@ internal class MediaPlayerViewModelTest {
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             getPublicAlbumNodeDataUseCase = getPublicAlbumNodeDataUseCase,
             getFileUriUseCase = getFileUriUseCase,
-            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            moveNodesToRubbishUseCase = moveNodesToRubbishUseCase,
         )
     }
 
@@ -100,6 +103,7 @@ internal class MediaPlayerViewModelTest {
             getFileUriUseCase,
             monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase,
+            moveNodesToRubbishUseCase,
         )
     }
 
@@ -570,6 +574,91 @@ internal class MediaPlayerViewModelTest {
                 assertThat(actual.isBusinessAccountExpired).isFalse()
                 assertThat(actual.showHiddenItems).isTrue()
                 cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    internal fun `test that moveNodeToRubbishBin updates itemToRemove and snackbar when success`() =
+        runTest {
+            val nodeHandle = 12345L
+            whenever(moveNodesToRubbishUseCase(listOf(nodeHandle))).thenReturn(
+                MoveRequestResult.RubbishMovement(
+                    count = 1,
+                    errorCount = 0,
+                    oldParentHandle = 999L,
+                    nodes = listOf(nodeHandle),
+                )
+            )
+            underTest.moveNodeToRubbishBin(nodeHandle)
+            advanceUntilIdle()
+            underTest.itemToRemove.test().assertValue(nodeHandle)
+            underTest.onSnackbarMessage().test()
+                .assertValue(sharedResR.string.node_moved_success_message)
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.nodeToMoveToTrash).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    internal fun `test that moveNodeToRubbishBin shows error snackbar when failure`() = runTest {
+        val nodeHandle = 12345L
+        whenever(moveNodesToRubbishUseCase(listOf(nodeHandle))).thenThrow(
+            RuntimeException("Move to rubbish failed")
+        )
+        underTest.moveNodeToRubbishBin(nodeHandle)
+        advanceUntilIdle()
+        underTest.onSnackbarMessage().test().assertValue(R.string.context_no_moved)
+    }
+
+    @Test
+    fun `test that showMoveToTrashDialog updates state with node handle and dialog visible`() =
+        runTest {
+            val nodeHandle = 98765L
+            underTest.showMoveToTrashDialog(nodeHandle)
+            advanceUntilIdle()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.nodeToMoveToTrash).isEqualTo(nodeHandle)
+                assertThat(state.showMoveToTrashDialog).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetNodeToMoveToTrash clears nodeToMoveToTrash in state`() = runTest {
+        val handle = 11111L
+        underTest.showMoveToTrashDialog(handle)
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().nodeToMoveToTrash).isEqualTo(handle)
+            underTest.resetNodeToMoveToTrash()
+            assertThat(awaitItem().nodeToMoveToTrash).isNull()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that hideMoveToTrashDialog sets showMoveToTrashDialog to false`() = runTest {
+        underTest.showMoveToTrashDialog(22222L)
+        advanceUntilIdle()
+        underTest.state.test {
+            assertThat(awaitItem().showMoveToTrashDialog).isTrue()
+            underTest.hideMoveToTrashDialog()
+            assertThat(awaitItem().showMoveToTrashDialog).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that setHiddenNodesOnboarded updates state isHiddenNodesOnboarded to true`() =
+        runTest {
+            underTest.setHiddenNodesOnboarded()
+            advanceUntilIdle()
+            underTest.state.test {
+                assertThat(awaitItem().isHiddenNodesOnboarded).isTrue()
+                cancelAndIgnoreRemainingEvents()
             }
         }
 

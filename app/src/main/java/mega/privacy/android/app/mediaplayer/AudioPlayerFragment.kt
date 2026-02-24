@@ -16,7 +16,9 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -80,6 +83,7 @@ class AudioPlayerFragment : Fragment() {
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
     private val audioViewModel by viewModels<AudioPlayerViewModel>()
+    private val mediaPlayerViewModel by activityViewModels<MediaPlayerViewModel>()
 
     private var playerViewHolder: AudioPlayerViewHolder? = null
 
@@ -295,6 +299,7 @@ class AudioPlayerFragment : Fragment() {
                     audioViewModel.updateIsSpeedPopupShown(true)
                 }
                 initPlaybackPositionDialog(viewHolder.playbackPositionDialog)
+                initMoveToTrashDialog(viewHolder.moveToTrashDialog)
             }
         }
     }
@@ -338,6 +343,32 @@ class AudioPlayerFragment : Fragment() {
                                 isClearPosition = isClearPosition
                             )
                             serviceGateway?.updatePlaybackPositionStatus(status)
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    private fun initMoveToTrashDialog(composeView: ComposeView) {
+        composeView.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                val uiState by mediaPlayerViewModel.state.collectAsStateWithLifecycle()
+                OriginalTheme(isDark = isSystemInDarkTheme()) {
+                    BasicDialog(
+                        isVisible = uiState.showMoveToTrashDialog,
+                        description = stringResource(id = R.string.confirmation_move_to_rubbish),
+                        positiveButtonText = stringResource(id = R.string.general_move),
+                        negativeButtonText = stringResource(id = sharedResR.string.general_dialog_cancel_button),
+                        onPositiveButtonClicked = {
+                            uiState.nodeToMoveToTrash?.let { node ->
+                                mediaPlayerViewModel.moveNodeToRubbishBin(node)
+                            }
+                            mediaPlayerViewModel.hideMoveToTrashDialog()
+                        },
+                        onNegativeButtonClicked = {
+                            mediaPlayerViewModel.hideMoveToTrashDialog()
                         }
                     )
                 }

@@ -41,6 +41,8 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
         binding.root.findViewById<ComposeView>(R.id.speed_playback_popup)
     internal val playbackPositionDialog =
         binding.root.findViewById<ComposeView>(R.id.playback_position_dialog)
+    internal val moveToTrashDialog =
+        binding.root.findViewById<ComposeView>(R.id.move_to_trash_dialog)
 
     /**
      * Update the layout param of artwork of player view.
