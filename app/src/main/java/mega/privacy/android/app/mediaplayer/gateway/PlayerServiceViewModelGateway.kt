@@ -230,4 +230,10 @@ interface PlayerServiceViewModelGateway {
      * Monitor the media item transition state
      */
     fun monitorMediaItemTransitionState(): Flow<Long?>
+
+
+    /**
+     * Save shuffle enabled state
+     */
+    fun saveShuffleEnabled()
 }

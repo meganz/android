@@ -537,6 +537,11 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         refreshMenuOptionsVisibility()
     }
 
+    override fun onStop() {
+        super.onStop()
+        playerServiceGateway?.saveShuffleEnabled()
+    }
+
     /**
      * onAttachedToWindow
      */

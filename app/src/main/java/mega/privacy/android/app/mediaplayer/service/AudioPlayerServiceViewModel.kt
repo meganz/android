@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -207,11 +208,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
         true
     )
 
-    private var shuffleEnabled = monitorAudioShuffleEnabledUseCase().stateIn(
-        sharingScope,
-        SharingStarted.Eagerly,
-        false
-    )
+    private var shuffleEnabled = MutableStateFlow(false)
 
     private var audioRepeatToggleMode = monitorAudioRepeatModeUseCase().stateIn(
         sharingScope,
@@ -274,12 +271,17 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     init {
         setupTransferListener()
-        cancellableJobs[JOB_KEY_MONITOR_SHUFFLE]?.cancel()
         cancellableJobs[JOB_KEY_MONITOR_SHUFFLE] = sharingScope.launch {
             monitorAudioShuffleEnabledUseCase().collect {
                 recreateAndUpdatePlaylistItems(
                     originalItems = if (it) playlistItemsFlow.value.first else playlistItems
                 )
+            }
+        }
+
+        sharingScope.launch {
+            monitorAudioShuffleEnabledUseCase().firstOrNull()?.let { isEnable ->
+                shuffleEnabled.update { isEnable }
             }
         }
 
@@ -1303,7 +1305,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun updateItemName(handle: Long, newName: String) =
         playlistItemsFlow.update {
             it.copy(
-                it.first.map { item ->
+                first = it.first.map { item ->
                     if (item.nodeHandle == handle) {
                         nodeNameUpdate.postValue(newName)
                         item.updateNodeName(newName)
@@ -1323,9 +1325,16 @@ class AudioPlayerServiceViewModel @Inject constructor(
     override fun getShuffleOrder() = shuffleOrder
 
     override fun setShuffleEnabled(enabled: Boolean) {
+        shuffleEnabled.update { enabled }
+        recreateAndUpdatePlaylistItems(
+            originalItems = if (enabled) playlistItemsFlow.value.first else playlistItems
+        )
+    }
+
+    override fun saveShuffleEnabled() {
         cancellableJobs[JOB_KEY_SET_SHUFFLE]?.cancel()
         cancellableJobs[JOB_KEY_SET_SHUFFLE] = sharingScope.launch {
-            setAudioShuffleEnabledUseCase(enabled)
+            setAudioShuffleEnabledUseCase(shuffleEnabled.value)
         }
     }
 
