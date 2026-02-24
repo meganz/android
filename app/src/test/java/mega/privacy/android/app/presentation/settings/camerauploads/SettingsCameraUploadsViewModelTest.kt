@@ -28,10 +28,12 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
@@ -46,6 +48,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathU
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
@@ -76,7 +79,6 @@ import mega.privacy.android.domain.usecase.camerauploads.SetupDefaultSecondaryFo
 import mega.privacy.android.domain.usecase.camerauploads.SetupMediaUploadsSettingUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupPrimaryFolderUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetupSecondaryFolderUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
@@ -129,7 +131,6 @@ internal class SettingsCameraUploadsViewModelTest {
     private val deleteCameraUploadsTemporaryRootDirectoryUseCase =
         mock<DeleteCameraUploadsTemporaryRootDirectoryUseCase>()
     private val disableMediaUploadsSettingsUseCase = mock<DisableMediaUploadsSettingsUseCase>()
-    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val getPrimaryFolderNodeUseCase = mock<GetPrimaryFolderNodeUseCase>()
     private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getSecondaryFolderNodeUseCase = mock<GetSecondaryFolderNodeUseCase>()
@@ -184,6 +185,10 @@ internal class SettingsCameraUploadsViewModelTest {
     private val broadcastCameraUploadsSettingsActionUseCase =
         mock<BroadcastCameraUploadsSettingsActionUseCase>()
     private val getPathByDocumentContentUriUseCase = mock<GetPathByDocumentContentUriUseCase>()
+    private val hasLocalFolderConflictWithSyncUseCase =
+        mock<HasLocalFolderConflictWithSyncUseCase>()
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase =
+        mock<IsFolderUsedBySyncOrBackupAcrossDevicesUseCase>()
 
     private val fakeMonitorCameraUploadsSettingsActionsFlow =
         MutableSharedFlow<CameraUploadsSettingsAction>()
@@ -207,7 +212,6 @@ internal class SettingsCameraUploadsViewModelTest {
             clearCameraUploadsRecordUseCase,
             deleteCameraUploadsTemporaryRootDirectoryUseCase,
             disableMediaUploadsSettingsUseCase,
-            getFeatureFlagValueUseCase,
             getPrimaryFolderNodeUseCase,
             getPrimaryFolderPathUseCase,
             getSecondaryFolderNodeUseCase,
@@ -249,7 +253,9 @@ internal class SettingsCameraUploadsViewModelTest {
             startCameraUploadUseCase,
             stopCameraUploadsUseCase,
             broadcastCameraUploadsSettingsActionUseCase,
-            getPathByDocumentContentUriUseCase
+            getPathByDocumentContentUriUseCase,
+            hasLocalFolderConflictWithSyncUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase
         )
     }
 
@@ -308,6 +314,14 @@ internal class SettingsCameraUploadsViewModelTest {
         whenever(checkEnableCameraUploadsStatusUseCase()).thenReturn(
             enableCameraUploadsStatus
         )
+        whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(false)
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId = anyValueClass(),
+                shouldCheckCameraUploads = any(),
+                shouldExcludeCurrentDevice = any(),
+            )
+        ).thenReturn(FolderUsageResult.NotUsed)
 
         underTest = SettingsCameraUploadsViewModel(
             applicationScope = applicationScope,
@@ -361,6 +375,8 @@ internal class SettingsCameraUploadsViewModelTest {
             videoQualityUiItemMapper = videoQualityUiItemMapper,
             broadcastCameraUploadsSettingsActionUseCase = broadcastCameraUploadsSettingsActionUseCase,
             getPathByDocumentContentUriUseCase = getPathByDocumentContentUriUseCase,
+            hasLocalFolderConflictWithSyncUseCase = hasLocalFolderConflictWithSyncUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
         )
     }
 
@@ -1176,16 +1192,18 @@ internal class SettingsCameraUploadsViewModelTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     internal inner class CameraUploadsLocalFolderSelectionTestGroup {
         @Test
-        fun `test that an error snackbar is shown when changing the local primary folder throws an exception`() =
+        fun `test that a snackbar is shown when the new local primary folder has conflict with sync or backup`() =
             runTest {
                 initializeUnderTest()
-                whenever(isFolderPathExistingUseCase(any())).thenThrow(RuntimeException())
+                whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(true)
                 whenever(getPathByDocumentContentUriUseCase(any())).thenReturn(primaryFolderPath)
 
-                assertDoesNotThrow { underTest.onLocalPrimaryFolderSelected(primaryFolderUriPath) }
+                underTest.onLocalPrimaryFolderSelected(primaryFolderUriPath)
 
                 underTest.uiState.test {
-                    assertThat(awaitItem().snackbarMessage).isEqualTo(triggered(R.string.general_error))
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                    )
                 }
             }
 
@@ -1311,6 +1329,27 @@ internal class SettingsCameraUploadsViewModelTest {
     @DisplayName("Camera Uploads - Folder Node Selection")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     internal inner class CameraUploadsFolderNodeSelectionTestGroup {
+        @Test
+        fun `test that a snackbar is shown when the new primary folder node is used by sync or backup`() =
+            runTest {
+                initializeUnderTest()
+                whenever(
+                    isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        nodeId = anyValueClass(),
+                        shouldCheckCameraUploads = any(),
+                        shouldExcludeCurrentDevice = any(),
+                    )
+                ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+
+                underTest.onPrimaryFolderNodeSelected(NodeId(123456L))
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                    )
+                }
+            }
+
         @Test
         fun `test that an error snackbar is shown when changing the primary folder node throws an exception`() =
             runTest {
@@ -1625,6 +1664,22 @@ internal class SettingsCameraUploadsViewModelTest {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     internal inner class MediaUploadsLocalFolderSelectionTestGroup {
         @Test
+        fun `test that a snackbar is shown when the new local secondary folder has conflict with sync or backup`() =
+            runTest {
+                initializeUnderTest()
+                whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(true)
+                whenever(getPathByDocumentContentUriUseCase(any())).thenReturn(secondaryFolderPath)
+
+                underTest.onLocalSecondaryFolderSelected(secondaryFolderUriPath)
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                    )
+                }
+            }
+
+        @Test
         fun `test that an error snackbar is shown when changing the local secondary folder throws an exception`() =
             runTest {
                 initializeUnderTest()
@@ -1746,6 +1801,27 @@ internal class SettingsCameraUploadsViewModelTest {
     @DisplayName("Media Uploads - Folder Node Selection")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     internal inner class MediaUploadsFolderNodeSelectionTestGroup {
+        @Test
+        fun `test that a snackbar is shown when the new secondary folder node is used by sync or backup`() =
+            runTest {
+                initializeUnderTest()
+                whenever(
+                    isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        nodeId = anyValueClass(),
+                        shouldCheckCameraUploads = any(),
+                        shouldExcludeCurrentDevice = any(),
+                    )
+                ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
+
+                underTest.onSecondaryFolderNodeSelected(NodeId(789012L))
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().snackbarMessage).isEqualTo(
+                        triggered(SharedR.string.error_folder_part_of_sync_or_backup)
+                    )
+                }
+            }
+
         @Test
         fun `test that an error snackbar is shown when changing the secondary folder node throws an exception`() =
             runTest {

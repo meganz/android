@@ -28,9 +28,11 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsFinishedRea
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
@@ -45,6 +47,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathU
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
@@ -214,6 +217,8 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     private val videoQualityUiItemMapper: VideoQualityUiItemMapper,
     private val broadcastCameraUploadsSettingsActionUseCase: BroadcastCameraUploadsSettingsActionUseCase,
     private val getPathByDocumentContentUriUseCase: GetPathByDocumentContentUriUseCase,
+    private val hasLocalFolderConflictWithSyncUseCase: HasLocalFolderConflictWithSyncUseCase,
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsCameraUploadsUiState())
@@ -822,6 +827,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             )
             runCatching {
                 primaryFolderPath?.let { primaryFolderPath ->
+                    // Validate against sync/backup folders FIRST
+                    if (hasLocalFolderConflictWithSyncUseCase(primaryFolderPath)) {
+                        showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)
+                        return@launch
+                    }
+
                     if (isFolderPathExistingUseCase(primaryFolderPath)) {
                         if (isPrimaryFolderPathUnrelatedToSecondaryFolderUseCase(primaryFolderPath)) {
                             setPrimaryFolderPathUseCase(primaryFolderPath)
@@ -862,6 +873,16 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onPrimaryFolderNodeSelected(newPrimaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
+                val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = newPrimaryFolderNodeId,
+                    shouldCheckCameraUploads = false,
+                    shouldExcludeCurrentDevice = false,
+                )
+                if (folderUsage != FolderUsageResult.NotUsed) {
+                    showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)
+                    return@launch
+                }
+
                 if (isNewFolderNodeValidUseCase(newPrimaryFolderNodeId.longValue)) {
                     setupPrimaryFolderUseCase(newPrimaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
@@ -897,6 +918,12 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             )
             runCatching {
                 secondaryFolderPath?.let { secondaryFolderPath ->
+                    // Validate against sync/backup folders FIRST
+                    if (hasLocalFolderConflictWithSyncUseCase(secondaryFolderPath)) {
+                        showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)
+                        return@launch
+                    }
+
                     if (isFolderPathExistingUseCase(secondaryFolderPath)) {
                         if (isSecondaryFolderPathUnrelatedToPrimaryFolderUseCase(secondaryFolderPath)) {
                             setSecondaryFolderLocalPathUseCase(secondaryFolderPath)
@@ -936,6 +963,17 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
     fun onSecondaryFolderNodeSelected(newSecondaryFolderNodeId: NodeId) {
         viewModelScope.launch {
             runCatching {
+                // Validate against sync/backup remote folders FIRST
+                val folderUsage = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                    nodeId = newSecondaryFolderNodeId,
+                    shouldCheckCameraUploads = false,
+                    shouldExcludeCurrentDevice = false,
+                )
+                if (folderUsage != FolderUsageResult.NotUsed) {
+                    showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)
+                    return@launch
+                }
+
                 if (isNewFolderNodeValidUseCase(newSecondaryFolderNodeId.longValue)) {
                     setupSecondaryFolderUseCase(newSecondaryFolderNodeId.longValue)
                     stopCameraUploadsUseCase(CameraUploadsRestartMode.Stop)
