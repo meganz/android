@@ -739,7 +739,11 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
 
         collectFlow(viewModel.uiState) { fileExplorerState ->
             if (fileExplorerState.shouldFinishScreen) {
-                finishAffinity()
+                if (mode == UPLOAD) {
+                    finishAffinity()
+                } else {
+                    finish()
+                }
                 viewModel.setShouldFinishScreen(false)
             }
         }
@@ -2784,7 +2788,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     }
 
                     // No collision resolution in progress, finish normally
-                    finishShareAndBack(uploadEvent.destinationId.longValue, getString(sharedR.string.transfers_upload_started_snackbar))
+                    finishShareAndBack(
+                        uploadEvent.destinationId.longValue,
+                        getString(sharedR.string.transfers_upload_started_snackbar)
+                    )
                 }
             }
         )
