@@ -275,26 +275,12 @@ class AlbumContentViewModel @AssistedInject constructor(
             }
 
             val mediaAlbum = state.uiAlbum?.mediaAlbum
-            val isPaid = state.accountType?.isPaid ?: false
-            val isBusinessAccountExpired = state.isBusinessAccountExpired
-            val isHiddenNodesOnboarded = state.isHiddenNodesOnboarded
-
-            // Hide/Unhide visibility logic
-            val includeSensitiveInheritedNode = selectedPhotos.any { it.isSensitiveInherited }
-            val hasNonSensitiveNode = selectedPhotos.any { !it.isSensitive }
-
-            val showHide = !isPaid ||
-                    isBusinessAccountExpired ||
-                    (hasNonSensitiveNode && isHiddenNodesOnboarded != null && !includeSensitiveInheritedNode)
-            val showUnhide = isPaid &&
-                    !isBusinessAccountExpired &&
-                    !hasNonSensitiveNode &&
-                    !includeSensitiveInheritedNode
-
-            // Delete (Remove Photos) - only visible for UserAlbum
+            val isPaidAccount = state.accountType?.isPaid == true && !state.isBusinessAccountExpired
+            val showHide =
+                !isPaidAccount || selectedPhotos.all { !it.isSensitive && !it.isSensitiveInherited }
+            val showUnhide =
+                isPaidAccount && selectedPhotos.all { it.isSensitive && !it.isSensitiveInherited }
             val showDelete = mediaAlbum is MediaAlbum.User
-
-            // RemoveFavourites - only visible for FavouriteAlbum
             val showRemoveFavourites =
                 (mediaAlbum as? MediaAlbum.System)?.id is FavouriteSystemAlbum
 
