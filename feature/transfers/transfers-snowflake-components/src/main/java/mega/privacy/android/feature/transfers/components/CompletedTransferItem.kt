@@ -91,17 +91,7 @@ internal fun CompletedTransferItem(
     modifier: Modifier = Modifier,
     isSelected: Boolean? = null,
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { swipeToDismissBoxValue ->
-            when (swipeToDismissBoxValue) {
-                SwipeToDismissBoxValue.StartToEnd -> onRetry()
-                SwipeToDismissBoxValue.EndToStart -> onClear()
-                SwipeToDismissBoxValue.Settled -> {}
-            }
-
-            swipeToDismissBoxValue != SwipeToDismissBoxValue.StartToEnd
-        }
-    )
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
 
     SwipeToDismissBox(
         state = swipeToDismissBoxState,
@@ -141,6 +131,13 @@ internal fun CompletedTransferItem(
         modifier = modifier.fillMaxWidth(),
         enableDismissFromStartToEnd = enableSwipeToDismiss && enableDismissFromStartToEnd,
         enableDismissFromEndToStart = enableSwipeToDismiss,
+        onDismiss = { direction ->
+            when (direction) {
+                SwipeToDismissBoxValue.StartToEnd -> onRetry()
+                SwipeToDismissBoxValue.EndToStart -> onClear()
+                SwipeToDismissBoxValue.Settled -> {}
+            }
+        }
     ) {
         Row(
             modifier = modifier

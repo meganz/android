@@ -21,6 +21,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.ProgressBarIndicator
@@ -70,16 +72,8 @@ fun ActiveTransferItem(
     isSelected: Boolean? = null,
     isBeingDragged: Boolean = false,
 ) {
-    val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        confirmValueChange = { swipeToDismissBoxValue ->
-            if (swipeToDismissBoxValue == SwipeToDismissBoxValue.EndToStart) {
-                onSetToCancel()
-            }
-
-            swipeToDismissBoxValue != SwipeToDismissBoxValue.StartToEnd
-        }
-    )
-
+    val swipeToDismissBoxState = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
     SwipeToDismissBox(
         state = swipeToDismissBoxState,
         backgroundContent = {
@@ -107,6 +101,14 @@ fun ActiveTransferItem(
             .testTag(TEST_TAG_ACTIVE_TRANSFER_ITEM + "_$tag"),
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = enableSwipeToDismiss,
+        onDismiss = { direction ->
+            if (direction == SwipeToDismissBoxValue.EndToStart) {
+                scope.launch {
+                    swipeToDismissBoxState.snapTo(SwipeToDismissBoxValue.Settled) // we need to set it to settle state in case the cancel is undone and the item recycled
+                    onSetToCancel()
+                }
+            }
+        }
     ) {
         Column(
             modifier = Modifier
