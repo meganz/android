@@ -33,7 +33,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.prompt.ErrorPrompt
 import mega.android.core.ui.components.state.EmptyStateView
-import mega.android.core.ui.components.tabs.MegaScrollableTabRow
+import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.MegaSpanStyle
@@ -60,8 +60,6 @@ import mega.privacy.android.app.presentation.transfers.view.failed.FailedTransfe
 import mega.privacy.android.app.presentation.transfers.view.sheet.ActiveTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.CompletedTransfersActionsBottomSheet
 import mega.privacy.android.app.presentation.transfers.view.sheet.FailedTransfersActionsBottomSheet
-import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
-import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -131,7 +129,6 @@ internal fun TransfersView(
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCancelAllTransfersDialog by rememberSaveable { mutableStateOf(false) }
     var showConfirmCancelTransfersDialog by rememberSaveable { mutableStateOf(false) }
-    val scrollToHideState = rememberScrollToHideState()
 
     // Track screen view event
     LaunchedEffect(Unit) {
@@ -286,13 +283,12 @@ internal fun TransfersView(
                 emptyStringId = sharedR.string.transfers_no_transfers_empty_text,
             )
         } else {
-            MegaScrollableTabRow(
+            MegaCollapsibleTabRow(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .scrollToHide(scrollToHideState)
                     .fillMaxSize(),
                 beyondViewportPageCount = 1,
-                hideTabs = isInSelectTransfersMode || scrollToHideState.shouldHide,
+                hideTabs = isInSelectTransfersMode,
                 pagerScrollEnabled = false,
                 fixedHeader = {
                     AnimatedVisibility(
@@ -369,9 +365,6 @@ internal fun TransfersView(
                 },
                 initialSelectedIndex = selectedTab,
                 onTabSelected = {
-                    if (selectedTab != it) {
-                        scrollToHideState.show()
-                    }
                     when (it) {
                         ACTIVE_TAB_INDEX -> ActiveTransfersTabEvent
                         COMPLETED_TAB_INDEX -> CompletedTransfersTabEvent

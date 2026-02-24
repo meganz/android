@@ -1,11 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -33,12 +28,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.normalize
 import mega.privacy.android.app.presentation.chat.list.model.ChatTab
@@ -49,9 +48,6 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManag
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
-import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
-import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
-import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.icon.pack.IconPack
@@ -115,9 +111,9 @@ fun ChatTabsView(
     var scrollToTop by remember { mutableStateOf(false) }
     var filteredChats by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
     var filteredMeetings by remember { mutableStateOf<List<ChatRoomItem>?>(listOf()) }
-    val scrollToHideState = rememberScrollToHideState()
+    val scrollToHideBehavior = rememberScrollToHideBehavior()
     LaunchedOnceEffect(pagerState.currentPage) {
-        scrollToHideState.show()
+        scrollToHideBehavior.reset()
     }
     MegaScaffold(
         modifier = if (isNewSingleActivity) Modifier.systemBarsPadding() else Modifier,
@@ -148,9 +144,7 @@ fun ChatTabsView(
                     onDismissed = { onShowNextTooltip(MeetingTooltipItem.RECURRING_OR_PENDING) },
                 ) {
                     FabButton(
-                        modifier = Modifier.animateFloatingActionButton(
-                            visible = !scrollToHideState.shouldHide,
-                        ),
+                        modifier = Modifier.applyScrollToHideFabBehavior(scrollToHideBehavior),
                         newFab = isNewSingleActivity,
                         onStartChatClick = onStartChatClick,
                     )
@@ -158,9 +152,7 @@ fun ChatTabsView(
             } else {
                 if ((state.hasAnyContact.not() && state.chats.isEmpty()) || state.chats.isNotEmpty() || pagerState.currentPage == ChatTab.MEETINGS.ordinal) {
                     FabButton(
-                        modifier = Modifier.animateFloatingActionButton(
-                            visible = !scrollToHideState.shouldHide,
-                        ),
+                        modifier = Modifier.applyScrollToHideFabBehavior(scrollToHideBehavior),
                         newFab = isNewSingleActivity,
                         onStartChatClick = onStartChatClick
                     )
@@ -171,41 +163,37 @@ fun ChatTabsView(
         Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .scrollToHide(scrollToHideState)
+                .nestedScroll(scrollToHideBehavior.nestedScrollConnection)
                 .fillMaxSize()
         ) {
-            AnimatedVisibility(
-                enter = fadeIn() + expandVertically(),
-                exit = fadeOut() + shrinkVertically(),
-                visible = !scrollToHideState.shouldHide
+            Tabs(
+                modifier = Modifier.applyScrollToHideBehavior(scrollToHideBehavior),
+                pagerEnabled = false,
+                pagerState = pagerState,
+                selectedTabIndex = pagerState.currentPage,
+                onTabSelected = {
+                    if (pagerState.currentPage == it) {
+                        scrollToTop = !scrollToTop
+                        false
+                    }
+                    true
+                }
             ) {
-                Tabs(
-                    pagerEnabled = false,
-                    pagerState = pagerState,
-                    selectedTabIndex = pagerState.currentPage,
-                    onTabSelected = {
-                        if (pagerState.currentPage == it) {
-                            scrollToTop = !scrollToTop
-                            false
-                        }
-                        true
-                    }
-                ) {
-                    ChatTab.entries.forEachIndexed { index, item ->
-                        addTextTab(
-                            text = stringResource(item.titleStringRes),
-                            tag = item.name,
-                            suffix = { activeColor, color ->
-                                if (state.currentUnreadStatus?.toList()?.getOrNull(index) == true) {
-                                    Canvas(modifier = Modifier.size(4.dp)) {
-                                        drawCircle(color = activeColor, center = Offset(20f, 20f))
-                                    }
+                ChatTab.entries.forEachIndexed { index, item ->
+                    addTextTab(
+                        text = stringResource(item.titleStringRes),
+                        tag = item.name,
+                        suffix = { activeColor, color ->
+                            if (state.currentUnreadStatus?.toList()?.getOrNull(index) == true) {
+                                Canvas(modifier = Modifier.size(4.dp)) {
+                                    drawCircle(color = activeColor, center = Offset(20f, 20f))
                                 }
-                            },
-                        )
-                    }
+                            }
+                        },
+                    )
                 }
             }
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),

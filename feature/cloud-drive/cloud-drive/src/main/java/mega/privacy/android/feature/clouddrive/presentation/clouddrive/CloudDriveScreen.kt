@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +17,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -28,10 +28,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
 import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
-import mega.privacy.android.core.sharedcomponents.extension.animateFloatingActionButton
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
-import mega.privacy.android.core.sharedcomponents.scroll.rememberScrollToHideState
-import mega.privacy.android.core.sharedcomponents.scroll.scrollToHide
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -73,7 +70,6 @@ fun CloudDriveScreen(
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
     val megaNavigator = rememberMegaNavigator()
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val scrollToHideState = rememberScrollToHideState()
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         navigationHandler = navigationHandler,
         viewModel = nodeOptionsActionViewModel,
@@ -160,10 +156,7 @@ fun CloudDriveScreen(
             AddContentFab(
                 modifier = Modifier
                     .testTag(CLOUD_DRIVE_FAB_TAG)
-                    .animateFloatingActionButton(
-                        visible = !scrollToHideState.shouldHide,
-                        alignment = Alignment.BottomEnd
-                    ),
+                    .applyScrollToHideFabBehavior(),
                 visible = uiState.isUploadAllowed && !uiState.isEmpty,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -173,7 +166,6 @@ fun CloudDriveScreen(
         },
         content = { innerPadding ->
             CloudDriveContent(
-                modifier = Modifier.scrollToHide(scrollToHideState),
                 isTabContent = false,
                 navigationHandler = navigationHandler,
                 uiState = uiState,
