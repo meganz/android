@@ -349,7 +349,6 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 },
                 onNotificationCancelledCallback = {
                     isNotificationCreated = false
-                    mediaPlayerGateway.playerStop()
                 }
             )
         )
