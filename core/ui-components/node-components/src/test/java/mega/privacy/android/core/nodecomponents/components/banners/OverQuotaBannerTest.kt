@@ -2,6 +2,7 @@ package mega.privacy.android.core.nodecomponents.components.banners
 
 import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -276,6 +277,37 @@ class OverQuotaBannerTest {
         )
 
         composeTestRule.onNodeWithTag(STORAGE_WARNING_BANNER_ROOT_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that analytics event is tracked again when OverQuotaWarningBanner is shown again after closing via Cancel button`() {
+        resetLaunchedOncePerAppEffect(AlmostFullStorageOverQuotaBannerDisplayedEvent)
+
+        val showBanner = mutableStateOf(true)
+        composeTestRule.setContent {
+            if (showBanner.value) {
+                OverQuotaBanner(
+                    overQuotaStatus = OverQuotaStatus(OverQuotaIssue.Storage.AlmostFull),
+                    onDismissed = { showBanner.value = false },
+                    onUpgradeClicked = {},
+                )
+            }
+        }
+        composeTestRule.waitForIdle()
+
+        val countAfterFirstShow =
+            analyticsRule.events.count { it == AlmostFullStorageOverQuotaBannerDisplayedEvent }
+        assertThat(countAfterFirstShow).isEqualTo(1)
+
+        composeTestRule.onNodeWithContentDescription("Banner Cancel").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.runOnUiThread { showBanner.value = true }
+        composeTestRule.waitForIdle()
+
+        val countAfterSecondShow =
+            analyticsRule.events.count { it == AlmostFullStorageOverQuotaBannerDisplayedEvent }
+        assertThat(countAfterSecondShow).isEqualTo(2)
     }
 
     private fun setContent(

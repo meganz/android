@@ -13,6 +13,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOncePerAppEffect
+import mega.privacy.android.core.sharedcomponents.coroutine.resetLaunchedOncePerAppEffect
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.AlmostFullStorageAndTransferOverQuotaBannerDisplayedEvent
@@ -199,6 +200,7 @@ fun OverQuotaWarningBanner(
                     AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent
                 )
                 onDismissed()
+                resetLaunchedOncePerAppEffect(analyticsEvent)
             },
         )
     }
