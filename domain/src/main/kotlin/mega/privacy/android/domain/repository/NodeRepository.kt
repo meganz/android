@@ -230,6 +230,11 @@ interface NodeRepository {
     fun monitorOfflineNodeUpdates(): Flow<List<Offline>>
 
     /**
+     * Monitor offline node ids
+     */
+    fun monitorOfflineNodeIds(): Flow<List<Int?>>
+
+    /**
      * Check if node is in rubbish or deleted
      */
     suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean

@@ -12,6 +12,9 @@ internal interface OfflineDao {
     @Query("SELECT * FROM offline")
     fun monitorOffline(): Flow<List<OfflineEntity>>
 
+    @Query("SELECT id FROM offline")
+    fun monitorOfflineNodeIds(): Flow<List<Int?>>
+
     @Query("SELECT * FROM offline")
     fun getOfflineFiles(): List<OfflineEntity>?
 

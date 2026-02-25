@@ -437,6 +437,7 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override fun monitorOfflineUpdates() = offlineDao.get().monitorOffline()
         .map { it.map { offlineEntity -> offlineModelMapper(offlineEntity) } }
 
+    override fun monitorOfflineNodeIds() = offlineDao.get().monitorOfflineNodeIds()
 
     override suspend fun getAllOfflineInfo() =
         offlineDao.get().getOfflineFiles()?.map { offlineModelMapper(it) } ?: emptyList()
