@@ -49,7 +49,7 @@ class LegacyCoreActivityFeatureGraph(
     rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
-        { navigationHandler, transferHandler ->
+        { navigationHandler, _ ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
             upgradeAccount(navigationHandler::remove)
             myAccount(navigationHandler::back)
@@ -69,16 +69,12 @@ class LegacyCoreActivityFeatureGraph(
             legacyFolderLinkScreen(navigationHandler::back)
             getLinkLegacyDestination(navigationHandler::back)
             chatListLegacyDestination(navigationHandler::back)
-            legacyAlbumCoverSelection(navigationHandler::returnResult)
-            legacyAlbumPhotosSelection(navigationHandler::back, navigationHandler::returnResult)
             legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
             legacyImageViewerScreen(navigationHandler::back)
             legacyTextEditorScreen(navigationHandler::back)
             legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
             videoSectionLegacyDestination(navigationHandler::back)
-            legacyAlbumContentPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
-            legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
             legacyMeetingScreen(
                 navigationHandler::back,
                 megaChatRequestHandler,
@@ -87,7 +83,6 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
-            legacyPhotosSearch(navigationHandler::back, navigationHandler::returnResult)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             fileInfoScreen(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)

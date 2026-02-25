@@ -59,7 +59,6 @@ import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
-import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
@@ -75,19 +74,14 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun EntryProviderScope<NavKey>.mediaMainRoute(
     navigationHandler: NavigationHandler,
     setNavigationItemVisibility: (Boolean) -> Unit,
-    photoSelectionResultFlow: (String) -> Flow<Long?>,
-    timelineAddToAlbumResultFlow: (String) -> Flow<String?>,
-    mediaAlbumNavigationFlow: (String) -> Flow<Pair<Long?, String>?>,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<MediaMainNavKey> {
-        val snackBarEventQueue = rememberSnackBarQueue()
-        val photoSelectionResult by photoSelectionResultFlow(PhotosSelectionNavKey.RESULT)
+        val photoSelectionResult by navigationHandler.monitorResult<Long?>(PhotosSelectionNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
-        val timelineAddToAlbumResult by timelineAddToAlbumResultFlow(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
-            .collectAsStateWithLifecycle(null)
-        val mediaAlbumNavigationFlow by mediaAlbumNavigationFlow(LegacyPhotosSearchNavKey.RESULT)
-            .collectAsStateWithLifecycle(null)
+        val mediaAlbumNavigationFlow by navigationHandler.monitorResult<Pair<Long?, String>?>(
+            LegacyPhotosSearchNavKey.RESULT
+        ).collectAsStateWithLifecycle(null)
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { it.create(null) }
@@ -111,13 +105,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
                 )
 
                 navigationHandler.clearResult(PhotosSelectionNavKey.RESULT)
-            }
-        }
-
-        LaunchedEffect(timelineAddToAlbumResult) {
-            timelineAddToAlbumResult?.let {
-                snackBarEventQueue.queueMessage(it)
-                navigationHandler.clearResult(LegacyAddToAlbumActivityNavKey.ADD_TO_ALBUM_RESULT)
             }
         }
 
