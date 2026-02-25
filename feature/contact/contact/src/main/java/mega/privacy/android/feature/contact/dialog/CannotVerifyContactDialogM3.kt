@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.contact
+package mega.privacy.android.feature.contact.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,9 +21,10 @@ internal const val CANNOT_VERIFY_DIALOG_TAG = "cannot_verify_dialog"
 fun CannotVerifyContactDialogM3(
     email: String,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     BasicDialog(
-        modifier = Modifier.testTag(CANNOT_VERIFY_DIALOG_TAG),
+        modifier = modifier.testTag(CANNOT_VERIFY_DIALOG_TAG),
         title = stringResource(id = sharedResR.string.shared_items_contact_not_in_contact_list_dialog_title),
         description = stringResource(
             id = sharedResR.string.shared_items_contact_not_in_contact_list_dialog_content,

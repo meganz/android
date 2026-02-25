@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.navigation
 
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.core.nodecomponents.dialog.contact.cannotVerifyContactDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.delete.moveToRubbishOrDeleteDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.leaveShareDialogM3
 import mega.privacy.android.core.nodecomponents.dialog.removelink.removeNodeLinkDialogM3
@@ -24,7 +23,6 @@ class NodeComponentsFeatureDestination : FeatureDestination {
             moveToRubbishOrDeleteDialogM3(navigationHandler::back)
             removeNodeLinkDialogM3(navigationHandler::back)
             removeShareFolderDialogM3(navigationHandler::back)
-            cannotVerifyContactDialogM3(navigationHandler::back)
             leaveShareDialogM3(navigationHandler::back)
             shareFolderAccessDialogM3(navigationHandler::back)
             shareFolderDialogM3(

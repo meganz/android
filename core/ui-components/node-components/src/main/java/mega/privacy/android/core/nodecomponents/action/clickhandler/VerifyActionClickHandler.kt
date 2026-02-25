@@ -3,11 +3,11 @@ package mega.privacy.android.core.nodecomponents.action.clickhandler
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuAction
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionProvider
-import mega.privacy.android.core.nodecomponents.dialog.contact.CannotVerifyContactDialogNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.CannotVerifyContactDialogNavKey
 import javax.inject.Inject
 
 class VerifyActionClickHandler @Inject constructor(
