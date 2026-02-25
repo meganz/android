@@ -28,6 +28,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -99,6 +100,12 @@ class AudioPlayerFragment : Fragment() {
     private var toolbarVisible = true
 
     private var retryFailedDialog: AlertDialog? = null
+
+    /**
+     * Last handle we processed from monitorMediaItemTransitionState(). Used to ignore the
+     * StateFlow replay when the same value emitted again.
+     */
+    private var lastProcessedMediaItemHandle: Long? = null
 
     // top-level inside class
     private var playerGlobalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
@@ -192,6 +199,7 @@ class AudioPlayerFragment : Fragment() {
         playerViewHolder = null
         serviceGateway?.removeListener(playerListener)
         serviceGateway = null
+        serviceViewModelGateway = null
         context?.unbindService(connection)
     }
 
@@ -243,7 +251,10 @@ class AudioPlayerFragment : Fragment() {
                         }
                     }
 
-                    viewLifecycleOwner.collectFlow(gateway.monitorMediaItemTransitionState()) { handle ->
+                    viewLifecycleOwner.collectFlow(
+                        gateway.monitorMediaItemTransitionState()
+                            .filter { it != lastProcessedMediaItemHandle }) { handle ->
+                        lastProcessedMediaItemHandle = handle
                         handle?.let {
                             val name = gateway.getPlaylistItem(it.toString())?.nodeName
                                 ?: activity?.intent?.getStringExtra(INTENT_EXTRA_KEY_FILE_NAME)
