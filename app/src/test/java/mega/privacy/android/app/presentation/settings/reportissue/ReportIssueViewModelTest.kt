@@ -15,8 +15,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.InstantExecutorExtension
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.settings.reportissue.ReportIssueViewModel
+import mega.privacy.android.app.extensions.asHotFlow
+import mega.privacy.android.app.extensions.withCoroutineExceptions
 import mega.privacy.android.app.presentation.settings.reportissue.model.SubmitIssueResult
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Progress
@@ -37,9 +39,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import mega.privacy.android.app.InstantExecutorExtension
-import mega.privacy.android.app.extensions.asHotFlow
-import mega.privacy.android.app.extensions.withCoroutineExceptions
 
 @ExperimentalCoroutinesApi
 @ExtendWith(InstantExecutorExtension::class)
@@ -55,6 +54,7 @@ class ReportIssueViewModelTest {
         mock<MonitorConnectivityUseCase>()
 
     private val supportEmail = "Support@Email.address"
+    private val typedDescription = "A long enough description with at least 30 characteres"
     private val getSupportEmail = mock<GetSupportEmailUseCase>()
 
     @BeforeEach
@@ -189,7 +189,7 @@ class ReportIssueViewModelTest {
         runTest {
             whenever(submitIssueUseCase(any())).thenReturn(emptyFlow())
             initViewModel()
-            underTest.setDescription("A long enough description")
+            underTest.setDescription(typedDescription)
             scheduler.advanceUntilIdle()
             underTest.uiState.map { it.result }.distinctUntilChanged()
                 .test {
@@ -211,7 +211,7 @@ class ReportIssueViewModelTest {
                 }
 
                 initViewModel()
-                underTest.setDescription("A long enough description")
+                underTest.setDescription(typedDescription)
                 scheduler.advanceUntilIdle()
                 underTest.uiState.map { it.result }.distinctUntilChanged()
                     .test {
@@ -226,22 +226,21 @@ class ReportIssueViewModelTest {
     fun `test that description and log setting are passed to submit use case`() = runTest {
         initViewModel()
         scheduler.advanceUntilIdle()
-        val newDescription = "Expected description"
-        underTest.setDescription(newDescription)
+        underTest.setDescription(typedDescription)
         underTest.setIncludeLogsEnabled(true)
 
         scheduler.advanceUntilIdle()
         underTest.submit()
         scheduler.advanceUntilIdle()
 
-        verify(submitIssueUseCase).invoke(argThat { description == newDescription && includeLogs })
+        verify(submitIssueUseCase).invoke(argThat { description == typedDescription && includeLogs })
     }
 
     @Test
     fun `test that upload progress from 0 to 100 is returned`() = runTest {
         whenever(submitIssueUseCase(any())).thenReturn(getProgressFlow())
         initViewModel()
-        underTest.setDescription("A long enough description")
+        underTest.setDescription(typedDescription)
         scheduler.advanceUntilIdle()
         underTest.uiState.mapNotNull { it.uploadProgress }.distinctUntilChanged()
             .test {
@@ -260,7 +259,7 @@ class ReportIssueViewModelTest {
             })
 
         initViewModel()
-        underTest.setDescription("A long enough description")
+        underTest.setDescription(typedDescription)
         scheduler.advanceUntilIdle()
         underTest.uiState.mapNotNull { it.uploadProgress }.distinctUntilChanged()
             .test {
@@ -279,7 +278,7 @@ class ReportIssueViewModelTest {
         )
 
         initViewModel()
-        underTest.setDescription("A long enough description")
+        underTest.setDescription(typedDescription)
         scheduler.advanceUntilIdle()
 
         underTest.uiState.map { it.result }.distinctUntilChanged()
@@ -300,7 +299,7 @@ class ReportIssueViewModelTest {
         )
 
         initViewModel()
-        underTest.setDescription("A long enough description")
+        underTest.setDescription(typedDescription)
         scheduler.advanceUntilIdle()
         underTest.uiState.map { it.uploadProgress == null }.distinctUntilChanged().test {
             assertThat(awaitItem()).isTrue()

@@ -1334,8 +1334,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">المساعدة</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">أرسل ملاحظاتك</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">ملاحظات الأندرويد Android</string>
     <!-- mail body -->
@@ -1383,12 +1381,6 @@
     <string name="invalid_connection_state">إعادة الاتصال بالمحادثة</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">حدث خطأ ولا يمكن توصيل المكالمة.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">هل يعجبك تطبيق ميغا للهاتف المحمول MEGA Mobile؟</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">نعم، قم بتقييم التطبيق</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">لا، أرسل الملاحظات</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">لا توجد لديك صلاحيات ممنوحة لجهات الاتصال</string>
     <!-- Option of the sliding panel to go to QR code section -->

@@ -1210,8 +1210,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Bantuan</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Kirim umpan balik</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Masukan untuk Android</string>
     <!-- mail body -->
@@ -1254,12 +1252,6 @@
     <string name="invalid_connection_state">Menghubungkan kembali ke obrolan</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Terjadi kesalahan dan panggilan tidak dapat tersambung.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Suka dengan Aplikasi Seluler MEGA?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Ya, beri nilai aplikasi</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Tidak, kirim umpan balik</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Tidak ada izin kontak yang diberikan</string>
     <!-- Option of the sliding panel to go to QR code section -->

@@ -500,9 +500,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">جاري إلغاء عمليات التراسل...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">يجب أن تتكون الاستفسارات من 10 أحرف على الأقل</string>
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">وصف المشكلة باستخدام 10 محارف على الأقل</string>
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">حافظ على خصوصية المحادثات</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2244,4 +2244,6 @@
     <string name="photos_create_album_duplicate_name_error">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
     <string name="photos_create_album_proscribed_name_error">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
     <string name="remove_from_offline_success_message">حذف من غير متصل بالانترنت</string>
+    <!-- Settings preference title for rate app -->
+    <string name="settings_help_rate_app">Rate us</string>
 </resources>

@@ -17,7 +17,7 @@ object SettingsConstants {
     const val KEY_2FA = "settings_2fa_activated"
     const val KEY_QR_CODE_AUTO_ACCEPT = "settings_qrcode_autoaccept"
     const val KEY_HELP_CENTRE = "settings_help_centre"
-    const val KEY_HELP_SEND_FEEDBACK = "settings_help_send_feedback"
+    const val KEY_HELP_RATE_APP = "settings_help_rate_app"
     const val KEY_ABOUT_PRIVACY_POLICY = "settings_about_privacy_policy"
     const val KEY_ABOUT_COOKIE_POLICY = "settings_about_cookie_policy"
     const val KEY_COOKIE_SETTINGS = "settings_cookie"

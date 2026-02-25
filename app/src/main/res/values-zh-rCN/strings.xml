@@ -1214,8 +1214,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">帮助</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">发送反馈</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">安卓反馈建议</string>
     <!-- mail body -->
@@ -1258,12 +1256,6 @@
     <string name="invalid_connection_state">正在重连到聊天</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">发送错误，通话无法连接。</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">喜欢MEGA手机应用程序吗？</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">是的，给应用评分</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">不喜欢，我要发送反馈</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">未授予联系人权限</string>
     <!-- Option of the sliding panel to go to QR code section -->

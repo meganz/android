@@ -467,9 +467,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelando transferencias&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">La descripción debe tener al menos 10 caracteres</string>
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe el problema con al menos 10 caracteres</string>
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Mantén tus conversaciones privadas</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2190,4 +2190,6 @@
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s está disponible con facturación anual</string>
     <string name="choose_account_screen_plan_available_monthly_billing">%1$s está disponible con facturación mensual</string>
     <string name="remove_from_offline_success_message">Archivo eliminado de Sin conexión</string>
+    <!-- Settings preference title for rate app -->
+    <string name="settings_help_rate_app">Rate us</string>
 </resources>

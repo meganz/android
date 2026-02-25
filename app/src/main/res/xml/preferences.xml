@@ -207,8 +207,8 @@
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />
 		<androidx.preference.Preference
-			android:key="settings_help_send_feedback"
-			android:title="@string/settings_help_preference"
+            android:key="settings_help_rate_app"
+            android:title="@string/settings_help_rate_app"
 			app:allowDividerAbove="true"
 			app:allowDividerBelow="true"
 			app:iconSpaceReserved="false" />

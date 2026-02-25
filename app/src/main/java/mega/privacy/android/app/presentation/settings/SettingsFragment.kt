@@ -42,7 +42,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CAMERA_
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_CHAT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_FEATURES_SYNC
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_CENTRE
-import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_SEND_FEEDBACK
+import mega.privacy.android.app.constants.SettingsConstants.KEY_HELP_RATE_APP
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDDEN_ITEMS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_HIDE_RECENT_ACTIVITY
 import mega.privacy.android.app.constants.SettingsConstants.KEY_MEDIA_DISCOVERY_VIEW
@@ -67,11 +67,14 @@ import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
+import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import mega.privacy.android.shared.resources.R as sharedResR
+import timber.log.Timber
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -324,7 +327,7 @@ class SettingsFragment :
                 context.launchUrl(HELP_CENTRE_URL)
             }
 
-            KEY_HELP_SEND_FEEDBACK -> showEvaluatedAppDialog()
+            KEY_HELP_RATE_APP -> navigateToRateApp()
             KEY_ABOUT_PRIVACY_POLICY -> {
                 context.launchUrl(PRIVACY_POLICY_URL)
             }
@@ -430,11 +433,13 @@ class SettingsFragment :
         return super.onPreferenceTreeClick(preference)
     }
 
-    private fun showEvaluatedAppDialog() {
-        FeedBackDialog.newInstance(
-            viewModel.uiState.value.email,
-            viewModel.uiState.value.accountType
-        ).show(childFragmentManager, FeedBackDialog.TAG)
+    private fun navigateToRateApp() {
+        Timber.d("Rate the app")
+        runCatching {
+            startActivity(Intent(Intent.ACTION_VIEW, RATE_APP_URL.toUri()))
+        }.onFailure {
+            Timber.d("Can not handle action Intent.ACTION_VIEW")
+        }
     }
 
     private fun deleteAccountClicked() {

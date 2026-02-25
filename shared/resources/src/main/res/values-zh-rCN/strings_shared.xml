@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消传输...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">查询必须至少包含10个字符（5个中文字）</string>
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">问题描述至少10个字符（5个中文字）</string>
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">保持私密对话</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2104,4 +2104,6 @@
     <string name="album_import_rename_album_dialog_description">您的相册中已存在一个名为“%1$s”的相册。请为您要保存的相册输入一个新名称。</string>
     <string name="album_import_snackbar_success_message">%1$s已保存到云盘</string>
     <string name="album_import_snackbar_error_message">%1$s无法保存到云盘。请稍后再试。如果问题仍然存在，请联系与您共享链接的人。</string>
+    <!-- Settings preference title for rate app -->
+    <string name="settings_help_rate_app">Rate us</string>
 </resources>

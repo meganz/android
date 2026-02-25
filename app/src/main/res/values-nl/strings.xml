@@ -1238,8 +1238,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Help</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Verstuur feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android feedback</string>
     <!-- mail body -->
@@ -1283,12 +1281,6 @@
     <string name="invalid_connection_state">Opnieuw verbinden met het gesprek</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Er is een fout opgetreden en de oproep kan niet worden verbonden.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Vind u de MEGA-Mobiele Applicatie leuk?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Ja, geef deze applicatie uw mening</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Nee, verstuur feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Geen contact toestemmingen toegekend</string>
     <!-- Option of the sliding panel to go to QR code section -->

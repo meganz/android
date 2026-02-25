@@ -1286,8 +1286,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Помощь</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Отправить отзыв</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Обратная связь по Android</string>
     <!-- mail body -->
@@ -1333,12 +1331,6 @@
     <string name="invalid_connection_state">Переподключение к чату</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Произошла ошибка, звонок не может быть соединён.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Вам нравится мобильное приложение MEGA?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Да, оценить</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Нет, написать отзыв</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">У контакта нет разрешений</string>
     <!-- Option of the sliding panel to go to QR code section -->

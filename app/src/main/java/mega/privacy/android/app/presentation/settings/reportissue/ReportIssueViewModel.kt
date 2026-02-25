@@ -202,6 +202,6 @@ class ReportIssueViewModel @Inject constructor(
     companion object {
         internal const val DESCRIPTION_KEY = "DESCRIPTION"
         internal const val INCLUDE_LOGS_KEY = "INCLUDE_LOGS"
-        private const val MINIMUM_CHARACTERS = 10
+        private const val MINIMUM_CHARACTERS = 30
     }
 }

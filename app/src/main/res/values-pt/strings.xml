@@ -1262,8 +1262,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Ajuda</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Enviar comentários</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android - Feedback</string>
     <!-- mail body -->
@@ -1308,12 +1306,6 @@
     <string name="invalid_connection_state">Reconectando ao chat</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">Ocorreu um erro e não foi possível estabelecer a chamada.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Você gosta do aplicativo do MEGA para dispositivos móveis?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Sim, avaliar o aplicativo</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">Não, enviar feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">Sem permissão para acessar os contatos</string>
     <!-- Option of the sliding panel to go to QR code section -->

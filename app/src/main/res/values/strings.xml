@@ -1238,8 +1238,6 @@
     </plurals>
     <!-- Menu item -->
     <string name="settings_help">Help</string>
-    <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">Send feedback</string>
     <!-- mail subject -->
     <string name="setting_feedback_subject">Android feedback</string>
     <!-- mail body -->
@@ -1283,12 +1281,6 @@
     <string name="invalid_connection_state">Reconnecting to chat</string>
     <!-- Message show when a call cannot be established -->
     <string name="call_error">An error has occurred and the call cannot be connected.</string>
-    <!-- Title of dialog to evaluate the app -->
-    <string name="title_evaluate_the_app_panel">Like the MEGA Mobile App?</string>
-    <!-- Label to show rate the app -->
-    <string name="rate_the_app_panel">Yes, rate the app</string>
-    <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">No, send feedback</string>
     <!-- Title of the section to invite contacts if the user has denied the contacts permmissions -->
     <string name="no_contacts_permissions">No contact permissions granted</string>
     <!-- Option of the sliding panel to go to QR code section -->

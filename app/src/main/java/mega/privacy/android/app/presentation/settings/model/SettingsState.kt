@@ -19,8 +19,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * @property startScreenSummary
  * @property hideRecentActivityChecked
  * @property mediaDiscoveryViewState
- * @property email
- * @property accountType
  * @property passcodeLock
  * @property subFolderMediaDiscoveryChecked
  * Uploads should be shown
@@ -42,8 +40,6 @@ data class SettingsState(
     val startScreenSummary: String,
     val hideRecentActivityChecked: Boolean,
     val mediaDiscoveryViewState: Int,
-    val email: String,
-    val accountType: String,
     val passcodeLock: Boolean,
     val subFolderMediaDiscoveryChecked: Boolean,
     val showHiddenItems: Boolean,

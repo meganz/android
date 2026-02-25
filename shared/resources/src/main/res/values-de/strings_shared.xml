@@ -456,9 +456,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Transfers werden abgebrochen&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Anfragen müssen mindestens 10 Zeichen lang sein</string>
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Beschreiben Sie das Problem und verwenden Sie dabei mindestens 10 Zeichen</string>
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Schützen Sie Ihre Unterhaltungen</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2141,4 +2141,6 @@
     <string name="photos_create_album_duplicate_name_error">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
     <string name="photos_create_album_proscribed_name_error">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
     <string name="remove_from_offline_success_message">Datei nicht mehr offline verfügbar</string>
+    <!-- Settings preference title for rate app -->
+    <string name="settings_help_rate_app">Rate us</string>
 </resources>

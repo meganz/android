@@ -467,9 +467,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10 caractere</string>
+    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10 caractere</string>
+    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Păstrați conversațiile private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2217,4 +2217,6 @@
     <string name="photos_create_album_duplicate_name_error">Un album cu acest nume există deja. Introduceți un alt nume.</string>
     <string name="photos_create_album_proscribed_name_error">Acest nume de album nu este permis. Introduceți un alt nume.</string>
     <string name="remove_from_offline_success_message">Fișier eliminat din Offline</string>
+    <!-- Settings preference title for rate app -->
+    <string name="settings_help_rate_app">Rate us</string>
 </resources>

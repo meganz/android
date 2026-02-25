@@ -120,8 +120,6 @@ class SettingsViewModel @Inject constructor(
             startScreenSummary = "",
             hideRecentActivityChecked = false,
             mediaDiscoveryViewState = MediaDiscoveryViewSettings.INITIAL.ordinal,
-            email = "",
-            accountType = "",
             passcodeLock = false,
             subFolderMediaDiscoveryChecked = true,
             showHiddenItems = false,
@@ -295,8 +293,6 @@ class SettingsViewModel @Inject constructor(
         { state: SettingsState ->
             state.copy(
                 deleteAccountVisible = canDeleteAccount(userAccount),
-                email = userAccount.email,
-                accountType = userAccount.accountTypeString
             )
         }
 
