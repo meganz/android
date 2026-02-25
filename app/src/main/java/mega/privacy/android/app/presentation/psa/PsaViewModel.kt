@@ -25,31 +25,15 @@ import javax.inject.Inject
  * @property monitorPsaUseCase
  * @property dismissPsaUseCase
  * @property psaStateMapper
- * @property currentTimeProvider
  * @property setDisplayedPsaUseCase
  */
 @HiltViewModel
-class PsaViewModel(
+class PsaViewModel @Inject constructor(
     private val monitorPsaUseCase: MonitorPsaUseCase,
     private val dismissPsaUseCase: DismissPsaUseCase,
     private val psaStateMapper: PsaStateMapper,
-    private val currentTimeProvider: () -> Long,
     private val setDisplayedPsaUseCase: SetDisplayedPsaUseCase,
 ) : ViewModel() {
-
-    @Inject
-    constructor(
-        monitorPsaUseCase: MonitorPsaUseCase,
-        dismissPsaUseCase: DismissPsaUseCase,
-        psaStateMapper: PsaStateMapper,
-        setDisplayedPsaUseCase: SetDisplayedPsaUseCase,
-    ) : this(
-        monitorPsaUseCase = monitorPsaUseCase,
-        dismissPsaUseCase = dismissPsaUseCase,
-        psaStateMapper = psaStateMapper,
-        currentTimeProvider = System::currentTimeMillis,
-        setDisplayedPsaUseCase = setDisplayedPsaUseCase,
-    )
 
 
     /**
@@ -59,7 +43,7 @@ class PsaViewModel(
         flow {
             runCatching {
                 emitAll(
-                    monitorPsaUseCase(currentTimeProvider)
+                    monitorPsaUseCase()
                         .map { psaStateMapper(it) }
                         .onEach { Timber.d("PSA State: $it") }
                         .catch { Timber.e(it, "Error in monitoring psa") },

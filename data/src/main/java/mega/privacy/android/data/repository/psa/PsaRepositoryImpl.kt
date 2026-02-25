@@ -5,11 +5,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.cache.Cache
+import mega.privacy.android.data.cache.StateFlowCache
 import mega.privacy.android.data.cache.psa.PsaDisplayCache
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.psa.PsaMapper
 import mega.privacy.android.domain.entity.psa.Psa
@@ -21,22 +20,21 @@ import javax.inject.Inject
 
 internal class PsaRepositoryImpl @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
-    private val psaCache: Cache<Psa>,
+    private val psaCache: StateFlowCache<Psa>,
     private val psaOnDisplayCache: PsaDisplayCache,
-    private val psaPreferenceGateway: PsaPreferenceGateway,
     private val psaMapper: PsaMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : PsaRepository {
-    override suspend fun fetchPsa(refreshCache: Boolean) = withContext(ioDispatcher) {
-        Timber.d("Calling fetch psa. Refresh cache: $refreshCache")
-        if (refreshCache) {
+
+    override suspend fun refreshPsa() {
+        withContext(ioDispatcher) {
             val latestPsa = getLatestPsa()
-            psaCache.set(latestPsa)
-            if (latestPsa == null) {
-                psaPreferenceGateway.setLastRequestedTime(null)
-            }
+            psaCache.setAsync(latestPsa)
         }
-        return@withContext psaCache.get()
+    }
+
+    override fun monitorPsa(): Flow<Psa?> {
+        return psaCache.state
     }
 
     private suspend fun getLatestPsa(): Psa? = withContext(ioDispatcher) {
@@ -67,12 +65,6 @@ internal class PsaRepositoryImpl @Inject constructor(
             megaApiGateway.getPsa(listener)
         }
     }
-
-    override suspend fun getLastPsaFetchedTime() =
-        withContext(ioDispatcher) { psaPreferenceGateway.getLastRequestedTime() }
-
-    override suspend fun setLastFetchedTime(time: Long?) =
-        withContext(ioDispatcher) { psaPreferenceGateway.setLastRequestedTime(time) }
 
     override suspend fun clearCache() {
         Timber.d("Psa cache cleared")

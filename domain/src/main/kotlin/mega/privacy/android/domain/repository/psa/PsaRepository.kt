@@ -7,27 +7,17 @@ import mega.privacy.android.domain.entity.psa.Psa
  * Psa repository
  */
 interface PsaRepository {
-    /**
-     * Fetch psa
-     *
-     * @param refreshCache
-     * @return latest psa if present
-     */
-    suspend fun fetchPsa(refreshCache: Boolean): Psa?
 
     /**
-     * Get last psa fetched time
+     * Refresh psa
      *
-     * @return last time psa was fetched
      */
-    suspend fun getLastPsaFetchedTime(): Long?
+    suspend fun refreshPsa(): Unit
 
     /**
-     * Set last fetched time
-     *
-     * @param time
+     * Monitor psa
      */
-    suspend fun setLastFetchedTime(time: Long?)
+    fun monitorPsa(): Flow<Psa?>
 
     /**
      * Clear cache

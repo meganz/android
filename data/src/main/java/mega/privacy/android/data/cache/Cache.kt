@@ -58,7 +58,7 @@ internal class PermanentCache<T> : Cache<T> {
 }
 
 internal class InMemoryStateFlowCache<T> : StateFlowCache<T> {
-    override val state: StateFlow<T?>
+    final override val state: StateFlow<T?>
         field: MutableStateFlow<T?> = MutableStateFlow(null)
 
     override fun get() = state.value

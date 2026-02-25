@@ -7,9 +7,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.cache.Cache
 import mega.privacy.android.data.cache.ExpiringCache
+import mega.privacy.android.data.cache.InMemoryStateFlowCache
 import mega.privacy.android.data.cache.LruLimitedCache
 import mega.privacy.android.data.cache.MapCache
 import mega.privacy.android.data.cache.PermanentCache
+import mega.privacy.android.data.cache.StateFlowCache
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.qualifier.DisplayPathFromUriCache
 import mega.privacy.android.data.qualifier.FeatureFlagCache
@@ -79,7 +81,7 @@ internal object LocalCacheModule {
 
     @Provides
     @Singleton
-    fun providePsaCache(): Cache<Psa> = PermanentCache()
+    fun providePsaCache(): StateFlowCache<Psa> = InMemoryStateFlowCache()
 
     @OriginalPathForNodeCache
     @Provides
