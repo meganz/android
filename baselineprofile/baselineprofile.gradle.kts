@@ -35,8 +35,9 @@ android {
     }
 
     defaultConfig {
+        val minSdkVersion: Int by rootProject.extra
         val targetSdkVersion: Int by rootProject.extra
-        minSdk = 28
+        minSdk = minSdkVersion
         targetSdk = targetSdkVersion
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -72,7 +73,7 @@ android {
 // You can specify to run the generators on a managed devices or connected devices.
 baselineProfile {
     managedDevices += "pixel6Api34"
-    useConnectedDevices = false
+    useConnectedDevices = true
 }
 
 dependencies {
