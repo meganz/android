@@ -107,6 +107,8 @@
 # Protobuf Library #
 #####################
 -keep class * extends com.google.protobuf.GeneratedMessageLite { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageV3 { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageV3$Builder { *; }
 -keep class com.google.protobuf.** { *; }
 
 #####################
