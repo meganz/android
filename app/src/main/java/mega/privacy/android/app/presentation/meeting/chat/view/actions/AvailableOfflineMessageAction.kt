@@ -26,6 +26,7 @@ import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackB
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.ChatConversationAvailableOfflineActionMenuItemEvent
 import timber.log.Timber
 
@@ -79,7 +80,7 @@ internal class AvailableOfflineMessageAction(
     override fun OnTrigger(messages: Set<TypedMessage>, onHandled: () -> Unit) {
         Analytics.tracker.trackEvent(ChatConversationAvailableOfflineActionMenuItemEvent)
         val snackbarHostState = LocalSnackBarHostStateOriginal.current
-        val removeMessage = stringResource(id = R.string.file_removed_offline)
+        val removeMessage = stringResource(id = sharedResR.string.remove_from_offline_success_message)
         val viewModel = hiltViewModel<NodeAttachmentMessageViewModel>()
         LaunchedEffect(messages.size) {
             val fileNode = (messages.first() as NodeAttachmentMessage).fileNode

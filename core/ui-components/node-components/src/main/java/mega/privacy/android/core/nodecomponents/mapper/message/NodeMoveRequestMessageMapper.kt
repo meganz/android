@@ -221,7 +221,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
             }
 
             is MoveRequestResult.RemoveOffline -> {
-                context.resources.getString(R.string.file_removed_offline)
+                context.resources.getString(sharedResR.string.remove_from_offline_success_message)
             }
 
             is MoveRequestResult.Restore -> {

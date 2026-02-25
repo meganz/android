@@ -250,8 +250,6 @@
 
     <!-- Menu item to make a node available offline -->
     <string name="node_menu_action_make_available_offline">Make available offline</string>
-    <!-- Menu item to remove a node from offline -->
-    <string name="node_menu_action_remove_offline">Remove from offline</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_upload">Upload</string>
     <string name="general_allow">Allow</string>

@@ -1610,7 +1610,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         if (isAvailableOffline) {
             nodeOptionsViewModel.removeOfflineNode(nodeId)
             refreshView()
-            Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
+            Util.showSnackbar(activity, resources.getString(sharedResR.string.remove_from_offline_success_message))
         } else {
             if (mode == VIDEO_PLAYLIST_DETAIL && getStorageState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning()

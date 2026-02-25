@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.fileinfo.model
 import mega.privacy.android.shared.resources.R as sharedR
 import android.content.Context
 import androidx.annotation.StringRes
-import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.node.NameCollision
 
 /**
@@ -45,7 +44,7 @@ sealed interface FileInfoOneOffViewEvent {
         /**
          * Offline file has been removed
          */
-        object RemovedOffline : Message(R.string.file_removed_offline)
+        object RemovedOffline : Message(sharedR.string.remove_from_offline_success_message)
 
         /**
          * Node description has been set

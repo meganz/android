@@ -34,6 +34,7 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedResR
 
 /**
  * The fragment for showing audio track info
@@ -106,7 +107,7 @@ class TrackInfoFragment : Fragment() {
                         event = uiState.offlineRemovedEvent,
                         onConsumed = viewModel::consumeOfflineRemovedEvent
                     ) {
-                        snackbarHostState.showAutoDurationSnackbar(getString(R.string.file_removed_offline))
+                        snackbarHostState.showAutoDurationSnackbar(getString(sharedResR.string.remove_from_offline_success_message))
                     }
                 }
             }
