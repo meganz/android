@@ -456,6 +456,11 @@ interface MegaLocalRoomGateway {
     fun monitorOfflineUpdates(): Flow<List<Offline>>
 
     /**
+     * Monitor offline node ids
+     */
+    fun monitorOfflineNodeIds(): Flow<List<Int?>>
+
+    /**
      * Get all offline files
      */
     suspend fun getAllOfflineInfo(): List<Offline>

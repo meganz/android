@@ -423,6 +423,9 @@ internal class NodeRepositoryImpl @Inject constructor(
     override fun monitorOfflineNodeUpdates(): Flow<List<Offline>> =
         megaLocalRoomGateway.monitorOfflineUpdates()
 
+    override fun monitorOfflineNodeIds(): Flow<List<Int?>> =
+        megaLocalRoomGateway.monitorOfflineNodeIds()
+
     override suspend fun isNodeInRubbishOrDeleted(nodeHandle: Long): Boolean =
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let { megaApiGateway.isInRubbish(it) }

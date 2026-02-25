@@ -21,7 +21,6 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.account.MonitorRefreshSessionUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorContactNameUpdatesUseCase
-import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import javax.inject.Inject
 
 /**
@@ -30,7 +29,6 @@ import javax.inject.Inject
 class MonitorNodeUpdatesByIdUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
     private val monitorRefreshSessionUseCase: MonitorRefreshSessionUseCase,
     private val monitorContactNameUpdatesUseCase: MonitorContactNameUpdatesUseCase,
 ) {
@@ -50,17 +48,13 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
             nodeId = nodeId,
             nodeSourceType = nodeSourceType
         )
-        val offlineNodeIdsToMatch = resolveOfflineNodeIds(
-            originalNodeId = nodeId,
-            effectiveNodeId = effectiveNodeId
-        )
         emitAll(
             merge(
                 monitorOnlineNodeUpdates(
                     effectiveNodeId = effectiveNodeId,
                     nodeSourceType = nodeSourceType
                 ),
-                monitorOfflineNodeUpdates(offlineNodeIdsToMatch),
+                monitorOfflineNodeUpdates(),
                 monitorRefreshSessionUpdates(),
                 monitorContactNameUpdates(nodeSourceType)
             ).conflate().debounce(500L)
@@ -77,21 +71,6 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         getRootNodeUseCase()?.id ?: nodeId
     } else {
         nodeId
-    }
-
-    /**
-     * Resolve node IDs for offline filtering
-     * Includes both effectiveNodeId and -1L if the original nodeId is root (-1L)
-     * since offline database stores parentId = -1L instead of actual root node id
-     */
-    private fun resolveOfflineNodeIds(
-        originalNodeId: NodeId,
-        effectiveNodeId: NodeId,
-    ) = buildSet {
-        add(effectiveNodeId.longValue)
-        if (originalNodeId.longValue == -1L) {
-            add(-1L)
-        }
     }
 
     private fun monitorOnlineNodeUpdates(
@@ -134,15 +113,9 @@ class MonitorNodeUpdatesByIdUseCase @Inject constructor(
         effectiveNodeId: NodeId
     ) = nodeSourceType == NodeSourceType.LINKS && effectiveNodeId.longValue == -1L
 
-    private fun monitorOfflineNodeUpdates(nodeIdsToMatch: Set<Long>) =
-        monitorOfflineNodeUpdatesUseCase()
+    private fun monitorOfflineNodeUpdates() =
+        nodeRepository.monitorOfflineNodeIds()
             .drop(1) // Skip the first emission (initial load from database)
-            .map { offlineList ->
-                offlineList.filter { offline ->
-                    offline.parentId.toLong() in nodeIdsToMatch ||
-                            offline.handle.toLong() in nodeIdsToMatch
-                }
-            }
             .distinctUntilChanged() // Only emit when the filtered list actually changes
             .map { NodeChanges.Attributes }
 
