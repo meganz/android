@@ -26,10 +26,4 @@ class ClearPsaUseCaseTest {
         verify(psaRepository).clearCache()
     }
 
-    @Test
-    internal fun `test that last fetched time is set to null`() = runTest {
-        underTest()
-
-        verify(psaRepository).setLastFetchedTime(null)
-    }
 }

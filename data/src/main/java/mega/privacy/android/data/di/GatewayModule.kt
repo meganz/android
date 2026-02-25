@@ -83,7 +83,6 @@ import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferenc
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.gateway.psa.PsaPreferenceGateway
 import mega.privacy.android.data.gateway.security.PasscodeStoreGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
 import mega.privacy.android.data.preferences.AppPreferencesDatastore
@@ -100,7 +99,6 @@ import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataSt
 import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
-import mega.privacy.android.data.preferences.psa.PsaPreferenceDataStore
 import mega.privacy.android.data.preferences.security.PasscodeDataStore
 import javax.inject.Singleton
 
@@ -296,10 +294,6 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindAdsGateway(implementation: AdsFacade): AdsGateway
-
-    @Binds
-    @Singleton
-    abstract fun bindPsaPreferenceGateway(implementation: PsaPreferenceDataStore): PsaPreferenceGateway
 
     @Binds
     @Singleton

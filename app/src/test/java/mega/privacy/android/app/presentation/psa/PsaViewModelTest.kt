@@ -40,7 +40,7 @@ class PsaViewModelTest {
         )
 
         monitorPsaUseCase.stub {
-            on { invoke(any()) }.thenReturn(flow { awaitCancellation() })
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
         }
 
         psaStateMapper.stub {
@@ -60,7 +60,6 @@ class PsaViewModelTest {
             monitorPsaUseCase = monitorPsaUseCase,
             dismissPsaUseCase = dismissPsaUseCase,
             psaStateMapper = psaStateMapper,
-            currentTimeProvider = { 0 },
             setDisplayedPsaUseCase = mock(),
         )
     }
@@ -70,7 +69,7 @@ class PsaViewModelTest {
         val expectedCount = 5
         val monitorFlow = MutableStateFlow(createPsa(99))
         monitorPsaUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(monitorFlow)
+            onBlocking { invoke() }.thenReturn(monitorFlow)
         }
 
         initViewModel()
