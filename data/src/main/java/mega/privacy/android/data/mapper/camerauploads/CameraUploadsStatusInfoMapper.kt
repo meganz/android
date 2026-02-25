@@ -10,6 +10,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -136,7 +137,7 @@ class CameraUploadsStatusInfoMapper @Inject constructor() {
 
                 NO_WIFI_CONNECTION -> CameraUploadsStatusInfo.NoWifiConnection
                 NO_NETWORK_CONNECTION -> CameraUploadsStatusInfo.NoNetworkConnection
-
+                FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP -> CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup
                 else -> {
                     null
                 }

@@ -125,4 +125,9 @@ object CameraUploadsWorkerStatusConstant {
      * No network Connection key
      */
     const val NO_NETWORK_CONNECTION = "no_network_connection"
+
+    /**
+     * Folder conflict with Sync or Backup key (covers both local and cross-device conflicts)
+     */
+    const val FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP = "folder_conflict_with_sync_or_backup"
 }

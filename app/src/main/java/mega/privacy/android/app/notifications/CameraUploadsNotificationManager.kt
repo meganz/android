@@ -74,6 +74,8 @@ class CameraUploadsNotificationManager @Inject constructor(
             Constants.NOTIFICATION_NO_WIFI_CONNECTION
         private const val NO_NETWORK_CONNECTION_NOTIFICATION_ID =
             Constants.NOTIFICATION_NO_NETWORK_CONNECTION
+        private const val FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID =
+            Constants.NOTIFICATION_FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
         private const val ACTION_OVER_QUOTA_STORAGE = Constants.ACTION_OVER_QUOTA_STORAGE
     }
 
@@ -132,6 +134,8 @@ class CameraUploadsNotificationManager @Inject constructor(
 
             CameraUploadsStatusInfo.NoWifiConnection -> showNoWifiConnectionNotification()
             CameraUploadsStatusInfo.NoNetworkConnection -> showNoNetworkConnectionNotification()
+            CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup ->
+                showFolderConflictWithSyncOrBackupNotification()
         }
     }
 
@@ -454,6 +458,21 @@ class CameraUploadsNotificationManager @Inject constructor(
     }
 
     /**
+     * Display a notification when Camera/Media Uploads folder conflicts with Sync/Backup folder
+     */
+    private suspend fun showFolderConflictWithSyncOrBackupNotification() {
+        val notification = createNotification(
+            title = context.getString(R.string.section_photo_sync),
+            content = context.getString(sharedR.string.error_folder_part_of_sync_or_backup),
+            intent = getCUSettingsPendingIntent(),
+        )
+        notificationManager.notify(
+            FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID,
+            notification
+        )
+    }
+
+    /**
      * Get foregroundInfo for camera uploads worker
      */
     fun getForegroundInfo(): ForegroundInfo {
@@ -497,6 +516,7 @@ class CameraUploadsNotificationManager @Inject constructor(
             cancel(COMPRESSION_NOTIFICATION_ID)
             cancel(NO_WIFI_CONNECTION_NOTIFICATION_ID)
             cancel(NO_NETWORK_CONNECTION_NOTIFICATION_ID)
+            cancel(FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP_NOTIFICATION_ID)
         }
     }
 

@@ -35,8 +35,8 @@ enum class CameraUploadsFinishedReason {
     BATTERY_LEVEL_TOO_LOW,
 
     /**
-     * Camera Uploads is configured to upload only on wifi and the device is not on wifi
-     * or the device has no connection.
+     * Camera Uploads is configured to upload only on wifi and device is not on wifi
+     * or device has no connection.
      */
     NETWORK_CONNECTION_REQUIREMENT_NOT_MET,
 
@@ -61,7 +61,7 @@ enum class CameraUploadsFinishedReason {
     ERROR_DURING_PROCESS,
 
     /**
-     * Camera Uploads was configured to only upload content when the Device is charged, and the
+     * Camera Uploads was configured to only upload content when Device is charged, and
      * Device is currently not charged
      */
     DEVICE_CHARGING_REQUIREMENT_NOT_MET,
@@ -70,6 +70,12 @@ enum class CameraUploadsFinishedReason {
      * The business account has expired.
      */
     BUSINESS_ACCOUNT_EXPIRED,
+
+    /**
+     * Camera Uploads local or remote folder conflicts with an existing Sync or Backup folder
+     * (either on the current device or on another device)
+     */
+    FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP,
 
     /**
      * Unknown reason.
@@ -155,7 +161,6 @@ enum class CameraUploadsFinishedReason {
      * This error is directly coming from the WorkManager system.
      *
      * @see {WorkInfo.STOP_REASON_QUOTA}
-
      */
     SYSTEM_REASON_QUOTA,
 
@@ -168,7 +173,7 @@ enum class CameraUploadsFinishedReason {
     SYSTEM_REASON_BACKGROUND_RESTRICTION,
 
     /**
-     * The current standby bucket requires that the job stop now.
+     * The current standby bucket requires that to job stop now.
      * This error is directly coming from the WorkManager system.
      *
      * @see {STOP_REASON_APP_STANDBY}
@@ -201,5 +206,3 @@ enum class CameraUploadsFinishedReason {
      */
     SYSTEM_REASON_ESTIMATED_APP_LAUNCH_TIME_CHANGED;
 }
-
-

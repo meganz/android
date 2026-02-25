@@ -20,7 +20,7 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
 ) {
 
     private companion object {
-        val POLL_INTERVAL = 1.minutes
+        val POLL_INTERVAL = 10.minutes
     }
 
     operator fun invoke(): Flow<FolderUsageResult?> = flow {

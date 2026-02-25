@@ -13,6 +13,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.NOT_ENOUGH_STORAGE
@@ -215,6 +216,96 @@ class CameraUploadsStatusInfoMapperTest {
             WorkInfo.State.RUNNING,
             WorkInfo.STOP_REASON_NOT_STOPPED,
             CameraUploadsStatusInfo.NoNetworkConnection
+        ),
+        Arguments.of(
+            workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP),
+            WorkInfo.State.RUNNING,
+            WorkInfo.STOP_REASON_NOT_STOPPED,
+            CameraUploadsStatusInfo.FolderConflictWithSyncOrBackup
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_PREEMPT,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_PREEMPT)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_TIMEOUT,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_TIMEOUT)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_DEVICE_STATE,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_DEVICE_STATE)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CONSTRAINT_BATTERY_NOT_LOW,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_BATTERY_NOT_LOW)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CONSTRAINT_CHARGING,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_CHARGING)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CONSTRAINT_CONNECTIVITY,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_CONNECTIVITY)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CONSTRAINT_DEVICE_IDLE,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_DEVICE_IDLE)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_CONSTRAINT_STORAGE_NOT_LOW,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_CONSTRAINT_STORAGE_NOT_LOW)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_QUOTA,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_QUOTA)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_BACKGROUND_RESTRICTION,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_BACKGROUND_RESTRICTION)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_APP_STANDBY,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_APP_STANDBY)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_USER,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.UNKNOWN)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_SYSTEM_PROCESSING,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_SYSTEM_PROCESSING)
+        ),
+        Arguments.of(
+            workDataOf(),
+            WorkInfo.State.FAILED,
+            WorkInfo.STOP_REASON_ESTIMATED_APP_LAUNCH_TIME_CHANGED,
+            CameraUploadsStatusInfo.Finished(reason = CameraUploadsFinishedReason.SYSTEM_REASON_ESTIMATED_APP_LAUNCH_TIME_CHANGED)
         ),
     )
 }

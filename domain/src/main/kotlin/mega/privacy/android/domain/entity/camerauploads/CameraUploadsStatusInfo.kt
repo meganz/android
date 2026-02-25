@@ -102,4 +102,10 @@ sealed interface CameraUploadsStatusInfo {
      */
     data class FolderUnavailable(val cameraUploadsFolderType: CameraUploadFolderType) :
         CameraUploadsStatusInfo
+
+    /**
+     * Camera/Media Uploads folder conflicts with an existing Sync or Backup folder
+     * (either on the current device or on another device)
+     */
+    data object FolderConflictWithSyncOrBackup : CameraUploadsStatusInfo
 }

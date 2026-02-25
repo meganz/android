@@ -42,6 +42,7 @@ import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURR
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.CURRENT_PROGRESS
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FINISHED_REASON
+import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_TYPE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.FOLDER_UNAVAILABLE
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.OUT_OF_SPACE
@@ -66,6 +67,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsTransferProgress
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -81,6 +83,7 @@ import mega.privacy.android.domain.repository.TimeSystemRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.IsStorageOverQuotaUseCase
 import mega.privacy.android.domain.usecase.backup.InitializeBackupsUseCase
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreCameraUploadsFoldersInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.camerauploads.BroadcastCameraUploadsSettingsActionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.CheckEnableCameraUploadsStatusUseCase
@@ -94,17 +97,20 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.ExtractGpsCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPendingCameraUploadsRecordsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFileSizeDifferenceUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadFolderHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleCUTransferEventsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HandleLocalIpChangeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderPathValidUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsSecondaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsWifiNotSatisfiedUseCase
+import mega.privacy.android.domain.usecase.camerauploads.MonitorCrossDeviceFolderConflictsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.MonitorIsChargingRequiredToUploadContentUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ProcessCameraUploadsMediaUseCase
 import mega.privacy.android.domain.usecase.camerauploads.RenameCameraUploadsRecordsUseCase
@@ -236,6 +242,13 @@ internal class CameraUploadsWorkerTest {
     private val checkEnableCameraUploadsStatusUseCase =
         mock<CheckEnableCameraUploadsStatusUseCase>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val monitorCrossDeviceFolderConflictsUseCase: MonitorCrossDeviceFolderConflictsUseCase =
+        mock()
+    private val hasLocalFolderConflictWithSyncUseCase: HasLocalFolderConflictWithSyncUseCase =
+        mock()
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase =
+        mock()
+    private val getSecondaryFolderPathUseCase: GetSecondaryFolderPathUseCase = mock()
 
     private val foregroundInfo = ForegroundInfo(1, mock())
     private val primaryNodeHandle = 1111L
@@ -330,6 +343,10 @@ internal class CameraUploadsWorkerTest {
                 checkEnableCameraUploadsStatusUseCase = checkEnableCameraUploadsStatusUseCase,
                 getUploadFileSizeDifferenceUseCase = getUploadFileSizeDifferenceUseCase,
                 getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+                monitorCrossDeviceFolderConflictsUseCase = monitorCrossDeviceFolderConflictsUseCase,
+                hasLocalFolderConflictWithSyncUseCase = hasLocalFolderConflictWithSyncUseCase,
+                isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+                getSecondaryFolderPathUseCase = getSecondaryFolderPathUseCase,
             )
         )
     }
@@ -380,6 +397,12 @@ internal class CameraUploadsWorkerTest {
             EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
         )
         whenever(getUploadFileSizeDifferenceUseCase(any())).thenReturn(null)
+
+        // mock folder conflict checks
+        whenever(monitorCrossDeviceFolderConflictsUseCase()).thenReturn(emptyFlow())
+        whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(false)
+        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any()))
+            .thenReturn(FolderUsageResult.NotUsed)
     }
 
     /**
@@ -1213,11 +1236,13 @@ internal class CameraUploadsWorkerTest {
     @Test
     fun `test that the worker returns failure when secondary upload node is not retrieved and fails to be created`() =
         runTest {
+            val validSecondaryHandle = 2222L
             setupDefaultCheckConditionMocks()
             whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
             whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
+            whenever(getSecondaryFolderPathUseCase()).thenReturn("secondaryPath")
             whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
-                .thenReturn(-1L)
+                .thenReturn(validSecondaryHandle)
             whenever(
                 checkOrCreateCameraUploadsNodeUseCase(
                     context.getString(R.string.section_secondary_media_uploads),
@@ -1792,5 +1817,141 @@ internal class CameraUploadsWorkerTest {
                 scheduleCameraUploadUseCase
             )
         }
+
+    @Test
+    fun `test that the worker returns failure when local folder conflicts with sync or backup`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(hasLocalFolderConflictWithSyncUseCase(primaryLocalPath)).thenReturn(true)
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP.name
+                )
+            )
+            verify(underTest).setProgress(
+                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the worker returns failure when remote folder conflicts with sync or backup`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any()))
+                .thenReturn(FolderUsageResult.UsedBySyncOrBackup(null))
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP.name
+                )
+            )
+            verify(underTest).setProgress(
+                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the worker returns failure when cross-device folder conflict is detected`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(monitorCrossDeviceFolderConflictsUseCase()).thenReturn(
+                flowOf(FolderUsageResult.UsedBySyncOrBackup(null))
+            )
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP.name
+                )
+            )
+            verify(underTest).setProgress(
+                workDataOf(STATUS_INFO to FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP)
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that camera uploads is not disabled when folder conflict is detected`() = runTest {
+        setupDefaultCheckConditionMocks()
+        whenever(hasLocalFolderConflictWithSyncUseCase(primaryLocalPath)).thenReturn(true)
+
+        underTest.doWork()
+
+        verify(disableCameraUploadsUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `test that camera uploads is not rescheduled when folder conflict is detected`() = runTest {
+        setupDefaultCheckConditionMocks()
+        whenever(hasLocalFolderConflictWithSyncUseCase(primaryLocalPath)).thenReturn(true)
+
+        underTest.doWork()
+
+        verify(scheduleCameraUploadUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `test that the worker checks secondary folder for conflicts when media uploads is enabled`() =
+        runTest {
+            val validSecondaryHandle = 2222L
+            setupDefaultCheckConditionMocks()
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+            whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
+            whenever(getSecondaryFolderPathUseCase()).thenReturn("secondaryPath")
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                .thenReturn(validSecondaryHandle)
+
+            underTest.doWork()
+
+            verify(hasLocalFolderConflictWithSyncUseCase).invoke(primaryLocalPath)
+            verify(hasLocalFolderConflictWithSyncUseCase).invoke("secondaryPath")
+            verify(isFolderUsedBySyncOrBackupAcrossDevicesUseCase, times(2)).invoke(
+                any(),
+                any(),
+                any()
+            )
+        }
+
+    @Test
+    fun `test that the worker returns failure when secondary local folder conflicts with sync or backup`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(true)
+            whenever(isSecondaryFolderSetUseCase()).thenReturn(true)
+            whenever(getSecondaryFolderPathUseCase()).thenReturn("secondaryPath")
+            whenever(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
+                .thenReturn(secondaryNodeHandle)
+            whenever(hasLocalFolderConflictWithSyncUseCase("secondaryPath")).thenReturn(true)
+
+            val result = underTest.doWork()
+
+            verify(underTest).setProgress(
+                workDataOf(
+                    STATUS_INFO to FINISHED,
+                    FINISHED_REASON to CameraUploadsFinishedReason.FOLDER_CONFLICT_WITH_SYNC_OR_BACKUP.name
+                )
+            )
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
+
+    @Test
+    fun `test that the worker monitors cross device folder conflicts when started`() = runTest {
+        setupDefaultCheckConditionMocks()
+
+        underTest.doWork()
+
+        verify(monitorCrossDeviceFolderConflictsUseCase).invoke()
+    }
 
 }
