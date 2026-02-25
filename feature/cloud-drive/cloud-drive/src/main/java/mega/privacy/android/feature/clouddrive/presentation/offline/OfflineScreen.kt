@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -53,6 +54,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -207,7 +209,9 @@ internal fun OfflineScreen(
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
         bottomBar = {
             SelectionModeBottomBar(
                 modifier = Modifier
@@ -305,7 +309,7 @@ internal fun OfflineScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues.excludingBottomPadding()),
         ) {
             if (uiState.showOfflineWarning && !uiState.isLoading) {
                 TopWarningBanner(
