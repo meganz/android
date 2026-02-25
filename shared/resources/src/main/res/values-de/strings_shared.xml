@@ -1141,7 +1141,7 @@
     <!-- General month label -->
     <string name="general_month">/Monat</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s jährlich</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nJährliche Abrechnung</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d Element nicht mehr verborgen</item>
@@ -1734,13 +1734,13 @@
     <string name="campaign_name_special_offer">Sonderaktion: %1$d %% gespart</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s für den %2$d. Monat</item>
-        <item quantity="other">%1$s für die ersten %2$d Monate</item>
+        <item quantity="one">[B]%1$s[/B]\nfür den ersten Monat</item>
+        <item quantity="other">[B]%1$s[/B]\nfür die ersten %2$d Monate</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s für das %2$d. Jahr</item>
-        <item quantity="other">%1$s für die ersten %2$d Jahre</item>
+        <item quantity="one">[B]%1$s[/B]\nfür das erste Jahr</item>
+        <item quantity="other">[B]%1$s[/B]\nfür die ersten %2$d Jahre</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA-Datenschutz-Suite</string>
@@ -1777,9 +1777,9 @@
         <item quantity="other">Bonus läuft in %1$d Tagen ab</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s für den ersten Monat</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nfür den ersten Monat</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s im ersten Jahr</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nfür das erste Jahr</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Nur Sie haben die Möglichkeit, verborgene Dateien sichtbar zu machen, entweder einzeln oder indem Sie über die [A]Einstellungen[/A] verborgene Elemente vorübergehend einblenden.</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -1878,7 +1878,7 @@
     <string name="payment_ads_free_intro_description">Upgraden Sie auf ein Pro-Paket mit reichlich Speicherplatz und mehr. Unsere Pro-Pakete sind bereits ab %1$s pro Monat erhältlich.</string>
     <plurals name="remove_links_warning_text">
         <item quantity="one">Dieser Link wird nicht mehr öffentlich verfügbar sein.</item>
-        <item quantity="other">Diese Links werden nicht mehr öffentlich verfügbar sein</item>
+        <item quantity="other">Diese Links werden nicht mehr öffentlich verfügbar sein.</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="one">Diesen Ordner nicht mehr freigeben?</item>
@@ -2055,4 +2055,105 @@
         <item quantity="one">%1$d Ordner&#160;·&#160;</item>
         <item quantity="other">%1$d Ordner&#160;·&#160;</item>
     </plurals>
+    <string name="general_first_name">Vorname(n)</string>
+    <string name="general_last_name">Familienname</string>
+    <string name="meetings_call_recording_consent_dialog_title">Dieses Gespräch wird aufgezeichnet</string>
+    <string name="meetings_call_recording_consent_dialog_message">Durch Ihre weitere Teilnahme am Gespräch geben Sie Ihr Einverständnis zur Aufzeichnung. Die Aufzeichnung wird nur auf dem Gerät der aufzeichnenden Person gespeichert.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Alles klar</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">Konferenz verlassen</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mehr erfahren[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite kaufen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I kaufen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II kaufen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kaufen</string>
+    <string name="subscription_type_monthly">monatlich</string>
+    <string name="subscription_type_yearly">Jährlich</string>
+    <string name="albums_multiple_delete_success_message">%d Alben gelöscht</string>
+    <string name="home_screen_no_network_desc">Sie sind offline.\nWenn Sie Dateien offline verfügbar machen, können Sie auch ohne Verbindung weiterhin auf sie zugreifen.</string>
+    <string name="home_screen_no_network_desc_with_offline_files">Sie sind offline.\nDie für die Offline-Nutzung gespeicherten Inhalte sind weiterhin verfügbar.</string>
+    <string name="home_screen_no_network_view_offline_files_button">Offline-Dateien anzeigen</string>
+    <string name="timeline_tab_cu_permission_warning_banner_action">Berechtigungen ändern</string>
+    <string name="timeline_tab_cu_permission_warning_banner_description">Damit wir alle Ihre Erinnerungen sichern können, benötigt MEGA vollständigen Zugriff auf Ihre Fotobibliothek.</string>
+    <string name="timeline_tab_cu_battery_level_warning_banner_description">Akkuladestand zu niedrig. Laden Sie das Gerät auf, um Kamera-Uploads zu starten.</string>
+    <string name="media_main_screen_camera_uploads_up_to_date_toolbar_subtitle">Kamera-Uploads auf dem neuesten Stand</string>
+    <string name="label_file_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_size_byte">%1$s&#160;B</string>
+    <string name="label_file_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_size_tera_byte">%1$s&#160;TB</string>
+    <string name="label_file_upload_speed_byte">%1$s&#160;B/s</string>
+    <string name="label_file_upload_speed_kilo_byte">%1$s&#160;KB/s</string>
+    <string name="label_file_upload_speed_mega_byte">%1$s&#160;MB/s</string>
+    <string name="label_file_upload_speed_giga_byte">%1$s&#160;GB/s</string>
+    <string name="label_file_upload_speed_tera_byte">%1$s&#160;TB/s</string>
+    <string name="label_file_upload_size_byte">%1$s&#160;B</string>
+    <string name="label_file_upload_size_kilo_byte">%1$s&#160;KB</string>
+    <string name="label_file_upload_size_mega_byte">%1$s&#160;MB</string>
+    <string name="label_file_upload_size_giga_byte">%1$s&#160;GB</string>
+    <string name="label_file_upload_size_tera_byte">%1$s&#160;TB</string>
+    <string name="search_placeholder_folder">In %s suchen</string>
+    <string name="search_placeholder_cloud_drive">In Cloud Drive suchen</string>
+    <string name="search_placeholder_rubbish_bin">In Papierkorb suchen</string>
+    <string name="search_placeholder_incoming_shares">In erhaltenen Freigaben suchen</string>
+    <string name="search_placeholder_outgoing_shares">In eigenen Freigaben suchen</string>
+    <string name="search_placeholder_links">In Links suchen</string>
+    <string name="search_placeholder_favourites">In Favoriten suchen</string>
+    <string name="search_placeholder_documents">In Dokumenten suchen</string>
+    <string name="search_placeholder_audios">In Audiodateien suchen</string>
+    <string name="search_placeholder_videos">In Videos suchen</string>
+    <string name="search_placeholder_backups">In Backups suchen</string>
+    <string name="general_clear_all">Alle entfernen</string>
+    <string name="offline_remove_singular_item_success_message">1 Element entfernt</string>
+    <string name="offline_remove_multiple_item_success_message">%d Elemente entfernt</string>
+    <string name="section_banners">Banner</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">Wird geladen&#8230;</string>
+    <string name="storage_usage_format">%1$s von %2$s belegt</string>
+    <string name="general_hi">Hallo</string>
+    <string name="home_recents_snackbar_activity_hidden">Ihre kürzlichen Aktivitäten wurden ausgeblendet</string>
+    <string name="home_recents_button_view_all">Alle anzeigen</string>
+    <string name="home_recents_options_menu_show_activity">Kürzliche Aktivitäten anzeigen</string>
+    <string name="home_recents_empty_text_description">Ihre kürzlichen Datei- und Ordneraktivitäten werden hier angezeigt</string>
+    <string name="home_recents_hidden_text_description">Kürzliche Aktivitäten ausgeblendet</string>
+    <string name="home_recents_bucket_subtitle_added_to">Hinzugefügt zu %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">Diese Dateien sind nicht mehr verfügbar</string>
+    <string name="shares_screen_links_section_empty">[B]Keine [/B][A]öffentlichen Links[/A]</string>
+    <string name="general_invalid_dot_name_warning">Der Name „.“ ist ungültig</string>
+    <string name="general_invalid_double_dot_name_warning">Der Name „..“ ist ungültig</string>
+    <string name="transfers_upload_started_snackbar">Upload gestartet. Details in der Benachrichtigung.</string>
+    <string name="search_landing_title">Sie möchten etwas finden?</string>
+    <string name="search_landing_subtitle">Dateien und Ordner durchsuchen</string>
+    <string name="offline_screen_empty_state_description">Keine Dateien für Offline-Nutzung gespeichert</string>
+    <string name="general_install_label">Installieren</string>
+    <string name="general_app_update_download_success_message">App-Update heruntergeladen</string>
+    <string name="error_folder_part_of_camera_uploads">Dieser Ordner ist bereits Teil der Kamera-Uploads. Wählen Sie einen anderen Ordner.</string>
+    <string name="error_folder_part_of_media_uploads">Dieser Ordner ist bereits Teil der Medien-Uploads. Wählen Sie einen anderen Ordner.</string>
+    <string name="error_folder_part_of_sync_or_backup">Dieser Ordner ist bereits Teil einer Synchronisierung oder eines Backups. Wählen Sie einen anderen Ordner.</string>
+    <string name="choose_account_screen_only_price_per_month">Nur %1$s/Monat</string>
+    <string name="cu_warning_banner_notification_disabled_warning">Aktivieren Sie Benachrichtigungen, um informiert zu werden, wenn Uploads fehlschlagen oder die Synchronisierung unterbrochen wird.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">Keine sichere Verbindung möglich</string>
+    <string name="album_import_screen_subtitle_album_link_text">Albumlink</string>
+    <string name="album_import_error_access_dialog_title">Zugriff auf Album nicht möglich</string>
+    <string name="album_import_input_decryption_key_dialog_title">Schlüssel eingeben</string>
+    <string name="album_import_input_decryption_key_dialog_description">Um auf das Album zuzugreifen, geben Sie den Schlüssel für die Entschlüsselung ein. Wenn Sie keinen Schlüssel haben, wenden Sie sich an die Person, die Ihnen den Link mitgeteilt hat.</string>
+    <string name="album_import_rename_album_dialog_title">Album umbenennen</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">Albumnamen eingeben</string>
+    <string name="album_import_saving_dialog_progress_text">Daten werden gespeichert&#8230;</string>
+    <string name="album_import_storage_exceeded_dialog_title">Album kann nicht gespeichert werden</string>
+    <string name="album_import_storage_exceeded_dialog_description">Sie haben nicht genug Speicherplatz, um dieses Album in Ihrem Cloud Drive zu speichern. Führen Sie jetzt ein Upgrade durch, um mehr Speicherplatz zu erhalten.</string>
+    <string name="photos_loading_indicator_text">Lade</string>
+    <string name="photos_network_error_message">Keine Netzverbindung</string>
+    <string name="photos_save_to_cloud_drive_button_text">In Cloud Drive speichern</string>
+    <string name="photos_create_album_duplicate_name_error">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
+    <string name="photos_create_album_proscribed_name_error">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
+    <string name="remove_from_offline_success_message">Datei nicht mehr offline verfügbar</string>
 </resources>

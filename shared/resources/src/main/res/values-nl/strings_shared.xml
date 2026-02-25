@@ -1141,7 +1141,7 @@
     <!-- General month label -->
     <string name="general_month">/maand</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s jaarlijks in rekening gebracht</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nJaarlijks in rekening gebracht</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d item niet verborgen</item>
@@ -1734,13 +1734,13 @@
     <string name="campaign_name_special_offer">Speciale aanbieding: %1$d%% korting</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s voor de eerste %2$d maand</item>
-        <item quantity="other">%1$s voor de eerste %2$d maanden</item>
+        <item quantity="one">[B]%1$s[/B]\nVoor de eerste maand</item>
+        <item quantity="other">[B]%1$s[/B]\nVoor de eerste %2$d maanden</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s voor het eerste %2$d jaar</item>
-        <item quantity="other">%1$s voor de eerste %2$d jaar</item>
+        <item quantity="one">[B]%1$s[/B]\nVoor het eerste jaar</item>
+        <item quantity="other">[B]%1$s[/B]\nVoor de eerste %2$d jaren</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA-privacysuite</string>
@@ -1777,9 +1777,9 @@
         <item quantity="other">Bonus verloopt over %1$d dagen</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s voor de eerste maand</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nVoor de eerste maand</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s voor het eerste jaar</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nVoor het eerste jaar</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Alleen u kunt verborgen bestanden onthullen, afzonderlijk of door tijdelijk verborgen items weer te geven uit de [A]instellingen[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2110,14 +2110,14 @@
     <string name="empty_rubbish_bin_menu">Prullenbak Leegmaken</string>
     <string name="remove_all_rubbish_bin_confirmation">U staat op het punt permanent alle items van uw Prullenbak te verwijderen.</string>
     <string name="general_clear">Wissen</string>
-    <string name="annotated_empty_rubbish_bin_menu">[B]Lege[/B] [A]Prullenbak[/A]</string>
-    <string name="annotated_empty_folder">[A]Map[/A][B]leegmaken[/B]</string>
+    <string name="annotated_empty_rubbish_bin_menu">[A]Prullenbak[/A][B]Legen[/B]</string>
+    <string name="annotated_empty_folder">[B]Lege[/B][A]Map[/A]</string>
     <string name="general_upload_label">Uploaden</string>
     <string name="empty_file_browser_folder">Lege Map</string>
     <string name="logout_offline_content_deletion_warning">Als u zich afmeldt, wordt uw offline inhoud verwijderd.</string>
     <string name="offline_screen_title">Offline</string>
     <string name="offline_screen_remove_from_offline_selection_menu">Verwijderen uit Offline</string>
-    <string name="offline_item_deletion_confirmation_title">Verwijderen van Offline?</string>
+    <string name="offline_item_deletion_confirmation_title">Verwijderen vanuit Offline?</string>
     <plurals name="num_of_files_with_parameter">
         <item quantity="one">%1$d bestand</item>
         <item quantity="other">%1$d bestanden</item>
@@ -2130,4 +2130,54 @@
         <item quantity="one">%1$d map&#160;·&#160;</item>
         <item quantity="other">%1$d mappen&#160;·&#160;</item>
     </plurals>
+    <string name="search_landing_title">Op zoek naar iets?</string>
+    <string name="search_landing_subtitle">Zoek bestanden en mappen</string>
+    <string name="offline_screen_empty_state_description">Geen bestanden opgeslagen voor Offline gebruik</string>
+    <string name="general_install_label">Installeren</string>
+    <string name="general_app_update_download_success_message">Applicatie update gedownload</string>
+    <string name="general_first_name">Voornaam</string>
+    <string name="general_last_name">Achternaam</string>
+    <string name="meetings_call_recording_consent_dialog_title">Deze oproep wordt opgenomen</string>
+    <string name="meetings_call_recording_consent_dialog_message">Door in het gesprek te blijven geeft u toestemming om opgenomen te worden. De opname wordt alleen opgeslagen op het apparaat van de persoon die deze opneemt.</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">Ok, ik snap het</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">Oproep verlaten</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Meer leren[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite kopen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I kopen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II kopen</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III kopen</string>
+    <string name="subscription_type_monthly">Maandelijks</string>
+    <string name="subscription_type_yearly">Jaarlijks</string>
+    <string name="choose_account_screen_only_price_per_month">Alleen %1$s per maand</string>
+    <string name="error_folder_part_of_camera_uploads">Deze map maakt al deel uit van Camera Uploads. Kies een andere map.</string>
+    <string name="error_folder_part_of_media_uploads">Deze map maakt al deel uit van Media-uploads. Kies een andere.</string>
+    <string name="error_folder_part_of_sync_or_backup">Deze map maakt al deel uit van een synchronisatie of back-up. Kies een andere map.</string>
+    <string name="cu_warning_banner_notification_disabled_warning">Schakel notificaties in om te weten te komen als uploads mislukken of de synchronisatie stopt.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">Veilige connectie mislukt</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA kon geen veilige verbinding maken.\n\nAls u gebruik maakt van openbare WiFi, probeer dan eerst in te loggen via uw browser.\n\nUw internetprovider of beveiligingssoftware kan ook de verbinding verstoren.\n\n[A]Meer informatie[/A]</string>
+    <string name="album_import_screen_subtitle_album_link_text">Album link</string>
+    <string name="album_import_error_access_dialog_title">Geen toegang tot album</string>
+    <string name="album_import_error_access_dialog_description">De link naar het album is verwijderd, of het album zelf is verwijderd. Neem contact op met degene die de link met u heeft gedeeld.</string>
+    <string name="album_import_input_decryption_key_dialog_title">Vul decoderingssleutel in</string>
+    <string name="album_import_input_decryption_key_dialog_description">Voer de decoderingssleutel in om toegang te krijgen tot het album. Als u deze niet hebt, neem dan contact op met de persoon die de link met u heeft gedeeld.</string>
+    <string name="album_import_rename_album_dialog_title">Hernoem album</string>
+    <string name="album_import_rename_album_dialog_description">Er bestaat al een album met de naam %1$s in uw albums. Voer een nieuwe naam in voor het album dat u wilt opslaan.</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">Voer een albumnaam in</string>
+    <string name="album_import_saving_dialog_progress_text">Opslaan&#8230;</string>
+    <string name="album_import_snackbar_success_message">%1$s opgeslagen in Cloud schijf</string>
+    <string name="album_import_snackbar_error_message">%1$s kunnen niet worden opgeslagen in de Cloud schijf. Probeer het later opnieuw. Als het probleem zich blijft voordoen, neem dan contact op met de persoon die de link met u heeft gedeeld.</string>
+    <string name="album_import_storage_exceeded_dialog_title">Kan album niet opslaan</string>
+    <string name="album_import_storage_exceeded_dialog_description">U heeft niet genoeg opslag om dit album op te slaan naar uw Cloud schijf. Upgrade nu om meer opslag te krijgen.</string>
+    <string name="photos_loading_indicator_text">Laden</string>
+    <string name="photos_network_error_message">Geen netwerk verbinding</string>
+    <string name="photos_save_to_cloud_drive_button_text">Opslaan op de Cloud schijf</string>
+    <string name="photos_create_album_duplicate_name_error">Een album met deze naam bestaat al. Voer een andere naam in.</string>
+    <string name="photos_create_album_proscribed_name_error">Deze album naam is niet toegestaan. Voer een andere naam in.</string>
+    <string name="remove_from_offline_success_message">Bestand verwijderd van Offline</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">Abonnementen zijn in uw regio niet beschikbaar via Google Play.</string>
+    <string name="home_recents_snackbar_activity_cleared">Uw recente activiteit is verwijderd</string>
+    <string name="home_recents_options_menu_clear">Recente activiteit wissen</string>
+    <string name="home_recents_clear_dialog_message">Weet u zeker dat u alle recente activiteiten wilt wissen? Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s is beschikbaar bij jaarlijkse facturering</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s is beschikbaar met maandelijkse facturering</string>
 </resources>

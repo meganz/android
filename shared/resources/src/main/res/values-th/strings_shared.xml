@@ -1125,7 +1125,7 @@
     <!-- General month label -->
     <string name="general_month">/เดือน</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">%1$s ต่อปี</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nชำระรายปี</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">ยกเลิกการซ่อน %1$d รายการแล้ว</item>
@@ -1698,11 +1698,11 @@
     <string name="campaign_name_special_offer">ข้อเสนอพิเศษ ลด %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">%1$s ในช่วง %2$d เดือนแรก</item>
+        <item quantity="other">[B]%1$s[/B]\nสำหรับ %2$d เดือนแรก</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">%1$s ในช่วง %2$d ปีแรก</item>
+        <item quantity="other">[B]%1$s[/B]\nสำหรับ %2$d ปีแรก</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">ชุดความเป็นส่วนตัวของ MEGA</string>
@@ -1737,9 +1737,9 @@
         <item quantity="other">โบนัสจะหมดอายุภายใน %1$d วัน</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s ในเดือนแรก</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nสำหรับเดือนแรก</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s ในปีแรก</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nสำหรับปีแรก</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">มีเพียงคุณเท่านั้นที่เปิดดูไฟล์ที่ซ่อนไว้ได้ โดยเลือกเปิดทีละไฟล์หรือแสดงรายการที่ซ่อนไว้ชั่วคราวผ่าน[A]การตั้งค่า[/A]</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -1947,21 +1947,21 @@
     <string name="copyright_action_disagree">ไม่ยอมรับ</string>
     <string name="general_clear_all">ล้างทั้งหมด</string>
     <string name="create_new_album_input_album_name_placeholder">อัลบั้มใหม่</string>
-    <string name="album_send_decryption_key_separately_title">ส่งคีย์ถอดรหัสลับแยกต่างหาก</string>
-    <string name="album_send_decryption_key_separately_description">ส่งออกลิงก์และคีย์ถอดรหัสลับแยกต่างหาก</string>
-    <string name="general_learn_more">เรียนรู้เพิ่มเติม</string>
+    <string name="album_send_decryption_key_separately_title">ส่งคีย์ถอดรหัสแยกต่างหาก</string>
+    <string name="album_send_decryption_key_separately_description">ส่งออกลิงก์และคีย์ถอดรหัสแยกต่างหาก</string>
+    <string name="general_learn_more">ดูข้อมูลเพิ่มเติม</string>
     <string name="album_get_link_link_section_title">ลิงก์</string>
-    <string name="album_get_link_requesting_link_placeholder">กำลังประมวลผล&#8230;</string>
+    <string name="album_get_link_requesting_link_placeholder">กำลังดำเนินการ&#8230;</string>
     <string name="album_get_link_decryption_key_section_title">คีย์</string>
     <string name="album_get_link_copy_link_action">คัดลอกลิงก์</string>
     <string name="album_get_link_copy_key_action">คัดลอกคีย์</string>
     <string name="album_get_link_copy_key_success_message">คัดลอกคีย์ไปไว้ที่คลิปบอร์ดแล้ว</string>
-    <string name="album_get_link_share_link_dialog_title">แชร์คีย์ถอดรหัสลับนี้ด้วยหรือไม่</string>
-    <string name="album_get_link_share_link_dialog_description">ส่งออกคีย์ถอดรหัสลับแล้วและจะแชร์ไปพร้อมกับลิงก์ด้วย</string>
-    <string name="album_get_link_share_link_dialog_share_action_only_link">แชร์แค่ลิงก์อย่างเดียว</string>
+    <string name="album_get_link_share_link_dialog_title">ต้องการแชร์คีย์ถอดรหัสด้วยหรือไม่</string>
+    <string name="album_get_link_share_link_dialog_description">ส่งออกคีย์ถอดรหัสแล้วและจะแชร์ไปพร้อมกับลิงก์</string>
+    <string name="album_get_link_share_link_dialog_share_action_only_link">แชร์เฉพาะลิงก์</string>
     <string name="album_get_link_share_link_dialog_share_action_link_key">แชร์ทั้งลิงก์และคีย์ด้วย</string>
     <string name="album_get_link_share_link_with_key">ลิงก์: %1$s\n\nคีย์: %2$s</string>
-    <string name="album_has_hidden_nodes_dialog_description">อัลบั้มนี้มีรายการบางอย่างที่ซ่อนไว้ การแชร์อัลบั้มนี้จะทำให้ผู้ที่คุณแชร์ด้วยสามารถเห็นเนื้อหาที่ซ่อนอยู่ได้ แต่เนื้อหาเหล่านี้จะยังคงซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
+    <string name="album_has_hidden_nodes_dialog_description">อัลบั้มนี้มีรายการที่ซ่อนอยู่ หากแชร์อัลบั้ม ผู้รับจะสามารถมองเห็นรายการดังกล่าวได้ แต่รายการเหล่านั้นจะยังคงถูกซ่อนอยู่ในคลาวด์ไดร์ฟของคุณ</string>
     <plurals name="album_link_copied_success_message">
         <item quantity="other">คัดลอกลิงก์ไปที่คลิปบอร์ดแล้ว</item>
     </plurals>
@@ -1972,23 +1972,23 @@
     <string name="title_bucket">%1$s และอื่น ๆ อีก %2$d รายการ</string>
     <string name="create_action_bucket">[A]สร้างโดย [/A]%s</string>
     <string name="update_action_bucket">[A]อัปเดตโดย [/A]%s</string>
-    <string name="label_yesterday">เมื่อวาน</string>
-    <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ไม่ได้ถอดรหัส]</string>
+    <string name="label_yesterday">เมื่อวานนี้</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ยังไม่ถอดรหัส]</string>
     <string name="section_recents">ล่าสุด</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="other">%d รูปภาพ</item>
+        <item quantity="other">รูปภาพ %d รูป</item>
     </plurals>
     <plurals name="title_media_bucket_only_videos">
-        <item quantity="other">%d วิดีโอ</item>
+        <item quantity="other">วิดีโอ %d รายการ</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="other">%1$d รูปภาพ&#160;</item>
+        <item quantity="other">รูปภาพ %1$d รูป&#160;</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos_2">
-        <item quantity="other">และ %1$d วิดีโอ</item>
+        <item quantity="other">และวิดีโอ %1$d รายการ</item>
     </plurals>
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="other">[ไฟล์ยังไม่ได้ถอดรหัส]</item>
+        <item quantity="other">[ไฟล์ที่ยังไม่ถอดรหัส]</item>
     </plurals>
     <plurals name="album_get_link_screen_title">
         <item quantity="other">แชร์ลิงก์</item>
@@ -2015,33 +2015,33 @@
     <string name="shares_screen_links_shares_tab_title">ลิงก์</string>
     <string name="shares_screen_incoming_empty">[B]ไม่มี[/B][A]โฟลเดอร์ที่แชร์ขาเข้า[/A]</string>
     <string name="shares_screen_outgoing_empty">[B]ไม่มี[/B][A]โฟลเดอร์ที่แชร์ขาออก[/A]</string>
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s ถูกแชร์โดยผู้ติดต่อที่คุณยังไม่ได้รับการตรวจสอบ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณตรวจสอบข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการตรวจสอบและแตะที่ข้อมูล</string>
-    <string name="homepage_favourites_empty_hint">[B]ไม่[/B][B]พบ[/B][A]รายการโปรด[/A]</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s แชร์โดยผู้ติดต่อที่คุณยังไม่ได้ตรวจสอบ เพื่อความปลอดภัยที่มากขึ้น ขอแนะนำให้ตรวจสอบข้อมูลประจำตัวในรายชื่อผู้ติดต่อ แตะที่จุดสามจุดถัดจากผู้ติดต่อที่ต้องการตรวจสอบแล้วแตะข้อมูล</string>
+    <string name="homepage_favourites_empty_hint">[B]ไม่พบ[/B] [A]รายการโปรด[/A]</string>
     <string name="general_create_label">สร้าง</string>
     <string name="general_new_text_file">ไฟล์ข้อความใหม่</string>
     <string name="general_new_folder">โฟลเดอร์ใหม่</string>
     <string name="album_get_multiple_links_list_title">ลิงก์</string>
     <string name="album_get_multiple_links_copy_all_action">คัดลอกทั้งหมด</string>
-    <string name="transfers_upload_started_snackbar">เริ่มการอัปโหลดแล้ว ดูรายละเอียดได้ที่การแจ้งเตือน</string>
+    <string name="transfers_upload_started_snackbar">เริ่มอัปโหลดแล้ว ดูรายละเอียดได้ที่การแจ้งเตือน</string>
     <string name="folder_created_success_message">สร้างโฟลเดอร์สำเร็จ</string>
-    <string name="folder_not_created_error_message">ผิดพลาด โฟลเดอร์ยังไม่ได้ถูกสร้าง</string>
+    <string name="folder_not_created_error_message">เกิดข้อผิดพลาด ไม่สามารถสร้างโฟลเดอร์ได้</string>
     <string name="unable_to_open_selected_file_message">ไม่สามารถเปิดไฟล์ที่เลือกได้</string>
-    <string name="camera_denied_info_message">MEGA ต้องการเข้าถึงกล้องของคุณเพื่อถ่ายภาพและวิดีโอ</string>
-    <string name="incoming_share_storage_quota_warning_message">ไม่สามารถส่งไฟล์ไปยังผู้ใช้ปลายทางได้ เนื่องจากเกินโควต้าการจัดเก็บข้อมูลแล้ว</string>
+    <string name="camera_denied_info_message">MEGA ต้องการสิทธิ์เข้าถึงกล้องเพื่อถ่ายรูปและวิดีโอ</string>
+    <string name="incoming_share_storage_quota_warning_message">ไม่สามารถส่งไฟล์ได้เนื่องจากผู้รับใช้พื้นที่จัดเก็บเกินโควตา</string>
     <string name="general_ok_only">ตกลง</string>
-    <string name="empty_rubbish_bin_success_message">เคลียร์ถังขยะเสร็จแล้ว</string>
-    <string name="empty_rubbish_bin_error_message">พบข้อผิดพลาด ถังขยะยังไม่ได้ทำการล้างข้อมูล</string>
-    <string name="empty_rubbish_bin_menu">ล้างข้อมูลในถังขยะ</string>
-    <string name="remove_all_rubbish_bin_confirmation">คุณกำลังจะลบรายการทั้งหมดออกจากถังขยะอย่างถาวร</string>
+    <string name="empty_rubbish_bin_success_message">ล้างถังขยะเรียบร้อยแล้ว</string>
+    <string name="empty_rubbish_bin_error_message">เกิดข้อผิดพลาด ไม่สามารถล้างถังขยะได้</string>
+    <string name="empty_rubbish_bin_menu">ล้างถังขยะ</string>
+    <string name="remove_all_rubbish_bin_confirmation">คุณกำลังจะลบรายการทั้งหมดในถังขยะอย่างถาวร</string>
     <string name="general_clear">ล้าง</string>
     <string name="annotated_empty_rubbish_bin_menu">[A]ถังขยะ[/A][B]ว่างเปล่า[/B]</string>
     <string name="annotated_empty_folder">[B]โฟลเดอร์[/B][A]ว่าง[/A]</string>
     <string name="general_upload_label">อัปโหลด</string>
     <string name="empty_file_browser_folder">โฟลเดอร์ว่างเปล่า</string>
-    <string name="logout_offline_content_deletion_warning">การออกจากระบบจะเป็นการลบเนื้อหาออฟไลน์ของคุณออก</string>
+    <string name="logout_offline_content_deletion_warning">การออกจากระบบจะเป็นการลบเนื้อหาออฟไลน์ออก</string>
     <string name="offline_screen_title">ออฟไลน์</string>
     <string name="offline_screen_remove_from_offline_selection_menu">เอาออกจากออฟไลน์</string>
-    <string name="offline_item_deletion_confirmation_title">นำออกจากออฟไลน์หรือไม่</string>
+    <string name="offline_item_deletion_confirmation_title">เอาออกจากออฟไลน์หรือไม่</string>
     <plurals name="num_of_files_with_parameter">
         <item quantity="other">%1$d ไฟล์</item>
     </plurals>
@@ -2051,4 +2051,62 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d โฟลเดอร์&#160;·&#160;</item>
     </plurals>
+    <string name="home_recents_snackbar_activity_hidden">ซ่อนกิจกรรมล่าสุดของคุณแล้ว</string>
+    <string name="home_recents_button_view_all">ดูทั้งหมด</string>
+    <string name="home_recents_options_menu_show_activity">แสดงกิจกรรมล่าสุด</string>
+    <string name="home_recents_empty_text_description">กิจกรรมล่าสุดของไฟล์และโฟลเดอร์จะแสดงที่นี่</string>
+    <string name="home_recents_hidden_text_description">ซ่อนกิจกรรมล่าสุด</string>
+    <string name="home_recents_bucket_subtitle_added_to">เพิ่มลงใน %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">ไฟล์เหล่านี้ใช้งานไม่ได้แล้ว</string>
+    <string name="shares_screen_links_section_empty">[B]ไม่มี [/B][A]ลิงก์สาธารณะ[/A]</string>
+    <string name="general_invalid_dot_name_warning">ชื่อ “.” ใช้งานไม่ได้</string>
+    <string name="general_invalid_double_dot_name_warning">ชื่อ “..” ใช้งานไม่ได้</string>
+    <string name="search_landing_title">กำลังหาอะไรอยู่หรือเปล่า</string>
+    <string name="search_landing_subtitle">ค้นหาไฟล์และโฟลเดอร์</string>
+    <string name="offline_screen_empty_state_description">ไม่มีไฟล์ในบันทึกออฟไลน์</string>
+    <string name="general_install_label">ติดตั้ง</string>
+    <string name="general_app_update_download_success_message">ดาวน์โหลดตัวอัปเดตแอปเสร็จแล้ว</string>
+    <string name="general_first_name">ชื่อ</string>
+    <string name="general_last_name">สกุล</string>
+    <string name="meetings_call_recording_consent_dialog_title">กำลังบันทึกการโทรนี้</string>
+    <string name="meetings_call_recording_consent_dialog_message">การอยู่ในสายสนทนาต่อถือว่าคุณอนุญาตให้บันทึกได้ ระบบจะจัดเก็บการบันทึกไว้ในอุปกรณ์ของผู้ที่ทำการบันทึกเท่านั้น</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">ตกลง เข้าใจแล้ว</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">วางสาย</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]เรียนรู้เพิ่มเติม[/A]</string>
+    <string name="error_folder_part_of_camera_uploads">โฟลเดอร์นี้อยู่ในอัปโหลดจากกล้องแล้ว กรุณาเลือกโฟลเดอร์อื่น</string>
+    <string name="error_folder_part_of_media_uploads">โฟลเดอร์นี้อยู่ในการอัปโหลดสื่อแล้ว กรุณาเลือกโฟลเดอร์อื่น</string>
+    <string name="error_folder_part_of_sync_or_backup">โฟลเดอร์นี้ถูกใช้สำหรับการซิงค์หรือสำรองข้อมูลแล้ว กรุณาเลือกโฟลเดอร์อื่น</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">ซื้อ Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">ซื้อ Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">ซื้อ Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">ซื้อ Pro&#160;III</string>
+    <string name="subscription_type_monthly">รายเดือน</string>
+    <string name="subscription_type_yearly">รายปี</string>
+    <string name="choose_account_screen_only_price_per_month">เพียง %1$s/เดือน</string>
+    <string name="cu_warning_banner_notification_disabled_warning">เปิดการแจ้งเตือนเพื่อให้ทราบหากอัปโหลดไม่สำเร็จหรือหยุดซิงค์</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">เชื่อมต่อแบบปลอดภัยไม่สำเร็จ</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA เชื่อมต่อแบบปลอดภัยไม่สำเร็จ \n\nหากคุณใช้งาน Wi-Fi สาธารณะ กรุณาลองเข้าสู่ระบบผ่านเบราว์เซอร์ก่อน \n\nผู้ให้บริการอินเทอร์เน็ตหรือซอฟต์แวร์ความปลอดภัยอาจรบกวนการเชื่อมต่อของคุณ \n\n[A]ดูข้อมูลเพิ่มเติม[/A]</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">ไม่สามารถสมัครใช้งานผ่าน Google Play ในภูมิภาคของคุณได้</string>
+    <string name="home_recents_snackbar_activity_cleared">ล้างกิจกรรมล่าสุดของคุณแล้ว</string>
+    <string name="home_recents_options_menu_clear">ล้างกิจกรรมล่าสุด</string>
+    <string name="home_recents_clear_dialog_message">คุณแน่ใจหรือไม่ว่าต้องการล้างกิจกรรมล่าสุดทั้งหมด การดำเนินการนี้ไม่สามารถยกเลิกได้</string>
+    <string name="album_import_screen_subtitle_album_link_text">ลิงก์อัลบั้ม</string>
+    <string name="album_import_error_access_dialog_title">เข้าถึงอัลบั้มนี้ไม่ได้</string>
+    <string name="album_import_error_access_dialog_description">ลิงก์ของอัลบั้มนี้ถูกลบออก หรือตัวอัลบั้มถูกลบไปแล้ว กรุณาติดต่อผู้ที่แชร์ลิงก์ให้คุณ</string>
+    <string name="album_import_input_decryption_key_dialog_title">กรอกคีย์เพื่อถอดรหัสลับ</string>
+    <string name="album_import_input_decryption_key_dialog_description">ในการเข้าถึงอัลบั้มนี้ ให้คุณกรอกคีย์ถอดรหัสลับก่อน หากคุณไม่มี ให้ติดต่อบุคคลที่แชร์ลิงก์นี้ให้กับคุณแทน</string>
+    <string name="album_import_rename_album_dialog_title">เปลี่ยนชื่ออัลบั้ม</string>
+    <string name="album_import_rename_album_dialog_description">มีอัลบั้มชื่อ %1$s อยู่แล้วในอัลบั้มของคุณ กรุณาระบุชื่อใหม่สำหรับอัลบั้มที่ต้องการบันทึก</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">กรอกชื่ออัลบั้ม</string>
+    <string name="album_import_saving_dialog_progress_text">กำลังบันทึก&#8230;</string>
+    <string name="album_import_snackbar_success_message">บันทึก %1$s ลงในคลาวด์ไดร์ฟแล้ว</string>
+    <string name="album_import_snackbar_error_message">ไม่สามารถบันทึก %1$s ลงในคลาวด์ไดร์ฟได้ ลองใหม่อีกครั้งในภายหลัง หากยังมีปัญหาอยู่ กรุณาติดต่อผู้ที่แชร์ลิงก์ให้คุณ</string>
+    <string name="album_import_storage_exceeded_dialog_title">บันทึกอัลบั้มไม่ได้</string>
+    <string name="album_import_storage_exceeded_dialog_description">คุณมีพื้นที่เก็บข้อมูลไม่เพียงพอที่จะบันทึกอัลบั้มนี้ไปที่คลาวด์ไดร์ฟ อัปเกรดทันทีเพื่อรับพื้นที่เก็บข้อมูลเพิ่มมากขึ้น</string>
+    <string name="photos_loading_indicator_text">กำลังโหลด</string>
+    <string name="photos_network_error_message">ไม่มีการเชื่อมต่อเครือข่าย</string>
+    <string name="photos_save_to_cloud_drive_button_text">บันทึกไปยังคลาวด์ไดรฟ์</string>
+    <string name="photos_create_album_duplicate_name_error">มีอัลบั้มที่ชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น</string>
+    <string name="photos_create_album_proscribed_name_error">ไม่อนุญาตให้ใช้ชื่ออัลบั้มนี้ กรอกชื่ออื่น</string>
+    <string name="remove_from_offline_success_message">ไฟล์ถูกลบออกจากออฟไลน์แล้ว</string>
 </resources>

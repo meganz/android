@@ -2145,7 +2145,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">ละเว้น</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s ปิดเสียงการโทรนี้</string>
+    <string name="muted_contact_micro">%s ปิดเสียงแล้ว</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">ปิดเสียง</string>
     <!-- Subtitle of the call screen when the call is on hold -->

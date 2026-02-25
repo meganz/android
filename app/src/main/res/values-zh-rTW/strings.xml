@@ -3369,7 +3369,7 @@
     <!-- User Alert notification for new scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加週期性會議，排定時間：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]定期性會議描述[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]週期性會議描述[/B]</string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
     <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s取消[/A][B]會議和其所有事件[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->

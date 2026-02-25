@@ -1874,23 +1874,23 @@
     <string name="campaign_name_cyber_monday">صفقة الاثنين الالكتروني: خصم %1$d%%</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">عرض خاص: خصم %1$d%%</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. &#10; is a line break. -->
+    <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="zero">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
-        <item quantity="one">[B]%1$s[/B]\nلأول %2$d شهر</item>
-        <item quantity="two">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other">==WEBLATE_PART==\n[B]%1$s[/B]\nلأول %2$d شهور</item>
+        <item quantity="zero">[B]%1$s[/B]\nلأول %2$d شهر</item>
+        <item quantity="one">[B]%1$s[/B]\nلأول شهر</item>
+        <item quantity="two">[B]%1$s[/B]\nلأول %2$d شهرين</item>
+        <item quantity="few">[B]%1$s[/B]\nلأول %2$d أشهر</item>
+        <item quantity="many">[B]%1$s[/B]\nلأول %2$d شهرًا</item>
+        <item quantity="other">[B]%1$s[/B]\nلأول %2$d أشهر</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. &#10; is a line break. -->
+    <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="zero">[B]%1$s[/B]\nلأول %2$d سنوات</item>
-        <item quantity="one">[B]%1$s[/B]\nلأول %2$d سنة</item>
-        <item quantity="two">[B]%1$s[/B]\nلأول %2$d سنوات</item>
-        <item quantity="few"></item>
-        <item quantity="many"></item>
-        <item quantity="other">[B]%1$s[/B]\nلأول %2$d سنوات</item>
+        <item quantity="zero">[B]%1$s[/B]\nلأول %2$d سنة</item>
+        <item quantity="one">[B]%1$s[/B]\nلأول سنة</item>
+        <item quantity="two">[B]%1$s[/B]\nلأول %2$d سنتين</item>
+        <item quantity="few">[B]%1$s[/B]\nلأول %2$d سنوات</item>
+        <item quantity="many">[B]%1$s[/B]\nلأول %2$d سنة</item>
+        <item quantity="other">[B]%1$s[/B]\nلأول %2$d سنة</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">مجموعة الخصوصية من ميغا MEGA</string>
@@ -1935,9 +1935,9 @@
         <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nلأول شهر</string>
+    <string name="label_first_time_in_months_full_singular">%1$s للشهر الأول</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nلأول سنة</string>
+    <string name="label_first_time_in_years_full_singular">%1$s للسنة الأولى</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">يمكنك فقط الكشف عن الملفات المخفية إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من [A]إعدادات[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2244,4 +2244,25 @@
     <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
     <!-- Error message when folder is already part of a sync or backup -->
     <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">اشتري برو لايت Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">اشتر برو Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">اشتر برو Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">اشتر برو Pro&#160;III</string>
+    <string name="subscription_type_monthly">شهرياً</string>
+    <string name="subscription_type_yearly">سنويًا</string>
+    <string name="album_import_screen_subtitle_album_link_text">رابط الألبوم</string>
+    <string name="album_import_error_access_dialog_title">لا يمكن الوصول إلى الألبوم</string>
+    <string name="album_import_input_decryption_key_dialog_title">أدخل مفتاح فك التشفير</string>
+    <string name="album_import_input_decryption_key_dialog_description">للوصول إلى الألبوم ، أدخل مفتاح فك التشفير. إذا لم يكن لديك، فاتصل بالشخص الذي شارك الرابط معك.</string>
+    <string name="album_import_rename_album_dialog_title">إعادة تسمية الألبوم</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">أدخل اسم الألبوم</string>
+    <string name="album_import_saving_dialog_progress_text">جاري الحفظ&#8230;</string>
+    <string name="album_import_storage_exceeded_dialog_title">لا يمكن حفظ الألبوم</string>
+    <string name="album_import_storage_exceeded_dialog_description">ليس لديك مساحة تخزين كافية لحفظ هذا الألبوم على سواقتك السحابية. قم بالترقية الآن للحصول على المزيد من مساحة التخزين.</string>
+    <string name="photos_loading_indicator_text">جاري التحميل</string>
+    <string name="photos_network_error_message">لا يوجد اتصال</string>
+    <string name="photos_save_to_cloud_drive_button_text">حفظ في السواقة السحابية</string>
+    <string name="photos_create_album_duplicate_name_error">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
+    <string name="photos_create_album_proscribed_name_error">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
+    <string name="remove_from_offline_success_message">حذف من غير متصل بالانترنت</string>
 </resources>

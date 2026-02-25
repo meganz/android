@@ -123,7 +123,7 @@
     <!-- password label -->
     <string name="password_text">Senha</string>
     <!-- Hint of the confirmation dialog to get link with password -->
-    <string name="confirm_password_text">Confirme a sua senha</string>
+    <string name="confirm_password_text">Confirmar senha</string>
     <!-- This question applies to users that do not have an account on MEGA yet -->
     <string name="new_to_mega">Novo no MEGA?</string>
     <!-- button that allows the user to create an account -->
@@ -187,7 +187,7 @@
     <!-- Label to reference a recents section -->
     <string name="section_recents">Atividades recentes</string>
     <!-- title of the screen where the secondary media images are uploaded, and name of the folder where the secondary media images are uploaded -->
-    <string name="section_secondary_media_uploads">Upload de mídias</string>
+    <string name="section_secondary_media_uploads">Uploads de mídia</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
     <string name="section_saved_for_offline_new">Offline</string>
     <!-- Label showing the location of a node which is not in root navigation level. The first placeholder is the name of the parent folder. The second placeholder is the name of the section in which the file is. e.g. PR reviews and tickets (Cloud Drive) -->
@@ -447,7 +447,7 @@
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">Os Uploads da câmera foram desativados - a pasta local não está disponível.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">O upload de mídias foi desativados - a pasta local não está disponível.</string>
+    <string name="camera_notif_secondary_local_unavailable">Os uploads de mídia foram desativados - a pasta local não está disponível.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Aparência</string>
     <!-- settings of the Features section -->
@@ -525,9 +525,9 @@
     <!-- settings option. How to upload the camera images: via Wi-Fi only or via Wi-Fi and data plan -->
     <string name="settings_camera_upload_how_to_upload">Como fazer o upload</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Enabling it would imply to choose a new local folder and then, a new destination folder in MEGA. This is the text that appears in the settings option to enable the second synchronization. -->
-    <string name="settings_secondary_upload_on">Ativar upload secundário de mídia</string>
+    <string name="settings_secondary_upload_on">Ativar os uploads secundários de mídia</string>
     <!-- The Secondary Media uploads allows to create a second Camera Folder synchronization. Disabling it would imply that the current second sync won’t be running anymore. This is the text that appears in the settings option to disable the second synchronization. -->
-    <string name="settings_secondary_upload_off">Desativar upload secundário de mídia</string>
+    <string name="settings_secondary_upload_off">Desativar os uploads secundários de mídia</string>
     <!-- Title of shared folder explorer to choose a folder to perform an action -->
     <string name="settings_empty_folder">Escolher pasta</string>
     <!-- What kind of files are going to be uploaded: images, videos or both -->
@@ -729,7 +729,7 @@
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">Digite a senha</string>
     <!-- Hint of the confirmation dialog to get link with password -->
-    <string name="hint_confirm_password_protection_dialog">Confirme a sua senha</string>
+    <string name="hint_confirm_password_protection_dialog">Confirmar senha</string>
     <!-- Status text at the beginning of getting a link -->
     <string name="link_request_status">Processando&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
@@ -1015,7 +1015,7 @@
     <!-- Title of the dialog to set the value of the auto away preference -->
     <string name="title_dialog_set_autoaway_value">Estabelecer o limite de tempo</string>
     <!-- Button to set a value -->
-    <string name="button_set">Estabelecer</string>
+    <string name="button_set">Denifir</string>
     <!-- Button to set a value -->
     <string name="hint_minutes">minutos</string>
     <!-- the options of what to upload in an array. Needed for the settings, the options of what to upload. -->
@@ -1225,7 +1225,7 @@
     <!-- confirmation message before removing CU folder -->
     <string name="confirmation_move_cu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads da câmera.</string>
     <!-- Confirmation message before removing MU folder -->
-    <string name="confirmation_move_mu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads de mídias.</string>
+    <string name="confirmation_move_mu_folder_to_rubbish">Você quer mover esta pasta para a Lixeira? Será gerada automaticamente uma nova pasta para os Uploads de mídia.</string>
     <!-- confirmation message before removing a file -->
     <string name="confirmation_move_to_rubbish_plural">Mover para a Lixeira?</string>
     <!-- confirmation message before removing a file -->
@@ -2829,7 +2829,7 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Grupos</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Opções como “Enviar a chave de decodificação separadamente”, “Definir uma data de validade” ou “Estabelecer uma senha de acesso” somente estão disponíveis ao selecionar um único item.</string>
+    <string name="warning_get_links">Opções como “Enviar a chave de decodificação separadamente”, “Definir uma data de validade” ou “Definir uma senha de acesso” somente estão disponíveis ao selecionar um único item.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Copiar todos</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->

@@ -1125,7 +1125,7 @@
     <!-- General month label -->
     <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">年繳%1$s</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n按年計費</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">已取消隱藏%1$d個項目</item>
@@ -1698,11 +1698,11 @@
     <string name="campaign_name_special_offer">特價優惠：%1$d%%折扣</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">前%2$d個月只要%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n前%2$d個月</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">前%2$d年只要%1$s</item>
+        <item quantity="other">[B]%1$s[/B]\n前%2$d年</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA隱私套件</string>
@@ -1737,9 +1737,9 @@
         <item quantity="other">獎勵將在%1$d天後到期</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">第一個月只要%1$s</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\n首月</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s首年</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\n首年</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">只有您可以顯示隱藏的檔案，既可以個別顯示，也可以透過[A]設定[/A]暫時顯示隱藏的項目。</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2048,4 +2048,64 @@
     <plurals name="num_of_folders_and_num_of_files">
         <item quantity="other">%1$d個資料夾&#160;·&#160;</item>
     </plurals>
+    <string name="general_first_name">名字</string>
+    <string name="general_last_name">姓氏</string>
+    <string name="meetings_call_recording_consent_dialog_title">此通話正在錄音</string>
+    <string name="meetings_call_recording_consent_dialog_message">留在通話中即表示您同意錄音。錄音內容僅儲存在錄音者的裝置上。</string>
+    <string name="meetings_call_recording_consent_dialog_positive_button">好的，明白了</string>
+    <string name="meetings_call_recording_consent_dialog_negative_button">離開通話</string>
+    <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]瞭解更多[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">購買Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">購買Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">購買Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">購買Pro&#160;III</string>
+    <string name="subscription_type_monthly">每月</string>
+    <string name="subscription_type_yearly">每年</string>
+    <string name="choose_account_screen_only_price_per_month">僅 %1$s/月</string>
+    <string name="section_banners">橫幅</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">載入中&#8230;</string>
+    <string name="storage_usage_format">已使用%1$s（共%2$s）</string>
+    <string name="general_hi">嗨</string>
+    <string name="home_recents_snackbar_activity_hidden">您近期的活動已被隱藏</string>
+    <string name="home_recents_button_view_all">查看全部</string>
+    <string name="home_recents_options_menu_show_activity">顯示近期活動</string>
+    <string name="home_recents_empty_text_description">您最近的所有檔案和資料夾活動將顯示在此</string>
+    <string name="home_recents_hidden_text_description">已隱藏近期活動</string>
+    <string name="home_recents_bucket_subtitle_added_to">已新增到%s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">這些檔案已不再可用</string>
+    <string name="shares_screen_links_section_empty">[B]無[/B][A]公開連結[/A]</string>
+    <string name="general_invalid_dot_name_warning">名稱「.」無效</string>
+    <string name="general_invalid_double_dot_name_warning">名稱「..」無效</string>
+    <string name="transfers_upload_started_snackbar">上傳已開始。詳情請查看通知。</string>
+    <string name="search_landing_title">想找什麼？</string>
+    <string name="search_landing_subtitle">搜尋檔案和資料夾</string>
+    <string name="offline_screen_empty_state_description">無離線儲存檔案</string>
+    <string name="general_install_label">安裝</string>
+    <string name="general_app_update_download_success_message">已下載應用程式更新</string>
+    <string name="error_folder_part_of_camera_uploads">此資料夾已包含在相機上傳中。選擇其它資料夾。</string>
+    <string name="error_folder_part_of_media_uploads">此資料夾已包含在媒體上傳中。選擇其它資料夾。</string>
+    <string name="error_folder_part_of_sync_or_backup">此資料夾已包含在同步或備份中。選擇其它資料夾。</string>
+    <string name="cu_warning_banner_notification_disabled_warning">開啟通知功能，以便在上傳失敗或停止同步時收到通知。</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">安全連線失敗</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">無法與MEGA進行安全連線。\n\n如果您使用的是公共Wi-Fi，請先嘗試透過瀏覽器登入。\n\n您的網路服務提供商或安全軟體也可能干擾了連線。\n\n[A]瞭解更多[/A]</string>
+    <string name="album_import_screen_subtitle_album_link_text">相簿連結</string>
+    <string name="album_import_error_access_dialog_title">無法存取相簿</string>
+    <string name="album_import_input_decryption_key_dialog_title">請輸入解密金鑰</string>
+    <string name="album_import_input_decryption_key_dialog_description">要存取相簿，請輸入解密金鑰。如果您沒有金鑰，請聯繫共享金鑰給您的人。</string>
+    <string name="album_import_rename_album_dialog_title">重新命名相簿</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">輸入相簿名稱</string>
+    <string name="album_import_saving_dialog_progress_text">正在儲存⋯</string>
+    <string name="album_import_storage_exceeded_dialog_title">無法儲存相簿</string>
+    <string name="album_import_storage_exceeded_dialog_description">您沒有足夠的儲存空間將此相簿儲存到您的雲端硬碟。立即升級以獲得更多儲存空間。</string>
+    <string name="photos_loading_indicator_text">讀取中</string>
+    <string name="photos_network_error_message">沒有網路連線</string>
+    <string name="photos_save_to_cloud_drive_button_text">儲存到雲端硬碟</string>
+    <string name="photos_create_album_duplicate_name_error">已存在相同名稱的相簿。請輸入不同的名稱。</string>
+    <string name="photos_create_album_proscribed_name_error">不允許使用此相簿名稱。請輸入不同的名稱。</string>
+    <string name="remove_from_offline_success_message">檔案已從可離線使用中移除</string>
 </resources>
