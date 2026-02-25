@@ -70,6 +70,14 @@ class GetSubscriptionsUseCaseTest {
         amount = CurrencyAmount(99999.toLong().toFloat(), Currency("EUR")),
     )
 
+    private val monthlySubscriptionWithInvalidCurrency = monthlySubscription.copy(
+        amount = CurrencyAmount(9999.toLong().toFloat(), Currency("INVALID")),
+    )
+
+    private val yearlySubscriptionWithInvalidCurrency = yearlySubscription.copy(
+        amount = CurrencyAmount(99999.toLong().toFloat(), Currency("")),
+    )
+
     private val monthlyLocalPricing = LocalPricing(
         CurrencyPoint.LocalCurrencyPoint(9999.toLong()),
         Currency("EUR"),
@@ -95,27 +103,25 @@ class GetSubscriptionsUseCaseTest {
         )
     }
 
+    private suspend fun setupCommonMocks() {
+        whenever(getSubscriptionOptionsUseCase()).thenReturn(
+            listOf(monthlySubscriptionOption, yearlySubscriptionOption)
+        )
+        whenever(
+            billingRepository.querySkus(
+                listOf("android.test.purchased.month", SKU_PRO_LITE_YEAR)
+            )
+        ).thenReturn(emptyList())
+        whenever(getLocalPricingUseCase("android.test.purchased.month")).thenReturn(
+            monthlyLocalPricing
+        )
+        whenever(getLocalPricingUseCase(SKU_PRO_LITE_YEAR)).thenReturn(yearlyLocalPricing)
+    }
+
     @Test
     fun `test the GetSubscriptionsUseCase returns the list of Subscriptions successfully`() {
         runTest {
-            whenever(getSubscriptionOptionsUseCase()).thenReturn(
-                listOf(
-                    monthlySubscriptionOption,
-                    yearlySubscriptionOption
-                )
-            )
-            whenever(
-                billingRepository.querySkus(
-                    listOf(
-                        "android.test.purchased.month",
-                        SKU_PRO_LITE_YEAR
-                    )
-                )
-            ).thenReturn(emptyList())
-            whenever(getLocalPricingUseCase("android.test.purchased.month")).thenReturn(
-                monthlyLocalPricing
-            )
-            whenever(getLocalPricingUseCase(SKU_PRO_LITE_YEAR)).thenReturn(yearlyLocalPricing)
+            setupCommonMocks()
             whenever(subscriptionMapper(monthlySubscriptionOption, monthlyLocalPricing)).thenReturn(
                 monthlySubscription
             )
@@ -128,6 +134,48 @@ class GetSubscriptionsUseCaseTest {
                 Subscriptions(
                     listOf(monthlySubscription),
                     listOf(yearlySubscription)
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that subscriptions with invalid currency codes are filtered out`() {
+        runTest {
+            setupCommonMocks()
+            whenever(subscriptionMapper(monthlySubscriptionOption, monthlyLocalPricing)).thenReturn(
+                monthlySubscriptionWithInvalidCurrency
+            )
+            whenever(subscriptionMapper(yearlySubscriptionOption, yearlyLocalPricing)).thenReturn(
+                yearlySubscriptionWithInvalidCurrency
+            )
+
+            val actual = underTest.invoke()
+            assertThat(actual).isEqualTo(
+                Subscriptions(
+                    monthlySubscriptions = emptyList(),
+                    yearlySubscriptions = emptyList(),
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that only subscriptions with valid currency codes are returned when mixed`() {
+        runTest {
+            setupCommonMocks()
+            whenever(subscriptionMapper(monthlySubscriptionOption, monthlyLocalPricing)).thenReturn(
+                monthlySubscription
+            )
+            whenever(subscriptionMapper(yearlySubscriptionOption, yearlyLocalPricing)).thenReturn(
+                yearlySubscriptionWithInvalidCurrency
+            )
+
+            val actual = underTest.invoke()
+            assertThat(actual).isEqualTo(
+                Subscriptions(
+                    monthlySubscriptions = listOf(monthlySubscription),
+                    yearlySubscriptions = emptyList(),
                 )
             )
         }

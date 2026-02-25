@@ -37,22 +37,20 @@ class GetSubscriptionsUseCase @Inject constructor(
         }
         val skus = paymentOptions.map { it.sku }.distinct()
         billingRepository.querySkus(skus)
-        val monthlyOption = getOptions(paymentOptions, 1).map { option ->
-            val localPricing = getLocalPricingUseCase(option.sku)
-            subscriptionMapper(option, localPricing)
-        }
-        val yearlyOption = getOptions(paymentOptions, 12).map { option ->
-            val localPricing = getLocalPricingUseCase(option.sku)
-            subscriptionMapper(option, localPricing)
-        }
         return Subscriptions(
-            monthlySubscriptions = monthlyOption,
-            yearlySubscriptions = yearlyOption
+            monthlySubscriptions = buildSubscriptions(paymentOptions, 1),
+            yearlySubscriptions = buildSubscriptions(paymentOptions, 12),
         )
     }
 
-    private fun getOptions(paymentOptions: List<SubscriptionOption>, numberOfMonth: Int) =
-        paymentOptions.filter { plan ->
-            plan.months == numberOfMonth
+    private fun buildSubscriptions(
+        paymentOptions: List<SubscriptionOption>,
+        numberOfMonths: Int,
+    ) = paymentOptions
+        .filter { it.months == numberOfMonths }
+        .map { option ->
+            subscriptionMapper(option, getLocalPricingUseCase(option.sku))
+        }.filter {
+            it.amount.currency.isValid
         }
 }

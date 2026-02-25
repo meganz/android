@@ -28,7 +28,7 @@ internal class SubscriptionOptionListMapper @Inject constructor(
             request.pricing.getGBStorage(it),
             request.pricing.getGBTransfer(it),
             CurrencyPoint.SystemCurrencyPoint(request.pricing.getAmount(it).toLong()),
-            currencyMapper(request.currency.currencyName),
+            currencyMapper(request.currency.currencyName.orEmpty()),
             request.pricing.hasMobileOffers(it),
         )
     }
