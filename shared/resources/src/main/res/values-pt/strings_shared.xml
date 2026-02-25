@@ -281,7 +281,7 @@
     <!-- Title of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_title">Conflito nas pastas de upload</string>
     <!-- Body of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
-    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">A pasta dos Uploads da câmera e a pasta de upload secundário de mídia não podem estar relacionadas. Escolha uma pasta diferente.</string>
+    <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_body">A pasta dos Uploads da câmera e a pasta dos uploads secundários de mídia não podem estar relacionadas. Escolha uma pasta diferente.</string>
     <!-- The confirmation Button text of the Warning Dialog shown when the new Local Primary or Secondary Folder is same as, a parent folder or sub-folder of the opposite Local Folder -->
     <string name="settings_camera_uploads_related_new_local_folder_warning_dialog_confirm_button">Entendi</string>
     <!-- Warning message shown when trying to select a local folder but there isn’t any app to do that. -->
@@ -839,7 +839,7 @@
     <!-- Name of the Camera uploads feature -->
     <string name="general_camera_uploads">Uploads da câmera</string>
     <!-- Name of the Camera uploads feature -->
-    <string name="general_media_uploads">Upload de mídias</string>
+    <string name="general_media_uploads">Uploads de mídia</string>
     <!-- Generic settings label text -->
     <string name="general_settings">Configurações</string>
     <!-- Ad settings label in the cookie settings page -->
@@ -1147,7 +1147,7 @@
     <!-- General month label -->
     <string name="general_month">/mês</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">Pagamento anual de %1$s</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nPagamento anual</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d item já não está oculto</item>
@@ -1764,15 +1764,15 @@
     <string name="campaign_name_special_offer">Oferta especial: %1$d%% de desconto</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s durante o primeiro %2$d mês</item>
-        <item quantity="many">%1$s durante os primeiros %2$d de meses</item>
-        <item quantity="other">%1$s durante os primeiros %2$d meses</item>
+        <item quantity="one">[B]%1$s[/B]\ndurante o primeiro mês</item>
+        <item quantity="many">[B]%1$s[/B]\ndurante os primeiros %2$d de meses</item>
+        <item quantity="other">[B]%1$s[/B]\ndurante os primeiros %2$d meses</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s durante o primeiro %2$d ano</item>
-        <item quantity="many">%1$s durante os primeiros %2$d de anos</item>
-        <item quantity="other">%1$s durante os primeiros %2$d anos</item>
+        <item quantity="one">[B]%1$s[/B]\ndurante o primeiro ano</item>
+        <item quantity="many">[B]%1$s[/B]\ndurante os primeiros %2$d de anos</item>
+        <item quantity="other">[B]%1$s[/B]\ndurante os primeiros %2$d anos</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Ferramentas de privacidade do MEGA</string>
@@ -1809,9 +1809,9 @@
         <item quantity="other">O bônus expira em %1$d dias</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s durante o primeiro mês</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\ndurante o primeiro mês</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s durante o primeiro ano</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\ndurante o primeiro ano</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Somente você pode mostrar arquivos ocultos, seja individualmente ou exibindo temporariamente itens ocultos nas [A]configurações[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2137,7 +2137,6 @@
     <string name="general_new_folder">Nova pasta</string>
     <string name="general_invalid_dot_name_warning">“.” não é um nome válido</string>
     <string name="general_invalid_double_dot_name_warning">“..” não é um nome válido</string>
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s durante %3$s</string>
     <string name="label_file_speed_mega_byte">%1$s&#160;MB/s</string>
     <string name="album_get_multiple_links_list_title">Links</string>
     <string name="album_get_multiple_links_copy_all_action">Copiar todos</string>
@@ -2188,4 +2187,43 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">Entendi</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Sair da chamada</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mais informações[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Comprar Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar Pro&#160;III</string>
+    <string name="subscription_type_monthly">Mensal</string>
+    <string name="subscription_type_yearly">Anual</string>
+    <string name="choose_account_screen_only_price_per_month">Somente %1$s por mês</string>
+    <string name="error_folder_part_of_camera_uploads">Esta pasta já faz parte dos Uploads da câmera. Escolha outra.</string>
+    <string name="error_folder_part_of_media_uploads">Esta pasta já faz parte dos Uploads de mídia. Escolha outra.</string>
+    <string name="error_folder_part_of_sync_or_backup">Esta pasta já faz parte de uma sincronização ou de um backup. Escolha outra.</string>
+    <string name="cu_warning_banner_notification_disabled_warning">Ative as notificações para saber se os uploads falham ou se os dados param de sincronizar.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">Falha na conexão segura</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">Não foi possível conectar com segurança ao MEGA.\n\nSe você estiver usando um Wi-Fi público, tente fazer primeiro o login no navegador.\n\nO seu provedor de Internet ou software de segurança também pode estar interferindo na conexão.\n\n[A]Mais informações[/A]</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">Assinaturas não estão disponíveis via Google Play na sua região.</string>
+    <string name="home_recents_snackbar_activity_cleared">A sua atividade recente foi deletada</string>
+    <string name="home_recents_options_menu_clear">Deletar a atividade recente</string>
+    <string name="home_recents_clear_dialog_message">Você tem certeza de que quer deletar toda a atividade recente? Esta ação não pode ser desfeita.</string>
+    <string name="album_import_screen_subtitle_album_link_text">Link do álbum</string>
+    <string name="album_import_error_access_dialog_title">Não foi possível acessar o álbum</string>
+    <string name="album_import_error_access_dialog_description">O link para o álbum foi removido ou o álbum foi deletado. Entre em contato com a pessoa que compartilhou o link com você.</string>
+    <string name="album_import_input_decryption_key_dialog_title">Digite a chave de decodificação</string>
+    <string name="album_import_input_decryption_key_dialog_description">Para acessar o álbum, digite a chave de decodificação. Se você não tiver a chave, entre em contato com a pessoa que compartilhou o link com você.</string>
+    <string name="album_import_rename_album_dialog_title">Renomear álbum</string>
+    <string name="album_import_rename_album_dialog_description">Nos seus Álbuns já existe um álbum chamado %1$s. Digite um novo nome para o álbum que você está salvando.</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">Digite o nome do álbum</string>
+    <string name="album_import_saving_dialog_progress_text">Salvando&#8230;</string>
+    <string name="album_import_snackbar_success_message">%1$s foi salvo na Nuvem de arquivos</string>
+    <string name="album_import_snackbar_error_message">Não foi possível salvar %1$s na Nuvem de arquivos. Tente novamente mais tarde. Se o problema persistir, entre em contato com a pessoa que compartilhou o link com você.</string>
+    <string name="album_import_storage_exceeded_dialog_title">Não foi possível salvar o álbum</string>
+    <string name="album_import_storage_exceeded_dialog_description">A sua conta não tem armazenamento suficiente para salvar este álbum na sua Nuvem de arquivos - faça um upgrade para obter mais espaço.</string>
+    <string name="photos_empty_screen_brand_name_text" translatable="false">MEGA</string>
+    <string name="photos_loading_indicator_text">Carregando</string>
+    <string name="photos_network_error_message">Não há conexão de rede</string>
+    <string name="photos_save_to_cloud_drive_button_text">Salvar na Nuvem de arquivos</string>
+    <string name="photos_create_album_duplicate_name_error">Já existe um álbum com este nome. Digite outro nome.</string>
+    <string name="photos_create_album_proscribed_name_error">O nome deste álbum não está permitido. Digite outro nome.</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">O plano %1$s está disponível com pagamento anual</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">O plano %1$s está disponível com pagamento mensal</string>
+    <string name="remove_from_offline_success_message">Arquivo removido de Offline</string>
 </resources>

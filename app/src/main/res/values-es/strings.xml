@@ -429,9 +429,9 @@
     <!-- title of the notification when camera upload is initializing -->
     <string name="settings_camera_notif_initializing_title">Iniciando Subidas de la cámara</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Se han desactivado las Subidas de la cámara. Tu carpeta local no está disponible.</string>
+    <string name="camera_notif_primary_local_unavailable">Se han desactivado las subidas de la cámara. Tu carpeta local no está disponible.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Se ha desactivado la a subida multimedia secundaria. Tu carpeta local no está disponible.</string>
+    <string name="camera_notif_secondary_local_unavailable">Se han desactivado las subidas multimedia. Tu carpeta local no está disponible.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apariencia</string>
     <!-- settings of the Features section -->

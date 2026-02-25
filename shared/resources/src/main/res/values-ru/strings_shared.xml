@@ -1163,7 +1163,7 @@
     <!-- General month label -->
     <string name="general_month">/месяц</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">Оплата %1$s ежегодно</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nОплачивается ежегодно</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">Показан %1$d элемент</item>
@@ -1794,17 +1794,17 @@
     <string name="campaign_name_special_offer">Специальное предложение: скидка %1$d%%</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="one">%1$s за первый %2$d месяц</item>
-        <item quantity="few">%1$s за первые %2$d месяца</item>
-        <item quantity="many">%1$s за первые %2$d месяцев</item>
-        <item quantity="other">%1$s за первые %2$d месяцев</item>
+        <item quantity="one">[B]%1$s[/B]\nЗа первый месяц</item>
+        <item quantity="few">[B]%1$s[/B]\nЗа первые %2$d месяца</item>
+        <item quantity="many">[B]%1$s[/B]\nЗа первые %2$d месяцев</item>
+        <item quantity="other">[B]%1$s[/B]\nЗа первые %2$d месяцев</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="one">%1$s за первый %2$d год</item>
-        <item quantity="few">%1$s за первые %2$d года</item>
-        <item quantity="many">%1$s за первые %2$d лет</item>
-        <item quantity="other">%1$s за первые %2$d лет</item>
+        <item quantity="one">[B]%1$s[/B]\nЗа первый год</item>
+        <item quantity="few">[B]%1$s[/B]\nЗа первые %2$d года</item>
+        <item quantity="many">[B]%1$s[/B]\nЗа первые %2$d лет</item>
+        <item quantity="other">[B]%1$s[/B]\nЗа первые %2$d лет</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">Комплекс конфиденциальности MEGA</string>
@@ -1843,9 +1843,9 @@
         <item quantity="other">Бонус истекает через %1$d дней</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s за первый месяц</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nЗа первый месяц</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s за первый год</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nЗа первый год</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Отобразить скрытые файлы можете только вы: либо по отдельности, либо временно временно включить отображение скрытых элементов в [A]настройках[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2161,7 +2161,6 @@
     </plurals>
     <string name="free_account">Free</string>
     <string name="business_label">Бизнес</string>
-    <string name="billing_info_with_discount_label">[A]%1$s[/A] %2$s на %3$s</string>
     <string name="general_clear_all">Очистить все</string>
     <string name="offline_remove_singular_item_success_message">1 элемент удалён</string>
     <string name="offline_remove_multiple_item_success_message">Элементы удалены ( %d)</string>
@@ -2245,4 +2244,26 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">Закрыть</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Покинуть звонок</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Подробнее[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Купить Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Купить Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Купить Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Купить Pro&#160;III</string>
+    <string name="subscription_type_monthly">Ежемесячно</string>
+    <string name="subscription_type_yearly">Ежегодно</string>
+    <string name="choose_account_screen_only_price_per_month">[B][X3X][/B]\nВсего %1$s в месяц</string>
+    <string name="album_import_screen_subtitle_album_link_text">Ссылка на альбом</string>
+    <string name="album_import_error_access_dialog_title">Альбом недоступен</string>
+    <string name="album_import_input_decryption_key_dialog_title">Введите ключ дешифрирования</string>
+    <string name="album_import_input_decryption_key_dialog_description">Для доступа к альбому введите ключ дешифрования. Если у вас его нет, обратитесь к человеку, который поделился с вами ссылкой.</string>
+    <string name="album_import_rename_album_dialog_title">Переименование альбома</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">Введите название альбома</string>
+    <string name="album_import_saving_dialog_progress_text">Сохранение&#8230;</string>
+    <string name="album_import_storage_exceeded_dialog_title">Не удалось сохранить альбом</string>
+    <string name="album_import_storage_exceeded_dialog_description">Недостаточно места в облаке для сохранения этого альбома. Улучшите аккаунт, чтобы получить больше места.</string>
+    <string name="photos_loading_indicator_text">Загрузка</string>
+    <string name="photos_network_error_message">Нет интернет-соединения</string>
+    <string name="photos_save_to_cloud_drive_button_text">Сохранить на Облачном диске</string>
+    <string name="photos_create_album_duplicate_name_error">Альбом с таким названием уже существует. Введите другое название.</string>
+    <string name="photos_create_album_proscribed_name_error">Недопустимое название альбома. Введите другое название.</string>
+    <string name="remove_from_offline_success_message">Файл удалён из локальных</string>
 </resources>

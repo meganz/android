@@ -2178,7 +2178,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Negeren</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s heeft deze oproep gedempt</string>
+    <string name="muted_contact_micro">%s is gedempt</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Gedempt</string>
     <!-- Subtitle of the call screen when the call is on hold -->

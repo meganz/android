@@ -1115,7 +1115,7 @@
     <!-- General month label -->
     <string name="general_month">/月</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 billed yearly -->
-    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n每年收费</string>
+    <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\n按年收费</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="other">%1$d个项目取消隐藏</item>
@@ -1686,11 +1686,11 @@
     <string name="campaign_name_special_offer">特别优惠：%1$d%%折扣</string>
     <!-- Label for first time period in days full format -->
     <plurals name="label_first_time_in_months_full">
-        <item quantity="other">[B]%1$s[/B]\n首%2$d个月</item>
+        <item quantity="other">[B]%1$s[/B]\n前%2$d个月</item>
     </plurals>
     <!-- Label for first time period in years full format -->
     <plurals name="label_first_time_in_years_full">
-        <item quantity="other">[B]%1$s[/B]\n首%2$d年</item>
+        <item quantity="other">[B]%1$s[/B]\n前%2$d年</item>
     </plurals>
     <!-- Header for MEGA privacy suite section in Menu screen -->
     <string name="general_mega_privacy_suite">MEGA 隐私工具</string>
@@ -2050,11 +2050,58 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">好的，明白了</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">离开通话</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]了解更多[/A]</string>
-    <!-- Error message when folder is already part of Camera Uploads -->
-    <string name="error_folder_part_of_camera_uploads">This folder is already part of Camera Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of Media Uploads -->
-    <string name="error_folder_part_of_media_uploads">This folder is already part of Media Uploads. Choose another.</string>
-    <!-- Error message when folder is already part of a sync or backup -->
-    <string name="error_folder_part_of_sync_or_backup">This folder is already part of a sync or backup. Choose another.</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">购买Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">购买Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">购买Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">购买Pro&#160;III</string>
+    <string name="subscription_type_monthly">每月</string>
+    <string name="subscription_type_yearly">每年</string>
     <string name="choose_account_screen_only_price_per_month">仅%1$s/月</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="recovering_info">加载中⋯</string>
+    <string name="storage_usage_format">在 %2$s 中已使用 %1$s</string>
+    <string name="general_hi">您好</string>
+    <string name="home_recents_snackbar_activity_hidden">您最近的活动已被隐藏</string>
+    <string name="home_recents_button_view_all">查看全部</string>
+    <string name="home_recents_options_menu_show_activity">显示最近的活动</string>
+    <string name="home_recents_empty_text_description">您最近的所有文件和文件夹活动将显示在这里</string>
+    <string name="home_recents_hidden_text_description">最近的活动已隐藏</string>
+    <string name="home_recents_bucket_subtitle_added_to">已添加到 %s</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">这些文件不再可用</string>
+    <string name="error_folder_part_of_camera_uploads">此文件夹已是相机上传的一部分。请选择其他文件夹。</string>
+    <string name="error_folder_part_of_media_uploads">此文件夹已是媒体上传的一部分。请选择其他文件夹。</string>
+    <string name="error_folder_part_of_sync_or_backup">此文件夹已是同步或备份的一部分。请选择其他文件夹。</string>
+    <string name="cu_warning_banner_notification_disabled_warning">开启通知，以便在上传失败或停止同步时了解情况。</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">安全连接失败</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA无法安全连接。\n\n如果您使用的是公共Wi-Fi，请先尝试通过浏览器登录。\n\n您的互联网服务提供商或安全软件也可能阻止了连接。\n\n[A]了解更多[/A]</string>
+    <string name="album_import_screen_subtitle_album_link_text">相册链接</string>
+    <string name="album_import_error_access_dialog_title">无法访问相册</string>
+    <string name="album_import_input_decryption_key_dialog_title">请输入解密密钥</string>
+    <string name="album_import_input_decryption_key_dialog_description">要访问该相册，请输入解密密钥。如果您没有，请联系与您共享链接的人。</string>
+    <string name="album_import_rename_album_dialog_title">重命名相册</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">输入相册名称</string>
+    <string name="album_import_saving_dialog_progress_text">正在保存&#8230;</string>
+    <string name="album_import_storage_exceeded_dialog_title">无法保存相册</string>
+    <string name="album_import_storage_exceeded_dialog_description">您没有足够的存储空间将此相册保存到云盘。立即升级以获得更多存储空间。</string>
+    <string name="photos_loading_indicator_text">正在加载</string>
+    <string name="photos_network_error_message">无网络连接</string>
+    <string name="photos_save_to_cloud_drive_button_text">保存到云盘</string>
+    <string name="photos_create_album_duplicate_name_error">已存在有该名称的相册。请输入不同的名称。</string>
+    <string name="photos_create_album_proscribed_name_error">不允许使用此相册名。请输入不同的名称。</string>
+    <string name="remove_from_offline_success_message">文件已从离线中移除</string>
+    <string name="payment_ads_free_intro_description">升级到Pro方案，享受充足的存储空间以及更多功能。我们的Pro方案起价仅为每月%1$s。</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">在您所在的地区，无法通过Google Play订阅。</string>
+    <string name="home_recents_snackbar_activity_cleared">您的最近活动已被清除</string>
+    <string name="home_recents_options_menu_clear">清除最近的活动</string>
+    <string name="home_recents_clear_dialog_message">您确定要清除所有最近活动吗？此操作无法撤销。</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s提供年度订阅</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s提供月度订阅</string>
+    <string name="album_import_error_access_dialog_description">该相册的链接已被删除或该相册已被删除。请联系与您共享该链接的人。</string>
+    <string name="album_import_rename_album_dialog_description">您的相册中已存在一个名为“%1$s”的相册。请为您要保存的相册输入一个新名称。</string>
+    <string name="album_import_snackbar_success_message">%1$s已保存到云盘</string>
+    <string name="album_import_snackbar_error_message">%1$s无法保存到云盘。请稍后再试。如果问题仍然存在，请联系与您共享链接的人。</string>
 </resources>

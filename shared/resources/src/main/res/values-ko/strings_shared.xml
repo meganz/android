@@ -1789,7 +1789,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">이 폴더는 비어있습니다</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">아직 클라우드 드라이브에 아무 것도 없습니다</string>
+    <string name="context_empty_cloud_drive_title">개인 금고에 아직 아무 것도 없습니다</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">영지식 암호화로 안전하게 보관하세요</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -1958,8 +1958,8 @@
     </plurals>
     <string name="section_saved_for_offline_new">오프라인</string>
     <string name="title_bucket">%1$s 그리고 %2$d개 더</string>
-    <string name="create_action_bucket">[A]생성인[/A] %s</string>
-    <string name="update_action_bucket">[A]수정인[/A] %s</string>
+    <string name="create_action_bucket">[A]생성자[/A] %s</string>
+    <string name="update_action_bucket">[A]수정자[/A] %s</string>
     <string name="label_yesterday">어제</string>
     <string name="shared_items_verify_credentials_undecrypted_folder">[복호화 되지 않은 폴더]</string>
     <string name="section_recents">최근</string>
@@ -1988,7 +1988,7 @@
     <string name="shares_screen_links_shares_tab_title">링크</string>
     <string name="shares_screen_incoming_empty">[A]들어오는 공유 폴더[/A] [B]없음[/B]</string>
     <string name="shares_screen_outgoing_empty">[A]나가는 공유 폴더[/A] [B]없음[/B]</string>
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s은/는 당신이 인증하지 않은 연락처에 의해 공유되었습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 인증할 것을 권장합니다. 인증하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s 는/은 당신이 인증하지 않은 연락처에 의해 공유되었습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 인증할 것을 권장합니다. 인증하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
     <string name="homepage_favourites_empty_hint">[B]발견된[/B] [A]즐겨찾기[/A] [B]없음[/B]</string>
     <string name="general_create_label">생성</string>
     <string name="general_new_text_file">새 텍스트 파일</string>
@@ -2002,16 +2002,16 @@
     <string name="camera_denied_info_message">MEGA는 사진과 동영상을 촬영하기 위해 당신의 카메라에 접근해야 합니다.</string>
     <string name="incoming_share_storage_quota_warning_message">대상 이용자의 저장소 할당량이 초과되어 파일을 전송할 수 없습니다.</string>
     <string name="general_ok_only">OK</string>
-    <string name="empty_rubbish_bin_success_message">휴지통 비움</string>
+    <string name="empty_rubbish_bin_success_message">휴지통을 비웠습니다</string>
     <string name="empty_rubbish_bin_error_message">오류가 발생하였습니다. 휴지통이 비워지지 않았습니다</string>
     <string name="empty_rubbish_bin_menu">휴지통 비우기</string>
-    <string name="remove_all_rubbish_bin_confirmation">휴지통에서 모든 항목을 완전히 제거하려고 합니다.</string>
+    <string name="remove_all_rubbish_bin_confirmation">휴지통에서 모든 항목을 영구적으로 제거하려고 합니다.</string>
     <string name="general_clear">비우기</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]빈[/B] [A]휴지통[/A]</string>
     <string name="annotated_empty_folder">[B]빈[/B] [A]폴더[/A]</string>
     <string name="general_upload_label">업로드</string>
     <string name="empty_file_browser_folder">빈 폴더</string>
-    <string name="logout_offline_content_deletion_warning">로그아웃 하면 오프라인 항목이 삭제됩니다.</string>
+    <string name="logout_offline_content_deletion_warning">로그아웃하면 오프라인 항목이 삭제됩니다.</string>
     <string name="offline_screen_title">오프라인</string>
     <string name="offline_screen_remove_from_offline_selection_menu">오프라인에서 제거</string>
     <string name="offline_item_deletion_confirmation_title">오프라인에서 제거할까요?</string>
@@ -2019,12 +2019,11 @@
         <item quantity="other">파일 %1$d개</item>
     </plurals>
     <plurals name="num_of_folders_with_parameter">
-        <item quantity="other">%d개의 폴더</item>
+        <item quantity="other">폴더 %d개</item>
     </plurals>
     <plurals name="num_of_folders_and_num_of_files">
-        <item quantity="other">폴더 %1$d개&#160;.&#160;</item>
+        <item quantity="other">폴더 %1$d개&#160;·&#160;</item>
     </plurals>
-    <string name="choose_account_screen_only_price_per_month">단돈 월 %1$s</string>
     <string name="recovering_info">불러오는 중&#8230;</string>
     <string name="storage_usage_format">%2$s 중 %1$s 이용함</string>
     <string name="general_hi">안녕하세요</string>
@@ -2035,4 +2034,64 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">알겠습니다</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">통화 떠나기</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]더 알아보기[/A]</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Pro&#160;Lite 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Pro&#160;I 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Pro&#160;II 구입</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III 구입</string>
+    <string name="subscription_type_monthly">매월</string>
+    <string name="subscription_type_yearly">매년</string>
+    <string name="section_banners">배너</string>
+    <string name="prolite_account">Pro Lite</string>
+    <string name="pro1_account">Pro I</string>
+    <string name="pro2_account">Pro II</string>
+    <string name="pro3_account">Pro III</string>
+    <string name="pro_flexi_account">Pro Flexi</string>
+    <string name="home_recents_snackbar_activity_hidden">최근 활동이 숨겨져 있습니다</string>
+    <string name="home_recents_button_view_all">모두 보기</string>
+    <string name="home_recents_options_menu_show_activity">최근 활동 보기</string>
+    <string name="home_recents_empty_text_description">모든 최근 파일과 폴더 활동이 여기에 나타납니다</string>
+    <string name="home_recents_hidden_text_description">최근 활동 숨겨짐</string>
+    <string name="home_recents_bucket_subtitle_added_to">%s에 추가</string>
+    <string name="home_recents_bucket_snackbar_files_unavailable">이 파일들은 더 이상 이용할 수 없습니다</string>
+    <string name="shares_screen_links_section_empty">[A]공개 링크[/A] [B]없음[/B]</string>
+    <string name="general_invalid_dot_name_warning">“.” 이름은 유효하지 않습니다</string>
+    <string name="general_invalid_double_dot_name_warning">“..” 이름은 유효하지 않습니다</string>
+    <string name="transfers_upload_started_snackbar">업로드가 시작되었습니다. 자세한 내용은 알림을 보세요.</string>
+    <string name="search_landing_title">무엇을 찾고 계신가요?</string>
+    <string name="search_landing_subtitle">파일과 폴더 검색</string>
+    <string name="offline_screen_empty_state_description">오프라인용으로 저장된 파일 없음</string>
+    <string name="general_install_label">설치</string>
+    <string name="general_app_update_download_success_message">앱 업데이트 다운로드됨</string>
+    <string name="error_folder_part_of_camera_uploads">이 폴더는 이미 카메라 업로드의 일부입니다. 다른 것을 고르세요.</string>
+    <string name="error_folder_part_of_media_uploads">이 폴더는 이미 미디어 업로드의 일부입니다. 다른 것을 고르세요.</string>
+    <string name="error_folder_part_of_sync_or_backup">이 폴더는 이미 동기화 또는 백업의 일부입니다. 다른 것을 고르세요.</string>
+    <string name="choose_account_screen_only_price_per_month">단돈 월 %1$s</string>
+    <string name="cu_warning_banner_notification_disabled_warning">업로드가 실패하거나 동기화가 멈추었을 때 알 수 있도록 알림을 켜세요.</string>
+    <string name="ssl_error_dialog_secure_connection_failed_title">안전한 연결 실패</string>
+    <string name="album_import_screen_subtitle_album_link_text">사진첩 링크</string>
+    <string name="album_import_error_access_dialog_title">사진첩에 접근할 수 없습니다</string>
+    <string name="album_import_error_access_dialog_description">사진첩에 대한 링크가 삭제되었거나, 사진첩이 삭제되었습니다. 링크를 공유해준 사람에게 연락하세요.</string>
+    <string name="album_import_input_decryption_key_dialog_title">복호화 키를 입력하세요</string>
+    <string name="album_import_input_decryption_key_dialog_description">사진첩에 접근하려면, 복호화 키를 입력하세요. 만약 가지고 있지 않다면, 링크를 공유해준 사람에게 연락하세요.</string>
+    <string name="album_import_rename_album_dialog_title">사진첩 이름 바꾸기</string>
+    <string name="album_import_rename_album_dialog_description">%1$s 이름을 가진 사진첩이 이미 존재합니다. 새로운 이름을 입력하세요.</string>
+    <string name="album_import_rename_album_dialog_empty_name_error">사진첩 이름을 입력하세요</string>
+    <string name="album_import_saving_dialog_progress_text">저장 중&#8230;</string>
+    <string name="album_import_snackbar_success_message">%1$s을/를 클라우드 드라이브에 저장하였습니다</string>
+    <string name="album_import_snackbar_error_message">%1$s을/를 클라우드 드라이브에 저장할 수 없었습니다. 나중에 다시 시도하세요. 문제가 계속 되면 링크를 공유해준 사람에게 연락하세요.</string>
+    <string name="album_import_storage_exceeded_dialog_title">사진첩을 저장할 수 없습니다</string>
+    <string name="album_import_storage_exceeded_dialog_description">클라우드 드라이브에 이 사진첩을 저장할 충분한 공간이 없습니다. 더 많은 저장소를 받으려면 지금 업그레이드 하세요.</string>
+    <string name="photos_loading_indicator_text">불러오는 중</string>
+    <string name="photos_network_error_message">네트워크 연결 없음</string>
+    <string name="photos_save_to_cloud_drive_button_text">클라우드 드라이브에 저장</string>
+    <string name="photos_create_album_duplicate_name_error">이 이름을 가진 앨범이 이미 존재합니다. 다른 이름을 입력하세요.</string>
+    <string name="photos_create_album_proscribed_name_error">이 사진첩 이름은 허용되지 않습니다. 다른 이름을 입력하세요.</string>
+    <string name="home_recents_clear_dialog_message">최근 활동을 모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s 요금제는 연간 결제로 이용 가능합니다</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s 요금제는 월간 결제로 이용 가능합니다</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA가 안전하게 연결할 수 없었습니다.\n\n만약 공개 Wi-Fi를 이용 중이라면, 먼저 브라우저를 통해 로그인하세요.\n\n당신의 인터넷 공급자 또는 보안 소프트웨어가 연결을 방해하고 있을 수도 있습니다.\n\n[A]더 알아보기[/A]</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">당신의 지역에서는 Google Play를 통한 구독을 이용할 수 없습니다.</string>
+    <string name="home_recents_snackbar_activity_cleared">최근 활동이 지워졌습니다</string>
+    <string name="home_recents_options_menu_clear">최근 활동 지우기</string>
+    <string name="remove_from_offline_success_message">파일이 오프라인에서 제거됨</string>
 </resources>
