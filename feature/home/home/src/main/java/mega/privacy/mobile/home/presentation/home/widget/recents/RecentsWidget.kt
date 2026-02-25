@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +89,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
         var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
         var showOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
         val context = LocalContext.current
+        val resources = LocalResources.current
         RecentsView(
             uiState = uiState,
             modifier = modifier,
@@ -145,7 +147,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onHideRecentActivity = {
                 viewModel.hideRecentActivity()
                 coroutineScope.launch {
-                    snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
+                    snackBarEventQueue.queueMessage(resources.getString(sharedR.string.home_recents_snackbar_activity_hidden))
                 }
             },
             onClearRecentActivity = viewModel::clearRecentActivity

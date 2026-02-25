@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -115,7 +114,6 @@ internal fun VideoPlaylistsTabScreen(
     onNavigateToDetail: (Long, PlaylistType) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
-    val context = LocalContext.current
     val resources = LocalResources.current
 
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -143,7 +141,7 @@ internal fun VideoPlaylistsTabScreen(
                 action = { deletedVideoPlaylistTitles ->
                     if (deletedVideoPlaylistTitles.isNotEmpty()) {
                         val deletedMessage = if (deletedVideoPlaylistTitles.size == 1) {
-                            context.getString(
+                            resources.getString(
                                 sharedR.string.video_section_playlists_delete_playlists_message_singular,
                                 deletedVideoPlaylistTitles[0]
                             )

@@ -24,7 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -142,7 +142,7 @@ fun MediaMainRoute(
     val snackBarEventQueue = rememberSnackBarQueue()
     val megaResultContract = rememberMegaResultContract()
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     var addToPlaylistIsRetry by rememberSaveable { mutableStateOf(false) }
     var addedVideoHandle by rememberSaveable { mutableStateOf<Long?>(null) }
 
@@ -155,7 +155,7 @@ fun MediaMainRoute(
             if (result.isRetry) {
                 val attributes = SnackbarAttributes(
                     message = result.message,
-                    action = context.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
+                    action = resources.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
                     actionClick = {
                         addToPlaylistIsRetry = true
                     }
@@ -233,7 +233,7 @@ fun MediaMainRoute(
                 if (result.isRetry) {
                     val attribute = SnackbarAttributes(
                         message = result.message,
-                        action = context.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
+                        action = resources.getString(sharedResR.string.transfers_retry_failed_snackbar_action),
                         actionClick = {
                             videoToPlaylistLauncher.launch(result.videoHandle)
                         }

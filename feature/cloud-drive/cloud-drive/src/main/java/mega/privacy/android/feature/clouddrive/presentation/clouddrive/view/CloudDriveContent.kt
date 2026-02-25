@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -113,6 +114,7 @@ internal fun CloudDriveContent(
     var showNewTextFileDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostState.current
     val megaResultContract = rememberMegaResultContract()
     val megaNavigator = rememberMegaNavigator()
@@ -383,7 +385,7 @@ internal fun CloudDriveContent(
                                 )
                             )
                         } else {
-                            snackbarHostState?.showAutoDurationSnackbar(context.getString(sharedR.string.folder_not_created_error_message))
+                            snackbarHostState?.showAutoDurationSnackbar(resources.getString(sharedR.string.folder_not_created_error_message))
                         }
                     }
                 },

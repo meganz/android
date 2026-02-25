@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
@@ -38,6 +39,7 @@ internal fun SyncFoldersRoute(
     deviceName: String,
 ) {
     val context = LocalContext.current
+    val resources = LocalResources.current
 
     SyncFoldersScreen(
         syncUiItems = uiState.syncUiItems,
@@ -117,7 +119,7 @@ internal fun SyncFoldersRoute(
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { resId ->
             val message =
-                uiState.snackbarMessage.let { context.getString(resId, uiState.movedFolderName) }
+                uiState.snackbarMessage.let { resources.getString(resId, uiState.movedFolderName) }
             snackBarHostState.showAutoDurationSnackbar(message)
             viewModel.handleAction(SnackBarShown)
         }

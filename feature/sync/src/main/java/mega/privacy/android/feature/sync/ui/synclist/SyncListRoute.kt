@@ -9,6 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
@@ -190,7 +191,7 @@ internal fun SyncListRoute(
         isSingleActivity = isSingleActivity,
     )
 
-    val context = LocalContext.current
+    val resources = LocalResources.current
     EventEffect(
         stalledIssueState.snackbarMessageContent,
         onConsumed = {
@@ -198,16 +199,14 @@ internal fun SyncListRoute(
         }
     ) {
         snackBarHostState.showAutoDurationSnackbar(
-            context.resources.getString(
-                it
-            )
+            resources.getString(it)
         )
     }
 
     LaunchedEffect(key1 = syncSettingsState.snackbarMessage) {
         syncSettingsState.snackbarMessage?.let { message ->
             snackBarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { context.getString(it) }
+                message.joinToString(separator = " ") { resources.getString(it) }
             )
             settingsSyncViewModel.handleAction(SettingsSyncAction.SnackbarShown)
         }

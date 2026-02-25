@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -81,7 +81,7 @@ fun RecentsBucketScreen(
     }
 
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     var openedFileNode by remember { mutableStateOf<TypedFileNode?>(null) }
     val listState = rememberLazyListState()
     val snackbarQueue = rememberSnackBarQueue()
@@ -161,7 +161,7 @@ fun RecentsBucketScreen(
         LaunchedEffect(uiState.isEmpty) {
             if (uiState.isEmpty) {
                 onBack()
-                snackbarQueue.queueMessage(context.getString(sharedR.string.home_recents_bucket_snackbar_files_unavailable))
+                snackbarQueue.queueMessage(resources.getString(sharedR.string.home_recents_bucket_snackbar_files_unavailable))
             }
         }
 

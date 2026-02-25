@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -38,7 +39,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getString
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
@@ -93,6 +93,7 @@ fun NewChooseAccountScreen(
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
+    val resources = LocalResources.current
     val locale = Locale.getDefault()
 
     val lazyListState = rememberLazyListState()
@@ -141,14 +142,14 @@ fun NewChooseAccountScreen(
             }
             val isPlanAvailable = selectedSubscription?.hasSubscriptionFor(isMonthly) == true
             if (!isPlanAvailable) {
-                val planName = context.getString(plan.toUIAccountType().textValue)
+                val planName = resources.getString(plan.toUIAccountType().textValue)
                 val message = if (selectedSubscription?.hasSubscriptionFor(true) == true) {
-                    context.getString(
+                    resources.getString(
                         sharedR.string.choose_account_screen_plan_available_monthly_billing,
                         planName
                     )
                 } else {
-                    context.getString(
+                    resources.getString(
                         sharedR.string.choose_account_screen_plan_available_yearly_billing,
                         planName
                     )
@@ -164,10 +165,7 @@ fun NewChooseAccountScreen(
         onConsumed = clearExternalPurchaseError,
         action = {
             snackBarHostState.showAutoDurationSnackbar(
-                getString(
-                    context,
-                    sharedR.string.general_text_error
-                )
+                resources.getString(sharedR.string.general_text_error)
             )
         }
     )
@@ -176,8 +174,8 @@ fun NewChooseAccountScreen(
         listOf(
             ProFeature(
                 icon = IconPack.Medium.Thin.Outline.Cloud,
-                title = context.getString(sharedR.string.pro_plan_feature_storage_title),
-                description = context.getString(
+                title = resources.getString(sharedR.string.pro_plan_feature_storage_title),
+                description = resources.getString(
                     sharedR.string.pro_plan_feature_storage_desc,
                     highestStorageString
                 ),
@@ -185,20 +183,20 @@ fun NewChooseAccountScreen(
             ),
             ProFeature(
                 icon = IconPack.Medium.Thin.Outline.ArrowsUpDown,
-                title = context.getString(sharedR.string.pro_plan_feature_transfer_title),
-                description = context.getString(sharedR.string.pro_plan_feature_transfer_desc),
+                title = resources.getString(sharedR.string.pro_plan_feature_transfer_title),
+                description = resources.getString(sharedR.string.pro_plan_feature_transfer_desc),
                 testTag = "pro_plan:feature:transfer"
             ),
             ProFeature(
                 icon = IconPack.Medium.Thin.Outline.VPN,
-                title = context.getString(sharedR.string.pro_plan_feature_vpn_title),
-                description = context.getString(sharedR.string.pro_plan_feature_vpn_desc),
+                title = resources.getString(sharedR.string.pro_plan_feature_vpn_title),
+                description = resources.getString(sharedR.string.pro_plan_feature_vpn_desc),
                 testTag = "pro_plan:feature:vpn"
             ),
             ProFeature(
                 icon = IconPack.Medium.Thin.Outline.LockKeyholeCircle,
-                title = context.getString(sharedR.string.pro_plan_feature_pass_title),
-                description = context.getString(sharedR.string.pro_plan_feature_pass_desc),
+                title = resources.getString(sharedR.string.pro_plan_feature_pass_title),
+                description = resources.getString(sharedR.string.pro_plan_feature_pass_desc),
                 testTag = "pro_plan:feature:pass"
             )
         )

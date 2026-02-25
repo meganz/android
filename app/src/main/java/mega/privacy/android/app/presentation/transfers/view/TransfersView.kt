@@ -22,7 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -123,7 +123,7 @@ internal fun TransfersView(
     initialTabIndex: Int,
 ) = with(uiState) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resource = LocalResources.current
     var showActiveTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showCompletedTransfersModal by rememberSaveable { mutableStateOf(false) }
     var showFailedTransfersModal by rememberSaveable { mutableStateOf(false) }
@@ -165,8 +165,8 @@ internal fun TransfersView(
 
                             coroutineScope.launch {
                                 val result = snackbarHostState?.showAutoDurationSnackbar(
-                                    context.getString(sharedR.string.transfers_all_transfers_paused_warning),
-                                    context.getString(sharedR.string.transfers_resume_all_button)
+                                    resource.getString(sharedR.string.transfers_all_transfers_paused_warning),
+                                    resource.getString(sharedR.string.transfers_resume_all_button)
                                 )
 
                                 if (result == SnackbarResult.ActionPerformed) {

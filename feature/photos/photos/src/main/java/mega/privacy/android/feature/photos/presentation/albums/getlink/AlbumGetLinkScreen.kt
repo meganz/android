@@ -86,7 +86,6 @@ fun AlbumGetLinkScreen(
         },
 ) {
     val state by albumGetLinkViewModel.stateFlow.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val resources = LocalResources.current
     val clipboardManager = LocalClipboardManager.current
     val coroutineScope = rememberCoroutineScope()
@@ -140,7 +139,7 @@ fun AlbumGetLinkScreen(
             },
             onNegativeButtonClicked = {
                 val link =
-                    context.getString(
+                    resources.getString(
                         sharedR.string.album_get_link_share_link_with_key,
                         keylessLink,
                         key
@@ -228,7 +227,7 @@ fun AlbumGetLinkScreen(
                     clipboardManager.setText(AnnotatedString(key))
 
                     coroutineScope.launch {
-                        snackbarQueue.queueMessage(context.getString(sharedR.string.album_get_link_copy_key_success_message))
+                        snackbarQueue.queueMessage(resources.getString(sharedR.string.album_get_link_copy_key_success_message))
                     }
                 },
             )

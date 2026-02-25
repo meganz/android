@@ -39,8 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -156,7 +156,7 @@ fun VoiceClipRecorderView(
     val audioPermissionState = rememberPermissionState(Manifest.permission.RECORD_AUDIO)
     val showTapAndHoldTooltip = remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val snackbarHostState = LocalSnackBarHostStateOriginal.current
     val recordAudioPermissionsLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -164,8 +164,8 @@ fun VoiceClipRecorderView(
         if (!isGranted) {
             coroutineScope.launch {
                 val result = snackbarHostState?.showAutoDurationSnackbar(
-                    context.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
-                    context.getString(R.string.general_allow),
+                    resources.getString(R.string.chat_microphone_permissions_denied_for_voice_clip),
+                    resources.getString(R.string.general_allow),
                 )
                 if (result == SnackbarResult.ActionPerformed) {
                     onNavigateToAppSettings()

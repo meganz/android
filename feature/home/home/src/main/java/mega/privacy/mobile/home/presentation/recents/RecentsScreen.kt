@@ -11,7 +11,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -61,7 +61,7 @@ fun RecentsScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackBarEventQueue = rememberSnackBarQueue()
     val snackBarHostState = LocalSnackBarHostState.current
-    val context = LocalContext.current
+    val resources = LocalResources.current
     var openedFileNode by remember { mutableStateOf<Pair<TypedFileNode, NodeSourceType>?>(null) }
     var showOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -143,7 +143,7 @@ fun RecentsScreen(
             viewModel.hideRecentActivity()
             onBack()
             coroutineScope.launch {
-                snackBarEventQueue.queueMessage(context.getString(sharedR.string.home_recents_snackbar_activity_hidden))
+                snackBarEventQueue.queueMessage(resources.getString(sharedR.string.home_recents_snackbar_activity_hidden))
             }
         },
         onClearRecentActivity = viewModel::clearRecentActivity

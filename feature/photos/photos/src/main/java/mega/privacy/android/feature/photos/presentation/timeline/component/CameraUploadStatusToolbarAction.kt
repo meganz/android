@@ -3,7 +3,7 @@ package mega.privacy.android.feature.photos.presentation.timeline.component
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -20,7 +20,7 @@ internal fun CameraUploadStatusToolbarAction(
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val scope = rememberCoroutineScope()
     val snackBarHostState = LocalSnackBarHostState.current
 
@@ -48,7 +48,7 @@ internal fun CameraUploadStatusToolbarAction(
                 onClick = {
                     scope.launch {
                         snackBarHostState?.showAutoDurationSnackbar(
-                            message = context.getString(SharedR.string.media_main_screen_camera_uploads_updated)
+                            message = resources.getString(SharedR.string.media_main_screen_camera_uploads_updated)
                         )
                     }
                 }

@@ -29,7 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
@@ -101,7 +101,7 @@ fun AlbumImportScreen(
     showOverDiskQuotaPaywallWarning: () -> Unit = {},
 ) {
     val state by albumImportViewModel.stateFlow.collectAsStateWithLifecycle()
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarEventQueue = rememberSnackBarQueue()
 
@@ -226,7 +226,7 @@ fun AlbumImportScreen(
                         } else {
                             coroutineScope.launch {
                                 snackbarEventQueue.queueMessage(
-                                    message = context.getString(sharedR.string.photos_network_error_message),
+                                    message = resources.getString(sharedR.string.photos_network_error_message),
                                 )
                             }
                         }
@@ -255,7 +255,7 @@ fun AlbumImportScreen(
                         } else {
                             coroutineScope.launch {
                                 snackbarEventQueue.queueMessage(
-                                    message = context.getString(sharedR.string.photos_network_error_message),
+                                    message = resources.getString(sharedR.string.photos_network_error_message),
                                 )
                             }
                         }

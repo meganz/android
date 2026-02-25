@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,7 +72,7 @@ internal fun ActiveTransfersView(
     val snackBarHostState = LocalSnackBarHostState.current?.let {
         SnackbarHostStateWrapper(it)
     }
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     if (activeTransfers.isEmpty()) {
         EmptyTransfersView(
@@ -128,8 +128,8 @@ internal fun ActiveTransfersView(
                             coroutineScope.launch {
                                 localSnackbarHostState?.currentSnackbarData?.dismiss()
                                 val result = snackBarHostState.showAutoDurationSnackbar(
-                                    context.getString(sharedR.string.transfers_transfer_cancelled),
-                                    context.getString(sharedR.string.general_undo),
+                                    resources.getString(sharedR.string.transfers_transfer_cancelled),
+                                    resources.getString(sharedR.string.general_undo),
                                 )
                                 when (result) {
                                     SnackbarResult.ActionPerformed -> {

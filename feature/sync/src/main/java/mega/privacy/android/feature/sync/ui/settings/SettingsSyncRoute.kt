@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -168,11 +168,11 @@ internal fun SettingSyncScreen(
             },
         )
     }
-    val context = LocalContext.current
+    val resources = LocalResources.current
     LaunchedEffect(key1 = uiState.snackbarMessage) {
         uiState.snackbarMessage?.let { message ->
             scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message.joinToString(separator = " ") { context.getString(it) }
+                message.joinToString(separator = " ") { resources.getString(it) }
             )
             snackbarShown()
         }

@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -189,14 +190,14 @@ private fun SyncNewFolderScreenScaffold(
                     isStorageOverQuota = state.isStorageOverQuota
                 )
 
-                val context = LocalContext.current
+                val resources = LocalResources.current
                 EventEffect(
                     event = state.showSnackbar,
                     onConsumed = { onShowSnackbarConsumed() },
                 ) { stringId ->
                     stringId?.let {
                         scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                            context.getString(stringId)
+                            resources.getString(stringId)
                         )
                     }
                 }
@@ -227,7 +228,7 @@ private fun SyncNewFolderScreenContent(
     snackBarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     var showSyncPermissionBanner by rememberSaveable {
         mutableStateOf(false)
     }
@@ -251,7 +252,7 @@ private fun SyncNewFolderScreenContent(
                     onSelectFolder()
                 }.onFailure {
                     coroutineScope.launch {
-                        snackBarHostState.showAutoDurationSnackbar(context.getString(sharedResR.string.general_no_picker_warning))
+                        snackBarHostState.showAutoDurationSnackbar(resources.getString(sharedResR.string.general_no_picker_warning))
                     }
                 }
             } else {
@@ -373,7 +374,7 @@ private fun SyncNewFolderScreenContent(
                         }.onFailure {
                             coroutineScope.launch {
                                 snackBarHostState.showAutoDurationSnackbar(
-                                    context.getString(
+                                    resources.getString(
                                         sharedResR.string.general_no_picker_warning
                                     )
                                 )
