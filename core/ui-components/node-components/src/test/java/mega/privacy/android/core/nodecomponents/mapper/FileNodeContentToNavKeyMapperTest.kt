@@ -129,7 +129,8 @@ class FileNodeContentToNavKeyMapperTest {
         val expected = LegacyTextEditorNavKey(
             nodeHandle = nodeHandle,
             mode = TextEditorMode.Edit.value,
-            nodeSourceType = expectedViewType
+            nodeSourceType = expectedViewType,
+            isTextEditorComposeEnabled = false
         )
 
         val result = underTest(
@@ -137,6 +138,38 @@ class FileNodeContentToNavKeyMapperTest {
             fileNode = fileNode,
             nodeSourceType = NodeSourceType.CLOUD_DRIVE,
             textEditorMode = TextEditorMode.Edit
+        )
+
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that TextContent maps to LegacyTextEditorNavKey with isTextEditorComposeEnabled true`() {
+        val nodeHandle = 333L
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "test.txt",
+            fileTypeInfo = TextFileTypeInfo("text/plain", "txt")
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.TextContent
+        val expected = LegacyTextEditorNavKey(
+            nodeHandle = nodeHandle,
+            mode = TextEditorMode.View.value,
+            nodeSourceType = expectedViewType,
+            isTextEditorComposeEnabled = true
+        )
+
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            textEditorMode = TextEditorMode.View,
+            isTextEditorComposeEnabled = true
         )
 
         assertThat(result).isEqualTo(expected)

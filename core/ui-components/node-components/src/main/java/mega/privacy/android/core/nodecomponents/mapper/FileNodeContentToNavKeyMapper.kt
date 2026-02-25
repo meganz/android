@@ -30,6 +30,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      * @param textEditorMode The text editor mode (default: View)
      * @param searchedItems The searched items for media player (default: null)
      * @param nodeIds The list of node ids of current screen, e.g. from recents bucket (default: null)
+     * @param isInShare Whether the node is in share (default: false)
+     * @param isTextEditorComposeEnabled Whether to use Compose text editor screen (default: false)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
@@ -41,6 +43,7 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         searchedItems: List<Long>? = null,
         nodeIds: List<Long>? = null,
         isInShare: Boolean = false,
+        isTextEditorComposeEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
         return when (content) {
@@ -62,7 +65,8 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
             is FileNodeContent.TextContent -> LegacyTextEditorNavKey(
                 nodeHandle = fileNode.id.longValue,
                 mode = textEditorMode.value,
-                nodeSourceType = viewType
+                nodeSourceType = viewType,
+                isTextEditorComposeEnabled = isTextEditorComposeEnabled
             )
 
             is FileNodeContent.AudioOrVideo -> LegacyMediaPlayerNavKey(

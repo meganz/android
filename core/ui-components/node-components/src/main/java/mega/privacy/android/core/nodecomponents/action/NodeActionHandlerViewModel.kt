@@ -2,21 +2,18 @@ package mega.privacy.android.core.nodecomponents.action
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.TextFileTypeInfo
-import mega.privacy.android.domain.entity.UrlFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import javax.inject.Inject
 
 /**
@@ -27,16 +24,30 @@ import javax.inject.Inject
 class NodeActionHandlerViewModel @Inject constructor(
     private val getFileNodeContentForFileNodeUseCase: GetFileNodeContentForFileNodeUseCase,
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
+
+    val isTextEditorComposeEnabled: StateFlow<Boolean?>
+        field = MutableStateFlow(null)
+
+    init {
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.TextEditorCompose)
+            }.onSuccess {
+                isTextEditorComposeEnabled.value = it
+            }
+        }
+    }
 
     /**
      * Handle file node clicked
      * Determines the type of content and returns appropriate FileNodeContent
      *
      * @param fileNode The file node to handle
-     * @return FileNodeContent representing the type of content
+     * @return [FileNodeContent] representing the type of content
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) =
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent =
         getFileNodeContentForFileNodeUseCase(fileNode)
 
     /**

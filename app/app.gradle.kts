@@ -210,6 +210,7 @@ dependencies {
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":icon-pack"))
     implementation(project(":feature:sync"))
+    implementation(project(":feature:text-editor:text-editor"))
     implementation(project(":feature:devicecenter"))
     implementation(project(":feature:cloudexplorer"))
     implementation(project(":shared:resources"))

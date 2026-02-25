@@ -2,7 +2,10 @@ package mega.privacy.android.core.nodecomponents.action
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -42,14 +45,15 @@ fun HandleNodeAction3(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenFileContent = { content: FileNodeContent ->
+        onOpenFileContent = { content: FileNodeContent, isTextEditorComposeEnabled: Boolean ->
             fileNodeContentToNavKeyMapper(
                 content = content,
                 fileNode = typedFileNode,
                 nodeSourceType = nodeSourceType,
                 sortOrder = sortOrder,
                 nodeIds = nodeIds,
-                isInShare = isInShare
+                isInShare = isInShare,
+                isTextEditorComposeEnabled = isTextEditorComposeEnabled
             )?.let { navKey ->
                 onNavigate(navKey)
             }

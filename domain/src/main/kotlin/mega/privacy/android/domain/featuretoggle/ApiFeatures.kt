@@ -107,6 +107,17 @@ enum class ApiFeatures(
         description = "Enable Media Revamp phase 2 features",
         defaultValue = false
     ),
+
+    /**
+     * Text editor Compose migration (AND-22552).
+     * When enabled, opens the text editor in the Compose screen (Nav3 + Material 3) instead of the legacy Activity.
+     */
+    TextEditorCompose(
+        experimentName = "andte",
+        description = "Convert the text editor to Compose (Nav3 + Material 3)",
+        singleCheckPerRun = true,
+        defaultValue = false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

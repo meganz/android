@@ -8,6 +8,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -32,7 +34,7 @@ fun BaseHandleNodeAction(
     typedFileNode: TypedFileNode,
     showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
-    onOpenFileContent: (FileNodeContent) -> Unit,
+    onOpenFileContent: (FileNodeContent, Boolean) -> Unit,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
 ) {
     val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
@@ -50,6 +52,13 @@ fun BaseHandleNodeAction(
         }.onSuccess { content ->
             runCatching {
                 when (content) {
+                    is FileNodeContent.TextContent -> {
+                        val isTextEditorComposeEnabled = runCatching {
+                            nodeActionsViewModel.isTextEditorComposeEnabled.first { it != null }
+                        }.getOrDefault(false)
+                        onOpenFileContent(content, isTextEditorComposeEnabled ?: false)
+                    }
+
                     is FileNodeContent.Other -> {
                         content.localFile.let { localFile ->
                             if (localFile == null) {
@@ -68,7 +77,10 @@ fun BaseHandleNodeAction(
                                     applyNodeContentUri = nodeActionsViewModel::applyNodeContentUri
                                 )
                             } else {
-                                onOpenFileContent(FileNodeContent.LocalZipFile(localFile))
+                                onOpenFileContent(
+                                    FileNodeContent.LocalZipFile(localFile),
+                                    false
+                                )
                             }
                         }
                     }
@@ -78,7 +90,7 @@ fun BaseHandleNodeAction(
                     }
 
                     else -> {
-                        onOpenFileContent(content)
+                        onOpenFileContent(content, false)
                     }
                 }
             }.onFailure {
