@@ -168,6 +168,7 @@ interface IconPackInterface {
                 val Home: ImageVector
                 val Image01: ImageVector
                 val Images: ImageVector
+                val ImageX: ImageVector
                 val Info: ImageVector
                 val Key02: ImageVector
                 val Link01: ImageVector

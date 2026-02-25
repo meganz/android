@@ -698,7 +698,7 @@ class AlbumContentViewModelTest {
             whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
             createViewModel()
 
-            underTest.handleAction(AlbumContentSelectionAction.Delete)
+            underTest.handleAction(AlbumContentSelectionAction.RemoveFromAlbum)
 
             verify(removeAlbumsUseCase).invoke(listOf(albumId))
             underTest.state.test {
@@ -736,7 +736,7 @@ class AlbumContentViewModelTest {
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-            underTest.handleAction(AlbumContentSelectionAction.Delete)
+            underTest.handleAction(AlbumContentSelectionAction.RemoveFromAlbum)
 
             underTest.state.test {
                 assertThat(awaitItem().showDeleteAlbumConfirmation).isEqualTo(triggered)
@@ -791,7 +791,7 @@ class AlbumContentViewModelTest {
         Arguments.of(AlbumContentSelectionAction.SelectAlbumCover),
         Arguments.of(AlbumContentSelectionAction.ManageLink),
         Arguments.of(AlbumContentSelectionAction.RemoveLink),
-        Arguments.of(AlbumContentSelectionAction.Delete),
+        Arguments.of(AlbumContentSelectionAction.RemoveFromAlbum),
     )
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
@@ -1243,7 +1243,7 @@ class AlbumContentViewModelTest {
 
             underTest.state.test {
                 val state = awaitItem()
-                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.Delete)
+                assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.RemoveFromAlbum)
                 assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.RemoveFavourites)
             }
         }
@@ -1277,7 +1277,7 @@ class AlbumContentViewModelTest {
                 val state = awaitItem()
                 assertThat(state.uiAlbum?.mediaAlbum).isEqualTo(mockSystemAlbum)
                 assertThat(state.visibleBottomBarActions).contains(AlbumContentSelectionAction.RemoveFavourites)
-                assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.Delete)
+                assertThat(state.visibleBottomBarActions).doesNotContain(AlbumContentSelectionAction.RemoveFromAlbum)
             }
         }
 

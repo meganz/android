@@ -398,7 +398,7 @@ internal fun AlbumContentScreen(
                 actions = uiState.visibleBottomBarActions,
                 onActionPressed = {
                     when (it) {
-                        is AlbumContentSelectionAction.Delete -> {
+                        is AlbumContentSelectionAction.RemoveFromAlbum -> {
                             Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                             showDeletePhotosConfirmation = true
                         }
@@ -584,7 +584,7 @@ internal fun AlbumContentScreen(
                         add(AlbumContentSelectionAction.ShareLink)
                     }
                 }
-                add(AlbumContentSelectionAction.Delete)
+                add(AlbumContentSelectionAction.RemoveFromAlbum)
             }
         )
 
