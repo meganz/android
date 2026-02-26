@@ -194,6 +194,7 @@ interface AppNavigator {
         collectionTitle: String? = null,
         collectionId: Long? = null,
         enableAddToAlbum: Boolean? = null,
+        serializedData: String? = null,
     )
 
     /**

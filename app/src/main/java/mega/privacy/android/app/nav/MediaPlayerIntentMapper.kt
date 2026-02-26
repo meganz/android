@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.VideoPlayerComposeActivity
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -60,6 +61,7 @@ class MediaPlayerIntentMapper @Inject constructor(
         collectionTitle: String? = null,
         collectionId: Long? = null,
         enableAddToAlbum: Boolean = false,
+        serializedData: String? = null,
     ): Intent {
         val intent = getIntent(context, fileTypeInfo).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
@@ -97,6 +99,9 @@ class MediaPlayerIntentMapper @Inject constructor(
             }
             collectionId?.let {
                 putExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, it)
+            }
+            serializedData?.let {
+                putExtra(EXTRA_SERIALIZE_STRING, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)

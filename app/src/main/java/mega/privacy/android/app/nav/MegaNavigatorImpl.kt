@@ -370,6 +370,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         collectionTitle: String?,
         collectionId: Long?,
         enableAddToAlbum: Boolean?,
+        serializedData: String?,
     ) {
         val intent = mediaPlayerIntentMapper(
             context = context,
@@ -392,6 +393,7 @@ internal class MegaNavigatorImpl @Inject constructor(
                     NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER,
                 )
             },
+            serializedData = serializedData,
         )
         context.startActivity(intent)
     }
