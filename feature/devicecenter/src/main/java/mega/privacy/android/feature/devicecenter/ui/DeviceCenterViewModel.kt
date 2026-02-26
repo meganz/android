@@ -18,10 +18,12 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
+import mega.privacy.android.feature.devicecenter.domain.usecase.folder.RemoveDeviceFolderConnectionUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterViewModel.Companion.GET_DEVICES_REFRESH_INTERVAL
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -37,6 +39,7 @@ import javax.inject.Inject
  * @property isCameraUploadsEnabledUseCase [IsCameraUploadsEnabledUseCase]
  * @property deviceUINodeListMapper [DeviceUINodeListMapper]
  * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
+ * @property removeDeviceFolderConnectionUseCase [RemoveDeviceFolderConnectionUseCase]
  */
 @HiltViewModel
 internal class DeviceCenterViewModel @Inject constructor(
@@ -44,6 +47,7 @@ internal class DeviceCenterViewModel @Inject constructor(
     private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
     private val deviceUINodeListMapper: DeviceUINodeListMapper,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val removeDeviceFolderConnectionUseCase: RemoveDeviceFolderConnectionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(DeviceCenterUiState())
@@ -141,7 +145,10 @@ internal class DeviceCenterViewModel @Inject constructor(
      */
     fun handleBackPress() {
         _state.update {
-            it.copy(menuClickedDevice = null)
+            it.copy(
+                menuClickedDevice = null,
+                menuClickedFolder = null
+            )
         }
         resetSearchState()
         if (_state.value.deviceToRename != null) {
@@ -170,7 +177,25 @@ internal class DeviceCenterViewModel @Inject constructor(
      * @param menuClickedDevice The [DeviceUINode] whose Context Menu is clicked
      */
     fun setMenuClickedDevice(menuClickedDevice: DeviceUINode) =
-        _state.update { it.copy(menuClickedDevice = menuClickedDevice) }
+        _state.update {
+            it.copy(
+                menuClickedDevice = menuClickedDevice,
+                menuClickedFolder = null
+            )
+        }
+
+    /**
+     * Updates the value of [DeviceCenterUiState.menuClickedFolder]
+     *
+     * @param menuClickedFolder The [DeviceFolderUINode] whose Context Menu is clicked
+     */
+    fun setMenuClickedFolder(menuClickedFolder: DeviceFolderUINode) =
+        _state.update {
+            it.copy(
+                menuClickedFolder = menuClickedFolder,
+                menuClickedDevice = null
+            )
+        }
 
     /**
      * Updates the value of [DeviceCenterUiState.deviceToRename]
@@ -202,6 +227,35 @@ internal class DeviceCenterViewModel @Inject constructor(
      */
     fun resetRenameDeviceSuccessEvent() =
         _state.update { it.copy(renameDeviceSuccess = consumed) }
+
+    /**
+     * Invoke the use case to remove the folder connection
+     *
+     * @param folder The [DeviceFolderUINode] to remove
+     */
+    fun removeFolderConnection(folder: DeviceFolderUINode) {
+        viewModelScope.launch {
+            runCatching {
+                removeDeviceFolderConnectionUseCase(folder.id.toLong())
+                _state.update { it.copy(removeFolderConnectionSuccess = triggered) }
+                getBackupInfo()
+                // Reset the selected device if the folder was removed from the currently selected device
+                _state.value.selectedDevice?.let { selectedDevice ->
+                    if (selectedDevice.folders.any { it.id == folder.id }) {
+                        showDeviceFolders(selectedDevice)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+    }
+
+    /**
+     * Acknowledges that [DeviceCenterUiState.removeFolderConnectionSuccess] has been triggered
+     */
+    fun resetRemoveFolderConnectionSuccess() =
+        _state.update { it.copy(removeFolderConnectionSuccess = consumed) }
 
     fun onSearchQueryChanged(query: String) {
         _state.update { it.copy(searchQuery = query) }

@@ -5,7 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -13,6 +13,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.entity.DeviceNode
 import mega.privacy.android.feature.devicecenter.domain.entity.OwnDeviceNode
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
+import mega.privacy.android.feature.devicecenter.domain.usecase.folder.RemoveDeviceFolderConnectionUseCase
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
@@ -29,6 +30,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 /**
@@ -43,14 +45,16 @@ internal class DeviceCenterViewModelTest {
     private val getDevicesUseCase = mock<GetDevicesUseCase>()
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val deviceUINodeListMapper = mock<DeviceUINodeListMapper>()
+    private val removeDeviceFolderConnectionUseCase = mock<RemoveDeviceFolderConnectionUseCase>()
 
+    private val monitorConnectivityFlow = MutableSharedFlow<Boolean>(replay = 1)
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        onBlocking { invoke() } doReturn monitorConnectivityFlow
     }
 
     private val isCameraUploadsEnabled = true
     private val ownDeviceFolderUINode = NonBackupDeviceFolderUINode(
-        id = "ABCD-EFGH",
+        id = "123456",
         name = "Camera uploads",
         icon = FolderIconType.CameraUploads,
         status = DeviceCenterUINodeStatus.UpToDate,
@@ -71,6 +75,7 @@ internal class DeviceCenterViewModelTest {
             getDevicesUseCase,
             isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper,
+            removeDeviceFolderConnectionUseCase,
         )
 
         underTest = DeviceCenterViewModel(
@@ -78,6 +83,7 @@ internal class DeviceCenterViewModelTest {
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             deviceUINodeListMapper = deviceUINodeListMapper,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
+            removeDeviceFolderConnectionUseCase = removeDeviceFolderConnectionUseCase,
         )
     }
 
@@ -449,5 +455,126 @@ internal class DeviceCenterViewModelTest {
         underTest.onSearchClicked()
 
         assertThat(underTest.state.value.searchWidgetState).isEqualTo(SearchWidgetState.EXPANDED)
+    }
+
+    @Test
+    fun `test that the folder context menu is hidden when a back press event occurs`() = runTest {
+        setupDefaultMocks()
+        underTest.setMenuClickedFolder(ownDeviceFolderUINode)
+        underTest.handleBackPress()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.menuClickedFolder).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the network connectivity state is updated`() = runTest {
+
+        underTest.state.test {
+            var state = awaitItem()
+            assertThat(state.isNetworkConnected).isFalse()
+
+            monitorConnectivityFlow.emit(true)
+            state = awaitItem()
+            assertThat(state.isNetworkConnected).isTrue()
+
+            monitorConnectivityFlow.emit(false)
+            state = awaitItem()
+            assertThat(state.isNetworkConnected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that shouldNavigateToSyncs returns true for OwnDeviceUINode`() {
+        val result = underTest.shouldNavigateToSyncs(ownDeviceUINode)
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that shouldNavigateToSyncs returns false for other DeviceUINode`() {
+        val otherDeviceUINode = mock<DeviceUINode>()
+        val result = underTest.shouldNavigateToSyncs(otherDeviceUINode)
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `test that the folder context menu is selected`() = runTest {
+        underTest.setMenuClickedFolder(ownDeviceFolderUINode)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.menuClickedFolder).isEqualTo(ownDeviceFolderUINode)
+            assertThat(state.menuClickedDevice).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the folder connection is removed successfully`() = runTest {
+        setupDefaultMocks()
+        underTest.getBackupInfo()
+        underTest.showDeviceFolders(ownDeviceUINode)
+
+        underTest.removeFolderConnection(ownDeviceFolderUINode)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.removeFolderConnectionSuccess).isEqualTo(triggered)
+            verify(removeDeviceFolderConnectionUseCase).invoke(ownDeviceFolderUINode.id.toLong())
+        }
+    }
+
+    @Test
+    fun `test that the remove folder connection success event is consumed`() = runTest {
+        underTest.resetRemoveFolderConnectionSuccess()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.removeFolderConnectionSuccess).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that the info selected item is updated`() = runTest {
+        underTest.onInfoClicked(ownDeviceUINode)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.infoSelectedItem).isEqualTo(ownDeviceUINode)
+        }
+    }
+
+    @Test
+    fun `test that the info selected item is reset on back press`() = runTest {
+        underTest.onInfoClicked(ownDeviceUINode)
+        underTest.onInfoBackPressHandle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.infoSelectedItem).isNull()
+        }
+    }
+
+    @Test
+    fun `test that the refresh backup info prompt flow emits periodically`() = runTest {
+        underTest.refreshBackupInfoPromptFlow.test {
+            awaitItem() // Initial emission
+            // Advance time to skip the delay (30 seconds)
+            testScheduler.advanceTimeBy(30_000 + 1)
+            awaitItem() // Second emission after 30 seconds
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the exit feature event is reset`() = runTest {
+
+        underTest.resetExitFeature()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.exitFeature).isEqualTo(consumed)
+        }
     }
 }
