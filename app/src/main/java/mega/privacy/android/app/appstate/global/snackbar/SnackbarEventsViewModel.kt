@@ -1,4 +1,4 @@
-package mega.privacy.android.app.appstate.global
+package mega.privacy.android.app.appstate.global.snackbar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueueReceiver
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,8 +25,9 @@ class SnackbarEventsViewModel @Inject constructor(
 ) : ViewModel() {
     private val snackbarEventConsumedSignal =
         MutableSharedFlow<StateEventWithContentConsumed>()
+    private val snackbarSequenceId = AtomicLong(0)
 
-    val snackbarEventState: StateFlow<StateEventWithContent<SnackbarAttributes>> by lazy {
+    internal val snackbarEventState: StateFlow<StateEventWithContent<SnackbarEvent>> by lazy {
         merge(
             monitorEventQueue(),
             snackbarEventConsumedSignal
@@ -39,7 +40,14 @@ class SnackbarEventsViewModel @Inject constructor(
 
     private fun monitorEventQueue() = flow {
         for (event in snackbarEventQueueReceiver.eventQueue) {
-            emit(triggered(event))
+            emit(
+                triggered(
+                    content = SnackbarEvent(
+                        attributes = event,
+                        uniqueId = snackbarSequenceId.getAndIncrement()
+                    )
+                )
+            )
             awaitEventConsumed()
         }
     }

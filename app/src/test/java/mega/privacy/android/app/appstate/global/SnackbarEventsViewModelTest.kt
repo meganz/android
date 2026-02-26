@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.global
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -9,6 +10,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEvent
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueueReceiver
 import org.junit.jupiter.api.Test
@@ -40,7 +43,8 @@ class SnackbarEventsViewModelTest {
         testChannel.send(attributes)
 
         underTest.snackbarEventState.test {
-            assertThat(awaitItem()).isEqualTo(triggered(attributes))
+            val event = awaitItem()
+            assertThat(event).isEqualTo(triggered(SnackbarEvent(attributes, 0)))
         }
     }
 
@@ -60,12 +64,12 @@ class SnackbarEventsViewModelTest {
 
             // First event should be triggered
             val eventState1 = awaitItem()
-            assertThat(eventState1).isEqualTo(triggered(attributes1))
+            assertThat(eventState1).isEqualTo(triggered(SnackbarEvent(attributes1, 0)))
 
             underTest.consumeEvent()
 
             // Second event should be triggered after consuming the first
-            assertThat(awaitItem()).isEqualTo(triggered(attributes2))
+            assertThat(awaitItem()).isEqualTo(triggered(SnackbarEvent(attributes2, 1)))
 
             // After consuming the second, state should be consumed
             underTest.consumeEvent()
@@ -83,7 +87,7 @@ class SnackbarEventsViewModelTest {
             assertThat(awaitItem()).isEqualTo(consumed())
 
             testChannel.send(attributes)
-            assertThat(awaitItem()).isEqualTo(triggered(attributes))
+            assertThat(awaitItem()).isEqualTo(triggered(SnackbarEvent(attributes, 0)))
 
             underTest.consumeEvent()
             assertThat(awaitItem()).isEqualTo(consumed())
@@ -91,36 +95,36 @@ class SnackbarEventsViewModelTest {
     }
 
     @Test
-    fun `test that next event should suspend when waiting for consumption`() = runTest {
-        init()
+    fun `test that next event should suspend when waiting for consumption and incremented`() =
+        runTest {
+            init()
 
-        val attributes1 = SnackbarAttributes("First message")
-        val attributes2 = SnackbarAttributes("Second message")
+            val attributes1 = SnackbarAttributes("First message")
+            val attributes2 = SnackbarAttributes("Second message")
 
-        underTest.snackbarEventState.test {
-            testChannel.send(attributes1)
-            testChannel.send(attributes2)
+            underTest.snackbarEventState.test {
+                testChannel.send(attributes1)
+                testChannel.send(attributes2)
 
-            assertThat(awaitItem()).isEqualTo(consumed())
+                assertThat(awaitItem()).isEqualTo(consumed())
 
-            // First event should be triggered
-            val eventState1 = awaitItem()
-            assertThat(eventState1).isEqualTo(triggered(attributes1))
+                // First event should be triggered
+                val eventState1 = awaitItem()
+                assertThat(eventState1).isEqualTo(triggered(SnackbarEvent(attributes1, 0)))
 
-            // Not consuming the first event yet, so the second should not be processed
-            expectNoEvents()
+                // Not consuming the first event yet, so the second should not be processed
+                expectNoEvents()
 
-            underTest.consumeEvent()
+                underTest.consumeEvent()
 
-            advanceUntilIdle()
+                advanceUntilIdle()
 
-            val eventState2 = awaitItem()
-            assertThat(eventState2).isEqualTo(triggered(attributes2))
+                val eventState2 = awaitItem()
+                assertThat(eventState2).isEqualTo(triggered(SnackbarEvent(attributes2, 1)))
 
-            underTest.consumeEvent()
-            assertThat(awaitItem()).isEqualTo(consumed())
-
+                underTest.consumeEvent()
+                assertThat(awaitItem()).isEqualTo(consumed())
+            }
         }
-    }
 }
 

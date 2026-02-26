@@ -117,6 +117,7 @@ fun OfflineScreen(
         onSearch = viewModel::setSearchQuery,
         consumeOpenFolderEvent = viewModel::onOpenFolderInPageEventConsumed,
         consumeOpenFileEvent = viewModel::onOpenOfflineNodeEventConsumed,
+        consumeRemoveEvent = viewModel::consumeRemoveNodesEvent,
         shareOfflineFiles = { files ->
             actionViewModel.handleShareOfflineNodes(
                 nodes = files,

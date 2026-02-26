@@ -36,7 +36,7 @@ sealed interface OfflineSelectionAction {
     data object Delete : MenuActionWithIcon {
         @Composable
         override fun getIconPainter(): Painter =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.X)
 
         override val testTag: String = "offline_selection_action:delete"
 
