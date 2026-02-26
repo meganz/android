@@ -62,10 +62,10 @@ import mega.privacy.android.app.appstate.content.navigation.rememberPendingBackS
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
 import mega.privacy.android.app.appstate.content.transfer.TransferHandlerImpl
 import mega.privacy.android.app.appstate.global.GlobalStateViewModel
-import mega.privacy.android.app.appstate.global.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.event.QueueEventViewModel
 import mega.privacy.android.app.appstate.global.model.GlobalState
 import mega.privacy.android.app.appstate.global.model.RootNodeState
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.middlelayer.inappupdate.InAppUpdateHandler
 import mega.privacy.android.app.presence.SignalPresenceViewModel
@@ -396,7 +396,7 @@ class MegaActivity : FragmentActivity() {
                                 EventEffect(
                                     event = snackbarEventsState,
                                     onConsumed = snackbarEventsViewModel::consumeEvent,
-                                    action = { snackbarHostState.show(it) }
+                                    action = { snackbarHostState.show(it.attributes) }
                                 )
 
 

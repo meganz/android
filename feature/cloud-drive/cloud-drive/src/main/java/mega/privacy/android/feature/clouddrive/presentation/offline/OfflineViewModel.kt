@@ -386,6 +386,10 @@ class OfflineViewModel @AssistedInject constructor(
         }
     }
 
+    fun consumeRemoveNodesEvent() {
+        _uiState.update { it.copy(removeNodesSuccessEvent = consumed()) }
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(navKey: OfflineNavKey): OfflineViewModel
