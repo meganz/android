@@ -284,9 +284,8 @@ internal fun TransfersView(
             )
         } else {
             MegaCollapsibleTabRow(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = paddingValues,
                 beyondViewportPageCount = 1,
                 hideTabs = isInSelectTransfersMode,
                 pagerScrollEnabled = false,
