@@ -180,7 +180,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     internal fun showUpdateVideoPlaylistDialog() {
         videoPlaylistEditState.update {
             it.copy(
-                showUpdateVideoPlaylistDialog = true
+                showUpdateVideoPlaylist = true
             )
         }
     }
@@ -188,7 +188,7 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     internal fun resetUpdateVideoPlaylistDialogEvent() {
         videoPlaylistEditState.update {
             it.copy(
-                showUpdateVideoPlaylistDialog = false
+                showUpdateVideoPlaylist = false
             )
         }
     }

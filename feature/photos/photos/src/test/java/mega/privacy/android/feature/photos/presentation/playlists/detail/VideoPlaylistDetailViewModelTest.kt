@@ -448,13 +448,13 @@ class VideoPlaylistDetailViewModelTest {
     @Test
     fun `test that resetUpdateVideoPlaylistDialogEvent updated correctly`() = runTest {
         underTest.videoPlaylistEditState.test {
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isFalse()
 
             underTest.showUpdateVideoPlaylistDialog()
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isTrue()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isTrue()
 
             underTest.resetUpdateVideoPlaylistDialogEvent()
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }

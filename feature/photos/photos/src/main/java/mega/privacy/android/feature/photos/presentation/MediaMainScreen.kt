@@ -360,6 +360,7 @@ fun MediaMainScreen(
     onTimelineFilterVisibilityChange: (shouldShow: Boolean) -> Unit,
     viewModel: MediaMainViewModel = hiltViewModel(),
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
+    videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -417,8 +418,15 @@ fun MediaMainScreen(
         floatingActionButton = {
             AddContentFab(
                 modifier = Modifier.testTag(MEDIA_ALBUMS_FAB_TAG),
-                visible = currentTabIndex == MediaScreen.Albums.ordinal && selectionModeType == MediaSelectionModeType.None,
-                onClick = viewModel::showNewAlbumDialog
+                visible = (currentTabIndex == MediaScreen.Albums.ordinal || currentTabIndex == MediaScreen.Playlists.ordinal)
+                        && selectionModeType == MediaSelectionModeType.None,
+                onClick = {
+                    if (currentTabIndex == MediaScreen.Albums.ordinal) {
+                        viewModel.showNewAlbumDialog()
+                    } else {
+                        videoPlaylistsTabViewModel.showCreateVideoPlaylistDialog()
+                    }
+                }
             )
         },
         topBar = {

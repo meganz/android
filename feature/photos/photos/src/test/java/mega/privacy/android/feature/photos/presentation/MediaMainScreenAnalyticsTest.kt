@@ -174,6 +174,7 @@ class MediaMainScreenAnalyticsTest {
                     albumsTabViewModel = albumsTabViewModel,
                     showTimelineFilter = false,
                     onTimelineFilterVisibilityChange = {},
+                    videoPlaylistsTabViewModel = mock(),
                     handleNotificationPermissionResult = {}
                 )
             }

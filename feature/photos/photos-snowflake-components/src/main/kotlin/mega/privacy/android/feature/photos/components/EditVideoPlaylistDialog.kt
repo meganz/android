@@ -21,8 +21,8 @@ fun EditVideoPlaylistDialog(
     resetErrorMessage: () -> Unit,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
-    initialInputText: String,
-    inputPlaceHolderText: String = "",
+    initialInputText: String = "",
+    inputPlaceHolderText: () -> String = { "" },
     errorText: String? = null,
 ) {
     var playlistInput by rememberSaveable(
@@ -37,10 +37,12 @@ fun EditVideoPlaylistDialog(
         positiveButtonText = positiveButtonText,
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         inputValue = playlistInput,
-        placeholder = inputPlaceHolderText,
+        placeholder = inputPlaceHolderText(),
         onPositiveButtonClicked = {
             resetErrorMessage()
-            onConfirm(handle, playlistInput.text)
+            val finalTitle = playlistInput.text.trim().ifBlank { inputPlaceHolderText().trim() }
+            onConfirm(handle, finalTitle)
+
         },
         onNegativeButtonClicked = {
             resetErrorMessage()

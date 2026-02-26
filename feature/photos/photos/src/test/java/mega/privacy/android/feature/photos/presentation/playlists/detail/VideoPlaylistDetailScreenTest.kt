@@ -178,7 +178,7 @@ class VideoPlaylistDetailScreenTest {
     fun `test that RenameVideoPlaylistDialog is displayed when showUpdateVideoPlaylistDialog is true`() {
         setComposeContent(
             videoPlaylistEditState = VideoPlaylistEditState(
-                showUpdateVideoPlaylistDialog = true
+                showUpdateVideoPlaylist = true
             )
         )
 

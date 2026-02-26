@@ -2292,6 +2292,8 @@
     <string name="general_install_label">Install</string>
     <!-- Message to user when app update is downloaded -->
     <string name="general_app_update_download_success_message">App update downloaded</string>
+    <!-- Placeholder to display when creating a New video playlist. If no title is entered, the placeholder will become the video playlist title -->
+    <string name="create_new_video_playlist_input_title_placeholder">New playlist</string>
     <!-- Label for First Name -->
     <string name="general_first_name">First name</string>
     <!-- Label for Last name -->

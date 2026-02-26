@@ -33,6 +33,7 @@ import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoPlaylistItemView
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
@@ -68,12 +69,22 @@ fun VideoPlaylistsTabRoute(
         onDeleteButtonClicked = viewModel::removeVideoPlaylists,
         onRemovedDialogDismiss = dismissVideoPlaylistRemovedDialog,
         showRenameVideoPlaylistDialog = viewModel::showUpdateVideoPlaylistDialog,
+        createVideoPlaylist = viewModel::createNewPlaylist,
         updatedVideoPlaylistTitle = viewModel::updateVideoPlaylistTitle,
         resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
-        resetShowRenameVideoPlaylistDialog = viewModel::resetUpdateVideoPlaylistDialogEvent,
-        resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
-        onNavigateToDetail = {
-            navigateToVideoPlaylistDetail(VideoPlaylistDetailNavKey(it.id.longValue, it.type))
+        resetShowCreateVideoPlaylistDialog = viewModel::resetShowCreateVideoPlaylist,
+        resetShowRenameVideoPlaylistDialog = viewModel::resetShowUpdateVideoPlaylist,
+        resetUpdateTitleSuccessEvent = {
+            viewModel.resetUpdateTitleSuccessEvent()
+            viewModel.resetShowUpdateVideoPlaylist()
+        },
+        resetCreateVideoPlaylistSuccessEvent = {
+            viewModel.resetCreateVideoPlaylistSuccessEvent()
+            viewModel.resetShowCreateVideoPlaylist()
+        },
+        getPresetNewVideoPlaylistTitle = viewModel::getPresetNewVideoPlaylistTitle,
+        onNavigateToDetail = { handle, type ->
+            navigateToVideoPlaylistDetail(VideoPlaylistDetailNavKey(handle, type))
         }
     )
 }
@@ -93,11 +104,15 @@ internal fun VideoPlaylistsTabScreen(
     onRemovedDialogDismiss: () -> Unit = {},
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
     showRenameVideoPlaylistDialog: () -> Unit = {},
+    createVideoPlaylist: (String) -> Unit = {},
     updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
     resetErrorMessage: () -> Unit = {},
     resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+    resetShowCreateVideoPlaylistDialog: () -> Unit = {},
+    resetCreateVideoPlaylistSuccessEvent: () -> Unit = {},
     resetUpdateTitleSuccessEvent: () -> Unit = {},
-    onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit,
+    getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
+    onNavigateToDetail: (Long, PlaylistType) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     val context = LocalContext.current
@@ -148,10 +163,41 @@ internal fun VideoPlaylistsTabScreen(
                 event = videoPlaylistEditState.updateTitleSuccessEvent,
                 onConsumed = resetUpdateTitleSuccessEvent,
                 action = {
-                    resetShowRenameVideoPlaylistDialog()
                     selectedVideoPlaylist = null
                 }
             )
+
+            EventEffect(
+                event = videoPlaylistEditState.createVideoPlaylistSuccessEvent,
+                onConsumed = resetCreateVideoPlaylistSuccessEvent,
+                action = {
+                    onNavigateToDetail(it.id.longValue, PlaylistType.User)
+                }
+            )
+
+            if (videoPlaylistEditState.showCreateVideoPlaylist) {
+                val defaultVideoPlaylistTitle =
+                    stringResource(sharedR.string.create_new_video_playlist_input_title_placeholder)
+                EditVideoPlaylistDialog(
+                    modifier = Modifier.testTag(
+                        VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG
+                    ),
+                    handle = -1L,
+                    title = stringResource(id = sharedR.string.video_section_playlists_create_playlist_dialog_title),
+                    positiveButtonText = stringResource(id = sharedR.string.general_create_label),
+                    onConfirm = { _, title ->
+                        createVideoPlaylist(title)
+                    },
+                    resetErrorMessage = resetErrorMessage,
+                    onDismiss = {
+                        resetShowCreateVideoPlaylistDialog()
+                    },
+                    inputPlaceHolderText = {
+                        getPresetNewVideoPlaylistTitle(defaultVideoPlaylistTitle)
+                    },
+                    errorText = videoPlaylistEditState.editVideoPlaylistErrorMessage,
+                )
+            }
 
             if (uiState.videoPlaylistEntities.isEmpty()) {
                 MegaEmptyView(
@@ -167,6 +213,7 @@ internal fun VideoPlaylistsTabScreen(
                     state = lazyListState,
                     totalItems = items.size,
                     modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG),
+                    contentPadding = PaddingValues(bottom = 100.dp),
                 ) {
                     item(key = "header") {
                         NodeHeaderItem(
@@ -198,7 +245,10 @@ internal fun VideoPlaylistsTabScreen(
                             isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
                             onClick = {
                                 if (uiState.selectedPlaylists.isEmpty()) {
-                                    onNavigateToDetail(videoPlaylistItem)
+                                    onNavigateToDetail(
+                                        videoPlaylistItem.id.longValue,
+                                        videoPlaylistItem.type,
+                                    )
                                 } else {
                                     onClick(videoPlaylistItem)
                                 }
@@ -280,7 +330,7 @@ internal fun VideoPlaylistsTabScreen(
                     )
                 }
 
-                if (videoPlaylistEditState.showUpdateVideoPlaylistDialog) {
+                if (videoPlaylistEditState.showUpdateVideoPlaylist) {
                     EditVideoPlaylistDialog(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
@@ -359,3 +409,11 @@ const val VIDEO_PLAYLISTS_TAB_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
  */
 const val VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlists_tab:dialog_rename_video_playlist"
+
+
+/**
+ * Test tag for CreateVideoPlaylistDialog
+ */
+const val VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+    "video_playlists_tab:dialog_create_video_playlist"
+

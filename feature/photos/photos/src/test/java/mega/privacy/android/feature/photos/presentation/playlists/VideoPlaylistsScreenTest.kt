@@ -10,6 +10,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Rule
@@ -37,11 +38,15 @@ class VideoPlaylistsScreenTest {
         onRemovedDialogDismiss: () -> Unit = {},
         snackBarQueue: SnackbarEventQueue = mock(),
         showRenameVideoPlaylistDialog: () -> Unit = {},
+        createVideoPlaylist: (String) -> Unit = {},
         updatedVideoPlaylistTitle: (NodeId, String) -> Unit = { _, _ -> },
         resetErrorMessage: () -> Unit = {},
         resetShowRenameVideoPlaylistDialog: () -> Unit = {},
+        resetShowCreateVideoPlaylistDialog: () -> Unit = {},
+        resetCreateVideoPlaylistSuccessEvent: () -> Unit = {},
         resetUpdateTitleSuccessEvent: () -> Unit = {},
-        onNavigateToDetail: (VideoPlaylistUiEntity) -> Unit = {},
+        getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
+        onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
@@ -57,10 +62,14 @@ class VideoPlaylistsScreenTest {
                 onRemovedDialogDismiss = onRemovedDialogDismiss,
                 snackBarQueue = snackBarQueue,
                 showRenameVideoPlaylistDialog = showRenameVideoPlaylistDialog,
+                createVideoPlaylist = createVideoPlaylist,
                 updatedVideoPlaylistTitle = updatedVideoPlaylistTitle,
                 resetErrorMessage = resetErrorMessage,
                 resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+                resetShowCreateVideoPlaylistDialog = resetShowCreateVideoPlaylistDialog,
+                resetCreateVideoPlaylistSuccessEvent = resetCreateVideoPlaylistSuccessEvent,
                 resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
+                getPresetNewVideoPlaylistTitle = getPresetNewVideoPlaylistTitle,
                 onNavigateToDetail = onNavigateToDetail
             )
         }
@@ -155,7 +164,7 @@ class VideoPlaylistsScreenTest {
                 videoPlaylistEntities = listOf(video)
             ),
             videoPlaylistEditState = VideoPlaylistEditState(
-                showUpdateVideoPlaylistDialog = true
+                showUpdateVideoPlaylist = true
             )
         )
 
@@ -168,11 +177,28 @@ class VideoPlaylistsScreenTest {
         setComposeContent(
             uiState = VideoPlaylistsTabUiState.Data(
                 videoPlaylistEntities = listOf(video)
-            ),
-            videoPlaylistEditState = VideoPlaylistEditState()
+            )
         )
 
         VIDEO_PLAYLISTS_TAB_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that CreateVideoPlaylistDialog is displayed when showCreateVideoPlaylistDialog is true`() {
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                showCreateVideoPlaylist = true
+            )
+        )
+
+        VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that CreateVideoPlaylistDialog is not displayed when showCreateVideoPlaylistDialog is false`() {
+        setComposeContent()
+
+        VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
     }
 
     private fun String.assertIsDisplayedWithTag() =

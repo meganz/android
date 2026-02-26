@@ -29,6 +29,8 @@ import mega.privacy.android.domain.exception.account.PlaylistNameValidationExcep
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
@@ -71,6 +73,8 @@ class VideoPlaylistsTabViewModelTest {
     private val videoPlaylistTitleValidationErrorMessageMapper =
         mock<VideoPlaylistTitleValidationErrorMessageMapper>()
     private val updateVideoPlaylistTitleUseCase = mock<UpdateVideoPlaylistTitleUseCase>()
+    private val createVideoPlaylistUseCase = mock<CreateVideoPlaylistUseCase>()
+    private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
 
     private val expectedId = NodeId(1L)
     private val expectedPlaylist = VideoPlaylistUiEntity(
@@ -101,6 +105,8 @@ class VideoPlaylistsTabViewModelTest {
             removeVideoPlaylistsUseCase = removeVideoPlaylistsUseCase,
             videoPlaylistTitleValidationErrorMessageMapper = videoPlaylistTitleValidationErrorMessageMapper,
             updateVideoPlaylistTitleUseCase = updateVideoPlaylistTitleUseCase,
+            createVideoPlaylistUseCase = createVideoPlaylistUseCase,
+            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
         )
     }
 
@@ -115,7 +121,9 @@ class VideoPlaylistsTabViewModelTest {
             monitorSortCloudOrderUseCase,
             removeVideoPlaylistsUseCase,
             videoPlaylistTitleValidationErrorMessageMapper,
-            updateVideoPlaylistTitleUseCase
+            updateVideoPlaylistTitleUseCase,
+            createVideoPlaylistUseCase,
+            getNextDefaultAlbumNameUseCase
         )
     }
 
@@ -543,18 +551,161 @@ class VideoPlaylistsTabViewModelTest {
     }
 
     @Test
-    fun `test that resetUpdateVideoPlaylistDialogEvent updated correctly`() = runTest {
+    fun `test that showUpdateVideoPlaylist updated correctly`() = runTest {
         underTest.videoPlaylistEditState.test {
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isFalse()
 
             underTest.showUpdateVideoPlaylistDialog()
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isTrue()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isTrue()
 
-            underTest.resetUpdateVideoPlaylistDialogEvent()
-            assertThat(awaitItem().showUpdateVideoPlaylistDialog).isFalse()
+            underTest.resetShowUpdateVideoPlaylist()
+            assertThat(awaitItem().showUpdateVideoPlaylist).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that showCreateVideoPlaylistDialog sets showCreateVideoPlaylist to true`() =
+        runTest {
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().showCreateVideoPlaylist).isFalse()
+
+                underTest.showCreateVideoPlaylistDialog()
+                assertThat(awaitItem().showCreateVideoPlaylist).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetShowCreateVideoPlaylist sets showCreateVideoPlaylist to false`() =
+        runTest {
+            underTest.showCreateVideoPlaylistDialog()
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().showCreateVideoPlaylist).isTrue()
+
+                underTest.resetShowCreateVideoPlaylist()
+                assertThat(awaitItem().showCreateVideoPlaylist).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that getPresetNewVideoPlaylistTitle returns result from getNextDefaultAlbumNameUseCase`() =
+        runTest {
+            val placeholderTitle = "New playlist"
+            val expectedTitle = "New playlist (1)"
+            stubInitialValues()
+            val currentNames = listOf(expectedPlaylist.title, expectedPlaylist.title)
+            whenever(
+                getNextDefaultAlbumNameUseCase(
+                    defaultName = placeholderTitle,
+                    currentNames = currentNames
+                )
+            ).thenReturn(expectedTitle)
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            val result = underTest.getPresetNewVideoPlaylistTitle(placeholderTitle)
+
+            assertThat(result).isEqualTo(expectedTitle)
+            verify(getNextDefaultAlbumNameUseCase).invoke(
+                defaultName = placeholderTitle,
+                currentNames = currentNames
+            )
+        }
+
+    @Test
+    fun `test that getPresetNewVideoPlaylistTitle returns empty string when use case throws`() =
+        runTest {
+            stubInitialValues()
+            whenever(getNextDefaultAlbumNameUseCase(any(), any())).thenThrow(
+                RuntimeException("test")
+            )
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            val result = underTest.getPresetNewVideoPlaylistTitle("New playlist")
+
+            assertThat(result).isEmpty()
+        }
+
+    @Test
+    fun `test that createNewPlaylist invokes use case and triggers success event on UserVideoPlaylist`() =
+        runTest {
+            val title = " My New Playlist "
+            val trimmedTitle = "My New Playlist"
+            val createdPlaylist = createVideoPlaylist(expectedPlaylist)
+            stubInitialValues()
+            whenever(createVideoPlaylistUseCase(trimmedTitle)).thenReturn(createdPlaylist)
+
+            underTest.createNewPlaylist(title)
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                val actual = awaitItem()
+                assertThat(actual.createVideoPlaylistSuccessEvent).isEqualTo(
+                    triggered(createdPlaylist)
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(createVideoPlaylistUseCase).invoke(trimmedTitle)
+        }
+
+    @Test
+    fun `test that createNewPlaylist sets error message when PlaylistNameValidationException is thrown`() =
+        runTest {
+            val title = "Duplicate"
+            val errorMessage = "Playlist already exists"
+            whenever(createVideoPlaylistUseCase(any())).thenAnswer {
+                throw PlaylistNameValidationException.Exists
+            }
+            whenever(
+                videoPlaylistTitleValidationErrorMessageMapper(
+                    PlaylistNameValidationException.Exists
+                )
+            ).thenReturn(errorMessage)
+
+            underTest.createNewPlaylist(title)
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().editVideoPlaylistErrorMessage).isEqualTo(errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that resetCreateVideoPlaylistSuccessEvent consumes createVideoPlaylistSuccessEvent`() =
+        runTest {
+            val createdPlaylist = createVideoPlaylist(expectedPlaylist)
+            stubInitialValues()
+            whenever(createVideoPlaylistUseCase(any())).thenReturn(createdPlaylist)
+
+            underTest.createNewPlaylist("New Playlist")
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().createVideoPlaylistSuccessEvent).isEqualTo(
+                    triggered(createdPlaylist)
+                )
+
+                underTest.resetCreateVideoPlaylistSuccessEvent()
+                assertThat(awaitItem().createVideoPlaylistSuccessEvent).isEqualTo(consumed())
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private suspend fun stubInitialValues(
         nodesAndEntities: Map<VideoPlaylist, VideoPlaylistUiEntity> = mapOf(

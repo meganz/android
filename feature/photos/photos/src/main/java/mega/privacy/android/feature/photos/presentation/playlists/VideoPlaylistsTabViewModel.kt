@@ -24,11 +24,14 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.videosection.CreateVideoPlaylistUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistsUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
 import mega.privacy.android.domain.usecase.videosection.RemoveVideoPlaylistsUseCase
@@ -53,6 +56,8 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     private val monitorVideoPlaylistSetsUpdateUseCase: MonitorVideoPlaylistSetsUpdateUseCase,
     private val videoPlaylistTitleValidationErrorMessageMapper: VideoPlaylistTitleValidationErrorMessageMapper,
     private val updateVideoPlaylistTitleUseCase: UpdateVideoPlaylistTitleUseCase,
+    private val createVideoPlaylistUseCase: CreateVideoPlaylistUseCase,
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
 ) : ViewModel() {
     private val selectedVideoPlaylistsFlow =
         MutableStateFlow<Set<VideoPlaylistUiEntity>>(emptySet())
@@ -251,15 +256,75 @@ class VideoPlaylistsTabViewModel @Inject constructor(
     internal fun showUpdateVideoPlaylistDialog() {
         videoPlaylistEditState.update {
             it.copy(
-                showUpdateVideoPlaylistDialog = true
+                showUpdateVideoPlaylist = true
             )
         }
     }
 
-    internal fun resetUpdateVideoPlaylistDialogEvent() {
+    internal fun resetShowUpdateVideoPlaylist() {
         videoPlaylistEditState.update {
             it.copy(
-                showUpdateVideoPlaylistDialog = false
+                showUpdateVideoPlaylist = false
+            )
+        }
+    }
+
+    internal fun showCreateVideoPlaylistDialog() {
+        videoPlaylistEditState.update {
+            it.copy(showCreateVideoPlaylist = true)
+        }
+    }
+
+    internal fun getPresetNewVideoPlaylistTitle(placeholderTitle: String): String {
+        val playlistTitles =
+            (uiState.value as? VideoPlaylistsTabUiState.Data)?.videoPlaylistEntities?.map {
+                it.title
+            } ?: emptyList()
+        return runCatching {
+            getNextDefaultAlbumNameUseCase(
+                defaultName = placeholderTitle,
+                currentNames = playlistTitles
+            )
+        }.getOrNull() ?: ""
+    }
+
+    internal fun resetShowCreateVideoPlaylist() {
+        videoPlaylistEditState.update {
+            it.copy(
+                showCreateVideoPlaylist = false
+            )
+        }
+    }
+
+    internal fun createNewPlaylist(title: String) {
+        viewModelScope.launch {
+            runCatching {
+                createVideoPlaylistUseCase(title.trim())
+            }.onSuccess { videoPlaylist ->
+                (videoPlaylist as? UserVideoPlaylist)?.let { playlist ->
+                    videoPlaylistEditState.update {
+                        it.copy(createVideoPlaylistSuccessEvent = triggered(playlist))
+                    }
+                    Timber.d("Current video playlist: ${playlist.title}")
+                }
+            }.onFailure { exception ->
+                Timber.e(exception)
+                if (exception is PlaylistNameValidationException) {
+                    val errorMessage = videoPlaylistTitleValidationErrorMessageMapper(exception)
+                    videoPlaylistEditState.update {
+                        it.copy(
+                            editVideoPlaylistErrorMessage = errorMessage
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    internal fun resetCreateVideoPlaylistSuccessEvent() {
+        videoPlaylistEditState.update {
+            it.copy(
+                createVideoPlaylistSuccessEvent = consumed()
             )
         }
     }

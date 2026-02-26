@@ -397,7 +397,7 @@ fun VideoPlaylistDetailScreen(
                     )
                 }
 
-                if (videoPlaylistEditState.showUpdateVideoPlaylistDialog) {
+                if (videoPlaylistEditState.showUpdateVideoPlaylist) {
                     EditVideoPlaylistDialog(
                         modifier = Modifier.testTag(
                             VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG
