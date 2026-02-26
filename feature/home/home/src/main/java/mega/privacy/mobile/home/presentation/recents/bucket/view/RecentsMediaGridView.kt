@@ -3,6 +3,7 @@ package mega.privacy.mobile.home.presentation.recents.bucket.view
 import MediaGridViewItem
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -14,12 +15,16 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVertic
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
 
+/**
+ * Grid view for recent action media bucket
+ */
 @Composable
 fun <T : TypedNode> RecentsMediaGridView(
-    modifier: Modifier = Modifier,
     nodeUiItems: List<NodeUiItem<T>>,
     onItemClicked: (NodeUiItem<T>) -> Unit,
     onLongClick: (NodeUiItem<T>) -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val configuration = LocalConfiguration.current
     val isInLandscapeMode = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -30,7 +35,8 @@ fun <T : TypedNode> RecentsMediaGridView(
         totalItems = nodeUiItems.size,
         columns = GridCells.Fixed(if (isInLandscapeMode) 6 else 3),
         horizontalArrangement = Arrangement.spacedBy(1.dp),
-        verticalArrangement = Arrangement.spacedBy(1.dp)
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+        contentPadding = contentPadding
     ) {
         items(nodeUiItems) { uiItem ->
             MediaGridViewItem(

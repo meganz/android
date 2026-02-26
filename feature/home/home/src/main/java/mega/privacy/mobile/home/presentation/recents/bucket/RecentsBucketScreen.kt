@@ -1,7 +1,9 @@
 package mega.privacy.mobile.home.presentation.recents.bucket
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -39,6 +41,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -73,6 +76,9 @@ fun RecentsBucketScreen(
     val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
 
     ReportSelectionMode(isInSelectionMode = uiState.isInSelectionMode)
+    BackHandler(uiState.isInSelectionMode) {
+        viewModel.deselectAllItems()
+    }
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -125,8 +131,9 @@ fun RecentsBucketScreen(
         },
     ) { paddingValues ->
         RecentsBucketScreenContent(
+            modifier = Modifier.padding(paddingValues.excludingBottomPadding()),
+            contentPadding = paddingValues,
             uiState = uiState,
-            modifier = Modifier.padding(paddingValues),
             listState = listState,
             onItemClicked = { item ->
                 if (uiState.isInSelectionMode) {
@@ -210,6 +217,7 @@ internal fun RecentsBucketScreenContent(
     onItemClicked: (NodeUiItem<TypedNode>) -> Unit,
     onMenuClick: (NodeUiItem<TypedNode>) -> Unit,
     onLongClick: (NodeUiItem<TypedNode>) -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     // Show loading skeleton only if loading takes more than 200ms
@@ -256,6 +264,7 @@ internal fun RecentsBucketScreenContent(
 
                 if (uiState.isMediaBucket) {
                     RecentsMediaGridView(
+                        contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
                         nodeUiItems = uiState.items,
                         onItemClicked = { item ->
                             onItemClicked(item)
@@ -269,6 +278,7 @@ internal fun RecentsBucketScreenContent(
                         onItemClicked = { item ->
                             onItemClicked(item)
                         },
+                        listContentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
                         onLongClick = onLongClick,
                         onEnterMediaDiscoveryClick = { /** No-op */ },
                         sortConfiguration = NodeSortConfiguration.default,
