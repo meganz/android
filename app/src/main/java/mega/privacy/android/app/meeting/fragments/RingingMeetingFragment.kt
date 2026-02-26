@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.view.RingingScreen
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
@@ -57,6 +58,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
      */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        pauseAudioPlayer(meetingActivity)
         meetingActivity.binding.toolbar.apply {
             isVisible = false
         }

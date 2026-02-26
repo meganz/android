@@ -165,12 +165,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 }
 
                 AudioManager.AUDIOFOCUS_GAIN -> {
-                    if (!mediaPlayerGateway.getPlayWhenReady()
-                        && isForeground
-                        && needPlayWhenReceiveResumeCommand
-                    ) {
-                        setPlayWhenReady(true)
-                    }
+                    resumeAudioPlayerIfNeeded()
                 }
             }
         }
@@ -375,11 +370,12 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
             COMMAND_PAUSE -> {
                 if (playing()) {
                     setPlayWhenReady(false)
-                    needPlayWhenReceiveResumeCommand = true
                 }
+                needPlayWhenReceiveResumeCommand = true
             }
 
             COMMAND_RESUME -> {
+                resumeAudioPlayerIfNeeded()
                 audioClosable = false
                 requestAudioFocus()
                 mainHandler.postDelayed(resumePlayRunnable, RESUME_DELAY_MS)
@@ -433,6 +429,15 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_AUDIO_PLAYER_ID)
             .setSmallIcon(R.drawable.ic_mega_logo)
             .build()
+    }
+
+    private fun resumeAudioPlayerIfNeeded() {
+        if (!mediaPlayerGateway.getPlayWhenReady()
+            && isForeground
+            && needPlayWhenReceiveResumeCommand
+        ) {
+            setPlayWhenReady(true)
+        }
     }
 
     private fun observeData() {

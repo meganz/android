@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
+import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
 import mega.privacy.android.app.presentation.meeting.RingingViewModel
 import mega.privacy.android.app.presentation.meeting.model.RingingUIState
@@ -97,6 +98,7 @@ internal fun RingingScreen(
         onVideoClicked = onVideoClicked,
         onHangUpClicked = {
             viewModel.onHangUpClicked()
+            resumeAudioPlayerIfNotInCall(context)
         }
     )
 }
