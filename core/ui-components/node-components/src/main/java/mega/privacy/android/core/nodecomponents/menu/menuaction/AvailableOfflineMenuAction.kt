@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.menu.MenuActionWithIcon
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.icon.pack.IconPack
 import javax.inject.Inject
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Available offline menu action
@@ -18,7 +18,7 @@ class AvailableOfflineMenuAction @Inject constructor() : MenuActionWithIcon {
 
     @Composable
     override fun getDescription() =
-        stringResource(id = R.string.node_menu_action_make_available_offline)
+        stringResource(id = sharedR.string.node_menu_action_make_available_offline)
 
     override val orderInCategory: Int
         get() = 150
