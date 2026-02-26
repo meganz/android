@@ -38,7 +38,6 @@ import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -66,7 +65,6 @@ import javax.inject.Inject
 class FileLinkViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
-    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val checkPublicNodesNameCollisionUseCase: CheckPublicNodesNameCollisionUseCase,
     private val copyPublicNodeUseCase: CopyPublicNodeUseCase,
@@ -102,10 +100,8 @@ class FileLinkViewModel @Inject constructor(
     fun checkLoginRequired() {
         viewModelScope.launch {
             val hasCredentials = hasCredentialsUseCase()
-            val shouldLogin = hasCredentials && !rootNodeExistsUseCase()
             _state.update {
                 it.copy(
-                    showLoginScreenEvent = if (shouldLogin) triggered else consumed,
                     hasDbCredentials = hasCredentials
                 )
             }
@@ -137,6 +133,7 @@ class FileLinkViewModel @Inject constructor(
     fun getPublicNode(link: String, decryptionIntroduced: Boolean = false) = viewModelScope.launch {
         runCatching { getPublicNodeUseCase(link) }
             .onSuccess { node ->
+                Timber.d("getPublicNode result: ${node.name}")
                 val iconResource = node.getIcon(
                     originShares = false,
                     fileTypeIconMapper = fileTypeIconMapper
@@ -148,6 +145,7 @@ class FileLinkViewModel @Inject constructor(
                 resetJobInProgressState()
             }
             .onFailure { exception ->
+                Timber.d("getPublicNode result: $exception")
                 resetJobInProgressState()
                 when (exception) {
                     is PublicNodeException.InvalidDecryptionKey -> {
