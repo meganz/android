@@ -51,7 +51,6 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUs
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
@@ -112,7 +111,6 @@ class FolderLinkViewModelTest {
     private val copyNodesUseCase: CopyNodesUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
     private val hasCredentialsUseCase: HasCredentialsUseCase = mock()
-    private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val setViewType: SetViewType = mock()
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
@@ -163,7 +161,6 @@ class FolderLinkViewModelTest {
             copyNodesUseCase,
             copyRequestMessageMapper,
             hasCredentialsUseCase,
-            rootNodeExistsUseCase,
             setViewType,
             fetchFolderNodesUseCase,
             getFolderParentNodeUseCase,
@@ -205,7 +202,6 @@ class FolderLinkViewModelTest {
             copyNodesUseCase = copyNodesUseCase,
             copyRequestMessageMapper = copyRequestMessageMapper,
             hasCredentialsUseCase = hasCredentialsUseCase,
-            rootNodeExistsUseCase = rootNodeExistsUseCase,
             setViewType = setViewType,
             fetchFolderNodesUseCase = fetchFolderNodesUseCase,
             getFolderParentNodeUseCase = getFolderParentNodeUseCase,
@@ -382,28 +378,26 @@ class FolderLinkViewModelTest {
         }
 
     @Test
-    fun `test that on valid credentials and no root node shouldShowLogin is returned true`() =
+    fun `test that hasDbCredentials is updated when checkLoginRequired is invoked with valid credentials`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(false)
+
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.showLoginEvent).isEqualTo(triggered)
                 assertThat(value.hasDbCredentials).isTrue()
             }
         }
 
     @Test
-    fun `test that on valid credentials and root node shouldShowLogin is returned false`() =
+    fun `test that hasDbCredentials is false when checkLoginRequired is invoked without credentials`() =
         runTest {
-            whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(true)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val value = expectMostRecentItem()
-                assertThat(value.showLoginEvent).isEqualTo(consumed)
-                assertThat(value.hasDbCredentials).isTrue()
+                assertThat(value.hasDbCredentials).isFalse()
             }
         }
 

@@ -22,7 +22,6 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.exception.PublicNodeException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.advertisements.QueryAdsUseCase
 import mega.privacy.android.domain.usecase.filelink.GetFileUrlByPublicLinkUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
@@ -57,7 +56,6 @@ class FileLinkViewModelTest {
     private lateinit var underTest: FileLinkViewModel
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
-    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val copyPublicNodeUseCase = mock<CopyPublicNodeUseCase>()
     private val checkPublicNodesNameCollisionUseCase = mock<CheckPublicNodesNameCollisionUseCase>()
@@ -84,7 +82,6 @@ class FileLinkViewModelTest {
         reset(
             isConnectedToInternetUseCase,
             hasCredentialsUseCase,
-            rootNodeExistsUseCase,
             getPublicNodeUseCase,
             copyPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase,
@@ -105,7 +102,6 @@ class FileLinkViewModelTest {
         underTest = FileLinkViewModel(
             isConnectedToInternetUseCase = isConnectedToInternetUseCase,
             hasCredentialsUseCase = hasCredentialsUseCase,
-            rootNodeExistsUseCase = rootNodeExistsUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
             checkPublicNodesNameCollisionUseCase = checkPublicNodesNameCollisionUseCase,
             copyPublicNodeUseCase = copyPublicNodeUseCase,
@@ -144,10 +140,9 @@ class FileLinkViewModelTest {
     }
 
     @Test
-    fun `test that showLoginScreenEvent is not triggered when root node exists and db credentials are valid`() =
+    fun `test that hasDbCredentials is updated when checkLoginRequired is invoked with valid credentials`() =
         runTest {
             whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(true)
 
             underTest.state.test {
                 underTest.checkLoginRequired()
@@ -168,16 +163,14 @@ class FileLinkViewModelTest {
         }
 
     @Test
-    fun `test that showLoginScreenEvent is triggered when db credentials are valid and rootnode does not exist`() =
+    fun `test that hasDbCredentials is false when checkLoginRequired is invoked without credentials`() =
         runTest {
-            whenever(hasCredentialsUseCase()).thenReturn(true)
-            whenever(rootNodeExistsUseCase()).thenReturn(false)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
 
             underTest.state.test {
                 underTest.checkLoginRequired()
                 val newValue = expectMostRecentItem()
-                assertThat(newValue.showLoginScreenEvent).isEqualTo(triggered)
-                assertThat(newValue.hasDbCredentials).isTrue()
+                assertThat(newValue.hasDbCredentials).isFalse()
             }
         }
 

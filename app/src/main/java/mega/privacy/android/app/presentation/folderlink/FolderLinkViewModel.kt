@@ -55,7 +55,6 @@ import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUs
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.StopAudioService
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
 import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
@@ -104,7 +103,6 @@ class FolderLinkViewModel @Inject constructor(
     private val copyNodesUseCase: CopyNodesUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
-    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val setViewType: SetViewType,
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
@@ -426,15 +424,13 @@ class FolderLinkViewModel @Inject constructor(
     fun checkLoginRequired() {
         viewModelScope.launch {
             val hasCredentials = hasCredentialsUseCase()
-            val showLogin = hasCredentials && !rootNodeExistsUseCase()
             _state.update {
                 it.copy(
-                    showLoginEvent = if (showLogin) triggered else consumed,
                     hasDbCredentials = hasCredentials
                 )
             }
             with(state.value) {
-                if (isInitialState && !showLogin) {
+                if (isInitialState) {
                     url?.let { folderLogin(it) }
                 }
             }
