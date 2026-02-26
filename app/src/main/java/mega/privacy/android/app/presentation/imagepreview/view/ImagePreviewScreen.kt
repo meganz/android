@@ -294,12 +294,14 @@ internal fun ImagePreviewScreen(
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
                                 showManageLinkMenu = viewModel::isGetLinkMenuVisible,
                                 showMoreMenu = viewModel::isMoreMenuVisible,
+                                showShareMenu = viewModel::isShareMenuVisible,
                                 onClickBack = onClickBack,
                                 onClickEdit = { onClickEdit(imageNode) },
                                 onClickSlideshow = onClickSlideshow,
                                 onClickForward = { onClickSendTo(imageNode) },
                                 onClickSaveToDevice = onClickSaveToDevice,
                                 onClickGetLink = { onClickGetLink(imageNode) },
+                                onClickShare = { onClickShare(imageNode) },
                                 onClickMore = {
                                     coroutineScope.launch {
                                         modalSheetState.show()
@@ -734,6 +736,7 @@ private fun ImagePreviewTopBar(
     showForwardMenu: suspend (ImageNode) -> Boolean,
     showSaveToDeviceMenu: suspend (ImageNode) -> Boolean,
     showManageLinkMenu: suspend (ImageNode) -> Boolean,
+    showShareMenu: suspend (ImageNode) -> Boolean,
     showMoreMenu: suspend (ImageNode) -> Boolean,
     onClickBack: () -> Unit,
     onClickEdit: () -> Unit,
@@ -741,6 +744,7 @@ private fun ImagePreviewTopBar(
     onClickForward: () -> Unit,
     onClickSaveToDevice: () -> Unit,
     onClickGetLink: () -> Unit,
+    onClickShare: () -> Unit,
     onClickMore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -784,6 +788,10 @@ private fun ImagePreviewTopBar(
 
                 val isEditMenuVisible by produceState(false, imageNode) {
                     value = showEditMenu(imageNode)
+                }
+
+                val isShareMenuVisible by produceState(false, imageNode) {
+                    value = showShareMenu(imageNode)
                 }
 
                 if (isEditMenuVisible) {
@@ -839,6 +847,17 @@ private fun ImagePreviewTopBar(
                             contentDescription = null,
                             tint = MaterialTheme.colors.black_white,
                             modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_MANAGE_LINK),
+                        )
+                    }
+                }
+
+                if (isShareMenuVisible) {
+                    IconButton(onClick = onClickShare) {
+                        Icon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ShareNetwork),
+                            contentDescription = null,
+                            tint = MaterialTheme.colors.black_white,
+                            modifier = Modifier.testTag(IMAGE_PREVIEW_APP_BAR_SHARE),
                         )
                     }
                 }

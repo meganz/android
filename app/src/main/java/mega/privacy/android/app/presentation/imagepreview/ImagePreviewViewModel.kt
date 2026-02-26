@@ -870,6 +870,8 @@ class ImagePreviewViewModel @Inject constructor(
     fun isInOfflineMode() =
         imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE && !state.value.isOnline
 
+    fun isFileLink() = imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE
+
     fun launchPhotoEditor(imageNode: ImageNode) {
         viewModelScope.launch {
             runCatching {

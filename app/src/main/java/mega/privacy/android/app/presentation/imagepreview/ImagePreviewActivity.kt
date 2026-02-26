@@ -59,6 +59,7 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewViewModel.Companion.PARAMS_CURRENT_IMAGE_NODE_ID_VALUE
 import mega.privacy.android.app.presentation.imagepreview.fetcher.CloudDriveImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.FavouriteImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.RubbishBinImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.fetcher.SharedItemsImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -389,13 +390,22 @@ class ImagePreviewActivity : BaseActivity() {
     }
 
     private fun shareNode(imageNode: ImageNode) {
-        if (viewModel.isInOfflineMode()) {
-            offlineNodeActionsViewModel.handleShareOfflineNodeById(
-                nodeId = imageNode.id,
-                isOnline = false
-            )
-        } else {
-            MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
+        when {
+            viewModel.isInOfflineMode() -> {
+                offlineNodeActionsViewModel.handleShareOfflineNodeById(
+                    nodeId = imageNode.id,
+                    isOnline = false
+                )
+            }
+
+            viewModel.isFileLink() -> {
+                intent.getBundleExtra(FETCHER_PARAMS)?.getString(PublicFileImageNodeFetcher.URL)
+                    ?.let { link ->
+                        MegaNodeUtil.shareLink(this, link, imageNode.name)
+                    }
+            }
+
+            else -> MegaNodeUtil.shareNode(this, MegaNode.unserialize(imageNode.serializedData))
         }
     }
 
