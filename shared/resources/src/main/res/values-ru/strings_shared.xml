@@ -478,9 +478,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Отмена передач&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
+    <string name="report_issue_error_minimum_characters">Сообщение должно содержать не менее 10 символов</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
+    <string name="report_issue_description_placeholder_message">Опишите проблему, используя не менее 10 символов</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Сохраняйте конфиденциальность разговоров</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2266,6 +2266,8 @@
     <string name="photos_create_album_duplicate_name_error">Альбом с таким названием уже существует. Введите другое название.</string>
     <string name="photos_create_album_proscribed_name_error">Недопустимое название альбома. Введите другое название.</string>
     <string name="remove_from_offline_success_message">Файл удалён из локальных</string>
-    <!-- Settings preference title for rate app -->
-    <string name="settings_help_rate_app">Rate us</string>
+    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
+    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
+    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
+    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
 </resources>

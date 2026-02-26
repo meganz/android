@@ -2386,4 +2386,10 @@
     <string name="remove_from_offline_success_message">File removed from Offline</string>
     <!-- Settings preference title for rate app -->
     <string name="settings_help_rate_app">Rate us</string>
+    <!-- Menu item to make a node available offline -->
+    <string name="node_menu_action_make_available_offline">Make available offline</string>
+    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
+    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
+    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
+    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
 </resources>

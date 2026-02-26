@@ -500,9 +500,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">جاري إلغاء عمليات التراسل...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
+    <string name="report_issue_error_minimum_characters">يجب أن تتكون الاستفسارات من 10 أحرف على الأقل</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
+    <string name="report_issue_description_placeholder_message">وصف المشكلة باستخدام 10 محارف على الأقل</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">حافظ على خصوصية المحادثات</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -1921,9 +1921,9 @@
         <item quantity="other">تنتهي صلاحية المكافأة في %1$d يوم</item>
     </plurals>
     <!-- Discount label for first month singular -->
-    <string name="label_first_time_in_months_full_singular">%1$s للشهر الأول</string>
+    <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nللشهر الأول</string>
     <!-- Discount label for first year singular -->
-    <string name="label_first_time_in_years_full_singular">%1$s للسنة الأولى</string>
+    <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nللسنة الأولى</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">يمكنك فقط الكشف عن الملفات المخفية إما بشكل فردي أو عن طريق عرض العناصر المخفية مؤقتًا من [A]إعدادات[/A].</string>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2244,6 +2244,42 @@
     <string name="photos_create_album_duplicate_name_error">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
     <string name="photos_create_album_proscribed_name_error">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
     <string name="remove_from_offline_success_message">حذف من غير متصل بالانترنت</string>
-    <!-- Settings preference title for rate app -->
-    <string name="settings_help_rate_app">Rate us</string>
+    <string name="payment_ads_free_intro_title">هل تريد ميغا MEGA بدون إعلانات؟</string>
+    <string name="payment_ads_free_intro_description">قم بالترقية إلى باقة برو Pro مع مساحة تخزين كبيرة والمزيد. تبدأ باقات برو Pro من %1$s فقط شهريًا.</string>
+    <plurals name="remove_links_warning_text">
+        <item quantity="zero">لا يوجد رابط متاح كمشاركة عامة بعد الآن.</item>
+        <item quantity="one">لن يكون هذا الرابط متاحاً كمشاركة عامة بعد الآن.</item>
+        <item quantity="two">لن يكونا هذان الرابطان متاحان كمشاركة عامة بعد الآن.</item>
+        <item quantity="few">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="many">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+        <item quantity="other">لن تكون هذه الروابط متاحة كمشاركة عامة بعد الآن.</item>
+    </plurals>
+    <plurals name="alert_remove_several_shares">
+        <item quantity="zero">إلغاء مشاركة هذه المجلدات %1$d؟</item>
+        <item quantity="one">إلغاء مشاركة هذا المجلد %1$d؟</item>
+        <item quantity="two">إلغاء مشاركة هذان المجلدان %1$d؟</item>
+        <item quantity="few">إلغاء مشاركة هذه المجلدات %1$d؟</item>
+        <item quantity="many">إلغاء مشاركة هذه المجلدات %1$d؟</item>
+        <item quantity="other">إلغاء مشاركة هذه المجلدات %1$d؟</item>
+    </plurals>
+    <plurals name="transfers_retry_feedback_snackbar_message">
+        <item quantity="zero">إعادة محاولة التراسل، راجع صفحة النشاط لمتابعة التقدم</item>
+        <item quantity="one">إعادة محاولة التراسل، راجع صفحة النشاط لمتابعة التقدم</item>
+        <item quantity="two">إعادة محاولة التراسلات، راجع صفحة النشاط لمتابعة التقدم</item>
+        <item quantity="few">إعادة محاولة التراسلات، راجع صفحة النشاط لمتابعة التقدم</item>
+        <item quantity="many">إعادة محاولة التراسلات، راجع صفحة النشاط لمتابعة التقدم</item>
+        <item quantity="other">إعادة محاولة التراسلات، راجع صفحة النشاط لمتابعة التقدم</item>
+    </plurals>
+    <string name="camera_update_network_requirement_not_met_banner_description">تم إيقاف ترفيعات الكاميرا، يرجى الاتصال بشبكة الواي فاي أو السماح باستخدام بيانات الهاتف المحمول</string>
+    <string name="preview_not_available_undecrypted_files">العرض غير متاح للملفات غير مفكوك تشفيرها</string>
+    <string name="external_checkout_button_text">اشترِ من موقعنا الإلكتروني (وفر حتى %1$.0f%%)</string>
+    <string name="camera_upload_no_full_access_banner_change_permissions_description">لضمان عدم تفويت أي من ذكرياتك، تحتاج MEGA إلى وصول كامل إلى مكتبة الصور الخاصة بك. [A]اضغط لتغيير الأذونات.[/A]</string>
+    <string name="camera_upload_banner_enable_cu_subtitle">نسخ احتياطي للصور ومقاطع الفيديو تلقائياً إلى سواقتك السحابية</string>
+    <string name="general_alert_not_logged_in">يجب عليك تسجيل الدخول أولا قبل تنفيذ هذه الخطوة</string>
+    <string name="timeline_tab_camera_uploads_limited_access">لدى ميغا MEGA إذن وصول محدود إلى مكتبة الصور الخاصة بك ولا يمكنها إجراء نسخ احتياطي لجميع صورك</string>
+    <string name="general_invalid_link">رابط غير صالح. الرجاء المحاولة مرة أخرى أو طلب رابط جديد.</string>
+    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
+    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
+    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
+    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
 </resources>

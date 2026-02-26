@@ -17,7 +17,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.status.MegaStatusIndicator
 import mega.privacy.android.shared.original.core.ui.controls.status.StatusColor
@@ -36,7 +35,6 @@ import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
  * @param statusIcon                    Status icon
  * @param statusColor                   Status color
  * @param onMoreClicked                 Action when "info" icon is clicked
- * @param onInfoClicked                 Action when "3-dos" icon is clicked
  */
 @Composable
 fun StatusListViewItem(
@@ -49,7 +47,6 @@ fun StatusListViewItem(
     @DrawableRes statusIcon: Int? = null,
     statusColor: StatusColor? = null,
     onMoreClicked: (() -> Unit)? = null,
-    onInfoClicked: (() -> Unit)? = null,
 ) {
     GenericTwoLineListItem(
         modifier = modifier.padding(end = 8.dp),
@@ -85,16 +82,6 @@ fun StatusListViewItem(
             )
         },
         trailingIcons = {
-            if (onInfoClicked != null) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_info),
-                    contentDescription = "Info",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable { onInfoClicked() }
-                        .testTag(MORE_ICON_TAG)
-                )
-            }
             if (onMoreClicked != null) {
                 Icon(
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
@@ -108,5 +95,3 @@ fun StatusListViewItem(
         }
     )
 }
-
-

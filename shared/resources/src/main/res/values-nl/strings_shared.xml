@@ -456,9 +456,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Overdrachten annuleren&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
+    <string name="report_issue_error_minimum_characters">Vragen moeten minstens 10 tekens lang zijn</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
+    <string name="report_issue_description_placeholder_message">Beschrijf het probleem met minstens 10 tekens</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Houd gesprekken privé</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2165,6 +2165,8 @@
     <string name="home_recents_clear_dialog_message">Weet u zeker dat u alle recente activiteiten wilt wissen? Dit kan niet ongedaan worden gemaakt.</string>
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s is beschikbaar bij jaarlijkse facturering</string>
     <string name="choose_account_screen_plan_available_monthly_billing">%1$s is beschikbaar met maandelijkse facturering</string>
-    <!-- Settings preference title for rate app -->
-    <string name="settings_help_rate_app">Rate us</string>
+    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
+    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
+    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
+    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
 </resources>

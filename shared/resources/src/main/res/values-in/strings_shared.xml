@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Membatalkan transfer&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Enquiries must be at least 30 characters</string>
+    <string name="report_issue_error_minimum_characters">Pertanyaan harus minimal 10 karakter</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Describe the issue with at least 30 characters</string>
+    <string name="report_issue_description_placeholder_message">Jelaskan masalah dengan setidaknya 10 karakter</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Jaga percakapan tetap pribadi</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2064,6 +2064,10 @@
     <string name="album_import_rename_album_dialog_description">Sebuah album bernama %1$s sudah ada di Album Anda. Masukkan nama baru untuk album yang ingin anda simpan.</string>
     <string name="album_import_snackbar_success_message">%1$s disimpan ke penyimpanan cloud</string>
     <string name="album_import_snackbar_error_message">%1$s tidak dapat disimpan ke Cloud Drive. Coba lagi nanti. Jika masalah berlanjut, hubungi orang yang membagikan tautan tersebut kepada anda.</string>
-    <!-- Settings preference title for rate app -->
-    <string name="settings_help_rate_app">Rate us</string>
+    <string name="settings_help_rate_app">Beri kami nilai</string>
+    <string name="node_menu_action_make_available_offline">Sediakan secara offline</string>
+    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
+    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
+    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
+    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
 </resources>

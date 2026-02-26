@@ -94,11 +94,6 @@ internal fun DeviceCenterListViewItem(
             } else {
                 null
             },
-            onInfoClicked = if (uiNode is DeviceUINode) {
-                null
-            } else { ->
-                onInfoClicked(uiNode)
-            },
         )
         MegaDivider(
             modifier = Modifier
@@ -120,7 +115,7 @@ internal fun DeviceCenterListViewItem(
  * @return The corresponding Status Text
  */
 @Composable
-private fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
+internal fun getStatusText(uiNodeStatus: DeviceCenterUINodeStatus) =
     when (uiNodeStatus) {
         is DeviceCenterUINodeStatus.UpdatingWithPercentage -> {
             // Apply String Formatting for this UI Status
