@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.transfers.view.dialog
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -11,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaSpannedClickableText
@@ -38,13 +37,7 @@ internal fun NotEnoughSpaceForUploadDialog(
         onCancel = onCancel,
         modifier = modifier,
         onLearnMore = {
-            context.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(LINK_TO_STORAGE_EXCEEDED_HELP_PAGE)
-                )
-            )
-
+            context.launchUrl(LINK_TO_STORAGE_EXCEEDED_HELP_PAGE)
         }
     )
 }

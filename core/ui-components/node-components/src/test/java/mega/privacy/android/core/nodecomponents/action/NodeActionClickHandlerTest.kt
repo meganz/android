@@ -952,7 +952,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).launchUrl(any(), any())
+        verify(mockMegaNavigator).launchUrl(any(), any(), anyBoolean())
     }
 
     // VerifyAction Tests
@@ -1418,7 +1418,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockMegaNavigator).launchUrl(any<Context>(), any<String>())
+        verify(mockMegaNavigator).launchUrl(any<Context>(), any<String>(), anyBoolean())
     }
 
     // ShareAction Tests (already exists, but adding multiple nodes test)
