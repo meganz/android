@@ -40,14 +40,16 @@ class LoginDeepLinkHandlerTest {
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "mega://login"
-        val expected = LoginNavKey()
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.LOGIN_LINK, isLoggedIn)
 
-        assertThat(actual).containsExactly(expected)
+        assertThat(actual?.size).isEqualTo(1)
+        assertThat(actual?.get(0)).isInstanceOf(LoginNavKey::class.java)
+        assertThat((actual?.first() as LoginNavKey).action).isNull()
+        assertThat((actual.first() as LoginNavKey).link).isNull()
         verifyNoInteractions(snackbarEventQueue)
     }
 
@@ -57,7 +59,6 @@ class LoginDeepLinkHandlerTest {
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "mega://confirmLink"
-        val expected = LoginNavKey(action = ACTION_CONFIRM, link = uriString)
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
@@ -69,7 +70,10 @@ class LoginDeepLinkHandlerTest {
             assertThat(actual).isEmpty()
             verify(snackbarEventQueue).queueMessage(R.string.open_link_account_confirmation_error)
         } else {
-            assertThat(actual).containsExactly(expected)
+            assertThat(actual?.size).isEqualTo(1)
+            assertThat(actual?.get(0)).isInstanceOf(LoginNavKey::class.java)
+            assertThat((actual?.first() as LoginNavKey).action).isEqualTo(ACTION_CONFIRM)
+            assertThat((actual.first() as LoginNavKey).link).isEqualTo(uriString)
             verifyNoInteractions(snackbarEventQueue)
         }
     }
