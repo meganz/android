@@ -362,7 +362,7 @@ class VideoPlayerViewModel @Inject constructor(
     private var currentIntent: Intent? = null
 
     private var isPausedByUser = false
-    private var isBackgroundPausing = false
+    private var allowUpdatePausedByUser = true
 
     init {
         setupTransferListener()
@@ -1282,7 +1282,7 @@ class VideoPlayerViewModel @Inject constructor(
     internal fun pauseForBackground() {
         val wasPlaying = mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser
         if (wasPlaying) {
-            isBackgroundPausing = true
+            allowUpdatePausedByUser = false
             mediaPlayerGateway.setPlayWhenReady(false)
         }
         uiState.update {
@@ -1295,10 +1295,10 @@ class VideoPlayerViewModel @Inject constructor(
 
     internal fun onPlayWhenReadyChanged(state: MediaPlaybackState, isPausedByUser: Boolean) {
         updatePlaybackState(state)
-        if (!isBackgroundPausing) {
+        if (allowUpdatePausedByUser) {
             this.isPausedByUser = isPausedByUser
         }
-        isBackgroundPausing = false
+        allowUpdatePausedByUser = true
     }
 
     internal fun handleAutoReplayIfPaused() {
@@ -1800,6 +1800,9 @@ class VideoPlayerViewModel @Inject constructor(
     }
 
     internal fun updatePlaybackStateWithReplay(value: Boolean) {
+        if (mediaPlayerGateway.getPlayWhenReady() && !isPausedByUser) {
+            allowUpdatePausedByUser = false
+        }
         mediaPlayerGateway.setPlayWhenReady(value)
         uiState.update {
             it.copy(
