@@ -71,7 +71,12 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
         val billingViewModel = hiltViewModel<BillingViewModel>()
 
         LaunchedEffect(key.timeStamp, key.action, key.link) {
-            checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
+            checkActions(
+                sharedViewModel = sharedViewModel,
+                action = key.action,
+                link = key.link,
+                timeStamp = key.timeStamp
+            )
         }
 
         LoginScreen(
@@ -85,9 +90,10 @@ private fun checkActions(
     sharedViewModel: LoginViewModel,
     action: String?,
     link: String?,
+    timeStamp: Long,
 ) {
     when (action) {
-        ACTION_CONFIRM -> link?.let { sharedViewModel.checkSignupLink(it) }
+        ACTION_CONFIRM -> link?.let { sharedViewModel.checkSignupLink(it, timeStamp) }
         ACTION_RESET_PASS -> link?.let {
             sharedViewModel.onRequestRecoveryKey(it)
             sharedViewModel.intentSet()

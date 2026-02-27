@@ -215,7 +215,7 @@ class LoginViewModel @AssistedInject constructor(
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
     private var performFetchNodesJob: Job? = null
-    private val handledLinks = mutableSetOf<String>()
+    private val handledLinks = mutableSetOf<HandledLinks>()
 
     init {
         Timber.d("LoginViewModel init $this")
@@ -563,9 +563,10 @@ class LoginViewModel @AssistedInject constructor(
     /**
      * Checks a signup link.
      */
-    fun checkSignupLink(link: String) {
+    fun checkSignupLink(link: String, timeStamp: Long) {
         // avoid rotating the screen calling this method again
-        if (handledLinks.contains(link)) return
+        val handledLink = HandledLinks(link = link, timeStamp = timeStamp)
+        if (handledLinks.contains(handledLink)) return
         _state.update { state ->
             state.copy(
                 isLoginRequired = false,
@@ -574,7 +575,7 @@ class LoginViewModel @AssistedInject constructor(
             )
         }
         viewModelScope.launch {
-            handledLinks.add(link)
+            handledLinks.add(handledLink)
             val result = runCatching { querySignupLinkUseCase(link) }
             var accountConfirmed: Boolean? = null
             var newAccountSession: AccountSession? = null
@@ -1412,4 +1413,6 @@ class LoginViewModel @AssistedInject constructor(
          */
         private const val ACTION_OPEN_APP = "OPEN_APP"
     }
+
+    data class HandledLinks(val link: String, val timeStamp: Long)
 }

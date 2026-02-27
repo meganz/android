@@ -591,7 +591,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     Constants.ACTION_CONFIRM -> {
                         Timber.d("querySignupLink")
                         intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
-                            ?.let { viewModel.checkSignupLink(it) }
+                            ?.let { viewModel.checkSignupLink(it, System.currentTimeMillis()) }
                         return@LaunchedEffect
                     }
 
