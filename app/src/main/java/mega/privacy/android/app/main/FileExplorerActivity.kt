@@ -23,6 +23,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -615,7 +616,10 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         }
         enableEdgeToEdge()
         binding = ActivityFileExplorerBinding.inflate(layoutInflater)
-        consumeInsetsWithToolbar(customToolbar = binding.appBarLayoutExplorer)
+        consumeInsetsWithToolbar(
+            type = WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout(),
+            customToolbar = binding.appBarLayoutExplorer
+        )
         setContentView(binding.root)
         addStartUploadTransferView()
 

@@ -30,7 +30,8 @@
                     android:id="@+id/sliding_tabs_file_explorer"
                     style="@style/Widget.Mega.TabLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    app:tabGravity="fill" />
 
             </com.google.android.material.appbar.AppBarLayout>
 

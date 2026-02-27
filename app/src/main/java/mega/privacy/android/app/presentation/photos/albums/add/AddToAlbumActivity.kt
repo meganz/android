@@ -5,14 +5,16 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import javax.inject.Inject
 
@@ -33,6 +35,7 @@ internal class AddToAlbumActivity : BaseActivity() {
             val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 AddToAlbumScreen(
+                    modifier = Modifier.safeDrawingPadding(),
                     addToAlbumViewModel = addToAlbumViewModel,
                     photoDownloaderViewModel = photoDownloaderViewModel,
                     onClose = ::handleCompletion,

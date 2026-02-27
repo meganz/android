@@ -35,10 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
+import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.legacy.core.ui.controls.appbar.CollapsedSearchAppBar
 import mega.privacy.android.shared.original.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -50,6 +50,7 @@ internal fun AddToAlbumScreen(
     addToAlbumViewModel: AddToAlbumViewModel,
     photoDownloaderViewModel: PhotoDownloaderViewModel,
     onClose: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val state by addToAlbumViewModel.stateFlow.collectAsStateWithLifecycle()
@@ -135,6 +136,7 @@ internal fun AddToAlbumScreen(
     }
 
     MegaScaffold(
+        modifier = modifier,
         topBar = {
             AddToAlbumTopBar(
                 viewType = state.viewType,
@@ -177,9 +179,9 @@ internal fun AddToAlbumScreen(
 
 @Composable
 private fun AddToAlbumTopBar(
-    modifier: Modifier = Modifier,
     viewType: Int,
     onClose: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     CollapsedSearchAppBar(
         onBackPressed = onClose,
@@ -194,13 +196,13 @@ private fun AddToAlbumTopBar(
 
 @Composable
 private fun AddToAlbumBottomBar(
-    modifier: Modifier = Modifier,
     selectedTabIndex: Int,
     selectedAlbum: UserAlbum?,
     selectedPlaylist: VideoPlaylistUIEntity?,
     onClickCancel: () -> Unit,
     onClickAddToAlbum: () -> Unit,
     onClickAddToPlaylist: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -232,7 +234,6 @@ private fun AddToAlbumBottomBar(
 
 @Composable
 private fun AddToAlbumContent(
-    modifier: Modifier = Modifier,
     pagerState: PagerState,
     tabNames: List<String>,
     selectedTabIndex: Int,
@@ -249,6 +250,7 @@ private fun AddToAlbumContent(
     onCancelPlaylistCreation: () -> Unit,
     onClearPlaylistNameErrorMessage: () -> Unit,
     onCreatePlaylist: (String) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
