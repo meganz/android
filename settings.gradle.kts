@@ -79,6 +79,7 @@ include(":feature:photos:photos")
 include(":feature:photos:photos-snowflake-components")
 include(":feature:contact:contact")
 include(":feature:contact:contact-snowflake-components")
+include(":feature:pdfviewer")
 
 include(":core:ui-components:shared-components")
 // Configure modules to use their own name as the build file name
@@ -119,5 +120,3 @@ fun shouldUsePrebuiltSdk(): Boolean =
     System.getenv("USE_PREBUILT_SDK")?.let { it != "false" } ?: true
 
 fun isServerBuild(): Boolean = System.getenv("BUILD_NUMBER") != null
-
-
