@@ -13,7 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.analytics.test.AnalyticsTestRule
-import mega.privacy.android.core.sharedcomponents.coroutine.resetLaunchedOncePerAppEffect
+import mega.android.core.ui.extensions.resetLaunchedOncePerAppEffect
 import mega.privacy.android.shared.resources.R
 import mega.privacy.mobile.analytics.event.AlmostFullStorageAndTransferOverQuotaBannerDisplayedEvent
 import mega.privacy.mobile.analytics.event.AlmostFullStorageOverQuotaBannerCloseButtonPressedEvent

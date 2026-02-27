@@ -60,7 +60,7 @@ import kotlinx.coroutines.delay
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaSnackbar
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.inputfields.HelpTextError

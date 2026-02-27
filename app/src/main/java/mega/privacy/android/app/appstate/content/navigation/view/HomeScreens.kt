@@ -36,7 +36,7 @@ import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler

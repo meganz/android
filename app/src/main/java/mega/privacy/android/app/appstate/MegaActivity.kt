@@ -89,7 +89,7 @@ import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackbarLifetimeController
+import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy

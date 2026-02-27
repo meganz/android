@@ -12,7 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.feature.payment.model.AccountTypeInt

@@ -49,7 +49,7 @@ import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.presentation.notification.model.NotificationItemType
 import mega.privacy.android.app.presentation.notification.model.NotificationState
 import mega.privacy.android.app.presentation.notification.view.notificationviewtype.PromoNotificationItemViewM3
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
+import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.notifications.PromoNotification
 import mega.privacy.android.feature.notifications.snowflakes.NotificationItemViewM3
 import mega.privacy.android.icon.pack.R as iconPackR

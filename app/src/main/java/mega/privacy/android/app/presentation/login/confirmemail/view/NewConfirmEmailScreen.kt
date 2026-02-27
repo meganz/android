@@ -42,7 +42,7 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaSnackbar
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.BannerPaddingProvider
 import mega.android.core.ui.components.button.PrimaryFilledButton

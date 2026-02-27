@@ -25,7 +25,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest

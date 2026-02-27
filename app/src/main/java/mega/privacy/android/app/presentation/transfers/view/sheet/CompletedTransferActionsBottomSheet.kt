@@ -46,7 +46,7 @@ import mega.privacy.android.app.presentation.transfers.view.completed.TEST_TAG_C
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.sharedcomponents.BottomSheetAction
+import mega.android.core.ui.components.sheets.BottomSheetAction
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType

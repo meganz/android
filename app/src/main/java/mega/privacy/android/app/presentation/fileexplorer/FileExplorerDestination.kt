@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 

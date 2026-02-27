@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.videosection
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.navigation3.runtime.EntryProviderScope
-import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult

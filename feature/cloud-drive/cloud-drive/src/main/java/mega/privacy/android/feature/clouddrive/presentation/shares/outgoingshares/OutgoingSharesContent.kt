@@ -24,8 +24,8 @@ import kotlinx.coroutines.isActive
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
-import mega.privacy.android.core.sharedcomponents.empty.MegaEmptyView
-import mega.privacy.android.core.sharedcomponents.extension.excludingBottomPadding
+import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType

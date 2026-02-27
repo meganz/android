@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicDialogButton
+import mega.android.core.ui.extensions.collectFlow
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
@@ -40,7 +41,6 @@ import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.sharedcomponents.coroutine.collectFlow
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
@@ -129,7 +129,7 @@ class LoginActivity : BaseActivity() {
         }
 
         val refreshForShare = intent.action == Constants.ACTION_FILE_EXPLORER_UPLOAD
-        collectFlow(viewModel.state) { uiState ->
+        collectFlow(viewModel.state, catchBlock = { Timber.e(it) }) { uiState ->
             if (uiState.accountSession?.session.isNullOrEmpty() && uiState.isSingleActivityEnabled && !refreshForShare) {
                 startActivity(Intent(this@LoginActivity, MegaActivity::class.java))
                 finish()
