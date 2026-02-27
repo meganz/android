@@ -58,21 +58,6 @@ open class ChooseAccountActivity : AppCompatActivity() {
         const val EXTRA_SOURCE = "EXTRA_SOURCE"
 
         /**
-         * Navigates to the Choose Account screen.
-         */
-        fun navigateToChooseAccount(
-            context: Context,
-            isNewCreationAccount: Boolean,
-        ) {
-            val intent = Intent(context, ChooseAccountActivity::class.java).apply {
-                putExtra(EXTRA_IS_UPGRADE_ACCOUNT, false)
-                putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, isNewCreationAccount)
-                putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, isNewCreationAccount)
-            }
-            context.startActivity(intent)
-        }
-
-        /**
          * Navigates to the Upgrade Account screen.
          *
          * @param context The context to use for navigation.
