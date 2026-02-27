@@ -31,10 +31,12 @@ class WebViewDeepLinkHandler @Inject constructor(
         RegexPatternType.MEGA_DROP_LINK,
         RegexPatternType.MEGA_FILE_REQUEST_LINK,
         RegexPatternType.REVERT_CHANGE_PASSWORD_LINK,
-        RegexPatternType.INSTALLER_DOWNLOAD_LINK,
         RegexPatternType.MEGA_BLOG_LINK,
         RegexPatternType.PURCHASE_LINK,
             -> listOf(WebSiteNavKey(uri.toString()))
+
+        RegexPatternType.INSTALLER_DOWNLOAD_LINK ->
+            listOf(WebSiteNavKey(uri.toString(), true))
 
         RegexPatternType.MEGA_LINK -> if (uri.toString().requiresSession()) {
             when {

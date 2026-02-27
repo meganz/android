@@ -28,7 +28,10 @@ data class MyAccountNavKey(
 data object AchievementNavKey : NavKey
 
 @Serializable
-data class WebSiteNavKey(val url: String) : NoSessionNavKey.Optional
+data class WebSiteNavKey(
+    val url: String,
+    val isBrowserLink: Boolean = false,
+) : NoSessionNavKey.Optional
 
 @Serializable
 @Parcelize

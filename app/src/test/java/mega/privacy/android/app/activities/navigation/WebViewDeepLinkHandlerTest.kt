@@ -62,7 +62,11 @@ class WebViewDeepLinkHandlerTest {
         regexPatternType: RegexPatternType?,
     ) = runTest {
         val uriString = "https://mega.app/whatever"
-        val expected = WebSiteNavKey(uriString)
+        val expected = if (regexPatternType == RegexPatternType.INSTALLER_DOWNLOAD_LINK) {
+            WebSiteNavKey(uriString, true)
+        } else {
+            WebSiteNavKey(uriString)
+        }
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
@@ -82,7 +86,11 @@ class WebViewDeepLinkHandlerTest {
         regexPatternType: RegexPatternType?,
     ) = runTest {
         val uriString = "https://mega.app/whatever"
-        val expected = WebSiteNavKey(uriString)
+        val expected = if (regexPatternType == RegexPatternType.INSTALLER_DOWNLOAD_LINK) {
+            WebSiteNavKey(uriString, true)
+        } else {
+            WebSiteNavKey(uriString)
+        }
         val uri = mock<Uri> {
             on { this.toString() } doReturn uriString
         }
