@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.chat.list.view
 
-import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -42,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
@@ -382,9 +381,7 @@ private fun EmptyView(
             color = TextColor.Secondary,
             onAnnotationClick = {
                 Analytics.tracker.trackEvent(InviteFriendsLearnMorePressedEvent)
-                context.startActivity(
-                    Intent(Intent.ACTION_VIEW, Uri.parse("https://mega.io/chatandmeetings"))
-                )
+                context.launchUrl("https://mega.io/chatandmeetings")
             },
             baseStyle = MaterialTheme.typography.body1.copy(
                 textAlign = TextAlign.Center,

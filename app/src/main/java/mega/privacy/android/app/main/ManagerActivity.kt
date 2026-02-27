@@ -1282,7 +1282,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                                         isFromManagerActivity = true,
                                     )
                                 },
-                                onLearnMoreClicked = {
+                                onLearnMoreClicked = { url ->
+                                    this@ManagerActivity.launchUrl(url)
                                     syncPromotionViewModel.setSyncPromotionShown(doNotShowAgain = true)
                                 },
                                 hideSheet = { coroutineScope.launch { syncPromotionViewModel.onConsumeShouldShowSyncPromotion() } })

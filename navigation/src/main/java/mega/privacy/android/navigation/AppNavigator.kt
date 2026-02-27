@@ -472,8 +472,10 @@ interface AppNavigator {
      *
      * @param context The Context
      * @param url The URL to launch
+     * @param appendNoPlansParam When true (default), appends noplans=1 to mega.io/help.mega.io/mega.co.nz
+     * URLs to suppress checkout redirects. Pass false for links where checkout should be shown.
      */
-    fun launchUrl(context: Context?, url: String?)
+    fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean = true)
 
     /**
      * Open SaveScannedDocumentsActivity

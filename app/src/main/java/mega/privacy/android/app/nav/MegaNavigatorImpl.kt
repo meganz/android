@@ -813,8 +813,8 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
-    override fun launchUrl(context: Context?, url: String?) {
-        context?.launchUrl(url)
+    override fun launchUrl(context: Context?, url: String?, appendNoPlansParam: Boolean) {
+        context?.launchUrl(url, appendNoPlansParam)
     }
 
     override fun openSaveScannedDocumentsActivity(
