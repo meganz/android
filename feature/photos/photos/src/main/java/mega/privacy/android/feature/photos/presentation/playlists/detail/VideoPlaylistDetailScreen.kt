@@ -336,7 +336,7 @@ fun VideoPlaylistDetailScreen(
                                 totalDuration = playlistDetail.uiEntity.totalDuration,
                                 numberOfVideos = playlistDetail.uiEntity.numberOfVideos,
                                 modifier = Modifier.padding(16.dp),
-                                onPlayAllClicked = {}
+                                onPlayAllClicked = { onClick(items[0]) }
                             )
                         }
 
