@@ -5,6 +5,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.cloudDriveScreen
 import mega.privacy.android.feature.clouddrive.presentation.drivesync.driveSyncScreen
 import mega.privacy.android.feature.clouddrive.presentation.favourites.favouritesScreen
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.folderLinkScreen
 import mega.privacy.android.feature.clouddrive.presentation.offline.offlineScreen
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.rubbishBin
 import mega.privacy.android.feature.clouddrive.presentation.search.searchScreen
@@ -80,6 +81,11 @@ class CloudDriveFeatureDestination : FeatureDestination {
                     navigationHandler.back() //to dismiss the dialog
                     navigationHandler.navigate(LegacyFolderLinkNavKey(folderLinkUri))
                 },
+            )
+
+            folderLinkScreen(
+                navigationHandler = navigationHandler,
+                transferHandler = transferHandler
             )
         }
 }

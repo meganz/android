@@ -80,6 +80,7 @@ import javax.inject.Inject
  * FolderLinkActivity with compose view
  */
 @AndroidEntryPoint
+@Deprecated("Use revamp")
 class FolderLinkComposeActivity : PasscodeActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 

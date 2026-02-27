@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 /**
  * Cloud drive route args
@@ -76,3 +77,13 @@ data class OverQuotaDialogNavKey(
     val isOverQuota: Boolean,
     val overQuotaAlert: Boolean = true,
 ) : DialogNavKey, Parcelable
+
+
+/**
+ * NavKey for folder link screen
+ * @param uriString the uri string of the folder
+ */
+@Serializable
+data class FolderLinkNavKey(
+    val uriString: String?,
+) : NoSessionNavKey.Optional

@@ -24,6 +24,15 @@ enum class AppFeatures(override val description: String, private val defaultValu
         true,
     ),
 
+
+    /**
+     * Search revamp
+     */
+    FolderLinkRevamp(
+        "Enable folder link revamp screen",
+        false,
+    ),
+
     /**
      * Search revamp
      */

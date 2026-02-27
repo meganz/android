@@ -95,6 +95,7 @@ import javax.inject.Inject
  *
  * @param monitorMiscLoadedUseCase Use case to monitor when misc data is loaded
  */
+@Deprecated("Use revamp")
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
