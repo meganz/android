@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.devicecenter.ui.view
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -13,6 +12,7 @@ import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUiState
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceMenuAction
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Material 3 App Bar for Device Center
@@ -58,14 +58,7 @@ internal fun DeviceCenterAppBarM3(
             searchPlaceholder = if (uiState.itemsToDisplay.any { it is DeviceUINode }) {
                 stringResource(R.string.device_center_top_app_bar_search_devices_hint)
             } else {
-                stringResource(R.string.device_center_top_app_bar_search_syncs_hint)
-            },
-            actions = remember(selectedDevice, uiState.isCameraUploadsEnabled, onActionPressed) {
-                buildActionsList(
-                    selectedDevice,
-                    uiState.isCameraUploadsEnabled,
-                    onActionPressed
-                ) ?: emptyList()
+                stringResource(sharedR.string.search_placeholder_folder, selectedDevice?.name ?: "")
             },
         )
     }

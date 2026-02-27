@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +45,7 @@ internal fun DeviceCenterContent(
     onDeviceMenuClicked: (DeviceUINode) -> Unit,
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit,
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit,
+    onFolderMenuClicked: (DeviceFolderUINode) -> Unit,
     onInfoClicked: (DeviceCenterUINode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -66,7 +67,7 @@ internal fun DeviceCenterContent(
                         uiNode = deviceFolders[itemIndex],
                         onBackupFolderClicked = onBackupFolderClicked,
                         onNonBackupFolderClicked = onNonBackupFolderClicked,
-                        onInfoClicked = onInfoClicked,
+                        onFolderMenuClicked = onFolderMenuClicked,
                     )
                 }
                 // The User's Devices are shown
@@ -91,7 +92,7 @@ internal fun DeviceCenterContent(
                 if (otherDevices.isNotEmpty()) {
                     item {
                         ItemHeader(
-                            modifier = Modifier.Companion.testTag(DEVICE_CENTER_OTHER_DEVICES_HEADER),
+                            modifier = Modifier.testTag(DEVICE_CENTER_OTHER_DEVICES_HEADER),
                             text = stringResource(R.string.device_center_list_view_item_header_other_devices),
                         )
                     }
@@ -125,7 +126,7 @@ private fun ItemHeader(
     ) {
         MegaText(
             text = text,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleSmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             textColor = TextColor.Secondary
@@ -146,6 +147,7 @@ private fun DeviceCenterContentWithOwnDeviceSectionOnlyPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onFolderMenuClicked = {},
             onInfoClicked = {}
         )
     }
@@ -164,6 +166,7 @@ private fun DeviceCenterContentWithOtherDevicesSectionOnlyPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onFolderMenuClicked = {},
             onInfoClicked = {},
         )
     }
@@ -187,6 +190,7 @@ private fun DeviceCenterContentWithBothDeviceSectionsPreview() {
             onDeviceMenuClicked = {},
             onBackupFolderClicked = {},
             onNonBackupFolderClicked = {},
+            onFolderMenuClicked = {},
             onInfoClicked = {},
         )
     }

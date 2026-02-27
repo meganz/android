@@ -12,6 +12,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import mega.privacy.android.feature.devicecenter.R
 import mega.privacy.android.feature.devicecenter.ui.model.BackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
+import mega.privacy.android.feature.devicecenter.ui.model.DeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceUINode
 import mega.privacy.android.feature.devicecenter.ui.model.NonBackupDeviceFolderUINode
 import mega.privacy.android.feature.devicecenter.ui.model.OwnDeviceUINode
@@ -53,7 +54,7 @@ internal fun DeviceCenterListViewItem(
     onDeviceMenuClicked: (DeviceUINode) -> Unit = {},
     onBackupFolderClicked: (BackupDeviceFolderUINode) -> Unit = {},
     onNonBackupFolderClicked: (NonBackupDeviceFolderUINode) -> Unit = {},
-    onInfoClicked: (DeviceCenterUINode) -> Unit = {},
+    onFolderMenuClicked: (DeviceFolderUINode) -> Unit = {},
 ) {
     ConstraintLayout(
         modifier = Modifier
@@ -89,10 +90,16 @@ internal fun DeviceCenterListViewItem(
             applySecondaryColorIconTint = uiNode.icon.applySecondaryColorTint,
             statusIcon = uiNode.status.icon,
             statusColor = uiNode.status.color,
-            onMoreClicked = if (uiNode is DeviceUINode) { ->
-                onDeviceMenuClicked(uiNode)
-            } else {
-                null
+            onMoreClicked = when (uiNode) {
+                is DeviceUINode -> {
+                    { onDeviceMenuClicked(uiNode) }
+                }
+
+                is DeviceFolderUINode -> {
+                    { onFolderMenuClicked(uiNode) }
+                }
+
+                else -> null
             },
         )
         MegaDivider(
