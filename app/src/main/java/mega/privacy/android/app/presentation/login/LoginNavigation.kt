@@ -26,6 +26,7 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 data class LoginNavKey(
     val action: String? = null,
     val link: String? = null,
+    val timeStamp: Long = System.currentTimeMillis(),
 ) : NoSessionNavKey.Mandatory, Parcelable
 
 internal fun NavGraphBuilder.loginScreen(
@@ -69,7 +70,7 @@ internal fun EntryProviderScope<NavKey>.loginScreen(
     entry<LoginNavKey> { key ->
         val billingViewModel = hiltViewModel<BillingViewModel>()
 
-        LaunchedEffect(key.action, key.link) {
+        LaunchedEffect(key.timeStamp, key.action, key.link) {
             checkActions(sharedViewModel = sharedViewModel, action = key.action, link = key.link)
         }
 
