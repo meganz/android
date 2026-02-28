@@ -83,8 +83,12 @@ replay_pid*
 
 # ai files
 .cursor*
-.claude*
 .devcontainer*
+.claude/
+!.claude/
+!.claude/skills/
+!.claude/skills/**
+.claude/settings.local.json
 
 *.keystore
 google-services.json
