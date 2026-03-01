@@ -22,8 +22,6 @@ data class ChooseAccountState(
     val currentSubscriptionPlan: AccountType? = null,
     val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
     val userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
-    val isExternalCheckoutEnabled: Boolean = false,
-    val isExternalCheckoutDefault: Boolean = false,
     val isSingleActivityEnabled: Boolean = false,
     val isSubscriptionFeatureAvailable: Boolean? = null,
 ) {

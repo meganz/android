@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import android.app.Activity
-import android.net.Uri
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -168,14 +167,4 @@ internal class DefaultBillingRepository @Inject constructor(
         }
     }
 
-    override suspend fun isExternalContentLinkAvailable(): Boolean =
-        billingGateway.isExternalContentLinkAvailable()
-
-    override suspend fun createExternalContentLinkReportingDetails(): String? =
-        billingGateway.createExternalContentLinkReportingDetails()
-
-    override suspend fun launchExternalContentLink(
-        activity: Activity,
-        linkUri: Uri,
-    ) = billingGateway.launchExternalContentLink(activity, linkUri)
 }

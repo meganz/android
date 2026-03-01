@@ -39,7 +39,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.MegaText
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
-import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
 import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
@@ -60,7 +58,6 @@ import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
-import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
@@ -80,14 +77,8 @@ fun NewChooseAccountScreen(
     onBack: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
-    billingUIState: BillingUIState = BillingUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
-    userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
-    isExternalCheckoutEnabled: Boolean = false,
-    isExternalCheckoutDefault: Boolean = false,
-    onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
-    clearExternalPurchaseError: () -> Unit = {},
     onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
@@ -160,16 +151,6 @@ fun NewChooseAccountScreen(
         }
     }
 
-    EventEffect(
-        event = billingUIState.generalError,
-        onConsumed = clearExternalPurchaseError,
-        action = {
-            snackBarHostState.showAutoDurationSnackbar(
-                resources.getString(sharedR.string.general_text_error)
-            )
-        }
-    )
-
     val proFeatures = remember(highestStorageString) {
         listOf(
             ProFeature(
@@ -231,17 +212,15 @@ fun NewChooseAccountScreen(
 
                     if (subscriptionForPeriod != null) {
                         BuyPlanBottomBar(
-                            accountType = accountType,
-                            isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                            isExternalCheckoutDefault = isExternalCheckoutDefault,
-                            userAgeComplianceStatus = userAgeComplianceStatus,
-                            selectedSubscription = selectedSubscription,
-                            isMonthly = isMonthly,
-                            onInAppCheckoutClick = onInAppCheckoutClick,
-                            onExternalCheckoutClick = { subscription ->
-                                onExternalCheckoutClick(subscription, isMonthly)
+                            modifier = Modifier,
+                            text = stringResource(
+                                accountType.toUIAccountType().textBuyButtonValue
+                            ),
+                            onClick = {
+                                selectedSubscription?.getSubscription(isMonthly)?.let {
+                                    onInAppCheckoutClick(it)
+                                }
                             },
-                            isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
                         )
                     }
                 }
@@ -387,57 +366,6 @@ fun getOfferPeriodLabel(discountedPrice: String, period: OfferPeriod) = when (pe
             period.value,
             discountedPrice,
             period.value
-        )
-    }
-}
-
-/**
- * Render the buy plan bottom bar, handling both single and dual button scenarios
- */
-@Composable
-private fun BuyPlanBottomBar(
-    accountType: AccountType,
-    isExternalCheckoutEnabled: Boolean,
-    isExternalCheckoutDefault: Boolean,
-    userAgeComplianceStatus: UserAgeComplianceStatus,
-    selectedSubscription: LocalisedSubscription?,
-    isMonthly: Boolean,
-    onInAppCheckoutClick: (Subscription) -> Unit,
-    onExternalCheckoutClick: (Subscription) -> Unit,
-    isLoadingExternalCheckout: Boolean = false,
-) {
-    val inAppCheckoutText = stringResource(accountType.toUIAccountType().textBuyButtonValue)
-    val externalCheckoutText = stringResource(
-        sharedR.string.external_checkout_button_text,
-        15.0f
-    )
-
-    if (isExternalCheckoutEnabled && userAgeComplianceStatus == UserAgeComplianceStatus.AdultVerified) {
-        BuyPlanBottomBar(
-            modifier = Modifier,
-            isExternalCheckoutDefault = isExternalCheckoutDefault,
-            inAppCheckoutText = inAppCheckoutText,
-            externalCheckoutText = externalCheckoutText,
-            isLoadingExternalCheckout = isLoadingExternalCheckout,
-            onClick = { isExternalCheckout ->
-                selectedSubscription?.getSubscription(isMonthly)?.let {
-                    if (isExternalCheckout) {
-                        onExternalCheckoutClick(it)
-                    } else {
-                        onInAppCheckoutClick(it)
-                    }
-                }
-            },
-        )
-    } else {
-        BuyPlanBottomBar(
-            modifier = Modifier,
-            text = inAppCheckoutText,
-            onClick = {
-                selectedSubscription?.getSubscription(isMonthly)?.let {
-                    onInAppCheckoutClick(it)
-                }
-            },
         )
     }
 }

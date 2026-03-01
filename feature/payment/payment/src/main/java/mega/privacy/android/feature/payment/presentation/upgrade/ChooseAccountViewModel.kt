@@ -20,12 +20,10 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
 import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
@@ -46,7 +44,6 @@ class ChooseAccountViewModel @Inject constructor(
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
     private val getRecommendedSubscriptionUseCase: GetRecommendedSubscriptionUseCase,
-    private val isExternalContentLinkSupportedUseCase: IsExternalContentLinkSupportedUseCase,
     private val isSubscriptionFeatureAvailableUseCase: IsSubscriptionFeatureAvailableUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -115,20 +112,6 @@ class ChooseAccountViewModel @Inject constructor(
                     isSubscriptionFeatureAvailable = isSubscriptionFeatureAvailable
                 )
             }
-        }
-        viewModelScope.launch {
-            runCatching {
-                val isExternalCheckoutEnabled =
-                    getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers)
-                val isExternalCheckoutDefault = getFeatureFlagValueUseCase(ABTestFeatures.ande)
-                val isExternalContentLinkSupported = isExternalContentLinkSupportedUseCase()
-                _state.update {
-                    it.copy(
-                        isExternalCheckoutEnabled = isExternalCheckoutEnabled && isExternalContentLinkSupported,
-                        isExternalCheckoutDefault = isExternalCheckoutDefault,
-                    )
-                }
-            }.onFailure(Timber.Forest::e)
         }
         viewModelScope.launch {
             runCatching {
