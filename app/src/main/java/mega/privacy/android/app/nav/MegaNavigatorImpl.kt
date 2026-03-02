@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_DEVICE_CENTER
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_SYNC_MEGA_FOLDER
+import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -67,6 +68,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
@@ -885,14 +887,14 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openTakedownPolicyLink(context: Context) {
         launchUrl(
             context = context,
-            url = "https://${getDomainNameUseCase()}/takedown"
+            url = TAKEDOWN_URL,
         )
     }
 
     override fun openDisputeTakedownLink(context: Context) {
         launchUrl(
             context = context,
-            url = "https://${getDomainNameUseCase()}/dispute"
+            url = DISPUTE_URL,
         )
     }
 
