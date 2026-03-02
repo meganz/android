@@ -200,9 +200,7 @@ import mega.privacy.android.app.presentation.notification.model.NotificationNavi
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
-import mega.privacy.android.app.presentation.photos.PhotosFragment
-import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
-import mega.privacy.android.app.presentation.photos.albums.albumcontent.AlbumContentFragment
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
@@ -566,7 +564,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     // Fragments
     private var cloudDriveSyncsFragment: CloudDriveSyncsFragment? = null
     private var rubbishBinComposeFragment: LegacyRubbishBinFragment? = null
-    private var photosFragment: PhotosFragment? = null
     private var albumContentFragment: Fragment? = null
     private var photosFilterFragment: PhotosFilterFragment? = null
     private var chatTabsFragment: ChatTabsFragment? = null
@@ -742,15 +739,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         outState.putInt(Constants.TYPE_CALL_PERMISSION, typesCameraPermission)
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink)
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
-        photosFragment?.let {
-            if (photosFragment?.isAdded == true) {
-                supportFragmentManager.putFragment(
-                    outState,
-                    FragmentTag.PHOTOS.tag,
-                    it
-                )
-            }
-        }
         uploadBottomSheetDialogActionHandler.onSaveInstanceState(outState)
         outState.putBoolean(PROCESS_FILE_DIALOG_SHOWN, isAlertDialogShown(processFileDialog))
         outState.putBoolean(STATE_KEY_IS_IN_ALBUM_CONTENT, isInAlbumContent)
@@ -1536,7 +1524,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     } else if (intent.action == ACTION_SHOW_CU_PROGRESS_VIEW) {
                         drawerItem = DrawerItem.PHOTOS
                         selectDrawerItem(drawerItem)
-                        photosFragment?.triggerCUProgressViewEvent()
                         selectDrawerItemPending = false
                         intent = null
                     } else if (intent.action == Constants.ACTION_OPEN_FOLDER) {
@@ -2455,12 +2442,9 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 handleShowingAds()
             } else {
                 hideAdsView()
-                //When the Camera Uploads transfer screen is shown, the BNV should remain hidden
-                if (photosFragment?.isCameraUploadsTransferScreen() != true) {
-                    showBNVImmediate()
-                    showHideBottomNavigationView(hide = false)
-                    updateHomepageFabPosition()
-                }
+                showBNVImmediate()
+                showHideBottomNavigationView(hide = false)
+                updateHomepageFabPosition()
             }
         }
         adsContainerView.setContent {
@@ -2796,7 +2780,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                 ACTION_SHOW_CU_PROGRESS_VIEW -> {
                     drawerItem = DrawerItem.PHOTOS
                     selectDrawerItem(drawerItem)
-                    photosFragment?.triggerCUProgressViewEvent()
                 }
 
                 Constants.ACTION_OPEN_FOLDER -> {
@@ -2986,22 +2969,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    fun skipToAlbumContentFragment(fragment: Fragment) {
-        albumContentFragment = fragment
-        replaceFragment(fragment, FragmentTag.ALBUM_CONTENT.tag)
-        isInAlbumContent = true
-        viewModel.setIsFirstNavigationLevel(false)
-        hideAdsView()
-        showHideBottomNavigationView(true)
-    }
-
-    fun skipToFilterFragment(fragment: PhotosFilterFragment) {
-        photosFilterFragment = fragment
-        replaceFragment(fragment, FragmentTag.PHOTOS_FILTER.tag)
-        isInFilterPage = true
-        viewModel.setIsFirstNavigationLevel(false)
-        showHideBottomNavigationView(true)
-    }
 
     private fun replaceFragment(fragment: Fragment, fragmentTag: String?) {
         val ft: FragmentTransaction = supportFragmentManager.beginTransaction()
@@ -3182,20 +3149,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.PHOTOS -> {
                 if (isInAlbumContent) {
-                    if (albumContentFragment is AlbumContentFragment && albumContentFragment?.isVisible == true) {
-                        val title = (albumContentFragment as? AlbumContentFragment)
-                            ?.getCurrentAlbumTitle()
-                        supportActionBar?.setTitle(title)
-                    } else {
-                        supportActionBar?.setTitle(getString(R.string.title_favourites_album))
-                    }
+                    supportActionBar?.setTitle(getString(R.string.title_favourites_album))
                     viewModel.setIsFirstNavigationLevel(false)
                 } else if (isInFilterPage) {
                     supportActionBar?.title = getString(R.string.photos_action_filter)
                     viewModel.setIsFirstNavigationLevel(false)
-                } else if (getPhotosFragment() != null) {
+                } else {
                     supportActionBar?.title = getString(R.string.sortby_type_photo_first)
-                    viewModel.setIsFirstNavigationLevel(!canPhotosEnableCUViewBack())
+                    viewModel.setIsFirstNavigationLevel(true)
                 }
             }
 
@@ -3328,32 +3289,15 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
             }
 
             else -> {
-                if (getPhotosFragment() != null) {
-                    if (canPhotosEnableCUViewBack()) {
-                        supportActionBar?.setHomeAsUpIndicator(
-                            tintIcon(
-                                this,
-                                R.drawable.ic_arrow_back_white
-                            )
-                        )
-                    } else {
-                        supportActionBar?.setHomeAsUpIndicator(
-                            tintIcon(
-                                this,
-                                R.drawable.ic_menu_white
-                            )
-                        )
-                    }
-                }
+                supportActionBar?.setHomeAsUpIndicator(
+                    tintIcon(
+                        this,
+                        R.drawable.ic_menu_white
+                    )
+                )
             }
         }
     }
-
-    private fun canPhotosEnableCUViewBack() =
-        viewModel.state().isFirstLogin
-                && photosFragment?.isEnableCameraUploadsViewShown() == true
-                && photosFragment?.doesAccountHavePhotos() == true
-                && photosFragment?.isInTimeline() == true
 
     private fun showOnlineMode() {
         Timber.d("showOnlineMode")
@@ -3665,9 +3609,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      */
     private fun resetCUFragment() {
         cameraUploadViewTypes.visibility = View.GONE
-        if (getPhotosFragment() != null) {
-            showBottomView()
-        }
+        showBottomView()
     }
 
     override fun drawerItemClicked(item: DrawerItem) {
@@ -3849,10 +3791,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
 
             DrawerItem.PHOTOS -> {
                 when {
-                    (isInAlbumContent || isInFilterPage) && photosFragment?.isCameraUploadsTransferScreen() == true -> {
-                        showHideBottomNavigationView(true)
-                    }
-
                     isInAlbumContent && albumContentFragment != null -> {
                         // Restore album content state after configuration change
                         hideAdsView()
@@ -3865,13 +3803,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                     }
 
                     else -> {
-                        if (getPhotosFragment() == null) {
-                            photosFragment =
-                                PhotosFragment.newInstance(viewModel.state().isFirstLogin)
-                        } else {
-                            refreshFragment(FragmentTag.PHOTOS.tag)
-                        }
-                        photosFragment?.let { replaceFragment(it, FragmentTag.PHOTOS.tag) }
                         setupPhotosDrawerItem(hideBottomNav = false, hideFab = false)
                     }
                 }
@@ -4536,15 +4467,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         rubbishBinComposeFragment = getRubbishBinComposeFragment()
                         rubbishBinComposeFragment?.onBackPressed()
                     } else if (drawerItem == DrawerItem.PHOTOS) {
-                        if (getPhotosFragment() != null) {
-                            if (canPhotosEnableCUViewBack()) {
-                                photosFragment?.onBackPressed()
-                            }
-                            setToolbarTitle()
-                            invalidateOptionsMenu()
-                            return true
-                        } else if (isInAlbumContent || isInFilterPage) {
-                            // When current fragment is AlbumContentFragment, the photosFragment will be null due to replaceFragment.
+                        if (isInAlbumContent || isInFilterPage) {
                             onBackPressedDispatcher.onBackPressed()
                         }
                     } else if (drawerItem == DrawerItem.BACKUPS) {
@@ -4791,20 +4714,14 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         } else if (drawerItem == DrawerItem.CHAT) {
             performOnBack()
         } else if (drawerItem == DrawerItem.PHOTOS) {
-            //When Camera Uploads transfer screen is shown, back press will trigger the event to hide the transfer screen
-            if (photosFragment?.isCameraUploadsTransferScreen() == true) {
-                photosFragment?.triggerPopBackFromCameraUploadsTransferScreenEvent()
-            } else if (isInAlbumContent) {
+            if (isInAlbumContent) {
                 fromAlbumContent = true
                 isInAlbumContent = false
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)
             } else if (isInFilterPage) {
                 isInFilterPage = false
                 goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                if (photosFragment == null) {
-                    goBackToBottomNavigationItem(bottomNavigationCurrentItem)
-                }
-            } else if (getPhotosFragment() == null || photosFragment?.onBackPressed() == 0) {
+            } else {
                 performOnBack()
             }
         } else if (isInMainHomePage) {
@@ -5597,22 +5514,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
     private fun cameraUploadsClicked() {
         Timber.d("cameraUploadsClicked")
         drawerItem = DrawerItem.PHOTOS
-        //Only when camera uploads transfer screen is not shown, we need to set the photos BNV checked.
-        if (photosFragment?.isCameraUploadsTransferScreen() != true) {
-            setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-            selectDrawerItem(drawerItem)
-        }
-    }
-
-    /**
-     * Refresh the UI of the Photos feature
-     */
-    fun refreshPhotosFragment() {
-        if (!isInPhotosPage) return
-        drawerItem = DrawerItem.PHOTOS
         setBottomNavigationMenuItemChecked(PHOTOS_BNV)
-        setToolbarTitle()
-        (supportFragmentManager.findFragmentByTag(FragmentTag.PHOTOS.tag) as? PhotosFragment)?.refreshViewLayout()
+        selectDrawerItem(drawerItem)
     }
 
     /**
@@ -6951,13 +6854,6 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         }
     }
 
-    private fun getPhotosFragment(): PhotosFragment? {
-        return (supportFragmentManager
-            .findFragmentByTag(FragmentTag.PHOTOS.tag) as? PhotosFragment).also {
-            photosFragment = it
-        }
-    }
-
     private val chatsFragment: ChatTabsFragment?
         get() = (supportFragmentManager.findFragmentByTag(FragmentTag.RECENT_CHAT.tag) as? ChatTabsFragment).also {
             chatTabsFragment = it
@@ -7180,7 +7076,7 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
      * @return True if the current screen is Photos, false otherwise.
      */
     val isInPhotosPage: Boolean
-        get() = drawerItem === DrawerItem.PHOTOS && photosFragment?.isCameraUploadsTransferScreen() != true
+        get() = drawerItem === DrawerItem.PHOTOS
 
     /**
      * Checks if the current screen is Media Discovery Fragment.

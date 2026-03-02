@@ -13,7 +13,6 @@ import androidx.work.ForegroundInfo
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.photos.PhotosFragment.Companion.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.INITIAL_PREFERENCE
 import mega.privacy.android.app.presentation.settings.SettingsFragment.Companion.NAVIGATE_TO_INITIAL_PREFERENCE
@@ -22,6 +21,7 @@ import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCame
 import mega.privacy.android.app.presentation.settings.compose.SettingsHomeActivity
 import mega.privacy.android.app.presentation.settings.model.cameraUploadsTargetPreference
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType

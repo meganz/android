@@ -37,7 +37,6 @@ internal class OpenLinkErrorMapper @Inject constructor() {
                 RegexPatternType.FILE_LINK,
                 RegexPatternType.FOLDER_LINK,
                 RegexPatternType.PASSWORD_LINK,
-                RegexPatternType.ALBUM_LINK,
                 -> null
 
                 else -> R.string.invalid_file_folder_link

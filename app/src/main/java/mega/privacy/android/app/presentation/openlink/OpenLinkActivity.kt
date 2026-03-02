@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.filelink.FileLinkComposeActivity
 import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_REFRESH_AND_OPEN_SESSION_LINK
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.participatingInACall
@@ -94,7 +93,6 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.isURLSanitized
 import mega.privacy.android.domain.entity.RegexPatternType
-import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.exception.ResetPasswordLinkException
 import mega.privacy.android.domain.usecase.GetUrlRegexPatternTypeUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
@@ -278,19 +276,6 @@ class OpenLinkActivity : PasscodeActivity(), LoadPreviewListener.OnPreviewLoaded
             !url.isURLSanitized() -> {
                 Timber.d("OpenLinkActivity: URL doesn't match regex pattern or whitelisted $url")
                 setError(getString(R.string.open_link_not_valid_link))
-            }
-            // Album link
-            matchRegexs(url, ALBUM_LINK_REGEX_ARRAY) -> {
-                lifecycleScope.launch {
-                    val intent = AlbumScreenWrapperActivity.createAlbumImportScreen(
-                        context = this@OpenLinkActivity,
-                        albumLink = AlbumLink(url.orEmpty()),
-                    ).apply {
-                        flags = FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    startActivity(intent)
-                    finish()
-                }
             }
             // Email verification link
             matchRegexs(url, EMAIL_VERIFY_LINK_REGEX_ARRAY) -> {

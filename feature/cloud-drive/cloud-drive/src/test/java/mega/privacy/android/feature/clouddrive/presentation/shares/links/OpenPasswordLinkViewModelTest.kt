@@ -138,7 +138,6 @@ class OpenPasswordLinkViewModelTest {
                 password
             )
         ) doReturn decryptedLink
-        whenever(getDecodedUrlRegexPatternTypeUseCase(decryptedLink)) doReturn RegexPatternType.ALBUM_LINK
 
         viewModel.decryptPasswordProtectedLink(passwordProtectedLink, password)
 

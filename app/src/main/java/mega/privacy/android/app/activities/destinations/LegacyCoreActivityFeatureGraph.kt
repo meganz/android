@@ -74,7 +74,9 @@ class LegacyCoreActivityFeatureGraph(
             legacyTextEditorScreen(navigationHandler::back)
             legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
             videoSectionLegacyDestination(navigationHandler::back)
+            legacyAlbumContentPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)
+            legacyAddToAlbumActivityNavKey(navigationHandler::returnResult)
             legacyMeetingScreen(
                 navigationHandler::back,
                 megaChatRequestHandler,

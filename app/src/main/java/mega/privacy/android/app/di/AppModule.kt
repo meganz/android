@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.login.createaccount.AccountInvitati
 import mega.privacy.android.app.presentation.login.createaccount.CreateAccountDeepLinkHandler
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutDialogDestinations
 import mega.privacy.android.app.presentation.meeting.navigation.FreePlanParticipantsLimitDialogDestination
-import mega.privacy.android.app.presentation.photos.albums.navigation.AlbumsDeepLinkHandler
 import mega.privacy.android.app.presentation.purchase.PurchaseResultDialogDestinations
 import mega.privacy.android.app.presentation.settings.SettingsDeepLinkHandler
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyDeepLinkHandler
@@ -259,8 +258,4 @@ internal class AppModule {
     @Provides
     @IntoSet
     fun provideMyAccountDeepLinkHandle(handler: MyAccountDeepLinkHandler): DeepLinkHandler = handler
-
-    @Provides
-    @IntoSet
-    fun provideAlbumsDeepLinkHandle(handler: AlbumsDeepLinkHandler): DeepLinkHandler = handler
 }

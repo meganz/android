@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.ACCOUNT_INVITATION_LINK
-import mega.privacy.android.domain.entity.RegexPatternType.ALBUM_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.BUSINESS_INVITE_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CANCEL_ACCOUNT_LINK
 import mega.privacy.android.domain.entity.RegexPatternType.CHAT_LINK
@@ -70,7 +69,6 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             isUrlMatchesRegexUseCase(url, FOLDER_LINK_REGEX) -> FOLDER_LINK
             isUrlMatchesRegexUseCase(url, CHAT_LINK_REGEX) -> CHAT_LINK
             isUrlMatchesRegexUseCase(url, PASSWORD_LINK_REGEX) -> PASSWORD_LINK
-            isUrlMatchesRegexUseCase(url, ALBUM_LINK_REGEX) -> ALBUM_LINK
             isUrlMatchesRegexUseCase(url, ACCOUNT_INVITATION_LINK_REGEX) -> ACCOUNT_INVITATION_LINK
             isUrlMatchesRegexUseCase(url, EXPORT_MASTER_KEY_LINK_REGEX) -> EXPORT_MASTER_KEY_LINK
             isUrlMatchesRegexUseCase(url, NEW_MESSAGE_CHAT_LINK_REGEX) -> NEW_MESSAGE_CHAT_LINK
@@ -357,14 +355,6 @@ class GetUrlRegexPatternTypeUseCase @Inject constructor(
             "^https://mega\\.nz/businessinvite.+$",
             "^https://mega\\.app/#businessinvite.+$",
             "^https://mega\\.app/businessinvite.+$"
-        )
-
-        /**
-         * This Regex Pattern checks for the existence of 'collection/' link in MEGA Url
-         */
-        private val ALBUM_LINK_REGEX = arrayOf(
-            "^https://mega\\.nz/collection/.+$",
-            "^https://mega\\.app/collection/.+$",
         )
 
         /**
