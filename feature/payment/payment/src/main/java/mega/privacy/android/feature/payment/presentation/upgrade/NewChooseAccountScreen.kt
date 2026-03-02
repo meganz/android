@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
@@ -43,16 +42,12 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getString
-import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaSnackbar
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.Badge
 import mega.android.core.ui.components.badge.BadgeType
 import mega.android.core.ui.components.chip.MegaChip
-import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
@@ -61,7 +56,6 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
-import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.feature.payment.R
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
@@ -73,9 +67,7 @@ import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.components.upgradeAccountSkeleton
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
-import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
-import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.icon.pack.IconPack
@@ -93,14 +85,8 @@ fun NewChooseAccountScreen(
     onBack: () -> Unit,
     uiState: ChooseAccountState = ChooseAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
-    billingUIState: BillingUIState = BillingUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
-    userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
-    isExternalCheckoutEnabled: Boolean = false,
-    isExternalCheckoutDefault: Boolean = false,
-    onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
-    clearExternalPurchaseError: () -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
@@ -143,19 +129,6 @@ fun NewChooseAccountScreen(
             }
         }
     }
-
-    EventEffect(
-        event = billingUIState.generalError,
-        onConsumed = clearExternalPurchaseError,
-        action = {
-            snackBarHostState.showAutoDurationSnackbar(
-                getString(
-                    context,
-                    sharedR.string.general_text_error
-                )
-            )
-        }
-    )
 
     val proFeatures = remember(highestStorageString) {
         listOf(
@@ -215,17 +188,15 @@ fun NewChooseAccountScreen(
                     .find { sub -> sub.accountType == chosenPlan }
 
                 BuyPlanBottomBar(
-                    accountType = accountType,
-                    isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-                    isExternalCheckoutDefault = isExternalCheckoutDefault,
-                    userAgeComplianceStatus = userAgeComplianceStatus,
-                    selectedSubscription = selectedSubscription,
-                    isMonthly = isMonthly,
-                    onInAppCheckoutClick = onInAppCheckoutClick,
-                    onExternalCheckoutClick = { subscription ->
-                        onExternalCheckoutClick(subscription, isMonthly)
+                    modifier = Modifier,
+                    text = stringResource(
+                        accountType.toUIAccountType().textBuyButtonValue
+                    ),
+                    onClick = {
+                        selectedSubscription?.getSubscription(isMonthly)?.let {
+                            onInAppCheckoutClick(it)
+                        }
                     },
-                    isLoadingExternalCheckout = billingUIState.isLoadingExternalCheckout,
                 )
             }
         }
@@ -500,57 +471,6 @@ fun getOfferPeriodLabel(discountedPrice: String, period: OfferPeriod) = when (pe
             period.value,
             discountedPrice,
             period.value
-        )
-    }
-}
-
-/**
- * Render the buy plan bottom bar, handling both single and dual button scenarios
- */
-@Composable
-private fun BuyPlanBottomBar(
-    accountType: AccountType,
-    isExternalCheckoutEnabled: Boolean,
-    isExternalCheckoutDefault: Boolean,
-    userAgeComplianceStatus: UserAgeComplianceStatus,
-    selectedSubscription: LocalisedSubscription?,
-    isMonthly: Boolean,
-    onInAppCheckoutClick: (Subscription) -> Unit,
-    onExternalCheckoutClick: (Subscription) -> Unit,
-    isLoadingExternalCheckout: Boolean = false,
-) {
-    val inAppCheckoutText = stringResource(accountType.toUIAccountType().textBuyButtonValue)
-    val externalCheckoutText = stringResource(
-        sharedR.string.external_checkout_button_text,
-        15.0f
-    )
-
-    if (isExternalCheckoutEnabled && userAgeComplianceStatus == UserAgeComplianceStatus.AdultVerified) {
-        BuyPlanBottomBar(
-            modifier = Modifier,
-            isExternalCheckoutDefault = isExternalCheckoutDefault,
-            inAppCheckoutText = inAppCheckoutText,
-            externalCheckoutText = externalCheckoutText,
-            isLoadingExternalCheckout = isLoadingExternalCheckout,
-            onClick = { isExternalCheckout ->
-                selectedSubscription?.getSubscription(isMonthly)?.let {
-                    if (isExternalCheckout) {
-                        onExternalCheckoutClick(it)
-                    } else {
-                        onInAppCheckoutClick(it)
-                    }
-                }
-            },
-        )
-    } else {
-        BuyPlanBottomBar(
-            modifier = Modifier,
-            text = inAppCheckoutText,
-            onClick = {
-                selectedSubscription?.getSubscription(isMonthly)?.let {
-                    onInAppCheckoutClick(it)
-                }
-            },
         )
     }
 }

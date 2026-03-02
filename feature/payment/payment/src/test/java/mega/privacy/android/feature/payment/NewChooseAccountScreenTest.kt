@@ -10,18 +10,14 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import de.palm.composestateevents.triggered
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
-import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_ON_WEBSITE_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
-import mega.privacy.android.feature.payment.model.BillingUIState
 import mega.privacy.android.feature.payment.model.ChooseAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -219,11 +215,10 @@ class NewChooseAccountScreenTest {
     }
 
     @Test
-    fun `test that single button is shown when external checkout is disabled`() {
+    fun `test that buy button is shown when plan is selected`() {
         var clickedSubscription: Subscription? = null
         setContent(
             isUpgradeAccount = true,
-            isExternalCheckoutEnabled = false,
             onBuyPlanClick = { clickedSubscription = it }
         )
 
@@ -233,131 +228,16 @@ class NewChooseAccountScreenTest {
         composeRule.onNodeWithTag(testTag).performClick()
 
         // Verify button exists (in-app checkout button)
-        // The button should be clickable and contain "Buy" text
         composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
             .assertIsDisplayed()
     }
 
     @Test
-    fun `test that two buttons are shown when external checkout is enabled`() {
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify both buttons exist and are displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that external checkout button is primary when isExternalCheckoutDefault is true`() {
-        var externalCheckoutClicked = false
-        var inAppCheckoutClicked = false
-
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = true,
-            onExternalCheckoutClick = { _, _ -> externalCheckoutClicked = true },
-            onBuyPlanClick = { inAppCheckoutClicked = true }
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify both buttons exist and are displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-
-        // Verify button order: external checkout button should be first (primary)
-        // When external is default, external button is the primary button (appears first)
-        // Click the external checkout button and verify callback
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .performClick()
-
-        assert(externalCheckoutClicked) { "External checkout callback should be called when primary button is clicked" }
-        assert(!inAppCheckoutClicked) { "In-app checkout callback should not be called" }
-    }
-
-    @Test
-    fun `test that in-app checkout button is primary when isExternalCheckoutDefault is false`() {
-        var externalCheckoutClicked = false
-        var inAppCheckoutClicked = false
-
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false,
-            onExternalCheckoutClick = { _, _ -> externalCheckoutClicked = true },
-            onBuyPlanClick = { inAppCheckoutClicked = true }
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify both buttons exist and are displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-
-        // Verify button order: in-app checkout button should be first (primary)
-        // Click the first button (should be in-app checkout) and verify callback
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .performClick()
-
-        assert(inAppCheckoutClicked) { "In-app checkout callback should be called when primary button is clicked" }
-        assert(!externalCheckoutClicked) { "External checkout callback should not be called" }
-    }
-
-    @Test
-    fun `test that onExternalCheckoutClick is called when external button is clicked`() {
+    fun `test that onInAppCheckoutClick is called when buy button is clicked`() {
         var clickedSubscription: Subscription? = null
 
         setContent(
             isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false,
-            onExternalCheckoutClick = { subscription, _ -> clickedSubscription = subscription }
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Click external checkout button (the one with "website" text)
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .performClick()
-
-        // Verify callback was called with correct subscription
-        assert(clickedSubscription != null) { "Callback should be called when external button is clicked" }
-        assert(clickedSubscription?.accountType == AccountType.PRO_I) { "Subscription account type should be PRO_I" }
-    }
-
-    @Test
-    fun `test that onInAppCheckoutClick is called when in-app button is clicked`() {
-        var clickedSubscription: Subscription? = null
-
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false,
             onBuyPlanClick = { clickedSubscription = it }
         )
 
@@ -373,50 +253,6 @@ class NewChooseAccountScreenTest {
         // Verify callback was called with correct subscription
         assert(clickedSubscription != null) { "Callback should be called when in-app button is clicked" }
         assert(clickedSubscription?.accountType == AccountType.PRO_I) { "Subscription account type should be PRO_I" }
-    }
-
-    @Test
-    fun `test that discount percentage is displayed in external checkout button`() {
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify external checkout button shows discount text (contains "Save" and "%")
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-
-        // Verify discount percentage text is displayed
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val externalButtonText =
-            context.getString(sharedR.string.external_checkout_button_text, 15.0f)
-        composeRule.onNodeWithText(externalButtonText)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that error snackbar is displayed when billingUIState has generalError triggered`() {
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val errorMessage = context.getString(sharedR.string.general_text_error)
-
-        setContent(
-            isUpgradeAccount = true,
-            billingUIState = BillingUIState(generalError = triggered),
-            clearExternalPurchaseError = {}
-        )
-
-        // Wait for composition and event processing
-        composeRule.waitForIdle()
-
-        // Verify error snackbar is displayed with the error message
-        composeRule.onNodeWithText(errorMessage)
-            .assertIsDisplayed()
     }
 
     @Test
@@ -457,85 +293,14 @@ class NewChooseAccountScreenTest {
         }
     }
 
-    @Test
-    fun `test that external checkout button is shown when external checkout is enabled and user is adult`() {
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false,
-            userAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify both buttons exist and are displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that external checkout button is not shown when user is under age`() {
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false,
-            userAgeComplianceStatus = UserAgeComplianceStatus.RequiresMinorRestriction
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify only in-app checkout button is displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        // Verify external checkout button is not displayed
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertDoesNotExist()
-    }
-
-    @Test
-    fun `test that external checkout button is shown when userAgeComplianceStatus defaults to AdultVerified`() {
-        setContent(
-            isUpgradeAccount = true,
-            isExternalCheckoutEnabled = true,
-            isExternalCheckoutDefault = false
-            // userAgeComplianceStatus defaults to AdultVerified
-        )
-
-        val testTag = "${TEST_TAG_PRO_PLAN_CARD}0"
-        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN).performScrollToNode(hasTestTag(testTag))
-        // Select a plan first
-        composeRule.onNodeWithTag(testTag).performClick()
-
-        // Verify both buttons exist and are displayed (default behavior)
-        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON)
-            .assertIsDisplayed()
-        composeRule.onNodeWithTag(TEST_TAG_BUY_ON_WEBSITE_BUTTON)
-            .assertIsDisplayed()
-    }
 
     private fun setContent(
         isUpgradeAccount: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
-        isExternalCheckoutEnabled: Boolean = false,
-        isExternalCheckoutDefault: Boolean = false,
-        onExternalCheckoutClick: (Subscription, Boolean) -> Unit = { _, _ -> },
-        billingUIState: BillingUIState = BillingUIState(),
-        clearExternalPurchaseError: () -> Unit = {},
-        userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
         uiState: ChooseAccountState = ChooseAccountState(
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
-            isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-            isExternalCheckoutDefault = isExternalCheckoutDefault,
         ),
     ) = composeRule.setContent {
         NewChooseAccountScreen(
@@ -543,14 +308,8 @@ class NewChooseAccountScreenTest {
             onFreePlanClicked = onFreePlanClick,
             maybeLaterClicked = maybeLaterClicked,
             uiState = uiState,
-            billingUIState = billingUIState,
-            clearExternalPurchaseError = clearExternalPurchaseError,
             onBack = {},
             isUpgradeAccount = isUpgradeAccount,
-            isExternalCheckoutEnabled = isExternalCheckoutEnabled,
-            isExternalCheckoutDefault = isExternalCheckoutDefault,
-            onExternalCheckoutClick = onExternalCheckoutClick,
-            userAgeComplianceStatus = userAgeComplianceStatus
         )
     }
 }

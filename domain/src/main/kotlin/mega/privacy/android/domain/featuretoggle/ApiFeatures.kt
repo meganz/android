@@ -45,12 +45,6 @@ enum class ApiFeatures(
         false
     ),
 
-    EnableUSExternalBillingForEligibleUsers(
-        "aepay",
-        "Enables US external billing for eligible users",
-        false
-    ),
-
     /**
      * Controls whether Android 16+ orientation migration is enabled.
      *

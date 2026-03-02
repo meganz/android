@@ -7,10 +7,8 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.coroutine.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.AccountType
@@ -33,7 +31,6 @@ import mega.privacy.mobile.analytics.event.BuyProLiteEvent
 import mega.privacy.mobile.analytics.event.GetStartedForFreeUpgradePlanButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressedEvent
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
-import timber.log.Timber
 
 @Composable
 fun ChooseAccountRoute(
@@ -47,7 +44,6 @@ fun ChooseAccountRoute(
 ) {
     val uiState by chooseAccountViewModel.state.collectAsStateWithLifecycle()
     val accountStorageUiState by accountStorageViewModel.state.collectAsStateWithLifecycle()
-    val billingUIState by billingViewModel.uiState.collectAsStateWithLifecycle()
     val megaNavigator = rememberMegaNavigator()
     val activity = LocalActivity.current
 
@@ -72,24 +68,9 @@ fun ChooseAccountRoute(
         }
     }
 
-    EventEffect(
-        event = billingUIState.onExternalPurchaseClick,
-        onConsumed = billingViewModel::onExternalPurchaseClickEventConsumed
-    ) { url ->
-        runCatching {
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            activity?.startActivity(intent)
-        }.onFailure { e ->
-            Timber.Forest.e(e, "Failed to launch external purchase URL: $url")
-            billingViewModel.onGeneralError()
-        }
-    }
-
     NewChooseAccountScreen(
         uiState = uiState,
         accountStorageUiState = accountStorageUiState,
-        billingUIState = billingUIState,
         isNewCreationAccount = isNewCreationAccount,
         isUpgradeAccount = isUpgradeAccount,
         onFreePlanClicked = {
@@ -131,21 +112,6 @@ fun ChooseAccountRoute(
                 )
             }
         },
-        onExternalCheckoutClick = { subscription, monthly ->
-            sendAccountTypeAnalytics(
-                isUpgradeAccount = isUpgradeAccount,
-                openFromSource = openFromSource,
-                planType = subscription.accountType,
-                isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
-            )
-            activity?.let {
-                billingViewModel.onExternalPurchaseClick(it, subscription, monthly)
-            }
-        },
-        isExternalCheckoutEnabled = uiState.isExternalCheckoutEnabled,
-        isExternalCheckoutDefault = uiState.isExternalCheckoutDefault,
-        userAgeComplianceStatus = uiState.userAgeComplianceStatus,
-        clearExternalPurchaseError = billingViewModel::clearExternalPurchaseError,
         onBack = {
             Analytics.tracker.trackEvent(BackButtonPressedEvent)
             onBack()

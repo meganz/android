@@ -5,7 +5,6 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -17,8 +16,8 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
+import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -27,21 +26,17 @@ import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
-import mega.privacy.android.domain.usecase.billing.IsExternalContentLinkSupportedUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
-import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -70,8 +65,6 @@ class ChooseAccountViewModelTest {
         )
     private val getRecommendedSubscriptionUseCase =
         mock<GetRecommendedSubscriptionUseCase>()
-    private val isExternalContentLinkSupportedUseCase =
-        mock<IsExternalContentLinkSupportedUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val ageSignalUseCase = mock<AgeSignalUseCase>()
@@ -84,7 +77,6 @@ class ChooseAccountViewModelTest {
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
             getRecommendedSubscriptionUseCase,
-            isExternalContentLinkSupportedUseCase,
             getPricing,
             monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase,
@@ -98,7 +90,6 @@ class ChooseAccountViewModelTest {
             getSubscriptionsUseCase = getSubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
             getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
-            isExternalContentLinkSupportedUseCase = isExternalContentLinkSupportedUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ageSignalUseCase = ageSignalUseCase,
@@ -129,7 +120,6 @@ class ChooseAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
         initViewModel()
         underTest.state.map { it.localisedSubscriptionsList }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedLocalisedSubscriptionsList)
@@ -154,7 +144,6 @@ class ChooseAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
         initViewModel()
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
@@ -194,113 +183,6 @@ class ChooseAccountViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = "test that isExternalCheckoutEnabled is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isExternalCheckoutEnabled is set from feature flag and external content link support`(
-        expectedValue: Boolean,
-    ) = runTest {
-        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getSubscriptionsUseCase()).thenReturn(
-            Subscriptions(
-                expectedMonthlySubscriptionsList,
-                expectedYearlySubscriptionsList
-            )
-        )
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-            .thenReturn(expectedValue)
-        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-        // External content link support must be true for external checkout to be enabled
-        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
-
-        initViewModel()
-
-        underTest.state.map { it.isExternalCheckoutEnabled }.test {
-            Truth.assertThat(awaitItem()).isEqualTo(expectedValue)
-        }
-    }
-
-    @Test
-    fun `test that isExternalCheckoutEnabled is false when external content link is not supported`() =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getSubscriptionsUseCase()).thenReturn(
-                Subscriptions(
-                    expectedMonthlySubscriptionsList,
-                    expectedYearlySubscriptionsList
-                )
-            )
-            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-                .thenReturn(true)
-            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(
-                false
-            )
-            wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(false)
-
-            initViewModel()
-
-            underTest.state.map { it.isExternalCheckoutEnabled }.test {
-                Truth.assertThat(awaitItem()).isFalse()
-            }
-        }
-
-    @ParameterizedTest(name = "test that isExternalCheckoutDefault is {0}")
-    @ValueSource(booleans = [true, false])
-    fun `test that isExternalCheckoutDefault is set from AB test flag`(expectedValue: Boolean) =
-        runTest {
-            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-            whenever(getSubscriptionsUseCase()).thenReturn(
-                Subscriptions(
-                    expectedMonthlySubscriptionsList,
-                    expectedYearlySubscriptionsList
-                )
-            )
-            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-                .thenReturn(true)
-            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(
-                expectedValue
-            )
-            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(
-                false
-            )
-            wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
-
-            initViewModel()
-
-            underTest.state.map { it.isExternalCheckoutDefault }.test {
-                Truth.assertThat(awaitItem()).isEqualTo(expectedValue)
-            }
-        }
-
-    @Test
-    fun `test that feature flags are loaded on initialization`() = runTest {
-        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
-        whenever(getSubscriptionsUseCase()).thenReturn(
-            Subscriptions(
-                expectedMonthlySubscriptionsList,
-                expectedYearlySubscriptionsList
-            )
-        )
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-            .thenReturn(true)
-        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(true)
-        whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-        wheneverBlocking { isExternalContentLinkSupportedUseCase() }.thenReturn(true)
-
-        initViewModel()
-
-        underTest.state.test {
-            val state = awaitItem()
-            Truth.assertThat(state.isExternalCheckoutEnabled).isTrue()
-            Truth.assertThat(state.isExternalCheckoutDefault).isTrue()
-        }
-    }
-
     @Test
     fun `test that userAgeComplianceStatus is AdultVerified when feature flag is disabled`() =
         runTest {
@@ -313,9 +195,6 @@ class ChooseAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(false)
-            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-                .thenReturn(false)
-            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
             initViewModel()
@@ -337,9 +216,6 @@ class ChooseAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(true)
-            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-                .thenReturn(false)
-            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
             wheneverBlocking { ageSignalUseCase() }.thenReturn(UserAgeComplianceStatus.AdultVerified)
 
@@ -362,9 +238,6 @@ class ChooseAccountViewModelTest {
             )
             wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
                 .thenReturn(true)
-            wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-                .thenReturn(false)
-            wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
             whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
             wheneverBlocking { ageSignalUseCase() }.thenReturn(
                 UserAgeComplianceStatus.RequiresMinorRestriction
@@ -390,9 +263,6 @@ class ChooseAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled) }
             .thenReturn(false)
-        wheneverBlocking { getFeatureFlagValueUseCase(ApiFeatures.EnableUSExternalBillingForEligibleUsers) }
-            .thenReturn(false)
-        wheneverBlocking { getFeatureFlagValueUseCase(ABTestFeatures.ande) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
 
         initViewModel()

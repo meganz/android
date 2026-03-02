@@ -3,7 +3,6 @@ package mega.privacy.android.data.facade
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -13,11 +12,8 @@ import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingFlowParams.SubscriptionUpdateParams
-import com.android.billingclient.api.BillingProgramReportingDetailsParams
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.GetBillingConfigParams
-import com.android.billingclient.api.LaunchExternalLinkParams
-import com.android.billingclient.api.LaunchExternalLinkResponseListener
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -46,7 +42,6 @@ import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.domain.entity.account.MegaSku
 import mega.privacy.android.domain.entity.billing.BillingEvent
-import mega.privacy.android.domain.entity.billing.ExternalContentLinkResult
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.ConnectBillingServiceException
@@ -441,93 +436,5 @@ internal class BillingFacade @Inject constructor(
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)
         accountInfoWrapper.updateActiveSubscription(max)
-    }
-
-    override suspend fun isExternalContentLinkAvailable(): Boolean = withContext(ioDispatcher) {
-        val client = ensureConnect()
-        ensureActive()
-        return@withContext suspendCancellableCoroutine { continuation ->
-            client.isBillingProgramAvailableAsync(
-                BillingClient.BillingProgram.EXTERNAL_CONTENT_LINK
-            ) { billingResult, billingProgramAvailabilityDetails ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    Timber.d("isExternalContentLinkAvailable: true")
-                    continuation.resumeWith(Result.success(true))
-                } else {
-                    Timber.w(
-                        "Failed to check external content link availability, responseCode: ${billingResult.responseCode}, " +
-                                "debugMessage: ${billingResult.debugMessage}"
-                    )
-                    continuation.resumeWith(Result.success(false))
-                }
-            }
-        }
-    }
-
-    override suspend fun createExternalContentLinkReportingDetails(): String? =
-        withContext(ioDispatcher) {
-            val client = ensureConnect()
-            ensureActive()
-            return@withContext suspendCancellableCoroutine { continuation ->
-                val params = BillingProgramReportingDetailsParams.newBuilder()
-                    .setBillingProgram(BillingClient.BillingProgram.EXTERNAL_CONTENT_LINK)
-                    .build()
-
-                client.createBillingProgramReportingDetailsAsync(
-                    params
-                ) { billingResult, billingProgramReportingDetails ->
-                    if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                        val externalTransactionToken =
-                            billingProgramReportingDetails?.externalTransactionToken
-                        continuation.resumeWith(Result.success(externalTransactionToken))
-                    } else {
-                        Timber.w(
-                            "Failed to create external content link reporting details, responseCode: ${billingResult.responseCode}, " +
-                                    "debugMessage: ${billingResult.debugMessage}"
-                        )
-                        continuation.resumeWith(Result.success(null))
-                    }
-                }
-            }
-        }
-
-    override suspend fun launchExternalContentLink(
-        activity: Activity,
-        linkUri: Uri,
-    ): ExternalContentLinkResult = withContext(ioDispatcher) {
-        val client = ensureConnect()
-        ensureActive()
-
-        return@withContext suspendCancellableCoroutine { continuation ->
-            val params = LaunchExternalLinkParams.newBuilder()
-                .setBillingProgram(BillingClient.BillingProgram.EXTERNAL_CONTENT_LINK)
-                .setLinkUri(linkUri)
-                .setLinkType(LaunchExternalLinkParams.LinkType.LINK_TO_DIGITAL_CONTENT_OFFER)
-                .setLaunchMode(LaunchExternalLinkParams.LaunchMode.CALLER_WILL_LAUNCH_LINK)
-                .build()
-
-            val listener = LaunchExternalLinkResponseListener { billingResult ->
-                val result = when (billingResult.responseCode) {
-                    BillingClient.BillingResponseCode.OK -> {
-                        Timber.d("Successfully launched external content link.")
-                        ExternalContentLinkResult.Success
-                    }
-                    BillingClient.BillingResponseCode.USER_CANCELED -> {
-                        Timber.d("User cancelled external content link launch.")
-                        ExternalContentLinkResult.Cancelled
-                    }
-                    else -> {
-                        Timber.w(
-                            "Failed to launch external content link, responseCode: ${billingResult.responseCode}, " +
-                                    "debugMessage: ${billingResult.debugMessage}"
-                        )
-                        ExternalContentLinkResult.Failed(billingResult.debugMessage)
-                    }
-                }
-                continuation.resumeWith(Result.success(result))
-            }
-
-            client.launchExternalLink(activity, params, listener)
-        }
     }
 }
