@@ -3,175 +3,138 @@ package mega.privacy.android.data.mapper
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject
 
-/**
- * The mapper class for converting the data entity to Photo.Image
- */
-typealias ImageMapper = (
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Long?,
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards String,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards LocalDateTime,
-    @JvmSuppressWildcards LocalDateTime,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards FileTypeInfo,
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards String,
-) -> @JvmSuppressWildcards Photo.Image
-
-internal fun toImage(
-    id: Long,
-    albumPhotoId: Long? = null,
-    parentId: Long,
-    name: String,
-    isFavourite: Boolean,
-    creationTime: LocalDateTime,
-    modificationTime: LocalDateTime,
-    thumbnailFilePath: String?,
-    previewFilePath: String?,
-    fileTypeInfo: FileTypeInfo,
-    size: Long,
-    isTakenDown: Boolean,
-    isSensitive: Boolean,
-    isSensitiveInherited: Boolean,
-    base64Id: String,
-) = Photo.Image(
-    id = id,
-    albumPhotoId = albumPhotoId,
-    parentId = parentId,
-    name = name,
-    isFavourite = isFavourite,
-    creationTime = creationTime,
-    modificationTime = modificationTime,
-    thumbnailFilePath = thumbnailFilePath,
-    previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo,
-    size = size,
-    isTakenDown = isTakenDown,
-    isSensitive = isSensitive,
-    isSensitiveInherited = isSensitiveInherited,
-    base64Id = base64Id,
+data class PhotoMapperArgs(
+    val id: Long,
+    val albumPhotoId: Long? = null,
+    val parentId: Long,
+    val name: String,
+    val isFavourite: Boolean,
+    val creationTime: LocalDateTime,
+    val modificationTime: LocalDateTime,
+    val thumbnailFilePath: String?,
+    val previewFilePath: String?,
+    val fileTypeInfo: FileTypeInfo,
+    val size: Long,
+    val isTakenDown: Boolean,
+    val isSensitive: Boolean,
+    val isSensitiveInherited: Boolean,
+    val base64Id: String,
+    val restoreId: NodeId? = null,
+    val label: Int = 0,
+    val nodeLabel: NodeLabel? = null,
+    val exportedData: ExportedData? = null,
+    val isIncomingShare: Boolean = false,
+    val isNodeKeyDecrypted: Boolean = false,
+    val serializedData: String? = null,
+    val isAvailableOffline: Boolean = false,
+    val versionCount: Int = 0,
+    val description: String? = null,
+    val tags: List<String>? = null,
 )
 
-/**
- * The mapper class for converting the data entity to Photo.Video
- */
-typealias VideoMapper = (
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Long?,
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards String,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards LocalDateTime,
-    @JvmSuppressWildcards LocalDateTime,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards String?,
-    @JvmSuppressWildcards FileTypeInfo,
-    @JvmSuppressWildcards Long,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards Boolean,
-    @JvmSuppressWildcards String,
-) -> @JvmSuppressWildcards Photo.Video
-
-internal fun toVideo(
-    id: Long,
-    albumPhotoId: Long? = null,
-    parentId: Long,
-    name: String,
-    isFavourite: Boolean,
-    creationTime: LocalDateTime,
-    modificationTime: LocalDateTime,
-    thumbnailFilePath: String?,
-    previewFilePath: String?,
-    fileTypeInfo: FileTypeInfo,
-    size: Long,
-    isTakenDown: Boolean,
-    isSensitive: Boolean,
-    isSensitiveInherited: Boolean,
-    base64Id: String,
-) = Photo.Video(
-    id = id,
-    albumPhotoId = albumPhotoId,
-    parentId = parentId,
-    name = name,
-    isFavourite = isFavourite,
-    creationTime = creationTime,
-    modificationTime = modificationTime,
-    thumbnailFilePath = thumbnailFilePath,
-    previewFilePath = previewFilePath,
-    fileTypeInfo = fileTypeInfo as VideoFileTypeInfo,
-    size = size,
-    isTakenDown = isTakenDown,
-    isSensitive = isSensitive,
-    isSensitiveInherited = isSensitiveInherited,
-    base64Id = base64Id
-)
-
-class PhotoMapper @Inject constructor(
-    private val imageMapper: ImageMapper,
-    private val videoMapper: VideoMapper,
+internal class PhotoMapper @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val dateUtilFacade: DateUtilWrapper,
     private val thumbnailPreviewRepository: ThumbnailPreviewRepository,
     private val megaApiGateway: MegaApiGateway,
+    private val nodeLabelMapper: NodeLabelMapper,
+    private val stringListMapper: StringListMapper,
 ) {
-    suspend operator fun invoke(node: MegaNode, albumPhotoId: AlbumPhotoId?): Photo? {
+    suspend operator fun invoke(
+        node: MegaNode,
+        albumPhotoId: AlbumPhotoId?,
+        requireSerializedData: Boolean = false,
+        isAvailableOffline: Boolean = false,
+    ): Photo? {
         return when (val fileType = fileTypeInfoMapper(node.name, node.duration)) {
             is ImageFileTypeInfo -> {
-                imageMapper(
-                    node.handle,
-                    albumPhotoId?.id,
-                    node.parentHandle,
-                    node.name,
-                    node.isFavourite,
-                    dateUtilFacade.fromEpoch(node.creationTime),
-                    dateUtilFacade.fromEpoch(node.modificationTime),
-                    getThumbnailFilePath(node),
-                    getPreviewFilePath(node),
-                    fileType,
-                    node.size,
-                    node.isTakenDown,
-                    node.isMarkedSensitive,
-                    megaApiGateway.isSensitiveInherited(node),
-                    node.base64Handle
+                toImage(
+                    args = PhotoMapperArgs(
+                        id = node.handle,
+                        albumPhotoId = albumPhotoId?.id,
+                        parentId = node.parentHandle,
+                        name = node.name,
+                        isFavourite = node.isFavourite,
+                        creationTime = dateUtilFacade.fromEpoch(node.creationTime),
+                        modificationTime = dateUtilFacade.fromEpoch(node.modificationTime),
+                        thumbnailFilePath = getThumbnailFilePath(node),
+                        previewFilePath = getPreviewFilePath(node),
+                        fileTypeInfo = fileType,
+                        size = node.size,
+                        isTakenDown = node.isTakenDown,
+                        isSensitive = node.isMarkedSensitive,
+                        isSensitiveInherited = megaApiGateway.isSensitiveInherited(node),
+                        base64Id = node.base64Handle,
+                        restoreId = NodeId(node.restoreHandle).takeIf {
+                            it.longValue != MegaApiJava.INVALID_HANDLE
+                        },
+                        label = node.label,
+                        nodeLabel = nodeLabelMapper(node.label),
+                        exportedData = node.takeIf { node.isExported }?.let {
+                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                        },
+                        isIncomingShare = node.isInShare,
+                        isNodeKeyDecrypted = node.isNodeKeyDecrypted,
+                        serializedData = if (requireSerializedData) node.serialize() else null,
+                        isAvailableOffline = isAvailableOffline,
+                        versionCount = (megaApiGateway.getNumVersions(node) - 1).coerceAtLeast(0),
+                        description = node.description,
+                        tags = node.tags?.let { stringListMapper(it) }
+                    )
                 )
             }
 
             is VideoFileTypeInfo -> {
-                videoMapper(
-                    node.handle,
-                    albumPhotoId?.id,
-                    node.parentHandle,
-                    node.name,
-                    node.isFavourite,
-                    dateUtilFacade.fromEpoch(node.creationTime),
-                    dateUtilFacade.fromEpoch(node.modificationTime),
-                    getThumbnailFilePath(node),
-                    getPreviewFilePath(node),
-                    fileType,
-                    node.size,
-                    node.isTakenDown,
-                    node.isMarkedSensitive,
-                    megaApiGateway.isSensitiveInherited(node),
-                    node.base64Handle
+                toVideo(
+                    args = PhotoMapperArgs(
+                        id = node.handle,
+                        albumPhotoId = albumPhotoId?.id,
+                        parentId = node.parentHandle,
+                        name = node.name,
+                        isFavourite = node.isFavourite,
+                        creationTime = dateUtilFacade.fromEpoch(node.creationTime),
+                        modificationTime = dateUtilFacade.fromEpoch(node.modificationTime),
+                        thumbnailFilePath = getThumbnailFilePath(node),
+                        previewFilePath = getPreviewFilePath(node),
+                        fileTypeInfo = fileType,
+                        size = node.size,
+                        isTakenDown = node.isTakenDown,
+                        isSensitive = node.isMarkedSensitive,
+                        isSensitiveInherited = megaApiGateway.isSensitiveInherited(node),
+                        base64Id = node.base64Handle,
+                        restoreId = NodeId(node.restoreHandle).takeIf {
+                            it.longValue != MegaApiJava.INVALID_HANDLE
+                        },
+                        label = node.label,
+                        nodeLabel = nodeLabelMapper(node.label),
+                        exportedData = node.takeIf { node.isExported }?.let {
+                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                        },
+                        isIncomingShare = node.isInShare,
+                        isNodeKeyDecrypted = node.isNodeKeyDecrypted,
+                        serializedData = if (requireSerializedData) node.serialize() else null,
+                        isAvailableOffline = isAvailableOffline,
+                        versionCount = (megaApiGateway.getNumVersions(node) - 1).coerceAtLeast(0),
+                        description = node.description,
+                        tags = node.tags?.let { stringListMapper(it) }
+                    )
                 )
             }
 
@@ -180,6 +143,64 @@ class PhotoMapper @Inject constructor(
             }
         }
     }
+
+    private fun toImage(args: PhotoMapperArgs) = Photo.Image(
+        id = args.id,
+        albumPhotoId = args.albumPhotoId,
+        parentId = args.parentId,
+        name = args.name,
+        isFavourite = args.isFavourite,
+        creationTime = args.creationTime,
+        modificationTime = args.modificationTime,
+        thumbnailFilePath = args.thumbnailFilePath,
+        previewFilePath = args.previewFilePath,
+        fileTypeInfo = args.fileTypeInfo,
+        size = args.size,
+        isTakenDown = args.isTakenDown,
+        isSensitive = args.isSensitive,
+        isSensitiveInherited = args.isSensitiveInherited,
+        base64Id = args.base64Id,
+        restoreId = args.restoreId,
+        label = args.label,
+        nodeLabel = args.nodeLabel,
+        exportedData = args.exportedData,
+        isIncomingShare = args.isIncomingShare,
+        isNodeKeyDecrypted = args.isNodeKeyDecrypted,
+        serializedData = args.serializedData,
+        isAvailableOffline = args.isAvailableOffline,
+        versionCount = args.versionCount,
+        description = args.description,
+        tags = args.tags
+    )
+
+    private fun toVideo(args: PhotoMapperArgs) = Photo.Video(
+        id = args.id,
+        albumPhotoId = args.albumPhotoId,
+        parentId = args.parentId,
+        name = args.name,
+        isFavourite = args.isFavourite,
+        creationTime = args.creationTime,
+        modificationTime = args.modificationTime,
+        thumbnailFilePath = args.thumbnailFilePath,
+        previewFilePath = args.previewFilePath,
+        fileTypeInfo = args.fileTypeInfo as VideoFileTypeInfo,
+        size = args.size,
+        isTakenDown = args.isTakenDown,
+        isSensitive = args.isSensitive,
+        isSensitiveInherited = args.isSensitiveInherited,
+        base64Id = args.base64Id,
+        restoreId = args.restoreId,
+        label = args.label,
+        nodeLabel = args.nodeLabel,
+        exportedData = args.exportedData,
+        isIncomingShare = args.isIncomingShare,
+        isNodeKeyDecrypted = args.isNodeKeyDecrypted,
+        serializedData = args.serializedData,
+        isAvailableOffline = args.isAvailableOffline,
+        versionCount = args.versionCount,
+        description = args.description,
+        tags = args.tags
+    )
 
     private suspend fun getThumbnailFilePath(node: MegaNode): String? {
         return thumbnailPreviewRepository.getThumbnailCacheFolderPath()?.let { path ->

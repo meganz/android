@@ -25,6 +25,17 @@ class PhotoMapper @Inject constructor() {
                     isSensitive = photoUiState.isSensitive,
                     isSensitiveInherited = photoUiState.isSensitiveInherited,
                     base64Id = photoUiState.base64Id,
+                    restoreId = photoUiState.restoreId,
+                    label = photoUiState.label,
+                    nodeLabel = photoUiState.nodeLabel,
+                    exportedData = photoUiState.exportedData,
+                    isIncomingShare = photoUiState.isIncomingShare,
+                    isNodeKeyDecrypted = photoUiState.isNodeKeyDecrypted,
+                    serializedData = photoUiState.serializedData,
+                    isAvailableOffline = photoUiState.isAvailableOffline,
+                    versionCount = photoUiState.versionCount,
+                    description = photoUiState.description,
+                    tags = photoUiState.tags
                 )
             }
 
@@ -44,7 +55,18 @@ class PhotoMapper @Inject constructor() {
                     isTakenDown = photoUiState.isTakenDown,
                     isSensitive = photoUiState.isSensitive,
                     isSensitiveInherited = photoUiState.isSensitiveInherited,
-                    base64Id = photoUiState.base64Id
+                    base64Id = photoUiState.base64Id,
+                    restoreId = photoUiState.restoreId,
+                    label = photoUiState.label,
+                    nodeLabel = photoUiState.nodeLabel,
+                    exportedData = photoUiState.exportedData,
+                    isIncomingShare = photoUiState.isIncomingShare,
+                    isNodeKeyDecrypted = photoUiState.isNodeKeyDecrypted,
+                    serializedData = photoUiState.serializedData,
+                    isAvailableOffline = photoUiState.isAvailableOffline,
+                    versionCount = photoUiState.versionCount,
+                    description = photoUiState.description,
+                    tags = photoUiState.tags
                 )
             }
         }

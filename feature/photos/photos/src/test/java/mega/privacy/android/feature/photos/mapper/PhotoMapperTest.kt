@@ -2,8 +2,11 @@ package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.ExportedData
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import org.junit.jupiter.api.BeforeEach
@@ -90,6 +93,17 @@ class PhotoMapperTest {
         isTakenDown: Boolean = false,
         isSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
+        restoreId: NodeId? = null,
+        label: Int = 0,
+        nodeLabel: NodeLabel? = null,
+        exportedData: ExportedData? = null,
+        isIncomingShare: Boolean = false,
+        isNodeKeyDecrypted: Boolean = false,
+        serializedData: String? = null,
+        isAvailableOffline: Boolean = false,
+        versionCount: Int = 0,
+        description: String? = null,
+        tags: List<String>? = null,
     ) = PhotoUiState.Image(
         id = id,
         albumPhotoId = albumPhotoId,
@@ -106,6 +120,17 @@ class PhotoMapperTest {
         isSensitive = isSensitive,
         isSensitiveInherited = isSensitiveInherited,
         base64Id = base64Id,
+        restoreId = restoreId,
+        label = label,
+        nodeLabel = nodeLabel,
+        exportedData = exportedData,
+        isIncomingShare = isIncomingShare,
+        isNodeKeyDecrypted = isNodeKeyDecrypted,
+        serializedData = serializedData,
+        isAvailableOffline = isAvailableOffline,
+        versionCount = versionCount,
+        description = description,
+        tags = tags
     )
 
     private fun newVideo(
@@ -124,6 +149,17 @@ class PhotoMapperTest {
         isTakenDown: Boolean = false,
         isSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
+        restoreId: NodeId? = null,
+        label: Int = 0,
+        nodeLabel: NodeLabel? = null,
+        exportedData: ExportedData? = null,
+        isIncomingShare: Boolean = false,
+        isNodeKeyDecrypted: Boolean = false,
+        serializedData: String? = null,
+        isAvailableOffline: Boolean = false,
+        versionCount: Int = 0,
+        description: String? = null,
+        tags: List<String>? = null,
     ) = PhotoUiState.Video(
         id = id,
         albumPhotoId = albumPhotoId,
@@ -140,5 +176,16 @@ class PhotoMapperTest {
         isSensitive = isSensitive,
         isSensitiveInherited = isSensitiveInherited,
         base64Id = base64Id,
+        restoreId = restoreId,
+        label = label,
+        nodeLabel = nodeLabel,
+        exportedData = exportedData,
+        isIncomingShare = isIncomingShare,
+        isNodeKeyDecrypted = isNodeKeyDecrypted,
+        serializedData = serializedData,
+        isAvailableOffline = isAvailableOffline,
+        versionCount = versionCount,
+        description = description,
+        tags = tags
     )
 }

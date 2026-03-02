@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
@@ -31,12 +32,12 @@ import kotlin.time.Duration.Companion.seconds
 class PhotoMapperTest {
     private lateinit var underTest: PhotoMapper
 
-    private val imageMapper: ImageMapper = ::toImage
-    private val videoMapper: VideoMapper = ::toVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val dateUtilWrapper: DateUtilWrapper = mock()
     private val thumbnailPreviewRepository: ThumbnailPreviewRepository = mock()
     private val megaApiGateway: MegaApiGateway = mock()
+    private val nodeLabelMapper: NodeLabelMapper = mock()
+    private val stringListMapper: StringListMapper = mock()
 
     private val testDateTime = LocalDateTime.of(2023, 1, 1, 12, 0, 0)
     private val testThumbnailPath = "/cache/thumbnails"
@@ -51,12 +52,12 @@ class PhotoMapperTest {
     @BeforeAll
     fun setUp() {
         underTest = PhotoMapper(
-            imageMapper = imageMapper,
-            videoMapper = videoMapper,
             fileTypeInfoMapper = fileTypeInfoMapper,
             dateUtilFacade = dateUtilWrapper,
             thumbnailPreviewRepository = thumbnailPreviewRepository,
-            megaApiGateway = megaApiGateway
+            megaApiGateway = megaApiGateway,
+            nodeLabelMapper = nodeLabelMapper,
+            stringListMapper = stringListMapper
         )
 
         whenever(dateUtilWrapper.fromEpoch(any())).thenReturn(testDateTime)
@@ -68,6 +69,7 @@ class PhotoMapperTest {
                 testPreviewPath
             )
             whenever(megaApiGateway.isSensitiveInherited(any())).thenReturn(false)
+            whenever(megaApiGateway.getNumVersions(any())).thenReturn(2)
         }
     }
 
@@ -219,6 +221,7 @@ class PhotoMapperTest {
 
         whenever(fileTypeInfoMapper(testNodeName, 0)).thenReturn(imageFileType)
         whenever(megaApiGateway.isSensitiveInherited(megaNode)).thenReturn(true)
+        whenever(megaApiGateway.getNumVersions(megaNode)).thenReturn(0)
 
         val result = underTest(megaNode, null)
 

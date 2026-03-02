@@ -28,6 +28,17 @@ class PhotoUiStateMapper @Inject constructor(
                     isSensitive = photo.isSensitive,
                     isSensitiveInherited = photo.isSensitiveInherited,
                     base64Id = photo.base64Id,
+                    restoreId = photo.restoreId,
+                    label = photo.label,
+                    nodeLabel = photo.nodeLabel,
+                    exportedData = photo.exportedData,
+                    isIncomingShare = photo.isIncomingShare,
+                    isNodeKeyDecrypted = photo.isNodeKeyDecrypted,
+                    serializedData = photo.serializedData,
+                    isAvailableOffline = photo.isAvailableOffline,
+                    versionCount = photo.versionCount,
+                    description = photo.description,
+                    tags = photo.tags
                 )
             }
 
@@ -48,6 +59,17 @@ class PhotoUiStateMapper @Inject constructor(
                     isSensitive = photo.isSensitive,
                     isSensitiveInherited = photo.isSensitiveInherited,
                     base64Id = photo.base64Id,
+                    restoreId = photo.restoreId,
+                    label = photo.label,
+                    nodeLabel = photo.nodeLabel,
+                    exportedData = photo.exportedData,
+                    isIncomingShare = photo.isIncomingShare,
+                    isNodeKeyDecrypted = photo.isNodeKeyDecrypted,
+                    serializedData = photo.serializedData,
+                    isAvailableOffline = photo.isAvailableOffline,
+                    versionCount = photo.versionCount,
+                    description = photo.description,
+                    tags = photo.tags,
                     duration = durationInSecondsTextMapper(duration = photo.fileTypeInfo.duration)
                 )
             }

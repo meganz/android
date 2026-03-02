@@ -20,14 +20,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
@@ -40,6 +38,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMed
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
@@ -60,7 +59,7 @@ class TimelineTabViewModel @Inject constructor(
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
+    private val photoToTypedNodeMapper: PhotoToTypedNodeMapper,
 ) : ViewModel() {
 
     private var isHiddenNodesEnabled: Boolean = false
@@ -334,10 +333,13 @@ class TimelineTabViewModel @Inject constructor(
         _selectedPhotoIdsFlow.update { setOf() }
     }
 
-    internal suspend fun retrieveTypedNodeFromSelection(): List<TypedNode> {
-        val nodes = runCatching {
-            getNodeListByIdsUseCase(nodeIds = _selectedPhotoIdsFlow.value.map { NodeId(longValue = it) })
-        }.getOrDefault(defaultValue = emptyList())
+    internal fun retrieveTypedNodeFromSelection(): List<TypedNode> {
+        val selectedIds = _selectedPhotoIdsFlow.value
+        val nodes = uiState.value.allPhotos
+            .asSequence()
+            .filter { it.photo.id in selectedIds }
+            .map { photoToTypedNodeMapper(it.photo) }
+            .toList()
         _selectedPhotosInTypedNodesFlow.update { nodes }
         return nodes
     }

@@ -19,7 +19,6 @@ import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePhotosResult
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.photos.TimelineSortedPhotosResult
-import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelinePhotosUseCase
@@ -33,6 +32,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMed
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedNodeMapper
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotosNodeListCardMapper
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
@@ -68,7 +68,7 @@ class TimelineTabViewModelTest {
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
-    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase = mock()
+    private val photoToTypedNodeMapper = PhotoToTypedNodeMapper()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
@@ -77,7 +77,6 @@ class TimelineTabViewModelTest {
     fun setup() = runTest {
         Analytics.initialise(analyticsTracker)
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
-        whenever(getNodeListByIdsUseCase(nodeIds = any())) doReturn emptyList()
         underTest = TimelineTabViewModel(
             monitorTimelinePhotosUseCase = monitorTimelinePhotosUseCase,
             photoUiStateMapper = photoUiStateMapper,
@@ -87,7 +86,7 @@ class TimelineTabViewModelTest {
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getNodeListByIdsUseCase = getNodeListByIdsUseCase
+            photoToTypedNodeMapper = photoToTypedNodeMapper
         )
     }
 
@@ -103,7 +102,6 @@ class TimelineTabViewModelTest {
             setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase,
-            getNodeListByIdsUseCase,
             analyticsTracker
         )
     }

@@ -18,7 +18,6 @@ import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
-import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -33,7 +32,6 @@ import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.UserSetMapper
-import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
@@ -54,7 +52,6 @@ import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toDuration
-import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
@@ -62,7 +59,6 @@ import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPricing
 import mega.privacy.android.data.mapper.toUserSet
-import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
@@ -108,18 +104,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
-
-        /**
-         * Provide images mapper
-         */
-        @Provides
-        fun provideImagesMapper(): ImageMapper = ::toImage
-
-        /**
-         * Provide videos mapper
-         */
-        @Provides
-        fun provideVideosMapper(): VideoMapper = ::toVideo
 
         /**
          * Provide media store file type uri mapper

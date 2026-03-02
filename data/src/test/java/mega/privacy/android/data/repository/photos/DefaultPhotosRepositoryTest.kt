@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -18,8 +17,7 @@ import mega.privacy.android.data.gateway.preferences.MediaTimelinePreferencesGat
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.ImageMapper
-import mega.privacy.android.data.mapper.VideoMapper
+import mega.privacy.android.data.mapper.PhotoMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
@@ -31,7 +29,6 @@ import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapp
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.data.mapper.search.MegaSearchPageMapper
 import mega.privacy.android.data.repository.CancelTokenProvider
-import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
@@ -56,6 +53,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -72,15 +70,7 @@ class DefaultPhotosRepositoryTest {
     }
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
-    private val cacheGateway = mock<CacheGateway> {
-        onBlocking { getOrCreateCacheFolder(any()) }.thenReturn(null)
-    }
     private val fileGateway = mock<FileGateway>()
-    private val dateUtilWrapper = mock<DateUtilWrapper> {
-        on { fromEpoch(any()) }.thenReturn(LocalDateTime.now())
-    }
-    private val imageMapper: ImageMapper = ::createImage
-    private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val imageNodeFileMapper: ImageNodeFileMapper = mock()
     private val imageNodeMapper: ImageNodeMapper = mock()
@@ -104,8 +94,12 @@ class DefaultPhotosRepositoryTest {
     }
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
     private val mediaTimelinePreferencesGateway = mock<MediaTimelinePreferencesGateway>()
+    private val photoMapper = mock<PhotoMapper>()
 
     private val mockBase64Id = "mockBase64Id"
+    private val defaultVideoType =
+        VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
+    private val defaultImageType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
 
     @Before
     fun setUp() {
@@ -129,10 +123,21 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
-
+        val fileType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
         whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
-            StaticImageFileTypeInfo(mimeType = "", extension = "image")
+            fileType
         )
+        val image = mock<Photo.Image> {
+            on { fileTypeInfo }.thenReturn(fileType)
+        }
+        whenever(
+            photoMapper(
+                node = megaNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn image
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -153,10 +158,21 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
-
+        val fileType = GifFileTypeInfo(mimeType = "", extension = "gif")
         whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
-            GifFileTypeInfo(mimeType = "", extension = "gif")
+            fileType
         )
+        val image = mock<Photo.Image> {
+            on { fileTypeInfo }.thenReturn(fileType)
+        }
+        whenever(
+            photoMapper(
+                node = megaNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn image
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -173,10 +189,21 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
-
+        val fileType = RawFileTypeInfo(mimeType = "", extension = "raw")
         whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
-            RawFileTypeInfo(mimeType = "", extension = "raw")
+            fileType
         )
+        val image = mock<Photo.Image> {
+            on { fileTypeInfo }.thenReturn(fileType)
+        }
+        whenever(
+            photoMapper(
+                node = megaNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn image
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -196,10 +223,21 @@ class DefaultPhotosRepositoryTest {
 
         whenever(nodeRepository.isNodeInRubbishBin(NodeId(any())))
             .thenReturn(false)
-
+        val fileType = VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
         whenever(fileTypeInfoMapper(megaNode.name, megaNode.duration)).thenReturn(
-            VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
+            fileType
         )
+        val image = mock<Photo.Image> {
+            on { fileTypeInfo }.thenReturn(fileType)
+        }
+        whenever(
+            photoMapper(
+                node = megaNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn image
 
         underTest = createUnderTest(this)
         val actualPhoto = underTest.getPhotoFromNodeID(nodeId)
@@ -318,11 +356,7 @@ class DefaultPhotosRepositoryTest {
         megaApiFolder = megaApiFolder,
         appScope = coroutineScope,
         ioDispatcher = UnconfinedTestDispatcher(),
-        cacheGateway = cacheGateway,
         fileGateway = fileGateway,
-        dateUtilFacade = dateUtilWrapper,
-        imageMapper = imageMapper,
-        videoMapper = videoMapper,
         fileTypeInfoMapper = fileTypeInfoMapper,
         imageNodeFileMapper = imageNodeFileMapper,
         megaChatApiGateway = megaChatApiGateway,
@@ -340,7 +374,8 @@ class DefaultPhotosRepositoryTest {
         megaSearchPageMapper = megaSearchPageMapper,
         monitorFetchNodesFinishUseCase = monitorFetchNodesFinishUseCase,
         uiPreferencesGateway = uiPreferencesGateway,
-        mediaTimelinePreferencesGateway = mediaTimelinePreferencesGateway
+        mediaTimelinePreferencesGateway = mediaTimelinePreferencesGateway,
+        photoMapper = photoMapper,
     )
 
     private fun createMegaNode(
@@ -482,6 +517,29 @@ class DefaultPhotosRepositoryTest {
                 ),
             ).thenReturn(listOf(videoNode))
             initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+            val image = mock<Photo.Image> {
+                on { fileTypeInfo }.thenReturn(defaultImageType)
+            }
+            whenever(
+                photoMapper(
+                    node = imageNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn image
+            val video = mock<Photo.Video> {
+                on { fileTypeInfo }.thenReturn(defaultVideoType)
+            }
+            whenever(
+                photoMapper(
+                    node = videoNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn video
+
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = true)
             assertThat(actualPhotos).isNotEmpty()
@@ -489,10 +547,10 @@ class DefaultPhotosRepositoryTest {
 
     private fun initFileTypeInfoMapperReturnedValue(imageNode: MegaNode, videoNode: MegaNode) {
         whenever(fileTypeInfoMapper(videoNode.name, videoNode.duration)).thenReturn(
-            VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
+            defaultVideoType
         )
         whenever(fileTypeInfoMapper(imageNode.name, imageNode.duration)).thenReturn(
-            StaticImageFileTypeInfo(mimeType = "", extension = "image")
+            defaultImageType
         )
     }
 
@@ -548,6 +606,29 @@ class DefaultPhotosRepositoryTest {
                 ),
             ).thenReturn(listOf(videoNode))
             initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+            val image = mock<Photo.Image> {
+                on { fileTypeInfo }.thenReturn(defaultImageType)
+            }
+            whenever(
+                photoMapper(
+                    node = imageNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn image
+            val video = mock<Photo.Video> {
+                on { fileTypeInfo }.thenReturn(defaultVideoType)
+            }
+            whenever(
+                photoMapper(
+                    node = videoNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn video
+
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(NodeId(-1L), recursive = false)
             assertThat(actualPhotos).isNotEmpty()
@@ -606,6 +687,29 @@ class DefaultPhotosRepositoryTest {
                 ),
             ).thenReturn(listOf(videoNode))
             initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+            val image = mock<Photo.Image> {
+                on { fileTypeInfo }.thenReturn(defaultImageType)
+            }
+            whenever(
+                photoMapper(
+                    node = imageNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn image
+            val video = mock<Photo.Video> {
+                on { fileTypeInfo }.thenReturn(defaultVideoType)
+            }
+            whenever(
+                photoMapper(
+                    node = videoNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn video
+
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),
@@ -667,6 +771,29 @@ class DefaultPhotosRepositoryTest {
                 ),
             ).thenReturn(listOf(videoNode))
             initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+            val image = mock<Photo.Image> {
+                on { fileTypeInfo }.thenReturn(defaultImageType)
+            }
+            whenever(
+                photoMapper(
+                    node = imageNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn image
+            val video = mock<Photo.Video> {
+                on { fileTypeInfo }.thenReturn(defaultVideoType)
+            }
+            whenever(
+                photoMapper(
+                    node = videoNode,
+                    albumPhotoId = null,
+                    requireSerializedData = false,
+                    isAvailableOffline = false
+                )
+            ) doReturn video
+
             underTest = createUnderTest(this)
             val actualPhotos = underTest.getPhotosByFolderId(
                 NodeId(-1L),
@@ -729,6 +856,32 @@ class DefaultPhotosRepositoryTest {
         ).thenReturn(listOf(videoNode))
         whenever(nodeRepository.isNodeInRubbishBin(any())).thenReturn(false)
         initFileTypeInfoMapperReturnedValue(imageNode, videoNode)
+        val image = mock<Photo.Image> {
+            on { id } doReturn -1L
+            on { name } doReturn "image.jpg"
+            on { fileTypeInfo }.thenReturn(defaultImageType)
+        }
+        whenever(
+            photoMapper(
+                node = imageNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn image
+        val video = mock<Photo.Video> {
+            on { id } doReturn -2L
+            on { name } doReturn "video.mp4"
+            on { fileTypeInfo }.thenReturn(defaultVideoType)
+        }
+        whenever(
+            photoMapper(
+                node = videoNode,
+                albumPhotoId = null,
+                requireSerializedData = false,
+                isAvailableOffline = false
+            )
+        ) doReturn video
 
         underTest = createUnderTest(this)
 
