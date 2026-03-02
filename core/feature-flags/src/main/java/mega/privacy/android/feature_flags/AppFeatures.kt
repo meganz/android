@@ -17,6 +17,17 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * PDF Viewer Compose UI
+     *
+     * When enabled, PDF files are displayed using the new Compose-based
+     * PdfViewerScreen. When disabled, the legacy PdfViewerActivity is used.
+     */
+    PdfViewerComposeUI(
+        "Enable PDF Viewer with ComposeUI and single activity",
+        false  // Default: false (legacy Activity)
+    ),
+
+    /**
      * Single activity
      */
     SingleActivity(
