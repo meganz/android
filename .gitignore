@@ -89,6 +89,7 @@ replay_pid*
 !.claude/skills/
 !.claude/skills/**
 .claude/settings.local.json
+./review.md
 
 *.keystore
 google-services.json
