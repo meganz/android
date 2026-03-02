@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
@@ -42,6 +43,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -49,7 +51,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 fun VideoPlaylistsTabRoute(
     showVideoPlaylistRemovedDialog: Boolean,
     dismissVideoPlaylistRemovedDialog: () -> Unit,
-    navigateToVideoPlaylistDetail: (VideoPlaylistDetailNavKey) -> Unit,
+    navigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
@@ -83,7 +85,10 @@ fun VideoPlaylistsTabRoute(
         },
         getPresetNewVideoPlaylistTitle = viewModel::getPresetNewVideoPlaylistTitle,
         onNavigateToDetail = { handle, type ->
-            navigateToVideoPlaylistDetail(VideoPlaylistDetailNavKey(handle, type))
+            navigate(VideoPlaylistDetailNavKey(handle, type))
+        },
+        newlyCreatedVideoPlaylist = { handle ->
+            navigate(SelectVideosForPlaylistNavKey(playlistHandle = handle, isNewlyCreated = true))
         }
     )
 }
@@ -111,7 +116,8 @@ internal fun VideoPlaylistsTabScreen(
     resetCreateVideoPlaylistSuccessEvent: () -> Unit = {},
     resetUpdateTitleSuccessEvent: () -> Unit = {},
     getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
-    onNavigateToDetail: (Long, PlaylistType) -> Unit,
+    onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
+    newlyCreatedVideoPlaylist: (Long) -> Unit = {},
 ) {
     val lazyListState = rememberLazyListState()
     val resources = LocalResources.current
@@ -169,7 +175,7 @@ internal fun VideoPlaylistsTabScreen(
                 event = videoPlaylistEditState.createVideoPlaylistSuccessEvent,
                 onConsumed = resetCreateVideoPlaylistSuccessEvent,
                 action = {
-                    onNavigateToDetail(it.id.longValue, PlaylistType.User)
+                    newlyCreatedVideoPlaylist(it.id.longValue)
                 }
             )
 

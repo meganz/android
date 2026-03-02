@@ -703,7 +703,7 @@ private fun MediaScreen.MediaContent(
             showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
             dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
             modifier = modifier,
-            navigateToVideoPlaylistDetail = navigationHandler::navigate
+            navigate = navigationHandler::navigate
         )
     }
 }

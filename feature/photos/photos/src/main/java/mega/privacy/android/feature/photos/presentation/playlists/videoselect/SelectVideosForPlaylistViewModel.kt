@@ -69,13 +69,13 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
     private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoHandlesFlow = MutableStateFlow<Set<Long>>(emptySet())
 
-    internal val navigateToFolderEvent: StateFlow<StateEventWithContent<Pair<Long, SelectVideoItemUiEntity>>>
-        field: MutableStateFlow<StateEventWithContent<Pair<Long, SelectVideoItemUiEntity>>> = MutableStateFlow(
+    internal val navigateToFolderEvent: StateFlow<StateEventWithContent<SelectVideoItemUiEntity>>
+        field: MutableStateFlow<StateEventWithContent<SelectVideoItemUiEntity>> = MutableStateFlow(
             consumed()
         )
 
-    internal val numberOfAddedVideosEvent: StateFlow<StateEventWithContent<Pair<Long, Int>>>
-        field: MutableStateFlow<StateEventWithContent<Pair<Long, Int>>> = MutableStateFlow(consumed())
+    internal val numberOfAddedVideosEvent: StateFlow<StateEventWithContent<Int>>
+        field: MutableStateFlow<StateEventWithContent<Int>> = MutableStateFlow(consumed())
 
     private val sortOrder: StateFlow<SortOrder> by lazy {
         monitorSortCloudOrderUseCase()
@@ -181,7 +181,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     internal fun itemClicked(item: SelectVideoItemUiEntity) {
         if (item.isFolder && selectedVideoHandlesFlow.value.isEmpty()) {
-            navigateToFolderEvent.update { triggered(args.playlistHandle to item) }
+            navigateToFolderEvent.update { triggered(item) }
         } else {
             toggleItemSelection(item)
         }
@@ -252,7 +252,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 addVideosToPlaylistUseCase(playlistID, videoIDs)
             }.onSuccess { numberOfAddedVideos ->
                 numberOfAddedVideosEvent.update {
-                    triggered(args.playlistHandle to numberOfAddedVideos)
+                    triggered(numberOfAddedVideos)
                 }
             }.onFailure { exception ->
                 Timber.e(exception)
@@ -272,5 +272,6 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
         val nodeHandle: Long,
         val nodeName: String?,
         val playlistHandle: Long,
+        val isNewlyCreated: Boolean
     )
 }

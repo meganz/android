@@ -26,8 +26,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
@@ -36,11 +38,9 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
-import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoGridView
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
@@ -53,10 +53,12 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun SelectVideosForPlaylistRoute(
-    onNavigateToFolder: (Long, String, Long) -> Unit,
+    isNewlyCreated: Boolean,
+    playlistHandle: Long,
+    onNavigateToFolder: (NavKey) -> Unit,
     returnResult: (String, Int) -> Unit,
-    backTo: (Long, PlaylistType) -> Unit,
     onBack: () -> Unit,
+    navigateAndClearTo: () -> Unit,
     viewModel: SelectVideosForPlaylistViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,18 +70,23 @@ fun SelectVideosForPlaylistRoute(
     EventEffect(
         event = navigateToFolderEvent,
         onConsumed = viewModel::resetNavigateToFolderEvent
-    ) { (playlistHandle, item) ->
-        onNavigateToFolder(item.id.longValue, item.name, playlistHandle)
+    ) { item ->
+        onNavigateToFolder(
+            SelectVideosForPlaylistNavKey(
+                item.id.longValue,
+                item.name,
+                playlistHandle,
+                isNewlyCreated
+            )
+        )
     }
 
     EventEffect(
         event = numberOfAddedVideosEvent,
         onConsumed = viewModel::resetNumberOfAddedVideosEvent,
-    ) { (playlistHandle, numberOfAddedVideos) ->
+    ) { numberOfAddedVideos ->
         returnResult(SelectVideosForPlaylistNavKey.RESULT, numberOfAddedVideos)
-        if (dataState?.isCloudDriveRoot != true) {
-            backTo(playlistHandle, PlaylistType.User)
-        }
+        navigateAndClearTo()
     }
 
     SelectVideosForPlaylistScreen(
@@ -95,7 +102,13 @@ fun SelectVideosForPlaylistRoute(
                 viewModel.addVideosToPlaylist(videoIDs = handles.map { NodeId(it) })
             }
         },
-        onBackPressed = onBack
+        onBackPressed = {
+            if (isNewlyCreated && dataState?.isCloudDriveRoot == true) {
+                navigateAndClearTo()
+            } else {
+                onBack()
+            }
+        }
     )
 }
 
@@ -116,9 +129,8 @@ fun SelectVideosForPlaylistScreen(
     onBackPressed: () -> Unit = {},
 ) {
     val dataState = uiState as? SelectVideosForPlaylistUiState.Data
-    BackHandler(dataState?.isCloudDriveRoot != true) {
-        onBackPressed()
-    }
+
+    BackHandler(onBack = onBackPressed)
 
     var isSearchBarVisible by rememberSaveable { mutableStateOf(false) }
     BackHandler(isSearchBarVisible) {
@@ -215,33 +227,6 @@ fun SelectVideosForPlaylistScreen(
                             listContentPadding = PaddingValues(
                                 bottom = innerPadding.calculateBottomPadding() + 100.dp
                             )
-                        )
-                    }
-
-                    if (showSortBottomSheet) {
-                        SortBottomSheet(
-                            modifier = Modifier.testTag(VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG),
-                            title = stringResource(sharedR.string.action_sort_by_header),
-                            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
-                            sheetState = sortBottomSheetState,
-                            selectedSort = SortBottomSheetResult(
-                                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
-                                sortDirection = uiState.selectedSortConfiguration.sortDirection
-                            ),
-                            onSortOptionSelected = { result ->
-                                result?.let {
-                                    onSortNodes(
-                                        NodeSortConfiguration(
-                                            sortOption = it.sortOptionItem,
-                                            sortDirection = it.sortDirection
-                                        )
-                                    )
-                                    showSortBottomSheet = false
-                                }
-                            },
-                            onDismissRequest = {
-                                showSortBottomSheet = false
-                            }
                         )
                     }
 

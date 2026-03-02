@@ -136,6 +136,7 @@ class SelectVideosForPlaylistViewModelTest {
             nodeHandle = nodeHandle,
             nodeName = nodeName,
             playlistHandle = playlistHandle,
+            isNewlyCreated = false
         )
         if (nodeHandle == -1L) {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
@@ -212,8 +213,7 @@ class SelectVideosForPlaylistViewModelTest {
                 val event = underTest.navigateToFolderEvent.value
                 assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
                 val content = (event as StateEventWithContentTriggered).content
-                assertThat(content.first).isEqualTo(playlistHandle)
-                assertThat(content.second).isEqualTo(folderEntity)
+                assertThat(content).isEqualTo(folderEntity)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -487,9 +487,7 @@ class SelectVideosForPlaylistViewModelTest {
 
                 val event = underTest.numberOfAddedVideosEvent.value
                 assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((event as StateEventWithContentTriggered).content).isEqualTo(
-                    playlistHandle to 2
-                )
+                assertThat((event as StateEventWithContentTriggered).content).isEqualTo(2)
                 verify(addVideosToPlaylistUseCase).invoke(any(), any())
                 cancelAndIgnoreRemainingEvents()
             }

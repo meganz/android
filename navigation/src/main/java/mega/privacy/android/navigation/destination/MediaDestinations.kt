@@ -15,7 +15,10 @@ data object MediaMainNavKey : MainNavItemNavKey
 data class AlbumContentNavKey(val id: Long?, val type: String?) : NavKey
 
 @Serializable
-data class VideoPlaylistDetailNavKey(val playlistHandle: Long, val type: PlaylistType) : NavKey
+data class VideoPlaylistDetailNavKey(
+    val playlistHandle: Long,
+    val type: PlaylistType,
+) : NavKey
 
 @Serializable
 data object MediaSearchNavKey : NavKey
@@ -47,6 +50,7 @@ data class SelectVideosForPlaylistNavKey(
     val nodeHandle: Long = -1L,
     val nodeName: String? = null,
     val playlistHandle: Long = -1L,
+    val isNewlyCreated: Boolean = false,
 ) : NavKey, Parcelable {
     companion object {
         const val RESULT = "SelectVideosForPlaylistNavKey::result"

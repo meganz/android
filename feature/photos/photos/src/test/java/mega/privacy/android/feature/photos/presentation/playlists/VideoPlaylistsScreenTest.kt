@@ -7,16 +7,19 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import de.palm.composestateevents.triggered
 import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.videosection.PlaylistType
+import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPlaylistUiEntity
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
 @Config(sdk = [34])
@@ -47,6 +50,7 @@ class VideoPlaylistsScreenTest {
         resetUpdateTitleSuccessEvent: () -> Unit = {},
         getPresetNewVideoPlaylistTitle: (String) -> String = { "" },
         onNavigateToDetail: (Long, PlaylistType) -> Unit = { _, _ -> },
+        newlyCreatedVideoPlaylist: (Long) -> Unit = {},
     ) {
         composeTestRule.setContent {
             VideoPlaylistsTabScreen(
@@ -70,7 +74,8 @@ class VideoPlaylistsScreenTest {
                 resetCreateVideoPlaylistSuccessEvent = resetCreateVideoPlaylistSuccessEvent,
                 resetUpdateTitleSuccessEvent = resetUpdateTitleSuccessEvent,
                 getPresetNewVideoPlaylistTitle = getPresetNewVideoPlaylistTitle,
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
+                newlyCreatedVideoPlaylist = newlyCreatedVideoPlaylist,
             )
         }
     }
@@ -201,6 +206,22 @@ class VideoPlaylistsScreenTest {
         VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
     }
 
+    @Test
+    fun `test that onNavigateToSelectVideos is called when createVideoPlaylistSuccessEvent is triggered`() {
+        val newlyCreatedVideoPlaylist = mock<(Long) -> Unit>()
+        val playlist = mock<UserVideoPlaylist> {
+            on { id }.thenReturn(NodeId(1L))
+        }
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                createVideoPlaylistSuccessEvent = triggered(playlist)
+            ),
+            newlyCreatedVideoPlaylist = newlyCreatedVideoPlaylist,
+        )
+
+        verify(newlyCreatedVideoPlaylist).invoke(playlist.id.longValue)
+    }
+
     private fun String.assertIsDisplayedWithTag() =
         composeTestRule.onNodeWithTag(testTag = this, useUnmergedTree = true).assertIsDisplayed()
 
@@ -219,8 +240,10 @@ class VideoPlaylistsScreenTest {
     private fun createVideoPlaylistUiEntity(
         handle: Long,
         title: String = "Video playlist $handle",
+        playlistType: PlaylistType = PlaylistType.User,
     ) = mock<VideoPlaylistUiEntity> {
         on { id }.thenReturn(NodeId(handle))
         on { this.title }.thenReturn(title)
+        on { type }.thenReturn(playlistType)
     }
 }

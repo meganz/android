@@ -97,7 +97,7 @@ class VideoPlaylistDetailViewModelTest {
     fun setUp() {
         val args = VideoPlaylistDetailViewModel.Args(
             playlistHandle = testId.longValue,
-            type = testType
+            type = testType,
         )
         underTest = VideoPlaylistDetailViewModel(
             videoPlaylistDetailUiEntityMapper = videoPlaylistDetailUiEntityMapper,

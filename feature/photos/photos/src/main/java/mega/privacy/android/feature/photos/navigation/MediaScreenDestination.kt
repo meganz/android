@@ -25,6 +25,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
@@ -174,7 +175,8 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
             hiltViewModel<VideoPlaylistDetailViewModel, VideoPlaylistDetailViewModel.Factory> { factory ->
                 factory.create(
                     VideoPlaylistDetailViewModel.Args(
-                        playlistHandle = key.playlistHandle, type = key.type
+                        playlistHandle = key.playlistHandle,
+                        type = key.type,
                     )
                 )
             }
@@ -406,23 +408,32 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
                     SelectVideosForPlaylistViewModel.Args(
                         nodeHandle = key.nodeHandle,
                         nodeName = key.nodeName,
-                        playlistHandle = key.playlistHandle
+                        playlistHandle = key.playlistHandle,
+                        isNewlyCreated = key.isNewlyCreated
                     )
                 )
             }
         SelectVideosForPlaylistRoute(
-            onNavigateToFolder = { handle, name, playlistHandle ->
-                navigationHandler.navigate(
-                    SelectVideosForPlaylistNavKey(handle, name, playlistHandle)
-                )
-            },
+            isNewlyCreated = key.isNewlyCreated,
+            playlistHandle = key.playlistHandle,
+            onNavigateToFolder = navigationHandler::navigate,
             returnResult = { key, numberOfAddedVideos ->
                 navigationHandler.returnResult(key, numberOfAddedVideos)
             },
-            backTo = { playlistHandle, playlistType ->
-                navigationHandler.backTo(VideoPlaylistDetailNavKey(playlistHandle, playlistType))
-            },
             onBack = navigationHandler::back,
+            navigateAndClearTo = {
+                navigationHandler.navigateAndClearTo(
+                    destination = VideoPlaylistDetailNavKey(
+                        playlistHandle = key.playlistHandle,
+                        type = PlaylistType.User
+                    ),
+                    newParent = SelectVideosForPlaylistNavKey(
+                        playlistHandle = key.playlistHandle,
+                        isNewlyCreated = key.isNewlyCreated
+                    ),
+                    inclusive = true
+                )
+            },
             viewModel = viewModel
         )
     }

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.videosection.SystemVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
@@ -642,6 +643,30 @@ class VideoPlaylistsTabViewModelTest {
         }
 
     @Test
+    fun `test that getPresetNewVideoPlaylistTitle passes empty currentNames when no playlists exist`() =
+        runTest {
+            val placeholderTitle = "New playlist"
+            whenever(getNextDefaultAlbumNameUseCase(placeholderTitle, emptyList()))
+                .thenReturn(placeholderTitle)
+            stubInitialValues(nodesAndEntities = emptyMap())
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistsTabUiState.Data>()
+                .test {
+                    awaitItem()
+                    cancelAndIgnoreRemainingEvents()
+                }
+
+            val result = underTest.getPresetNewVideoPlaylistTitle(placeholderTitle)
+
+            assertThat(result).isEqualTo(placeholderTitle)
+            verify(getNextDefaultAlbumNameUseCase).invoke(
+                defaultName = placeholderTitle,
+                currentNames = emptyList()
+            )
+        }
+
+    @Test
     fun `test that createNewPlaylist invokes use case and triggers success event on UserVideoPlaylist`() =
         runTest {
             val title = " My New Playlist "
@@ -682,6 +707,20 @@ class VideoPlaylistsTabViewModelTest {
 
             underTest.videoPlaylistEditState.test {
                 assertThat(awaitItem().editVideoPlaylistErrorMessage).isEqualTo(errorMessage)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that createNewPlaylist does not trigger success event when use case returns non-UserVideoPlaylist`() =
+        runTest {
+            whenever(createVideoPlaylistUseCase(any())).thenReturn(mock<SystemVideoPlaylist>())
+
+            underTest.createNewPlaylist("New Playlist")
+            advanceUntilIdle()
+
+            underTest.videoPlaylistEditState.test {
+                assertThat(awaitItem().createVideoPlaylistSuccessEvent).isEqualTo(consumed())
                 cancelAndIgnoreRemainingEvents()
             }
         }
