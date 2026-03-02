@@ -185,6 +185,14 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
 
     private var tempNodeId: NodeId? = null
 
+    private val credentials by lazy {
+        runBlocking {
+            runCatching { getAccountCredentialsUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrNull()
+        }
+    }
+
     private val nameCollisionActivityContract = registerForActivityResult(
         NameCollisionActivityContract()
     ) { result ->
@@ -214,10 +222,6 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             Timber.w("Intent null")
             finish()
             return
-        }
-        val credentials = runBlocking {
-            runCatching { getAccountCredentialsUseCase() }
-                .onFailure { Timber.e(it) }
         }
 
         binding = ActivityPdfviewerBinding.inflate(layoutInflater)
@@ -971,7 +975,7 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                 moveToTrashMenuItem.isVisible = false
                 removeMenuItem.isVisible = false
                 chatMenuItem.isVisible = false
-                importMenuItem.isVisible = true
+                importMenuItem.isVisible = credentials != null
                 saveForOfflineMenuItem.isVisible = false
                 chatRemoveMenuItem.isVisible = false
             } else if (type == Constants.ZIP_ADAPTER) {
