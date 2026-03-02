@@ -7,7 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -25,7 +25,7 @@ class MonitorPendingMessageTransferEventsUseCaseTest {
     private lateinit var underTest: MonitorPendingMessageTransferEventsUseCase
 
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
-    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
+    private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase = mock()
 
     private val transferEventFlow = MutableSharedFlow<TransferEvent>()
     private val pendingMessageId1 = 123L
@@ -41,20 +41,20 @@ class MonitorPendingMessageTransferEventsUseCaseTest {
     fun setUp() {
         underTest = MonitorPendingMessageTransferEventsUseCase(
             monitorTransferEventsUseCase = monitorTransferEventsUseCase,
-            getInProgressTransfersUseCase = getInProgressTransfersUseCase
+            getInProgressTransfersFromSdkUseCase = getInProgressTransfersFromSdkUseCase
         )
     }
 
     @BeforeEach
     fun resetMocks() {
-        reset(getInProgressTransfersUseCase)
+        reset(getInProgressTransfersFromSdkUseCase)
         wheneverBlocking { monitorTransferEventsUseCase() } doReturn transferEventFlow
     }
 
     @Test
     fun `test that no event is emitted if no transfer event update is received and there is no in progress transfers`() =
         runTest {
-            whenever(getInProgressTransfersUseCase()).thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
 
             underTest().test {
                 expectNoEvents()
@@ -64,7 +64,12 @@ class MonitorPendingMessageTransferEventsUseCaseTest {
     @Test
     fun `test that two events are emitted if no transfer event update is received and there are two in progress chat upload transfers`() =
         runTest {
-            whenever(getInProgressTransfersUseCase()).thenReturn(listOf(transfer1, transfer2))
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(
+                listOf(
+                    transfer1,
+                    transfer2
+                )
+            )
 
             underTest().test {
                 assertThat(awaitItem()).isEqualTo(Pair(listOf(pendingMessageId1), transfer1))
@@ -75,7 +80,7 @@ class MonitorPendingMessageTransferEventsUseCaseTest {
     @Test
     fun `test that two events are emitted if a transfer event update is received and there are one in progress chat upload transfers`() =
         runTest {
-            whenever(getInProgressTransfersUseCase()).thenReturn(listOf(transfer1))
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(transfer1))
 
             underTest().test {
                 assertThat(awaitItem()).isEqualTo(Pair(listOf(pendingMessageId1), transfer1))
@@ -87,7 +92,7 @@ class MonitorPendingMessageTransferEventsUseCaseTest {
     @Test
     fun `test that two events are emitted if two transfer event updates are received and there is no in progress chat upload transfers`() =
         runTest {
-            whenever(getInProgressTransfersUseCase()).thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
 
             underTest().test {
                 transferEventFlow.emit(TransferEvent.TransferUpdateEvent(transfer1))

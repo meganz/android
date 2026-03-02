@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.pendingMessageIds
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ import javax.inject.Inject
  */
 class MonitorPendingMessageTransferEventsUseCase @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
-    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase,
 ) {
 
     /**
@@ -27,7 +27,7 @@ class MonitorPendingMessageTransferEventsUseCase @Inject constructor(
                 ?.let { it to event.transfer }
         }
         .onStart {
-            getInProgressTransfersUseCase().filter {
+            getInProgressTransfersFromSdkUseCase().filter {
                 it.pendingMessageIds() != null
             }.forEach { transfer ->
                 transfer.pendingMessageIds()?.let {

@@ -4,16 +4,16 @@ import mega.privacy.android.domain.repository.TransferRepository
 import javax.inject.Inject
 
 /**
- * Get in progress transfers use case
+ * Get in progress transfers from sdk use case
  *
  * @property repository
  */
-class GetInProgressTransfersUseCase @Inject constructor(
+class GetInProgressTransfersFromSdkUseCase @Inject constructor(
     private val repository: TransferRepository,
 ) {
     /**
      * Invoke
      *
      */
-    suspend operator fun invoke() = repository.getInProgressTransfers()
+    suspend operator fun invoke() = repository.getInProgressTransfersFromSdk()
 }

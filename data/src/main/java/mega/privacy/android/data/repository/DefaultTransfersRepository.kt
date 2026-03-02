@@ -436,18 +436,19 @@ internal class DefaultTransfersRepository @Inject constructor(
         megaApiGateway.resumeTransfersForNotLoggedInInstance()
     }
 
-    override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
-        val transfers = mutableListOf<Transfer>()
-        megaApiGateway.getTransferData()?.let { data ->
-            transfers.addAll(
-                (0 until data.numDownloads)
-                    .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
-            transfers.addAll(
-                (0 until data.numUploads)
-                    .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
+    override suspend fun getInProgressTransfersFromSdk(): List<Transfer> =
+        withContext(ioDispatcher) {
+            val transfers = mutableListOf<Transfer>()
+            megaApiGateway.getTransferData()?.let { data ->
+                transfers.addAll(
+                    (0 until data.numDownloads)
+                        .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
+                transfers.addAll(
+                    (0 until data.numUploads)
+                        .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
+            }
+            transfers.sortedBy { it.priority }
         }
-        transfers.sortedBy { it.priority }
-    }
 
     override fun monitorCompletedTransfersByStateWithLimit(
         limit: Int,
@@ -765,15 +766,6 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
-
-    override suspend fun removeInProgressTransfer(uniqueId: Long) {
-        if (!inProgressTransfersFlow.value.containsKey(uniqueId)) return
-        inProgressTransfersFlow.update { inProgressTransfers ->
-            inProgressTransfers.toMutableMap().also {
-                it.remove(uniqueId)
-            }
-        }
-    }
 
     override suspend fun removeInProgressTransfers(uniqueIds: Set<Long>) {
         if (uniqueIds.isEmpty()) return

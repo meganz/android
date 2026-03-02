@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,22 +27,22 @@ class UpdateActiveTransfersUseCaseTest {
     private lateinit var underTest: UpdateActiveTransfersUseCase
 
     private val transferRepository = mock<TransferRepository>()
-    private val getInProgressTransfersUseCase = mock<GetInProgressTransfersUseCase>()
+    private val getInProgressTransfersFromSdkUseCase = mock<GetInProgressTransfersFromSdkUseCase>()
 
     @BeforeAll
     fun setUp() {
         underTest = UpdateActiveTransfersUseCase(
             transferRepository = transferRepository,
-            getInProgressTransfersUseCase = getInProgressTransfersUseCase,
+            getInProgressTransfersFromSdkUseCase = getInProgressTransfersFromSdkUseCase,
         )
     }
 
     @BeforeEach
     fun resetMocks() = runTest {
-        reset(transferRepository, getInProgressTransfersUseCase)
+        reset(transferRepository, getInProgressTransfersFromSdkUseCase)
         whenever(transferRepository.getActiveTransferGroups()).thenReturn(emptyList())
         whenever(transferRepository.getCompletedTransfers()).thenReturn(emptyList())
-        whenever(getInProgressTransfersUseCase()).thenReturn(emptyList())
+        whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
     }
 
     @Test
@@ -55,7 +55,7 @@ class UpdateActiveTransfersUseCaseTest {
         }
         val inProgressTransfers = listOf(inProgressTransfer1, inProgressTransfer2)
 
-        whenever(getInProgressTransfersUseCase()).thenReturn(inProgressTransfers)
+        whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(inProgressTransfers)
 
         val actual = underTest()
 
@@ -152,7 +152,7 @@ class UpdateActiveTransfersUseCaseTest {
                 on { this.groupId } doReturn groupId.toInt()
             }
 
-            whenever(getInProgressTransfersUseCase()).thenReturn(listOf(inProgressTransfer))
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(inProgressTransfer))
             whenever(transferRepository.getCompletedTransfers()).thenReturn(listOf(completedTransfer))
             whenever(transferRepository.getActiveTransferGroups())
                 .thenReturn(listOf(activeTransferGroup))

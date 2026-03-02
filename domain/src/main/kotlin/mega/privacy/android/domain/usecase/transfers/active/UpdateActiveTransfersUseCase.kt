@@ -4,7 +4,7 @@ import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.getTransferGroup
 import mega.privacy.android.domain.repository.TransferRepository
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import javax.inject.Inject
 
 /**
@@ -15,14 +15,14 @@ import javax.inject.Inject
  */
 class UpdateActiveTransfersUseCase @Inject constructor(
     private val transferRepository: TransferRepository,
-    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase,
 ) {
     /**
      * invoke
      * @return true if transfers have been added from SDK in progress transfers
      */
     suspend operator fun invoke(): Boolean {
-        val inProgressTransfers: List<Transfer> = getInProgressTransfersUseCase()
+        val inProgressTransfers: List<Transfer> = getInProgressTransfersFromSdkUseCase()
         val completedTransfers: List<CompletedTransfer> = transferRepository.getCompletedTransfers()
         val transferGroupIds =
             transferRepository.getActiveTransferGroups().mapNotNull { it.groupId?.toLong() }

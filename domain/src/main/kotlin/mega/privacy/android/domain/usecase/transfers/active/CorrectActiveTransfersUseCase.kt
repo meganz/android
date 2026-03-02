@@ -12,7 +12,7 @@ import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
-import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersUseCase
+import mega.privacy.android.domain.usecase.transfers.GetInProgressTransfersFromSdkUseCase
 import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransferStateUseCase
 import javax.inject.Inject
 
@@ -22,7 +22,7 @@ import javax.inject.Inject
  * we need to fix it to avoid outdated counters in [ActiveTransferTotals]
  */
 class CorrectActiveTransfersUseCase @Inject constructor(
-    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase,
     private val transferRepository: TransferRepository,
     private val updatePendingTransferStateUseCase: UpdatePendingTransferStateUseCase,
     private val fileSystemRepository: FileSystemRepository,
@@ -45,7 +45,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         } else {
             transferRepository.getActiveTransfersByType(transferType)
         }
-        val inProgressTransfers = getInProgressTransfersUseCase()
+        val inProgressTransfersInSdk = getInProgressTransfersFromSdkUseCase()
             .filterNot { transfer ->
                 transfer.isVoiceClip()
                         || transfer.isBackgroundTransfer()
@@ -53,13 +53,13 @@ class CorrectActiveTransfersUseCase @Inject constructor(
             }
 
         //update transferred bytes for each transfer
-        transferRepository.updateActiveTransfersBytes(inProgressTransfers)
+        transferRepository.updateActiveTransfersBytes(inProgressTransfersInSdk)
 
         //set not-in-progress active transfers as finished, this can happen if we missed a finish event from SDK
         val notInProgressActiveTransfers = activeTransfers
             .filter { activeTransfer ->
                 !activeTransfer.isFinished
-                        && activeTransfer.uniqueId !in inProgressTransfers.map { it.uniqueId }
+                        && activeTransfer.uniqueId !in inProgressTransfersInSdk.map { it.uniqueId }
             }
 
         if (notInProgressActiveTransfers.isNotEmpty()) {
@@ -81,7 +81,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         }
 
         //add in-progress active transfers if they are not added, this can happen if we missed a start event from SDK
-        val inProgressNotInActiveTransfers = inProgressTransfers.filterNot { transfer ->
+        val inProgressNotInActiveTransfers = inProgressTransfersInSdk.filterNot { transfer ->
             activeTransfers.map { it.uniqueId }.contains(transfer.uniqueId)
         }
         if (inProgressNotInActiveTransfers.isNotEmpty()) {
@@ -109,7 +109,7 @@ class CorrectActiveTransfersUseCase @Inject constructor(
         val notInProgressPendingTransfersWaitingSdkScanning =
             pendingTransfersWaitingSdkScanning.filter { pendingTransfer ->
                 pendingTransfer.transferUniqueId == null ||
-                        inProgressTransfers.map { it.uniqueId }
+                        inProgressTransfersInSdk.map { it.uniqueId }
                             .contains(pendingTransfer.transferUniqueId).not()
             }
         if (notInProgressPendingTransfersWaitingSdkScanning.isNotEmpty()) {

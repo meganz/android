@@ -203,7 +203,7 @@ interface TransferRepository {
      * Get in progress transfers
      *
      */
-    suspend fun getInProgressTransfers(): List<Transfer>
+    suspend fun getInProgressTransfersFromSdk(): List<Transfer>
 
     /**
      * Monitors list of completed transfers
@@ -497,11 +497,6 @@ interface TransferRepository {
      * Monitor in progress transfers flow.
      */
     fun monitorInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>
-
-    /**
-     * Remove in progress transfer by uniqueId.
-     */
-    suspend fun removeInProgressTransfer(uniqueId: Long)
 
     /**
      * Remove a list of in progress transfers by uniqueId.

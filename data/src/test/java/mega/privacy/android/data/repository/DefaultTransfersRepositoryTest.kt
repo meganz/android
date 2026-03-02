@@ -743,7 +743,7 @@ class DefaultTransfersRepositoryTest {
                 on { numUploads }.thenReturn(0)
             }
             whenever(megaApiGateway.getTransferData()).thenReturn(data)
-            assertThat(underTest.getInProgressTransfers()).isEmpty()
+            assertThat(underTest.getInProgressTransfersFromSdk()).isEmpty()
         }
 
     @Test
@@ -756,7 +756,7 @@ class DefaultTransfersRepositoryTest {
             whenever(megaApiGateway.getTransferData()).thenReturn(data)
             whenever(transferMapper.invoke(any())).thenReturn(mock())
             whenever(megaApiGateway.getTransferByTag(any())).thenReturn(mock())
-            assertThat(underTest.getInProgressTransfers()).hasSize(data.numDownloads + data.numUploads)
+            assertThat(underTest.getInProgressTransfersFromSdk()).hasSize(data.numDownloads + data.numUploads)
         }
 
     @Test
