@@ -50,7 +50,8 @@ class MegaAppContainerProvider @Inject constructor(
                     themeMode = mode,
                     useLegacyStatusBarColor = useLegacyStatusBarColor,
                     passcodeCryptObjectFactory = passcodeCryptObjectFactory,
-                    content = content
+                    content = content,
+                    includePsa = includePsa,
                 )
             }
         }
