@@ -5,11 +5,11 @@ import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -34,14 +34,15 @@ fun BaseHandleNodeAction(
     typedFileNode: TypedFileNode,
     showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
-    onOpenFileContent: (FileNodeContent, Boolean) -> Unit,
+    onOpenFileContent: (FileNodeContent, Boolean, Boolean) -> Unit,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
 ) {
     val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
+    val resources = LocalResources.current
     val context = LocalContext.current
 
     if (!typedFileNode.isNodeKeyDecrypted) {
-        showSnackbar(context.getString(sharedR.string.preview_not_available_undecrypted_files))
+        showSnackbar(resources.getString(sharedR.string.preview_not_available_undecrypted_files))
         onActionHandled()
         return
     }
@@ -54,9 +55,30 @@ fun BaseHandleNodeAction(
                 when (content) {
                     is FileNodeContent.TextContent -> {
                         val isTextEditorComposeEnabled = runCatching {
-                            nodeActionsViewModel.isTextEditorComposeEnabled.first { it != null }
+                            nodeActionsViewModel.state
+                                .map { it.isTextEditorComposeEnabled }
+                                .first { it != null }
                         }.getOrDefault(false)
-                        onOpenFileContent(content, isTextEditorComposeEnabled ?: false)
+
+                        onOpenFileContent(
+                            content,
+                            isTextEditorComposeEnabled ?: false,
+                            false
+                        )
+                    }
+
+                    is FileNodeContent.Pdf -> {
+                        val isPDFViewerEnabled = runCatching {
+                            nodeActionsViewModel.state
+                                .map { it.isPDFViewerEnabled }
+                                .first { it != null }
+                        }.getOrDefault(false)
+
+                        onOpenFileContent(
+                            content,
+                            false,
+                            isPDFViewerEnabled ?: false
+                        )
                     }
 
                     is FileNodeContent.Other -> {
@@ -79,6 +101,7 @@ fun BaseHandleNodeAction(
                             } else {
                                 onOpenFileContent(
                                     FileNodeContent.LocalZipFile(localFile),
+                                    false,
                                     false
                                 )
                             }
@@ -90,11 +113,11 @@ fun BaseHandleNodeAction(
                     }
 
                     else -> {
-                        onOpenFileContent(content, false)
+                        onOpenFileContent(content, false, false)
                     }
                 }
             }.onFailure {
-                showSnackbar(context.getString(sharedR.string.intent_not_available))
+                showSnackbar(resources.getString(sharedR.string.intent_not_available))
             }
             onActionHandled()
         }.onFailure {

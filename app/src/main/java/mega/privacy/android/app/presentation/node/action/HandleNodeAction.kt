@@ -56,7 +56,7 @@ fun HandleNodeAction(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenFileContent = { content, _ ->
+        onOpenFileContent = { content, _, _ ->
             when (content) {
                 is FileNodeContent.Pdf -> {
                     megaNavigator.openPdfActivity(

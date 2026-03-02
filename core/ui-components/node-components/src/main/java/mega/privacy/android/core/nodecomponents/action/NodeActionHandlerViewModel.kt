@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -14,7 +16,20 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
+import mega.privacy.android.feature_flags.AppFeatures
+import timber.log.Timber
 import javax.inject.Inject
+
+/**
+ * UI state for [NodeActionHandlerViewModel].
+ * Eventually this class will be removed when feature flags are removed, no need to create a separate file for it.
+ * @param isTextEditorComposeEnabled Whether the Compose text editor feature is enabled (null until loaded).
+ * @param isPDFViewerEnabled Whether the Compose PDF viewer feature is enabled (null until loaded).
+ */
+data class NodeActionHandlerUiState(
+    val isTextEditorComposeEnabled: Boolean? = null,
+    val isPDFViewerEnabled: Boolean? = null,
+)
 
 /**
  * Simplified view model for handling node actions
@@ -27,15 +42,23 @@ class NodeActionHandlerViewModel @Inject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
-    val isTextEditorComposeEnabled: StateFlow<Boolean?>
-        field = MutableStateFlow(null)
+    private val _state = MutableStateFlow(NodeActionHandlerUiState())
+    val state: StateFlow<NodeActionHandlerUiState> = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(ApiFeatures.TextEditorCompose)
-            }.onSuccess {
-                isTextEditorComposeEnabled.value = it
+            }.onSuccess { value ->
+                _state.update { it.copy(isTextEditorComposeEnabled = value) }
+            }
+        }
+        viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)
+            }.onSuccess { value ->
+                Timber.d("PDF Viewer Compose UI feature flag value: $value")
+                _state.update { it.copy(isPDFViewerEnabled = value) }
             }
         }
     }

@@ -3,46 +3,28 @@ package mega.privacy.android.core.nodecomponents.action
 import android.content.Intent
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
-import mega.privacy.android.domain.entity.AudioFileTypeInfo
-import mega.privacy.android.domain.entity.ImageFileTypeInfo
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
-import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
-import mega.privacy.android.domain.entity.UnknownFileTypeInfo
-import mega.privacy.android.domain.entity.UrlFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
-import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
-import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.stub
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
-import java.util.stream.Stream
-import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -103,7 +85,7 @@ class NodeActionHandlerViewModelTest {
     }
 
     @Test
-    fun `test that isTextEditorComposeEnabled flow emits when flag is loaded`() = runTest {
+    fun `test that state isTextEditorComposeEnabled emits when flag is loaded`() = runTest {
         reset(getFeatureFlagValueUseCase)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorCompose)).thenReturn(true)
 
@@ -113,10 +95,37 @@ class NodeActionHandlerViewModelTest {
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
 
-        val result = viewModelUnderTest.isTextEditorComposeEnabled.first { it != null }
+        val result = viewModelUnderTest.state
+            .map { it.isTextEditorComposeEnabled }
+            .first { it != null }
 
         assertThat(result).isTrue()
         verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.TextEditorCompose)
+    }
+
+    @Test
+    fun `test that state isPDFViewerEnabled emits when flag is loaded`() = runTest {
+        reset(getFeatureFlagValueUseCase)
+        whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
+
+        val viewModelUnderTest = NodeActionHandlerViewModel(
+            getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
+            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+        )
+
+        val result = viewModelUnderTest.state
+            .map { it.isPDFViewerEnabled }
+            .first { it != null }
+
+        assertThat(result).isTrue()
+        verify(getFeatureFlagValueUseCase).invoke(AppFeatures.PdfViewerComposeUI)
+    }
+
+    @Test
+    fun `test that initial state has null feature flags`() = runTest {
+        assertThat(viewModel.state.value.isTextEditorComposeEnabled).isNull()
+        assertThat(viewModel.state.value.isPDFViewerEnabled).isNull()
     }
 
     private fun createMockFileNode(): TypedFileNode = mock {

@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeIdFromBase64UseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
@@ -53,6 +55,7 @@ class CloudDriveDeepLinkHandlerTest {
     private val fileNodeContentToNavKeyMapper = mock<FileNodeContentToNavKeyMapper>()
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
 
     @BeforeAll
@@ -65,6 +68,7 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue = snackbarEventQueue,
             rootNodeExistsUseCase = rootNodeExistsUseCase,
             getNodeLocationUseCase = getNodeLocationUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -78,8 +82,10 @@ class CloudDriveDeepLinkHandlerTest {
             snackbarEventQueue,
             rootNodeExistsUseCase,
             getNodeLocationUseCase,
+            getFeatureFlagValueUseCase,
         )
         wheneverBlocking { rootNodeExistsUseCase() } doReturn true
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.doReturn(false)
     }
 
     @ParameterizedTest
@@ -811,4 +817,3 @@ class CloudDriveDeepLinkHandlerTest {
 
     private val rootId = NodeId(1L)
 }
-

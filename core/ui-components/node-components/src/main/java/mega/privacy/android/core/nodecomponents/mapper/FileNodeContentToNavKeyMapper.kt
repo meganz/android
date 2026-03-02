@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.mapper
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNodeContent
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -11,6 +12,7 @@ import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import javax.inject.Inject
 
 /**
@@ -44,15 +46,37 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         nodeIds: List<Long>? = null,
         isInShare: Boolean = false,
         isTextEditorComposeEnabled: Boolean = false,
+        isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
         return when (content) {
-            is FileNodeContent.Pdf -> LegacyPdfViewerNavKey(
-                nodeHandle = fileNode.id.longValue,
-                nodeContentUri = content.uri,
-                nodeSourceType = viewType,
-                mimeType = fileNode.type.mimeType
-            )
+            is FileNodeContent.Pdf -> if (isPDFViewerEnabled.not()) {
+                LegacyPdfViewerNavKey(
+                    nodeHandle = fileNode.id.longValue,
+                    nodeContentUri = content.uri,
+                    nodeSourceType = viewType,
+                    mimeType = fileNode.type.mimeType
+                )
+            } else {
+                val (contentUri, isLocal, shouldStop) = when (val uri = content.uri) {
+                    is NodeContentUri.LocalContentUri -> {
+                        Triple(uri.file.path, true, false)
+                    }
+
+                    is NodeContentUri.RemoteContentUri -> {
+                        Triple(uri.url, false, uri.shouldStopHttpSever)
+                    }
+                }
+                PdfViewerNavKey(
+                    nodeHandle = fileNode.id.longValue,
+                    contentUri = contentUri,
+                    isLocalContent = isLocal,
+                    shouldStopHttpServer = shouldStop,
+                    nodeSourceType = nodeSourceType,
+                    mimeType = fileNode.type.mimeType,
+                    title = null,
+                )
+            }
 
             is FileNodeContent.ImageForNode -> LegacyImageViewerNavKey(
                 nodeHandle = fileNode.id.longValue,
@@ -93,4 +117,3 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         }
     }
 }
-

@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.feature.pdfviewer.navigation.PdfViewerFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 import javax.inject.Singleton
 
@@ -88,6 +89,10 @@ class FeatureDestinationModule {
     @Provides
     @IntoSet
     fun provideScanDestination(): FeatureDestination = SaveScannedDocumentsDestination()
+
+    @Provides
+    @IntoSet
+    fun providePdfViewerFeatureDestination(): FeatureDestination = PdfViewerFeatureDestination
 
     @Provides
     @Singleton

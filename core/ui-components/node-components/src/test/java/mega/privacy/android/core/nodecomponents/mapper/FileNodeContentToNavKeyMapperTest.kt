@@ -20,18 +20,15 @@ import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.LegacyZipBrowserNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
 import java.io.File
-import java.util.stream.Stream
 import kotlin.time.Duration.Companion.seconds
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -51,7 +48,7 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
-    fun `test that Pdf content maps to LegacyPdfViewerNavKey`() {
+    fun `test that Pdf content maps to LegacyPdfViewerNavKey when isPDFViewerEnabled is false`() {
         val nodeHandle = 123L
         val nodeContentUri = NodeContentUri.RemoteContentUri("http://example.com/file.pdf", false)
         val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
@@ -75,9 +72,79 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            isPDFViewerEnabled = false
         )
 
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that Pdf content maps to PdfViewerNavKey when isPDFViewerEnabled is true with RemoteContentUri`() {
+        val nodeHandle = 456L
+        val contentUrl = "http://example.com/remote.pdf"
+        val shouldStopServer = true
+        val nodeContentUri = NodeContentUri.RemoteContentUri(contentUrl, shouldStopServer)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "remote.pdf",
+            fileTypeInfo = PdfFileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+            .thenReturn(NodeSourceTypeInt.FILE_BROWSER_ADAPTER)
+
+        val content = FileNodeContent.Pdf(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            isPDFViewerEnabled = true
+        )
+
+        val expected = PdfViewerNavKey(
+            nodeHandle = nodeHandle,
+            contentUri = contentUrl,
+            isLocalContent = false,
+            shouldStopHttpServer = shouldStopServer,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            mimeType = "application/pdf",
+            title = null,
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that Pdf content maps to PdfViewerNavKey when isPDFViewerEnabled is true with LocalContentUri`() {
+        val nodeHandle = 789L
+        val localFile = File("/path/to/local.pdf")
+        val nodeContentUri = NodeContentUri.LocalContentUri(localFile)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            name = "local.pdf",
+            fileTypeInfo = PdfFileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+            .thenReturn(NodeSourceTypeInt.FILE_BROWSER_ADAPTER)
+
+        val content = FileNodeContent.Pdf(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            isPDFViewerEnabled = true
+        )
+
+        val expected = PdfViewerNavKey(
+            nodeHandle = nodeHandle,
+            contentUri = localFile.path,
+            isLocalContent = true,
+            shouldStopHttpServer = false,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            mimeType = "application/pdf",
+            title = null,
+        )
         assertThat(result).isEqualTo(expected)
     }
 
@@ -352,4 +419,3 @@ class FileNodeContentToNavKeyMapperTest {
         whenever(it.modificationTime).thenReturn(1234567890L)
     }
 }
-
