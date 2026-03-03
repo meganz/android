@@ -185,6 +185,11 @@ alwaysApply: true
 - **Truth**: Use Google Truth for assertions
 - **Coroutines**: Use `runTest` for coroutine testing
 
+### Test Method Naming
+- **Format**: Use one of the following patterns for test method names:
+  - `test that <method> <action>`() — e.g. `test that init does not call loginToFolderUseCase`()
+  - `test that <method> <action> when <cause>`() — e.g. `test that init emits Loaded when login succeeds`()
+
 ### Test Structure
 - **Repository Tests**: Test repository implementations with mocked dependencies
 - **Use Case Tests**: Test use cases with mocked repository dependencies
