@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.meeting.chat.mapper
 
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
+import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
-import mega.privacy.android.domain.entity.chat.messages.reactions.Reaction
 import javax.inject.Inject
 
 /**
@@ -20,23 +20,27 @@ class UiReactionListMapper @Inject constructor(
      * @return [UIReaction].
      */
     operator fun invoke(reactions: List<Reaction>) =
-        reactions.map { reaction ->
+        reactions.mapNotNull { reaction ->
             with(reaction) {
-                val userList = reaction.userHandles.map {
-                    UIReactionUser(
-                        userHandle = it,
-                        avatarContent = { userHandle, modifier ->
-                            ChatAvatar(handle = userHandle, modifier)
-                        }
+                // we need catch exception here because proguard issue
+                // it's not visible issue to user because it will reload everytime user enter chat room
+                runCatching {
+                    val userList = reaction.userHandles.map {
+                        UIReactionUser(
+                            userHandle = it,
+                            avatarContent = { userHandle, modifier ->
+                                ChatAvatar(handle = userHandle, modifier)
+                            }
+                        )
+                    }
+                    UIReaction(
+                        reaction = this.reaction,
+                        count = count,
+                        shortCode = emojiShortCodeMapper(this.reaction),
+                        hasMe = hasMe,
+                        userList = userList
                     )
-                }
-                UIReaction(
-                    reaction = this.reaction,
-                    count = count,
-                    shortCode = emojiShortCodeMapper(this.reaction),
-                    hasMe = hasMe,
-                    userList = userList
-                )
+                }.getOrNull()
             }
         }
 }

@@ -68,9 +68,12 @@
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
-# Prevent R8 from leaving Data object members always null
--keepclassmembers,allowobfuscation class * {
+# General Gson rule for R8 full mode: keep classes with @SerializedName (not just members).
+# keepclasseswithmembers preserves the class itself when only used via reflection/Retrofit,
+# preventing ClassCastException from generic type corruption. See Gson gson.pro and #2401.
+-keepclasseswithmembers,allowobfuscation class * {
   @com.google.gson.annotations.SerializedName <fields>;
+  <init>(...);
 }
 # Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
