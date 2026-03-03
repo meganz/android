@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
@@ -328,6 +329,25 @@ class ChooseAccountViewModelTest {
                 Truth.assertThat(awaitItem()).isEqualTo(
                     UserAgeComplianceStatus.RequiresMinorRestriction
                 )
+            }
+        }
+
+    @Test
+    fun `test that isSubscriptionFeatureAvailable is false when getSubscriptionsUseCase throws LocalPricingNotAvailableException`() =
+        runTest {
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenThrow(LocalPricingNotAvailableException())
+            wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(false)
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(
+                false
+            )
+
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.map { it.isSubscriptionFeatureAvailable }.test {
+                Truth.assertThat(awaitItem()).isFalse()
             }
         }
 

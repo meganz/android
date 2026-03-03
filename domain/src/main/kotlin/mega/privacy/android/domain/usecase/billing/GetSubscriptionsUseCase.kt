@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.billing
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import javax.inject.Inject
@@ -37,6 +38,10 @@ class GetSubscriptionsUseCase @Inject constructor(
         }
         val skus = paymentOptions.map { it.sku }.distinct()
         billingRepository.querySkus(skus)
+        val allLocalPricingNull = skus.all { getLocalPricingUseCase(it) == null }
+        if (allLocalPricingNull) {
+            throw LocalPricingNotAvailableException()
+        }
         return Subscriptions(
             monthlySubscriptions = buildSubscriptions(paymentOptions, 1),
             yearlySubscriptions = buildSubscriptions(paymentOptions, 12),

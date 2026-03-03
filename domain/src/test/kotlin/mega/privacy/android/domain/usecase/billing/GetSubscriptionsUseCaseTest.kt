@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_YEAR
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
 import org.junit.Before
@@ -180,4 +181,21 @@ class GetSubscriptionsUseCaseTest {
             )
         }
     }
+
+    @Test(expected = LocalPricingNotAvailableException::class)
+    fun `test that LocalPricingNotAvailableException is thrown when all local pricing is null`() =
+        runTest {
+            whenever(getSubscriptionOptionsUseCase()).thenReturn(
+                listOf(monthlySubscriptionOption, yearlySubscriptionOption)
+            )
+            whenever(
+                billingRepository.querySkus(
+                    listOf("android.test.purchased.month", SKU_PRO_LITE_YEAR)
+                )
+            ).thenReturn(emptyList())
+            whenever(getLocalPricingUseCase("android.test.purchased.month")).thenReturn(null)
+            whenever(getLocalPricingUseCase(SKU_PRO_LITE_YEAR)).thenReturn(null)
+
+            underTest.invoke()
+        }
 }

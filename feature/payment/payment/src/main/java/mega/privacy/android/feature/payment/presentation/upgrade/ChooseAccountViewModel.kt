@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.billing.Pricing
-import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -58,27 +58,7 @@ class ChooseAccountViewModel @Inject constructor(
         savedStateHandle.get<Boolean>(EXTRA_IS_UPGRADE_ACCOUNT) ?: false
 
     init {
-        viewModelScope.launch {
-            val (monthlySubscriptions, yearlySubscriptions) = runCatching { getSubscriptionsUseCase() }.getOrElse {
-                Subscriptions(
-                    emptyList(),
-                    emptyList()
-                )
-            }
-            val allAccountTypes = (monthlySubscriptions.map { it.accountType } +
-                    yearlySubscriptions.map { it.accountType }).distinct().sorted()
-            val localisedSubscriptions = allAccountTypes.mapNotNull { accountType ->
-                val monthly = monthlySubscriptions.firstOrNull { it.accountType == accountType }
-                val yearly = yearlySubscriptions.firstOrNull { it.accountType == accountType }
-                if (monthly != null || yearly != null) {
-                    localisedSubscriptionMapper(
-                        monthlySubscription = monthly,
-                        yearlySubscription = yearly
-                    )
-                } else null
-            }
-            _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
-        }
+        loadSubscriptions()
         viewModelScope.launch {
             val cheapestSubscriptionAvailable =
                 runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
@@ -133,6 +113,34 @@ class ChooseAccountViewModel @Inject constructor(
             loadCurrentSubscriptionPlan()
         }
         refreshPricing()
+    }
+
+    private fun loadSubscriptions() {
+        viewModelScope.launch {
+            runCatching { getSubscriptionsUseCase() }
+                .onSuccess { (monthlySubscriptions, yearlySubscriptions) ->
+                    val allAccountTypes = (monthlySubscriptions.map { it.accountType } +
+                            yearlySubscriptions.map { it.accountType }).distinct().sorted()
+                    val localisedSubscriptions = allAccountTypes.mapNotNull { accountType ->
+                        val monthly =
+                            monthlySubscriptions.firstOrNull { it.accountType == accountType }
+                        val yearly =
+                            yearlySubscriptions.firstOrNull { it.accountType == accountType }
+                        if (monthly != null || yearly != null) {
+                            localisedSubscriptionMapper(
+                                monthlySubscription = monthly,
+                                yearlySubscription = yearly
+                            )
+                        } else null
+                    }
+                    _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
+                }.onFailure { error ->
+                    Timber.w(error, "Failed to get subscriptions")
+                    if (error is LocalPricingNotAvailableException) {
+                        _state.update { it.copy(isSubscriptionFeatureAvailable = false) }
+                    }
+                }
+        }
     }
 
     /**
