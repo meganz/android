@@ -30,8 +30,6 @@ import com.github.barteksc.pdfviewer.scroll.ScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.util.SizeF;
 
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
-
 /**
  * This Manager takes care of moving the PDFView,
  * set its zoom track user actions.
@@ -79,7 +77,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
                 ps.show();
             }
         }
-        ((PdfViewerActivity) pdfView.getContext()).setToolbarVisibility();
+        // Toolbar visibility is handled by onTap callback
         pdfView.performClick();
         return true;
     }
@@ -154,9 +152,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
         scrolling = true;
 
-        if (((PdfViewerActivity) pdfView.getContext()).isToolbarVisible()){
-            ((PdfViewerActivity) pdfView.getContext()).setToolbarVisibilityHide(200L);
-        }
+        // Toolbar visibility is handled by onPageScroll callback
 
         if (pdfView.isZooming() || pdfView.isSwipeEnabled()) {
             pdfView.moveRelativeTo(-distanceX, -distanceY);

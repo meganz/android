@@ -15,10 +15,6 @@
  */
 package com.github.barteksc.pdfviewer;
 
-import static mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown;
-import static mega.privacy.android.app.utils.Util.isOnline;
-
-import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -27,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.PointF;
-import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -35,17 +30,9 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.link.DefaultLinkHandler;
@@ -71,7 +58,6 @@ import com.github.barteksc.pdfviewer.util.Constants;
 import com.github.barteksc.pdfviewer.util.FitPolicy;
 import com.github.barteksc.pdfviewer.util.MathUtils;
 import com.github.barteksc.pdfviewer.util.Util;
-import com.google.android.material.textfield.TextInputLayout;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
 import com.shockwave.pdfium.util.Size;
@@ -85,8 +71,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import timber.log.Timber;
 
 /**
@@ -119,7 +103,6 @@ public class PDFView extends RelativeLayout {
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
 
-    private PdfViewerActivity pdfViewer;
 
     /**
      * START - scrolling in first page direction
@@ -242,8 +225,6 @@ public class PDFView extends RelativeLayout {
     /** Construct the initial view */
     public PDFView(Context context, AttributeSet set) {
         super(context, set);
-
-        pdfViewer = (PdfViewerActivity) getContext();
 
         renderingHandlerThread = new HandlerThread("PDF renderer");
 
@@ -746,98 +727,6 @@ public class PDFView extends RelativeLayout {
         callbacks.callOnLoadComplete(pdfFile.getPagesCount());
 
         jumpTo(defaultPage, false);
-
-        PdfViewerActivity.loading = false;
-        pdfViewer.getProgressBar().setVisibility(GONE);
-    }
-
-    void showErrorDialog(final Throwable t) {
-        if (pdfViewer == null || t == null) {
-            Timber.e("Cannot show error dialog, pdfViewer or t is null");
-            return;
-        }
-
-        if (isAlertDialogShown(pdfViewer.getTakenDownDialog())) {
-            return;
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setCancelable(false);
-
-        if ("Password required or incorrect password.".equals(t.getLocalizedMessage())
-                || ("Password required or incorrect password.").equals(t.getMessage())) {
-            if (pdfViewer.getMaxIntents() > 0) {
-                View layout = pdfViewer.getLayoutInflater().inflate(R.layout.dialog_pdf_password, null);
-                final TextInputLayout passwordLayout = layout.findViewById(R.id.password_layout);
-                final AppCompatEditText passwordText = layout.findViewById(R.id.password_text);
-                final ImageView passwordError = layout.findViewById(R.id.password_text_error_icon);
-
-                if (pdfViewer.getPassword() != null) {
-                    passwordError.setVisibility(VISIBLE);
-                    String text = pdfViewer.getPassword();
-                    passwordText.setText(text);
-                    passwordText.setSelection(text.length());
-                    passwordLayout.setError(pdfViewer.getString(R.string.error_enter_password));
-                    passwordLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error);
-                    passwordError.setVisibility(View.VISIBLE);
-                    passwordText.getBackground().mutate().setColorFilter(ContextCompat.getColor(getContext(), R.color.red_600_red_300), PorterDuff.Mode.SRC_ATOP);
-                } else {
-                    passwordError.setVisibility(GONE);
-                }
-
-                passwordLayout.setEndIconVisible(false);
-                passwordText.setOnFocusChangeListener((v, hasFocus) -> passwordLayout.setEndIconVisible(hasFocus));
-
-                passwordText.setOnEditorActionListener((textView, actionId, keyEvent) -> {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        pdfViewer.reloadPDFwithPassword(textView.getText().toString());
-                        return true;
-                    }
-                    return false;
-                });
-
-                passwordText.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable editable) {
-                        if (passwordLayout.getError() != null && !passwordLayout.getError().toString().isEmpty()) {
-                            passwordLayout.setError(null);
-                            passwordLayout.setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint);
-                            passwordError.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
-                builder.setView(layout);
-                builder.setTitle(getContext().getString(R.string.title_pdf_password))
-                        .setMessage(getContext().getString(R.string.text_pdf_password, pdfViewer.getPdfFileName()))
-                        .setNegativeButton(mega.privacy.android.shared.resources.R.string.general_dialog_cancel_button, (dialogInterface, i) -> pdfViewer.finish())
-                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.reloadPDFwithPassword(passwordText.getText().toString()));
-            } else {
-                builder.setTitle(getResources().getString(R.string.general_error_word))
-                        .setMessage(getResources().getString(R.string.error_max_pdf_password))
-                        .setPositiveButton(R.string.contact_accept, (dialogInterface, i) -> pdfViewer.finish());
-            }
-        } else {
-            builder.setMessage(isOnline(pdfViewer) ? R.string.corrupt_pdf_dialog_text
-                            : R.string.error_fail_to_open_file_no_network)
-                    .setPositiveButton(mega.privacy.android.shared.resources.R.string.general_ok, (dialog, which) -> pdfViewer.finish());
-        }
-        try {
-            builder.show();
-        } catch (Exception e) {
-            Timber.e(e, "PDFView.showErrorDialog: Cannot show dialog");
-        }
-
     }
 
     void loadError(Throwable t) {
@@ -849,8 +738,7 @@ public class PDFView extends RelativeLayout {
         if (onErrorListener != null) {
             onErrorListener.onError(t);
         } else {
-            showErrorDialog(t);
-            Timber.e(t, "Load pdf error");
+            Timber.e(t, "Load pdf error: no error listener set");
         }
     }
 

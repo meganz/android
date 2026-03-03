@@ -17,7 +17,6 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.Util;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity;
 import timber.log.Timber;
 
 public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandle {
@@ -222,10 +221,7 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
                 motionYOrigin = 0;
                 break;
             case MotionEvent.ACTION_MOVE: {
-                float newMotionY = event.getRawY();
-                if (Math.abs(motionYOrigin - newMotionY) > 5 && ((PdfViewerActivity) context).isToolbarVisible()) {
-                    ((PdfViewerActivity) context).setToolbarVisibilityHide(200L);
-                }
+                // Toolbar visibility is handled by onPageScroll callback
             }
         }
 

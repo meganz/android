@@ -15,6 +15,8 @@ import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
 import android.provider.OpenableColumns
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
@@ -341,6 +343,8 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         pdfFileName = getFileName(uri)
         defaultScrollHandle = DefaultScrollHandle(this@PdfViewerActivity)
         loading = true
+        setupView()
+
         if (uri.toString().contains("http://")) {
             isUrl = true
             loadStreamPDF()
@@ -348,8 +352,6 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
             isUrl = false
             loadLocalPDF()
         }
-
-        setupView()
 
         collectFLows()
         if (savedInstanceState == null) {
@@ -403,6 +405,13 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                             .spacing(10) // in dp
                             .onPageError(this@PdfViewerActivity)
                             .password(password)
+                            .onTap { setToolbarVisibility(); false }
+                            .onPageScroll { _, _ ->
+                                if (isToolbarVisible) {
+                                    setToolbarVisibilityHide(200L)
+                                }
+                            }
+                            .onError { showPdfErrorDialog(it) }
                             .load()
                     } catch (e: Exception) {
                         Timber.w(e, "Exception loading PDF as stream")
@@ -498,6 +507,142 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                 onConsumeEvent = startDownloadViewModel::consumeDownloadEvent,
             )
         )
+    }
+
+
+    private fun showPasswordDialog(
+        onPasswordEntered: (String) -> Unit,
+        onCancel: () -> Unit
+    ) {
+        if (isAlertDialogShown(takenDownDialog)) {
+            return
+        }
+
+        val builder = AlertDialog.Builder(this)
+        builder.setCancelable(false)
+
+        if (maxIntents > 0) {
+            val layout = layoutInflater.inflate(R.layout.dialog_pdf_password, null)
+            val passwordLayout = layout.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.password_layout)
+            val passwordText = layout.findViewById<androidx.appcompat.widget.AppCompatEditText>(R.id.password_text)
+            val passwordError = layout.findViewById<android.widget.ImageView>(R.id.password_text_error_icon)
+
+            if (password != null) {
+                passwordError?.visibility = View.VISIBLE
+                val text = password
+                passwordText?.setText(text)
+                passwordText?.setSelection(text?.length ?: 0)
+                passwordLayout?.error = getString(R.string.error_enter_password)
+                passwordLayout?.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                passwordError?.visibility = View.VISIBLE
+                passwordText?.background?.mutate()?.setColorFilter(
+                    androidx.core.content.ContextCompat.getColor(this, R.color.red_600_red_300),
+                    android.graphics.PorterDuff.Mode.SRC_ATOP
+                )
+            } else {
+                passwordError?.visibility = View.GONE
+            }
+
+            passwordLayout?.isEndIconVisible = false
+            passwordText?.setOnFocusChangeListener { _, hasFocus ->
+                passwordLayout?.isEndIconVisible = hasFocus
+            }
+
+            passwordText?.setOnEditorActionListener { textView, actionId, _ ->
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE) {
+                    onPasswordEntered(textView.text.toString())
+                    true
+                } else {
+                    false
+                }
+            }
+
+            passwordText?.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    if (passwordLayout?.error != null && passwordLayout.error.toString().isNotEmpty()) {
+                        passwordLayout.error = null
+                        passwordLayout.setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
+                        passwordError?.visibility = View.GONE
+                    }
+                }
+            })
+
+            builder.setView(layout)
+            builder.setTitle(getString(R.string.title_pdf_password))
+                .setMessage(getString(R.string.text_pdf_password, pdfFileName))
+                .setNegativeButton(sharedR.string.general_dialog_cancel_button) { _, _ ->
+                    onCancel()
+                }
+                .setPositiveButton(R.string.contact_accept) { _, _ ->
+                    onPasswordEntered(passwordText?.text?.toString() ?: "")
+                }
+        } else {
+            builder.setTitle(getString(R.string.general_error_word))
+                .setMessage(getString(R.string.error_max_pdf_password))
+                .setPositiveButton(R.string.contact_accept) { _, _ ->
+                    onCancel()
+                }
+        }
+
+        try {
+            builder.show()
+        } catch (e: Exception) {
+            Timber.e(e, "PdfViewerActivity.showPasswordDialog: Cannot show dialog")
+        }
+    }
+
+    /**
+     * Check if error is a password error
+     */
+    private fun isPasswordError(error: Throwable): Boolean {
+        return "Password required or incorrect password." == error.localizedMessage ||
+                "Password required or incorrect password." == error.message
+    }
+
+    /**
+     * Show PDF error dialog, handling password errors separately
+     */
+    private fun showPdfErrorDialog(error: Throwable) {
+        if (isPasswordError(error)) {
+            showPasswordDialog(
+                onPasswordEntered = { password ->
+                    reloadPDFwithPassword(password)
+                },
+                onCancel = {
+                    finish()
+                }
+            )
+        } else {
+            showErrorDialog(error)
+        }
+    }
+
+    private fun showErrorDialog(error: Throwable) {
+        if (isAlertDialogShown(takenDownDialog)) {
+            return
+        }
+
+        val builder = AlertDialog.Builder(this)
+        builder.setCancelable(false)
+
+        val message = if (Util.isOnline(this)) {
+            getString(R.string.corrupt_pdf_dialog_text)
+        } else {
+            getString(R.string.error_fail_to_open_file_no_network)
+        }
+
+        builder.setMessage(message)
+            .setPositiveButton(sharedR.string.general_ok) { _, _ ->
+                finish()
+            }
+
+        try {
+            builder.show()
+        } catch (e: Exception) {
+            Timber.e(e, "PdfViewerActivity.showErrorDialog: Cannot show dialog")
+        }
     }
 
     private fun setupBottomClick() = binding.uploadContainerLayoutBottom.setOnClickListener {
@@ -705,6 +850,13 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
                     .spacing(10) // in dp
                     .onPageError(this)
                     .password(password)
+                    .onTap { setToolbarVisibility(); false }
+                    .onPageScroll { _, _ ->
+                        if (isToolbarVisible) {
+                            setToolbarVisibilityHide(200L)
+                        }
+                    }
+                    .onError { showPdfErrorDialog(it) }
                     .load()
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -1596,6 +1748,11 @@ class PdfViewerActivity : BaseActivity(), OnPageChangeListener,
         Timber.d("Creation Date = ${meta.creationDate}")
         Timber.d("Mod. Date = ${meta.modDate}")
         printBookmarksTree(binding.pdfView.tableOfContents, "-")
+        
+        // Hide progress bar when loading is complete
+        loading = false
+        binding.pdfViewerProgressBar.isVisible = false
+        
         handler?.postDelayed({ if (isToolbarVisible) setToolbarVisibilityHide(200L) }, 2000)
     }
 
