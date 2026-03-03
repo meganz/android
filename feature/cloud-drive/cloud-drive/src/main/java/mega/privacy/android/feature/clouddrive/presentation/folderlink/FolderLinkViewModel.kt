@@ -11,8 +11,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
@@ -23,6 +27,8 @@ import timber.log.Timber
 internal class FolderLinkViewModel @AssistedInject constructor(
     private val loginToFolderUseCase: LoginToFolderUseCase,
     private val hasCredentialsUseCase: HasCredentialsUseCase,
+    private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
+    private val nodeUiItemMapper: NodeUiItemMapper,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -30,10 +36,13 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     val uiState: StateFlow<FolderLinkUiState> = _uiState.asStateFlow()
 
     init {
-        when {
-            args.uriString != null -> loginToFolder(args.uriString)
-            // args.nodeHandle != null → future MR: fetch sub-folder nodes
-            // both null              → future MR: fetch root nodes
+        viewModelScope.launch {
+            checkCredentials()
+            when {
+                args.uriString != null -> loginToFolder(args.uriString)
+                // args.nodeHandle != null → future MR: fetch sub-folder nodes
+                // both null              → future MR: fetch root nodes
+            }
         }
     }
 
@@ -44,50 +53,59 @@ internal class FolderLinkViewModel @AssistedInject constructor(
         }
     }
 
-    private fun loginToFolder(url: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(contentState = FolderLinkContentState.Loading) }
-            runCatching { loginToFolderUseCase(url) }
-                .onSuccess { status ->
-                    when (status) {
-                        FolderLoginStatus.SUCCESS ->
-                            _uiState.update {
-                                it.copy(
-                                    contentState = FolderLinkContentState.Loaded(
-                                        hasDbCredentials = runCatching { hasCredentialsUseCase() }
-                                            .getOrDefault(false)
-                                    )
-                                )
-                            }
-
-                        FolderLoginStatus.API_INCOMPLETE ->
-                            _uiState.update {
-                                it.copy(
-                                    contentState = FolderLinkContentState.DecryptionKeyRequired(
-                                        url = url
-                                    )
-                                )
-                            }
-
-                        FolderLoginStatus.INCORRECT_KEY ->
-                            _uiState.update {
-                                it.copy(
-                                    contentState = FolderLinkContentState.DecryptionKeyRequired(
-                                        url = url,
-                                        isKeyIncorrect = true
-                                    )
-                                )
-                            }
-
-                        FolderLoginStatus.ERROR ->
-                            _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
-                    }
-                }
-                .onFailure { error ->
-                    Timber.e(error)
-                    _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
-                }
+    private suspend fun checkCredentials() {
+        val hasCredentials = hasCredentialsUseCase()
+        _uiState.update {
+            it.copy(hasCredentials = hasCredentials)
         }
+    }
+
+    private suspend fun loginToFolder(url: String) {
+        _uiState.update { it.copy(contentState = FolderLinkContentState.Loading) }
+        runCatching {
+            val hasCredentials = hasCredentialsUseCase()
+            _uiState.update {
+                it.copy(hasCredentials = hasCredentials)
+            }
+        }
+        runCatching { loginToFolderUseCase(url) }
+            .onSuccess { status ->
+                when (status) {
+                    FolderLoginStatus.SUCCESS -> {
+                        _uiState.update {
+                            it.copy(contentState = FolderLinkContentState.FolderLogged)
+
+                        }
+                        fetchNodes(null)
+                    }
+
+                    FolderLoginStatus.API_INCOMPLETE ->
+                        _uiState.update {
+                            it.copy(
+                                contentState = FolderLinkContentState.DecryptionKeyRequired(
+                                    url = url
+                                )
+                            )
+                        }
+
+                    FolderLoginStatus.INCORRECT_KEY ->
+                        _uiState.update {
+                            it.copy(
+                                contentState = FolderLinkContentState.DecryptionKeyRequired(
+                                    url = url,
+                                    isKeyIncorrect = true
+                                )
+                            )
+                        }
+
+                    FolderLoginStatus.ERROR ->
+                        _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
+                }
+            }
+            .onFailure { error ->
+                Timber.e(error)
+                _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
+            }
     }
 
     private fun onDecryptionKeyEntered(key: String) {
@@ -106,11 +124,52 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                 if (trimmedKey.startsWith("#")) "$url$trimmedKey" else "$url#$trimmedKey"
             }
         }
-        loginToFolder(urlWithKey)
+        viewModelScope.launch {
+            loginToFolder(urlWithKey)
+        }
     }
 
     private fun onDecryptionKeyDialogDismissed() {
         _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
+    }
+
+    /**
+     * Fetch the nodes to show
+     *
+     * @param folderSubHandle   Handle of the folder to fetch the nodes for
+     */
+    private fun fetchNodes(folderSubHandle: String?) {
+        viewModelScope.launch {
+            runCatching {
+                val result = fetchFolderNodesUseCase(folderSubHandle)
+                val title = result.parentNode?.name ?: result.rootNode?.name ?: ""
+                val nodeUiItems = nodeUiItemMapper(result.childrenNodes)
+                _uiState.update {
+                    it.copy(
+                        contentState = FolderLinkContentState.Loaded(
+                            items = nodeUiItems,
+                            rootNode = result.rootNode,
+                            parentNode = result.parentNode,
+                            title = LocalizedText.Literal(title)
+                        )
+                    )
+                }
+            }.onFailure { throwable ->
+                if (throwable is FetchFolderNodesException.Expired) {
+                    _uiState.update {
+                        it.copy(
+                            contentState = FolderLinkContentState.Expired
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            contentState = FolderLinkContentState.Unavailable
+                        )
+                    }
+                }
+            }
+        }
     }
 
     @AssistedFactory
