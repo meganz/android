@@ -40,6 +40,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -129,7 +130,7 @@ internal fun FavouritesContent(
                     .fillMaxWidth()
                     .weight(1f),
                 listContentPadding = PaddingValues(
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                    bottom = contentPadding.calculateSafeBottomPadding(),
                 ),
                 listState = listState,
                 gridState = gridState,

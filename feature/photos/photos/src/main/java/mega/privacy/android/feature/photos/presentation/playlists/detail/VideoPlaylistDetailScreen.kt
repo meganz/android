@@ -47,6 +47,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
@@ -315,7 +316,7 @@ fun VideoPlaylistDetailScreen(
                         state = lazyListState,
                         totalItems = items.size,
                         contentPadding = PaddingValues(
-                            bottom = innerPadding.calculateBottomPadding() + 100.dp
+                            bottom = innerPadding.calculateSafeBottomPadding()
                         ),
                         modifier = Modifier
                             .padding(

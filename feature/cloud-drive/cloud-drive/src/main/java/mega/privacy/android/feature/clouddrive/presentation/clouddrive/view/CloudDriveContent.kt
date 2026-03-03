@@ -36,6 +36,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -245,7 +246,7 @@ internal fun CloudDriveContent(
                     .weight(1f),
                 listContentPadding = PaddingValues(
                     top = topPadding,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                    bottom = contentPadding.calculateSafeBottomPadding()
                 ),
                 listState = listState,
                 gridState = gridState,

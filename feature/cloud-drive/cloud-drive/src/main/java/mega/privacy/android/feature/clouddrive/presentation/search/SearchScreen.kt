@@ -36,6 +36,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
@@ -372,7 +373,7 @@ fun SearchContent(
                     .testTag(SEARCH_CONTENT_RESULTS_TAG),
                 listContentPadding = PaddingValues(
                     top = 8.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                    bottom = contentPadding.calculateSafeBottomPadding()
                 ),
                 spanCount = spanCount,
                 items = uiState.items,

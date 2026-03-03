@@ -23,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -33,6 +32,7 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
@@ -210,7 +210,7 @@ fun SelectVideosForPlaylistScreen(
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
                             showHiddenItems = uiState.showHiddenItems,
                             listContentPadding = PaddingValues(
-                                bottom = innerPadding.calculateBottomPadding() + 100.dp
+                                bottom = innerPadding.calculateSafeBottomPadding()
                             )
                         )
                     } else {
@@ -225,7 +225,7 @@ fun SelectVideosForPlaylistScreen(
                             isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
                             showHiddenItems = uiState.showHiddenItems,
                             listContentPadding = PaddingValues(
-                                bottom = innerPadding.calculateBottomPadding() + 100.dp
+                                bottom = innerPadding.calculateSafeBottomPadding()
                             )
                         )
                     }

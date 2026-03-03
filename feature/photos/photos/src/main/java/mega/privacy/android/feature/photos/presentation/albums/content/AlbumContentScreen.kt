@@ -56,6 +56,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
@@ -503,7 +504,7 @@ internal fun AlbumContentScreen(
                         contentPadding = PaddingValues(
                             start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
                             end = innerPadding.calculateRightPadding(LayoutDirection.Ltr),
-                            bottom = innerPadding.calculateBottomPadding() + 100.dp
+                            bottom = innerPadding.calculateSafeBottomPadding()
                         ),
                         onSortOrderClick = {
                             showSortBottomSheet = true

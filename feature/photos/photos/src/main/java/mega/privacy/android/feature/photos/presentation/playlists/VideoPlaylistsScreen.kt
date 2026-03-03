@@ -30,6 +30,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.plusSafeBottom
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -217,7 +218,7 @@ internal fun VideoPlaylistsTabScreen(
                     state = lazyListState,
                     totalItems = items.size,
                     modifier = modifier.testTag(VIDEO_PLAYLISTS_TAB_ALL_PLAYLISTS_VIEW_TEST_TAG),
-                    contentPadding = PaddingValues(bottom = 100.dp),
+                    contentPadding = PaddingValues().plusSafeBottom()
                 ) {
                     item(key = "header") {
                         NodeHeaderItem(

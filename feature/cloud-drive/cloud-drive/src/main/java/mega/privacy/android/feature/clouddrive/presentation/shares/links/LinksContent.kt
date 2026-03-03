@@ -29,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -100,7 +101,7 @@ fun LinksContent(
                     .weight(1f),
                 listContentPadding = PaddingValues(
                     top = 12.dp,
-                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                    bottom = contentPadding.calculateSafeBottomPadding()
                 ),
                 listState = listState,
                 gridState = gridState,

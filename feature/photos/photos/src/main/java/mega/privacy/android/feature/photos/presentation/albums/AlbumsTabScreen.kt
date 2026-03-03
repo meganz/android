@@ -24,8 +24,9 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
-import mega.privacy.android.analytics.Analytics
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
@@ -124,7 +125,7 @@ internal fun AlbumsTabScreen(
                 top = 8.dp,
                 start = 8.dp,
                 end = 8.dp,
-                bottom = 100.dp
+                bottom = contentPadding.calculateSafeBottomPadding(),
             )
         ) {
             items(
