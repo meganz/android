@@ -74,8 +74,6 @@ class TimelineTabViewModel @Inject constructor(
      * uiState when this property changes.
      */
     internal var selectedTimePeriod by mutableStateOf(PhotoModificationTimePeriod.All)
-    private val _selectedPhotoIdsFlow = MutableStateFlow<Set<Long>>(value = emptySet())
-    internal val selectedPhotoIds = _selectedPhotoIdsFlow.asStateFlow()
     private val _selectedPhotosInTypedNodesFlow =
         MutableStateFlow<List<TypedNode>>(value = emptyList())
     internal val selectedPhotosInTypedNodesFlow = _selectedPhotosInTypedNodesFlow.asStateFlow()
@@ -300,41 +298,7 @@ class TimelineTabViewModel @Inject constructor(
         }
     }
 
-    internal fun onPhotoSelected(node: PhotoNodeUiState) {
-        if (node.photo.id in _selectedPhotoIdsFlow.value) {
-            _selectedPhotoIdsFlow.update {
-                it - node.photo.id
-            }
-        } else {
-            _selectedPhotoIdsFlow.update {
-                it + node.photo.id
-            }
-        }
-    }
-
-    internal fun onSelectAllPhotos() {
-        val notAddedIds = uiState.value
-            .displayedPhotos
-            .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
-            .filter { it.node.photo.id !in _selectedPhotoIdsFlow.value }
-            .map { it.node.photo.id }
-
-        if (notAddedIds.isEmpty()) return
-
-        _selectedPhotoIdsFlow.update {
-            it.toMutableSet().apply {
-                addAll(notAddedIds)
-            }
-        }
-    }
-
-    internal fun onDeselectAllPhotos() {
-        if (_selectedPhotoIdsFlow.value.isEmpty()) return
-        _selectedPhotoIdsFlow.update { setOf() }
-    }
-
-    internal fun retrieveTypedNodeFromSelection(): List<TypedNode> {
-        val selectedIds = _selectedPhotoIdsFlow.value
+    internal fun retrieveTypedNodeFromSelection(selectedIds: Set<Long>): List<TypedNode> {
         val nodes = uiState.value.allPhotos
             .asSequence()
             .filter { it.photo.id in selectedIds }

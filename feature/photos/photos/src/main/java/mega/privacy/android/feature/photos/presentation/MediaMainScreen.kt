@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
@@ -45,7 +47,6 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.extensions.toTrackingEvent
@@ -118,7 +119,7 @@ fun MediaMainRoute(
     val videosTabUiState by videosTabViewModel.uiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
     val nodeActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    val timelineSelectedPhotoIds by timelineViewModel.selectedPhotoIds.collectAsStateWithLifecycle()
+    val timelineSelectedPhotoIds = rememberSaveable { mutableStateSetOf<Long>() }
 
     val selectionModeActionHandler = rememberMultiNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
@@ -190,10 +191,12 @@ fun MediaMainRoute(
         }
     }
 
-    LaunchedEffect(timelineSelectedPhotoIds) {
+    LaunchedEffect(timelineSelectedPhotoIds.size) {
         if (timelineSelectedPhotoIds.isNotEmpty()) {
             nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-                selectedNodes = timelineViewModel.retrieveTypedNodeFromSelection().toSet(),
+                selectedNodes = timelineViewModel
+                    .retrieveTypedNodeFromSelection(selectedIds = timelineSelectedPhotoIds)
+                    .toSet(),
                 nodeSourceType = NodeSourceType.TIMELINE,
             )
         }
@@ -213,7 +216,7 @@ fun MediaMainRoute(
         nodeActionState = nodeActionUiState,
         onDismissRequest = {
             when (selectionModeType) {
-                MediaSelectionModeType.Timeline -> timelineViewModel.onDeselectAllPhotos()
+                MediaSelectionModeType.Timeline -> timelineSelectedPhotoIds.clear()
                 MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
                 else -> Unit
             }
@@ -221,7 +224,7 @@ fun MediaMainRoute(
         onDismissEventConsumed = nodeOptionsActionViewModel::resetDismiss,
         onActionTriggered = {
             when (selectionModeType) {
-                MediaSelectionModeType.Timeline -> timelineViewModel.onDeselectAllPhotos()
+                MediaSelectionModeType.Timeline -> timelineSelectedPhotoIds.clear()
                 MediaSelectionModeType.Videos -> videosTabViewModel.clearSelection()
                 else -> Unit
             }
@@ -249,7 +252,7 @@ fun MediaMainRoute(
 
     MediaSelectionModelHandler(
         type = selectionModeType,
-        onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
+        onClearTimelinePhotosSelection = timelineSelectedPhotoIds::clear,
         onClearAlbumsSelection = albumsTabViewModel::clearAlbumsSelection,
         onClearVideosSelection = videosTabViewModel::clearSelection,
         onClearPlaylistsSelection = videoPlaylistsTabViewModel::clearSelection,
@@ -289,8 +292,14 @@ fun MediaMainRoute(
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
-        onTimelinePhotoSelected = timelineViewModel::onPhotoSelected,
-        onClearTimelinePhotosSelection = timelineViewModel::onDeselectAllPhotos,
+        onTimelinePhotoSelected = {
+            if (it.photo.id in timelineSelectedPhotoIds) {
+                timelineSelectedPhotoIds.remove(it.photo.id)
+            } else {
+                timelineSelectedPhotoIds.add(it.photo.id)
+            }
+        },
+        onClearTimelinePhotosSelection = { timelineSelectedPhotoIds.clear() },
         onNavigateToTimelinePhotoPreview = onNavigateToTimelinePhotoPreview,
         clearCameraUploadsCompletedMessage = mediaCameraUploadViewModel::onConsumeUploadCompleteEvent,
         onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
