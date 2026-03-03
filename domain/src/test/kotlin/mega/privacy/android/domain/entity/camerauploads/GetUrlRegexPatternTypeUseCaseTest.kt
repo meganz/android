@@ -237,6 +237,15 @@ class GetUrlRegexPatternTypeUseCaseTest {
     }
 
     @ParameterizedTest(name = "{0}: {1}")
+    @MethodSource("invalidAlbumLinks")
+    fun `test that when url does not match album link pattern, it does not return ALBUM_LINK pattern type`(
+        name: String,
+        urlToCheck: String?,
+    ) {
+        assertThat(underTest(urlToCheck)).isNotEqualTo(RegexPatternType.ALBUM_LINK)
+    }
+
+    @ParameterizedTest(name = "{0}: {1}")
     @MethodSource("invalidUpgradePageLinks")
     fun `test that when url does not match upgrade page link pattern, it does not return UPGRADE_PAGE_LINK pattern type`(
         name: String,
