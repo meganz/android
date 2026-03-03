@@ -23,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.button.MegaRadioButton
@@ -195,6 +194,8 @@ fun ProPlanCard(
 
 @Composable
 private fun YearlyBillingInfo(yearlyBillingInfo: String) {
+    val bodyMedium = MaterialTheme.typography.bodyMedium
+    val titleLarge = MaterialTheme.typography.titleLarge
     SpannedText(
         value = yearlyBillingInfo,
         baseTextColor = TextColor.Secondary,
@@ -204,14 +205,17 @@ private fun YearlyBillingInfo(yearlyBillingInfo: String) {
         spanStyles = mapOf(
             SpanIndicator('A') to MegaSpanStyle.DefaultColorStyle(
                 SpanStyle(
-                    textDecoration = TextDecoration.LineThrough
+                    textDecoration = TextDecoration.LineThrough,
+                    fontSize = bodyMedium.fontSize,
+                    fontWeight = bodyMedium.fontWeight,
                 )
             ),
-            SpanIndicator('B') to MegaSpanStyle.DefaultColorStyle(
+            SpanIndicator('B') to MegaSpanStyle.TextColorStyle(
                 SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                )
+                    fontWeight = FontWeight.Medium,
+                    fontSize = titleLarge.fontSize,
+                ),
+                TextColor.Primary
             )
         ),
         modifier = Modifier
