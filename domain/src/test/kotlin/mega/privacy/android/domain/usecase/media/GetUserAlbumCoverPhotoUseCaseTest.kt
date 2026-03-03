@@ -20,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -176,7 +177,53 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
         val result = underTest(albumId)
 
         assertThat(result).isEqualTo(coverPhoto)
+        // Early return — the fallback mapNotNull should never fetch the other photo
+        verify(photosRepository, never()).getPhotoFromNodeID(
+            nodeId = otherPhotoId.nodeId,
+            albumPhotoId = otherPhotoId,
+            refresh = false,
+        )
     }
+
+    @Test
+    fun `test that fallback is used when selected cover node returns null from repository`() =
+        runTest {
+            val albumId = AlbumId(1L)
+            val coverPhotoId = albumPhotoId(id = 20L, nodeId = 200L, albumId = albumId.id)
+            val otherPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+            val otherPhoto = createMockPhoto(
+                id = 10L,
+                isSensitive = false,
+                isSensitiveInherited = false,
+            )
+            val userSet = mock<UserSet> {
+                on { cover }.thenReturn(20L)
+            }
+
+            setupDefaultHiddenItemsConfig()
+            whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
+                .thenReturn(listOf(coverPhotoId, otherPhotoId))
+            whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
+            whenever(
+                photosRepository.getPhotoFromNodeID(
+                    nodeId = coverPhotoId.nodeId,
+                    albumPhotoId = coverPhotoId,
+                    refresh = false,
+                )
+            ).thenReturn(null)
+            whenever(
+                photosRepository.getPhotoFromNodeID(
+                    nodeId = otherPhotoId.nodeId,
+                    albumPhotoId = otherPhotoId,
+                    refresh = false,
+                )
+            ).thenReturn(otherPhoto)
+
+            initUseCase()
+            val result = underTest(albumId)
+
+            assertThat(result).isEqualTo(otherPhoto)
+        }
 
     @Test
     fun `test that free account includes all photos regardless of sensitive status`() = runTest {
