@@ -10,4 +10,5 @@ data class TextEditorComposeUiState(
     val isLoading: Boolean = false,
     val mode: TextEditorMode = TextEditorMode.View,
     val isFileEdited: Boolean = false,
+    val showLineNumbers: Boolean = false,
 )

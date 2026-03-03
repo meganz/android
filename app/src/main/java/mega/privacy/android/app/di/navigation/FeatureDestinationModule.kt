@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestination
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.feature.pdfviewer.navigation.PdfViewerFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
 import javax.inject.Singleton
@@ -40,6 +41,7 @@ class FeatureDestinationModule {
         chatManagement: ChatManagement,
         setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
         rtcAudioManagerGateway: RTCAudioManagerGateway,
+        viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
     ): FeatureDestination =
         LegacyCoreActivityFeatureGraph(
             nodeContentUriIntentMapper,
@@ -48,6 +50,7 @@ class FeatureDestinationModule {
             chatManagement,
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
+            viewTypeToNodeSourceTypeMapper,
         )
 
     @Provides

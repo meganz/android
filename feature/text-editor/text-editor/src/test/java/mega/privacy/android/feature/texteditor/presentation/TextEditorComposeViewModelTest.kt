@@ -3,6 +3,7 @@ package mega.privacy.android.feature.texteditor.presentation
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import org.junit.jupiter.api.Test
 
 internal class TextEditorComposeViewModelTest {
@@ -84,5 +85,24 @@ internal class TextEditorComposeViewModelTest {
     fun `test that null fileName results in empty string in uiState`() {
         initUnderTest(fileName = null)
         assertThat(underTest.uiState.value.fileName).isEmpty()
+    }
+
+    @Test
+    fun `test that onMenuAction Download does not crash`() {
+        initUnderTest()
+        underTest.onMenuAction(TextEditorTopBarAction.Download)
+        assertThat(underTest.uiState.value.showLineNumbers).isFalse()
+    }
+
+    @Test
+    fun `test that onMenuAction LineNumbers toggles showLineNumbers`() {
+        initUnderTest()
+        assertThat(underTest.uiState.value.showLineNumbers).isFalse()
+
+        underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
+        assertThat(underTest.uiState.value.showLineNumbers).isTrue()
+
+        underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
+        assertThat(underTest.uiState.value.showLineNumbers).isFalse()
     }
 }

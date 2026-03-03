@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 
 /**
  * ViewModel for the Compose text editor screen.
+ * Uses MVI-style intent handling: UI emits actions via [onMenuAction], ViewModel processes them.
  */
 @HiltViewModel(assistedFactory = TextEditorComposeViewModel.Factory::class)
 class TextEditorComposeViewModel @AssistedInject constructor(
@@ -47,5 +49,21 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun saveFile(fromHome: Boolean) {
+    }
+
+    /**
+     * Handles top bar action intents from the UI (MVI pattern).
+     */
+    fun onMenuAction(action: TextEditorTopBarAction) {
+        when (action) {
+            TextEditorTopBarAction.Download -> {}
+            TextEditorTopBarAction.GetLink -> {}
+            TextEditorTopBarAction.Share -> {}
+            TextEditorTopBarAction.LineNumbers -> {
+                _uiState.update {
+                    it.copy(showLineNumbers = !it.showLineNumbers)
+                }
+            }
+        }
     }
 }
