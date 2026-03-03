@@ -25,6 +25,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 apply("mega.android.test")
                 apply("mega.lint")
                 apply("de.mannodermaus.android-junit5")
+                apply("mega.android.architecture")
             }
 
             extensions.configure<LibraryExtension> {

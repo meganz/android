@@ -103,5 +103,11 @@ gradlePlugin {
             implementationClass = "AndroidLibraryComposeConventionPlugin"
         }
     }
+    plugins {
+        register("architecture") {
+            id = "mega.android.architecture"
+            implementationClass = "ArchitecturePlugin"
+        }
+    }
 }
 
