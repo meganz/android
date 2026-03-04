@@ -3,9 +3,15 @@ package mega.privacy.android.feature.texteditor.presentation
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorConditionalTopBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlot
+import mega.privacy.android.feature.texteditor.presentation.model.DefaultTextEditorTopBarSlots
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlots
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class TextEditorComposeViewModelTest {
 
     private lateinit var underTest: TextEditorComposeViewModel
@@ -15,6 +21,7 @@ internal class TextEditorComposeViewModelTest {
         mode: TextEditorMode = TextEditorMode.View,
         nodeSourceType: Int? = null,
         fileName: String? = null,
+        topBarSlots: TextEditorTopBarSlots = DefaultTextEditorTopBarSlots,
     ) {
         underTest = TextEditorComposeViewModel(
             args = Args(
@@ -22,6 +29,7 @@ internal class TextEditorComposeViewModelTest {
                 mode = mode,
                 nodeSourceType = nodeSourceType,
                 fileName = fileName,
+                topBarSlots = topBarSlots,
             )
         )
     }
@@ -95,6 +103,18 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that initial uiState reflects topBarSlots from Args`() {
+        val slots: TextEditorTopBarSlots = listOf(
+            TextEditorTopBarSlot.Conditional(TextEditorConditionalTopBarAction.GetLink),
+        )
+        initUnderTest(topBarSlots = slots)
+        val state = underTest.uiState.value
+        assertThat(state.topBarSlots).containsExactly(
+            TextEditorTopBarSlot.Conditional(TextEditorConditionalTopBarAction.GetLink),
+        )
+    }
+
+    @Test
     fun `test that onMenuAction LineNumbers toggles showLineNumbers`() {
         initUnderTest()
         assertThat(underTest.uiState.value.showLineNumbers).isFalse()
@@ -104,5 +124,26 @@ internal class TextEditorComposeViewModelTest {
 
         underTest.onMenuAction(TextEditorTopBarAction.LineNumbers)
         assertThat(underTest.uiState.value.showLineNumbers).isFalse()
+    }
+
+    @Test
+    fun `test that onMenuAction SendToChat does not change state`() {
+        initUnderTest()
+        val before = underTest.uiState.value
+        underTest.onMenuAction(TextEditorTopBarAction.SendToChat)
+        val after = underTest.uiState.value
+        assertThat(after).isEqualTo(before)
+    }
+
+    @Test
+    fun `test that onMenuAction Download GetLink Share do not change state`() {
+        initUnderTest()
+        val before = underTest.uiState.value
+        underTest.onMenuAction(TextEditorTopBarAction.Download)
+        assertThat(underTest.uiState.value).isEqualTo(before)
+        underTest.onMenuAction(TextEditorTopBarAction.GetLink)
+        assertThat(underTest.uiState.value).isEqualTo(before)
+        underTest.onMenuAction(TextEditorTopBarAction.Share)
+        assertThat(underTest.uiState.value).isEqualTo(before)
     }
 }

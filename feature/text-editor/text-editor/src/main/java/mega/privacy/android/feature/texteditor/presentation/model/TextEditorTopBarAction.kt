@@ -8,5 +8,6 @@ sealed interface TextEditorTopBarAction {
     data object Download : TextEditorTopBarAction
     data object LineNumbers : TextEditorTopBarAction
     data object GetLink : TextEditorTopBarAction
+    data object SendToChat : TextEditorTopBarAction
     data object Share : TextEditorTopBarAction
 }

@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
+import mega.privacy.android.feature.texteditor.presentation.model.DefaultTextEditorTopBarSlots
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlots
 
 /**
  * ViewModel for the Compose text editor screen.
@@ -26,6 +28,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             fileName = args.fileName.orEmpty(),
             mode = args.mode,
             isLoading = false,
+            topBarSlots = args.topBarSlots,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -40,6 +43,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val mode: TextEditorMode,
         val nodeSourceType: Int?,
         val fileName: String?,
+        val topBarSlots: TextEditorTopBarSlots = DefaultTextEditorTopBarSlots,
     )
 
     fun setViewMode() {
@@ -58,6 +62,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         when (action) {
             TextEditorTopBarAction.Download -> {}
             TextEditorTopBarAction.GetLink -> {}
+            TextEditorTopBarAction.SendToChat -> {}
             TextEditorTopBarAction.Share -> {}
             TextEditorTopBarAction.LineNumbers -> {
                 _uiState.update {

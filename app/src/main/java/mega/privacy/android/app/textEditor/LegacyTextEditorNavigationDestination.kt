@@ -25,7 +25,7 @@ internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
 ): Boolean =
     result is NodeOptionsBottomSheetResult.Navigation ||
-        result is NodeOptionsBottomSheetResult.Transfer
+            result is NodeOptionsBottomSheetResult.Transfer
 
 /**
  * Legacy text editor destination. When [LegacyTextEditorNavKey.isTextEditorComposeEnabled] is true,
@@ -70,15 +70,17 @@ private fun TextEditorEntry(
     }
 
     if (navKey.isTextEditorComposeEnabled) {
+        val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
+        val topBarSlots = computeTextEditorTopBarSlots(navKey.nodeSourceType, mode)
         val viewModel =
             hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
-                val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
                 factory.create(
                     TextEditorComposeViewModel.Args(
                         nodeHandle = navKey.nodeHandle,
                         mode = mode,
                         nodeSourceType = navKey.nodeSourceType,
                         fileName = navKey.fileName,
+                        topBarSlots = topBarSlots,
                     )
                 )
             }

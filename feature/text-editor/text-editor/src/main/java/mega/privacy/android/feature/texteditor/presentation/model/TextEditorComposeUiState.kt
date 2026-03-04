@@ -11,4 +11,5 @@ data class TextEditorComposeUiState(
     val mode: TextEditorMode = TextEditorMode.View,
     val isFileEdited: Boolean = false,
     val showLineNumbers: Boolean = false,
+    val topBarSlots: TextEditorTopBarSlots = DefaultTextEditorTopBarSlots,
 )
