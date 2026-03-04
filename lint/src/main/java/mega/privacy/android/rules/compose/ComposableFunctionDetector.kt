@@ -17,11 +17,16 @@ internal abstract class ComposableFunctionDetector(vararg options: LintOption) :
             override fun visitMethod(node: UMethod) {
                 val ktFunction = node.sourcePsi as? KtFunction ?: return
                 if (ktFunction.isComposable) {
-                    visitComposable(context, ktFunction)
+                    visitComposable(context, ktFunction, node)
                 }
             }
         }
     }
 
-    abstract fun visitComposable(context: JavaContext, function: KtFunction)
+    fun UMethod.isReturningUnit(): Boolean {
+        val returnType = this.javaPsi.returnType
+        return returnType?.canonicalText == "kotlin.Unit"
+    }
+
+    abstract fun visitComposable(context: JavaContext, function: KtFunction, method: UMethod)
 }

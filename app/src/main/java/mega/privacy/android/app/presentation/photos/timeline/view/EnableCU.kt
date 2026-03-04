@@ -180,7 +180,7 @@ fun EnableCU(
 }
 
 @Composable
-fun EnableCameraUploadsScreen(
+internal fun EnableCameraUploadsScreen(
     onEnable: () -> Unit,
 ) {
     val isLight = MaterialTheme.colors.isLight
@@ -242,7 +242,7 @@ fun EnableCameraUploadsScreen(
 }
 
 @Composable
-fun EnableCameraUploadsButton(
+internal fun EnableCameraUploadsButton(
     modifier: Modifier = Modifier,
     onEnable: () -> Unit,
 ) {

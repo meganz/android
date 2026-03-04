@@ -47,7 +47,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
  * Base Compose Timeline View
  */
 @Composable
-fun TimelineView(
+internal fun TimelineView(
     photoDownload: PhotoDownload,
     timelineViewState: TimelineViewState,
     lazyGridState: LazyGridState,
