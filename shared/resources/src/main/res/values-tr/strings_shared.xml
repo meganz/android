@@ -456,9 +456,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Aktarımlar iptal ediliyor&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Sorun açıklaması en az 10 karakter olmalıdır</string>
+    <string name="report_issue_error_minimum_characters">Sorun açıklaması en az 30 karakter olmalıdır</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Sorunu en az 10 karakterle açıklayın</string>
+    <string name="report_issue_description_placeholder_message">Sorunu en az 30 karakterle açıklayın</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Sohbetleri gizli tutun</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2168,8 +2168,9 @@
     <string name="remove_from_offline_success_message">Dosya çevrim dışından kaldırıldı</string>
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s yıllık faturalandırma ile sunulmaktadır</string>
     <string name="choose_account_screen_plan_available_monthly_billing">%1$s aylık faturalandırma ile sunulmaktadır</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">Yeni oynatma listesi</string>
+    <string name="settings_help_rate_app">Bizi değerlendirin</string>
+    <string name="node_menu_action_make_available_offline">Çevrim dışı olarak kullanılabilir yap</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">Bağlantıyı kaldır</string>
+    <string name="device_center_snackbar_message_connection_removed">Bağlantı kaldırıldı</string>
 </resources>

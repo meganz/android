@@ -2278,8 +2278,13 @@
     <string name="general_alert_not_logged_in">يجب عليك تسجيل الدخول أولا قبل تنفيذ هذه الخطوة</string>
     <string name="timeline_tab_camera_uploads_limited_access">لدى ميغا MEGA إذن وصول محدود إلى مكتبة الصور الخاصة بك ولا يمكنها إجراء نسخ احتياطي لجميع صورك</string>
     <string name="general_invalid_link">رابط غير صالح. الرجاء المحاولة مرة أخرى أو طلب رابط جديد.</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">قائمة تشغيل جديدة</string>
+    <string name="album_content_remove_multiple_links_dialog_description">الأشخاص الذين شاركتهم هذه الروابط سيفقدون إمكانية الوصول إلى الألبومات</string>
+    <string name="delete_album_singular_confirmation_dialog_title">حذف الألبوم؟</string>
+    <string name="delete_albums_multiple_confirmation_dialog_title">حذف الألبومات؟</string>
+    <string name="delete_album_singular_confirmation_dialog_description">لن يتم حذف محتويات الألبوم</string>
+    <string name="album_photos_selection_limit_dialog_description">يمكنك إضافة حتى %d عناصر في المرة الواحدة إلى ألبوم.</string>
+    <string name="album_photos_selection_empty_state_no_media_found">لم يتم العثور على أي وسائط</string>
+    <string name="home_screen_no_network_desc_with_offline_files">أنت غير متصل بالإنترنت.\nالعناصر التي حفظتها للاستخدام دون اتصال ما زالت متوفرة.</string>
+    <string name="home_screen_no_network_view_offline_files_button">عرض الملفات دون اتصال بالإنترنت</string>
 </resources>

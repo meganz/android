@@ -2107,8 +2107,7 @@
     <string name="remove_from_offline_success_message">オフラインから削除されたファイル</string>
     <string name="settings_help_rate_app">ご評価ください</string>
     <string name="node_menu_action_make_available_offline">オフラインで利用できるようにする</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">接続を削除</string>
+    <string name="device_center_snackbar_message_connection_removed">接続が削除されました</string>
+    <string name="create_new_video_playlist_input_title_placeholder">新しいプレイリスト</string>
 </resources>

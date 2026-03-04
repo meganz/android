@@ -1932,9 +1932,9 @@
         <item quantity="other">Nouvelles tentatives de transferts, voir l\’onglet Actif pour suivre la progression</item>
     </plurals>
     <plurals name="delete_album_confirmation_dialog_title">
-        <item quantity="one">Supprimer l\’album ?</item>
-        <item quantity="many">Supprimer les albums ?</item>
-        <item quantity="other">Supprimer les albums ?</item>
+        <item quantity="one">Supprimer l\’album ?</item>
+        <item quantity="many">Supprimer les albums ?</item>
+        <item quantity="other">Supprimer les albums ?</item>
     </plurals>
     <plurals name="album_content_remove_links_dialog_title">
         <item quantity="one">Supprimer le lien ?</item>
@@ -2212,8 +2212,5 @@
     <string name="photos_create_album_duplicate_name_error">Un album du même nom existe déjà. Entrez un nom différent.</string>
     <string name="photos_create_album_proscribed_name_error">Ce nom d’album n’est pas autorisé. Entrez un nom différent.</string>
     <string name="remove_from_offline_success_message">Le fichier a été supprimé de Hors&#160;ligne</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">Nouvelle playlist</string>
 </resources>

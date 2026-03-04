@@ -5624,4 +5624,5 @@
     <string name="onboarding_camera_upload_permission_enabled_success_message">تم تمكين ترفيعات الكاميرا</string>
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
+    <string name="invalid_link">رابط غير صالح. الرجاء المحاولة مرة أخرى أو طلب رابط جديد.</string>
 </resources>

@@ -2217,8 +2217,9 @@
     <string name="photos_create_album_duplicate_name_error">Un album cu acest nume există deja. Introduceți un alt nume.</string>
     <string name="photos_create_album_proscribed_name_error">Acest nume de album nu este permis. Introduceți un alt nume.</string>
     <string name="remove_from_offline_success_message">Fișier eliminat din Offline</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">Listă de redare nouă</string>
+    <string name="settings_help_rate_app">Evaluează-ne</string>
+    <string name="node_menu_action_make_available_offline">Fă disponibil offline</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">Elimină conexiunea</string>
+    <string name="device_center_snackbar_message_connection_removed">Conexiunea a fost eliminată</string>
 </resources>

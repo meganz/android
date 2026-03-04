@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">전송 취소 중&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">문의사항은 최소 10자이어야 합니다</string>
+    <string name="report_issue_error_minimum_characters">문의 내용은 최소 30자 이상이어야 합니다</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">문제에 대한 설명을 최소 10자 이상을 입력하세요</string>
+    <string name="report_issue_description_placeholder_message">문제에 대한 설명을 최소 30자 이상을 입력하세요</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">대화를 비공개로 유지</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2094,8 +2094,9 @@
     <string name="home_recents_snackbar_activity_cleared">최근 활동이 지워졌습니다</string>
     <string name="home_recents_options_menu_clear">최근 활동 지우기</string>
     <string name="remove_from_offline_success_message">파일이 오프라인에서 제거됨</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">새 재생목록</string>
+    <string name="settings_help_rate_app">평가해주세요</string>
+    <string name="node_menu_action_make_available_offline">오프라인에서 이용 가능하게 하기</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">연결 제거</string>
+    <string name="device_center_snackbar_message_connection_removed">연결 제거됨</string>
 </resources>

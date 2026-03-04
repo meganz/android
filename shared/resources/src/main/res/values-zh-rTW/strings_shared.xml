@@ -2094,8 +2094,5 @@
     <string name="photos_create_album_duplicate_name_error">已存在相同名稱的相簿。請輸入不同的名稱。</string>
     <string name="photos_create_album_proscribed_name_error">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <string name="remove_from_offline_success_message">檔案已從可離線使用中移除</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">新的播放列表</string>
 </resources>

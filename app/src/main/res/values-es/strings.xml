@@ -435,7 +435,7 @@
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Apariencia</string>
     <!-- settings of the Features section -->
-    <string name="settings_features">Características</string>
+    <string name="settings_features">Funcionalidades</string>
     <!-- label of storage in upgrade/choose account page, it is being used with a variable, e.g. for LITE user it will show ‘200GB Storage’. -->
     <string name="settings_storage">Almacenamiento</string>
     <!-- Settings of the Passcode -->

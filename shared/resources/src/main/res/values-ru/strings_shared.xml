@@ -2266,8 +2266,5 @@
     <string name="photos_create_album_duplicate_name_error">Альбом с таким названием уже существует. Введите другое название.</string>
     <string name="photos_create_album_proscribed_name_error">Недопустимое название альбома. Введите другое название.</string>
     <string name="remove_from_offline_success_message">Файл удалён из локальных</string>
-    <!-- The name of the Device Center Bottom Sheet item to remove a folder connection -->
-    <string name="device_center_bottom_sheet_item_remove_connection">Remove connection</string>
-    <!-- The Snackbar message to inform the User that the folder connection has been successfully removed -->
-    <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
+    <string name="create_new_video_playlist_input_title_placeholder">Новый плейлист</string>
 </resources>
