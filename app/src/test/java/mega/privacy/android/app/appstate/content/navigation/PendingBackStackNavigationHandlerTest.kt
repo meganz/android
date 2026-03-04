@@ -616,4 +616,28 @@ class PendingBackStackNavigationHandlerTest {
         assertThat(backStack).doesNotContain(initialHomeScreen)
         assertThat(backStack).contains(expectedHomeScreen)
     }
+
+    @Test
+    fun `test that destination is not added if already present`() = runTest {
+        data class TestKey(val value: String) : NavKey
+
+        val destination = TestKey("key")
+        backStack.add(destination)
+        underTest.navigate(destination)
+        assertThat(backStack.count { it == destination }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that multiple destinations are not added if already present`() = runTest {
+        data class TestKey(val value: String) : NavKey
+
+        val destination1 = TestKey("key1")
+        val destination2 = TestKey("key2")
+
+        val list = listOf(destination1, destination2)
+        backStack.addAll(list)
+        underTest.navigate(list)
+        assertThat(backStack.count { it == destination1 }).isEqualTo(1)
+        assertThat(backStack.count { it == destination2 }).isEqualTo(1)
+    }
 }

@@ -66,15 +66,16 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destination: NavKey) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destination")
-        if (destination == backstack.lastOrNull()) {
-            Timber.d("Destination is already on the backstack")
-            return
-        }
         navigate(listOf(destination))
     }
 
     override fun navigate(destinations: List<NavKey>) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        if (backstack.takeLast(destinations.size).containsAll(destinations)) {
+            Timber.d("Destinations are already on the backstack")
+            return
+        }
+
         val topDestination = destinations.last()
         when {
             topDestination is NoSessionNavKey.Mandatory && isLoggedOut().not() -> {
@@ -122,7 +123,11 @@ class PendingBackStackNavigationHandler(
         navigate(destination)
     }
 
-    override fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean) {
+    override fun navigateAndClearTo(
+        destination: List<NavKey>,
+        newParent: NavKey,
+        inclusive: Boolean,
+    ) {
         removeFromBackStackTo(newParent, inclusive)
         navigate(destination)
     }

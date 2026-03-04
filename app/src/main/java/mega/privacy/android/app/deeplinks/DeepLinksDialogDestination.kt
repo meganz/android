@@ -19,12 +19,12 @@ data object DeepLinksDialogDestinations : AppDialogDestinations {
         { navigationHandler, onHandled ->
             deepLinkDialogDestination(
                 remove = navigationHandler::remove,
-                navigate = navigationHandler::navigate,
+                navigateAndClearTo = navigationHandler::navigateAndClearTo,
                 onDialogHandled = onHandled
             )
             deepLinkAfterFetchNodesDialogDestination(
                 remove = navigationHandler::remove,
-                navigate = navigationHandler::navigate,
+                navigateAndClearTo = navigationHandler::navigateAndClearTo,
                 onDialogHandled = onHandled
             )
         }
@@ -32,22 +32,22 @@ data object DeepLinksDialogDestinations : AppDialogDestinations {
 
 fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
     remove: (NavKey) -> Unit,
-    navigate: (List<NavKey>) -> Unit,
+    navigateAndClearTo: (List<NavKey>, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<DeepLinksDialogNavKey>(
         metadata = DialogSceneStrategy.dialog()
-    ) {
+    ) { key ->
         val viewModel = hiltViewModel<DeepLinksViewModel, DeepLinksViewModel.Factory> { factory ->
-            factory.create(args = DeepLinksViewModel.Args(uri = it.deepLink.toUri()))
+            factory.create(args = DeepLinksViewModel.Args(uri = key.deepLink.toUri()))
         }
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         DeepLinksDialog(
             uiState = uiState,
-            onNavigate = navigate,
+            onNavigate = { destinations -> navigateAndClearTo(destinations, key, true) },
             onDismiss = {
-                remove(it)
+                remove(key)
                 onDialogHandled()
             }
         )
@@ -56,17 +56,17 @@ fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
 
 fun EntryProviderScope<DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
     remove: (NavKey) -> Unit,
-    navigate: (List<NavKey>) -> Unit,
+    navigateAndClearTo: (List<NavKey>, NavKey, Boolean) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<DeepLinksAfterFetchNodesDialogNavKey>(
         metadata = DialogSceneStrategy.dialog()
-    ) {
+    ) { key ->
         val viewModel = hiltViewModel<DeepLinksViewModel, DeepLinksViewModel.Factory> { factory ->
             factory.create(
                 DeepLinksViewModel.Args(
-                    uri = it.deepLink.toUri(),
-                    regexPatternType = it.regexPatternType
+                    uri = key.deepLink.toUri(),
+                    regexPatternType = key.regexPatternType
                 )
             )
         }
@@ -74,9 +74,9 @@ fun EntryProviderScope<DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
 
         DeepLinksDialog(
             uiState = uiState,
-            onNavigate = navigate,
+            onNavigate = { destinations -> navigateAndClearTo(destinations, key, true) },
             onDismiss = {
-                remove(it)
+                remove(key)
                 onDialogHandled()
             }
         )

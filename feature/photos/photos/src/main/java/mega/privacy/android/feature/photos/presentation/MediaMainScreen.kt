@@ -768,6 +768,13 @@ private fun PhotosMainScreenPreview() {
                 ) {
                 }
 
+                override fun navigateAndClearTo(
+                    destination: List<NavKey>,
+                    newParent: NavKey,
+                    inclusive: Boolean,
+                ) {
+                }
+
                 override fun <T> returnResult(key: String, value: T) {}
                 override fun clearResult(key: String) {}
                 override fun <T> monitorResult(key: String): Flow<T?> = flowOf(null)

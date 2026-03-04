@@ -53,5 +53,15 @@ interface NavigationHandler : NavigationResultsHandler {
      * @param newParent The new parent destination to set in the back stack
      * @param inclusive Whether to include the new parent in the pop operation
      */
-    fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean = false)
+    fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean = false) =
+        navigateAndClearTo(listOf(destination), newParent, inclusive)
+
+    /**
+     * Navigate to a destination and clear the back stack up to a new parent destination.
+     *
+     * @param destination The destinations to navigate to
+     * @param newParent The new parent destination to set in the back stack
+     * @param inclusive Whether to include the new parent in the pop operation
+     */
+    fun navigateAndClearTo(destination: List<NavKey>, newParent: NavKey, inclusive: Boolean = false)
 } 
