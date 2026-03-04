@@ -3,11 +3,14 @@ package mega.privacy.android.app.components.session
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.domain.usecase.chat.IsMegaApiLoggedInUseCase
 import javax.inject.Inject
 
 /**
@@ -17,19 +20,25 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginInProgressViewModel @Inject constructor(
     @LoginMutex private val loginMutex: Mutex,
+    private val isMegaApiLoggedInUseCase: IsMegaApiLoggedInUseCase,
 ) : ViewModel() {
 
     val state = flow {
-        if (loginMutex.isLocked) {
-            loginMutex.withLock {
-                emit(LoginInProgressState(isLoginInProgress = false))
-            }
-        } else {
-            emit(LoginInProgressState(isLoginInProgress = false))
+        while (!loginMutex.isLocked) {
+            delay(POLL_INTERVAL_MS)
+            // there are some case mutex locked by fetch node but login already completed
+            if (isMegaApiLoggedInUseCase()) break
         }
-    }.asUiStateFlow(
+        emit(LoginInProgressState(isLoginInProgress = false))
+    }.catch {
+        emit(LoginInProgressState(isLoginInProgress = false))
+    }.stateIn(
         scope = viewModelScope,
+        started = SharingStarted.Eagerly,
         initialValue = LoginInProgressState(isLoginInProgress = loginMutex.isLocked),
     )
 
+    companion object {
+        private const val POLL_INTERVAL_MS = 100L
+    }
 }
