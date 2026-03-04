@@ -92,6 +92,11 @@ enum class NodeSourceType {
      * When node source is Timeline
      */
     TIMELINE,
+
+    /**
+     * When node source is Recently Watched
+     */
+    VIDEO_RECENTLY_WATCHED,
 }
 
 /**

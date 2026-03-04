@@ -1141,6 +1141,7 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.VIDEO_PLAYLISTS,
         NodeSourceType.RECENTS_BUCKET,
         NodeSourceType.TIMELINE,
+        NodeSourceType.VIDEO_RECENTLY_WATCHED,
             -> MegaApiJava.INVALID_HANDLE
 
         NodeSourceType.HOME, NodeSourceType.OTHER, NodeSourceType.OFFLINE -> getRootNodeUseCase()?.id?.longValue

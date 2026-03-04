@@ -36,7 +36,11 @@ class NodeSourceTypeToViewTypeMapperTest {
         Arguments.of(NodeSourceType.AUDIO, NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.VIDEOS, NodeSourceTypeInt.VIDEO_BROWSE_ADAPTER),
         Arguments.of(NodeSourceType.SEARCH, NodeSourceTypeInt.SEARCH_BY_ADAPTER),
-        Arguments.of(NodeSourceType.VIDEO_PLAYLISTS, null),
+        Arguments.of(NodeSourceType.VIDEO_PLAYLISTS, NodeSourceTypeInt.VIDEO_PLAYLISTS_ADAPTER),
+        Arguments.of(
+            NodeSourceType.VIDEO_RECENTLY_WATCHED,
+            NodeSourceTypeInt.VIDEO_RECENTLY_WATCHED_ADAPTER
+        ),
         Arguments.of(NodeSourceType.OFFLINE, null),
         Arguments.of(NodeSourceType.OTHER, null),
     )

@@ -29,6 +29,8 @@ class ViewTypeToNodeSourceTypeMapper @Inject constructor() {
         NodeSourceTypeInt.VIDEO_BROWSE_ADAPTER -> NodeSourceType.VIDEOS
         NodeSourceTypeInt.SEARCH_BY_ADAPTER -> NodeSourceType.SEARCH
         NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER -> NodeSourceType.RECENTS_BUCKET
+        NodeSourceTypeInt.VIDEO_PLAYLISTS_ADAPTER -> NodeSourceType.VIDEO_PLAYLISTS
+        NodeSourceTypeInt.VIDEO_RECENTLY_WATCHED_ADAPTER -> NodeSourceType.VIDEO_RECENTLY_WATCHED
         else -> NodeSourceType.CLOUD_DRIVE
     }
 }

@@ -44,6 +44,7 @@ class GetSortOrderByNodeSourceTypeUseCase @Inject constructor(
             NodeSourceType.SEARCH,
             NodeSourceType.VIDEO_PLAYLISTS,
             NodeSourceType.RECENTS_BUCKET,
+            NodeSourceType.VIDEO_RECENTLY_WATCHED
                 -> getCloudSortOrder()
 
             NodeSourceType.OFFLINE -> getOfflineSortOrder()

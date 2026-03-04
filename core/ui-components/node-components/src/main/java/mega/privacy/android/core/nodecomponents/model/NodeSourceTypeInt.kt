@@ -17,4 +17,6 @@ object NodeSourceTypeInt {
     const val SEARCH_BY_ADAPTER: Int = 2018
     const val VIDEO_BROWSE_ADAPTER: Int = 2032
     const val RECENTS_BUCKET_ADAPTER: Int = 2034
+    const val VIDEO_PLAYLISTS_ADAPTER: Int = 2035
+    const val VIDEO_RECENTLY_WATCHED_ADAPTER: Int = 2036
 }

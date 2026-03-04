@@ -47,6 +47,7 @@ class NodeSourceTypeTest {
             Arguments.of(NodeSourceType.OTHER),
             Arguments.of(NodeSourceType.OFFLINE),
             Arguments.of(NodeSourceType.VIDEO_PLAYLISTS),
+            Arguments.of(NodeSourceType.VIDEO_RECENTLY_WATCHED),
             Arguments.of(NodeSourceType.VIDEOS),
             Arguments.of(NodeSourceType.SEARCH),
         )
