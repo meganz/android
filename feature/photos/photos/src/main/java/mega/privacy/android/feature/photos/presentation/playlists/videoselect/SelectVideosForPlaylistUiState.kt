@@ -5,7 +5,7 @@ import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 
@@ -39,15 +39,4 @@ sealed interface SelectVideosForPlaylistUiState {
         val query: String? = null,
         val selectItemHandles: Set<Long> = emptySet(),
     ) : SelectVideosForPlaylistUiState
-}
-
-/**
- * Sealed interface representing the different states of progressive node loading
- */
-sealed interface NodesLoadingState {
-    object Idle : NodesLoadingState
-    object Loading : NodesLoadingState
-    object PartiallyLoaded : NodesLoadingState
-    object FullyLoaded : NodesLoadingState
-    object Failed : NodesLoadingState
 }

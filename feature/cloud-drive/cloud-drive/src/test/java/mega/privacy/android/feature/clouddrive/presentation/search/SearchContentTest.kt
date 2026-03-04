@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.feature.clouddrive.presentation.search.model.SearchUiState
 import mega.privacy.android.feature.clouddrive.presentation.search.view.FILTER_CHIPS_TAG
 import org.junit.Rule

@@ -11,6 +11,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -121,21 +122,4 @@ data class CloudDriveUiState(
     val isUploadAllowed = hasWritePermission
             && nodeSourceType != NodeSourceType.RUBBISH_BIN
             && !isInSelectionMode
-}
-
-/**
- * Sealed interface representing the different states of progressive node loading
- */
-sealed interface NodesLoadingState {
-    object Idle : NodesLoadingState
-    object Loading : NodesLoadingState
-    object PartiallyLoaded : NodesLoadingState
-    object FullyLoaded : NodesLoadingState
-    object Failed : NodesLoadingState
-
-    val isInProgress: Boolean
-        get() = this == Loading || this == PartiallyLoaded
-
-    val isComplete: Boolean
-        get() = this == FullyLoaded || this == Failed
 }

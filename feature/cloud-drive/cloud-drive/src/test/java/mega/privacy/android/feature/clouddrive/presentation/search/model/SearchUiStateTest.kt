@@ -3,9 +3,9 @@ package mega.privacy.android.feature.clouddrive.presentation.search.model
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.NodesLoadingState
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
