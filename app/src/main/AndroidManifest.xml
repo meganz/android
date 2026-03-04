@@ -617,6 +617,17 @@
                 android:name="mega.privacy.android.app.initializer.NotificationChannelsInitializer"
                 android:value="androidx.startup" />
         </provider>
+        <provider
+            android:name=".providers.documentprovider.CloudDriveDocumentProvider"
+            android:authorities="${cloudDriveDocumentProviderAuthority}"
+            android:enabled="false"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter>
+                <action android:name="android.content.action.DOCUMENTS_PROVIDER" />
+            </intent-filter>
+        </provider>
 
         <activity
             android:name=".main.megachat.MapsActivity"

@@ -62,6 +62,13 @@ android {
         buildConfigField("int", "KARMA_PLUGIN_PORT", "${getKarmaPluginPort(project)}")
         resValue("string", "app_version", "\"${versionName}${versionNameSuffix}\"")
 
+        val cloudDriveDocumentProviderAuthority = "$applicationId.cloud.documents"
+        manifestPlaceholders["cloudDriveDocumentProviderAuthority"] = cloudDriveDocumentProviderAuthority
+        buildConfigField(
+            "String",
+            "CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY",
+            "\"${cloudDriveDocumentProviderAuthority}\""
+        )
         val megaSdkVersion: String by rootProject.extra
         resValue("string", "sdk_version", "\"${getSdkGitHash(megaSdkVersion, project)}\"")
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion, project)}\"")
@@ -136,6 +143,15 @@ android {
             applicationIdSuffix = ".qa"
             buildConfigField("String", "ENVIRONMENT", "\"MEGAEnv/QA\"")
             buildConfigField("String", "AD_UNIT_ID", "\"ca-app-pub-3940256099942544/9214589741\"")
+            val cloudDriveDocumentProviderAuthority =
+                "${defaultConfig.applicationId}$applicationIdSuffix.cloud.documents"
+            manifestPlaceholders["cloudDriveDocumentProviderAuthority"] =
+                cloudDriveDocumentProviderAuthority
+            buildConfigField(
+                "String",
+                "CLOUD_DRIVE_DOCUMENT_PROVIDER_AUTHORITY",
+                "\"${cloudDriveDocumentProviderAuthority}\""
+            )
             firebaseAppDistribution {
                 releaseNotes = readReleaseNotes()
                 groups = readTesterGroupList()
