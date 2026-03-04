@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.backup.BackupRemovalStatus
 import mega.privacy.android.domain.repository.CameraUploadsRepository
+import mega.privacy.android.domain.usecase.backup.RemoveDeviceFolderConnectionUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,7 +27,7 @@ internal class RemoveDeviceFolderConnectionUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = RemoveDeviceFolderConnectionUseCase(
+        underTest = RemoveDeviceFolderConnectionUseCaseImpl(
             cameraUploadsRepository = cameraUploadsRepository
         )
     }

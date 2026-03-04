@@ -1,10 +1,13 @@
 package mega.privacy.android.feature.devicecenter.di
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
+import mega.privacy.android.domain.usecase.backup.RemoveDeviceFolderConnectionUseCase
+import mega.privacy.android.feature.devicecenter.domain.usecase.folder.RemoveDeviceFolderConnectionUseCaseImpl
 import mega.privacy.android.feature.devicecenter.navigation.DeviceCenterDeepLinkHandler
 import mega.privacy.android.feature.devicecenter.navigation.DeviceCenterFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -12,15 +15,22 @@ import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 
 @Module
 @InstallIn(SingletonComponent::class)
-class DeviceCenterModule {
+internal interface DeviceCenterModule {
 
-    @Provides
-    @IntoSet
-    fun provideDeviceCenterFeatureDestination(): FeatureDestination =
-        DeviceCenterFeatureDestination()
+    @Binds
+    fun bindRemoveDeviceFolderConnectionUseCase(
+        impl: RemoveDeviceFolderConnectionUseCaseImpl,
+    ): RemoveDeviceFolderConnectionUseCase
 
-    @Provides
-    @IntoSet
-    fun provideDeviceCenterDeepLinkHandler(handler: DeviceCenterDeepLinkHandler): DeepLinkHandler =
-        handler
+    companion object {
+        @Provides
+        @IntoSet
+        fun provideDeviceCenterFeatureDestination(): FeatureDestination =
+            DeviceCenterFeatureDestination()
+
+        @Provides
+        @IntoSet
+        fun provideDeviceCenterDeepLinkHandler(handler: DeviceCenterDeepLinkHandler): DeepLinkHandler =
+            handler
+    }
 }

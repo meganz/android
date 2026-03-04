@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.usecase.backup.RemoveDeviceFolderConnectionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.devicecenter.domain.usecase.GetDevicesUseCase
-import mega.privacy.android.feature.devicecenter.domain.usecase.folder.RemoveDeviceFolderConnectionUseCase
 import mega.privacy.android.feature.devicecenter.ui.DeviceCenterViewModel.Companion.GET_DEVICES_REFRESH_INTERVAL
 import mega.privacy.android.feature.devicecenter.ui.mapper.DeviceUINodeListMapper
 import mega.privacy.android.feature.devicecenter.ui.model.DeviceCenterUINode
