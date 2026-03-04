@@ -5,5 +5,9 @@
             android:name="mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity"
             android:label="Choose account"
             android:launchMode="singleTop" />
+        <activity
+            android:name="mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
     </application>
 </manifest>

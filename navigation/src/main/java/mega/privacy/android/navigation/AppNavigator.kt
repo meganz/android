@@ -113,6 +113,15 @@ interface AppNavigator {
     )
 
     /**
+     * Navigates to the Cancel Account Plan screen.
+     * Opens the activity directly (no single-activity navigation).
+     *
+     * @param context The context to use for navigation.
+     * @param usedStorage The formatted used storage string to display, or null for empty.
+     */
+    fun navigateToCancelAccountPlan(context: Context, usedStorage: String)
+
+    /**
      * Navigates to the Syncs page
      *
      * @param context       Context

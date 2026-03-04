@@ -90,6 +90,7 @@ import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
+import mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
@@ -272,6 +273,13 @@ internal class MegaNavigatorImpl @Inject constructor(
                 context = context, source = source
             )
         }
+    }
+
+    override fun navigateToCancelAccountPlan(context: Context, usedStorage: String) {
+        CancelAccountPlanActivity.navigateToCancelAccountPlan(
+            context = context,
+            usedStorage = usedStorage,
+        )
     }
 
     private fun getChatActivityIntent(

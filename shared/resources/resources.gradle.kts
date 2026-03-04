@@ -8,5 +8,6 @@ android {
 
     dependencies {
         lintChecks(project(":lint"))
+        implementation(androidx.annotation)
     }
 }

@@ -44,7 +44,6 @@ import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ANDROID_PLATFORM_NO_NAVIGATION
 import mega.privacy.android.app.main.dialog.storagestatus.TYPE_ITUNES
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.presentation.cancelaccountplan.CancelAccountPlanActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.logout.LogoutConfirmationDialog
 import mega.privacy.android.app.presentation.logout.LogoutViewModel
@@ -369,7 +368,10 @@ internal class MyAccountActivity : PasscodeActivity(),
      */
     private fun handleShowCancelSubscription() {
         Analytics.tracker.trackEvent(CancelSubscriptionMenuToolbarEvent)
-        navigateToCancelAccountPlan()
+        megaNavigator.navigateToCancelAccountPlan(
+            context = this,
+            usedStorage = viewModel.getUsedStorage(),
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -567,14 +569,6 @@ internal class MyAccountActivity : PasscodeActivity(),
                 viewModel.resetChangeEmailConfirmation()
             }
         }
-    }
-
-    private fun navigateToCancelAccountPlan() {
-        startActivity(
-            Intent(this, CancelAccountPlanActivity::class.java).putExtra(
-                CancelAccountPlanActivity.EXTRA_USED_STORAGE, viewModel.getUsedStorage()
-            )
-        )
     }
 
     /**

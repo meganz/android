@@ -121,10 +121,6 @@
         android:theme="@style/Theme.Mega"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".presentation.cancelaccountplan.CancelAccountPlanActivity"
-            android:exported="false"
-            android:launchMode="singleTop" />
-        <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"
             android:label="@string/action_settings"
