@@ -112,6 +112,13 @@ Build:            Convention plugins (build-logic/convention/), Version Catalogs
 - [ ] Hilt annotations used correctly (`@HiltViewModel`, `@AndroidEntryPoint`, `@Module @InstallIn`)
 - [ ] Gateway/Facade interfaces used to abstract SDK access (not calling SDK directly from Repository)
 
+#### Modular Dependency checklist
+- [ ] **`:feature:`** modules can depend on `:shared`, `:core`, and their own `:*-snowflakes`.
+- [ ] **`:shared:`** modules can depend on `:core` and their own `:*-snowflakes`.
+- [ ] **`:core:`** modules can only depend on other `:core` modules.
+- [ ] **`Snowflake`** modules (ending in `-snowflakes` or `-snowflake-components`) can only depend on `:core`.
+
+
 **Common Issues:**
 ```kotlin
 // ❌ ViewModel holding Context — causes memory leaks
