@@ -38,23 +38,47 @@ From the commits and diff, extract:
 ### 3. Write the description in this exact format
 
 ```
-## Summary
-<1-3 sentence overview of what this MR does and why. Explain how is it different than the current implementation>
+#### Summary
+<1-3 sentence overview of what this MR does and why. Explain how it differs from the current implementation>
 
-## Key Changes
+#### Key Changes
 - <change 1>
 - <change 2>
-- <change 3>
 
-## Benefits
+#### Benefits
 - <benefit 1>
 - <benefit 2>
 
-## Cons / Risks (if any)
+#### Cons / Risks (if any)
 - <con or risk — omit this section entirely if none>
 
-## TODOs for Next MR
+#### TODOs for Next MR
 - <//TODO or FIXME items found, or "None">
+
+#### Why are we making this change?
+
+#### What features are impacted?
+
+#### If the MR has more than 10 files, please provide a valid reason.
+
+## Screenshot/Screen-recording comparisons
+
+| Before | After |
+|--------|-------|
+|        |       |
+
+## Resources
+
+[Android MR Checklist](https://confluence.developers.mega.co.nz/display/MOB/Android+MR+Checklist)
+
+## Gitlab MR shortcuts
+
+- jenkins rebuild - Run build again
+- deliver_qa - Send build to firebase
+
+Documentation: [Android CI/CD Pipeline Commands](https://confluence.developers.mega.co.nz/pages/viewpage.action?pageId=37651416)
+
+Closes <Jira Ticket Number>
 ```
 
 **Writing guidelines:**
