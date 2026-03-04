@@ -174,12 +174,10 @@ class MyAccountDeepLinkHandlerTest {
                 )
             )
         } else {
-            assertThat(actual).containsExactly(
-                LoginNavKey(
-                    action = Constants.ACTION_RESET_PASS,
-                    link = uriString
-                )
-            )
+            assertThat(actual?.size).isEqualTo(1)
+            assertThat(actual?.first()).isInstanceOf(LoginNavKey::class.java)
+            assertThat((actual?.first() as LoginNavKey).action).isEqualTo(Constants.ACTION_RESET_PASS)
+            assertThat((actual.first() as LoginNavKey).link).isEqualTo(uriString)
         }
 
         verifyNoInteractions(snackbarEventQueue)

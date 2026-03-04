@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.chat.ChatFile
@@ -44,5 +45,9 @@ val nodeSerialisationModule = SerializersModule {
     }
     polymorphic(TypedFileNode::class) {
         subclass(DefaultTypedFileNode::class)
+    }
+    polymorphic(NodeContentUri::class) {
+        subclass(NodeContentUri.LocalContentUri::class)
+        subclass(NodeContentUri.RemoteContentUri::class)
     }
 }
