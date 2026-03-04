@@ -7,14 +7,14 @@ import mega.privacy.android.domain.entity.node.TypedNode
  *
  * @property node The folder or file node
  * @property isDisabled True if the folder is excluded or used by sync/backup (any device)
- * @property subtitle Device name to show in list for folders connected to another device
+ * @property isUsedBySyncOrBackup True if this node is used by sync/backup (any device); used to disable parent selection
  * @property backupId Backup ID for remove-connection action (only set for other-device folders)
  * @property deviceName Device name for the remove-connection
  */
 internal data class MegaPickerNodeInfo(
     val node: TypedNode,
     val isDisabled: Boolean = false,
-    val subtitle: String? = null,
+    val isUsedBySyncOrBackup: Boolean = false,
     val backupId: Long? = null,
     val deviceName: String? = null,
 )

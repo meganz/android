@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import org.junit.jupiter.api.AfterEach
@@ -25,7 +24,6 @@ import org.mockito.kotlin.whenever
 internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
     private val getBackupInfoUseCase: GetBackupInfoUseCase = mock()
-    private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase = mock()
     private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
@@ -33,7 +31,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
     private val underTest = IsFolderUsedBySyncOrBackupAcrossDevicesUseCase(
         getBackupInfoUseCase,
-        getCameraUploadsSyncHandlesUseCase,
         determineNodeRelationshipUseCase,
         getDeviceIdUseCase,
         getFeatureFlagValueUseCase
@@ -43,7 +40,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
     fun resetAndTearDown() {
         reset(
             getBackupInfoUseCase,
-            getCameraUploadsSyncHandlesUseCase,
             determineNodeRelationshipUseCase,
             getDeviceIdUseCase,
             getFeatureFlagValueUseCase
@@ -66,7 +62,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
-            verifyNoInteractions(getCameraUploadsSyncHandlesUseCase, getBackupInfoUseCase)
+            verifyNoInteractions(getBackupInfoUseCase)
         }
 
     @Test
@@ -82,15 +78,20 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
-        verifyNoInteractions(getCameraUploadsSyncHandlesUseCase, getBackupInfoUseCase)
+        verifyNoInteractions(getBackupInfoUseCase)
     }
 
     @Test
     fun `test that when feature flag is enabled, camera uploads are checked`() = runTest {
         val nodeId = NodeId(1L)
+        val cameraUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+            on { rootHandle }.thenReturn(NodeId(1L))
+            on { deviceId }.thenReturn("device-1")
+        }
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L)
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
         whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
             .thenReturn(NodeRelationship.ExactMatch)
 
@@ -107,9 +108,14 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
     fun `test that if folder is used by primary Camera Uploads then result is UsedByCameraUpload`() =
         runTest {
             val nodeId = NodeId(1L)
+            val cameraUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(1L))
+                on { deviceId }.thenReturn("device-1")
+            }
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
                 .thenReturn(NodeRelationship.ExactMatch)
 
@@ -120,16 +126,31 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUpload)
-            verifyNoInteractions(getBackupInfoUseCase)
+            verify(getBackupInfoUseCase).invoke()
         }
 
     @Test
     fun `test that if folder is used by secondary Camera Uploads then result is UsedByMediaUpload`() =
         runTest {
             val nodeId = NodeId(2L)
+            val cameraUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(1L))
+                on { deviceId }.thenReturn("device-1")
+            }
+            val mediaUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(2L))
+                on { deviceId }.thenReturn("device-1")
+            }
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L)
+            whenever(getBackupInfoUseCase()).thenReturn(
+                listOf(
+                    cameraUploadsBackup,
+                    mediaUploadsBackup
+                )
+            )
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
                 .thenReturn(NodeRelationship.NoMatch)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(2L)))
@@ -142,7 +163,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.UsedByMediaUpload)
-            verifyNoInteractions(getBackupInfoUseCase)
+            verify(getBackupInfoUseCase).invoke()
         }
 
     @Test
@@ -150,14 +171,12 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val nodeId = NodeId(3L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
         whenever(getBackupInfoUseCase()).thenReturn(emptyList())
 
         val result =
             underTest(nodeId, shouldCheckCameraUploads = true, shouldExcludeCurrentDevice = false)
 
         assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
-        verify(getCameraUploadsSyncHandlesUseCase).invoke()
         verify(getBackupInfoUseCase).invoke()
     }
 
@@ -172,11 +191,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         }
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L) // Doesn't match
-        whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
-            .thenReturn(NodeRelationship.NoMatch)
-        whenever(determineNodeRelationshipUseCase(nodeId, NodeId(2L)))
-            .thenReturn(NodeRelationship.NoMatch)
         whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
         whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
             .thenReturn(NodeRelationship.ExactMatch)
@@ -213,7 +227,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(3L)))
                 .thenReturn(NodeRelationship.NoMatch)
@@ -236,6 +249,16 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val nodeId = NodeId(99L)
             val backups = listOf(
                 mock<BackupInfo> {
+                    on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                    on { rootHandle }.thenReturn(NodeId(1L))
+                    on { deviceId }.thenReturn("device-1")
+                },
+                mock<BackupInfo> {
+                    on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+                    on { rootHandle }.thenReturn(NodeId(2L))
+                    on { deviceId }.thenReturn("device-1")
+                },
+                mock<BackupInfo> {
                     on { rootHandle }.thenReturn(NodeId(3L))
                     on { deviceId }.thenReturn("other-device-1")
                     on { type }.thenReturn(BackupInfoType.BACKUP_UPLOAD)
@@ -248,11 +271,14 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(NodeId(99L), NodeId(1L)))
                 .thenReturn(NodeRelationship.NoMatch)
             whenever(determineNodeRelationshipUseCase(NodeId(99L), NodeId(2L)))
+                .thenReturn(NodeRelationship.NoMatch)
+            whenever(determineNodeRelationshipUseCase(NodeId(99L), NodeId(3L)))
+                .thenReturn(NodeRelationship.NoMatch)
+            whenever(determineNodeRelationshipUseCase(NodeId(99L), NodeId(7L)))
                 .thenReturn(NodeRelationship.NoMatch)
 
             val result = underTest(
@@ -271,10 +297,15 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         // Assuming node hierarchy: /Photos (id=100) -> /Photos/Camera (id=1)
         val parentNodeId = NodeId(100L)
         val cameraUploadsNodeId = NodeId(1L)
+        val cameraUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+            on { rootHandle }.thenReturn(cameraUploadsNodeId)
+            on { deviceId }.thenReturn("device-1")
+        }
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(cameraUploadsNodeId.longValue to 2L)
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
         whenever(determineNodeRelationshipUseCase(parentNodeId, cameraUploadsNodeId))
             .thenReturn(NodeRelationship.TargetIsDescendant) // target is descendant of source
 
@@ -292,10 +323,15 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         // Assuming node hierarchy: /Photos/Camera (id=1) -> /Photos/Camera/2023 (id=101)
         val childNodeId = NodeId(101L)
         val cameraUploadsNodeId = NodeId(1L)
+        val cameraUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+            on { rootHandle }.thenReturn(cameraUploadsNodeId)
+            on { deviceId }.thenReturn("device-1")
+        }
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(cameraUploadsNodeId.longValue to 2L)
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup))
         whenever(determineNodeRelationshipUseCase(childNodeId, cameraUploadsNodeId))
             .thenReturn(NodeRelationship.TargetIsAncestor) // target is ancestor of source
 
@@ -314,10 +350,20 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
     fun `test that parent of Media Uploads returns UsedByMediaUploadParent`() = runTest {
         val parentNodeId = NodeId(200L)
         val mediaUploadsNodeId = NodeId(2L)
+        val cameraUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+            on { rootHandle }.thenReturn(NodeId(1L))
+            on { deviceId }.thenReturn("device-1")
+        }
+        val mediaUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+            on { rootHandle }.thenReturn(mediaUploadsNodeId)
+            on { deviceId }.thenReturn("device-1")
+        }
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to mediaUploadsNodeId.longValue)
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup, mediaUploadsBackup))
         whenever(determineNodeRelationshipUseCase(parentNodeId, NodeId(1L)))
             .thenReturn(NodeRelationship.NoMatch)
         whenever(determineNodeRelationshipUseCase(parentNodeId, mediaUploadsNodeId))
@@ -336,10 +382,20 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
     fun `test that child of Media Uploads returns UsedByMediaUploadChild`() = runTest {
         val childNodeId = NodeId(202L)
         val mediaUploadsNodeId = NodeId(2L)
+        val cameraUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+            on { rootHandle }.thenReturn(NodeId(1L))
+            on { deviceId }.thenReturn("device-1")
+        }
+        val mediaUploadsBackup = mock<BackupInfo> {
+            on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+            on { rootHandle }.thenReturn(mediaUploadsNodeId)
+            on { deviceId }.thenReturn("device-1")
+        }
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to mediaUploadsNodeId.longValue)
+        whenever(getBackupInfoUseCase()).thenReturn(listOf(cameraUploadsBackup, mediaUploadsBackup))
         whenever(determineNodeRelationshipUseCase(childNodeId, NodeId(1L)))
             .thenReturn(NodeRelationship.NoMatch)
         whenever(determineNodeRelationshipUseCase(childNodeId, mediaUploadsNodeId))
@@ -364,7 +420,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
         val backupInfo = mock<BackupInfo> {
             on { rootHandle }.thenReturn(backupNodeId)
             on { this.deviceId }.thenReturn(deviceId)
@@ -391,7 +446,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
         val backupInfo = mock<BackupInfo> {
             on { rootHandle }.thenReturn(backupNodeId)
             on { this.deviceId }.thenReturn(deviceId)
@@ -438,7 +492,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             // Should find the backup, not Camera Uploads (even though nodeId=1 might match CU handle)
             val expected = FolderUsageResult.UsedBySyncOrBackup(deviceId)
             assertThat(result).isEqualTo(expected)
-            verifyNoInteractions(getCameraUploadsSyncHandlesUseCase)
             verify(getBackupInfoUseCase).invoke()
         }
 
@@ -457,7 +510,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
-            verifyNoInteractions(getCameraUploadsSyncHandlesUseCase)
         }
 
     @Test
@@ -482,7 +534,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(10L)))
@@ -514,7 +565,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
@@ -554,7 +604,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
             whenever(getDeviceIdUseCase()).thenReturn(currentDeviceId)
             whenever(getBackupInfoUseCase()).thenReturn(backups)
             whenever(determineNodeRelationshipUseCase(nodeId, nodeId))
@@ -576,6 +625,16 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         runTest {
             val nodeId = NodeId(2L)
             val deviceId = "test-device-id"
+            val cameraUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.CAMERA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(1L))
+                on { this.deviceId }.thenReturn(deviceId)
+            }
+            val mediaUploadsBackup = mock<BackupInfo> {
+                on { type }.thenReturn(BackupInfoType.MEDIA_UPLOADS)
+                on { rootHandle }.thenReturn(NodeId(2L))
+                on { this.deviceId }.thenReturn(deviceId)
+            }
             val backupInfo = mock<BackupInfo> {
                 on { rootHandle }.thenReturn(NodeId(10L))
                 on { this.deviceId }.thenReturn(deviceId)
@@ -584,8 +643,13 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
-            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(1L to 2L)
-            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getBackupInfoUseCase()).thenReturn(
+                listOf(
+                    cameraUploadsBackup,
+                    mediaUploadsBackup,
+                    backupInfo
+                )
+            )
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(1L)))
                 .thenReturn(NodeRelationship.NoMatch)
             whenever(determineNodeRelationshipUseCase(nodeId, NodeId(2L)))
@@ -597,7 +661,7 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
                 shouldExcludeCurrentDevice = false
             )
 
-            // Should find Camera Uploads match
+            // Should find Media Uploads match
             assertThat(result).isEqualTo(FolderUsageResult.UsedByMediaUpload)
         }
 
@@ -637,7 +701,6 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             // Should find the other device's backup, not Camera Uploads or current device
             val expected = FolderUsageResult.UsedBySyncOrBackup(otherDeviceId)
             assertThat(result).isEqualTo(expected)
-            verifyNoInteractions(getCameraUploadsSyncHandlesUseCase)
             // Verify getDeviceIdUseCase was called (once per backup during filtering)
             verify(getDeviceIdUseCase, atLeastOnce()).invoke()
         }

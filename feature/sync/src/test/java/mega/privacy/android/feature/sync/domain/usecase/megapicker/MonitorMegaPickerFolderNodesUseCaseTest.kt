@@ -5,8 +5,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.backup.BackupInfo
+import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
@@ -15,13 +18,16 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
+import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -43,26 +49,15 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
     private val getBackupInfoUseCase: GetBackupInfoUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
     private val getDeviceIdAndNameMapUseCase: GetDeviceIdAndNameMapUseCase = mock()
-    private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase = mock()
+    private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase = mock()
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase = mock()
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase = mock()
 
     private lateinit var underTest: MonitorMegaPickerFolderNodesUseCase
 
-    @BeforeEach
+    @BeforeAll
     fun setUp() {
-        reset(
-            getTypedNodesFromFolder,
-            getCameraUploadsFolderHandleUseCase,
-            getMediaUploadsFolderHandleUseCase,
-            getMyChatsFilesFolderIdUseCase,
-            getFolderPairsUseCase,
-            getFeatureFlagValueUseCase,
-            getBackupInfoUseCase,
-            getDeviceIdUseCase,
-            getDeviceIdAndNameMapUseCase,
-            determineNodeRelationshipUseCase,
-            nodeExistsInCurrentLocationUseCase,
-        )
         underTest = MonitorMegaPickerFolderNodesUseCase(
             getTypedNodesFromFolder = getTypedNodesFromFolder,
             getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
@@ -73,8 +68,29 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             getBackupInfoUseCase = getBackupInfoUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
             getDeviceIdAndNameMapUseCase = getDeviceIdAndNameMapUseCase,
-            determineNodeRelationshipUseCase = determineNodeRelationshipUseCase,
+            getFullNodePathByIdUseCase = getFullNodePathByIdUseCase,
             nodeExistsInCurrentLocationUseCase = nodeExistsInCurrentLocationUseCase,
+            isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
+            isMediaUploadsEnabledUseCase = isMediaUploadsEnabledUseCase,
+        )
+    }
+
+    @BeforeEach
+    fun clear() {
+        reset(
+            getTypedNodesFromFolder,
+            getCameraUploadsFolderHandleUseCase,
+            getMediaUploadsFolderHandleUseCase,
+            getMyChatsFilesFolderIdUseCase,
+            getFolderPairsUseCase,
+            getFeatureFlagValueUseCase,
+            getBackupInfoUseCase,
+            getDeviceIdUseCase,
+            getDeviceIdAndNameMapUseCase,
+            getFullNodePathByIdUseCase,
+            nodeExistsInCurrentLocationUseCase,
+            isCameraUploadsEnabledUseCase,
+            isMediaUploadsEnabledUseCase,
         )
     }
 
@@ -128,6 +144,8 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
         val cuFolder: TypedNode = mock { on { id } doReturn cuFolderId }
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(false)
+        whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
+        whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
         whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(cuFolderId.longValue)
         whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
@@ -243,6 +261,170 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
 
             underTest(rootFolder, rootFolderId, false, null).test {
                 awaitComplete()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is false when currentFolder is not root but has a child used by sync or backup`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val parentFolderId = NodeId(456L)
+            val syncedChildId = NodeId(789L)
+            val otherChildId = NodeId(101L)
+            val backupRootHandle = NodeId(789L)
+            val parentFolder: TypedFolderNode = mock { on { id } doReturn parentFolderId }
+            val syncedChild: TypedFolderNode = mock { on { id } doReturn syncedChildId }
+            val otherChild: TypedFolderNode = mock { on { id } doReturn otherChildId }
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn backupRootHandle
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { deviceId } doReturn "otherDevice"
+            }
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn("device1")
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(getTypedNodesFromFolder(parentFolderId))
+                .thenReturn(flowOf(listOf<TypedNode>(syncedChild, otherChild)))
+            // Mock path lookups: syncedChild path matches backup path (ExactMatch)
+            whenever(getFullNodePathByIdUseCase(backupRootHandle)).thenReturn("/Cloud Drive/SyncedFolder")
+            whenever(getFullNodePathByIdUseCase(syncedChildId)).thenReturn("/Cloud Drive/SyncedFolder")
+            whenever(getFullNodePathByIdUseCase(otherChildId)).thenReturn("/Cloud Drive/OtherFolder")
+
+            underTest(parentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isFalse()
+                assertThat(result.nodes).hasSize(2)
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isTrue()
+                assertThat(result.nodes[1].isUsedBySyncOrBackup).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is true when currentFolder is not root and no child is used by sync or backup`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val parentFolderId = NodeId(456L)
+            val childId = NodeId(789L)
+            val parentFolder: FolderNode = mock { on { id } doReturn parentFolderId }
+            val childNode: TypedNode = mock { on { id } doReturn childId }
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getBackupInfoUseCase()).thenReturn(emptyList())
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getTypedNodesFromFolder(parentFolderId)).thenReturn(flowOf(listOf(childNode)))
+
+            underTest(parentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isTrue()
+                assertThat(result.nodes).hasSize(1)
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is false when currentFolder is not root but has a child in folder pairs`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val parentFolderId = NodeId(456L)
+            val syncedChildId = NodeId(789L)
+            val otherChildId = NodeId(101L)
+            val parentFolder: FolderNode = mock { on { id } doReturn parentFolderId }
+            val syncedChild: TypedNode = mock { on { id } doReturn syncedChildId }
+            val otherChild: TypedNode = mock { on { id } doReturn otherChildId }
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(false)
+            whenever(getBackupInfoUseCase()).thenReturn(emptyList())
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getFolderPairsUseCase()).thenReturn(
+                listOf(
+                    FolderPair(
+                        id = 1L,
+                        syncType = mega.privacy.android.domain.entity.sync.SyncType.TYPE_TWOWAY,
+                        pairName = "Sync",
+                        localFolderPath = "/path",
+                        remoteFolder = RemoteFolder(syncedChildId, "Synced"),
+                        syncStatus = mega.privacy.android.feature.sync.domain.entity.SyncStatus.SYNCED,
+                    )
+                )
+            )
+            whenever(getTypedNodesFromFolder(parentFolderId))
+                .thenReturn(flowOf(listOf(syncedChild, otherChild)))
+
+            underTest(parentFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isFalse()
+                assertThat(result.nodes).hasSize(2)
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isTrue()
+                assertThat(result.nodes[1].isUsedBySyncOrBackup).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that parent folder of synced folder is not disabled`() =
+        runTest {
+            // Scenario: CloudDrive > ParentFolder > SyncedFolder
+            // When viewing CloudDrive, ParentFolder should NOT be grayed out
+            // because it's a PARENT of the synced folder, not the synced folder itself
+
+            val rootFolderId = NodeId(123L)
+            val parentFolderId = NodeId(456L)
+            val syncedChildId = NodeId(789L)
+            val backupRootHandle = NodeId(789L) // synced child is the backup root
+
+            val rootFolder: FolderNode = mock { on { id } doReturn rootFolderId }
+            val parentFolder: TypedNode = mock { on { id } doReturn parentFolderId }
+
+            val backupInfo = mock<BackupInfo> {
+                on { rootHandle } doReturn backupRootHandle
+                on { type } doReturn BackupInfoType.TWO_WAY_SYNC
+                on { deviceId } doReturn "device1"
+            }
+
+            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(true)
+            whenever(getBackupInfoUseCase()).thenReturn(listOf(backupInfo))
+            whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn("device1")
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+
+            // When loading root folder, parent is shown as child
+            whenever(getTypedNodesFromFolder(rootFolderId))
+                .thenReturn(flowOf(listOf(parentFolder)))
+
+            // Mock path lookups:
+            // - Backup path: /Cloud Drive/ParentFolder/SyncedFolder
+            // - Parent path: /Cloud Drive/ParentFolder
+            // Parent is NOT inside backup (backup is INSIDE parent), so parent should NOT be disabled
+            whenever(getFullNodePathByIdUseCase(backupRootHandle)).thenReturn("/Cloud Drive/ParentFolder/SyncedFolder")
+            whenever(getFullNodePathByIdUseCase(parentFolderId)).thenReturn("/Cloud Drive/ParentFolder")
+
+            underTest(rootFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                // Parent should NOT be disabled (not grayed out)
+                assertThat(result.nodes[0].isDisabled).isFalse()
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
             }
         }
 }

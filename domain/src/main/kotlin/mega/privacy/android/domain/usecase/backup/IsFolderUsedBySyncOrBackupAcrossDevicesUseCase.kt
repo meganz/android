@@ -5,7 +5,6 @@ import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import javax.inject.Inject
@@ -15,7 +14,6 @@ import javax.inject.Inject
  */
 class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
     private val getBackupInfoUseCase: GetBackupInfoUseCase,
-    private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
     private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
@@ -34,35 +32,41 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         if (isFeatureEnabled.not()) {
             return FolderUsageResult.NotUsed
         }
-        if (shouldCheckCameraUploads) {
-            // Check if the folder is related to Camera Uploads or Media Uploads
-            getCameraUploadsSyncHandlesUseCase()?.let { (primaryHandle, secondaryHandle) ->
-                // Check primary (Camera Uploads) handle
-                checkCameraUploadsRelationship(nodeId, NodeId(primaryHandle))?.let { return it }
-                // Check secondary (Media Uploads) handle
-                checkMediaUploadsRelationship(nodeId, NodeId(secondaryHandle))?.let { return it }
-            }
-        }
 
-        // If not related to Camera/Media Uploads, check all backup entries
-        val backups =
-            getBackupInfoUseCase()
+        val backups = getBackupInfoUseCase()
                 .filterNot { shouldExcludeCurrentDevice && it.deviceId == getDeviceIdUseCase() }
-                .filter { it.type == BackupInfoType.BACKUP_UPLOAD || it.type == BackupInfoType.TWO_WAY_SYNC }
+            .filter {
+                it.type == BackupInfoType.BACKUP_UPLOAD
+                        || it.type == BackupInfoType.TWO_WAY_SYNC
+                        || (shouldCheckCameraUploads && it.type == BackupInfoType.CAMERA_UPLOADS || it.type == BackupInfoType.MEDIA_UPLOADS)
+            }
         for (backup in backups) {
-            val relationship =
-                determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
-            when (relationship) {
-                NodeRelationship.ExactMatch ->
-                    return FolderUsageResult.UsedBySyncOrBackup(backup.deviceId)
+            when (backup.type) {
+                BackupInfoType.CAMERA_UPLOADS -> {
+                    checkCameraUploadsRelationship(nodeId, backup.rootHandle)?.let { return it }
+                }
 
-                NodeRelationship.TargetIsAncestor ->
-                    return FolderUsageResult.UsedBySyncOrBackupChild(backup.deviceId)
+                BackupInfoType.MEDIA_UPLOADS -> {
+                    checkMediaUploadsRelationship(nodeId, backup.rootHandle)?.let { return it }
+                }
 
-                NodeRelationship.TargetIsDescendant ->
-                    return FolderUsageResult.UsedBySyncOrBackupParent(backup.deviceId)
+                else -> {
+                    // If not related to Camera/Media Uploads, check all backup entries
+                    val relationship =
+                        determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
+                    when (relationship) {
+                        NodeRelationship.ExactMatch ->
+                            return FolderUsageResult.UsedBySyncOrBackup(backup.deviceId)
 
-                else -> { /* continue checking other backups */
+                        NodeRelationship.TargetIsAncestor ->
+                            return FolderUsageResult.UsedBySyncOrBackupChild(backup.deviceId)
+
+                        NodeRelationship.TargetIsDescendant ->
+                            return FolderUsageResult.UsedBySyncOrBackupParent(backup.deviceId)
+
+                        else -> { /* continue checking other backups */
+                        }
+                    }
                 }
             }
         }

@@ -5,10 +5,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.backup.BackupInfo
 import mega.privacy.android.domain.entity.backup.BackupInfoType
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
@@ -16,9 +17,11 @@ import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
+import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerFolderResult
 import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerNodeInfo
@@ -40,8 +43,10 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
     private val getBackupInfoUseCase: GetBackupInfoUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getDeviceIdAndNameMapUseCase: GetDeviceIdAndNameMapUseCase,
-    private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
+    private val getFullNodePathByIdUseCase: GetFullNodePathByIdUseCase,
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
+    private val isCameraUploadsEnabledUseCase: IsCameraUploadsEnabledUseCase,
+    private val isMediaUploadsEnabledUseCase: IsMediaUploadsEnabledUseCase,
 ) {
 
     /**
@@ -59,6 +64,10 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         isStopBackup: Boolean,
         folderName: String?,
     ): Flow<MegaPickerFolderResult> = flow {
+        val isFeatureEnabled =
+            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+        val currentDeviceId = runCatching { getDeviceIdUseCase() }.getOrNull()
+
         val excludeFolders = if (currentFolder.id == rootFolderId) {
             runCatching {
                 buildExcludeFoldersAtRoot()
@@ -69,14 +78,15 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             null
         }
 
-        val syncBackupInfoList = runCatching {
-            val isFeatureEnabled =
-                getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+        val syncBackupInfoListOtherDevice = runCatching {
             if (isFeatureEnabled) {
                 getBackupInfoUseCase()
                     .filter {
-                        it.type == BackupInfoType.BACKUP_UPLOAD ||
-                                it.type == BackupInfoType.TWO_WAY_SYNC
+                        (it.deviceId != null && it.deviceId != currentDeviceId) &&
+                                (it.type == BackupInfoType.BACKUP_UPLOAD
+                                        || it.type == BackupInfoType.TWO_WAY_SYNC
+                                        || it.type == BackupInfoType.CAMERA_UPLOADS
+                                        || it.type == BackupInfoType.MEDIA_UPLOADS)
                     }
             } else {
                 emptyList()
@@ -86,11 +96,6 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             emptyList()
         }
 
-        val currentDeviceId = runCatching { getDeviceIdUseCase() }.getOrNull()
-        val syncBackupInfoListOtherDevice = syncBackupInfoList.filter {
-            it.deviceId != null && it.deviceId != currentDeviceId
-        }
-
         val deviceNameMap = runCatching {
             getDeviceIdAndNameMapUseCase()
         }.getOrElse {
@@ -98,35 +103,68 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             emptyMap()
         }
 
-        val isSelectEnabled = if (isStopBackup) {
+        val syncedFolderIds = runCatching {
+            getFolderPairsUseCase().map { it.remoteFolder.id }
+        }.getOrElse {
+            Timber.d(it, "Error getting folder pairs for sync usage check")
+            emptyList()
+        }
+
+        val isSelectEnabledForStopBackup = if (isStopBackup) {
             runCatching {
                 folderName?.let {
                     !nodeExistsInCurrentLocationUseCase(currentFolder.id, it)
                 } ?: true
             }.getOrElse { true }
         } else {
-            currentFolder.id != rootFolderId
+            null
         }
 
-        Timber.d(
-            "Current folder: ${currentFolder.name}, id: ${currentFolder.id}, " +
-                    "RootFolderId: $rootFolderId, Exclude folders: $excludeFolders"
-        )
+        // Pre-fetch all backup root paths
+        val backupPaths: Map<NodeId, String> =
+            syncBackupInfoListOtherDevice.mapNotNull { backupInfo ->
+                runCatching {
+                    getFullNodePathByIdUseCase(backupInfo.rootHandle)?.let { path ->
+                        backupInfo.rootHandle to path
+                    }
+                }.getOrNull()
+            }.toMap()
 
         getTypedNodesFromFolder(currentFolder.id)
             .catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
             }
             .collect { childFolders ->
+                // Pre-fetch paths only for folder nodes (files don't need path comparison for backup check)
+                val folderNodePaths: Map<NodeId, String> = childFolders
+                    .filterIsInstance<FolderNode>()
+                    .mapNotNull { node ->
+                        runCatching {
+                            getFullNodePathByIdUseCase(node.id)?.let { path ->
+                                node.id to path
+                            }
+                        }.getOrNull()
+                    }.toMap()
+
+                // Map nodes using pre-fetched paths
                 val nodes = childFolders.map { node ->
                     mapNodeToMegaPickerNodeInfo(
                         node = node,
+                        nodePath = folderNodePaths[node.id],
                         excludeFolders = excludeFolders,
-                        syncBackupInfoList = syncBackupInfoList,
+                        backupPaths = backupPaths,
                         syncBackupInfoListOtherDevice = syncBackupInfoListOtherDevice,
                         deviceNameMap = deviceNameMap,
+                        syncedFolderIds = syncedFolderIds,
                     )
                 }
+
+                val isSelectEnabled = isSelectEnabledForStopBackup ?: run {
+                    val notAtRoot = currentFolder.id != rootFolderId
+                    val noChildUsedBySyncOrBackup = !nodes.any { it.isUsedBySyncOrBackup }
+                    notAtRoot && noChildUsedBySyncOrBackup
+                }
+
                 emit(
                     MegaPickerFolderResult(
                         currentFolder = currentFolder,
@@ -138,13 +176,15 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
     }
 
     private suspend fun buildExcludeFoldersAtRoot(): List<NodeId>? {
-        val cameraUploadsFolderHandle = getCameraUploadsFolderHandleUseCase()
-        val mediaUploadsFolderHandle = getMediaUploadsFolderHandleUseCase()?.id
+        val cameraUploadsFolderHandle =
+            getCameraUploadsFolderHandleUseCase().takeIf { isCameraUploadsEnabledUseCase() }
+        val mediaUploadsFolderHandle =
+            getMediaUploadsFolderHandleUseCase()?.id.takeIf { isMediaUploadsEnabledUseCase() }
         val myChatsUploadsFolderHandle = getMyChatsFilesFolderIdUseCase()
         val syncedFolderHandles = getFolderPairsUseCase().map { it.remoteFolder.id }
 
         val list = listOfNotNull(
-            NodeId(cameraUploadsFolderHandle),
+            cameraUploadsFolderHandle?.let { NodeId(it) },
             mediaUploadsFolderHandle,
             myChatsUploadsFolderHandle,
         ).filterNot { it == NodeId(-1L) }
@@ -153,42 +193,52 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         return list.ifEmpty { null }
     }
 
-    private suspend fun mapNodeToMegaPickerNodeInfo(
+    private fun mapNodeToMegaPickerNodeInfo(
         node: TypedNode,
+        nodePath: String?,
         excludeFolders: List<NodeId>?,
-        syncBackupInfoList: List<BackupInfo>,
+        backupPaths: Map<NodeId, String>,
         syncBackupInfoListOtherDevice: List<BackupInfo>,
         deviceNameMap: Map<String, String>,
+        syncedFolderIds: List<NodeId>,
     ): MegaPickerNodeInfo {
         val isExcluded = excludeFolders?.contains(node.id) == true
 
-        val matchingBackupInfoAny = syncBackupInfoList.firstOrNull { backupInfo ->
-            runCatching {
-                determineNodeRelationshipUseCase(
-                    node.id,
-                    backupInfo.rootHandle
-                ) != NodeRelationship.NoMatch
-            }.getOrElse { false }
-        }
-        val matchingBackupInfoOtherDevice =
+        val matchingBackupInfoOtherDevice = if (nodePath != null) {
             syncBackupInfoListOtherDevice.firstOrNull { backupInfo ->
-                runCatching {
-                    determineNodeRelationshipUseCase(
-                        node.id,
-                        backupInfo.rootHandle
-                    ) != NodeRelationship.NoMatch
-                }.getOrElse { false }
+                val backupPath = backupPaths[backupInfo.rootHandle]
+                backupPath != null && isNodeInBackupPath(nodePath, backupPath)
             }
+        } else null
 
-        val isUsedBySyncOrBackup = matchingBackupInfoAny != null
+        val isUsedBySyncOrBackup =
+            matchingBackupInfoOtherDevice != null || node.id in syncedFolderIds
         val isDisabled = isExcluded || isUsedBySyncOrBackup
 
         return MegaPickerNodeInfo(
             node = node,
             isDisabled = isDisabled,
-            subtitle = matchingBackupInfoOtherDevice?.deviceId?.let { deviceNameMap[it] },
+            isUsedBySyncOrBackup = isUsedBySyncOrBackup,
             backupId = matchingBackupInfoOtherDevice?.id,
             deviceName = matchingBackupInfoOtherDevice?.deviceId?.let { deviceNameMap[it] },
         )
+    }
+
+    /**
+     * Checks if the node is in the backup hierarchy using path comparison.
+     * Returns true if nodePath IS the backup or is INSIDE the backup (not a parent of it).
+     */
+    private fun isNodeInBackupPath(nodePath: String, backupPath: String): Boolean {
+        val normalizedNodePath = nodePath.trimEnd('/')
+        val normalizedBackupPath = backupPath.trimEnd('/')
+
+        return when {
+            // Exact match: node IS the backup folder
+            normalizedNodePath == normalizedBackupPath -> true
+            // Node is INSIDE the backup folder (backup is an ancestor of node)
+            UriPath(normalizedNodePath).isSubPathOf(UriPath(normalizedBackupPath)) -> true
+            // Otherwise: node is a parent of backup or unrelated
+            else -> false
+        }
     }
 }

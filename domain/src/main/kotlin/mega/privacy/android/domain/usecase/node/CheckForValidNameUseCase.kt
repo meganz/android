@@ -14,7 +14,6 @@ import javax.inject.Inject
  * While renaming or creating a node, this use case will check for all errors for input text
  */
 class CheckForValidNameUseCase @Inject constructor(
-    private val nodeExistsInParentUseCase: NodeExistsInParentUseCase,
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     private val regexRepository: RegexRepository,
 ) {
@@ -35,8 +34,6 @@ class CheckForValidNameUseCase @Inject constructor(
 
             node is FolderNode && nodeExistsInCurrentLocationUseCase(node.id, newName)
                 -> InvalidNameType.NAME_ALREADY_EXISTS
-
-            nodeExistsInParentUseCase(node, newName) -> InvalidNameType.NAME_ALREADY_EXISTS
 
             node is FileNode -> {
                 val extension = newName.substringAfterLast('.', "")

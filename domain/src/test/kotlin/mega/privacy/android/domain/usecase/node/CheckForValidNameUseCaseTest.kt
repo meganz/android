@@ -32,8 +32,6 @@ import java.util.stream.Stream
 class CheckForValidNameUseCaseTest {
 
     private lateinit var underTest: CheckForValidNameUseCase
-
-    private val nodeExistsInParentUseCase: NodeExistsInParentUseCase = mock()
     private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase = mock()
     private val regexRepository: RegexRepository = mock()
 
@@ -50,7 +48,6 @@ class CheckForValidNameUseCaseTest {
     @BeforeAll
     fun setup() {
         underTest = CheckForValidNameUseCase(
-            nodeExistsInParentUseCase,
             nodeExistsInCurrentLocationUseCase,
             regexRepository
         )
@@ -59,7 +56,6 @@ class CheckForValidNameUseCaseTest {
     @BeforeEach
     fun resetMocks() {
         reset(
-            nodeExistsInParentUseCase,
             nodeExistsInCurrentLocationUseCase,
             regexRepository,
         )
@@ -75,27 +71,9 @@ class CheckForValidNameUseCaseTest {
         expected: InvalidNameType,
     ) = runTest {
         whenever(nodeExistsInCurrentLocationUseCase(node.id, providedName)).thenReturn(false)
-        whenever(nodeExistsInParentUseCase(node, providedName)).thenReturn(false)
 
         assertThat(expected).isEqualTo(underTest(providedName, node))
     }
-
-    @Test
-    fun `test that if same name found in node list for file returns NAME_ALREADY_EXISTS error type`() =
-        runTest {
-            val providedName = "SameName.txt"
-
-            whenever(nodeExistsInParentUseCase(fileNode, providedName)).thenReturn(true)
-
-            assertThat(
-                underTest(
-                    providedName,
-                    fileNode
-                )
-            ).isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
-
-            verifyNoInteractions(nodeExistsInCurrentLocationUseCase)
-        }
 
     @Test
     fun `test that if same name found in node list for folder returns NAME_ALREADY_EXISTS error type`() =
@@ -106,8 +84,6 @@ class CheckForValidNameUseCaseTest {
 
             assertThat(underTest(providedName, folderNode))
                 .isEqualTo(InvalidNameType.NAME_ALREADY_EXISTS)
-
-            verifyNoInteractions(nodeExistsInParentUseCase)
         }
 
     @Test
@@ -119,7 +95,12 @@ class CheckForValidNameUseCaseTest {
             }
             val providedName = "File"
 
-            whenever(nodeExistsInParentUseCase(fileNode, providedName)).thenReturn(false)
+            whenever(
+                nodeExistsInCurrentLocationUseCase(
+                    fileNode.id,
+                    providedName
+                )
+            ).thenReturn(false)
 
             assertThat(
                 underTest(
