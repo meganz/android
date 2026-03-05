@@ -24,7 +24,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
-import mega.privacy.android.navigation.destination.CloudDriveExplorerNavKey
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsActivityNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.shared.resources.R
@@ -37,11 +37,11 @@ class SaveScannedDocumentsDestination : FeatureDestination {
                     navigationHandler.navigate(ChatExplorerNavKey)
                 },
                 onUploadToCloudDrive = { currentNavKey, uri, scanFileType, cloudDriveParentHandle, canSelectScanFileType ->
-                    navigationHandler.clearResult(CloudDriveExplorerNavKey.SELECTED_ID)
-                    navigationHandler.navigate(CloudDriveExplorerNavKey)
+                    navigationHandler.clearResult(NodesExplorerNavKey.SELECTED_ID)
+                    navigationHandler.navigate(NodesExplorerNavKey)
                 },
                 cloudDriveDestinationSelectedFlow =
-                    navigationHandler.monitorResult(CloudDriveExplorerNavKey.SELECTED_ID),
+                    navigationHandler.monitorResult(NodesExplorerNavKey.SELECTED_ID),
                 cloudDriveDestinationSelected = { uriPath, destination ->
                     transferHandler.setTransferEvent(
                         TransferTriggerEvent.StartUpload.Files(
@@ -50,7 +50,7 @@ class SaveScannedDocumentsDestination : FeatureDestination {
                             pitagTrigger = PitagTrigger.Scanner
                         )
                     )
-                    navigationHandler.clearResult(CloudDriveExplorerNavKey.SELECTED_ID)
+                    navigationHandler.clearResult(NodesExplorerNavKey.SELECTED_ID)
                     navigationHandler.back()
                 }
             )

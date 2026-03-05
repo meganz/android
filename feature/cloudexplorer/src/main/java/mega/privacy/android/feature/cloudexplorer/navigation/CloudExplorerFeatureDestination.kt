@@ -6,32 +6,32 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.clouddriveexplorer.CloudDriveExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.clouddriveexplorer.CloudDriveExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
-import mega.privacy.android.navigation.destination.CloudDriveExplorerNavKey
+import mega.privacy.android.navigation.destination.NodesExplorerNavKey
 
 class CloudExplorerFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
-            cloudDriveExplorerDestination {
+            nodeExplorerDestination {
                 navigationHandler.returnResult(
-                    key = CloudDriveExplorerNavKey.SELECTED_ID,
+                    key = NodesExplorerNavKey.SELECTED_ID,
                     value = it
                 )
             }
             chatExplorerDestination()
         }
 
-    fun EntryProviderScope<NavKey>.cloudDriveExplorerDestination(
+    fun EntryProviderScope<NavKey>.nodeExplorerDestination(
         onFolderSelected: (NodeId) -> Unit,
     ) {
-        entry<CloudDriveExplorerNavKey> { key ->
-            val viewModel = hiltViewModel<CloudDriveExplorerViewModel>()
-            CloudDriveExplorerScreen(
+        entry<NodesExplorerNavKey> { key ->
+            val viewModel = hiltViewModel<NodesExplorerViewModel>()
+            NodesExplorerScreen(
                 viewModel = viewModel,
                 onFolderDestinationSelected = { onFolderSelected(it.id) }
             )

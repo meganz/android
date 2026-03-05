@@ -12,6 +12,6 @@ data class ShareToMegaNavKey(val shareUris: List<UriPath>?) : NoSessionNavKey.Ma
 data object ChatExplorerNavKey : NavKey
 
 @Serializable
-data object CloudDriveExplorerNavKey : NavKey {
+data object NodesExplorerNavKey : NavKey {
     const val SELECTED_ID = "selected_id"
 }
