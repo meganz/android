@@ -662,6 +662,15 @@ internal class MediaPlayerViewModelTest {
             }
         }
 
+    @Test
+    fun `test that itemToRemove is updated correctly when updateItemToRemove is invoked`() =
+        runTest {
+            val handle = 123456L
+            underTest.updateItemToRemove(handle)
+
+            underTest.itemToRemove.test().assertValue(handle)
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

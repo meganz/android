@@ -235,7 +235,8 @@ class MediaPlayerViewModel @Inject constructor(
                 }
                 result.moveRequestResult?.let {
                     if (it.isSuccess) {
-                        _itemToRemove.value = nodeHandle
+                        _itemToRemove.value =
+                            result.firstNodeCollisionOrNull?.nodeHandle ?: nodeHandle
                         snackbarMessage.value = sharedResR.string.node_moved_success_message
                     } else {
                         snackbarMessage.value = R.string.context_no_moved
@@ -366,6 +367,10 @@ class MediaPlayerViewModel @Inject constructor(
         _state.update {
             it.copy(showMoveToTrashDialog = false)
         }
+    }
+
+    internal fun updateItemToRemove(handle: Long) {
+        _itemToRemove.value = handle
     }
 
     internal suspend fun getContentUri(file: File) =
