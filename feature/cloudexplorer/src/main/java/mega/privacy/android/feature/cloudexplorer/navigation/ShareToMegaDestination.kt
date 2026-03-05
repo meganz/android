@@ -10,7 +10,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
-import mega.privacy.android.navigation.destination.CloudExplorerNavKey
+import mega.privacy.android.navigation.destination.CloudDriveExplorerNavKey
 import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 
 class ShareToMegaDestination : FeatureDestination {
@@ -34,7 +34,7 @@ class ShareToMegaDestination : FeatureDestination {
                 }
 
             ShareToMegaScreen(
-                onNavigateToCloudExplorer = { navigate(CloudExplorerNavKey) },
+                onNavigateToCloudExplorer = { navigate(CloudDriveExplorerNavKey) },
                 onNavigateToChatExplorer = { navigate(ChatExplorerNavKey) },
             )
         }

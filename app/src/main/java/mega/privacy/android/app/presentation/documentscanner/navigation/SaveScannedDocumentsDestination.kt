@@ -15,7 +15,6 @@ import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocument
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsScreen
 import mega.privacy.android.app.presentation.documentscanner.SaveScannedDocumentsViewModel
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
-import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -25,8 +24,7 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
-import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.CloudExplorerNavKey
+import mega.privacy.android.navigation.destination.CloudDriveExplorerNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsActivityNavKey
 import mega.privacy.android.navigation.destination.SaveScannedDocumentsNavKey
 import mega.privacy.android.shared.resources.R
@@ -39,11 +37,11 @@ class SaveScannedDocumentsDestination : FeatureDestination {
                     navigationHandler.navigate(ChatExplorerNavKey)
                 },
                 onUploadToCloudDrive = { currentNavKey, uri, scanFileType, cloudDriveParentHandle, canSelectScanFileType ->
-                    navigationHandler.clearResult(CloudExplorerNavKey.SELECTED_ID)
-                    navigationHandler.navigate(CloudExplorerNavKey)
+                    navigationHandler.clearResult(CloudDriveExplorerNavKey.SELECTED_ID)
+                    navigationHandler.navigate(CloudDriveExplorerNavKey)
                 },
                 cloudDriveDestinationSelectedFlow =
-                    navigationHandler.monitorResult(CloudExplorerNavKey.SELECTED_ID),
+                    navigationHandler.monitorResult(CloudDriveExplorerNavKey.SELECTED_ID),
                 cloudDriveDestinationSelected = { uriPath, destination ->
                     transferHandler.setTransferEvent(
                         TransferTriggerEvent.StartUpload.Files(
@@ -52,7 +50,7 @@ class SaveScannedDocumentsDestination : FeatureDestination {
                             pitagTrigger = PitagTrigger.Scanner
                         )
                     )
-                    navigationHandler.clearResult(CloudExplorerNavKey.SELECTED_ID)
+                    navigationHandler.clearResult(CloudDriveExplorerNavKey.SELECTED_ID)
                     navigationHandler.back()
                 }
             )
