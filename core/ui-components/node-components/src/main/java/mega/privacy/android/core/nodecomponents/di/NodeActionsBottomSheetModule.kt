@@ -29,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.OpenWithBottomShee
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveAvailableOfflineBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveFavouriteBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveLinkBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveRecentlyWatchedVideoBottomSheetItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveShareBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RenameBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RestoreBottomSheetMenuItem
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
+import mega.privacy.android.domain.qualifier.features.VideoPlaylist
 import mega.privacy.android.domain.qualifier.features.Videos
 import javax.inject.Singleton
 
@@ -542,6 +544,77 @@ abstract class NodeActionsBottomSheetModule {
                 versionsMenuAction,
                 viewInFolderMenuAction,
                 addToPlaylistBottomSheetMenuItem
+            )
+        }
+
+        /**
+         * Provide video playlists toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoPlaylist
+        @Singleton
+        fun provideVideoPlaylistsBottomSheetOptions(
+            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
+            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
+            copyMenuAction: CopyBottomSheetMenuItem,
+            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
+            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+            favouriteMenuAction: FavouriteBottomSheetMenuItem,
+            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
+            getLinkMenuAction: GetLinkBottomSheetMenuItem,
+            infoMenuAction: InfoBottomSheetMenuItem,
+            labelMenuAction: LabelBottomSheetMenuItem,
+            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
+            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
+            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
+            moveMenuAction: MoveBottomSheetMenuItem,
+            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
+            openWithMenuAction: OpenWithBottomSheetMenuItem,
+            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
+            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
+            renameMenuAction: RenameBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+            restoreMenuAction: RestoreBottomSheetMenuItem,
+            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
+            shareMenuAction: ShareBottomSheetMenuItem,
+            trashMenuAction: TrashBottomSheetMenuItem,
+            verifyMenuAction: VerifyBottomSheetMenuItem,
+            versionsMenuAction: VersionsBottomSheetMenuItem,
+            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                availableOfflineMenuAction,
+                removeOfflineMenuAction,
+                copyMenuAction,
+                deletePermanentlyMenuAction,
+                disputeTakeDownMenuAction,
+                downloadMenuAction,
+                favouriteMenuAction,
+                removeFavouriteMenuAction,
+                getLinkMenuAction,
+                infoMenuAction,
+                labelMenuAction,
+                leaveShareMenuAction,
+                manageLinkMenuAction,
+                manageShareFolderBottomSheetMenuItem,
+                moveMenuAction,
+                openLocationMenuAction,
+                openWithMenuAction,
+                removeLinkMenuAction,
+                removeShareMenuAction,
+                renameMenuAction,
+                hideMenuAction,
+                unhideMenuAction,
+                restoreMenuAction,
+                sendToChatMenuAction,
+                shareMenuAction,
+                trashMenuAction,
+                verifyMenuAction,
+                versionsMenuAction,
+                viewInFolderMenuAction,
             )
         }
     }

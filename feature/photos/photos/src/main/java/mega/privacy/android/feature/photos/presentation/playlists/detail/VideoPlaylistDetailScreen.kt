@@ -48,7 +48,9 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.EditVideoPlaylistDialog
 import mega.privacy.android.feature.photos.components.VideoItemView
@@ -68,11 +70,10 @@ import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
 @Composable
-fun VideoPlaylistDetailRoute(
+internal fun VideoPlaylistDetailRoute(
     numberOfAddedVideos: Int?,
     clearResult: (key: String) -> Unit,
-    navigateToVideoPlayer: (navKey: NavKey) -> Unit,
-    navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit,
+    navigate: (navKey: NavKey) -> Unit,
     onBack: () -> Unit,
     viewModel: VideoPlaylistDetailViewModel = hiltViewModel(),
 ) {
@@ -83,7 +84,7 @@ fun VideoPlaylistDetailRoute(
     NavigationEventEffect(
         event = navigateEvent,
         onConsumed = viewModel::resetNavigateToVideoPlayer,
-        action = navigateToVideoPlayer
+        action = navigate
     )
 
     VideoPlaylistDetailScreen(
@@ -104,14 +105,15 @@ fun VideoPlaylistDetailRoute(
         resetRemoveVideosEvent = viewModel::resetNumberOfRemovedVideosEvent,
         removeVideosFromPlaylist = viewModel::removeVideosFromPlaylist,
         clearResultFlow = clearResult,
-        navigateToSelectVideos = navigateToSelectVideos,
-        onBack = onBack
+        navigateToSelectVideos = navigate,
+        onBack = onBack,
+        onMenuClick = navigate
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VideoPlaylistDetailScreen(
+internal fun VideoPlaylistDetailScreen(
     uiState: VideoPlaylistDetailUiState,
     videoPlaylistEditState: VideoPlaylistEditState,
     numberOfAddedVideos: Int?,
@@ -132,6 +134,7 @@ fun VideoPlaylistDetailScreen(
     navigateToSelectVideos: (navKey: SelectVideosForPlaylistNavKey) -> Unit = {},
     clearResultFlow: (key: String) -> Unit = {},
     resetRemoveVideosEvent: () -> Unit = {},
+    onMenuClick: (NavKey) -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
@@ -362,7 +365,14 @@ fun VideoPlaylistDetailScreen(
                                 thumbnailData = ThumbnailRequest(videoItem.id),
                                 nodeAvailableOffline = videoItem.nodeAvailableOffline,
                                 onClick = { onClick(videoItem) },
-                                onMenuClick = {},
+                                onMenuClick = {
+                                    onMenuClick(
+                                        NodeOptionsBottomSheetNavKey(
+                                            nodeHandle = videoItem.id.longValue,
+                                            nodeSourceType = NodeSourceType.VIDEO_PLAYLISTS
+                                        )
+                                    )
+                                },
                                 onLongClick = {
                                     if (!playlistDetail.uiEntity.isSystemVideoPlayer) {
                                         onLongClick(videoItem)
@@ -465,7 +475,7 @@ fun VideoPlaylistDetailScreen(
 }
 
 @Composable
-fun VideoPlaylistDetailEmptyView(
+internal fun VideoPlaylistDetailEmptyView(
     title: String?,
     totalDuration: String?,
     numberOfVideos: Int?,
@@ -491,49 +501,53 @@ fun VideoPlaylistDetailEmptyView(
 /**
  * Test tag for the video playlist detail loading view
  */
-const val VIDEO_PLAYLIST_DETAIL_LOADING_VIEW_TEST_TAG = "video_playlist_detail:view_loading"
+internal const val VIDEO_PLAYLIST_DETAIL_LOADING_VIEW_TEST_TAG =
+    "video_playlist_detail:view_loading"
 
 /**
  * Test tag for the video playlist detail videos empty view
  */
-const val VIDEO_PLAYLIST_DETAIL_VIDEOS_EMPTY_VIEW_TEST_TAG =
+internal const val VIDEO_PLAYLIST_DETAIL_VIDEOS_EMPTY_VIEW_TEST_TAG =
     "video_playlist_detail:view_videos_empty"
 
 /**
  * Test tag for the video playlist detail view
  */
-const val VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG =
+internal const val VIDEO_PLAYLISTS_DETAIL_PLAYLIST_DETAIL_VIEW_TEST_TAG =
     "video_playlists_detail:view_playlist_detail"
 
 /**
  * Test tag for the video playlist detail app bar
  */
-const val VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG = "video_playlists_detail:view_app_bar"
+internal const val VIDEO_PLAYLISTS_DETAIL_APP_BAR_VIEW_TEST_TAG =
+    "video_playlists_detail:view_app_bar"
 
 /**
  * Test tag for RenameVideoPlaylistDialog
  */
-const val VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+internal const val VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlist_detail:dialog_rename_video_playlist"
 
 /**
  * Test tag for VideoPlaylistBottomSheet
  */
-const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG = "video_playlist_detail:bottom_sheet"
+internal const val VIDEO_PLAYLIST_DETAIL_BOTTOM_SHEET_TEST_TAG =
+    "video_playlist_detail:bottom_sheet"
 
 /**
  * Test tag for delete video playlist dialog
  */
-const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
+internal const val VIDEO_PLAYLIST_DETAIL_DELETE_VIDEO_PLAYLIST_DIALOG_TEST_TAG =
     "video_playlist_detail:dialog_delete_video_playlist"
 
 /**
  * Test tag for removing videos dialog
  */
-const val VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG =
+internal const val VIDEO_PLAYLIST_DETAIL_REMOVE_VIDEOS_DIALOG_TEST_TAG =
     "video_playlist_detail:dialog_remove_videos"
 
 /**
  * Test tag for adding video to playlist FAB
  */
-const val VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG = "video_playlist_detail:add_video_fab"
+internal const val VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG =
+    "video_playlist_detail:add_video_fab"

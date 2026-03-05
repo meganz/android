@@ -10,6 +10,9 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import javax.inject.Inject
 
+/**
+ * Bottom sheet menu item that removes a video from the recently watched list.
+ */
 class RemoveRecentlyWatchedVideoBottomSheetItem @Inject constructor(
     override val menuAction: RemoveRecentlyWatchedVideoMenuAction,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {

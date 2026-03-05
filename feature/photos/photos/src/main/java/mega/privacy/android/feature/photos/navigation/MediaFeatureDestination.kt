@@ -18,7 +18,11 @@ class MediaFeatureDestination : FeatureDestination {
                 resultFlow = navigationHandler::monitorResult
             )
 
-            videoPlaylistDetailScreen(navigationHandler, navigationHandler::monitorResult)
+            videoPlaylistDetailScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent,
+                resultFlow = navigationHandler::monitorResult
+            )
 
             mediaSearchScreen(
                 navigationHandler = navigationHandler,

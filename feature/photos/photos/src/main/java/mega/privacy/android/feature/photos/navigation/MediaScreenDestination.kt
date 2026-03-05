@@ -168,6 +168,7 @@ fun EntryProviderScope<NavKey>.albumContentScreen(
 
 fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
     navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     resultFlow: (String) -> Flow<Int?>,
 ) {
     entry<VideoPlaylistDetailNavKey> { key ->
@@ -183,11 +184,22 @@ fun EntryProviderScope<NavKey>.videoPlaylistDetailScreen(
                 )
             }
 
+        val nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
+
         VideoPlaylistDetailRoute(
             numberOfAddedVideos = numberOfAddedVideos,
             clearResult = navigationHandler::clearResult,
-            navigateToVideoPlayer = navigationHandler::navigate,
-            navigateToSelectVideos = navigationHandler::navigate,
+            navigate = navigationHandler::navigate,
             onBack = navigationHandler::back,
             viewModel = viewModel
         )

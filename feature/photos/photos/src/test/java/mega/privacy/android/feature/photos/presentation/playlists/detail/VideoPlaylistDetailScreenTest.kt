@@ -9,6 +9,7 @@ import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
@@ -51,6 +52,7 @@ class VideoPlaylistDetailScreenTest {
         resetRemoveVideosEvent: () -> Unit = {},
         snackBarQueue: SnackbarEventQueue = mock(),
         onBack: () -> Unit = {},
+        onMenuClick: (NavKey) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
         composeTestRule.setContent {
@@ -74,7 +76,8 @@ class VideoPlaylistDetailScreenTest {
                 snackBarQueue = snackBarQueue,
                 numberOfAddedVideos = numberOfAddedVideos,
                 removeVideosFromPlaylist = removeVideosFromPlaylist,
-                resetRemoveVideosEvent = resetRemoveVideosEvent
+                resetRemoveVideosEvent = resetRemoveVideosEvent,
+                onMenuClick = onMenuClick,
             )
         }
     }
