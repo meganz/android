@@ -13,12 +13,7 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
 ) {
     entry<FolderLinkNavKey> { key ->
         val viewModel = hiltViewModel<FolderLinkViewModel, FolderLinkViewModel.Factory> { factory ->
-            factory.create(
-                FolderLinkViewModel.Args(
-                    uriString = key.uriString,
-                    nodeHandle = key.nodeHandle,
-                )
-            )
+            factory.create(FolderLinkViewModel.Args(uriString = key.uriString))
         }
         FolderLinkScreen(
             viewModel = viewModel,

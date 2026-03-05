@@ -81,11 +81,9 @@ data class OverQuotaDialogNavKey(
 
 /**
  * NavKey for folder link screen
- * @param uriString the uri string of the folder, present on deep-link entry
- * @param nodeHandle the handle of the node, present for sub-folder navigation
+ * @param uriString the uri string of the folder link
  */
 @Serializable
 data class FolderLinkNavKey(
     val uriString: String? = null,
-    val nodeHandle: Long? = null,
 ) : NoSessionNavKey.Optional
