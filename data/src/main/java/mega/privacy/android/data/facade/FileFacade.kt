@@ -183,6 +183,13 @@ internal class FileFacade @Inject constructor(
         }
     }
 
+    override suspend fun readTextFromPath(path: String): String =
+        File(path).readText()
+
+    override suspend fun writeTextToPath(path: String, text: String) {
+        File(path).writeText(text)
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun getExternalFile(
         selectionArgs: Array<String>,

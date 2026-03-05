@@ -115,6 +115,22 @@ interface FileGateway {
     suspend fun getFileByPath(path: String): File?
 
     /**
+     * Read text content from the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @return file content as string
+     */
+    suspend fun readTextFromPath(path: String): String
+
+    /**
+     * Write text content to the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param text content to write
+     */
+    suspend fun writeTextToPath(path: String, text: String)
+
+    /**
      * Get offline files root path
      *
      * @return the root path of offline files

@@ -132,6 +132,14 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         File(path).exists()
     }
 
+    override suspend fun readTextFromPath(path: String): String = withContext(ioDispatcher) {
+        fileGateway.readTextFromPath(path)
+    }
+
+    override suspend fun writeTextToPath(path: String, text: String) = withContext(ioDispatcher) {
+        fileGateway.writeTextToPath(path, text)
+    }
+
     override suspend fun getParent(path: String): String = withContext(ioDispatcher) {
         File(path).parent ?: path
     }

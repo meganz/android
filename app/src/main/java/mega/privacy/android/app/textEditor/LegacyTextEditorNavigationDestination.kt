@@ -2,10 +2,13 @@ package mega.privacy.android.app.textEditor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -14,6 +17,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 
@@ -36,6 +40,7 @@ internal fun shouldCloseTextEditorOnNodeOptionsResult(
 fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
     navigationHandler: NavigationHandler,
     viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    transferHandler: TransferHandler,
 ) {
     entry<LegacyTextEditorNavKey>(
         metadata = transparentMetadata()
@@ -44,6 +49,7 @@ fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
             navKey = key,
             navigationHandler = navigationHandler,
             viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
+            transferHandler = transferHandler,
         )
     }
 }
@@ -53,6 +59,7 @@ private fun TextEditorEntry(
     navKey: LegacyTextEditorNavKey,
     navigationHandler: NavigationHandler,
     viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    transferHandler: TransferHandler,
 ) {
     val context = LocalContext.current
     val removeDestination: () -> Unit = { navigationHandler.back() }
@@ -84,6 +91,13 @@ private fun TextEditorEntry(
                     )
                 )
             }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        EventEffect(
+            event = uiState.transferEvent,
+            onConsumed = viewModel::consumeTransferEvent,
+        ) { content ->
+            transferHandler.setTransferEvent(content)
+        }
         TextEditorScreen(
             viewModel = viewModel,
             onBack = removeDestination,

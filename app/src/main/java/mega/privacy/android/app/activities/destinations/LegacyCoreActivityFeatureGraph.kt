@@ -51,7 +51,7 @@ class LegacyCoreActivityFeatureGraph(
     private val viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
-        { navigationHandler, _ ->
+        { navigationHandler, transferHandler ->
             overDiskQuotaPaywallWarning(navigationHandler::back)
             upgradeAccount(navigationHandler::remove)
             myAccount(navigationHandler::back)
@@ -73,7 +73,7 @@ class LegacyCoreActivityFeatureGraph(
             chatListLegacyDestination(navigationHandler::back)
             legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
             legacyImageViewerScreen(navigationHandler::back)
-            legacyTextEditorScreen(navigationHandler, viewTypeToNodeSourceTypeMapper)
+            legacyTextEditorScreen(navigationHandler, viewTypeToNodeSourceTypeMapper, transferHandler)
             legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)

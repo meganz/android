@@ -136,6 +136,23 @@ interface FileSystemRepository {
     suspend fun doesFileExist(path: String): Boolean
 
     /**
+     * Read file content as UTF-8 text.
+     *
+     * @param path Absolute path to the file.
+     * @return File content as string.
+     * @throws java.io.FileNotFoundException if the file does not exist or is not readable.
+     */
+    suspend fun readTextFromPath(path: String): String
+
+    /**
+     * Write text to a file at the given path (UTF-8). Overwrites if the file exists.
+     *
+     * @param path Absolute path to the file.
+     * @param text Content to write.
+     */
+    suspend fun writeTextToPath(path: String, text: String)
+
+    /**
      * Returns the parent path of the file represented by path
      */
     suspend fun getParent(path: String): String
