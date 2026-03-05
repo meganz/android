@@ -119,6 +119,9 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         NameCollisionActivityContract()
     ) { result ->
         result?.let {
+            playerServiceGateway?.getCurrentPlayingHandle()?.let {
+                viewModel.updateItemToRemove(it)
+            }
             showSnackbar(SNACKBAR_TYPE, it, INVALID_HANDLE)
         }
     }
