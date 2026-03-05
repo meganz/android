@@ -111,6 +111,9 @@ Build:            Convention plugins (build-logic/convention/), Version Catalogs
 - [ ] Interfaces are appropriately abstracted (not over- or under-engineered)
 - [ ] Hilt annotations used correctly (`@HiltViewModel`, `@AndroidEntryPoint`, `@Module @InstallIn`)
 - [ ] Gateway/Facade interfaces used to abstract SDK access (not calling SDK directly from Repository)
+- [ ] New repository implementations live in the data layer/package in a `data` module, not in the `app` module
+- [ ] Repositories never inject use cases — this inverts Clean Architecture's dependency flow
+- [ ] Repositories stay focused on data access; business/orchestration logic belongs in use cases
 
 #### Modular Dependency checklist
 - [ ] **`:feature:`** modules can depend on `:shared`, `:core`, and their own `:*-snowflakes`.
@@ -165,6 +168,44 @@ class AppModule {
     @Singleton
     @Provides
     fun provideDatabase(): AppDatabase = ...
+}
+
+// ❌ Repository in app module — belongs in data layer
+// app/src/main/kotlin/.../DefaultUserRepository.kt
+
+// ✅ Repository in data module
+// data/account/src/main/kotlin/.../DefaultAccountRepository.kt
+
+// ❌ Use case injected into repository — inverts dependency flow
+class DefaultUserRepository @Inject constructor(
+    private val loginUseCase: LoginUseCase  // ❌
+)
+
+// ✅ Repository depends only on data sources, gateways, mappers
+class DefaultUserRepository @Inject constructor(
+    private val userApiGateway: UserApiGateway,
+    private val userMapper: UserMapper
+)
+
+// ❌ Business logic in repository — orchestration belongs in use case
+class DefaultUserRepository {
+    suspend fun getActiveUser(): User {
+        val user = api.fetchUser()
+        if (user.isExpired) refreshToken()  // ❌ business logic
+        return user
+    }
+}
+
+// ✅ Repository: data access only. Use case: orchestration
+class DefaultUserRepository {
+    suspend fun getUser(): User = api.fetchUser()
+}
+class GetActiveUserUseCase {
+    suspend operator fun invoke(): User {
+        val user = repository.getUser()
+        if (user.isExpired) refreshTokenUseCase()
+        return user
+    }
 }
 ```
 
@@ -370,6 +411,8 @@ suspend operator fun invoke(backup: Backup): BackupEntity? {
 
 **Checklist:**
 - [ ] ViewModel, UseCase and Repository implementation business logics have corresponding unit tests
+- [ ] **Test method naming:** Follow the patterns below (see Test Method Naming)
+- [ ] New logic has corresponding tests — no missing tests for new behavior
 - [ ] Compose View has UI tests
 - [ ] ViewModels can be tested without Android framework dependencies
 - [ ] Test coverage meets team requirements (recommended ≥ 80% for core logic)
@@ -377,11 +420,26 @@ suspend operator fun invoke(backup: Backup): BackupEntity? {
 - [ ] `initViewModel()` helper function used to construct ViewModels under test, with default parameters for brevity
 - [ ] Flow emissions tested using Turbine (`underTest.state.test { ... }`)
 
+#### Test Method Naming
+- **Format**: Use one of the following patterns for test method names:
+  - `` `test that <method> <action>` `` — e.g. `` `test that init does not call loginToFolderUseCase` ``()
+  - `` `test that <method> <action> when <cause>` `` — e.g. `` `test that init emits Loaded when login succeeds` ``()
+
 **Common Issues:**
 ```kotlin
+// ❌ Test name does not follow "test that" patterns — inconsistent with project convention
+@Test
+fun `loading state is shown`() { ... }
+
+// ✅ Use "test that <method> <action>" or "test that <method> <action> when <cause>"
+@Test
+fun `test that init emits Loaded when login succeeds`() { ... }
+@Test
+fun `test that init does not call loginToFolderUseCase`() { ... }
+
 // ❌ ViewModel constructed inline in every test — brittle and repetitive
 @Test
-fun `test loading state`() {
+fun `test that loading state`() {
     val vm = MyViewModel(mockUseCase, mockOtherUseCase, pageSize = 4)
     ...
 }
@@ -409,9 +467,13 @@ fun `test loading state`() = runTest {
 ### 8. Code Style & Formatting
 
 **Checklist:**
+- [ ] Use explicit imports at the top of the file — never inline fully qualified class names in code
 - [ ] Package structure follows conventions (e.g., `mega.privacy.android.feature.{feature}.{layer}`)
 - [ ] Resources follow naming conventions (`ic_` icons, `bg_` backgrounds, `item_` list layouts)
 - [ ] No hardcoded strings (should be in `shared_strings.xml`)
+- [ ] Naming and comments are clear; intent is obvious (no unclear naming or comments)
+- [ ] No leftover debug code or TODOs in production code
+- [ ] **Extra or unused code after implementation switch** — When the change refactors or replaces an approach, check for leftover files, types, or dependencies that are no longer used and suggest removing or slimming them
 - [ ] Naming conventions followed:
   - ViewModels: `{Feature}ViewModel` (e.g., `GlobalStateViewModel`)
   - Use Cases: `{Action}UseCase` (e.g., `LoginUseCase`)
@@ -422,6 +484,17 @@ fun `test loading state`() = runTest {
 - [ ] KDoc present on public API classes, functions, and interfaces
 - [ ] Build files use module name as filename (e.g., `feature/home/home.gradle.kts`)
 - [ ] Convention plugins used for build configuration (`mega.android.library`, `mega.android.hilt`, etc.)
+
+**Common Issues:**
+```kotlin
+// ❌ Inline fully qualified name
+val handler = android.os.Handler(android.os.Looper.getMainLooper())
+
+// ✅ Explicit import at top
+import android.os.Handler
+import android.os.Looper
+val handler = Handler(Looper.getMainLooper())
+```
 
 ---
 

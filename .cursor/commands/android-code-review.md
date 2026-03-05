@@ -73,6 +73,9 @@ If `--output <path>` was specified, save the full report markdown to that path.
 - [ ] Interfaces appropriately abstracted
 - [ ] Hilt annotations correct (`@HiltViewModel`, `@AndroidEntryPoint`, `@Module @InstallIn`)
 - [ ] Gateway/Facade used to abstract SDK (not calling SDK directly from Repository)
+- [ ] New repository implementations in data layer/package in `data` module, not `app`
+- [ ] Repositories never inject use cases (inverts Clean Architecture)
+- [ ] Repositories focused on data access; business logic in use cases
 
 #### Modular Dependency Rules
 - [ ] **`:feature:`** modules can depend on `:shared`, `:core`, and their own `:*-snowflakes`.
@@ -80,7 +83,7 @@ If `--output <path>` was specified, save the full report markdown to that path.
 - [ ] **`:core:`** modules can only depend on other `:core` modules.
 - [ ] **`Snowflake`** modules (ending in `-snowflakes` or `-snowflake-components`) can only depend on `:core`.
 
-**Common issues**: ViewModel holding Context (memory leak), Repository in Fragment, SDK in Repository, Hilt module missing `@Singleton`, incorrect module dependencies.
+**Common issues**: ViewModel holding Context (memory leak), Repository in Fragment, SDK in Repository, Hilt module missing `@Singleton`, incorrect module dependencies, repository in app module, use case injected into repository, business logic in repository.
 
 ### 2. Kotlin Code Quality
 
@@ -130,6 +133,8 @@ If `--output <path>` was specified, save the full report markdown to that path.
 ### 7. Testability
 
 - [ ] ViewModel, UseCase, Repository have unit tests
+- [ ] **Test method naming:** Use one of: `` `test that <method> <action>` `` (e.g. `` `test that init does not call loginToFolderUseCase` ``) or `` `test that <method> <action> when <cause>` `` (e.g. `` `test that init emits Loaded when login succeeds` ``)
+- [ ] New logic has corresponding tests — no missing tests for new behavior
 - [ ] Compose screens have UI tests
 - [ ] `@ExtendWith(CoroutineMainDispatcherExtension::class)`, `@TestInstance(PER_CLASS)`
 - [ ] `initViewModel()` helper with defaults
@@ -137,8 +142,12 @@ If `--output <path>` was specified, save the full report markdown to that path.
 
 ### 8. Code Style & Formatting
 
+- [ ] Explicit imports at top of file — no inline fully qualified class names
 - [ ] Package: `mega.privacy.android.feature.{feature}.{layer}`
 - [ ] Naming: `{Feature}ViewModel`, `{Action}UseCase`, `Default{Feature}Repository`, `{Source}Mapper`
+- [ ] Naming and comments are clear; no unclear naming or comments
+- [ ] No leftover debug code or TODOs in production code
+- [ ] **Extra or unused code after implementation switch** — When the change refactors or replaces an approach, check for leftover files, types, or dependencies that are no longer used and suggest removing or slimming them
 - [ ] 4 spaces indentation (no tabs)
 - [ ] KDoc on public APIs
 - [ ] Strings in `shared_strings.xml`
