@@ -88,6 +88,7 @@ import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
 
@@ -484,6 +485,9 @@ fun MediaMainScreen(
                     MediaAppBarAction.SortBy.toTrackingEvent()
                         ?.let { Analytics.tracker.trackEvent(it) }
                     showTimelineSortDialog = true
+                },
+                navigateToRecentlyWatched = {
+                    navigationHandler.navigate(VideoRecentlyWatchedNavKey)
                 }
             )
         },

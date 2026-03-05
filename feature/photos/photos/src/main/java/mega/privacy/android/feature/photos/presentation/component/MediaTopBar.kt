@@ -72,6 +72,7 @@ internal fun MediaTopBar(
     navigateToMediaSearch: (NavKey) -> Unit,
     onFilterActionClick: () -> Unit,
     onSortActionClick: () -> Unit,
+    navigateToRecentlyWatched: () -> Unit,
 ) {
     val shouldShowTimelineActions by remember(
         selectedTimePeriod,
@@ -196,25 +197,39 @@ internal fun MediaTopBar(
                 else -> null
             },
             trailingIcons = {
-                if (currentTabIndex == MediaScreen.Timeline.ordinal) {
-                    val isFilterApplied =
-                        timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
-                    if (isFilterApplied) {
-                        MegaIcon(
-                            modifier = Modifier
-                                .clickable(onClick = onFilterActionClick)
-                                .padding(end = 24.dp),
-                            imageVector = IconPack.Medium.Thin.Outline.Filter,
-                            tint = IconColor.Primary
+                when (currentTabIndex) {
+                    MediaScreen.Timeline.ordinal -> {
+                        val isFilterApplied =
+                            timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
+                        if (isFilterApplied) {
+                            MegaIcon(
+                                modifier = Modifier
+                                    .clickable(onClick = onFilterActionClick)
+                                    .padding(end = 24.dp),
+                                imageVector = IconPack.Medium.Thin.Outline.Filter,
+                                tint = IconColor.Primary
+                            )
+                        }
+
+                        CameraUploadStatusToolbarAction(
+                            modifier = Modifier.padding(end = 14.dp),
+                            cameraUploadsStatus = mediaCameraUploadUiState.status,
+                            onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                            onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
                         )
                     }
 
-                    CameraUploadStatusToolbarAction(
-                        modifier = Modifier.padding(end = 14.dp),
-                        cameraUploadsStatus = mediaCameraUploadUiState.status,
-                        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                        onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen
-                    )
+                    MediaScreen.Videos.ordinal,
+                    MediaScreen.Playlists.ordinal,
+                        -> {
+                        MegaIcon(
+                            modifier = Modifier
+                                .clickable(onClick = navigateToRecentlyWatched)
+                                .padding(end = 24.dp),
+                            imageVector = IconPack.Medium.Thin.Outline.ClockPlay,
+                            tint = IconColor.Primary
+                        )
+                    }
                 }
             },
             actions = buildList {

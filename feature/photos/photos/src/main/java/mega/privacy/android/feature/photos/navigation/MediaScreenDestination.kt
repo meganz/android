@@ -49,6 +49,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.videoselect.Se
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
+import mega.privacy.android.feature.photos.presentation.videos.VideoRecentlyWatchedRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
@@ -70,6 +71,7 @@ import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
+import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 fun EntryProviderScope<NavKey>.mediaMainRoute(
@@ -504,6 +506,17 @@ fun EntryProviderScope<NavKey>.albumImports(
             showOverDiskQuotaPaywallWarning = {
                 navigationHandler.navigate(OverDiskQuotaPaywallWarningNavKey)
             }
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.videoRecentlyWatchedScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<VideoRecentlyWatchedNavKey> {
+        VideoRecentlyWatchedRoute(
+            onBack = navigationHandler::back,
+            navigate = navigationHandler::navigate
         )
     }
 }

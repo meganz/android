@@ -59,3 +59,6 @@ data class SelectVideosForPlaylistNavKey(
 
 @Serializable
 data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
+
+@Serializable
+data object VideoRecentlyWatchedNavKey : NavKey

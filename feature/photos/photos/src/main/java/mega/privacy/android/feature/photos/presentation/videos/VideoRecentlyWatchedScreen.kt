@@ -11,9 +11,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -21,7 +23,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.empty.MegaEmptyView
@@ -38,10 +43,42 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoItemView
 import mega.privacy.android.feature.photos.presentation.videos.view.VideoRecentlyWatchedClearMenuAction
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+
+@Composable
+internal fun VideoRecentlyWatchedRoute(
+    onBack: () -> Unit,
+    navigate: (NavKey) -> Unit,
+    viewModel: VideoRecentlyWatchedViewModel = hiltViewModel(),
+    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
+) {
+    val resources = LocalResources.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val clearVideosRecentlyWatched by viewModel.clearRecentlyWatchedEvent.collectAsStateWithLifecycle()
+
+    EventEffect(
+        event = clearVideosRecentlyWatched,
+        onConsumed = viewModel::resetVideosRecentlyWatched,
+        action = {
+            snackBarQueue.queueMessage(
+                resources.getString(sharedR.string.video_section_message_clear_recently_watched)
+            )
+        }
+    )
+
+    VideoRecentlyWatchedScreen(
+        uiState = uiState,
+        onBack = onBack,
+        onClear = viewModel::clearVideosRecentlyWatched,
+        onMenuClick = navigate
+    )
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,6 +97,7 @@ internal fun VideoRecentlyWatchedScreen(
         topBar = {
             val isNotEmpty = (uiState as? VideoRecentlyWatchedUiState.Data)
                 ?.groupedVideoRecentlyWatchedItems?.isNotEmpty() == true
+
             MegaTopAppBar(
                 modifier = Modifier
                     .testTag(RECENTLY_WATCHED_SEARCH_TOP_APP_BAR_TAG),
