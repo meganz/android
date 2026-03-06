@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
@@ -30,6 +32,7 @@ import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.resources.R as shareR
@@ -67,64 +70,67 @@ fun ProPlanCard(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(vertical = 10.dp),
         ) {
-            MegaText(
-                text = planName,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                textColor = TextColor.Primary,
-                modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_TITLE)
-            )
-            if (isCurrentPlan) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
+            ) {
                 MegaText(
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .background(
-                            color = DSTokens.colors.notifications.notificationWarning,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                        .testTag(TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN),
-                    text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_current_plan_label),
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Warning
+                    text = planName,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    textColor = TextColor.Primary,
+                    modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_TITLE)
                 )
-            } else if (!offerName.isNullOrEmpty()) {
-                MegaText(
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .background(
-                            color = DSTokens.colors.brand.default,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                        .testTag(TEST_TAG_PRO_PLAN_CARD_OFFER),
-                    text = offerName,
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.OnColor
-                )
-            } else if (isRecommended) {
-                MegaText(
-                    modifier = Modifier
-                        .padding(start = 8.dp)
-                        .background(
-                            color = DSTokens.colors.notifications.notificationInfo,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                        .testTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED),
-                    text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_recommended_label),
-                    style = MaterialTheme.typography.bodySmall,
-                    textColor = TextColor.Info
-                )
+                if (isCurrentPlan) {
+                    MegaText(
+                        modifier = Modifier
+                            .background(
+                                color = DSTokens.colors.notifications.notificationWarning,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .testTag(TEST_TAG_PRO_PLAN_CARD_CURRENT_PLAN),
+                        text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_current_plan_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        textColor = TextColor.Warning
+                    )
+                } else if (!offerName.isNullOrEmpty()) {
+                    MegaText(
+                        modifier = Modifier
+                            .background(
+                                color = DSTokens.colors.brand.default,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .testTag(TEST_TAG_PRO_PLAN_CARD_OFFER),
+                        text = offerName,
+                        style = MaterialTheme.typography.bodySmall,
+                        textColor = TextColor.OnColor
+                    )
+                } else if (isRecommended) {
+                    MegaText(
+                        modifier = Modifier
+                            .background(
+                                color = DSTokens.colors.notifications.notificationInfo,
+                                shape = RoundedCornerShape(4.dp)
+                            )
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                            .testTag(TEST_TAG_PRO_PLAN_CARD_RECOMMENDED),
+                        text = stringResource(shareR.string.account_upgrade_account_pro_plan_info_recommended_label),
+                        style = MaterialTheme.typography.bodySmall,
+                        textColor = TextColor.Info
+                    )
+                }
             }
-            Spacer(Modifier.weight(1f))
             if (!isCurrentPlan) {
                 MegaRadioButton(
                     selected = isSelected,
                     onOptionSelected = { onSelected() },
                     modifier = Modifier
                         .size(20.dp)
+                        .align(Alignment.Top)
                         .testTag(TEST_TAG_PRO_PLAN_CARD_RADIO),
                     identifier = planName
                 )
@@ -135,9 +141,9 @@ fun ProPlanCard(
                 .padding(vertical = 16.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
+                modifier = Modifier.weight(STORAGE_COLUMN_WEIGHT),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.Start
             ) {
@@ -155,6 +161,9 @@ fun ProPlanCard(
                 )
             }
             Column(
+                modifier = Modifier
+                    .weight(PRICE_COLUMN_WEIGHT)
+                    .align(Alignment.CenterVertically),
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
@@ -163,6 +172,7 @@ fun ProPlanCard(
                 if (discountedPrice != null) {
                     MegaText(
                         text = price,
+                        textAlign = TextAlign.End,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Normal,
                             textDecoration = TextDecoration.LineThrough
@@ -177,6 +187,7 @@ fun ProPlanCard(
                             shareR.string.choose_account_screen_only_price_per_month,
                             actualPrice
                         ),
+                        textAlign = TextAlign.End,
                         style = MaterialTheme.typography.bodyMedium,
                         textColor = TextColor.Brand,
                         modifier = Modifier.testTag(TEST_TAG_PRO_PLAN_CARD_PRICE)
@@ -244,9 +255,36 @@ private fun MonthlyBillingInfo(actualPrice: String) {
     }
 }
 
-@CombinedThemePreviews
+@Preview(
+    showBackground = true,
+    name = "Large font",
+    group = "font scales",
+    fontScale = 2f
+)
+@Preview
 @Composable
 private fun ProPlanCardPreview() {
+    AndroidThemeForPreviews() {
+        ProPlanCard(
+            modifier = Modifier.padding(16.dp),
+            planName = "Pro I",
+            isRecommended = false,
+            isSelected = true,
+            storage = "2 TB storage",
+            transfer = "24 TB transfer",
+            price = "€9.99",
+            yearlyBillingInfo = "[A]€99.99[/A] [B]€49.99[/B]\nFor the first year",
+            offerName = "Black Friday deal: 50% off",
+            discountedPrice = "$34.22",
+            isCurrentPlan = false
+        )
+    }
+}
+
+
+@CombinedThemePreviews
+@Composable
+private fun ProPlanCardsPreview() {
     AndroidTheme(isSystemInDarkTheme()) {
         Column {
             // Card with discount - billingInfo uses [A] for strikethrough, [B] for bold
@@ -292,6 +330,9 @@ private fun ProPlanCardPreview() {
         }
     }
 }
+
+private const val STORAGE_COLUMN_WEIGHT = 1f
+private const val PRICE_COLUMN_WEIGHT = 202f / 126f //this comes from widths in figma design
 
 /**
  * Tag for the ProPlanCard root container
