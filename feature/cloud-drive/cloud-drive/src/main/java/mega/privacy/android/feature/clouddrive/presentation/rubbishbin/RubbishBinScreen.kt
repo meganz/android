@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -24,7 +23,6 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -38,6 +36,7 @@ import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewMode
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
@@ -58,7 +57,6 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
 import mega.privacy.android.shared.resources.R as sharedR
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * M3 Compose Screen for Rubbish Bin
@@ -122,16 +120,6 @@ internal fun RubbishBinScreen(
     }
 
     val isRootDirectory = uiState.parentFolderId == null
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
-
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(100.milliseconds)
-            shouldShowSkeleton = true
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
 
     LaunchedEffect(uiState.selectedNodes.size) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -219,13 +207,12 @@ internal fun RubbishBinScreen(
     ) { innerPadding ->
         when {
             uiState.isLoading -> {
-                if (shouldShowSkeleton) {
-                    NodesViewSkeleton(
-                        contentPadding = innerPadding,
-                        isListView = uiState.currentViewType == ViewType.LIST,
-                        spanCount = spanCount
-                    )
-                }
+                NodesViewSkeleton(
+                    contentPadding = innerPadding,
+                    isListView = uiState.currentViewType == ViewType.LIST,
+                    spanCount = spanCount,
+                    delay = NodeSkeletons.defaultDelay,
+                )
             }
 
             uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {

@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -23,14 +22,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.empty.MegaEmptyView
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
@@ -39,9 +39,6 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
-import mega.android.core.ui.components.empty.MegaEmptyView
-import mega.android.core.ui.modifiers.calculateSafeBottomPadding
-import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -78,8 +75,6 @@ internal fun FavouritesContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackBarHostState.current
-    val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -92,30 +87,18 @@ internal fun FavouritesContent(
         )
     }
 
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(200L)
-            if (this.isActive) {
-                shouldShowSkeleton = true
-            }
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
-
     Column(
         modifier = modifier
             .padding(contentPadding.excludingBottomPadding())
     ) {
         when {
             uiState.isLoading -> {
-                if (shouldShowSkeleton) {
-                    NodesViewSkeleton(
-                        isListView = isListView,
-                        spanCount = spanCount,
-                        contentPadding = PaddingValues(top = 12.dp),
-                    )
-                }
+                NodesViewSkeleton(
+                    isListView = isListView,
+                    spanCount = spanCount,
+                    contentPadding = PaddingValues(top = 12.dp),
+                    delay = NodeSkeletons.defaultDelay,
+                )
             }
 
             uiState.isEmpty -> {

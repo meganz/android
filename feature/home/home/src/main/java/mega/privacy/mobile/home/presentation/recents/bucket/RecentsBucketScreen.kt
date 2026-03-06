@@ -41,6 +41,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.android.core.ui.extensions.delayedTrue
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -60,6 +61,7 @@ import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketLi
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsBucketMediaGridLoadingView
 import mega.privacy.mobile.home.presentation.recents.bucket.view.RecentsMediaGridView
 import mega.privacy.mobile.home.presentation.recents.view.RecentDateHeader
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -220,21 +222,11 @@ internal fun RecentsBucketScreenContent(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
-    // Show loading skeleton only if loading takes more than 200ms
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(200L)
-            if (this.isActive) {
-                shouldShowSkeleton = true
-            }
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
 
     when {
         uiState.isLoading -> {
+            // Show loading skeleton only if loading takes more than 200ms
+            val shouldShowSkeleton by delayedTrue(200.milliseconds)
             Box(modifier = modifier) {
                 if (shouldShowSkeleton)
                     if (uiState.isMediaBucket) {

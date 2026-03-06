@@ -10,25 +10,20 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
@@ -66,17 +61,6 @@ private fun FolderLinkContent(
 ) {
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
-    LaunchedEffect(uiState.contentState) {
-        if (uiState.contentState is FolderLinkContentState.Loading) {
-            delay(200L) // Show skeleton only for large folders
-            if (this.isActive) {
-                shouldShowSkeleton = true
-            }
-        } else {
-            shouldShowSkeleton = false
-        }
-    }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
@@ -100,12 +84,11 @@ private fun FolderLinkContent(
         ) {
             when (val contentState = uiState.contentState) {
                 FolderLinkContentState.Loading -> {
-                    if (shouldShowSkeleton) {
-                        NodesViewSkeleton(
-                            isListView = isListView,
-                            spanCount = spanCount,
-                        )
-                    }
+                    NodesViewSkeleton(
+                        isListView = isListView,
+                        spanCount = spanCount,
+                        delay = NodeSkeletons.defaultDelay,
+                    )
                 }
 
                 is FolderLinkContentState.DecryptionKeyRequired -> {

@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -29,33 +30,48 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.list.GenericListItem
+import mega.android.core.ui.extensions.delayedTrue
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.tokens.theme.DSTokens
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A skeleton view that mimics the cloud drive content layout with shimmer effects.
  * Shows placeholder items for files/folders while loading.
  * Supports both list and grid view types with exact matching layouts.
+ * @param delay Delay before showing the skeleton. Default is 0 that means it will show immediately.
  */
 @Composable
 fun NodesViewSkeleton(
-    contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     isListView: Boolean = true,
     spanCount: Int = 2,
+    delay: Duration = Duration.ZERO,
 ) {
-    if (isListView) {
-        NodeListViewSkeleton(modifier = modifier, contentPadding = contentPadding)
-    } else {
-        NodeGridViewSkeleton(
-            modifier = modifier,
-            spanCount = spanCount,
-            contentPadding = contentPadding
-        )
+    val shouldShowSkeleton by delayedTrue(delay)
+    if (shouldShowSkeleton) {
+        if (isListView) {
+            NodeListViewSkeleton(modifier = modifier, contentPadding = contentPadding)
+        } else {
+            NodeGridViewSkeleton(
+                modifier = modifier,
+                spanCount = spanCount,
+                contentPadding = contentPadding
+            )
+        }
     }
+}
+
+object NodeSkeletons {
+    /**
+     * Default delay for large folder to avoid showing the shimmer if it loads fast
+     */
+    val defaultDelay = 200.milliseconds
 }
 
 /**

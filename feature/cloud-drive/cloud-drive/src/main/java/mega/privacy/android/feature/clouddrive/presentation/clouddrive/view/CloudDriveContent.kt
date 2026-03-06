@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
@@ -46,6 +44,7 @@ import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssu
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
+import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
@@ -150,7 +149,6 @@ internal fun CloudDriveContent(
             }
         }
     }
-    var shouldShowSkeleton by remember { mutableStateOf(false) }
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -161,17 +159,6 @@ internal fun CloudDriveContent(
             uiState.selectedNodes.toSet(),
             nodeSourceType = uiState.nodeSourceType
         )
-    }
-
-    LaunchedEffect(uiState.isLoading) {
-        if (uiState.isLoading) {
-            delay(200L)
-            if (this.isActive) {
-                shouldShowSkeleton = true
-            }
-        } else {
-            shouldShowSkeleton = false
-        }
     }
 
     EventEffect(
@@ -216,13 +203,12 @@ internal fun CloudDriveContent(
 
         when {
             uiState.isLoading -> {
-                if (shouldShowSkeleton) {
-                    NodesViewSkeleton(
-                        isListView = isListView,
-                        spanCount = spanCount,
-                        contentPadding = PaddingValues(top = topPadding),
-                    )
-                }
+                NodesViewSkeleton(
+                    isListView = isListView,
+                    spanCount = spanCount,
+                    contentPadding = PaddingValues(top = topPadding),
+                    delay = NodeSkeletons.defaultDelay,
+                )
             }
 
             uiState.isEmpty -> {
