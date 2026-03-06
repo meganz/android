@@ -50,7 +50,59 @@ git checkout -b "<branch-name>"
 - If the command fails because the branch already exists, run `git checkout "<branch-name>"` instead and inform the user.
 - Continue to Step 1 using this new branch as the current branch.
 
-### Step 1 — Gather branch info
+### Step 1 — Ensure commits are GPG-signed
+
+#### Sub-step A — Commit any uncommitted changes (signed)
+
+Run:
+```bash
+git status --porcelain
+```
+
+If the output is non-empty (uncommitted changes exist):
+1. Ask the user for a commit message before proceeding — do not auto-generate one silently.
+2. Stage and commit using the user's default GPG key:
+   ```bash
+   git add -A
+   git commit -S -m "<user-provided message>"
+   ```
+3. If the commit fails because no default GPG key is configured, surface the error and halt with instructions:
+   ```bash
+   # List available secret keys
+   gpg --list-secret-keys --keyid-format=long
+
+   # Set the signing key and enable auto-signing
+   git config --global user.signingkey <KEY_ID>
+   git config --global commit.gpgsign true
+   ```
+   Ask the user to configure their GPG key and then re-run `/create-mr`.
+
+#### Sub-step B — Verify all branch commits are GPG-signed
+
+Run:
+```bash
+git log develop..HEAD --pretty="format:%H %s %G?"
+```
+
+The `%G?` field reports signature status per commit:
+- `G` — good signature
+- `U` — good signature, unknown key
+- `X` / `Y` / `R` — expired or revoked key (treat as warning, still proceed)
+- `B` — bad signature (halt)
+- `N` — no signature (halt)
+
+If **any commit** shows `N` or `B`:
+- List the offending commits (hash + subject) to the user.
+- **Halt** — do not proceed to the next step.
+- Instruct the user to re-sign all branch commits:
+  ```bash
+  git rebase --exec "git commit --amend --no-edit -S" develop
+  ```
+  After re-signing, ask the user to re-run `/create-mr`.
+
+If all commits are signed (no `N` or `B`), continue to Step 2.
+
+### Step 2 — Gather branch info
 
 Run:
 ```bash
@@ -61,7 +113,7 @@ git log develop..HEAD --oneline
 - Use the current branch name as the push target.
 - Use the latest commit message as the default MR title (if `--title` was not provided).
 
-### Step 2 — Generate MR description
+### Step 3 — Generate MR description
 
 Run:
 ```bash
@@ -126,19 +178,25 @@ Writing guidelines:
 - Don't pad with filler phrases
 - Be honest about cons/risks — don't just list positives
 
-### Step 3 — Push and create MR
+### Step 4 — Push and create MR
 
-Run `git push` using the Bash tool with GitLab push options. Pass the generated description
-via a bash variable to handle newlines and special characters correctly:
+Run `git push` using the Bash tool with GitLab push options.
+
+**Important:** GitLab push options do not support literal newline characters and will fail with `fatal: push options must not have new line characters`. Always build the description as a single-line string with `\n` (backslash-n) in place of every newline:
 
 ```bash
-DESCRIPTION='<generated description from Step 2>'
+DESCRIPTION='#### Summary\n<text>\n\n#### Key Changes\n- item 1\n- item 2'
 git push --set-upstream origin "<current branch>" \
   -o merge_request.create \
   -o "merge_request.title=<title>" \
   -o "merge_request.description=${DESCRIPTION}" \
   -o "merge_request.target_branch=<base>"
 ```
+
+Rules for building `DESCRIPTION`:
+- Write the entire value on **one line** inside single quotes
+- Replace every newline with the two-character sequence `\n`
+- Escape any single quotes in the text as `'"'"'`
 
 If `--draft` was passed, append `-o merge_request.draft` to the command.
 
@@ -147,7 +205,7 @@ Squash behaviour (in priority order):
 2. If `--no-squash` was passed → do not append squash
 3. Otherwise (default) → append `-o merge_request.squash`
 
-### Step 4 — Confirm
+### Step 5 — Confirm
 
 - Display the generated MR description so the user can review it.
 - Extract and display the MR URL from the `git push` output.
