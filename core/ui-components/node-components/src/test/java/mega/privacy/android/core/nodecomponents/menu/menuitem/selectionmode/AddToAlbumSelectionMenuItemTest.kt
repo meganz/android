@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -53,6 +54,22 @@ class AddToAlbumSelectionMenuItemTest {
             listOf(createVideoNode(), createImageNode(), createOtherNode())
         ),
     )
+
+    @Test
+    fun `test that true is returned when the node source type is Timeline`() = runTest {
+        val addToAlbumMenuItem = AddToAlbumSelectionMenuItem(mock<AddToAlbumMenuAction>())
+
+        val actual = addToAlbumMenuItem.shouldDisplay(
+            hasNodeAccessPermission = false,
+            selectedNodes = listOf(),
+            canBeMovedToTarget = false,
+            noNodeInBackups = false,
+            noNodeTakenDown = false,
+            nodeSourceType = NodeSourceType.TIMELINE
+        )
+
+        assertThat(actual).isTrue()
+    }
 
     private fun createImageNode() = mock<TypedFileNode> {
         on { type }.thenReturn(
