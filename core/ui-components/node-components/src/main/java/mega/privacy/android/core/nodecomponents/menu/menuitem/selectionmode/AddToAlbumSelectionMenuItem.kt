@@ -20,7 +20,10 @@ class AddToAlbumSelectionMenuItem @Inject constructor(
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
-    ): Boolean {
+    ): Boolean = if (nodeSourceType == NodeSourceType.TIMELINE) {
+        // In Timeline, we only load ImageFileTypeInfo and VideoFileTypeInfo, so this menu item should always be displayed.
+        true
+    } else {
         var allFilesAreImageOrVideo = true
         var allFilesAreVideo = true
         for (node in selectedNodes) {
@@ -40,6 +43,6 @@ class AddToAlbumSelectionMenuItem @Inject constructor(
                 }
             }
         }
-        return allFilesAreImageOrVideo && !allFilesAreVideo
+        allFilesAreImageOrVideo && !allFilesAreVideo
     }
 }
