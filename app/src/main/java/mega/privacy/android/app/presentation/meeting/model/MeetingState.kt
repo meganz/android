@@ -143,7 +143,7 @@ data class MeetingState(
     val answerResult: AnswerCallResult? = null,
     val editProfileEvent: Boolean = false,
     val emailContactToShowInfo: String? = null,
-    val isSingleActivityEnabled: Boolean = false,
+    val isSingleActivityEnabled: Boolean = true,
 ) {
 
     /**
