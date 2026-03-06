@@ -20,8 +20,6 @@ import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEdito
 import mega.privacy.android.domain.usecase.texteditor.SaveTextContentForTextEditorUseCase
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComposeUiState
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
-import mega.privacy.android.feature.texteditor.presentation.model.DefaultTextEditorTopBarSlots
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlots
 
 /**
  * ViewModel for the Compose text editor screen.
@@ -39,7 +37,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             fileName = args.fileName.orEmpty(),
             mode = args.mode,
             isLoading = args.mode != TextEditorMode.Create,
-            topBarSlots = args.topBarSlots,
         )
     )
     val uiState = _uiState.asStateFlow()
@@ -88,7 +85,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val mode: TextEditorMode,
         val nodeSourceType: Int?,
         val fileName: String?,
-        val topBarSlots: TextEditorTopBarSlots = DefaultTextEditorTopBarSlots,
         val chatId: Long? = null,
         val messageId: Long? = null,
         val localPath: String? = null,

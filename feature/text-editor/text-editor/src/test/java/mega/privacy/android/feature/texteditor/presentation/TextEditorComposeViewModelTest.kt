@@ -4,11 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel.Args
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorConditionalTopBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlot
-import mega.privacy.android.feature.texteditor.presentation.model.DefaultTextEditorTopBarSlots
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlots
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,7 +43,6 @@ internal class TextEditorComposeViewModelTest {
         mode: TextEditorMode = TextEditorMode.View,
         nodeSourceType: Int? = null,
         fileName: String? = null,
-        topBarSlots: TextEditorTopBarSlots = DefaultTextEditorTopBarSlots,
         localPath: String? = null,
     ) {
         underTest = TextEditorComposeViewModel(
@@ -56,7 +51,6 @@ internal class TextEditorComposeViewModelTest {
                 mode = mode,
                 nodeSourceType = nodeSourceType,
                 fileName = fileName,
-                topBarSlots = topBarSlots,
                 localPath = localPath,
             ),
             getTextContentForTextEditorUseCase = getTextContentForTextEditorUseCase,
@@ -133,18 +127,6 @@ internal class TextEditorComposeViewModelTest {
         initUnderTest()
         underTest.onMenuAction(TextEditorTopBarAction.Download)
         assertThat(underTest.uiState.value.showLineNumbers).isFalse()
-    }
-
-    @Test
-    fun `test that initial uiState reflects topBarSlots from Args`() {
-        val slots: TextEditorTopBarSlots = listOf(
-            TextEditorTopBarSlot.Conditional(TextEditorConditionalTopBarAction.GetLink),
-        )
-        initUnderTest(topBarSlots = slots)
-        val state = underTest.uiState.value
-        assertThat(state.topBarSlots).containsExactly(
-            TextEditorTopBarSlot.Conditional(TextEditorConditionalTopBarAction.GetLink),
-        )
     }
 
     @Test

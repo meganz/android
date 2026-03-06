@@ -2398,4 +2398,8 @@
     <string name="device_center_snackbar_message_connection_removed">Connection removed</string>
     <!-- Placeholder to display when creating a New video playlist. If no title is entered, the placeholder will become the video playlist title -->
     <string name="create_new_video_playlist_input_title_placeholder">New playlist</string>
+    <!-- Content description for text editor toolbar: show line numbers -->
+    <string name="text_editor_show_line_numbers">Show line numbers</string>
+    <!-- Content description for text editor toolbar: hide line numbers -->
+    <string name="text_editor_hide_line_numbers">Hide line numbers</string>
 </resources>

@@ -42,18 +42,15 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorConditionalTopBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlot
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarSlots
+import mega.privacy.android.feature.texteditor.R
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Compose screen for viewing and editing text files.
- * Top bar: Back + Download, Line numbers, Get link, Send to chat, Share, More (opens Node Options Bottom Sheet).
- * Slots and order depend on node source and mode; node actions are also available via the bottom sheet when tapping More.
+ * Top bar: Back + Line numbers + More (opens Node Options Bottom Sheet). Download, Get link, Send to chat, Share are in the bottom bar.
  */
 @Composable
 fun TextEditorScreen(
@@ -80,8 +77,8 @@ fun TextEditorScreen(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TextEditorTopAppBar(
+                title = uiState.fileName,
                 showLineNumbers = uiState.showLineNumbers,
-                topBarSlots = uiState.topBarSlots,
                 onBack = onBack,
                 onMenuAction = viewModel::onMenuAction,
                 onOpenNodeOptions = onOpenNodeOptions,
@@ -253,31 +250,19 @@ private fun TextEditorLoadingContent() {
 
 @Composable
 private fun TextEditorTopAppBar(
+    title: String,
     showLineNumbers: Boolean,
-    topBarSlots: TextEditorTopBarSlots,
     onBack: () -> Unit,
     onMenuAction: (TextEditorTopBarAction) -> Unit,
     onOpenNodeOptions: () -> Unit,
 ) {
     MegaTopAppBar(
-        title = "",
+        title = title,
         navigationType = AppBarNavigationType.Back(onBack),
         trailingIcons = {
             Row {
-                topBarSlots.forEach { slot ->
-                    when (slot) {
-                        TextEditorTopBarSlot.LineNumbers -> LineNumbersButton(
-                            showLineNumbers,
-                            onMenuAction,
-                        )
-
-                        TextEditorTopBarSlot.More -> MoreButton(onOpenNodeOptions)
-                        is TextEditorTopBarSlot.Conditional -> ConditionalActionButton(
-                            slot.action,
-                            onMenuAction,
-                        )
-                    }
-                }
+                LineNumbersButton(showLineNumbers, onMenuAction)
+                MoreButton(onOpenNodeOptions)
             }
         },
     )
@@ -288,15 +273,14 @@ private fun LineNumbersButton(
     showLineNumbers: Boolean,
     onMenuAction: (TextEditorTopBarAction) -> Unit,
 ) {
-    // TODO: Replace Menu01 with dedicated line-numbers icon when UI/UX provides it (IconPack). Track in backlog.
-    // Legacy uses action_show_line_numbers / action_hide_line_numbers (app); we use shared strings here because feature does not depend on app.
     IconButton(onClick = { onMenuAction(TextEditorTopBarAction.LineNumbers) }) {
+        // TODO: Use dedicated hide-line-numbers icon when designer provides it (track in backlog); for now same icon for show/hide.
         MegaIcon(
-            imageVector = IconPack.Medium.Thin.Outline.Menu01,
+            painter = painterResource(R.drawable.icon_text_editor_show_line_numbers),
             tint = IconColor.Primary,
             contentDescription = stringResource(
-                if (showLineNumbers) sharedR.string.general_hide_node
-                else sharedR.string.general_unhide_node
+                if (showLineNumbers) sharedR.string.text_editor_hide_line_numbers
+                else sharedR.string.text_editor_show_line_numbers
             ),
         )
     }
@@ -310,59 +294,5 @@ private fun MoreButton(onOpenNodeOptions: () -> Unit) {
             tint = IconColor.Primary,
             contentDescription = stringResource(sharedR.string.album_content_selection_action_more_description),
         )
-    }
-}
-
-@Composable
-private fun ConditionalActionButton(
-    action: TextEditorConditionalTopBarAction,
-    onMenuAction: (TextEditorTopBarAction) -> Unit,
-) {
-    when (action) {
-        TextEditorConditionalTopBarAction.Download -> IconButton(onClick = {
-            onMenuAction(
-                TextEditorTopBarAction.Download
-            )
-        }) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.Download,
-                tint = IconColor.Primary,
-                contentDescription = stringResource(sharedR.string.general_save_to_device),
-            )
-        }
-
-        TextEditorConditionalTopBarAction.GetLink -> IconButton(onClick = {
-            onMenuAction(
-                TextEditorTopBarAction.GetLink
-            )
-        }) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.Link01,
-                tint = IconColor.Primary,
-                contentDescription = stringResource(sharedR.string.meetings_share_link_bottom_sheet_button_share_link),
-            )
-        }
-
-        TextEditorConditionalTopBarAction.SendToChat -> IconButton(onClick = {
-            onMenuAction(TextEditorTopBarAction.SendToChat)
-        }) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.MessageArrowUp,
-                tint = IconColor.Primary,
-                contentDescription = stringResource(sharedR.string.meetings_share_link_bottom_sheet_button_send_link_chat),
-            )
-        }
-
-        TextEditorConditionalTopBarAction.Share -> IconButton(onClick = {
-            onMenuAction(
-                TextEditorTopBarAction.Share
-            )
-        }) {
-            MegaIcon(
-                imageVector = IconPack.Medium.Thin.Outline.ShareNetwork,
-                tint = IconColor.Primary,
-                contentDescription = stringResource(sharedR.string.general_share),
-            )
-        }
     }
 }

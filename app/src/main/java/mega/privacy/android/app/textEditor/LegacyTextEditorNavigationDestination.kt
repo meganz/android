@@ -78,7 +78,6 @@ private fun TextEditorEntry(
 
     if (navKey.isTextEditorComposeEnabled) {
         val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
-        val topBarSlots = computeTextEditorTopBarSlots(navKey.nodeSourceType, mode)
         val viewModel =
             hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
                 factory.create(
@@ -87,7 +86,6 @@ private fun TextEditorEntry(
                         mode = mode,
                         nodeSourceType = navKey.nodeSourceType,
                         fileName = navKey.fileName,
-                        topBarSlots = topBarSlots,
                     )
                 )
             }
