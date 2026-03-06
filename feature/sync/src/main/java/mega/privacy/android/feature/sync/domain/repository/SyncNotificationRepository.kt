@@ -76,4 +76,23 @@ interface SyncNotificationRepository {
      * @return the sync error notification message
      */
     fun getSyncIssueNotificationByType(type: SyncNotificationType): SyncNotificationMessage
+
+    /**
+     * Get the cross-device conflict notification message
+     * @param conflictingSyncs List of syncs that have cross-device folder conflicts
+     * @return the cross-device conflict notification message
+     */
+    suspend fun getCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>): SyncNotificationMessage
+
+    /**
+     * Set pending cross-device conflict notification to be shown
+     * @param conflictingSyncs List of syncs that have cross-device folder conflicts
+     */
+    suspend fun setPendingCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>)
+
+    /**
+     * Get pending cross-device conflict notification if any
+     * @return the pending cross-device conflict notification message, or null if none pending
+     */
+    suspend fun getPendingCrossDeviceConflictNotification(): SyncNotificationMessage?
 }

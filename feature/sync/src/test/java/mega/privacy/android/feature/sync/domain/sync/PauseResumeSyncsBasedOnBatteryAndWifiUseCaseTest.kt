@@ -9,6 +9,7 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.IsSyncPausedByTheUserUseCase
@@ -56,7 +57,7 @@ internal class PauseResumeSyncsBasedOnBatteryAndWifiUseCaseTest {
 
     @BeforeAll
     fun setUp() {
-        underTest = PauseResumeSyncsBasedOnBatteryAndWiFiUseCase(
+        underTest = PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl(
             pauseSyncUseCase,
             resumeSyncUseCase,
             getFolderPairsUseCase,

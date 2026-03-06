@@ -12,6 +12,8 @@ import mega.privacy.android.feature.sync.domain.usecase.logout.ClearSyncSolvedIs
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetLocalSyncOrBackupUriPathUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -23,6 +25,9 @@ internal interface SyncDomainModule {
      */
     @Binds
     fun bindMonitorSyncsUseCase(impl: MonitorSyncsUseCaseImpl): MonitorSyncsUseCase
+
+    @Binds
+    fun bindPauseResumeSyncsBasedOnBatteryAndWiFiUseCase(impl: PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl): PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 
     @Binds
     fun bindGetLocalSyncOrBackupUriPathUseCase(impl: GetLocalSyncOrBackupUriPathUseCaseImpl): GetLocalSyncOrBackupUriPathUseCase

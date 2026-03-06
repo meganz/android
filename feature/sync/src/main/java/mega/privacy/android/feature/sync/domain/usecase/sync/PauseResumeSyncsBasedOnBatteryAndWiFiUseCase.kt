@@ -7,25 +7,38 @@ import javax.inject.Inject
 
 /**
  * Use case to pause/resume syncs based on the status of device battery and WiFi
- *
- * @param pauseSyncUseCase              [PauseSyncUseCase]
- * @param resumeSyncUseCase             [ResumeSyncUseCase]
- * @param getFolderPairsUseCase         [GetFolderPairsUseCase]
- * @param isSyncPausedByTheUserUseCase  [IsSyncPausedByTheUserUseCase]
  */
-class PauseResumeSyncsBasedOnBatteryAndWiFiUseCase @Inject constructor(
-    private val pauseSyncUseCase: PauseSyncUseCase,
-    private val resumeSyncUseCase: ResumeSyncUseCase,
-    private val getFolderPairsUseCase: GetFolderPairsUseCase,
-    private val isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase,
-) {
+interface PauseResumeSyncsBasedOnBatteryAndWiFiUseCase {
 
     /**
      * Invoke
      *
      * @param shouldResumeSync       True if syncs should be resumed or False if they should be paused
      */
-    suspend operator fun invoke(shouldResumeSync: Boolean) {
+    suspend operator fun invoke(shouldResumeSync: Boolean)
+}
+
+/**
+ * Use case to pause/resume syncs based on the status of device battery and WiFi
+ *
+ * @param pauseSyncUseCase              [PauseSyncUseCase]
+ * @param resumeSyncUseCase             [ResumeSyncUseCase]
+ * @param getFolderPairsUseCase         [GetFolderPairsUseCase]
+ * @param isSyncPausedByTheUserUseCase  [IsSyncPausedByTheUserUseCase]
+ */
+internal class PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl @Inject constructor(
+    private val pauseSyncUseCase: PauseSyncUseCase,
+    private val resumeSyncUseCase: ResumeSyncUseCase,
+    private val getFolderPairsUseCase: GetFolderPairsUseCase,
+    private val isSyncPausedByTheUserUseCase: IsSyncPausedByTheUserUseCase,
+) : PauseResumeSyncsBasedOnBatteryAndWiFiUseCase {
+
+    /**
+     * Invoke
+     *
+     * @param shouldResumeSync       True if syncs should be resumed or False if they should be paused
+     */
+    override suspend operator fun invoke(shouldResumeSync: Boolean) {
         if (shouldResumeSync) {
             val activeSyncs =
                 getFolderPairsUseCase()

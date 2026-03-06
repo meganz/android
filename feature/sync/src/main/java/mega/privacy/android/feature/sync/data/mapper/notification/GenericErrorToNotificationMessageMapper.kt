@@ -16,11 +16,13 @@ internal class GenericErrorToNotificationMessageMapper @Inject constructor() {
         title = when (syncNotificationType) {
             SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_title
             SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_title
+            SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.sync_snackbar_message_confirm_sync_stopped
             else -> sharedResR.string.general_sync_notification_generic_error_title
         },
         text = when (syncNotificationType) {
             SyncNotificationType.BATTERY_LOW, SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
             SyncNotificationType.NOT_CONNECTED_TO_WIFI -> sharedResR.string.general_sync_notification_lost_wifi_text
+            SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.error_folder_part_of_sync_or_backup
             else -> sharedResR.string.general_sync_notification_generic_error_text
         },
         syncNotificationType = syncNotificationType,

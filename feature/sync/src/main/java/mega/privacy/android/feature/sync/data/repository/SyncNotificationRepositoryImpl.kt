@@ -78,4 +78,21 @@ internal class SyncNotificationRepositoryImpl @Inject constructor(
     override fun getSyncIssueNotificationByType(type: SyncNotificationType): SyncNotificationMessage {
         return genericErrorToNotificationMessageMapper(type)
     }
+
+    override suspend fun getCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>): SyncNotificationMessage =
+        genericErrorToNotificationMessageMapper(
+            syncNotificationType = SyncNotificationType.CROSS_DEVICE_CONFLICT,
+            issuePath = conflictingSyncs.first().pairName
+        )
+
+    override suspend fun setPendingCrossDeviceConflictNotification(conflictingSyncs: List<FolderPair>) {
+        val notification = getCrossDeviceConflictNotification(conflictingSyncs)
+        setDisplayedNotification(notification, notificationId = null)
+    }
+
+    override suspend fun getPendingCrossDeviceConflictNotification(): SyncNotificationMessage? {
+        val pendingNotifications =
+            getDisplayedNotificationsByType(SyncNotificationType.CROSS_DEVICE_CONFLICT)
+        return pendingNotifications.firstOrNull()
+    }
 }

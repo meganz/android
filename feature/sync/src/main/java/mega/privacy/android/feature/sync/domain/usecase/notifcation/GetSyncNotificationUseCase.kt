@@ -5,6 +5,7 @@ import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.StalledIssue
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationMessage
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.BATTERY_LOW
+import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.CROSS_DEVICE_CONFLICT
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.ERROR
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CHARGING
 import mega.privacy.android.feature.sync.domain.entity.SyncNotificationType.NOT_CONNECTED_TO_WIFI
@@ -62,6 +63,13 @@ class GetSyncNotificationUseCase @Inject constructor(
                 getSyncErrorsNotification(syncs)
             }
 
+            getCrossDeviceConflictNotification() != null -> {
+                resetBatteryLowNotification()
+                resetNetworkConstraintNotification()
+                resetSyncErrorsNotification()
+                getCrossDeviceConflictNotification()
+            }
+
             stalledIssues.isNotEmpty() -> {
                 resetBatteryLowNotification()
                 resetNetworkConstraintNotification()
@@ -82,6 +90,7 @@ class GetSyncNotificationUseCase @Inject constructor(
         resetNetworkConstraintNotification()
         resetSyncErrorsNotification()
         resetSyncStalledIssuesNotification()
+        resetCrossDeviceConflictNotification()
     }
 
     private suspend fun resetBatteryLowNotification() {
@@ -122,6 +131,14 @@ class GetSyncNotificationUseCase @Inject constructor(
                 syncNotificationManager.cancelNotification(notificationId = notificationId)
             }
         syncNotificationRepository.deleteDisplayedNotificationByType(STALLED_ISSUE)
+    }
+
+    private suspend fun resetCrossDeviceConflictNotification() {
+        syncNotificationRepository.getDisplayedNotificationsIdsByType(CROSS_DEVICE_CONFLICT)
+            .forEach { notificationId ->
+                syncNotificationManager.cancelNotification(notificationId = notificationId)
+            }
+        syncNotificationRepository.deleteDisplayedNotificationByType(CROSS_DEVICE_CONFLICT)
     }
 
     private suspend fun getBatteryLowNotification(): SyncNotificationMessage? =
@@ -183,4 +200,7 @@ class GetSyncNotificationUseCase @Inject constructor(
             null
         }
     }
+
+    private suspend fun getCrossDeviceConflictNotification(): SyncNotificationMessage? =
+        syncNotificationRepository.getPendingCrossDeviceConflictNotification()
 }

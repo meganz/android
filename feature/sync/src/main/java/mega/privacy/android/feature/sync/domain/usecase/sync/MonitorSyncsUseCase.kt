@@ -7,22 +7,30 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
+import mega.privacy.android.feature.sync.domain.repository.SyncNotificationRepository
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import javax.inject.Inject
 
 /**
  * Use case for monitoring syncs
  */
-class MonitorSyncsUseCaseImpl @Inject constructor(
+internal class MonitorSyncsUseCaseImpl @Inject constructor(
     private val syncRepository: SyncRepository,
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase,
     private val resumeSyncUseCase: ResumeSyncUseCase,
     private val canReadUriUseCase: CanReadUriUseCase,
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
+    private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+    private val pauseSyncUseCase: PauseSyncUseCase,
+    private val setUserPausedSyncUseCase: SetUserPausedSyncUseCase,
+    private val syncNotificationRepository: SyncNotificationRepository,
 ) : MonitorSyncsUseCase {
 
 
@@ -40,6 +48,28 @@ class MonitorSyncsUseCaseImpl @Inject constructor(
                 }
                 .conflate()
                 .collect { (validSyncs, invalidSyncs) ->
+                    // Check for cross-device folder conflicts
+                    val conflictingSyncs = validSyncs.filter {
+                        isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                            nodeId = it.remoteFolder.id,
+                            shouldCheckCameraUploads = true,
+                            shouldExcludeCurrentDevice = true
+                        ) != FolderUsageResult.NotUsed
+                    }
+
+                    // Pause conflicting syncs and mark as user-paused to prevent auto-resume
+                    conflictingSyncs.forEach {
+                        pauseSyncUseCase(it.id)
+                        setUserPausedSyncUseCase(it.id, paused = true)
+                    }
+
+                    // Store notification for conflicting syncs
+                    if (conflictingSyncs.isNotEmpty()) {
+                        syncNotificationRepository.setPendingCrossDeviceConflictNotification(
+                            conflictingSyncs
+                        )
+                    }
+
                     val pausedSyncs = invalidSyncs.map {
                         it.copy(
                             syncError = SyncError.NO_SYNC_ERROR,

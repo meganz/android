@@ -6,7 +6,7 @@ import javax.inject.Inject
 /**
  * Use case to set the preference for the sync worker to run in the foreground
  */
-class SetSyncWorkerForegroundPreferenceUseCase @Inject constructor(
+internal class SetSyncWorkerForegroundPreferenceUseCase @Inject constructor(
     private val syncPreferencesRepository: SyncPreferencesRepository,
 ) {
     /**
@@ -17,4 +17,3 @@ class SetSyncWorkerForegroundPreferenceUseCase @Inject constructor(
         syncPreferencesRepository.setShouldRunForeground(shouldRun)
     }
 }
-

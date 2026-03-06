@@ -79,6 +79,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.sync_snackbar_message_confirm_sync_stopped
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
@@ -87,6 +88,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.error_folder_part_of_sync_or_backup
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = 0)
@@ -117,6 +119,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_title
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_title
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_generic_error_title
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.sync_snackbar_message_confirm_sync_stopped
                 },
                 text = when (notificationType) {
                     SyncNotificationType.BATTERY_LOW -> sharedResR.string.general_sync_notification_low_battery_text
@@ -125,6 +128,7 @@ internal class SyncNotificationRepositoryImplTest {
                     SyncNotificationType.STALLED_ISSUE -> sharedResR.string.general_sync_notification_stalled_issues_text
                     SyncNotificationType.CHANGE_SYNC_ROOT -> sharedResR.string.general_sync_notification_generic_error_text
                     SyncNotificationType.NOT_CHARGING -> sharedResR.string.general_sync_notification_low_battery_text
+                    SyncNotificationType.CROSS_DEVICE_CONFLICT -> sharedResR.string.error_folder_part_of_sync_or_backup
                 },
                 syncNotificationType = notificationType,
                 notificationDetails = NotificationDetails(path = "Path", errorCode = null)
