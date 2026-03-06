@@ -314,7 +314,7 @@ class AudioPlayerService : LifecycleService(), LifecycleEventObserver, MediaPlay
                 thumbnail = viewModelGateway.getPlayingThumbnail(),
                 smallIcon = iconPackR.drawable.ic_stat_notify,
                 onNotificationPostedCallback = { notificationId, notification, ongoing ->
-                    if (ongoing && isForeground) {
+                    if (ongoing) {
                         // Make sure the service will not get destroyed while playing media.
                         try {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
