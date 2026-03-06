@@ -420,7 +420,7 @@
         </activity>
         <activity
             android:name=".mediaplayer.VideoPlayerComposeActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:theme="@style/Theme.Mega.FullScreen.VideoPlayer"
             android:windowSoftInputMode="adjustNothing" />
         <activity
