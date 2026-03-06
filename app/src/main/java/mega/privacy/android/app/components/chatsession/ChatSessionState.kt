@@ -17,5 +17,5 @@ internal sealed interface ChatSessionState {
  */
 internal data class ChatSessionUiState(
     val sessionState: ChatSessionState = ChatSessionState.Pending,
-    val isSingleActivityEnabled: Boolean = false
+    val isSingleActivityEnabled: Boolean = true,
 )

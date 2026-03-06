@@ -8,5 +8,5 @@ package mega.privacy.android.app.components.session
  */
 internal data class SessionState(
     val doesRootNodeExist: Boolean? = null,
-    val isSingleActivityEnabled: Boolean = false
+    val isSingleActivityEnabled: Boolean = true,
 )

@@ -22,7 +22,7 @@ data class ChooseAccountState(
     val currentSubscriptionPlan: AccountType? = null,
     val subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
     val userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
-    val isSingleActivityEnabled: Boolean = false,
+    val isSingleActivityEnabled: Boolean = true,
 ) {
     // checking if there is any discount available it's different from current plan
     fun hasDiscount() = localisedSubscriptionsList.any {
