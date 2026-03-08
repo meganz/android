@@ -895,10 +895,13 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
         Timber.d("action = UPLOAD")
         mode = UPLOAD
         action = intent.action
-        createAndShowProgressDialog(
-            false,
-            resources.getQuantityString(R.plurals.upload_prepare, 1)
-        )
+
+        if (viewModel.uiState.value.documents.isEmpty()) {
+            createAndShowProgressDialog(
+                false,
+                resources.getQuantityString(R.plurals.upload_prepare, 1)
+            )
+        }
 
         with(binding) {
             cloudDriveFrameLayout.isVisible = true
