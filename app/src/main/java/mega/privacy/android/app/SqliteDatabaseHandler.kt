@@ -400,7 +400,11 @@ class SqliteDatabaseHandler @Inject constructor(
             Timber.e("Error: Chat settings are null")
             return
         }
-        db.execSQL("DELETE FROM $TABLE_CHAT_SETTINGS")
+        try {
+            db.execSQL("DELETE FROM $TABLE_CHAT_SETTINGS")
+        } catch (_: SQLiteException) {
+            legacyDatabaseMigration.onCreate(writableDatabase)
+        }
         val values = ContentValues().apply {
             put(KEY_CHAT_NOTIFICATIONS_ENABLED, "")
             put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(chatSettings.notificationsSound))
