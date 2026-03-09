@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -29,6 +31,8 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,6 +51,8 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper,
     private val addNodeType: AddNodeType,
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper,
@@ -182,6 +188,36 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         }
     }
 
+    private fun hiddenNodesFilterFlow(): Flow<Pair<Boolean, Boolean>> =
+        combine(
+            monitorHiddenNodesEnabledUseCase().catch {
+                Timber.e(
+                    it,
+                    "CloudDriveDocumentDataProvider monitorHiddenNodesEnabled"
+                )
+            },
+            monitorShowHiddenItemsUseCase().catch {
+                Timber.e(
+                    it,
+                    "CloudDriveDocumentDataProvider monitorShowHiddenItems"
+                )
+            },
+            ::Pair
+        )
+
+    private fun filterNodesByHiddenSettings(
+        nodes: List<TypedNode>,
+        isHiddenNodesEnabled: Boolean,
+        showHiddenItems: Boolean,
+    ): List<TypedNode> {
+        val showAll = showHiddenItems || !isHiddenNodesEnabled
+        return if (showAll) {
+            nodes
+        } else {
+            nodes.filterNot { it.isMarkedSensitive || it.isSensitiveInherited }
+        }
+    }
+
     private suspend fun getChildDataFlow(
         parentDocumentId: String,
         accountName: String,
@@ -190,30 +226,40 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         val parentId = documentIdToNodeIdMapper(
             parentDocumentId, CLOUD_DRIVE_ROOT_ID
         ) ?: return@runCatching null
-        getNodesByIdInChunkUseCase(parentId).runningFold<Pair<List<TypedNode>, Boolean>, Pair<List<TypedNode>, Boolean>>(
-            Pair(listOf(), true)
-        ) { acc, newValue ->
+        val nodesFlow = getNodesByIdInChunkUseCase(parentId).runningFold<
+                Pair<List<TypedNode>, Boolean>,
+                Pair<List<TypedNode>, Boolean>
+                >(Pair(listOf(), true)) { acc, newValue ->
             Pair(acc.first + newValue.first, newValue.second)
         }
-            .mapLatest<Pair<List<TypedNode>, Boolean>, CloudDriveDocumentProviderUiState> { (childNodes, hasMore) ->
-                CloudDriveDocumentProviderUiState.ChildData(
+        flow<CloudDriveDocumentProviderUiState> {
+            emit(
+                CloudDriveDocumentProviderUiState.LoadingChildren(
                     accountName = accountName,
-                    parentId = notificationString ?: parentDocumentId,
-                    children = childNodes.map {
-                        cloudDriveDocumentRowMapper(
-                            it, CLOUD_DRIVE_ROOT_ID
-                        )
-                    },
-                    hasMore = hasMore,
+                    currentParentDocumentId = notificationString ?: parentDocumentId,
                 )
-            }.onStart {
-                emit(
-                    CloudDriveDocumentProviderUiState.LoadingChildren(
-                        accountName = accountName,
-                        currentParentDocumentId = notificationString ?: parentDocumentId,
+            )
+            emitAll(
+                combine(
+                    nodesFlow,
+                    hiddenNodesFilterFlow(),
+                ) { (childNodes, hasMore), (isHiddenNodesEnabled, showHiddenItems) ->
+                    val filteredNodes = filterNodesByHiddenSettings(
+                        childNodes,
+                        isHiddenNodesEnabled,
+                        showHiddenItems,
                     )
-                )
-            }
+                    CloudDriveDocumentProviderUiState.ChildData(
+                        accountName = accountName,
+                        parentId = notificationString ?: parentDocumentId,
+                        children = filteredNodes.map {
+                            cloudDriveDocumentRowMapper(it, CLOUD_DRIVE_ROOT_ID)
+                        },
+                        hasMore = hasMore,
+                    )
+                }
+            )
+        }
     }.getOrNull()
 
     private suspend fun FlowCollector<CloudDriveDocumentProviderUiState>.collectDocumentFlow(
@@ -227,24 +273,30 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                 currentDocumentId = notificationString ?: documentName,
             )
         )
-        val document = runCatching {
+        val typedNode = runCatching {
             val nodeId = documentIdToNodeIdMapper(
                 documentName, CLOUD_DRIVE_ROOT_ID
             ) ?: return@runCatching null
-            getNodeByHandleUseCase(nodeId.longValue)?.let {
-                addNodeType(it)
-            }?.let {
-                cloudDriveDocumentRowMapper(it, CLOUD_DRIVE_ROOT_ID)
-            }
+            getNodeByHandleUseCase(nodeId.longValue)?.let { addNodeType(it) }
         }.getOrNull()
 
-        if (document != null) {
+        val (isHiddenNodesEnabled, showHiddenItems) = hiddenNodesFilterFlow().first()
+        val shouldHideDocument = typedNode != null &&
+                filterNodesByHiddenSettings(
+                    listOf(typedNode),
+                    isHiddenNodesEnabled,
+                    showHiddenItems
+                ).isEmpty()
+
+        if (typedNode != null && !shouldHideDocument) {
+            val document = cloudDriveDocumentRowMapper(typedNode, CLOUD_DRIVE_ROOT_ID)
+            val finalDocument =
+                notificationString?.let { document.copy(documentId = it) } ?: document
             emit(
                 CloudDriveDocumentProviderUiState.DocumentData(
                     accountName = accountName,
                     documentId = notificationString ?: documentName,
-                    document = notificationString?.let { document.copy(documentId = it) }
-                        ?: document,
+                    document = finalDocument,
                 )
             )
         } else {

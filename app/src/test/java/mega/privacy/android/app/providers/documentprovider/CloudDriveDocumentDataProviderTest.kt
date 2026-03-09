@@ -26,11 +26,14 @@ import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -52,6 +55,8 @@ class CloudDriveDocumentDataProviderTest {
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase = mock()
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper = mock()
     private val addNodeType: AddNodeType = mock()
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper = mock()
@@ -78,12 +83,16 @@ class CloudDriveDocumentDataProviderTest {
             backgroundFastLoginUseCase,
             monitorNodeUpdatesUseCase,
             monitorUserCredentialsUseCase,
+            monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase,
             cloudDriveDocumentRowMapper,
             addNodeType,
             documentIdToNodeIdMapper,
             mockedCredentials,
         )
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(mockedCredentials.email).thenReturn("test@mega.co.nz")
         whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(mockedCredentials))
         whenever(documentIdToNodeIdMapper.invoke(any(), any())).thenAnswer { invocation ->
@@ -100,6 +109,8 @@ class CloudDriveDocumentDataProviderTest {
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             cloudDriveDocumentRowMapper = cloudDriveDocumentRowMapper,
             addNodeType = addNodeType,
             documentIdToNodeIdMapper = documentIdToNodeIdMapper,
@@ -109,6 +120,24 @@ class CloudDriveDocumentDataProviderTest {
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    private suspend fun stubRootLoad() {
+        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        val rootFolderNode: FolderNode = mock()
+        val rootTypedNode: DefaultTypedFolderNode = mock()
+        whenever(getNodeByHandleUseCase.invoke(1L, false)).thenReturn(rootFolderNode)
+        whenever(addNodeType.invoke(rootFolderNode)).thenReturn(rootTypedNode)
+        val rootRow = CloudDriveDocumentRow(
+            documentId = CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+            displayName = "MEGA",
+            mimeType = Document.MIME_TYPE_DIR,
+            size = 0L,
+            lastModified = 0L,
+            flags = 0,
+        )
+        whenever(cloudDriveDocumentRowMapper.invoke(rootTypedNode, DOCUMENT_ID_PREFIX))
+            .thenReturn(rootRow)
     }
 
     @Test
@@ -144,7 +173,8 @@ class CloudDriveDocumentDataProviderTest {
             awaitItem() // consume LoadingDocument(root) from initial Root request
             underTest.loadDocumentInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
             advanceUntilIdle()
-            val state = awaitItem() // DocumentData(root) from loadDocumentInBackground(CLOUD_DRIVE_ROOT_ID)
+            val state =
+                awaitItem() // DocumentData(root) from loadDocumentInBackground(CLOUD_DRIVE_ROOT_ID)
             assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
             val documentData = state as CloudDriveDocumentProviderUiState.DocumentData
             assertThat(documentData.accountName).isEqualTo("test@mega.co.nz")
@@ -245,7 +275,6 @@ class CloudDriveDocumentDataProviderTest {
                 assertThat(loadingChildren).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingChildren::class.java)
                 assertThat((loadingChildren as CloudDriveDocumentProviderUiState.LoadingChildren).currentParentDocumentId)
                     .isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
-                awaitItem() // skip initial ChildData(empty, hasMore=true) from runningFold
                 val childData = awaitItem() // ChildData(children=..., hasMore=false)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
@@ -277,4 +306,452 @@ class CloudDriveDocumentDataProviderTest {
             }
         }
 
+    @Test
+    fun `test that when showHiddenItems is true all nodes including sensitive are included in ChildData`() =
+        runTest {
+            val sensitiveNode: TypedNode = mock()
+            val normalNode: TypedNode = mock()
+            whenever(sensitiveNode.isMarkedSensitive).thenReturn(true)
+            whenever(sensitiveNode.isSensitiveInherited).thenReturn(false)
+            whenever(normalNode.isMarkedSensitive).thenReturn(false)
+            whenever(normalNode.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(normalNode, sensitiveNode) to false)
+            )
+            val row1 = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "Normal",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            val row2 = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:2",
+                displayName = "Sensitive",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                row1
+            )
+            whenever(
+                cloudDriveDocumentRowMapper.invoke(
+                    sensitiveNode,
+                    DOCUMENT_ID_PREFIX
+                )
+            ).thenReturn(row2)
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).hasSize(2)
+                assertThat(data.children).containsExactly(row1, row2)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when isHiddenNodesEnabled is false all nodes including sensitive are included in ChildData`() =
+        runTest {
+            val sensitiveNode: TypedNode = mock()
+            whenever(sensitiveNode.isMarkedSensitive).thenReturn(true)
+            whenever(sensitiveNode.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(sensitiveNode) to false)
+            )
+            val row = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "Sensitive",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(
+                cloudDriveDocumentRowMapper.invoke(
+                    sensitiveNode,
+                    DOCUMENT_ID_PREFIX
+                )
+            ).thenReturn(row)
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).hasSize(
+                    1
+                )
+                assertThat(childData.children[0]).isEqualTo(row)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when showHiddenItems false and isHiddenNodesEnabled true nodes with isMarkedSensitive are filtered out`() =
+        runTest {
+            val sensitiveNode: TypedNode = mock()
+            val normalNode: TypedNode = mock()
+            whenever(sensitiveNode.isMarkedSensitive).thenReturn(true)
+            whenever(sensitiveNode.isSensitiveInherited).thenReturn(false)
+            whenever(normalNode.isMarkedSensitive).thenReturn(false)
+            whenever(normalNode.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(normalNode, sensitiveNode) to false)
+            )
+            val normalRow = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "Normal",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                normalRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).hasSize(1)
+                assertThat(data.children[0]).isEqualTo(normalRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper).invoke(normalNode, DOCUMENT_ID_PREFIX)
+        }
+
+    @Test
+    fun `test that when showHiddenItems false and isHiddenNodesEnabled true nodes with isSensitiveInherited are filtered out`() =
+        runTest {
+            val sensitiveInheritedNode: TypedNode = mock()
+            val normalNode: TypedNode = mock()
+            whenever(sensitiveInheritedNode.isMarkedSensitive).thenReturn(false)
+            whenever(sensitiveInheritedNode.isSensitiveInherited).thenReturn(true)
+            whenever(normalNode.isMarkedSensitive).thenReturn(false)
+            whenever(normalNode.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(normalNode, sensitiveInheritedNode) to false)
+            )
+            val normalRow = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "Normal",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                normalRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).hasSize(1)
+                assertThat(data.children[0]).isEqualTo(normalRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper).invoke(normalNode, DOCUMENT_ID_PREFIX)
+        }
+
+    @Test
+    fun `test that when showHiddenItems false and isHiddenNodesEnabled true both isMarkedSensitive and isSensitiveInherited are filtered out`() =
+        runTest {
+            val markedSensitiveNode: TypedNode = mock()
+            val inheritedSensitiveNode: TypedNode = mock()
+            val normalNode: TypedNode = mock()
+            whenever(markedSensitiveNode.isMarkedSensitive).thenReturn(true)
+            whenever(markedSensitiveNode.isSensitiveInherited).thenReturn(false)
+            whenever(inheritedSensitiveNode.isMarkedSensitive).thenReturn(false)
+            whenever(inheritedSensitiveNode.isSensitiveInherited).thenReturn(true)
+            whenever(normalNode.isMarkedSensitive).thenReturn(false)
+            whenever(normalNode.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(normalNode, markedSensitiveNode, inheritedSensitiveNode) to false)
+            )
+            val normalRow = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "Normal",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normalNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                normalRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).hasSize(1)
+                assertThat(data.children[0]).isEqualTo(normalRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper, times(1)).invoke(any(), any())
+        }
+
+    @Test
+    fun `test that when filtering sensitive all non-sensitive nodes are included`() =
+        runTest {
+            val normal1: TypedNode = mock()
+            val normal2: TypedNode = mock()
+            whenever(normal1.isMarkedSensitive).thenReturn(false)
+            whenever(normal1.isSensitiveInherited).thenReturn(false)
+            whenever(normal2.isMarkedSensitive).thenReturn(false)
+            whenever(normal2.isSensitiveInherited).thenReturn(false)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(normal1, normal2) to false)
+            )
+            val row1 = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:1",
+                displayName = "A",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            val row2 = CloudDriveDocumentRow(
+                documentId = "$DOCUMENT_ID_PREFIX:2",
+                displayName = "B",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normal1, DOCUMENT_ID_PREFIX)).thenReturn(
+                row1
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(normal2, DOCUMENT_ID_PREFIX)).thenReturn(
+                row2
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).hasSize(2)
+                assertThat(data.children).containsExactly(row1, row2)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that when showHiddenItems false and isHiddenNodesEnabled true all sensitive nodes yield empty ChildData`() =
+        runTest {
+            val sensitive1: TypedNode = mock()
+            val sensitive2: TypedNode = mock()
+            whenever(sensitive1.isMarkedSensitive).thenReturn(true)
+            whenever(sensitive1.isSensitiveInherited).thenReturn(false)
+            whenever(sensitive2.isMarkedSensitive).thenReturn(false)
+            whenever(sensitive2.isSensitiveInherited).thenReturn(true)
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
+                flowOf(listOf(sensitive1, sensitive2) to false)
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                advanceUntilIdle()
+                awaitItem()
+                val childData = awaitItem()
+                assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
+                val data = childData as CloudDriveDocumentProviderUiState.ChildData
+                assertThat(data.children).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper, times(0)).invoke(any(), any())
+        }
+
+
+    @Test
+    fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but showHiddenItems is true`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            val handle = 777L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedNode: TypedNode = mock()
+            whenever(typedNode.isMarkedSensitive).thenReturn(true)
+            whenever(typedNode.isSensitiveInherited).thenReturn(false)
+            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
+            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
+            val expectedRow = CloudDriveDocumentRow(
+                documentId = documentId,
+                displayName = "Sensitive Doc",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                expectedRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadDocumentInBackground(documentId)
+                advanceUntilIdle()
+                awaitItem() // LoadingDocument(documentId)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
+                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
+                    .isEqualTo(expectedRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
+        }
+
+    @Test
+    fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but isHiddenNodesEnabled is false`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            val handle = 666L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedNode: TypedNode = mock()
+            whenever(typedNode.isMarkedSensitive).thenReturn(true)
+            whenever(typedNode.isSensitiveInherited).thenReturn(false)
+            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
+            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            val expectedRow = CloudDriveDocumentRow(
+                documentId = documentId,
+                displayName = "Sensitive Doc",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                expectedRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadDocumentInBackground(documentId)
+                advanceUntilIdle()
+                awaitItem() // LoadingDocument(documentId)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
+                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
+                    .isEqualTo(expectedRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
+        }
+
+    @Test
+    fun `test that loadDocumentInBackground emits DocumentData when document is not sensitive and hidden nodes filtering is on`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            val handle = 555L
+            val documentId = "$DOCUMENT_ID_PREFIX:$handle"
+            val mockNode: FolderNode = mock()
+            val typedNode: TypedNode = mock()
+            whenever(typedNode.isMarkedSensitive).thenReturn(false)
+            whenever(typedNode.isSensitiveInherited).thenReturn(false)
+            whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
+            whenever(addNodeType.invoke(any())).thenReturn(typedNode)
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
+            val expectedRow = CloudDriveDocumentRow(
+                documentId = documentId,
+                displayName = "Normal Doc",
+                mimeType = Document.MIME_TYPE_DIR,
+                size = 0L,
+                lastModified = 0L,
+                flags = 0,
+            )
+            whenever(cloudDriveDocumentRowMapper.invoke(typedNode, DOCUMENT_ID_PREFIX)).thenReturn(
+                expectedRow
+            )
+
+            underTest.state.test {
+                skipItems(1)
+                awaitItem()
+                awaitItem()
+                underTest.loadDocumentInBackground(documentId)
+                advanceUntilIdle()
+                awaitItem() // LoadingDocument(documentId)
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
+                assertThat((state as CloudDriveDocumentProviderUiState.DocumentData).document)
+                    .isEqualTo(expectedRow)
+                cancelAndIgnoreRemainingEvents()
+            }
+            verify(cloudDriveDocumentRowMapper, atLeastOnce()).invoke(typedNode, DOCUMENT_ID_PREFIX)
+        }
 }
