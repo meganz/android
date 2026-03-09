@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
@@ -61,6 +62,8 @@ internal class FolderLinkViewModel @AssistedInject constructor(
                     navigateBackEvent = consumed
                 )
             }
+
+            FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
         }
     }
 
@@ -164,8 +167,17 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private fun onItemClicked(action: FolderLinkAction.ItemClicked) {
         when (val node = action.nodeUiItem.node) {
             is TypedFolderNode -> openFolder(node)
-            else -> Unit // TODO file handling: future MR
+            is TypedFileNode -> onFileClicked(node)
+            else -> Unit
         }
+    }
+
+    private fun onFileClicked(fileNode: TypedFileNode) {
+        _uiState.update { it.copy(openedFileNode = fileNode) }
+    }
+
+    private fun onOpenedFileNodeHandled() {
+        _uiState.update { it.copy(openedFileNode = null) }
     }
 
     private fun openFolder(folder: TypedFolderNode) {

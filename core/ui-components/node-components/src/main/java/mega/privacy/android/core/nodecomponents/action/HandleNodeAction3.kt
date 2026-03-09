@@ -3,9 +3,11 @@ package mega.privacy.android.core.nodecomponents.action
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
@@ -20,11 +22,11 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 @Composable
 fun HandleNodeAction3(
     typedFileNode: TypedFileNode,
-    snackBarHostState: SnackbarHostState?,
     onNavigate: (NavKey) -> Unit,
     onActionHandled: () -> Unit,
-    coroutineScope: CoroutineScope,
     nodeSourceData: NodeSourceData,
+    snackBarHostState: SnackbarHostState? = LocalSnackBarHostState.current,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
 ) {

@@ -23,12 +23,15 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
@@ -41,6 +44,7 @@ internal fun FolderLinkScreen(
     viewModel: FolderLinkViewModel,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     FolderLinkContent(
@@ -48,6 +52,7 @@ internal fun FolderLinkScreen(
         onNavigate = onNavigate,
         onBack = onBack,
         onAction = viewModel::processAction,
+        onTransfer = onTransfer
     )
 }
 
@@ -58,6 +63,7 @@ private fun FolderLinkContent(
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onAction: (FolderLinkAction) -> Unit,
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
@@ -147,6 +153,16 @@ private fun FolderLinkContent(
                 }
             }
         }
+    }
+
+    uiState.openedFileNode?.let { fileNode ->
+        HandleNodeAction3(
+            typedFileNode = fileNode,
+            nodeSourceData = NodeSourceData.FolderLink,
+            onNavigate = onNavigate,
+            onActionHandled = { onAction(FolderLinkAction.OpenedFileNodeHandled) },
+            onDownloadEvent = onTransfer
+        ) // TODO sort
     }
 
     BackHandler { onAction(FolderLinkAction.BackPressed) }

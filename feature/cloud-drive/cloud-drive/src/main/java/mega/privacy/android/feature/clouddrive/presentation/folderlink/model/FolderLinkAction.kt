@@ -9,4 +9,5 @@ sealed interface FolderLinkAction {
     data class ItemClicked(val nodeUiItem: NodeUiItem<TypedNode>) : FolderLinkAction
     data object BackPressed : FolderLinkAction
     data object NavigateBackEventConsumed : FolderLinkAction
+    data object OpenedFileNodeHandled : FolderLinkAction
 }

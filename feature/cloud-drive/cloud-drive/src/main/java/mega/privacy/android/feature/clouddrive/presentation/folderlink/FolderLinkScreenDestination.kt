@@ -19,6 +19,7 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
             viewModel = viewModel,
             onBack = navigationHandler::back,
             onNavigate = navigationHandler::navigate,
+            onTransfer = transferHandler::setTransferEvent
         )
     }
 }

@@ -12,6 +12,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
@@ -82,6 +83,15 @@ internal class FolderLinkViewModelTest {
 
     private fun mockFolderNodeUiItem(folder: TypedFolderNode): NodeUiItem<TypedNode> = mock {
         on { node } doReturn folder
+    }
+
+    private fun mockFileNode(id: Long = 2L, name: String = "file.txt"): TypedFileNode = mock {
+        on { this.id } doReturn NodeId(id)
+        on { this.name } doReturn name
+    }
+
+    private fun mockFileNodeUiItem(file: TypedFileNode): NodeUiItem<TypedNode> = mock {
+        on { node } doReturn file
     }
 
     private suspend fun stubNodeUiItemMapper(result: List<NodeUiItem<TypedNode>> = emptyList()) {
@@ -488,5 +498,50 @@ internal class FolderLinkViewModelTest {
         underTest.processAction(FolderLinkAction.NavigateBackEventConsumed)
 
         assertThat(underTest.uiState.value.navigateBackEvent).isNotEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that ItemClicked with a file node sets openedFileNode in state`() = runTest {
+        val file = mockFileNode(id = 99L, name = "document.pdf")
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        initViewModel(FolderLinkViewModel.Args(uriString = null))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemClicked(mockFileNodeUiItem(file)))
+
+        assertThat(underTest.uiState.value.openedFileNode).isEqualTo(file)
+    }
+
+    @Test
+    fun `test that OpenedFileNodeHandled clears openedFileNode from state`() = runTest {
+        val file = mockFileNode(id = 99L, name = "document.pdf")
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        initViewModel(FolderLinkViewModel.Args(uriString = null))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemClicked(mockFileNodeUiItem(file)))
+        assertThat(underTest.uiState.value.openedFileNode).isEqualTo(file)
+
+        underTest.processAction(FolderLinkAction.OpenedFileNodeHandled)
+
+        assertThat(underTest.uiState.value.openedFileNode).isNull()
+    }
+
+    @Test
+    fun `test that ItemClicked with a folder node does not set openedFileNode`() = runTest {
+        val url = "https://mega.nz/folder/abc"
+        val folder = mockFolderNode(id = 42L)
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(null)).thenReturn(FetchFolderNodesResult())
+        stubNodeUiItemMapper()
+        whenever(getFolderLinkChildrenNodesUseCase(42L, null)).thenReturn(emptyList())
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemClicked(mockFolderNodeUiItem(folder)))
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.openedFileNode).isNull()
     }
 }
