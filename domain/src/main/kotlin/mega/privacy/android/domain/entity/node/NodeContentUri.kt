@@ -9,6 +9,7 @@ import java.io.File
  * Node content uri
  *
  */
+@Serializable
 @Polymorphic
 sealed interface NodeContentUri {
     /**
