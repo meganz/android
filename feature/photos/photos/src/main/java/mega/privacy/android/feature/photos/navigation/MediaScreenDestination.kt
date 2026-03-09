@@ -1,8 +1,6 @@
 package mega.privacy.android.feature.photos.navigation
 
 import android.content.Intent
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +50,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabView
 import mega.privacy.android.feature.photos.presentation.videos.VideoRecentlyWatchedRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.contract.shared.sharedViewModel
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.AlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.AlbumDecryptionKeyNavKey
@@ -107,8 +106,7 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             }
         }
 
-        val activity = LocalActivity.current as ComponentActivity
-        val timelineViewModel: TimelineTabViewModel = hiltViewModel(activity)
+        val timelineViewModel: TimelineTabViewModel = sharedViewModel()
         MediaMainRoute(
             timelineViewModel = timelineViewModel,
             navigationHandler = navigationHandler,

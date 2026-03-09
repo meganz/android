@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -28,6 +29,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewModel
@@ -36,11 +38,11 @@ import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
 import mega.privacy.android.navigation.contract.state.SelectionModeController
@@ -137,6 +139,7 @@ fun HomeScreens(
                     },
                     navContent = { navigationUiController ->
                         var isSelectionMode by remember { mutableStateOf(false) }
+                        val homeScreensOwner = LocalViewModelStoreOwner.current
                         Column(Modifier.fillMaxSize()) {
                             val selectionModeController = remember(isSelectionMode) {
                                 SelectionModeController(
@@ -148,7 +151,8 @@ fun HomeScreens(
                                 )
                             }
                             CompositionLocalProvider(
-                                LocalSelectionModeController provides selectionModeController
+                                LocalSelectionModeController provides selectionModeController,
+                                LocalSharedViewModelStoreOwner provides homeScreensOwner,
                             ) {
                                 NavDisplay(
                                     modifier = Modifier
@@ -180,30 +184,30 @@ fun HomeScreens(
                                     popTransitionSpec = { fadeTransition },
                                     predictivePopTransitionSpec = { fadeTransition }
                                 )
-                            }
-                            var isMiniPlayerVisible by remember { mutableStateOf(false) }
-                            Box(
-                                contentAlignment = Alignment.TopCenter
-                            ) {
-                                if (!isSelectionMode) {
-                                    MiniAudioPlayerView(
+                                var isMiniPlayerVisible by remember { mutableStateOf(false) }
+                                Box(
+                                    contentAlignment = Alignment.TopCenter
+                                ) {
+                                    if (!isSelectionMode) {
+                                        MiniAudioPlayerView(
+                                            modifier = Modifier
+                                                .fillMaxWidth(),
+                                            onVisibilityChanged = { isVisible ->
+                                                isMiniPlayerVisible = isVisible
+                                            }
+                                        )
+                                    }
+                                    RequestStatusProgressContainer(
+                                        viewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
                                         modifier = Modifier
-                                            .fillMaxWidth(),
-                                        onVisibilityChanged = { isVisible ->
-                                            isMiniPlayerVisible = isVisible
-                                        }
+                                            .conditional(
+                                                (!isMiniPlayerVisible || isSelectionMode) &&
+                                                        LocalNavigationRailVisible.current
+                                            ) {
+                                                navigationBarsPadding()
+                                            }
                                     )
                                 }
-                                RequestStatusProgressContainer(
-                                    viewModel = hiltViewModel(LocalActivity.current as ComponentActivity),
-                                    modifier = Modifier
-                                        .conditional(
-                                            (!isMiniPlayerVisible || isSelectionMode) &&
-                                                    LocalNavigationRailVisible.current
-                                        ) {
-                                            navigationBarsPadding()
-                                        }
-                                )
                             }
                         }
                     },

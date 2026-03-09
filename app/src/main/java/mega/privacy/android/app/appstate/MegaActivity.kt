@@ -34,7 +34,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -50,6 +49,7 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.NavigationGraphViewModel
@@ -89,7 +89,6 @@ import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.parcelableArrayList
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
-import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.bottomsheet.BottomSheetSceneStrategy
@@ -97,6 +96,7 @@ import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
+import mega.privacy.android.navigation.contract.shared.rememberSharedViewModelStoreNavEntryDecorator
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.contract.transparent.TransparentSceneStrategy
 import mega.privacy.android.navigation.destination.DeepLinksDialogNavKey
@@ -416,7 +416,7 @@ class MegaActivity : FragmentActivity() {
                                             .chain(bottomSheetStrategy),
                                         entryDecorators = listOf(
                                             rememberSaveableStateHolderNavEntryDecorator(),
-                                            rememberViewModelStoreNavEntryDecorator(),
+                                            rememberSharedViewModelStoreNavEntryDecorator(),
                                             rememberAnalyticNavEntryDecorator()
                                         ),
                                         entryProvider = entryProvider {
