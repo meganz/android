@@ -5,6 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.node.NodeId
@@ -31,6 +32,7 @@ class VideoRecentlyWatchedScreenTest {
         onBack: () -> Unit = {},
         onClear: () -> Unit = {},
         onMenuClick: (NavKey) -> Unit = {},
+        onClick: (VideoUiEntity) -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
         composeTestRule.setContent {
@@ -39,6 +41,7 @@ class VideoRecentlyWatchedScreenTest {
                 onBack = onBack,
                 onClear = onClear,
                 onMenuClick = onMenuClick,
+                onClick = onClick,
                 modifier = modifier
             )
         }
@@ -111,6 +114,28 @@ class VideoRecentlyWatchedScreenTest {
             composeTestRule.onNodeWithTag(it).performClick()
         }
         verify(onClear).invoke()
+    }
+
+    @Test
+    fun `test that clicking video item invokes onClick with that item`() {
+        val videoItem = mock<VideoUiEntity> {
+            on { id }.thenReturn(NodeId(123L))
+            on { name }.thenReturn("video")
+            on { durationString }.thenReturn("10:00")
+            on { duration }.thenReturn(10.minutes)
+        }
+        val onClick: (VideoUiEntity) -> Unit = mock()
+        setComposeContent(
+            uiState = VideoRecentlyWatchedUiState.Data(
+                groupedVideoRecentlyWatchedItems = mapOf(
+                    0L to listOf(videoItem)
+                )
+            ),
+            onClick = onClick
+        )
+
+        composeTestRule.onNodeWithText("video", true).performClick()
+        verify(onClick).invoke(videoItem)
     }
 
     private fun String.assertIsDisplayedWithTag() =

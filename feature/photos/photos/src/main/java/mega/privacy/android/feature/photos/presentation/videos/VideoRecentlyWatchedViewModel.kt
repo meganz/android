@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,18 +13,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -47,9 +49,15 @@ class VideoRecentlyWatchedViewModel @Inject constructor(
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val videoUiEntityMapper: VideoUiEntityMapper,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
+    private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
+    private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
 ) : ViewModel() {
     internal val clearRecentlyWatchedEvent: StateFlow<StateEvent>
         field: MutableStateFlow<StateEvent> = MutableStateFlow(consumed)
+
+    internal val navigateToVideoPlayerEvent: StateFlow<StateEventWithContent<Pair<VideoUiEntity, NodeContentUri>>>
+        field: MutableStateFlow<StateEventWithContent<Pair<VideoUiEntity, NodeContentUri>>> =
+        MutableStateFlow(consumed())
 
     private fun getShowHiddenItemsFlow(): Flow<Boolean> = combine(
         monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
@@ -107,5 +115,22 @@ class VideoRecentlyWatchedViewModel @Inject constructor(
 
     internal fun resetVideosRecentlyWatched() {
         clearRecentlyWatchedEvent.update { consumed }
+    }
+
+    internal fun onItemClicked(item: VideoUiEntity) {
+        navigateToVideoPlayer(item)
+    }
+
+    private fun navigateToVideoPlayer(item: VideoUiEntity) {
+        viewModelScope.launch {
+            val uri = runCatching {
+                getNodeContentUriByHandleUseCase(item.id.longValue)
+            }.onFailure { Timber.e(it) }.getOrNull() ?: return@launch
+            navigateToVideoPlayerEvent.update { triggered(item to uri) }
+        }
+    }
+
+    internal fun resetNavigateToVideoPlayer() {
+        navigateToVideoPlayerEvent.update { consumed() }
     }
 }

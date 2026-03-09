@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.empty.MegaEmptyView
@@ -37,14 +38,17 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoItemView
+import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.feature.photos.presentation.videos.view.VideoRecentlyWatchedClearMenuAction
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import java.time.LocalDate
 import java.time.ZoneId
@@ -60,6 +64,8 @@ internal fun VideoRecentlyWatchedRoute(
     val resources = LocalResources.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val clearVideosRecentlyWatched by viewModel.clearRecentlyWatchedEvent.collectAsStateWithLifecycle()
+    val navigateEvent by viewModel.navigateToVideoPlayerEvent.collectAsStateWithLifecycle()
+    val nodeSourceTypeToViewTypeMapper = remember { NodeSourceTypeToViewTypeMapper() }
 
     EventEffect(
         event = clearVideosRecentlyWatched,
@@ -71,14 +77,36 @@ internal fun VideoRecentlyWatchedRoute(
         }
     )
 
+    NavigationEventEffect(
+        event = navigateEvent,
+        onConsumed = viewModel::resetNavigateToVideoPlayer,
+        action = { (item, uri) ->
+            val dataState = uiState as? VideoRecentlyWatchedUiState.Data
+            val items =
+                dataState?.groupedVideoRecentlyWatchedItems?.values?.flatten() ?: emptyList()
+            val navKey = LegacyMediaPlayerNavKey(
+                nodeHandle = item.id.longValue,
+                nodeContentUri = uri,
+                nodeSourceType = nodeSourceTypeToViewTypeMapper(NodeSourceType.SEARCH),
+                isFolderLink = false,
+                fileName = item.name,
+                parentHandle = item.parentId.longValue,
+                fileHandle = item.id.longValue,
+                fileTypeInfo = item.fileTypeInfo,
+                searchedItems = items.map { it.id.longValue }
+            )
+            navigate(navKey)
+        }
+    )
+
     VideoRecentlyWatchedScreen(
         uiState = uiState,
         onBack = onBack,
         onClear = viewModel::clearVideosRecentlyWatched,
-        onMenuClick = navigate
+        onMenuClick = navigate,
+        onClick = viewModel::onItemClicked
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,6 +115,7 @@ internal fun VideoRecentlyWatchedScreen(
     onBack: () -> Unit,
     onClear: () -> Unit,
     onMenuClick: (NavKey) -> Unit,
+    onClick: (VideoUiEntity) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val clearMenuAction = remember { VideoRecentlyWatchedClearMenuAction() }
@@ -176,9 +205,7 @@ internal fun VideoRecentlyWatchedScreen(
                                         },
                                         thumbnailData = ThumbnailRequest(videoItem.id),
                                         nodeAvailableOffline = videoItem.nodeAvailableOffline,
-                                        onClick = {
-                                            //TODO navigate to video player
-                                        },
+                                        onClick = { onClick(videoItem) },
                                         onMenuClick = {
                                             onMenuClick(
                                                 NodeOptionsBottomSheetNavKey(
