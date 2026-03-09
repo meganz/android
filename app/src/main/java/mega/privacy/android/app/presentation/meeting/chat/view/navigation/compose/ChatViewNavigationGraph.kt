@@ -1,9 +1,11 @@
 package mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.material.ScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavBackStackEntry
@@ -58,7 +60,6 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             },
         ),
     ) {
-
         chatScreen(
             navController = navController,
             bottomSheetNavigator = bottomSheetNavigator,
@@ -208,11 +209,16 @@ internal class ChatArgs(val chatId: Long, val action: String, val link: String?)
             )
 }
 
+@SuppressLint("LifecycleCurrentStateInComposition")
 @Composable
 inline fun <reified T : ViewModel> NavBackStackEntry.sharedViewModel(navController: NavHostController): T {
     val navGraphRoute = destination.parent?.route ?: return hiltViewModel()
     val parentEntry = remember(this) {
         navController.getBackStackEntry(navGraphRoute)
     }
-    return hiltViewModel(parentEntry)
+    return if (parentEntry.lifecycle.currentState.isAtLeast(Lifecycle.State.CREATED)) {
+        hiltViewModel(parentEntry)
+    } else {
+        hiltViewModel()
+    }
 }
