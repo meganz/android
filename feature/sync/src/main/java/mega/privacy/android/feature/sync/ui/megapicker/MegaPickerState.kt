@@ -9,8 +9,10 @@ internal data class MegaPickerState(
     val nodes: List<TypedNodeUiModel>? = null,
     val showAllFilesAccessDialog: Boolean = false,
     val showDisableBatteryOptimizationsDialog: Boolean = false,
-    val errorMessageId: Int? = null,
+    val snackbarMessageId: Int? = null,
     val navigateNextEvent: StateEvent = consumed,
     val isSelectEnabled: Boolean = false,
     val isLoading: Boolean = false,
+    val showRemoveConnectionDialog: Boolean = false,
+    val selectedDisabledFolder: TypedNodeUiModel? = null,
 )

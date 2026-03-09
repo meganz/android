@@ -2287,4 +2287,10 @@
     <string name="album_photos_selection_empty_state_no_media_found">لم يتم العثور على أي وسائط</string>
     <string name="home_screen_no_network_desc_with_offline_files">أنت غير متصل بالإنترنت.\nالعناصر التي حفظتها للاستخدام دون اتصال ما زالت متوفرة.</string>
     <string name="home_screen_no_network_view_offline_files_button">عرض الملفات دون اتصال بالإنترنت</string>
+    <!-- Sync folder connection dialog title -->
+    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
+    <!-- Sync folder connection dialog message. %1$s is the device name -->
+    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
+    <!-- Sync folder connection subtitle -->
+    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
 </resources>

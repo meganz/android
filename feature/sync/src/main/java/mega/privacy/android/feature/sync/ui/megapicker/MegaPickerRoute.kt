@@ -46,13 +46,14 @@ internal fun MegaPickerRoute(
         currentFolder = state.value.currentFolder,
         nodes = state.value.nodes,
         folderClicked = { viewModel.handleAction(FolderClicked(it)) },
+        disabledFolderClicked = { viewModel.handleAction(MegaPickerAction.DisabledFolderClicked(it)) },
         currentFolderSelected = {
             selectCurrentFolder(viewModel, syncPermissionsManager)
         },
         fileTypeIconMapper = fileTypeIconMapper,
-        errorMessageId = state.value.errorMessageId,
-        errorMessageShown = {
-            viewModel.handleAction(MegaPickerAction.ErrorMessageShown)
+        snackbarMessageId = state.value.snackbarMessageId,
+        snackbarMessageShown = {
+            viewModel.handleAction(MegaPickerAction.SnackbarShown)
         },
         onCreateNewFolderDialogSuccess = { newFolderName ->
             viewModel.createFolder(
@@ -97,6 +98,20 @@ internal fun MegaPickerRoute(
             },
             onDismiss = {
                 viewModel.handleAction(MegaPickerAction.DisableBatteryOptimizationsDialogShown)
+            },
+        )
+    }
+
+    // Remove folder connection dialog
+    if (state.value.showRemoveConnectionDialog) {
+        RemoveConnectionDialog(
+            deviceName = state.value.selectedDisabledFolder?.deviceName
+                ?: "",
+            onConfirm = {
+                viewModel.handleAction(MegaPickerAction.RemoveConnectionConfirmed)
+            },
+            onDismiss = {
+                viewModel.handleAction(MegaPickerAction.RemoveConnectionDialogDismissed)
             },
         )
     }
@@ -181,6 +196,40 @@ private fun AllFilesAccessDialogPreview() {
 private fun DisableBatteryOptimizationDialogPreview() {
     OriginalTheme(isDark = isSystemInDarkTheme()) {
         DisableBatteryOptimizationDialog(
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
+}
+
+/**
+ * Dialog to confirm removal of folder connection
+ */
+@Composable
+private fun RemoveConnectionDialog(
+    deviceName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ConfirmationDialog(
+        title = stringResource(id = sharedResR.string.sync_folder_connection_dialog_title),
+        text = stringResource(
+            id = sharedResR.string.sync_folder_connection_dialog_message,
+            deviceName
+        ),
+        confirmButtonText = stringResource(id = sharedResR.string.device_center_bottom_sheet_item_remove_connection),
+        cancelButtonText = stringResource(id = android.R.string.cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun RemoveConnectionDialogPreview() {
+    OriginalTheme(isDark = isSystemInDarkTheme()) {
+        RemoveConnectionDialog(
+            deviceName = "My Device",
             onConfirm = {},
             onDismiss = {},
         )

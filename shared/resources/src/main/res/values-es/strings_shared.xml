@@ -2191,4 +2191,10 @@
     <string name="choose_account_screen_plan_available_monthly_billing">%1$s está disponible con facturación mensual</string>
     <string name="remove_from_offline_success_message">Archivo eliminado de Sin conexión</string>
     <string name="create_new_video_playlist_input_title_placeholder">Nueva lista de reproducción</string>
+    <!-- Sync folder connection dialog title -->
+    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
+    <!-- Sync folder connection dialog message. %1$s is the device name -->
+    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
+    <!-- Sync folder connection subtitle -->
+    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
 </resources>

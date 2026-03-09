@@ -43,24 +43,22 @@ class SyncUriValidityMapper @Inject constructor(
                 val primaryFolderPath = getPrimaryFolderPathUseCase()
                 val mediaUploadPath = getSecondaryFolderPathUseCase()
                 val folderPairs = getFolderPairsUseCase()
-                if (checkIfPathIsAlreadySynced(
-                        path,
-                        localDCIMFolderPath,
-                        primaryFolderPath,
-                        mediaUploadPath
-                    )
-                ) {
-                    return SyncValidityResult.ShowSnackbar(
-                        messageResId = sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message
-                    )
+                val pathMatchCameraUploadsResult = checkIfPathIsAlreadyUsedByCameraUploads(
+                    path,
+                    localDCIMFolderPath,
+                    primaryFolderPath,
+                    mediaUploadPath
+                )
+                if (pathMatchCameraUploadsResult !is SyncValidityResult.ValidFolderSelected) {
+                    return pathMatchCameraUploadsResult
                 }
-                val matchDetails = findDetailedMatchingFolderPair(
+                val pathMatchSyncBackupResult = checkPathAlreadySyncedOrBackedUp(
                     folderPairs,
                     externalPath,
                 )
 
-                if (matchDetails != null) {
-                    val (matchingFolderPair, _, relationship) = matchDetails // Destructuring declaration
+                if (pathMatchSyncBackupResult != null) {
+                    val (matchingFolderPair, _, relationship) = pathMatchSyncBackupResult // Destructuring declaration
                     val syncType = matchingFolderPair.syncType
 
                     val snackbarMessage = when (relationship) {
@@ -104,12 +102,12 @@ class SyncUriValidityMapper @Inject constructor(
     }
 
 
-    private suspend fun checkIfPathIsAlreadySynced(
+    private suspend fun checkIfPathIsAlreadyUsedByCameraUploads(
         path: String,
         localDCIMFolderPath: String,
         primaryFolderPath: String,
         mediaUploadPath: String,
-    ): Boolean {
+    ): SyncValidityResult {
         val isNewDCIMLogicEnabled =
             getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
 
@@ -125,10 +123,27 @@ class SyncUriValidityMapper @Inject constructor(
                 localDCIMFolderPath.isNotEmpty() &&
                 path.startsWith(localDCIMFolderPath)
 
-        return isCameraMatch || isMediaMatch || isLegacyDCIMMatch
+        return if (isCameraMatch) {
+            SyncValidityResult.ShowSnackbar(
+                messageResId = sharedR.string.error_folder_part_of_camera_uploads
+            )
+        } else if (isMediaMatch) {
+            SyncValidityResult.ShowSnackbar(
+                messageResId = sharedR.string.error_folder_part_of_media_uploads
+            )
+        } else if (isLegacyDCIMMatch) {
+            SyncValidityResult.ShowSnackbar(
+                messageResId = sharedR.string.device_center_new_sync_select_local_device_folder_currently_synced_message
+            )
+        } else {
+            SyncValidityResult.ValidFolderSelected(
+                localFolderUri = UriPath(""),
+                folderName = ""
+            )
+        }
     }
 
-    private suspend fun findDetailedMatchingFolderPair(
+    private suspend fun checkPathAlreadySyncedOrBackedUp(
         folderPairs: List<FolderPair>,
         externalPath: String,
     ): PathMatchDetails? {

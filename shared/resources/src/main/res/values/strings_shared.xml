@@ -2402,4 +2402,10 @@
     <string name="text_editor_show_line_numbers">Show line numbers</string>
     <!-- Content description for text editor toolbar: hide line numbers -->
     <string name="text_editor_hide_line_numbers">Hide line numbers</string>
+    <!-- Sync folder connection dialog title -->
+    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
+    <!-- Sync folder connection dialog message. %1$s is the device name -->
+    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
+    <!-- Sync folder connection subtitle -->
+    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
 </resources>

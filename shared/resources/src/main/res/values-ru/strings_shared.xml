@@ -2267,4 +2267,10 @@
     <string name="photos_create_album_proscribed_name_error">Недопустимое название альбома. Введите другое название.</string>
     <string name="remove_from_offline_success_message">Файл удалён из локальных</string>
     <string name="create_new_video_playlist_input_title_placeholder">Новый плейлист</string>
+    <!-- Sync folder connection dialog title -->
+    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
+    <!-- Sync folder connection dialog message. %1$s is the device name -->
+    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
+    <!-- Sync folder connection subtitle -->
+    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
 </resources>

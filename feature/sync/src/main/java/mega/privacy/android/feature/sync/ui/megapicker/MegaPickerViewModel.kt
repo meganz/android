@@ -16,27 +16,21 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.exception.MegaSyncException
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
-import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
-import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderNodeUseCase
-import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
+import mega.privacy.android.domain.usecase.backup.RemoveDeviceFolderConnectionUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
-import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
+import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerNodeInfo
+import mega.privacy.android.feature.sync.domain.usecase.megapicker.MonitorMegaPickerFolderNodesUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.TryNodeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetSelectedMegaFolderUseCase
 import mega.privacy.android.shared.resources.R as sharedR
@@ -50,19 +44,15 @@ internal class MegaPickerViewModel @AssistedInject constructor(
     @Assisted val folderName: String? = null,
     private val setSelectedMegaFolderUseCase: SetSelectedMegaFolderUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val getTypedNodesFromFolder: GetTypedNodesFromFolderUseCase,
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase,
     private val tryNodeSyncUseCase: TryNodeSyncUseCase,
     private val deviceFolderUINodeErrorMessageMapper: DeviceFolderUINodeErrorMessageMapper,
-    private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
-    private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
-    private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
     private val isFolderUsedBySyncOrBackupAcrossDevicesUseCase: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase,
-    private val getBackupInfoUseCase: GetBackupInfoUseCase,
-    private val determineNodeRelationshipUseCase: DetermineNodeRelationshipUseCase,
+    private val removeDeviceFolderConnectionUseCase: RemoveDeviceFolderConnectionUseCase,
+    private val monitorMegaPickerFolderNodesUseCase: MonitorMegaPickerFolderNodesUseCase,
+    private val nodeExistsInCurrentLocationUseCase: NodeExistsInCurrentLocationUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -118,26 +108,10 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                         } ?: FolderUsageResult.NotUsed
                     }.getOrNull() ?: FolderUsageResult.NotUsed
 
-                    val errorMessage = when (folderUsageResult) {
-                        FolderUsageResult.NotUsed -> null
-                        FolderUsageResult.UsedByCameraUpload,
-                        FolderUsageResult.UsedByCameraUploadParent,
-                        FolderUsageResult.UsedByCameraUploadChild,
-                            -> sharedR.string.error_folder_part_of_camera_uploads
-
-                        FolderUsageResult.UsedByMediaUpload,
-                        FolderUsageResult.UsedByMediaUploadParent,
-                        FolderUsageResult.UsedByMediaUploadChild,
-                            -> sharedR.string.error_folder_part_of_media_uploads
-
-                        is FolderUsageResult.UsedBySyncOrBackup,
-                        is FolderUsageResult.UsedBySyncOrBackupParent,
-                        is FolderUsageResult.UsedBySyncOrBackupChild,
-                            -> sharedR.string.error_folder_part_of_sync_or_backup
-                    }
+                    val errorMessage = getFolderUsageMessage(folderUsageResult)
 
                     if (errorMessage != null) {
-                        _state.update { it.copy(errorMessageId = errorMessage) }
+                        _state.update { it.copy(snackbarMessageId = errorMessage) }
                         return@launch
                     }
 
@@ -172,7 +146,7 @@ internal class MegaPickerViewModel @AssistedInject constructor(
 
                         _state.update { state ->
                             state.copy(
-                                errorMessageId = errorMessage
+                                snackbarMessageId = errorMessage
                             )
                         }
                     }
@@ -207,12 +181,69 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                 }
             }
 
-            MegaPickerAction.ErrorMessageShown -> {
+            MegaPickerAction.SnackbarShown -> {
                 _state.update {
-                    it.copy(errorMessageId = null)
+                    it.copy(snackbarMessageId = null)
+                }
+            }
+
+            is MegaPickerAction.DisabledFolderClicked -> {
+                // Only show remove-connection dialog when folder has a removable backup (other device)
+                if (action.node.backupId != null) {
+                    _state.update {
+                        it.copy(
+                            showRemoveConnectionDialog = true,
+                            selectedDisabledFolder = action.node
+                        )
+                    }
+                }
+            }
+
+            MegaPickerAction.RemoveConnectionConfirmed -> {
+                val backupId = state.value.selectedDisabledFolder?.backupId
+                if (backupId != null) {
+                    removeFolderConnection(backupId)
+                } else {
+                    Timber.w("RemoveConnectionConfirmed action received but backupId is null")
+                    _state.update {
+                        it.copy(
+                            showRemoveConnectionDialog = false,
+                            selectedDisabledFolder = null
+                        )
+                    }
+                }
+            }
+
+            MegaPickerAction.RemoveConnectionDialogDismissed -> {
+                _state.update {
+                    it.copy(
+                        showRemoveConnectionDialog = false,
+                        selectedDisabledFolder = null
+                    )
                 }
             }
         }
+    }
+
+    private fun getFolderUsageMessage(folderUsageResult: FolderUsageResult): Int? {
+        val errorMessage = when (folderUsageResult) {
+            FolderUsageResult.NotUsed -> null
+            FolderUsageResult.UsedByCameraUpload,
+            FolderUsageResult.UsedByCameraUploadParent,
+            FolderUsageResult.UsedByCameraUploadChild,
+                -> sharedR.string.error_folder_part_of_camera_uploads
+
+            FolderUsageResult.UsedByMediaUpload,
+            FolderUsageResult.UsedByMediaUploadParent,
+            FolderUsageResult.UsedByMediaUploadChild,
+                -> sharedR.string.error_folder_part_of_media_uploads
+
+            is FolderUsageResult.UsedBySyncOrBackup,
+            is FolderUsageResult.UsedBySyncOrBackupParent,
+            is FolderUsageResult.UsedBySyncOrBackupChild,
+                -> sharedR.string.error_folder_part_of_sync_or_backup
+        }
+        return errorMessage
     }
 
     private fun folderSelected() {
@@ -253,85 +284,63 @@ internal class MegaPickerViewModel @AssistedInject constructor(
         }
     }
 
+    private fun removeFolderConnection(backupId: Long) {
+        viewModelScope.launch {
+            runCatching {
+                removeDeviceFolderConnectionUseCase(backupId)
+            }.onSuccess {
+                _state.update {
+                    it.copy(
+                        showRemoveConnectionDialog = false,
+                        selectedDisabledFolder = null,
+                        snackbarMessageId = sharedR.string.device_center_snackbar_message_connection_removed
+                    )
+                }
+                state.value.currentFolder?.let(::fetchFolders)
+            }.onFailure {
+                Timber.e(it, "Failed to remove folder connection")
+                _state.update { state ->
+                    state.copy(
+                        showRemoveConnectionDialog = false,
+                        selectedDisabledFolder = null,
+                        snackbarMessageId = sharedR.string.general_text_error
+                    )
+                }
+            }
+        }
+    }
+
     private fun fetchFolders(currentFolder: Node) {
         getNodesFromFolderJob?.cancel()
         getNodesFromFolderJob = viewModelScope.launch {
-            _state.update { state -> state.copy(isLoading = true) }
-            val excludeFolders = if (currentFolder.id == rootFolder?.id) {
-                runCatching {
-                    val cameraUploadsFolderHandle = getCameraUploadsFolderHandleUseCase()
-                    val mediaUploadsFolderHandle = getMediaUploadsFolderHandleUseCase()?.id
-                    val myChatsUploadsFolderHandle = getMyChatsFilesFolderIdUseCase()
-
-                    listOfNotNull(
-                        NodeId(cameraUploadsFolderHandle),
-                        mediaUploadsFolderHandle,
-                        myChatsUploadsFolderHandle
-                    ).filterNot { it == NodeId(-1L) }
-                        .ifEmpty { null }
-                }
-                    .onFailure {
-                        Timber.d(it, "Error getting handles of CU and MyChat files")
-                    }
-                    .getOrNull()
-            } else {
-                null
-            }
-
-            // Pre-fetch backup/sync folder handles once (Approach A optimization)
-            val syncBackupFolderIds: List<NodeId> = runCatching {
-                val isFeatureEnabled =
-                    getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
-                if (isFeatureEnabled) {
-                    getBackupInfoUseCase()
-                        .filter { it.type == BackupInfoType.BACKUP_UPLOAD || it.type == BackupInfoType.TWO_WAY_SYNC }
-                        .map { it.rootHandle }
-                } else {
-                    emptyList()
-                }
-            }.getOrElse {
-                Timber.d(it, "Error getting backup info for folder usage check")
-                emptyList()
-            }
-
-            Timber.d("Current folder: ${currentFolder.name}, id: ${currentFolder.id}, RootFolder: ${rootFolder?.name}, id: ${rootFolder?.id}, Exclude folders: $excludeFolders")
-
-            val isSelectEnabled =
-                if (isStopBackup) isFolderExists(currentFolder.id).not() else currentFolder.id != rootFolder?.id
-
-            getTypedNodesFromFolder(currentFolder.id).catch {
-                Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
-            }.collectLatest { childFolders ->
-                val nodeUiModels = childFolders.map { node ->
-                    val isExcluded = excludeFolders?.contains(node.id) == true
-                    val isUsedBySyncOrBackup = if (syncBackupFolderIds.isNotEmpty()) {
-                        runCatching {
-                            syncBackupFolderIds.any { backupNodeId ->
-                                determineNodeRelationshipUseCase(
-                                    node.id,
-                                    backupNodeId
-                                ) != NodeRelationship.NoMatch
-                            }
-                        }.getOrElse { false }
-                    } else {
-                        false
-                    }
-                    TypedNodeUiModel(
-                        node = node,
-                        isDisabled = isExcluded || isUsedBySyncOrBackup,
-                    )
-                }
-                _state.update { megaPickerState ->
-                    megaPickerState.copy(
-                        currentFolder = currentFolder,
-                        nodes = nodeUiModels,
-                        isSelectEnabled = isSelectEnabled,
+            _state.update { it.copy(isLoading = true) }
+            monitorMegaPickerFolderNodesUseCase(
+                currentFolder,
+                rootFolder?.id,
+                isStopBackup,
+                folderName,
+            ).catch {
+                Timber.e(it)
+            }.collectLatest { result ->
+                _state.update {
+                    it.copy(
+                        currentFolder = result.currentFolder,
+                        nodes = result.nodes.map { node -> node.toTypedNodeUiModel() },
+                        isSelectEnabled = result.isSelectEnabled,
                         isLoading = false,
                     )
                 }
             }
         }
     }
+
+    private fun MegaPickerNodeInfo.toTypedNodeUiModel(): TypedNodeUiModel =
+        TypedNodeUiModel(
+            node = node,
+            isDisabled = isDisabled,
+            backupId = backupId,
+            deviceName = deviceName,
+        )
 
     private suspend fun isFolderExists(currentFolder: NodeId) =
         folderName?.let {

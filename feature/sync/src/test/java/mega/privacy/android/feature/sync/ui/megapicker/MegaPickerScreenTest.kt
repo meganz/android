@@ -32,8 +32,8 @@ internal class MegaPickerScreenTest {
     private val mockFileTypeIconMapper = mock<FileTypeIconMapper>()
     private val mockFolderClicked = mock<(TypedNode) -> Unit>()
     private val mockCurrentFolderSelected = mock<() -> Unit>()
-    private val mockErrorMessageShown = mock<() -> Unit>()
-    private val mockOnCreateNewFolderDialogSuccess = mock<(String) -> Unit>()
+    private val mockSnackbarMessageShown = mock<() -> Unit>()
+    private val mockDisabledFolderClicked = mock<(TypedNodeUiModel) -> Unit>()
 
     private fun createMockFolderNode(
         id: Long = 1L,
@@ -63,10 +63,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = null,
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = true,
                 isSelectEnabled = false,
             )
@@ -83,10 +84,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -108,10 +110,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = mockNodes,
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -138,10 +141,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -161,10 +165,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -186,10 +191,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = rootFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -202,15 +208,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that select button is displayed when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -233,10 +242,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -252,15 +262,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that select button click triggers currentFolderSelected callback`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -284,10 +297,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
                 isStopBackupMegaPicker = true,
@@ -306,10 +320,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
                 isStopBackupMegaPicker = false,
@@ -330,10 +345,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -356,10 +372,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = null,
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -372,15 +389,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button is visible and clickable when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -402,10 +422,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -420,15 +441,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button click triggers callback when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -446,15 +470,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button shows correct text for stop backup mega picker when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
                 isStopBackupMegaPicker = true,
@@ -472,15 +499,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button shows correct text for regular mega picker when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
                 isStopBackupMegaPicker = false,
@@ -504,10 +534,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = false,
             )
@@ -522,16 +553,19 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that layout adapts correctly when isSelectEnabled changes from true to false`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         // Test the behavior when isSelectEnabled is true
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -546,15 +580,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button is positioned at bottom when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -573,6 +610,7 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button works correctly with different node states when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
         val mockNodes = listOf(
             TypedNodeUiModel(createMockFolderNode(1L, "Folder 1")),
             TypedNodeUiModel(createMockFolderNode(2L, "Folder 2"))
@@ -580,13 +618,14 @@ internal class MegaPickerScreenTest {
 
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = mockNodes,
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -615,10 +654,11 @@ internal class MegaPickerScreenTest {
                 currentFolder = null,
                 nodes = null,
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = true,
                 isSelectEnabled = true,
             )
@@ -637,15 +677,18 @@ internal class MegaPickerScreenTest {
 
     @Test
     fun `test that button works correctly in empty state when isSelectEnabled is true`() {
+        val currentFolder = createMockCurrentFolder(id = 1L, name = "Test Folder", parentId = 2L)
+
         composeTestRule.setContent {
             MegaPickerScreen(
-                currentFolder = null,
+                currentFolder = currentFolder,
                 nodes = emptyList(),
                 folderClicked = mockFolderClicked,
+                disabledFolderClicked = {},
                 currentFolderSelected = mockCurrentFolderSelected,
                 fileTypeIconMapper = mockFileTypeIconMapper,
-                errorMessageId = null,
-                errorMessageShown = mockErrorMessageShown,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
                 isLoading = false,
                 isSelectEnabled = true,
             )
@@ -662,5 +705,160 @@ internal class MegaPickerScreenTest {
         // Verify empty state is also displayed
         composeTestRule.onNodeWithTag(TAG_SYNC_MEGA_FOLDER_PICKER_LIST_SCREEN_NO_ITEMS)
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that screen displays disabled folder with device name`() {
+        val disabledFolder = TypedNodeUiModel(
+            node = createMockFolderNode(1L, "Disabled Folder"),
+            isDisabled = true,
+            backupId = 123L,
+            deviceName = "My Laptop"
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = listOf(disabledFolder),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify the disabled folder is displayed
+        composeTestRule.onNodeWithText("Disabled Folder").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clicking disabled folder triggers disabledFolderClicked callback`() {
+        val disabledFolder = TypedNodeUiModel(
+            node = createMockFolderNode(1L, "Disabled Folder"),
+            isDisabled = true,
+            backupId = 123L,
+            deviceName = "My Laptop"
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = listOf(disabledFolder),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click on the disabled folder
+        composeTestRule.onNodeWithText("Disabled Folder").performClick()
+
+        // Verify the disabledFolderClicked callback was called with the correct node
+        verify(mockDisabledFolderClicked).invoke(disabledFolder)
+    }
+
+    @Test
+    fun `test that snackbar is displayed when snackbarMessageId is set`() {
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = emptyList(),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = sharedR.string.device_center_snackbar_message_connection_removed,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify the snackbar message is displayed
+        composeTestRule.onNodeWithText(
+            composeTestRule.activity.getString(sharedR.string.device_center_snackbar_message_connection_removed)
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that clicking enabled folder triggers folderClicked callback`() {
+        val enabledFolder = TypedNodeUiModel(
+            node = createMockFolderNode(1L, "Enabled Folder"),
+            isDisabled = false
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = listOf(enabledFolder),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Click on the enabled folder
+        composeTestRule.onNodeWithText("Enabled Folder").performClick()
+
+        // Verify the folderClicked callback was called
+        verify(mockFolderClicked).invoke(enabledFolder.node)
+    }
+
+    @Test
+    fun `test that screen displays mixed enabled and disabled folders`() {
+        val folders = listOf(
+            TypedNodeUiModel(createMockFolderNode(1L, "Enabled Folder 1"), isDisabled = false),
+            TypedNodeUiModel(
+                node = createMockFolderNode(2L, "Disabled Folder"),
+                isDisabled = true,
+                backupId = 123L,
+                deviceName = "My Laptop"
+            ),
+            TypedNodeUiModel(createMockFolderNode(3L, "Enabled Folder 2"), isDisabled = false),
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = folders,
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        // Verify all folders are displayed
+        composeTestRule.onNodeWithText("Enabled Folder 1").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Disabled Folder").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Enabled Folder 2").assertIsDisplayed()
     }
 }
