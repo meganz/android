@@ -10,7 +10,15 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -30,6 +38,37 @@ internal fun shouldCloseTextEditorOnNodeOptionsResult(
 ): Boolean =
     result is NodeOptionsBottomSheetResult.Navigation ||
             result is NodeOptionsBottomSheetResult.Transfer
+
+/** True when adapter is rubbish bin, offline, folder link, zip, file link, chat, or versions (hides Get Link and Edit). */
+private fun inExcludedAdapterForGetLinkAndEdit(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return false
+    return nodeSourceType in setOf(
+        RUBBISH_BIN_ADAPTER,
+        OFFLINE_ADAPTER,
+        FOLDER_LINK_ADAPTER,
+        ZIP_ADAPTER,
+        FILE_LINK_ADAPTER,
+        FROM_CHAT,
+        VERSIONS_ADAPTER,
+    )
+}
+
+/** True when Download should be shown for this source type (not offline, not rubbish bin). */
+private fun shouldShowDownload(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType != OFFLINE_ADAPTER && nodeSourceType != RUBBISH_BIN_ADAPTER
+}
+
+/** True when Share should be shown for this source type (not folder link, versions, incoming shares, or chat). */
+private fun shouldShowShare(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return true
+    return nodeSourceType !in setOf(
+        FOLDER_LINK_ADAPTER,
+        VERSIONS_ADAPTER,
+        INCOMING_SHARES_ADAPTER,
+        FROM_CHAT,
+    )
+}
 
 /**
  * Legacy text editor destination. When [LegacyTextEditorNavKey.isTextEditorComposeEnabled] is true,
@@ -78,35 +117,17 @@ private fun TextEditorEntry(
 
     if (navKey.isTextEditorComposeEnabled) {
         val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
-        val viewModel =
-            hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
-                factory.create(
-                    TextEditorComposeViewModel.Args(
-                        nodeHandle = navKey.nodeHandle,
-                        mode = mode,
-                        nodeSourceType = navKey.nodeSourceType,
-                        fileName = navKey.fileName,
-                    )
-                )
-            }
-        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        EventEffect(
-            event = uiState.transferEvent,
-            onConsumed = viewModel::consumeTransferEvent,
-        ) { content ->
-            transferHandler.setTransferEvent(content)
-        }
-        TextEditorScreen(
-            viewModel = viewModel,
-            onBack = removeDestination,
-            onOpenNodeOptions = {
-                navigationHandler.navigate(
-                    NodeOptionsBottomSheetNavKey(
-                        nodeHandle = navKey.nodeHandle,
-                        nodeSourceType = viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType),
-                    )
-                )
-            },
+        val nodeSourceType = navKey.nodeSourceType
+        TextEditorComposeContent(
+            navKey = navKey,
+            mode = mode,
+            inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
+            showDownload = shouldShowDownload(nodeSourceType),
+            showShare = shouldShowShare(nodeSourceType),
+            navigationHandler = navigationHandler,
+            removeDestination = removeDestination,
+            viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
+            transferHandler = transferHandler,
         )
     } else {
         LaunchedEffect(Unit) {
@@ -122,4 +143,52 @@ private fun TextEditorEntry(
             removeDestination()
         }
     }
+}
+
+@Composable
+private fun TextEditorComposeContent(
+    navKey: LegacyTextEditorNavKey,
+    mode: TextEditorMode,
+    inExcludedAdapterForGetLinkAndEdit: Boolean,
+    showDownload: Boolean,
+    showShare: Boolean,
+    navigationHandler: NavigationHandler,
+    removeDestination: () -> Unit,
+    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+    transferHandler: TransferHandler,
+) {
+    val viewModel =
+        hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
+            factory.create(
+                TextEditorComposeViewModel.Args(
+                    nodeHandle = navKey.nodeHandle,
+                    mode = mode,
+                    nodeSourceType = navKey.nodeSourceType,
+                    fileName = navKey.fileName,
+                    inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit,
+                    showDownload = showDownload,
+                    showShare = showShare,
+                    transferHandler = transferHandler,
+                )
+            )
+        }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    EventEffect(
+        event = uiState.transferEvent,
+        onConsumed = viewModel::consumeTransferEvent,
+    ) { content ->
+        transferHandler.setTransferEvent(content)
+    }
+    TextEditorScreen(
+        viewModel = viewModel,
+        onBack = removeDestination,
+        onOpenNodeOptions = {
+            navigationHandler.navigate(
+                NodeOptionsBottomSheetNavKey(
+                    nodeHandle = navKey.nodeHandle,
+                    nodeSourceType = viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType),
+                )
+            )
+        },
+    )
 }

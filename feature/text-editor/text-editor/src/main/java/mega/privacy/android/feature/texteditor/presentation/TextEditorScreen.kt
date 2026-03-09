@@ -1,6 +1,10 @@
 package mega.privacy.android.feature.texteditor.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,11 +14,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -39,11 +43,14 @@ import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
-import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import mega.privacy.android.feature.texteditor.R
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
+import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -113,6 +120,13 @@ fun TextEditorScreen(
                     )
                 }
             }
+            TextEditorBottomBar(
+                visible = uiState.bottomBarActions.isNotEmpty() && !uiState.isLoading,
+                actions = uiState.bottomBarActions,
+                onActionPressed = { action ->
+                    (action as? TextEditorBottomBarAction)?.let { viewModel.onBottomBarAction(it) }
+                },
+            )
         }
     }
 }
@@ -245,6 +259,35 @@ private fun TextEditorLoadingContent() {
             color = MaterialTheme.colorScheme.onSurface,
             trackColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         )
+    }
+}
+
+@Composable
+private fun TextEditorBottomBar(
+    visible: Boolean,
+    actions: List<MenuActionWithIcon>,
+    onActionPressed: (MenuActionWithIcon) -> Unit,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = slideInVertically(
+            animationSpec = tween(durationMillis = 300),
+            initialOffsetY = { it },
+        ),
+        exit = ExitTransition.None,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 16.dp),
+        ) {
+            MegaFloatingToolbar(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                actions = actions,
+                actionsEnabled = true,
+                onActionPressed = onActionPressed,
+            )
+        }
     }
 }
 
