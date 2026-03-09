@@ -78,7 +78,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             }
         }.catch { Timber.e(it, "CloudDriveDocumentDataProvider state") }.asUiStateFlow(
             scope = applicationScope,
-            initialValue = CloudDriveDocumentProviderUiState.LoadingRoot
+            initialValue = CloudDriveDocumentProviderUiState.Initialising
         )
     }
 
@@ -110,6 +110,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private sealed interface DocumentDataRequest {
         data object Root : DocumentDataRequest
+        data object RootChildren : DocumentDataRequest
         data class Children(val parentName: String) : DocumentDataRequest
         data class Document(val documentName: String) : DocumentDataRequest
     }
@@ -130,25 +131,30 @@ class CloudDriveDocumentDataProvider @Inject constructor(
                         is DocumentDataRequest.Children -> {
                             collectChildrenFlow(
                                 accountName = accountName,
-                                request = request,
-                                rootNodeDocumentId = rootNodeDocumentId
+                                parentDocumentId = request.parentName,
                             )
                         }
 
                         is DocumentDataRequest.Document -> {
                             collectDocumentFlow(
                                 accountName = accountName,
-                                request = request,
-                                rootNodeDocumentId = rootNodeDocumentId
+                                documentName = request.documentName,
                             )
                         }
 
                         DocumentDataRequest.Root -> {
-                            emit(
-                                CloudDriveDocumentProviderUiState.Root(
-                                    accountName = accountName,
-                                    rootNodeDocumentId = rootNodeDocumentId,
-                                )
+                            collectDocumentFlow(
+                                accountName = accountName,
+                                documentName = rootNodeDocumentId,
+                                notificationString = CLOUD_DRIVE_ROOT_ID
+                            )
+                        }
+
+                        DocumentDataRequest.RootChildren -> {
+                            collectChildrenFlow(
+                                accountName = accountName,
+                                parentDocumentId = rootNodeDocumentId,
+                                notificationString = CLOUD_DRIVE_ROOT_ID
                             )
                         }
                     }
@@ -159,18 +165,17 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private suspend fun FlowCollector<CloudDriveDocumentProviderUiState>.collectChildrenFlow(
         accountName: String,
-        request: DocumentDataRequest.Children,
-        rootNodeDocumentId: String,
+        parentDocumentId: String,
+        notificationString: String? = null,
     ) {
-        getChildDataFlow(request, accountName, rootNodeDocumentId).let { childDataFlow ->
+        getChildDataFlow(parentDocumentId, accountName, notificationString).let { childDataFlow ->
             if (childDataFlow != null) {
                 emitAll(childDataFlow)
             } else {
                 emit(
                     CloudDriveDocumentProviderUiState.FileNotFound(
                         accountName = accountName,
-                        documentId = request.parentName,
-                        rootNodeDocumentId = rootNodeDocumentId,
+                        documentId = notificationString ?: parentDocumentId,
                     )
                 )
             }
@@ -178,12 +183,12 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     }
 
     private suspend fun getChildDataFlow(
-        request: DocumentDataRequest.Children,
+        parentDocumentId: String,
         accountName: String,
-        rootNodeDocumentId: String,
+        notificationString: String? = null,
     ): Flow<CloudDriveDocumentProviderUiState>? = runCatching {
         val parentId = documentIdToNodeIdMapper(
-            request.parentName, CLOUD_DRIVE_ROOT_ID
+            parentDocumentId, CLOUD_DRIVE_ROOT_ID
         ) ?: return@runCatching null
         getNodesByIdInChunkUseCase(parentId).runningFold<Pair<List<TypedNode>, Boolean>, Pair<List<TypedNode>, Boolean>>(
             Pair(listOf(), true)
@@ -193,21 +198,19 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             .mapLatest<Pair<List<TypedNode>, Boolean>, CloudDriveDocumentProviderUiState> { (childNodes, hasMore) ->
                 CloudDriveDocumentProviderUiState.ChildData(
                     accountName = accountName,
-                    parentId = request.parentName,
+                    parentId = notificationString ?: parentDocumentId,
                     children = childNodes.map {
                         cloudDriveDocumentRowMapper(
                             it, CLOUD_DRIVE_ROOT_ID
                         )
                     },
                     hasMore = hasMore,
-                    rootNodeDocumentId = rootNodeDocumentId,
                 )
             }.onStart {
                 emit(
                     CloudDriveDocumentProviderUiState.LoadingChildren(
                         accountName = accountName,
-                        currentParentDocumentId = request.parentName,
-                        rootNodeDocumentId = rootNodeDocumentId,
+                        currentParentDocumentId = notificationString ?: parentDocumentId,
                     )
                 )
             }
@@ -215,21 +218,20 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     private suspend fun FlowCollector<CloudDriveDocumentProviderUiState>.collectDocumentFlow(
         accountName: String,
-        request: DocumentDataRequest.Document,
-        rootNodeDocumentId: String,
+        documentName: String,
+        notificationString: String? = null,
     ) {
         emit(
             CloudDriveDocumentProviderUiState.LoadingDocument(
                 accountName = accountName,
-                currentDocumentId = request.documentName,
-                rootNodeDocumentId = rootNodeDocumentId
+                currentDocumentId = notificationString ?: documentName,
             )
         )
         val document = runCatching {
-            val documentId = documentIdToNodeIdMapper(
-                request.documentName, CLOUD_DRIVE_ROOT_ID
+            val nodeId = documentIdToNodeIdMapper(
+                documentName, CLOUD_DRIVE_ROOT_ID
             ) ?: return@runCatching null
-            getNodeByHandleUseCase(documentId.longValue)?.let {
+            getNodeByHandleUseCase(nodeId.longValue)?.let {
                 addNodeType(it)
             }?.let {
                 cloudDriveDocumentRowMapper(it, CLOUD_DRIVE_ROOT_ID)
@@ -240,17 +242,16 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             emit(
                 CloudDriveDocumentProviderUiState.DocumentData(
                     accountName = accountName,
-                    documentId = request.documentName,
-                    document = document,
-                    rootNodeDocumentId = rootNodeDocumentId,
+                    documentId = notificationString ?: documentName,
+                    document = notificationString?.let { document.copy(documentId = it) }
+                        ?: document,
                 )
             )
         } else {
             emit(
                 CloudDriveDocumentProviderUiState.FileNotFound(
                     accountName = accountName,
-                    documentId = request.documentName,
-                    rootNodeDocumentId = rootNodeDocumentId,
+                    documentId = notificationString ?: documentName,
                 )
             )
         }
@@ -258,13 +259,23 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 
     fun loadDocumentInBackground(documentId: String) {
         applicationScope.launch {
-            requestFlow.emit(DocumentDataRequest.Document(documentId))
+            val request = if (documentId == CLOUD_DRIVE_ROOT_ID) {
+                DocumentDataRequest.Root
+            } else {
+                DocumentDataRequest.Document(documentId)
+            }
+            requestFlow.emit(request)
         }
     }
 
     fun loadChildrenInBackground(parentDocumentId: String) {
         applicationScope.launch {
-            requestFlow.emit(DocumentDataRequest.Children(parentDocumentId))
+            val request = if (parentDocumentId == CLOUD_DRIVE_ROOT_ID) {
+                DocumentDataRequest.RootChildren
+            } else {
+                DocumentDataRequest.Children(parentDocumentId)
+            }
+            requestFlow.emit(request)
         }
     }
 

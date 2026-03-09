@@ -13,26 +13,22 @@ sealed interface CloudDriveDocumentProviderUiState {
      *
      * @property accountName
      * @property currentDocumentId
-     * @property rootNodeDocumentId
      */
     data class LoadingDocument(
         override val accountName: String,
         val currentDocumentId: String,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
 
     /**
      * Loading children
      *
      * @property accountName
      * @property currentParentDocumentId
-     * @property rootNodeDocumentId
      */
     data class LoadingChildren(
         override val accountName: String,
         val currentParentDocumentId: String,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
 
     /**
      * Not logged in
@@ -50,18 +46,7 @@ sealed interface CloudDriveDocumentProviderUiState {
     /**
      * Loading root
      */
-    data object LoadingRoot : CloudDriveDocumentProviderUiState
-
-    /**
-     * Root
-     *
-     * @property accountName
-     * @property rootNodeDocumentId
-     */
-    data class Root(
-        override val accountName: String,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    data object Initialising : CloudDriveDocumentProviderUiState
 
     /**
      * Document data
@@ -69,14 +54,12 @@ sealed interface CloudDriveDocumentProviderUiState {
      * @property accountName
      * @property documentId
      * @property document
-     * @property rootNodeDocumentId
      */
     data class DocumentData(
         override val accountName: String,
         val documentId: String,
         val document: CloudDriveDocumentRow,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
 
     /**
      * Child data
@@ -85,28 +68,24 @@ sealed interface CloudDriveDocumentProviderUiState {
      * @property parentId
      * @property children
      * @property hasMore
-     * @property rootNodeDocumentId
      */
     data class ChildData(
         override val accountName: String,
         val parentId: String,
         val children: List<CloudDriveDocumentRow>,
         val hasMore: Boolean,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
 
     /**
      * File not found
      *
      * @property accountName
      * @property documentId
-     * @property rootNodeDocumentId
      */
     data class FileNotFound(
         override val accountName: String,
         val documentId: String,
-        override val rootNodeDocumentId: String,
-    ) : CloudDriveDocumentProviderUiState, HasRoot
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
 }
 
 /**
@@ -114,11 +93,4 @@ sealed interface CloudDriveDocumentProviderUiState {
  */
 internal interface HasCredentials {
     val accountName: String
-}
-
-/**
- * Has root
- */
-internal interface HasRoot : HasCredentials {
-    val rootNodeDocumentId: String
 }

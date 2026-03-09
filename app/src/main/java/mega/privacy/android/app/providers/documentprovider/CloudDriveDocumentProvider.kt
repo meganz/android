@@ -74,25 +74,21 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
             dataProvider.state.collect { state ->
                 when (state) {
-                    CloudDriveDocumentProviderUiState.LoadingRoot -> {}
-                    CloudDriveDocumentProviderUiState.NotLoggedIn -> {
-                        notifyRootChanged()
-                    }
+                    CloudDriveDocumentProviderUiState.Initialising -> {}
 
-                    is CloudDriveDocumentProviderUiState.Root -> notifyRootChanged(state.rootNodeDocumentId)
+                    CloudDriveDocumentProviderUiState.NotLoggedIn -> notifyRootChanged()
+
                     is CloudDriveDocumentProviderUiState.LoadingDocument -> {}
+
                     is CloudDriveDocumentProviderUiState.LoadingChildren -> {}
-                    is CloudDriveDocumentProviderUiState.DocumentData -> {
-                        notifyDocumentChanged(state.documentId)
-                    }
+
+                    is CloudDriveDocumentProviderUiState.DocumentData -> notifyDocumentChanged(state.documentId)
 
                     is CloudDriveDocumentProviderUiState.ChildData -> notifyChildDocumentsChanged(
                         state.parentId
                     )
 
-                    is CloudDriveDocumentProviderUiState.FileNotFound -> {
-                        notifyDocumentChanged(state.documentId)
-                    }
+                    is CloudDriveDocumentProviderUiState.FileNotFound -> notifyDocumentChanged(state.documentId)
 
                     is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {}
                 }
@@ -103,43 +99,33 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
     override fun queryRoots(projection: Array<String>?): Cursor {
         Timber.d("CloudDriveDocumentProvider queryRoots projection=$projection,")
-
         val result = when (val state = dataProvider.state.value) {
-            is HasRoot -> {
-                Timber.d("CloudDriveDocumentProvider queryRoots adding root row email=${state.accountName}")
+            is HasCredentials -> {
+                val summary = state.accountName
                 getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
-                    newRow().apply {
-                        add(Root.COLUMN_ROOT_ID, CLOUD_DRIVE_ROOT_ID)
-                        add(
-                            Root.COLUMN_TITLE,
-                            context?.getString(R.string.app_name) ?: "MEGA"
-                        )
-                        add(Root.COLUMN_SUMMARY, state.accountName)
-                        add(Root.COLUMN_DOCUMENT_ID, state.rootNodeDocumentId)
-                        add(Root.COLUMN_ICON, R.mipmap.ic_launcher)
-                    }
+                    addRootRow(summary)
                 }
             }
 
-            is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
-                dataProvider.refreshRootNode()
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = true)
-            }
-
-            is CloudDriveDocumentProviderUiState.LoadingRoot -> {
-                dataProvider.refreshRootNode()
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = true)
-            }
-
-            else -> {
-                Timber.d("CloudDriveDocumentProvider queryRoots root is not available and not loading, returning empty")
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
-            }
+            else -> getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
         }
 
         setNotificationUriForRoot(result)
         return result
 
+    }
+
+    private fun MatrixCursor.addRootRow(summary: String) {
+        newRow().apply {
+            add(Root.COLUMN_ROOT_ID, CLOUD_DRIVE_ROOT_ID)
+            add(
+                Root.COLUMN_TITLE,
+                context?.getString(R.string.app_name) ?: "MEGA"
+            )
+            add(Root.COLUMN_SUMMARY, summary)
+            add(Root.COLUMN_DOCUMENT_ID, CLOUD_DRIVE_ROOT_ID)
+            add(Root.COLUMN_ICON, R.mipmap.ic_launcher)
+        }
     }
 
     override fun queryDocument(documentId: String?, projection: Array<String>?): Cursor {
@@ -149,6 +135,9 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             throw FileNotFoundException("Invalid document id: $documentId")
         }
 
+        if (documentId == CLOUD_DRIVE_ROOT_ID) {
+            return documentCursorForRootDocument(projection)
+        }
 
         val result = when (val state = dataProvider.state.value) {
             is CloudDriveDocumentProviderUiState.DocumentData -> {
@@ -166,42 +155,25 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
             }
 
-            CloudDriveDocumentProviderUiState.LoadingRoot -> {
-                loadDocumentAsync(documentId, projection)
-            }
+            CloudDriveDocumentProviderUiState.Initialising -> loadDocumentAsync(
+                documentId,
+                projection
+            )
 
-            CloudDriveDocumentProviderUiState.NotLoggedIn -> {
+            CloudDriveDocumentProviderUiState.NotLoggedIn ->
                 getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
-            }
 
-            is CloudDriveDocumentProviderUiState.Root -> {
-                if (documentId == state.rootNodeDocumentId) {
-                    Timber.d("CloudDriveDocumentProvider queryDocument Root match rootId return root folder row")
-                    val rootFolderRow = CloudDriveDocumentRow(
-                        documentId = state.rootNodeDocumentId,
-                        displayName = context?.getString(R.string.app_name) ?: "MEGA",
-                        mimeType = Document.MIME_TYPE_DIR,
-                        size = 0L,
-                        lastModified = 0L,
-                        flags = 0,
-                    )
-                    documentCursor(row = rootFolderRow, projection = projection)
-                } else {
-                    loadDocumentAsync(documentId, projection)
-                }
-            }
+            is CloudDriveDocumentProviderUiState.ChildData -> loadDocumentAsync(
+                documentId,
+                projection
+            )
 
-            is CloudDriveDocumentProviderUiState.ChildData -> {
-                loadDocumentAsync(documentId, projection)
-            }
+            is CloudDriveDocumentProviderUiState.LoadingChildren -> loadDocumentAsync(
+                documentId,
+                projection
+            )
 
-            is CloudDriveDocumentProviderUiState.LoadingChildren -> {
-                loadDocumentAsync(documentId, projection)
-            }
-
-            is CloudDriveDocumentProviderUiState.FileNotFound -> {
-                throw FileNotFoundException("Node not found: $documentId")
-            }
+            is CloudDriveDocumentProviderUiState.FileNotFound -> throw FileNotFoundException("Node not found: $documentId")
 
             is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
                 dataProvider.refreshRootNode()
@@ -212,6 +184,19 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
         return result
 
+    }
+
+    private fun documentCursorForRootDocument(projection: Array<String>?): MatrixCursor {
+        val row = CloudDriveDocumentRow(
+            documentId = CLOUD_DRIVE_ROOT_ID,
+            displayName = context?.getString(R.string.app_name) ?: "MEGA",
+            mimeType = Document.MIME_TYPE_DIR,
+            size = 0L,
+            lastModified = 0L,
+            flags = 0
+        )
+        val result = documentCursor(row = row, projection = projection)
+        return result
     }
 
     private fun loadDocumentAsync(
@@ -253,9 +238,10 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 }
             }
 
-            is CloudDriveDocumentProviderUiState.DocumentData -> {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
+            is CloudDriveDocumentProviderUiState.DocumentData -> loadChildrenAsync(
+                parentDocumentId,
+                projection
+            )
 
             is CloudDriveDocumentProviderUiState.LoadingChildren -> {
                 if (parentDocumentId != state.currentParentDocumentId) {
@@ -264,25 +250,21 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
             }
 
-            is CloudDriveDocumentProviderUiState.LoadingDocument -> {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
+            is CloudDriveDocumentProviderUiState.LoadingDocument -> loadChildrenAsync(
+                parentDocumentId,
+                projection
+            )
 
-            CloudDriveDocumentProviderUiState.LoadingRoot -> {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
+            CloudDriveDocumentProviderUiState.Initialising -> loadChildrenAsync(
+                parentDocumentId,
+                projection
+            )
 
-            CloudDriveDocumentProviderUiState.NotLoggedIn -> {
+            CloudDriveDocumentProviderUiState.NotLoggedIn ->
                 getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
-            }
 
-            is CloudDriveDocumentProviderUiState.Root -> {
-                loadChildrenAsync(parentDocumentId, projection)
-            }
-
-            is CloudDriveDocumentProviderUiState.FileNotFound -> {
+            is CloudDriveDocumentProviderUiState.FileNotFound ->
                 throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
-            }
 
             is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {
                 dataProvider.refreshRootNode()

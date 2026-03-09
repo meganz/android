@@ -33,6 +33,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -115,23 +116,40 @@ class CloudDriveDocumentDataProviderTest {
         whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(null))
 
         underTest.state.test {
-            skipItems(1)
-            assertThat(awaitItem()).isInstanceOf(CloudDriveDocumentProviderUiState.NotLoggedIn::class.java)
+            skipItems(1) // skip Initialising (StateFlow initial value)
+            assertThat(awaitItem()).isInstanceOf(CloudDriveDocumentProviderUiState.NotLoggedIn::class.java) // NotLoggedIn
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `test that state is Root when credentials and root available`() = runTest {
+    fun `test that state is DocumentData for root when credentials and root available`() = runTest {
+        val mockNode: FolderNode = mock()
+        val typedNode: DefaultTypedFolderNode = mock()
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        val rootRow = CloudDriveDocumentRow(
+            documentId = CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
+            displayName = "MEGA",
+            mimeType = Document.MIME_TYPE_DIR,
+            size = 0L,
+            lastModified = 0L,
+            flags = 0,
+        )
+        whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(mockNode)
+        whenever(addNodeType.invoke(any())).thenReturn(typedNode)
+        whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(rootRow)
 
         underTest.state.test {
-            skipItems(1)
-            val state = awaitItem()
-            assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.Root::class.java)
-            val root = state as CloudDriveDocumentProviderUiState.Root
-            assertThat(root.accountName).isEqualTo("test@mega.co.nz")
-            assertThat(root.rootNodeDocumentId).isEqualTo(ROOT_DOCUMENT_ID)
+            skipItems(1) // skip Initialising (StateFlow initial value)
+            awaitItem() // consume LoadingDocument(root) from initial Root request
+            underTest.loadDocumentInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+            advanceUntilIdle()
+            val state = awaitItem() // DocumentData(root) from loadDocumentInBackground(CLOUD_DRIVE_ROOT_ID)
+            assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
+            val documentData = state as CloudDriveDocumentProviderUiState.DocumentData
+            assertThat(documentData.accountName).isEqualTo("test@mega.co.nz")
+            assertThat(documentData.documentId).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+            assertThat(documentData.document).isEqualTo(rootRow)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -157,22 +175,23 @@ class CloudDriveDocumentDataProviderTest {
             whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
 
             underTest.state.test {
-                skipItems(1)
-                awaitItem()
+                skipItems(1) // skip Initialising (StateFlow initial value)
+                awaitItem() // consume LoadingDocument(root) from initial Root request
+                awaitItem() // consume DocumentData(root) from initial Root request
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                val loadingDoc = awaitItem()
+                val loadingDoc = awaitItem() // LoadingDocument(documentId)
                 assertThat(loadingDoc).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingDocument::class.java)
                 assertThat((loadingDoc as CloudDriveDocumentProviderUiState.LoadingDocument).currentDocumentId)
                     .isEqualTo(documentId)
-                val documentData = awaitItem()
+                val documentData = awaitItem() // DocumentData(documentId)
                 assertThat(documentData).isInstanceOf(CloudDriveDocumentProviderUiState.DocumentData::class.java)
                 assertThat((documentData as CloudDriveDocumentProviderUiState.DocumentData).document)
                     .isEqualTo(expectedRow)
                 cancelAndIgnoreRemainingEvents()
             }
             verify(getNodeByHandleUseCase).invoke(handle, false)
-            verify(cloudDriveDocumentRowMapper).invoke(typedNode, DOCUMENT_ID_PREFIX)
+            verify(cloudDriveDocumentRowMapper, times(2)).invoke(typedNode, DOCUMENT_ID_PREFIX)
         }
 
     @Test
@@ -183,12 +202,14 @@ class CloudDriveDocumentDataProviderTest {
             whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(null)
 
             underTest.state.test {
-                skipItems(1)
-                awaitItem()
+                skipItems(1) // skip Initialising (StateFlow initial value)
+                awaitItem() // consume LoadingDocument(root) from initial Root request
+                awaitItem() // consume DocumentData(root) from initial Root request
                 underTest.loadDocumentInBackground(documentId)
                 advanceUntilIdle()
-                awaitItem()
-                val state = awaitItem()
+                val loadingDoc = awaitItem() // LoadingDocument(documentId)
+                assertThat(loadingDoc).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingDocument::class.java)
+                val state = awaitItem() // FileNotFound(documentId)
                 assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.FileNotFound::class.java)
                 assertThat((state as CloudDriveDocumentProviderUiState.FileNotFound).documentId)
                     .isEqualTo(documentId)
@@ -215,21 +236,22 @@ class CloudDriveDocumentDataProviderTest {
             whenever(cloudDriveDocumentRowMapper.invoke(any(), any())).thenReturn(expectedRow)
 
             underTest.state.test {
-                skipItems(1)
-                awaitItem()
-                underTest.loadChildrenInBackground(ROOT_DOCUMENT_ID)
+                skipItems(1) // skip Initialising (StateFlow initial value)
+                awaitItem() // consume LoadingDocument(root) from initial Root request
+                awaitItem() // consume DocumentData(root) from initial Root request
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                val loadingChildren = awaitItem()
+                val loadingChildren = awaitItem() // LoadingChildren(CLOUD_DRIVE_ROOT_ID)
                 assertThat(loadingChildren).isInstanceOf(CloudDriveDocumentProviderUiState.LoadingChildren::class.java)
                 assertThat((loadingChildren as CloudDriveDocumentProviderUiState.LoadingChildren).currentParentDocumentId)
-                    .isEqualTo(ROOT_DOCUMENT_ID)
-                awaitItem() //skip initial emission
-                val childData = awaitItem()
+                    .isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
+                awaitItem() // skip initial ChildData(empty, hasMore=true) from runningFold
+                val childData = awaitItem() // ChildData(children=..., hasMore=false)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).hasSize(1)
                 assertThat(data.children[0]).isEqualTo(expectedRow)
-                assertThat(data.parentId).isEqualTo(ROOT_DOCUMENT_ID)
+                assertThat(data.parentId).isEqualTo(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -242,12 +264,13 @@ class CloudDriveDocumentDataProviderTest {
                 .thenReturn(flowOf(emptyList<TypedNode>() to false))
 
             underTest.state.test {
-                skipItems(1)
-                awaitItem()
-                underTest.loadChildrenInBackground(ROOT_DOCUMENT_ID)
+                skipItems(1) // skip Initialising (StateFlow initial value)
+                awaitItem() // consume LoadingDocument(root) from initial Root request
+                awaitItem() // consume DocumentData(root) from initial Root request
+                underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
-                val childData = awaitItem()
+                awaitItem() // consume LoadingChildren(CLOUD_DRIVE_ROOT_ID)
+                val childData = awaitItem() // ChildData(children=empty, hasMore=false)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 assertThat((childData as CloudDriveDocumentProviderUiState.ChildData).children).isEmpty()
                 cancelAndIgnoreRemainingEvents()
