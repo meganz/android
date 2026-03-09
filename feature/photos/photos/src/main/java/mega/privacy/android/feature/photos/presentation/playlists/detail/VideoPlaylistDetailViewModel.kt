@@ -22,7 +22,10 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -31,9 +34,11 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
@@ -64,6 +69,9 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
     private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
     private val removeVideosFromPlaylistUseCase: RemoveVideosFromPlaylistUseCase,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     @Assisted private val args: Args,
 ) : ViewModel() {
     private val selectedVideoIdsFlow = MutableStateFlow<Set<Long>>(emptySet())
@@ -73,6 +81,16 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
 
     internal val videoPlaylistEditState: StateFlow<VideoPlaylistEditState>
         field: MutableStateFlow<VideoPlaylistEditState> = MutableStateFlow(VideoPlaylistEditState())
+
+    private val sortOrder: StateFlow<SortOrder> by lazy {
+        monitorSortCloudOrderUseCase()
+            .mapLatest { it ?: SortOrder.ORDER_DEFAULT_ASC }
+            .catch { Timber.e(it) }
+            .asUiStateFlow(
+                viewModelScope,
+                SortOrder.ORDER_DEFAULT_ASC
+            )
+    }
 
     private fun combinedTriggerFlow(): Flow<Unit> = merge(
         monitorVideoPlaylistSetsUpdateUseCase()
@@ -84,7 +102,9 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             .filter { nodeUpdate ->
                 isMatchRefreshCondition(nodeUpdate)
             }.mapLatest { }
-            .catch { Timber.e(it) }
+            .catch { Timber.e(it) },
+        monitorSortCloudOrderUseCase().mapLatest { }
+            .catch { Timber.d(it) }
     ).onStart { emit(Unit) }
 
     private fun getVideoPlaylist() =
@@ -99,8 +119,9 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             getVideoPlaylist(),
             monitorHiddenNodesEnabledUseCase().catch { Timber.e(it) },
             monitorShowHiddenItemsUseCase().catch { Timber.e(it) },
-            selectedVideoIdsFlow
-        ) { videoPlaylist, isHiddenNodesEnabled, isShowHiddenItems, selectedVideoIds ->
+            selectedVideoIdsFlow,
+            sortOrder,
+        ) { videoPlaylist, isHiddenNodesEnabled, isShowHiddenItems, selectedVideoIds, sortOrder ->
             val showHiddenItems = isShowHiddenItems || !isHiddenNodesEnabled
             val videoPlaylistUiEntity = videoPlaylist?.let {
                 videoPlaylistDetailUiEntityMapper(it, showHiddenItems, selectedVideoIds)
@@ -110,11 +131,14 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
                 it.id.longValue in selectedVideoIds
             }?.toSet() ?: emptySet()
 
+            val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+
             VideoPlaylistDetailUiState.Data(
                 playlistDetail = videoPlaylistUiEntity,
                 showHiddenItems = showHiddenItems,
                 selectedTypedNodes = selectedNodes,
-                isHiddenNodesEnabled = isHiddenNodesEnabled
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                selectedSortConfiguration = sortOrderPair
             )
         }.catch {
             Timber.e(it)
@@ -310,6 +334,17 @@ class VideoPlaylistDetailViewModel @AssistedInject constructor(
             it.copy(
                 numberOfRemovedVideosEvent = consumed()
             )
+        }
+    }
+
+    internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val order = nodeSortConfigurationUiMapper(sortConfiguration)
+                setCloudSortOrderUseCase(order)
+            }.onFailure {
+                Timber.e(it, "Failed to set cloud sort order")
+            }
         }
     }
 

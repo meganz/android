@@ -2,9 +2,9 @@ package mega.privacy.android.feature.photos.presentation.playlists.detail
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,22 +13,29 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedVideoNode
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.domain.entity.videosection.UserVideoPlaylist
 import mega.privacy.android.domain.entity.videosection.VideoPlaylist
 import mega.privacy.android.domain.exception.account.PlaylistNameValidationException
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriByHandleUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.videosection.GetVideoPlaylistByIdUseCase
 import mega.privacy.android.domain.usecase.videosection.MonitorVideoPlaylistSetsUpdateUseCase
@@ -79,7 +86,12 @@ class VideoPlaylistDetailViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
     private val removeVideosFromPlaylistUseCase = mock<RemoveVideosFromPlaylistUseCase>()
+    private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
+    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
+    private val nodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
     private val nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper()
+
+    private val sortOrderFlow = MutableStateFlow<SortOrder?>(SortOrder.ORDER_DEFAULT_ASC)
 
     private val testId = NodeId(123456L)
     private val testType = PlaylistType.User
@@ -112,6 +124,9 @@ class VideoPlaylistDetailViewModelTest {
             nodeSourceTypeToViewTypeMapper = nodeSourceTypeToViewTypeMapper,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
             removeVideosFromPlaylistUseCase = removeVideosFromPlaylistUseCase,
+            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             args = args,
         )
     }
@@ -129,8 +144,11 @@ class VideoPlaylistDetailViewModelTest {
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
             getNodeContentUriByHandleUseCase,
-            removeVideosFromPlaylistUseCase
+            removeVideosFromPlaylistUseCase,
+            monitorSortCloudOrderUseCase,
+            setCloudSortOrderUseCase
         )
+        sortOrderFlow.value = SortOrder.ORDER_DEFAULT_ASC
     }
 
     @Test
@@ -144,6 +162,11 @@ class VideoPlaylistDetailViewModelTest {
                 assertThat(actual.playlistDetail?.uiEntity).isEqualTo(expectedPlaylistUiEntity)
                 assertThat(actual.playlistDetail?.videos).isNotEmpty()
                 assertThat(actual.playlistDetail?.videos).hasSize(4)
+                assertThat(actual.selectedSortConfiguration).isEqualTo(
+                    nodeSortConfigurationUiMapper(
+                        sortOrderFlow.value ?: SortOrder.ORDER_DEFAULT_ASC
+                    )
+                )
                 cancelAndIgnoreRemainingEvents()
             }
     }
@@ -274,6 +297,73 @@ class VideoPlaylistDetailViewModelTest {
                 }
         }
 
+    @Test
+    fun `test that getVideoPlaylistByIdUseCase is invoked when monitorSortCloudOrderUseCase is triggered`() =
+        runTest {
+            stubInitialValues()
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    val initial = awaitItem()
+                    assertThat(initial.playlistDetail).isNotNull()
+                    clearInvocations(getVideoPlaylistByIdUseCase)
+
+                    sortOrderFlow.emit(SortOrder.ORDER_MODIFICATION_DESC)
+                    awaitItem()
+                    verify(getVideoPlaylistByIdUseCase).invoke(any(), any())
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that selectedSortConfiguration is derived from monitorSortCloudOrderUseCase`() =
+        runTest {
+            stubInitialValues()
+            val expectedConfig = NodeSortConfiguration(
+                NodeSortOption.Modified,
+                SortDirection.Descending
+            )
+            sortOrderFlow.value = SortOrder.ORDER_MODIFICATION_DESC
+
+            underTest.uiState
+                .filterIsInstance<VideoPlaylistDetailUiState.Data>()
+                .test {
+                    val actual = awaitItem()
+                    assertThat(actual.selectedSortConfiguration).isEqualTo(expectedConfig)
+                    cancelAndIgnoreRemainingEvents()
+                }
+        }
+
+    @Test
+    fun `test that setCloudSortOrder invokes setCloudSortOrderUseCase with mapped order`() =
+        runTest {
+            stubInitialValues()
+            val sortConfiguration = NodeSortConfiguration(
+                NodeSortOption.Name,
+                SortDirection.Ascending
+            )
+            val expectedOrder = nodeSortConfigurationUiMapper(sortConfiguration)
+
+            underTest.setCloudSortOrder(sortConfiguration)
+            advanceUntilIdle()
+
+            verify(setCloudSortOrderUseCase).invoke(expectedOrder)
+        }
+
+    @Test
+    fun `test that setCloudSortOrder does not throw when setCloudSortOrderUseCase fails`() =
+        runTest {
+            stubInitialValues()
+            whenever(setCloudSortOrderUseCase(any())).thenThrow(RuntimeException("test failure"))
+
+            underTest.setCloudSortOrder(
+                NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
+            )
+            advanceUntilIdle()
+
+            verify(setCloudSortOrderUseCase).invoke(any())
+        }
+
     private suspend fun stubInitialValues(
         videoPlaylist: VideoPlaylist = expectedVideoPlaylist,
         detailEntity: VideoPlaylistDetailUiEntity = expectedPlaylistDetail,
@@ -312,6 +402,7 @@ class VideoPlaylistDetailViewModelTest {
                 selectedIds = any()
             )
         ).thenReturn(detailEntity)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(sortOrderFlow)
     }
 
     @Test

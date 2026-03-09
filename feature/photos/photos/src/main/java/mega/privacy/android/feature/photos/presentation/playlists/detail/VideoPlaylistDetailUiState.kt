@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.presentation.playlists.detail
 
 import androidx.compose.runtime.Stable
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailSelectionMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.detail.model.VideoPlaylistDetailUiEntity
@@ -20,12 +21,14 @@ sealed interface VideoPlaylistDetailUiState {
      * @property selectedCount The count of selected items
      * @property areAllSelected Whether all items are selected
      * @property selectedElementIds Element ids of selected videos (derived from playlistDetail.videos)
+     * @property selectedSortConfiguration the selected sort configuration
      */
     data class Data(
         val playlistDetail: VideoPlaylistDetailUiEntity? = null,
         val selectedTypedNodes: Set<TypedNode> = emptySet(),
         val showHiddenItems: Boolean = false,
         val isHiddenNodesEnabled: Boolean = false,
+        val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     ) : VideoPlaylistDetailUiState {
         val selectedElementIds: Set<Long>
             get() = playlistDetail?.videos
@@ -48,13 +51,22 @@ sealed interface VideoPlaylistDetailUiState {
                 val hasNonSensitiveNode = selectedTypedNodes.any { !it.isMarkedSensitive }
                 val isNodeHidden =
                     isHiddenNodesEnabled && !hasNonSensitiveNode && !includeSensitiveInheritedNode
+
+                val isSystemPlaylist = playlistDetail?.uiEntity?.isSystemVideoPlayer == true
                 buildList {
+                    if (isSystemPlaylist) {
+                        add(VideoPlaylistDetailSelectionMenuAction.Download)
+                        add(VideoPlaylistDetailSelectionMenuAction.SendToChat)
+                        add(VideoPlaylistDetailSelectionMenuAction.Share)
+                        add(VideoPlaylistDetailSelectionMenuAction.RemoveFavourite)
+                    } else {
+                        add(VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist)
+                    }
                     if (isNodeHidden) {
                         add(VideoPlaylistDetailSelectionMenuAction.Unhide)
                     } else {
                         add(VideoPlaylistDetailSelectionMenuAction.Hide)
                     }
-                    add(VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist)
                 }
             }
     }

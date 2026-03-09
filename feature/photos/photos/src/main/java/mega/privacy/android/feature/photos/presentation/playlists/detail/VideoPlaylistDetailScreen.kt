@@ -49,6 +49,14 @@ import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -61,6 +69,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.model.VideoPla
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistBottomSheet
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistRenameMenuAction
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
+import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -107,7 +116,8 @@ internal fun VideoPlaylistDetailRoute(
         clearResultFlow = clearResult,
         navigateToSelectVideos = navigate,
         onBack = onBack,
-        onMenuClick = navigate
+        onMenuClick = navigate,
+        onSortNodes = viewModel::setCloudSortOrder
     )
 }
 
@@ -135,6 +145,7 @@ internal fun VideoPlaylistDetailScreen(
     clearResultFlow: (key: String) -> Unit = {},
     resetRemoveVideosEvent: () -> Unit = {},
     onMenuClick: (NavKey) -> Unit = {},
+    onSortNodes: (NodeSortConfiguration) -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
     snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
@@ -144,6 +155,8 @@ internal fun VideoPlaylistDetailScreen(
     val playlistBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showRemovedPlaylistDialog by rememberSaveable { mutableStateOf(false) }
     var showRemovedVideosDialog by rememberSaveable { mutableStateOf(false) }
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val dataState = uiState as? VideoPlaylistDetailUiState.Data
     val selectedNodes = dataState?.selectedTypedNodes ?: emptySet()
@@ -183,18 +196,28 @@ internal fun VideoPlaylistDetailScreen(
                     dataState?.playlistDetail?.uiEntity?.title ?: ""
                 },
                 actions = buildList {
-                    if (videoSelectedCount > 0) {
-                        if (!areAllVideosSelected) {
-                            add(NodeSelectionAction.SelectAll)
+                    val isSystemPlaylist =
+                        dataState?.playlistDetail?.uiEntity?.isSystemVideoPlayer == true
+                    when {
+                        videoSelectedCount > 0 -> {
+                            if (!areAllVideosSelected) {
+                                add(NodeSelectionAction.SelectAll)
+                            }
                         }
-                    } else {
-                        add(NodeSelectionAction.More)
+
+                        isSystemPlaylist -> {
+                            add(VideoPlaylistDetailSelectionMenuAction.SortOrder)
+                        }
+
+                        else -> add(NodeSelectionAction.More)
                     }
                 },
                 onActionPressed = { action ->
                     when (action) {
                         is NodeSelectionAction.More -> showPlaylistBottomSheet = true
                         is NodeSelectionAction.SelectAll -> selectAll()
+                        is VideoPlaylistDetailSelectionMenuAction.SortOrder ->
+                            showSortBottomSheet = true
                     }
                 }
             )
@@ -223,6 +246,34 @@ internal fun VideoPlaylistDetailScreen(
 
                         is VideoPlaylistDetailSelectionMenuAction.RemoveFromPlaylist -> {
                             showRemovedVideosDialog = true
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Download -> {
+                            multiNodeActionHandler(
+                                DownloadMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.SendToChat -> {
+                            multiNodeActionHandler(
+                                SendToChatMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.Share -> {
+                            multiNodeActionHandler(
+                                ShareMenuAction(),
+                                selectedNodes.toList()
+                            )
+                        }
+
+                        is VideoPlaylistDetailSelectionMenuAction.RemoveFavourite -> {
+                            multiNodeActionHandler(
+                                RemoveFavouriteMenuAction(),
+                                selectedNodes.toList()
+                            )
                         }
                     }
                 }
@@ -374,9 +425,7 @@ internal fun VideoPlaylistDetailScreen(
                                     )
                                 },
                                 onLongClick = {
-                                    if (!playlistDetail.uiEntity.isSystemVideoPlayer) {
-                                        onLongClick(videoItem)
-                                    }
+                                    onLongClick(videoItem)
                                 },
                                 isSensitive = uiState.showHiddenItems &&
                                         (videoItem.isMarkedSensitive || videoItem.isSensitiveInherited),
@@ -467,6 +516,33 @@ internal fun VideoPlaylistDetailScreen(
                         },
                         onNegativeButtonClicked = { showRemovedVideosDialog = false },
                         onDismiss = { showRemovedVideosDialog = false }
+                    )
+                }
+
+                if (showSortBottomSheet) {
+                    SortBottomSheet(
+                        modifier = Modifier.testTag(VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG),
+                        title = stringResource(sharedR.string.action_sort_by_header),
+                        options = NodeSortOption.getOptionsForSourceType(NodeSourceType.CLOUD_DRIVE),
+                        sheetState = sortBottomSheetState,
+                        selectedSort = SortBottomSheetResult(
+                            sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                            sortDirection = uiState.selectedSortConfiguration.sortDirection
+                        ),
+                        onSortOptionSelected = { result ->
+                            result?.let {
+                                onSortNodes(
+                                    NodeSortConfiguration(
+                                        sortOption = it.sortOptionItem,
+                                        sortDirection = it.sortDirection
+                                    )
+                                )
+                                showSortBottomSheet = false
+                            }
+                        },
+                        onDismissRequest = {
+                            showSortBottomSheet = false
+                        }
                     )
                 }
             }
