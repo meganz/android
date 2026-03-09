@@ -93,5 +93,8 @@ replay_pid*
 ./review.md
 .trees
 
+/.testrail/results/*
+/.testrail/output/*
+
 *.keystore
 google-services.json
