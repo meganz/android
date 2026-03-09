@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -35,8 +34,6 @@ import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCas
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
-import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
 
 abstract class NodeExplorerSharedViewModel(
@@ -50,8 +47,11 @@ abstract class NodeExplorerSharedViewModel(
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    open val args: Args,
+    args: Args,
 ) : ViewModel() {
+    private val argsInternal: Args = args
+    open val args: Args get() = argsInternal
+
     private val _nodedExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
     val nodeExplorerSharedUiState = _nodedExplorerSharedUiState.asStateFlow()
 
@@ -66,9 +66,9 @@ abstract class NodeExplorerSharedViewModel(
     open fun monitorNodeUpdates() {
         viewModelScope.launch {
             monitorNodeUpdatesByIdUseCase(
-                nodeId = args.nodeId,
-                nodeSourceType = args.nodeSourceType,
-            ).catch { Timber.Forest.e(it) }
+                nodeId = argsInternal.nodeId,
+                nodeSourceType = argsInternal.nodeSourceType,
+            ).catch { Timber.e(it) }
                 .collectLatest { change ->
                     if (change == NodeChanges.Remove) {
                         // If current folder is moved to rubbish bin, navigate back
@@ -83,7 +83,7 @@ abstract class NodeExplorerSharedViewModel(
     private fun monitorViewType() {
         viewModelScope.launch {
             monitorViewTypeUseCase()
-                .catch { Timber.Forest.e(it) }
+                .catch { Timber.e(it) }
                 .collect { viewType ->
                     _nodedExplorerSharedUiState.update { it.copy(viewType = viewType) }
                 }
@@ -100,13 +100,7 @@ abstract class NodeExplorerSharedViewModel(
                 setViewTypeUseCase(toggledViewType)
                 toggledViewType
             }.onFailure {
-                Timber.Forest.e(it, "Failed to change view type")
-            }.onSuccess { viewType ->
-                val event = when (viewType) {
-                    ViewType.LIST -> ViewModeListMenuItemEvent
-                    ViewType.GRID -> ViewModeGridMenuItemEvent
-                }
-                Analytics.tracker.trackEvent(event)
+                Timber.e(it, "Failed to change view type")
             }
         }
     }
@@ -127,9 +121,9 @@ abstract class NodeExplorerSharedViewModel(
         viewModelScope.launch {
             combine(
                 monitorHiddenNodesEnabledUseCase()
-                    .catch { Timber.Forest.e(it) },
+                    .catch { Timber.e(it) },
                 monitorShowHiddenItemsUseCase()
-                    .catch { Timber.Forest.e(it) },
+                    .catch { Timber.e(it) },
             ) { isHiddenNodesEnabled, showHiddenItems ->
                 _nodedExplorerSharedUiState.update { state ->
                     state.copy(
@@ -144,7 +138,7 @@ abstract class NodeExplorerSharedViewModel(
 
     open fun monitorSortOrder() {
         monitorSortCloudOrderUseCase()
-            .catch { Timber.Forest.e(it) }
+            .catch { Timber.e(it) }
             .filterNotNull()
             .onEach { sortOrder ->
                 updateSortOrder(nodeSortConfigurationUiMapper(sortOrder), sortOrder)
@@ -171,7 +165,7 @@ abstract class NodeExplorerSharedViewModel(
                 val order = nodeSortConfigurationUiMapper(nodeSortConfiguration)
                 setCloudSortOrderUseCase(order)
             }.onFailure {
-                Timber.Forest.e(it, "Failed to set cloud sort order")
+                Timber.e(it, "Failed to set cloud sort order")
             }
         }
     }
@@ -180,7 +174,7 @@ abstract class NodeExplorerSharedViewModel(
         viewModelScope.launch {
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
-                nodeSourceType = args.nodeSourceType,
+                nodeSourceType = argsInternal.nodeSourceType,
                 existingItems = nodeExplorerSharedUiState.value.items,
             )
 

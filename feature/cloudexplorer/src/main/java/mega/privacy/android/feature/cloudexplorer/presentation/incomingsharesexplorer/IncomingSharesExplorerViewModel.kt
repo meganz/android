@@ -65,7 +65,7 @@ class IncomingSharesExplorerViewModel @Inject constructor(
     override fun loadNodes() {
         viewModelScope.launch {
             setItems(
-                nodes = getIncomingSharesChildrenNodeUseCase(args.nodeId.longValue),
+                nodes = getIncomingSharesChildrenNodeUseCase(-1),
                 nodesLoadingState = NodesLoadingState.FullyLoaded
             )
         }
