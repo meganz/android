@@ -62,7 +62,6 @@ import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
 import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
-import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
@@ -80,9 +79,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     entry<MediaMainNavKey> {
         val photoSelectionResult by navigationHandler.monitorResult<Long?>(PhotosSelectionNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
-        val mediaAlbumNavigationFlow by navigationHandler.monitorResult<Pair<Long?, String>?>(
-            LegacyPhotosSearchNavKey.RESULT
-        ).collectAsStateWithLifecycle(null)
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { it.create(null) }
@@ -108,14 +104,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
                 navigationHandler.clearResult(PhotosSelectionNavKey.RESULT)
             }
         }
-
-        LaunchedEffect(mediaAlbumNavigationFlow) {
-            mediaAlbumNavigationFlow?.let { (id, type) ->
-                navigationHandler.navigate(AlbumContentNavKey(id = id, type = type))
-                navigationHandler.clearResult(LegacyPhotosSearchNavKey.RESULT)
-            }
-        }
-
 
         val activity = LocalActivity.current as ComponentActivity
         val timelineViewModel: TimelineTabViewModel = hiltViewModel(activity)
