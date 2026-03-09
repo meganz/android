@@ -236,4 +236,9 @@ interface PlayerServiceViewModelGateway {
      * Save shuffle enabled state
      */
     fun saveShuffleEnabled()
+
+    /**
+     * Reset the error
+     */
+    fun resetError()
 }

@@ -55,6 +55,7 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
 import mega.privacy.android.app.usecase.orientation.enableAdaptiveLayout
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import mega.privacy.android.app.utils.AlertsAndWarnings.showTakenDownAlert
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
@@ -217,7 +218,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
 
         super.onCreate(savedInstanceState)
 
-        // Setup the Back Press dispatcher to receive Back Press events
+        // Set up the Back Press dispatcher to receive Back Press events
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         val extras = intent.extras
@@ -449,7 +450,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                                     node,
                                     OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                                         if (error.errorCode == MegaError.API_OK) {
-                                            // Some times checking node.isExported immediately will still
+                                            // Sometimes checking node.isExported immediately will still
                                             // get true, so let's add some delay here.
                                             RunOnUIThreadUtils.runDelay(500L) {
                                                 refreshMenuOptionsVisibility()
@@ -804,8 +805,17 @@ class AudioPlayerActivity : MediaPlayerActivity() {
     private fun onError(megaException: MegaException) {
         when (megaException) {
             is BlockedMegaException -> {
-                if (!AlertDialogUtil.isAlertDialogShown(takenDownDialog)) {
-                    takenDownDialog = AlertsAndWarnings.showTakenDownAlert(this)
+                if (takenDownDialog?.isShowing != true) {
+                    val errorHandle = playerServiceGateway?.getCurrentPlayingHandle()
+                    takenDownDialog = showTakenDownAlert(
+                        activity = this@AudioPlayerActivity,
+                        onDismiss = {
+                            errorHandle?.let {
+                                viewModel.updateItemToRemove(it)
+                            }
+                            playerServiceGateway?.resetError()
+                        }
+                    )
                 }
             }
         }
@@ -1155,7 +1165,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
                             )
                             mega.privacy.android.app.utils.Util.showSnackbar(this, message)
                         }
-                        // Some times checking node.isMarkedSensitive immediately will still
+                        // Sometimes checking node.isMarkedSensitive immediately will still
                         // get true, so let's add some delay here.
                         RunOnUIThreadUtils.runDelay(500L) {
                             refreshMenuOptionsVisibility()
