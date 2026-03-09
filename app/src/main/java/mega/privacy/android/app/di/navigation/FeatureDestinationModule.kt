@@ -26,6 +26,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.feature.pdfviewer.navigation.PdfViewerFeatureDestination
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import javax.inject.Singleton
 
 @Module
@@ -42,6 +43,7 @@ class FeatureDestinationModule {
         setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
         rtcAudioManagerGateway: RTCAudioManagerGateway,
         viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
+        snackbarEventQueue: SnackbarEventQueue,
     ): FeatureDestination =
         LegacyCoreActivityFeatureGraph(
             nodeContentUriIntentMapper,
@@ -51,6 +53,7 @@ class FeatureDestinationModule {
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
             viewTypeToNodeSourceTypeMapper,
+            snackbarEventQueue,
         )
 
     @Provides
