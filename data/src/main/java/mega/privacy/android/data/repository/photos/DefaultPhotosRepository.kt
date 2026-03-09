@@ -749,7 +749,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getTimelineFilterPreferences(): Map<String, String?>? =
         withContext(ioDispatcher) {
-            getContentConsumptionPreferences()?.let { allPreferences ->
+            getContentConsumptionPreferences(methodName = "getTimelineFilterPreferences")?.let { allPreferences ->
                 val allCurrentPreferences = allPreferences.getValueFor(
                     TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION.value
                 )?.decodeBase64()
@@ -759,7 +759,8 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun setTimelineFilterPreferences(preferences: Map<String, String>): String? =
         withContext(ioDispatcher) {
-            val latestPreferencesStringMap = getContentConsumptionPreferences()
+            val latestPreferencesStringMap =
+                getContentConsumptionPreferences(methodName = "setTimelineFilterPreferences")
             val valueToPut = contentConsumptionMegaStringMapMapper(
                 latestPreferencesStringMap,
                 preferences,
@@ -781,34 +782,35 @@ internal class DefaultPhotosRepository @Inject constructor(
             }
         }
 
-    private suspend fun getContentConsumptionPreferences() = withContext(ioDispatcher) {
-        val request = suspendCancellableCoroutine { continuation ->
-            val listener = OptionalMegaRequestListenerInterface(
-                onRequestFinish = { request, error ->
-                    when (error.errorCode) {
-                        MegaError.API_OK -> {
-                            continuation.resumeWith(Result.success(request))
-                        }
+    private suspend fun getContentConsumptionPreferences(methodName: String) =
+        withContext(ioDispatcher) {
+            val request = suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request, error ->
+                        when (error.errorCode) {
+                            MegaError.API_OK -> {
+                                continuation.resumeWith(Result.success(request))
+                            }
 
-                        MegaError.API_ENOENT -> {
-                            continuation.resumeWith(Result.success(null))
-                        }
+                            MegaError.API_ENOENT -> {
+                                continuation.resumeWith(Result.success(null))
+                            }
 
-                        else -> {
-                            continuation.failWithError(error, "getTimelineFilterPreferences")
+                            else -> {
+                                continuation.failWithError(error, methodName)
+                            }
                         }
                     }
-                }
-            )
-            megaApiFacade.getUserAttribute(
-                MegaApiJava.USER_ATTR_CC_PREFS,
-                listener
-            )
+                )
+                megaApiFacade.getUserAttribute(
+                    MegaApiJava.USER_ATTR_CC_PREFS,
+                    listener
+                )
+            }
+            request?.let {
+                request.megaStringMap
+            }
         }
-        request?.let {
-            request.megaStringMap
-        }
-    }
 
     private suspend fun getPublicNode(nodeFileLink: String): MegaNode? =
         suspendCancellableCoroutine { continuation ->
@@ -995,7 +997,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun isHiddenNodesOnboarded(): Boolean = withContext(ioDispatcher) {
         try {
-            val prefs = getContentConsumptionPreferences()
+            val prefs = getContentConsumptionPreferences(methodName = "isHiddenNodesOnboarded")
             sensitivesRetriever(prefs)
         } catch (e: Throwable) {
             Timber.e(e)
@@ -1005,7 +1007,7 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun setHiddenNodesOnboarded() = withContext(ioDispatcher) {
         val newPrefs = sensitivesMapper(
-            prefs = getContentConsumptionPreferences(),
+            prefs = getContentConsumptionPreferences(methodName = "setHiddenNodesOnboarded"),
             data = mapOf(TimelinePreferencesJSON.JSON_SENSITIVES_ONBOARDED.value to true),
         )
 
