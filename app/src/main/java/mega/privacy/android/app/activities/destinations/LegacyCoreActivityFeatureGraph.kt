@@ -39,6 +39,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 
 class LegacyCoreActivityFeatureGraph(
     nodeContentUriIntentMapper: NodeContentUriIntentMapper,
@@ -47,6 +48,7 @@ class LegacyCoreActivityFeatureGraph(
     chatManagement: ChatManagement,
     setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
     rtcAudioManagerGateway: RTCAudioManagerGateway,
+    snackbarEventQueue: SnackbarEventQueue,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
@@ -74,8 +76,14 @@ class LegacyCoreActivityFeatureGraph(
             legacyAlbumImport(navigationHandler::back)
             legacyPdfViewerScreen(navigationHandler::back, nodeContentUriIntentMapper)
             legacyImageViewerScreen(navigationHandler::back)
-            legacyTextEditorScreen(navigationHandler::back)
-            legacyMediaPlayerScreen(navigationHandler::back, mediaPlayerIntentMapper)
+            legacyTextEditorScreen(
+                navigationHandler::back
+            )
+            legacyMediaPlayerScreen(
+                navigationHandler::back,
+                mediaPlayerIntentMapper,
+                snackbarEventQueue,
+            )
             videoSectionLegacyDestination(navigationHandler::back)
             legacyAlbumContentPreview(navigationHandler::back)
             legacyMediaTimelinePhotoPreview(navigationHandler::back)

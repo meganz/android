@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserFeatureDestina
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.navigation.contract.FeatureDestination
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,6 +36,7 @@ class FeatureDestinationModule {
         chatManagement: ChatManagement,
         setChatVideoInDeviceUseCase: SetChatVideoInDeviceUseCase,
         rtcAudioManagerGateway: RTCAudioManagerGateway,
+        snackbarEventQueue: SnackbarEventQueue,
     ): FeatureDestination =
         LegacyCoreActivityFeatureGraph(
             nodeContentUriIntentMapper,
@@ -43,6 +45,7 @@ class FeatureDestinationModule {
             chatManagement,
             setChatVideoInDeviceUseCase,
             rtcAudioManagerGateway,
+            snackbarEventQueue,
         )
 
     @Provides
