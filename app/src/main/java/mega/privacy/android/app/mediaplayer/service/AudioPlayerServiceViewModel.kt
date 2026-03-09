@@ -1468,6 +1468,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun monitorMediaItemTransitionState(): Flow<Long?> = mediaItemTransitionState
 
+    override fun resetError() {
+        error.value = null
+    }
+
     companion object {
         private const val MAX_RETRY = 6
 

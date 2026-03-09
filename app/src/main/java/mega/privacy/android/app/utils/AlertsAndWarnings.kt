@@ -155,14 +155,19 @@ object AlertsAndWarnings {
      * Shows a taken down alert.
      *
      * @param activity   Required to create the dialog and finish the activity.
+     * @param onDismiss  The function that handles the behavior when the Dismiss button is clicked
      */
     @JvmStatic
-    fun showTakenDownAlert(activity: Activity): AlertDialog =
+    fun showTakenDownAlert(activity: Activity, onDismiss: (() -> Unit)? = null): AlertDialog =
         MaterialAlertDialogBuilder(activity)
             .setTitle(activity.getString(R.string.error_file_not_available))
             .setMessage(activity.getString(R.string.error_takendown_file))
             .setNegativeButton(activity.getString(sharedR.string.general_dismiss_dialog)) { _, _ ->
-                if (!activity.isFinishing) activity.finish()
+                if (onDismiss == null) {
+                    if (!activity.isFinishing) activity.finish()
+                } else {
+                    onDismiss()
+                }
             }
             .create().apply {
                 setCancelable(false)

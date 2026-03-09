@@ -478,11 +478,11 @@ class MediaPlayerFacade @Inject constructor(
                 crashReporter.log(
                     "nextIndex is $nextIndex, play sources size: ${player.mediaItemCount}"
                 )
-                player.removeMediaItem(index)
                 if (nextIndex != C.INDEX_UNSET) {
                     if (nextIndex < player.mediaItemCount)
                         result = player.getMediaItemAt(nextIndex).mediaId
                 }
+                player.removeMediaItem(index)
                 crashReporter.log("next media id: $result")
             }
             result
