@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -34,8 +35,10 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
@@ -103,6 +106,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val myAccountInfoFacade: AccountInfoWrapper,
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
+    private val appVersionMapper: AppVersionMapper,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -672,11 +676,25 @@ internal class DefaultSettingsRepository @Inject constructor(
             megaLocalRoomGateway.insertOrUpdateHomeScreenWidgetConfigurations(configurations)
         }
 
-    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String){
+    override suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String) {
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteHomeScreenWidgetConfiguration(widgetIdentifier)
         }
     }
+
+    override suspend fun getLastVersionNewFeatureShown(): AppVersion? =
+        withContext(ioDispatcher) {
+            uiPreferencesGateway
+                .monitorLastVersionNewFeatureShownPreference()
+                .firstOrNull()
+                ?.let { appVersionMapper(it) }
+        }
+
+
+    override suspend fun setLastVersionNewFeatureShown(version: AppVersion) =
+        withContext(ioDispatcher) {
+            uiPreferencesGateway.setLastVersionNewFeatureShownPreference(appVersionMapper(version))
+        }
 
     companion object {
         private const val COLORED_FOLDERS_ONBOARDING_SHOWN_KEY = "colored_folders_onboarding_shown"

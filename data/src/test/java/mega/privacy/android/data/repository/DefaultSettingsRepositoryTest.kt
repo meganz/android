@@ -22,6 +22,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
@@ -75,6 +76,7 @@ internal class DefaultSettingsRepositoryTest {
     private val fileVersionsOptionCache: Cache<Boolean> = mock()
     private val myAccountInfoFacade: AccountInfoWrapper = mock()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
+    private val appVersionMapper = mock<AppVersionMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -93,7 +95,8 @@ internal class DefaultSettingsRepositoryTest {
             fileManagementPreferencesGateway = fileManagementPreferencesGateway,
             fileVersionsOptionCache = fileVersionsOptionCache,
             myAccountInfoFacade = myAccountInfoFacade,
-            megaLocalRoomGateway = megaLocalRoomGateway
+            megaLocalRoomGateway = megaLocalRoomGateway,
+            appVersionMapper = appVersionMapper
         )
     }
 
@@ -113,6 +116,7 @@ internal class DefaultSettingsRepositoryTest {
             fileManagementPreferencesGateway,
             fileVersionsOptionCache,
             megaLocalRoomGateway,
+            appVersionMapper
         )
     }
 

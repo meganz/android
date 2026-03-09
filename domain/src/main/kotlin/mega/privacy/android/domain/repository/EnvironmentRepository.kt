@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.entity.environment.DevicePowerConnectionState
@@ -26,6 +27,13 @@ interface EnvironmentRepository {
      * @return app info
      */
     fun getAppInfo(): AppInfo
+
+    /**
+     * Get app version
+     *
+     * @return app version
+     */
+    fun getAppVersion(): AppVersion?
 
     /**
      * Get device sdk version Int

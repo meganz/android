@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.CallsMeetingInvitations
 import mega.privacy.android.domain.entity.CallsMeetingReminders
 import mega.privacy.android.domain.entity.CallsSoundEnabledState
@@ -572,4 +573,14 @@ interface SettingsRepository {
      * @param widgetIdentifier the identifier of the widget to delete
      */
     suspend fun deleteHomeScreenWidgetConfiguration(widgetIdentifier: String)
+
+    /**
+     * Get the last version feature shown to the user
+     */
+    suspend fun getLastVersionNewFeatureShown(): AppVersion?
+
+    /**
+     * Set the last version feature shown to the user
+     */
+    suspend fun setLastVersionNewFeatureShown(version: AppVersion)
 }

@@ -167,4 +167,18 @@ interface UIPreferencesGateway {
      * @return serialised string representing the start screen preference destination
      */
     fun monitorSerialisedStartScreenPreferenceDestination(): Flow<String?>
+
+    /**
+     * Monitor the last version that a new feature was shown
+     *
+     * @return ve
+     */
+    fun monitorLastVersionNewFeatureShownPreference(): Flow<String?>
+
+    /**
+     * Set the last version that a new feature was shown
+     *
+     * @param value
+     */
+    suspend fun setLastVersionNewFeatureShownPreference(value: String)
 }

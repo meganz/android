@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import javax.inject.Inject
+import kotlin.text.set
 
 private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
@@ -34,6 +35,8 @@ private const val GEO_TAGGING = "GEO_TAGGING"
 private const val NOTIFICATION_SHOWN_TIMESTAMP = "NOTIFICATION_SHOWN_TIMESTAMP"
 private const val SERIALISED_START_SCREEN_PREFERENCE_DESTINATION =
     "SERIALISED_START_SCREEN_PREFERENCE_DESTINATION"
+private const val LAST_VERSION_NEW_FEATURE_SHOWN = "LAST_VERSION_NEW_FEATURE_SHOWN"
+
 private val Context.uiPreferenceDataStore: DataStore<Preferences> by preferencesDataStore(
     name = USER_INTERFACE_PREFERENCES,
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
@@ -183,4 +186,15 @@ internal class UIPreferencesDatastore @Inject constructor(
         context.uiPreferenceDataStore.monitor(
             stringPreferencesKey(SERIALISED_START_SCREEN_PREFERENCE_DESTINATION)
         )
+
+    override fun monitorLastVersionNewFeatureShownPreference() =
+        context.uiPreferenceDataStore.monitor(
+            stringPreferencesKey(LAST_VERSION_NEW_FEATURE_SHOWN)
+        )
+
+    override suspend fun setLastVersionNewFeatureShownPreference(value: String) {
+        context.uiPreferenceDataStore.edit {
+            it[stringPreferencesKey(LAST_VERSION_NEW_FEATURE_SHOWN)] = value
+        }
+    }
 }

@@ -14,11 +14,13 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.model.protobuf.TombstoneProtos
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
 import mega.privacy.android.domain.entity.AppInfo
+import mega.privacy.android.domain.entity.AppVersion
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.entity.DeviceInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -40,6 +42,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     private val applicationIpAddressWrapper: ApplicationIpAddressWrapper,
     private val thermalStateMapper: ThermalStateMapper,
     private val devicePowerConnectionStateMapper: DevicePowerConnectionStateMapper,
+    private val appVersionMapper: AppVersionMapper
 ) : EnvironmentRepository {
     private val isHistoricalProcessExitReasonsFetched = AtomicBoolean(false)
 
@@ -61,6 +64,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
         sdkVersion = megaApiGateway.getSdkVersion(),
     )
 
+    override fun getAppVersion() = appVersionMapper(context.getString(R.string.app_version))
 
     override fun getDeviceSdkVersionInt() = deviceGateway.getSdkVersionInt()
 

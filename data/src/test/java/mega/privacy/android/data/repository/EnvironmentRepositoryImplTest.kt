@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.environment.DevicePowerConnectionStateMapper
 import mega.privacy.android.data.mapper.environment.ThermalStateMapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
@@ -45,6 +46,7 @@ internal class EnvironmentRepositoryImplTest {
     private val applicationIpAddressWrapper = mock<ApplicationIpAddressWrapper>()
     private val thermalStateMapper = mock<ThermalStateMapper>()
     private val devicePowerConnectionStateMapper = mock<DevicePowerConnectionStateMapper>()
+    private val appVersionMapper = mock<AppVersionMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -56,6 +58,7 @@ internal class EnvironmentRepositoryImplTest {
             applicationIpAddressWrapper = applicationIpAddressWrapper,
             thermalStateMapper = thermalStateMapper,
             devicePowerConnectionStateMapper = devicePowerConnectionStateMapper,
+            appVersionMapper = appVersionMapper
         )
     }
 
@@ -68,6 +71,7 @@ internal class EnvironmentRepositoryImplTest {
             applicationIpAddressWrapper,
             thermalStateMapper,
             devicePowerConnectionStateMapper,
+            appVersionMapper
         )
         whenever(deviceGateway.getCurrentDeviceLanguage()).thenReturn("en")
     }
