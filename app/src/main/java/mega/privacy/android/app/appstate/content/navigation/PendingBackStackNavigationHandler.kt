@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate.content.navigation
 
+import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
@@ -64,13 +65,14 @@ class PendingBackStackNavigationHandler(
         backstack.remove(navKey)
     }
 
-    override fun navigate(destination: NavKey) {
+    override fun navigate(destination: NavKey, navOptions: NavOptions?) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destination")
-        navigate(listOf(destination))
+        navigate(listOf(destination), navOptions)
     }
 
-    override fun navigate(destinations: List<NavKey>) {
+    override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        applyNavOptions(navOptions)
         if (backstack.takeLast(destinations.size).containsAll(destinations)) {
             Timber.d("Destinations are already on the backstack")
             return
@@ -261,6 +263,16 @@ class PendingBackStackNavigationHandler(
 
     private fun AuthStatus?.sessionOrNull(): String? =
         (this as? AuthStatus.LoggedIn)?.session
+
+    private fun applyNavOptions(navOptions: NavOptions?) {
+        if (navOptions == null) return
+        navOptions.popUpToRoute?.let { route ->
+            val popUpToKey = backstack.lastOrNull { it::class.qualifiedName == route }
+            if (popUpToKey != null) {
+                removeFromBackStackTo(popUpToKey, navOptions.isPopUpToInclusive())
+            }
+        }
+    }
 
     /**
      * Removes elements from the back stack up to the specified destination.

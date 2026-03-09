@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate.content.navigation
 
+import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
@@ -23,11 +24,13 @@ class TopLevelBackStackNavigationHandler(
         }
     }
 
-    override fun navigate(destination: NavKey) {
+    override fun navigate(destination: NavKey, navOptions: NavOptions?) {
+        applyNavOptions(navOptions)
         backStack.add(destination)
     }
 
-    override fun navigate(destinations: List<NavKey>) {
+    override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
+        applyNavOptions(navOptions)
         backStack.addAll(destinations)
     }
 
@@ -50,6 +53,16 @@ class TopLevelBackStackNavigationHandler(
 
         // Navigate back after setting the result
         backStack.removeLast()
+    }
+
+    private fun applyNavOptions(navOptions: NavOptions?) {
+        if (navOptions == null) return
+        navOptions.popUpToRoute?.let { route ->
+            val popUpToKey = backStack.backStack.lastOrNull { it::class.qualifiedName == route }
+            if (popUpToKey != null) {
+                removeFromBackStackTo(popUpToKey, navOptions.isPopUpToInclusive())
+            }
+        }
     }
 
     /**

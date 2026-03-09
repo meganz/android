@@ -1,5 +1,6 @@
 package mega.privacy.android.navigation.contract
 
+import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
 
 /**
@@ -20,16 +21,24 @@ interface NavigationHandler : NavigationResultsHandler {
     /**
      * Navigate to a specific destination.
      *
+     * Note: Animation options in [NavOptions] (enter/exit transitions) are not supported
+     * by this NavigationHandler. Only back stack manipulation options (e.g. popUpTo) are handled.
+     *
      * @param destination The destination to navigate to
+     * @param navOptions Optional navigation options for customizing navigation behavior
      */
-    fun navigate(destination: NavKey)
+    fun navigate(destination: NavKey, navOptions: NavOptions? = null)
 
     /**
      * Navigate to a specific destination within a hierarchy
      *
+     * Note: Animation options in [NavOptions] (enter/exit transitions) are not supported
+     * by this NavigationHandler. Only back stack manipulation options (e.g. popUpTo) are handled.
+     *
      * @param destinations
+     * @param navOptions Optional navigation options for customizing navigation behavior
      */
-    fun navigate(destinations: List<NavKey>)
+    fun navigate(destinations: List<NavKey>, navOptions: NavOptions? = null)
 
     /**
      * Pop back stack to a specific destination.

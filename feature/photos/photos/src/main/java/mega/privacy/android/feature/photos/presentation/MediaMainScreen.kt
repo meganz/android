@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -761,8 +762,8 @@ private fun PhotosMainScreenPreview() {
             navigationHandler = object : NavigationHandler {
                 override fun back() {}
                 override fun remove(navKey: NavKey) {}
-                override fun navigate(destination: NavKey) {}
-                override fun navigate(destinations: List<NavKey>) {}
+                override fun navigate(destination: NavKey, navOptions: NavOptions?) {}
+                override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {}
                 override fun backTo(destination: NavKey, inclusive: Boolean) {}
                 override fun navigateAndClearBackStack(destination: NavKey) {}
                 override fun navigateAndClearTo(

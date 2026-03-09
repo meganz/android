@@ -48,8 +48,6 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.VersionsActi
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ViewInFolderActionClickHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
-import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
@@ -84,6 +82,8 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VerifyMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.VersionsMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ViewInFolderMenuAction
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
@@ -1042,7 +1042,7 @@ class NodeActionClickHandlerTest {
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
         verify(mockGetNodeShareDataUseCase).invoke(mockFileNode)
-        verify(mockNavigationHandler, never()).navigate(any<NavKey>())
+        verify(mockNavigationHandler, never()).navigate(any<NavKey>(), anyOrNull())
         verify(mockMegaNavigator, never()).openAuthenticityCredentialsActivity(any(), any(), any())
     }
 
@@ -1303,7 +1303,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L))
-            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>(), anyOrNull())
         }
 
     @Test
@@ -1318,7 +1318,7 @@ class NodeActionClickHandlerTest {
             action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
             verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
-            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>())
+            verify(mockNavigationHandler, never()).navigate(any<LeaveShareDialogNavKey>(), anyOrNull())
         }
 
     // UnhideAction Tests (already exists, but adding for completeness)

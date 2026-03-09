@@ -1,5 +1,6 @@
 package mega.privacy.android.app.appstate.content.navigation
 
+import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
@@ -639,5 +640,62 @@ class PendingBackStackNavigationHandlerTest {
         underTest.navigate(list)
         assertThat(backStack.count { it == destination1 }).isEqualTo(1)
         assertThat(backStack.count { it == destination2 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate with navOptions popUpTo pops back stack to target destination`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo(Destination1::class.qualifiedName!!) {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with navOptions popUpTo inclusive pops target destination as well`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo(Destination1::class.qualifiedName!!) {
+                inclusive = true
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3)
+    }
+
+    @Test
+    fun `test that navigate list with navOptions popUpTo pops back stack before adding destinations`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo(Destination1::class.qualifiedName!!) {
+                inclusive = false
+            }
+        }
+        underTest.navigate(listOf(Destination2, Destination3), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with null navOptions does not pop back stack`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.navigate(Destination3, navOptions = null)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2, Destination3
+        )
     }
 }
