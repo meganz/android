@@ -41,6 +41,7 @@ import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -239,7 +240,7 @@ fun SearchScreen(
             snackBarHostState = snackbarHostState,
             coroutineScope = coroutineScope,
             onActionHandled = { viewModel.processAction(SearchUiAction.OpenedFileNodeHandled) },
-            nodeSourceType = uiState.nodeSourceType,
+            nodeSourceData = NodeSourceData.Default(uiState.nodeSourceType),
             onDownloadEvent = onTransfer,
             sortOrder = uiState.selectedSortOrder,
             onNavigate = navigationHandler::navigate,

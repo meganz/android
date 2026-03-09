@@ -1,10 +1,10 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
@@ -27,28 +27,28 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      *
      * @param content The file node content to convert
      * @param fileNode The file node containing metadata
-     * @param nodeSourceType The NodeSourceType
+     * @param nodeSourceData The node source data describing the navigation context
      * @param sortOrder The sort order for media player (default: ORDER_NONE)
      * @param textEditorMode The text editor mode (default: View)
      * @param searchedItems The searched items for media player (default: null)
-     * @param nodeIds The list of node ids of current screen, e.g. from recents bucket (default: null)
-     * @param isInShare Whether the node is in share (default: false)
      * @param isTextEditorComposeEnabled Whether to use Compose text editor screen (default: false)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
         content: FileNodeContent,
         fileNode: TypedFileNode,
-        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        nodeSourceData: NodeSourceData,
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
-        nodeIds: List<Long>? = null,
-        isInShare: Boolean = false,
         isTextEditorComposeEnabled: Boolean = false,
         isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
-        val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceType)
+        val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
+        val nodeIds = (nodeSourceData as? NodeSourceData.RecentsBucket)?.nodeIds
+        val isInShare = (nodeSourceData as? NodeSourceData.RecentsBucket)?.isInShare ?: false
+        val publicUrl = (nodeSourceData as? NodeSourceData.FileLink)?.url
+
         return when (content) {
             is FileNodeContent.Pdf -> if (isPDFViewerEnabled.not()) {
                 LegacyPdfViewerNavKey(
@@ -59,31 +59,36 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 )
             } else {
                 val (contentUri, isLocal, shouldStop) = when (val uri = content.uri) {
-                    is NodeContentUri.LocalContentUri -> {
-                        Triple(uri.file.path, true, false)
-                    }
-
-                    is NodeContentUri.RemoteContentUri -> {
-                        Triple(uri.url, false, uri.shouldStopHttpSever)
-                    }
+                    is NodeContentUri.LocalContentUri -> Triple(uri.file.path, true, false)
+                    is NodeContentUri.RemoteContentUri -> Triple(
+                        uri.url,
+                        false,
+                        uri.shouldStopHttpSever
+                    )
                 }
                 PdfViewerNavKey(
                     nodeHandle = fileNode.id.longValue,
                     contentUri = contentUri,
                     isLocalContent = isLocal,
                     shouldStopHttpServer = shouldStop,
-                    nodeSourceType = nodeSourceType,
+                    nodeSourceType = nodeSourceData.nodeSourceType,
                     mimeType = fileNode.type.mimeType,
+                    isFolderLink = nodeSourceData is NodeSourceData.FolderLink,
                     title = null,
                 )
             }
 
             is FileNodeContent.ImageForNode -> LegacyImageViewerNavKey(
                 nodeHandle = fileNode.id.longValue,
-                parentNodeHandle = fileNode.parentId.longValue,
+                parentNodeHandle = if (nodeSourceData is NodeSourceData.FileLink) {
+                    -1L
+                } else {
+                    fileNode.parentId.longValue
+                },
                 nodeSourceType = viewType,
                 nodeIds = nodeIds,
-                isInShare = isInShare
+                isInShare = isInShare,
+                url = publicUrl
             )
 
             is FileNodeContent.TextContent -> LegacyTextEditorNavKey(
@@ -98,13 +103,17 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 nodeContentUri = content.uri,
                 nodeSourceType = viewType,
                 sortOrder = sortOrder,
-                isFolderLink = false,
+                isFolderLink = nodeSourceData is NodeSourceData.FolderLink,
                 fileName = fileNode.name,
-                parentHandle = fileNode.parentId.longValue,
+                parentHandle = if (nodeSourceData is NodeSourceData.FileLink) {
+                    -1L
+                } else {
+                    fileNode.parentId.longValue
+                },
                 fileHandle = fileNode.id.longValue,
                 fileTypeInfo = fileNode.type,
                 searchedItems = searchedItems,
-                nodeHandles = nodeIds
+                nodeHandles = nodeIds,
             )
 
             is FileNodeContent.LocalZipFile -> LegacyZipBrowserNavKey(

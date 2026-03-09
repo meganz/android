@@ -31,6 +31,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
@@ -272,7 +273,7 @@ internal fun RubbishBinScreen(
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
-            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.RUBBISH_BIN),
             sortOrder = uiState.sortOrder,
             snackBarHostState = snackbarHostState,
             onActionHandled = {

@@ -26,6 +26,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.android.core.ui.extensions.LaunchedOnceEffect
@@ -128,7 +129,7 @@ fun RecentsScreen(
             snackBarHostState = snackBarHostState,
             coroutineScope = coroutineScope,
             onActionHandled = { openedFileNode = null },
-            nodeSourceType = source,
+            nodeSourceData = NodeSourceData.Default(source),
             onDownloadEvent = transferHandler::setTransferEvent,
             onNavigate = onNavigate,
         )

@@ -32,6 +32,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
@@ -195,11 +196,12 @@ fun RecentsBucketScreen(
                 snackBarHostState = LocalSnackBarHostState.current,
                 coroutineScope = coroutineScope,
                 onActionHandled = { openedFileNode = null },
-                nodeSourceType = NodeSourceType.RECENTS_BUCKET,
+                nodeSourceData = NodeSourceData.RecentsBucket(
+                    nodeIds = uiState.nodeIds,
+                    isInShare = uiState.nodeSourceType.isSharedSource()
+                ),
                 onDownloadEvent = transferHandler::setTransferEvent,
                 onNavigate = onNavigate,
-                nodeIds = uiState.nodeIds,
-                isInShare = uiState.nodeSourceType.isSharedSource()
             )
         }
     }

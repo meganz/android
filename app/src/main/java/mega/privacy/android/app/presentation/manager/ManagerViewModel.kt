@@ -1141,6 +1141,8 @@ class ManagerViewModel @Inject constructor(
         NodeSourceType.VIDEO_PLAYLISTS,
         NodeSourceType.RECENTS_BUCKET,
         NodeSourceType.TIMELINE,
+        NodeSourceType.FOLDER_LINK,
+        NodeSourceType.FILE_LINK,
         NodeSourceType.VIDEO_RECENTLY_WATCHED,
             -> MegaApiJava.INVALID_HANDLE
 

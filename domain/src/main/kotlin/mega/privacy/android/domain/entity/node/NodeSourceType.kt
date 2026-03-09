@@ -97,6 +97,16 @@ enum class NodeSourceType {
      * When node source is Recently Watched
      */
     VIDEO_RECENTLY_WATCHED,
+
+    /**
+     * When node source is Folder Link
+     */
+    FOLDER_LINK,
+
+    /**
+     * When node source is File Link
+     */
+    FILE_LINK
 }
 
 /**

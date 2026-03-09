@@ -74,6 +74,8 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     NodeSourceType.VIDEO_PLAYLISTS,
                     NodeSourceType.RECENTS_BUCKET,
                     NodeSourceType.VIDEO_RECENTLY_WATCHED,
+                    NodeSourceType.FOLDER_LINK,
+                    NodeSourceType.FILE_LINK,
                         -> ORDER_CLOUD
 
                     NodeSourceType.FAVOURITES -> ORDER_FAVOURITES

@@ -4,7 +4,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 
@@ -21,7 +23,11 @@ fun EntryProviderScope<NavKey>.legacyPdfViewerScreen(
                 context = context,
                 nodeHandle = key.nodeHandle,
                 nodeSourceType = key.nodeSourceType,
-            )
+            ).also {
+                if (key.nodeSourceType == NodeSourceTypeInt.FOLDER_LINK_ADAPTER) {
+                    it.putExtra(Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK, true)
+                }
+            }
             nodeContentUriIntentMapper(
                 intent = intent,
                 content = key.nodeContentUri,

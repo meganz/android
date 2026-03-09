@@ -68,10 +68,14 @@ class NodeActionHandlerViewModel @Inject constructor(
      * Determines the type of content and returns appropriate FileNodeContent
      *
      * @param fileNode The file node to handle
+     * @param isLinkNode Whether the node belongs to a public link (folder/file link).
+     *                   When true, content URI is resolved using the folder link API.
      * @return [FileNodeContent] representing the type of content
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent =
-        getFileNodeContentForFileNodeUseCase(fileNode)
+    suspend fun handleFileNodeClicked(
+        fileNode: TypedFileNode,
+        isLinkNode: Boolean = false,
+    ): FileNodeContent = getFileNodeContentForFileNodeUseCase(fileNode, isLinkNode)
 
     /**
      * Apply node content uri to intent

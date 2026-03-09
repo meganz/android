@@ -257,6 +257,7 @@ data class LegacyImageViewerNavKey(
     val nodeSourceType: Int? = null,
     val nodeIds: List<Long>? = null,
     val isInShare: Boolean = false,
+    val url: String? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

@@ -39,6 +39,7 @@ import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaErrorBanner
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
@@ -313,7 +314,7 @@ internal fun CloudDriveContent(
                 snackBarHostState = snackbarHostState,
                 coroutineScope = coroutineScope,
                 onActionHandled = { onAction(OpenedFileNodeHandled) },
-                nodeSourceType = uiState.nodeSourceType,
+                nodeSourceData = NodeSourceData.Default(uiState.nodeSourceType),
                 onDownloadEvent = onTransfer,
                 sortOrder = uiState.selectedSortOrder,
                 onNavigate = navigationHandler::navigate,

@@ -35,5 +35,7 @@ class NodeSourceTypeToViewTypeMapper @Inject constructor() {
             -> null
 
         NodeSourceType.RECENTS_BUCKET -> NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
+        NodeSourceType.FOLDER_LINK -> NodeSourceTypeInt.FOLDER_LINK_ADAPTER
+        NodeSourceType.FILE_LINK -> NodeSourceTypeInt.FILE_LINK_ADAPTER
     }
 }

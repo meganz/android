@@ -1,6 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
@@ -72,7 +73,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             isPDFViewerEnabled = false
         )
 
@@ -98,7 +99,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             isPDFViewerEnabled = true
         )
 
@@ -132,7 +133,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             isPDFViewerEnabled = true
         )
 
@@ -173,9 +174,74 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.FAVOURITES
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.FAVOURITES)
         )
 
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that ImageForNode content maps to LegacyImageViewerNavKey with FileLink sets parentNodeHandle to minus one and url`() {
+        val nodeHandle = 999L
+        val publicUrl = "https://mega.nz/file/abc"
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = 100L,
+            name = "photo.jpg",
+            fileTypeInfo = StaticImageFileTypeInfo("image/jpeg", "jpg")
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FILE_LINK))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.ImageForNode
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FileLink(url = publicUrl)
+        )
+
+        val expected = LegacyImageViewerNavKey(
+            nodeHandle = nodeHandle,
+            parentNodeHandle = -1L,
+            nodeSourceType = expectedViewType,
+            url = publicUrl
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that ImageForNode content maps to LegacyImageViewerNavKey with RecentsBucket sets nodeIds and isInShare`() {
+        val nodeHandle = 888L
+        val parentHandle = 77L
+        val nodeIds = listOf(1L, 2L, 3L)
+        val isInShare = true
+        val expectedViewType = NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = "image.png",
+            fileTypeInfo = StaticImageFileTypeInfo("image/png", "png")
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.RECENTS_BUCKET))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.ImageForNode
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.RecentsBucket(nodeIds = nodeIds, isInShare = isInShare)
+        )
+
+        val expected = LegacyImageViewerNavKey(
+            nodeHandle = nodeHandle,
+            parentNodeHandle = parentHandle,
+            nodeSourceType = expectedViewType,
+            nodeIds = nodeIds,
+            isInShare = isInShare
+        )
         assertThat(result).isEqualTo(expected)
     }
 
@@ -203,7 +269,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             textEditorMode = TextEditorMode.Edit
         )
 
@@ -234,7 +300,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             textEditorMode = TextEditorMode.View,
             isTextEditorComposeEnabled = true
         )
@@ -276,7 +342,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
             sortOrder = SortOrder.ORDER_MODIFICATION_DESC
         )
 
@@ -317,9 +383,131 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.AUDIO
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.AUDIO)
         )
 
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with FolderLink sets isFolderLink true`() {
+        val nodeHandle = 555L
+        val parentHandle = 444L
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val nodeContentUri = NodeContentUri.LocalContentUri(File("/path/to/video.mp4"))
+        val fileName = "folder_link_video.mp4"
+        val fileTypeInfo = VideoFileTypeInfo("video/mp4", "mp4", 60.seconds)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = fileName,
+            fileTypeInfo = fileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FOLDER_LINK))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.AudioOrVideo(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FolderLink
+        )
+
+        val expected = LegacyMediaPlayerNavKey(
+            nodeHandle = nodeHandle,
+            nodeContentUri = nodeContentUri,
+            nodeSourceType = expectedViewType,
+            sortOrder = SortOrder.ORDER_NONE,
+            isFolderLink = true,
+            fileName = fileName,
+            parentHandle = parentHandle,
+            fileHandle = nodeHandle,
+            fileTypeInfo = fileTypeInfo
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with FileLink sets parentHandle to minus one`() {
+        val nodeHandle = 333L
+        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+        val nodeContentUri = NodeContentUri.RemoteContentUri("http://example.com/video.mp4", false)
+        val fileName = "file_link_video.mp4"
+        val fileTypeInfo = VideoFileTypeInfo("video/mp4", "mp4", 90.seconds)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = 999L,
+            name = fileName,
+            fileTypeInfo = fileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.FILE_LINK))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.AudioOrVideo(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.FileLink(url = "https://mega.nz/file/xyz")
+        )
+
+        val expected = LegacyMediaPlayerNavKey(
+            nodeHandle = nodeHandle,
+            nodeContentUri = nodeContentUri,
+            nodeSourceType = expectedViewType,
+            sortOrder = SortOrder.ORDER_NONE,
+            isFolderLink = false,
+            fileName = fileName,
+            parentHandle = -1L,
+            fileHandle = nodeHandle,
+            fileTypeInfo = fileTypeInfo
+        )
+        assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that AudioOrVideo content maps to LegacyMediaPlayerNavKey with RecentsBucket sets nodeHandles and searchedItems`() {
+        val nodeHandle = 222L
+        val parentHandle = 111L
+        val nodeIds = listOf(10L, 20L, 30L)
+        val searchedItems = listOf(40L, 50L)
+        val expectedViewType = NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER
+        val nodeContentUri = NodeContentUri.LocalContentUri(File("/path/to/audio.mp3"))
+        val fileName = "recents_audio.mp3"
+        val fileTypeInfo = AudioFileTypeInfo("audio/mpeg", "mp3", 120.seconds)
+        val fileNode = createMockFileNode(
+            id = nodeHandle,
+            parentId = parentHandle,
+            name = fileName,
+            fileTypeInfo = fileTypeInfo
+        )
+
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.RECENTS_BUCKET))
+            .thenReturn(expectedViewType)
+
+        val content = FileNodeContent.AudioOrVideo(uri = nodeContentUri)
+        val result = underTest(
+            content = content,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.RecentsBucket(nodeIds = nodeIds, isInShare = false),
+            sortOrder = SortOrder.ORDER_DEFAULT_ASC,
+            searchedItems = searchedItems
+        )
+
+        val expected = LegacyMediaPlayerNavKey(
+            nodeHandle = nodeHandle,
+            nodeContentUri = nodeContentUri,
+            nodeSourceType = expectedViewType,
+            sortOrder = SortOrder.ORDER_DEFAULT_ASC,
+            isFolderLink = false,
+            fileName = fileName,
+            parentHandle = parentHandle,
+            fileHandle = nodeHandle,
+            fileTypeInfo = fileTypeInfo,
+            searchedItems = searchedItems,
+            nodeHandles = nodeIds
+        )
         assertThat(result).isEqualTo(expected)
     }
 
@@ -338,7 +526,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
         )
 
         assertThat(result).isEqualTo(expected)
@@ -352,7 +540,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
         )
 
         assertThat(result).isNull()
@@ -366,7 +554,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
         )
 
         assertThat(result).isNull()
@@ -380,7 +568,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
         )
 
         assertThat(result).isNull()
@@ -395,7 +583,7 @@ class FileNodeContentToNavKeyMapperTest {
         val result = underTest(
             content = content,
             fileNode = fileNode,
-            nodeSourceType = NodeSourceType.CLOUD_DRIVE
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
         )
 
         assertThat(result).isNull()

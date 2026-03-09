@@ -2,6 +2,7 @@ package mega.privacy.android.feature.clouddrive.navigation
 
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.node.FileNode
@@ -69,7 +70,7 @@ class CloudDriveDeepLinkHandler @Inject constructor(
                             fileNodeContentToNavKeyMapper(
                                 content = getFileNodeContentForFileNodeUseCase(fileNode),
                                 fileNode = fileNode,
-                                nodeSourceType = nodeSourceType,
+                                nodeSourceData = NodeSourceData.Default(nodeSourceType),
                                 isPDFViewerEnabled = runCatching {
                                     getFeatureFlagValueUseCase(
                                         AppFeatures.PdfViewerComposeUI

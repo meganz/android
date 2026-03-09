@@ -21,6 +21,7 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
@@ -120,7 +121,7 @@ fun LinksContent(
     uiState.openedFileNode?.let { fileNode ->
         HandleNodeAction3(
             typedFileNode = fileNode,
-            nodeSourceType = NodeSourceType.LINKS,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.LINKS),
             sortOrder = uiState.selectedSortOrder,
             snackBarHostState = snackbarHostState,
             onActionHandled = {

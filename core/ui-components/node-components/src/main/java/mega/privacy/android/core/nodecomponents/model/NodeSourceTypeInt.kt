@@ -19,4 +19,6 @@ object NodeSourceTypeInt {
     const val RECENTS_BUCKET_ADAPTER: Int = 2034
     const val VIDEO_PLAYLISTS_ADAPTER: Int = 2035
     const val VIDEO_RECENTLY_WATCHED_ADAPTER: Int = 2036
+    const val FOLDER_LINK_ADAPTER: Int = 2005
+    const val FILE_LINK_ADAPTER: Int = 2019
 }

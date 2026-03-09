@@ -39,14 +39,15 @@ class GetFileNodeContentForFileNodeUseCaseTest {
     private lateinit var underTest: GetFileNodeContentForFileNodeUseCase
 
     private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val getFolderLinkNodeContentUriUseCase = mock<GetFolderLinkNodeContentUriUseCase>()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val getPathFromNodeContentUseCase = mock<GetPathFromNodeContentUseCase>()
-
 
     @BeforeEach
     fun setUp() {
         underTest = GetFileNodeContentForFileNodeUseCase(
             getNodeContentUriUseCase,
+            getFolderLinkNodeContentUriUseCase,
             getNodePreviewFileUseCase,
             getPathFromNodeContentUseCase,
         )
@@ -56,6 +57,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
     fun cleanUp() {
         reset(
             getNodeContentUriUseCase,
+            getFolderLinkNodeContentUriUseCase,
             getNodePreviewFileUseCase,
             getPathFromNodeContentUseCase,
         )
@@ -87,6 +89,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
             is UrlFileTypeInfo -> {
                 verify(getNodeContentUriUseCase).invoke(node)
                 verify(getPathFromNodeContentUseCase).invoke(content)
+                verifyNoMoreInteractions(getFolderLinkNodeContentUriUseCase)
             }
 
             is VideoFileTypeInfo,
@@ -94,6 +97,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
             is AudioFileTypeInfo,
                 -> {
                 verify(getNodeContentUriUseCase).invoke(node)
+                verifyNoMoreInteractions(getFolderLinkNodeContentUriUseCase)
             }
 
             else -> {
@@ -115,6 +119,22 @@ class GetFileNodeContentForFileNodeUseCaseTest {
         val result = underTest(pdfNode)
 
         verify(getNodeContentUriUseCase).invoke(pdfNode)
+        assertThat(result).isInstanceOf(FileNodeContent.Pdf::class.java)
+        assertThat((result as FileNodeContent.Pdf).uri).isEqualTo(content)
+    }
+
+    @Test
+    fun `test that use case invoke returns Pdf content for PDF files when isLinkNode is true`() = runTest {
+        val pdfNode = mock<TypedFileNode>().stub {
+            on { type } doReturn PdfFileTypeInfo
+        }
+        val content = NodeContentUri.LocalContentUri(File("document.pdf"))
+        whenever(getFolderLinkNodeContentUriUseCase(pdfNode)).thenReturn(content)
+
+        val result = underTest(pdfNode, isLinkNode = true)
+
+        verify(getFolderLinkNodeContentUriUseCase).invoke(pdfNode)
+        verifyNoMoreInteractions(getNodeContentUriUseCase)
         assertThat(result).isInstanceOf(FileNodeContent.Pdf::class.java)
         assertThat((result as FileNodeContent.Pdf).uri).isEqualTo(content)
     }
@@ -191,6 +211,26 @@ class GetFileNodeContentForFileNodeUseCaseTest {
     }
 
     @Test
+    fun `test that use case invoke returns AudioOrVideo for video files when isLinkNode is true`() = runTest {
+        val videoNode = mock<TypedFileNode>().stub {
+            on { type } doReturn VideoFileTypeInfo(
+                extension = "mp4",
+                mimeType = "video/mp4",
+                duration = Duration.INFINITE
+            )
+        }
+        val content = NodeContentUri.LocalContentUri(File("video.mp4"))
+        whenever(getFolderLinkNodeContentUriUseCase(videoNode)).thenReturn(content)
+
+        val result = underTest(videoNode, isLinkNode = true)
+
+        verify(getFolderLinkNodeContentUriUseCase).invoke(videoNode)
+        verifyNoMoreInteractions(getNodeContentUriUseCase)
+        assertThat(result).isInstanceOf(FileNodeContent.AudioOrVideo::class.java)
+        assertThat((result as FileNodeContent.AudioOrVideo).uri).isEqualTo(content)
+    }
+
+    @Test
     fun `test that use case invoke returns AudioOrVideo for audio files`() = runTest {
         val audioNode = mock<TypedFileNode>().stub {
             on { type } doReturn AudioFileTypeInfo(
@@ -205,6 +245,26 @@ class GetFileNodeContentForFileNodeUseCaseTest {
         val result = underTest(audioNode)
 
         verify(getNodeContentUriUseCase).invoke(audioNode)
+        assertThat(result).isInstanceOf(FileNodeContent.AudioOrVideo::class.java)
+        assertThat((result as FileNodeContent.AudioOrVideo).uri).isEqualTo(content)
+    }
+
+    @Test
+    fun `test that use case invoke returns AudioOrVideo for audio files when isLinkNode is true`() = runTest {
+        val audioNode = mock<TypedFileNode>().stub {
+            on { type } doReturn AudioFileTypeInfo(
+                extension = "mp3",
+                mimeType = "audio/mpeg",
+                duration = Duration.INFINITE
+            )
+        }
+        val content = NodeContentUri.LocalContentUri(File("audio.mp3"))
+        whenever(getFolderLinkNodeContentUriUseCase(audioNode)).thenReturn(content)
+
+        val result = underTest(audioNode, isLinkNode = true)
+
+        verify(getFolderLinkNodeContentUriUseCase).invoke(audioNode)
+        verifyNoMoreInteractions(getNodeContentUriUseCase)
         assertThat(result).isInstanceOf(FileNodeContent.AudioOrVideo::class.java)
         assertThat((result as FileNodeContent.AudioOrVideo).uri).isEqualTo(content)
     }

@@ -30,6 +30,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.sheet.home.HomeFabOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -133,7 +134,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
                 snackBarHostState = snackBarHostState,
                 coroutineScope = coroutineScope,
                 onActionHandled = { openedFileNode = null },
-                nodeSourceType = source,
+                nodeSourceData = NodeSourceData.Default(source),
                 onDownloadEvent = transferHandler::setTransferEvent,
                 onNavigate = navigationHandler::navigate,
             )

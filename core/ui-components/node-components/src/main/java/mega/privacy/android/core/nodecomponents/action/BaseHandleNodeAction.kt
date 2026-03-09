@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
@@ -36,6 +37,7 @@ fun BaseHandleNodeAction(
     onActionHandled: () -> Unit,
     onOpenFileContent: (FileNodeContent, Boolean, Boolean) -> Unit,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
+    isLinkNode: Boolean = false,
 ) {
     val nodeActionsViewModel: NodeActionHandlerViewModel = hiltViewModel()
     val resources = LocalResources.current
@@ -49,7 +51,7 @@ fun BaseHandleNodeAction(
 
     LaunchedEffect(key1 = typedFileNode) {
         runCatching {
-            nodeActionsViewModel.handleFileNodeClicked(typedFileNode)
+            nodeActionsViewModel.handleFileNodeClicked(typedFileNode, isLinkNode)
         }.onSuccess { content ->
             runCatching {
                 when (content) {
@@ -86,7 +88,11 @@ fun BaseHandleNodeAction(
                             if (localFile == null) {
                                 onDownloadEvent(
                                     TransferTriggerEvent.StartDownloadForPreview(
-                                        node = typedFileNode,
+                                        node = if (isLinkNode) {
+                                            PublicLinkFile(typedFileNode, null)
+                                        } else {
+                                            typedFileNode
+                                        },
                                         isOpenWith = false
                                     )
                                 )

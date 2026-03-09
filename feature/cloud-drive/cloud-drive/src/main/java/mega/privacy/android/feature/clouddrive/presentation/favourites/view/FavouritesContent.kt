@@ -29,6 +29,7 @@ import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
@@ -165,7 +166,7 @@ internal fun FavouritesContent(
                 onNavigate = navigationHandler::navigate,
                 coroutineScope = coroutineScope,
                 onActionHandled = { onAction(OpenedFileNodeHandled) },
-                nodeSourceType = NodeSourceType.FAVOURITES,
+                nodeSourceData = NodeSourceData.Default(NodeSourceType.FAVOURITES),
                 onDownloadEvent = onTransfer,
                 sortOrder = uiState.selectedSortOrder
             )

@@ -11,7 +11,6 @@ import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMa
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNodeContent
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 
@@ -25,17 +24,16 @@ fun HandleNodeAction3(
     onNavigate: (NavKey) -> Unit,
     onActionHandled: () -> Unit,
     coroutineScope: CoroutineScope,
-    nodeSourceType: NodeSourceType,
+    nodeSourceData: NodeSourceData,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    nodeIds: List<Long>? = null,
-    isInShare: Boolean = false,
 ) {
     val fileNodeContentToNavKeyMapper = remember {
         FileNodeContentToNavKeyMapper(NodeSourceTypeToViewTypeMapper())
     }
     BaseHandleNodeAction(
         typedFileNode = typedFileNode,
+        isLinkNode = nodeSourceData.isPublicLinkSource(),
         showSnackbar = { message ->
             coroutineScope.launch {
                 snackBarHostState?.showAutoDurationSnackbar(message)
@@ -46,12 +44,10 @@ fun HandleNodeAction3(
             fileNodeContentToNavKeyMapper(
                 content = content,
                 fileNode = typedFileNode,
-                nodeSourceType = nodeSourceType,
+                nodeSourceData = nodeSourceData,
                 sortOrder = sortOrder,
-                nodeIds = nodeIds,
-                isInShare = isInShare,
                 isTextEditorComposeEnabled = isTextEditorComposeEnabled,
-                isPDFViewerEnabled = isPDFViewerEnabled
+                isPDFViewerEnabled = isPDFViewerEnabled,
             )?.let { navKey ->
                 onNavigate(navKey)
             }
@@ -59,3 +55,4 @@ fun HandleNodeAction3(
         onDownloadEvent = onDownloadEvent,
     )
 }
+

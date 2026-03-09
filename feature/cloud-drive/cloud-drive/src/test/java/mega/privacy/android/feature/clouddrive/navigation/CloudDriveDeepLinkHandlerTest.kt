@@ -3,6 +3,7 @@ package mega.privacy.android.feature.clouddrive.navigation
 import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.mapper.FileNodeContentToNavKeyMapper
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.node.DefaultTypedFileNode
@@ -287,7 +288,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -340,7 +347,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -449,7 +462,11 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
         whenever(
-            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
+            )
         ) doReturn previewNavKey
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
@@ -493,7 +510,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
@@ -529,7 +552,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.RUBBISH_BIN)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, true)
@@ -567,7 +596,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.RUBBISH_BIN)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -632,7 +667,11 @@ class CloudDriveDeepLinkHandlerTest {
             mimeType = "application/pdf"
         )
         whenever(
-            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.RUBBISH_BIN)
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.RUBBISH_BIN)
+            )
         ) doReturn previewNavKey
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -684,7 +723,13 @@ class CloudDriveDeepLinkHandlerTest {
         whenever(getNodeIdFromBase64UseCase(base64Handle)) doReturn nodeId
         whenever(getNodeByIdUseCase(nodeId)) doReturn fileNode
         whenever(getFileNodeContentForFileNodeUseCase(fileNode)) doReturn fileNodeContent
-        whenever(fileNodeContentToNavKeyMapper(fileNodeContent, fileNode)) doReturn null
+        whenever(
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.INCOMING_SHARES)
+            )
+        ) doReturn null
         whenever(getNodeLocationUseCase(fileNode)) doReturn nodeLocation
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)
@@ -749,7 +794,11 @@ class CloudDriveDeepLinkHandlerTest {
             mimeType = "application/pdf"
         )
         whenever(
-            fileNodeContentToNavKeyMapper(fileNodeContent, fileNode, NodeSourceType.INCOMING_SHARES)
+            fileNodeContentToNavKeyMapper(
+                fileNodeContent,
+                fileNode,
+                NodeSourceData.Default(NodeSourceType.INCOMING_SHARES)
+            )
         ) doReturn previewNavKey
 
         val actual = underTest.getNavKeysInternal(uri, RegexPatternType.HANDLE_LINK, isLoggedIn)

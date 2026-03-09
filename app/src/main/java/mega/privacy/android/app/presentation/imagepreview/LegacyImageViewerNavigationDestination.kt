@@ -5,6 +5,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.imagepreview.fetcher.DefaultImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.FolderLinkImageNodeFetcher
+import mega.privacy.android.app.presentation.imagepreview.fetcher.PublicFileImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
@@ -20,8 +22,8 @@ fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
     ) { key ->
         val context = LocalContext.current
         LaunchedEffect(Unit) {
-            val intent = if (key.nodeSourceType == NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER) {
-                ImagePreviewActivity.createIntent(
+            val intent = when (key.nodeSourceType) {
+                NodeSourceTypeInt.RECENTS_BUCKET_ADAPTER -> ImagePreviewActivity.createIntent(
                     context = context,
                     imageSource = ImagePreviewFetcherSource.DEFAULT,
                     menuOptionsSource = if (key.isInShare) ImagePreviewMenuSource.SHARED_ITEMS else ImagePreviewMenuSource.DEFAULT,
@@ -31,8 +33,25 @@ fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
                     } ?: emptyMap(),
                     enableAddToAlbum = true,
                 )
-            } else {
-                ImagePreviewActivity.createIntent(
+
+                NodeSourceTypeInt.FOLDER_LINK_ADAPTER -> ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.FOLDER_LINK,
+                    menuOptionsSource = ImagePreviewMenuSource.FOLDER_LINK,
+                    anchorImageNodeId = NodeId(key.nodeHandle),
+                    isForeign = true,
+                    params = mapOf(FolderLinkImageNodeFetcher.PARENT_ID to key.parentNodeHandle),
+                )
+
+                NodeSourceTypeInt.FILE_LINK_ADAPTER -> ImagePreviewActivity.createIntent(
+                    context = context,
+                    imageSource = ImagePreviewFetcherSource.PUBLIC_FILE,
+                    menuOptionsSource = ImagePreviewMenuSource.PUBLIC_FILE,
+                    anchorImageNodeId = NodeId(key.nodeHandle),
+                    params = mapOf(PublicFileImageNodeFetcher.URL to (key.url ?: "")),
+                )
+
+                else -> ImagePreviewActivity.createIntent(
                     context = context,
                     fileNodeId = key.nodeHandle,
                     parentNodeId = key.parentNodeHandle,

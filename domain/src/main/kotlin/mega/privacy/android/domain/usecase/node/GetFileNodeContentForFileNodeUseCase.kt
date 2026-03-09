@@ -17,38 +17,51 @@ import javax.inject.Inject
  */
 class GetFileNodeContentForFileNodeUseCase @Inject constructor(
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase,
+    private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
 ) {
     /**
      * Invoke
+     *
+     * @param fileNode The file node to get content for
+     * @param isLinkNode Whether the node belongs to a public link (folder/file link).
+     *        When true, content URI is resolved via [GetFolderLinkNodeContentUriUseCase].
      */
-    suspend operator fun invoke(fileNode: TypedFileNode): FileNodeContent = when {
-        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
-            uri = getNodeContentUriUseCase(fileNode)
-        )
+    suspend operator fun invoke(
+        fileNode: TypedFileNode,
+        isLinkNode: Boolean = false,
+    ): FileNodeContent {
+        val getContentUri = if (isLinkNode) {
+            getFolderLinkNodeContentUriUseCase::invoke
+        } else {
+            getNodeContentUriUseCase::invoke
+        }
+        return when (fileNode.type) {
+            is PdfFileTypeInfo -> FileNodeContent.Pdf(
+                uri = getContentUri(fileNode)
+            )
 
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
+            is ImageFileTypeInfo -> FileNodeContent.ImageForNode
+            is TextFileTypeInfo if fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+            is VideoFileTypeInfo, is AudioFileTypeInfo -> {
+                FileNodeContent.AudioOrVideo(
+                    uri = getContentUri(fileNode)
+                )
+            }
 
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+            is UrlFileTypeInfo -> {
+                val content = getNodeContentUriUseCase(fileNode)
+                val path = getPathFromNodeContentUseCase(content)
+                FileNodeContent.UrlContent(
+                    uri = content,
+                    path = path
+                )
+            }
 
-        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
-            FileNodeContent.AudioOrVideo(
-                uri = getNodeContentUriUseCase(fileNode)
+            else -> FileNodeContent.Other(
+                localFile = getNodePreviewFileUseCase(fileNode)
             )
         }
-
-        fileNode.type is UrlFileTypeInfo -> {
-            val content = getNodeContentUriUseCase(fileNode)
-            val path = getPathFromNodeContentUseCase(content)
-            FileNodeContent.UrlContent(
-                uri = content,
-                path = path
-            )
-        }
-
-        else -> FileNodeContent.Other(
-            localFile = getNodePreviewFileUseCase(fileNode)
-        )
     }
 }
