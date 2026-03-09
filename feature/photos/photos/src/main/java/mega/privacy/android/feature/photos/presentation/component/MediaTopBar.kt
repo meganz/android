@@ -38,7 +38,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModi
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.view.VideosTabToolbar
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.navigation.destination.LegacyPhotosSearchNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.shared.resources.R as SharedR
 import java.util.Locale
@@ -240,10 +239,8 @@ internal fun MediaTopBar(
 
                             MediaScreen.Playlists.ordinal -> isPlaylistsTabSearchBarVisible = true
 
-                            else -> if (mediaMainUiState.isMediaRevampPhase2Enabled) {
+                            else -> {
                                 navigateToMediaSearch(MediaSearchNavKey)
-                            } else {
-                                navigateToMediaSearch(LegacyPhotosSearchNavKey)
                             }
                         }
                     }
