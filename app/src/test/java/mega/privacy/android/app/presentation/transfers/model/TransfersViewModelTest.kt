@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCas
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
@@ -98,6 +99,7 @@ class TransfersViewModelTest {
     private val pauseTransferByTagUseCase = mock<PauseTransferByTagUseCase>()
     private val pauseTransfersQueueUseCase = mock<PauseTransfersQueueUseCase>()
     private val cancelTransfersUseCase = mock<CancelTransfersUseCase>()
+    private val correctActiveTransfersUseCase = mock<CorrectActiveTransfersUseCase>()
     private val monitorCompletedTransfersByStateWithLimitUseCase =
         mock<MonitorCompletedTransfersByStateWithLimitUseCase>()
     private val moveTransferBeforeByTagUseCase = mock<MoveTransferBeforeByTagUseCase>()
@@ -185,6 +187,7 @@ class TransfersViewModelTest {
             deleteCompletedTransfersByIdUseCase,
             cancelTransferByTagUseCase,
             cancelTransfersUseCase,
+            correctActiveTransfersUseCase,
             monitorCompletedTransfersByStateWithLimitUseCase,
             clearTransferErrorStatusUseCase,
             getTransferByUniqueIdUseCase,
@@ -208,6 +211,7 @@ class TransfersViewModelTest {
         }.thenReturn(emptyFlow())
         wheneverBlocking { isTransferInErrorStatusUseCase() }.thenReturn(false)
         wheneverBlocking { monitorConnectivityUseCase() }.thenReturn(flowOf(true))
+        wheneverBlocking { correctActiveTransfersUseCase(any()) }.thenReturn(Unit)
     }
 
     private fun initTestClass() {
@@ -235,6 +239,7 @@ class TransfersViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             overQuotaStatusMapper = overQuotaStatusMapper,
+            correctActiveTransfersUseCase = correctActiveTransfersUseCase,
             isTransferInErrorStatusUseCase = isTransferInErrorStatusUseCase,
         )
     }
@@ -476,14 +481,16 @@ class TransfersViewModelTest {
         }
 
     @Test
-    fun `test that cancelAllTransfers invokes CancelTransfersUseCase`() = runTest {
-        whenever(cancelTransfersUseCase()).thenReturn(Unit)
+    fun `test that cancelAllTransfers invokes CancelTransfersUseCase and CorrectActiveTransfersUseCase`() =
+        runTest {
+            whenever(cancelTransfersUseCase()).thenReturn(Unit)
 
-        initTestClass()
-        underTest.cancelAllTransfers()
+            initTestClass()
+            underTest.cancelAllTransfers()
 
-        verify(cancelTransfersUseCase).invoke()
-    }
+            verify(cancelTransfersUseCase).invoke()
+            verify(correctActiveTransfersUseCase).invoke(null)
+        }
 
     @Test
     fun `test that MonitorCompletedTransfersByStateWithLimitUseCase updates state with completed and failed transfers`() =
@@ -1327,6 +1334,7 @@ class TransfersViewModelTest {
 
             verify(cancelTransferByTagUseCase).invoke(tag)
             verify(getTransferByUniqueIdUseCase).invoke(uniqueId)
+            verify(correctActiveTransfersUseCase).invoke(null)
             verifyNoMoreInteractions(cancelTransferByTagUseCase)
         }
 

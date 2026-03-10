@@ -499,6 +499,11 @@ interface TransferRepository {
     fun monitorInProgressTransfers(): Flow<Map<Long, InProgressTransfer>>
 
     /**
+     * Get in progress transfers
+     */
+    suspend fun getInProgressTransfers(): List<InProgressTransfer>
+
+    /**
      * Remove a list of in progress transfers by uniqueId.
      */
     suspend fun removeInProgressTransfers(uniqueIds: Set<Long>)

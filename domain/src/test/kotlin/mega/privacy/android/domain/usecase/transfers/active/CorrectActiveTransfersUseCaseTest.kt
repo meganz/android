@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferType
@@ -98,6 +99,7 @@ internal class CorrectActiveTransfersUseCaseTest {
             .thenReturn(emptyList())
         whenever(transferRepository.getPendingTransfersByState(any()))
             .thenReturn(emptyList())
+        whenever(transferRepository.getInProgressTransfers()).thenReturn(emptyList())
         whenever(isUserLoggedInUseCase()).thenReturn(true)
         whenever(rootNodeExistsUseCase()).thenReturn(true)
     }
@@ -217,6 +219,59 @@ internal class CorrectActiveTransfersUseCaseTest {
 
             verify(transferRepository).removeInProgressTransfers(expected.map { it.uniqueId }
                 .toSet())
+        }
+
+    @Test
+    fun `test that in progress transfers not in SDK are removed from in progress transfers`() =
+        runTest {
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            val inSdkTransfer = mock<Transfer> { on { uniqueId } doReturn 100L }
+            val notInSdkTransfer1 = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 200L
+            }
+            val notInSdkTransfer2 = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 300L
+            }
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(inSdkTransfer))
+            whenever(transferRepository.getInProgressTransfers()).thenReturn(
+                listOf(notInSdkTransfer1, notInSdkTransfer2)
+            )
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository).removeInProgressTransfers(setOf(200L, 300L))
+        }
+
+    @Test
+    fun `test that in progress transfers not in SDK are not removed when list is empty`() =
+        runTest {
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(emptyList())
+            whenever(transferRepository.getInProgressTransfers()).thenReturn(emptyList())
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository, never()).removeInProgressTransfers(any())
+        }
+
+    @Test
+    fun `test that in progress transfers all in SDK are not removed`() =
+        runTest {
+            val inProgressTransfer = mock<InProgressTransfer.Download> {
+                on { uniqueId } doReturn 100L
+            }
+            val sdkTransfer = mock<Transfer> { on { uniqueId } doReturn 100L }
+            whenever(transferRepository.getActiveTransfersByType(any()))
+                .thenReturn(emptyList())
+            whenever(getInProgressTransfersFromSdkUseCase()).thenReturn(listOf(sdkTransfer))
+            whenever(transferRepository.getInProgressTransfers())
+                .thenReturn(listOf(inProgressTransfer))
+
+            underTest(TransferType.GENERAL_UPLOAD)
+
+            verify(transferRepository, never()).removeInProgressTransfers(any())
         }
 
     @Test

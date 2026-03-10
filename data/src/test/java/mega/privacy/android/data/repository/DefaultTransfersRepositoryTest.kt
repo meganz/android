@@ -738,25 +738,19 @@ class DefaultTransfersRepositoryTest {
     @Test
     fun `test that getInProgressTransfers empty when both getTransferData numDownloads and numUploads equal zero`() =
         runTest {
-            val data = mock<MegaTransferData> {
-                on { numDownloads }.thenReturn(0)
-                on { numUploads }.thenReturn(0)
-            }
-            whenever(megaApiGateway.getTransferData()).thenReturn(data)
+            whenever(megaApiGateway.getTransfers(any())).thenReturn(emptyList())
             assertThat(underTest.getInProgressTransfersFromSdk()).isEmpty()
         }
 
     @Test
     fun `test that getInProgressTransfers returns correctly when both getTransferData numDownloads and numUploads differ zero`() =
         runTest {
-            val data = mock<MegaTransferData> {
-                on { numDownloads }.thenReturn(5)
-                on { numUploads }.thenReturn(5)
-            }
-            whenever(megaApiGateway.getTransferData()).thenReturn(data)
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD))
+                .thenReturn(listOf(mock(), mock()))
+            whenever(megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
+                .thenReturn(listOf(mock()))
             whenever(transferMapper.invoke(any())).thenReturn(mock())
-            whenever(megaApiGateway.getTransferByTag(any())).thenReturn(mock())
-            assertThat(underTest.getInProgressTransfersFromSdk()).hasSize(data.numDownloads + data.numUploads)
+            assertThat(underTest.getInProgressTransfersFromSdk()).hasSize(3)
         }
 
     @Test

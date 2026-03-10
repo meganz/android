@@ -454,12 +454,15 @@ class UploadFolderActivity : PasscodeActivity(), Scrollable {
      * @param collisions    List of [NameCollisionUiEntity] to manage.
      */
     private fun manageCollisions(collisions: ArrayList<NameCollision>) {
-        collisionsForResult.launch(
-            NameCollisionActivity.getIntentForFolderUpload(
-                this,
-                collisions = collisions
+        if (collisions.isNotEmpty()) {
+            viewModel.consumeCollisions()
+            collisionsForResult.launch(
+                NameCollisionActivity.getIntentForFolderUpload(
+                    this,
+                    collisions = collisions
+                )
             )
-        )
+        }
     }
 
     /**

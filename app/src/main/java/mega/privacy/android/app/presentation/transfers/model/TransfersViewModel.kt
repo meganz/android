@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCas
 import mega.privacy.android.domain.usecase.transfers.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfers.MoveTransferToLastByTagUseCase
+import mega.privacy.android.domain.usecase.transfers.active.CorrectActiveTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.active.MonitorInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersByIdUseCase
 import mega.privacy.android.domain.usecase.transfers.completed.DeleteCompletedTransfersUseCase
@@ -91,6 +92,7 @@ class TransfersViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val overQuotaStatusMapper: OverQuotaStatusMapper,
+    private val correctActiveTransfersUseCase: CorrectActiveTransfersUseCase,
     isTransferInErrorStatusUseCase: IsTransferInErrorStatusUseCase,
 ) : ViewModel() {
 
@@ -274,6 +276,8 @@ class TransfersViewModel @Inject constructor(
     fun cancelAllTransfers() {
         viewModelScope.launch {
             runCatching { cancelTransfersUseCase() }
+                .onFailure { Timber.e(it) }
+            runCatching { correctActiveTransfersUseCase(null) }
                 .onFailure { Timber.e(it) }
         }
     }
@@ -659,7 +663,11 @@ class TransfersViewModel @Inject constructor(
             getTransferByUniqueIdUseCase(uniqueId)?.let { transfer ->
                 runCatching { cancelTransferByTagUseCase(transfer.tag) }
                     .onFailure { Timber.e(it, "Retry cancel transfer failed") }
-            } ?: Timber.e("Transfer not found, probably already finished")
+            } ?: run {
+                Timber.e("Transfer not found, probably already finished")
+                runCatching { correctActiveTransfersUseCase(null) }
+                    .onFailure { Timber.e(it) }
+            }
         }
     }
 

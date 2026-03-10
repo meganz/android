@@ -4,6 +4,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
@@ -75,7 +76,7 @@ class UploadFolderViewModel @Inject constructor(
     fun getCurrentFolder(): LiveData<FolderContent.Data> = currentFolder
     fun getFolderItems(): LiveData<MutableList<FolderContent>> = folderItems
     fun getSelectedItems(): LiveData<MutableList<Int>> = selectedItems
-    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions
+    fun getCollisions(): LiveData<ArrayList<NameCollision>> = collisions.distinctUntilChanged()
     fun onActionResult(): LiveData<String?> = actionResult
 
     /**
@@ -429,4 +430,11 @@ class UploadFolderViewModel @Inject constructor(
      * Cancels the name collision job.
      */
     fun isInList() = isList
+
+    /**
+     * Clears the collisions.
+     */
+    fun consumeCollisions() {
+        collisions.value = ArrayList()
+    }
 }

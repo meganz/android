@@ -17,9 +17,9 @@ import mega.privacy.android.domain.usecase.transfers.pending.UpdatePendingTransf
 import javax.inject.Inject
 
 /**
- * To ensure that the local database accurately reflects the current state of transfers by retrieving and updating transfer status information from the SDK.
- * This process is necessary to rectify any misaligned states resulting from potential event loss, such as finish, cancel, or start of a transfer,
- * we need to fix it to avoid outdated counters in [ActiveTransferTotals]
+ * To ensure that in-memory and local database transfers accurately reflects the current state of transfers, this use-case retrieves the current transfer status information from the SDK and synchs it with the local data.
+ * This process is necessary to rectify any misaligned states resulting from potential event loss, such as finish, cancel, or start of a transfer, in case of app killed by the system or potential crashes, etc.
+ * we need to fix it to avoid outdated counters in [ActiveTransferTotals] for notifications and [mega.privacy.android.domain.entity.transfer.InProgressTransfer] for UI.
  */
 class CorrectActiveTransfersUseCase @Inject constructor(
     private val getInProgressTransfersFromSdkUseCase: GetInProgressTransfersFromSdkUseCase,
@@ -78,6 +78,16 @@ class CorrectActiveTransfersUseCase @Inject constructor(
                     notInProgressActiveTransfers.map { it.uniqueId }.toSet()
                 )
             }
+        }
+
+        // If there are still in-progress-transfers that are not in the sdk, remove them as there's nothing we can do with them
+        val notInSdkInProgressTransfers =
+            transferRepository.getInProgressTransfers().filterNot { inProgressTransfer ->
+                inProgressTransfer.uniqueId in inProgressTransfersInSdk.map { it.uniqueId }
+            }
+        if (notInSdkInProgressTransfers.isNotEmpty()) {
+            transferRepository
+                .removeInProgressTransfers(notInSdkInProgressTransfers.map { it.uniqueId }.toSet())
         }
 
         //add in-progress active transfers if they are not added, this can happen if we missed a start event from SDK

@@ -438,16 +438,10 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun getInProgressTransfersFromSdk(): List<Transfer> =
         withContext(ioDispatcher) {
-            val transfers = mutableListOf<Transfer>()
-            megaApiGateway.getTransferData()?.let { data ->
-                transfers.addAll(
-                    (0 until data.numDownloads)
-                        .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
-                transfers.addAll(
-                    (0 until data.numUploads)
-                        .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
-            }
-            transfers.sortedBy { it.priority }
+            (megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
+                        + megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
+                .map { transferMapper(it) }
+            .sortedBy { it.priority }
         }
 
     override fun monitorCompletedTransfersByStateWithLimit(
@@ -766,6 +760,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     }
 
     override fun monitorInProgressTransfers() = inProgressTransfersFlow
+
+    override suspend fun getInProgressTransfers() = inProgressTransfersFlow.value.values.toList()
 
     override suspend fun removeInProgressTransfers(uniqueIds: Set<Long>) {
         if (uniqueIds.isEmpty()) return
