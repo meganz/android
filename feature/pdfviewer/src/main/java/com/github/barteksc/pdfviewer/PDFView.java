@@ -1141,8 +1141,8 @@ public class PDFView extends RelativeLayout {
     }
 
     /** Use stream as the pdf source. Stream will be written to bytearray, because native code does not support Java Streams */
-    public Configurator fromStream(InputStream stream, String tmpFileName) {
-        return new Configurator(new InputStreamSource(stream, tmpFileName));
+    public Configurator fromStream(InputStream stream, String tmpFileName, File cacheFolder) {
+        return new Configurator(new InputStreamSource(stream, tmpFileName, cacheFolder));
     }
 
     /** Use custom source as pdf source */

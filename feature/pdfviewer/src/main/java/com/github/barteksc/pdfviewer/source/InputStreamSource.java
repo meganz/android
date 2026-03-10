@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import mega.privacy.android.app.utils.CacheFolderManager;
 
 public class InputStreamSource implements DocumentSource {
     private static final int EOF = -1;
@@ -33,18 +32,19 @@ public class InputStreamSource implements DocumentSource {
 
     private InputStream inputStream;
     private final String tmpFileName;
+    private final File cacheFolder;
 
-    public InputStreamSource(InputStream inputStream, String tmpFileName) {
+    public InputStreamSource(InputStream inputStream, String tmpFileName, File cacheFolder) {
         this.inputStream = inputStream;
         this.tmpFileName = tmpFileName;
+        this.cacheFolder = cacheFolder;
     }
 
     @Override
     public PdfDocument createDocument(Context context, PdfiumCore core, String password)
             throws IOException {
 
-        File tmpFolder = CacheFolderManager
-                .getCacheFolder(CacheFolderManager.TEMPORARY_FOLDER);
+        File tmpFolder = cacheFolder;
         if (tmpFolder == null || tmpFileName == null) {
             // fail to create tmp folder, or no tmpFileName provided, fallback to old behavior
             return core.newDocument(Util.toByteArray(inputStream), password);

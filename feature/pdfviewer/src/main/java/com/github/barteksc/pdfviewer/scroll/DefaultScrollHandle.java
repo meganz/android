@@ -1,9 +1,8 @@
 package com.github.barteksc.pdfviewer.scroll;
 
-import static mega.privacy.android.app.utils.Util.dp2px;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Handler;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -16,7 +15,7 @@ import androidx.core.content.ContextCompat;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.util.Util;
 
-import mega.privacy.android.app.R;
+import mega.privacy.android.feature.pdfviewer.R;
 import timber.log.Timber;
 
 public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandle {
@@ -261,5 +260,9 @@ public class DefaultScrollHandle extends ConstraintLayout implements ScrollHandl
 
     public void setTotalPages(int nbPages) {
         totalPages = nbPages;
+    }
+
+    private static int dp2px(int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, Resources.getSystem().getDisplayMetrics());
     }
 }
