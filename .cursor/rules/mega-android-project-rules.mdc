@@ -175,9 +175,9 @@ alwaysApply: true
   private val mockUseCase = mock<MonitorAccountBlockedUseCase>()
   whenever(mockUseCase()).thenReturn(flowOf(AccountBlocked(false)))
   ```
-- **Turbine**: Use Turbine for testing Flow emissions
+- **Turbine**: Use Turbine for testing Flow emissions, for example UiState
   ```kotlin
-  underTest.state.test {
+  underTest.uiState.test {
       val state = awaitItem()
       assertThat(state.accountBlockedEvent).isNull()
   }

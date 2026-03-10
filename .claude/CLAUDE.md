@@ -1,0 +1,1 @@
+../.cursor/rules/mega-android-project-rules.mdc
