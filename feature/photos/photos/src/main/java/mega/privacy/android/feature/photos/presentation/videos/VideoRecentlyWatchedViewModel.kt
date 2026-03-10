@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -36,7 +35,8 @@ import mega.privacy.android.feature.photos.mapper.VideoUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -50,7 +50,6 @@ class VideoRecentlyWatchedViewModel @Inject constructor(
     private val videoUiEntityMapper: VideoUiEntityMapper,
     private val clearRecentlyWatchedVideosUseCase: ClearRecentlyWatchedVideosUseCase,
     private val getNodeContentUriByHandleUseCase: GetNodeContentUriByHandleUseCase,
-    private val nodeSourceTypeToViewTypeMapper: NodeSourceTypeToViewTypeMapper,
 ) : ViewModel() {
     internal val clearRecentlyWatchedEvent: StateFlow<StateEvent>
         field: MutableStateFlow<StateEvent> = MutableStateFlow(consumed)
@@ -82,7 +81,11 @@ class VideoRecentlyWatchedViewModel @Inject constructor(
             monitorVideoRecentlyWatchedUseCase().map { videoNodes ->
                 videoNodes.map {
                     videoUiEntityMapper(it, emptyList())
-                }.groupBy { TimeUnit.SECONDS.toDays(it.watchedDate) }
+                }.groupBy {
+                    Instant.ofEpochSecond(it.watchedDate)
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate().toEpochDay()
+                }
             }
         }
 

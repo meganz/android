@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
@@ -58,7 +57,6 @@ class VideoRecentlyWatchedViewModelTest {
     private val clearRecentlyWatchedVideosUseCase = mock<ClearRecentlyWatchedVideosUseCase>()
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
     private val getNodeContentUriByHandleUseCase = mock<GetNodeContentUriByHandleUseCase>()
-    private val nodeSourceTypeToViewTypeMapper = NodeSourceTypeToViewTypeMapper()
 
     @BeforeEach
     fun setUp() {
@@ -71,7 +69,6 @@ class VideoRecentlyWatchedViewModelTest {
             videoUiEntityMapper = videoUiEntityMapper,
             clearRecentlyWatchedVideosUseCase = clearRecentlyWatchedVideosUseCase,
             getNodeContentUriByHandleUseCase = getNodeContentUriByHandleUseCase,
-            nodeSourceTypeToViewTypeMapper = nodeSourceTypeToViewTypeMapper,
         )
     }
 
