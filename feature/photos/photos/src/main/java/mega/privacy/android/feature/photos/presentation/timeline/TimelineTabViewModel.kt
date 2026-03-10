@@ -186,6 +186,7 @@ class TimelineTabViewModel @Inject constructor(
         val yearsCardPhotos = async {
             photosNodeListCardMapper(photosDateResults = sortResult.photosInYear)
         }
+        actionFlow.update { it.copy(isReady = true) }
         TimelineTabUiState(
             isLoading = false,
             allPhotos = allPhotos,

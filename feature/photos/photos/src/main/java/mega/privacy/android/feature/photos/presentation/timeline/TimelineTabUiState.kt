@@ -23,6 +23,7 @@ data class TimelineTabUiState(
 )
 
 data class TimelineTabActionUiState(
+    val isReady: Boolean = false,
     val normalModeItem: TimelineTabNormalModeActionUiState = TimelineTabNormalModeActionUiState(),
 )
 

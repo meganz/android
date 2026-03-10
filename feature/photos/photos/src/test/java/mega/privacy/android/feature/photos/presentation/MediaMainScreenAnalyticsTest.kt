@@ -28,6 +28,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
@@ -58,6 +59,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
+import java.time.LocalDateTime
 
 /** Test class for MediaMainScreen analytics tracking */
 @Config(sdk = [33])
@@ -279,10 +281,21 @@ class MediaMainScreenAnalyticsTest {
 
     @Test
     fun `test that filter button pressed event is tracked when filter action is clicked`() {
+        val timelineTabUiState = TimelineTabUiState(
+            displayedPhotos = listOf(
+                PhotosNodeContentItem.HeaderItem(
+                    time = LocalDateTime.now()
+                )
+            )
+        )
         val timelineTabActionUiState = TimelineTabActionUiState(
+            isReady = true,
             normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false)
         )
-        setComposeContent(timelineTabActionUiState = timelineTabActionUiState)
+        setComposeContent(
+            timelineTabUiState = timelineTabUiState,
+            timelineTabActionUiState = timelineTabActionUiState
+        )
 
         composeTestRule.onNodeWithContentDescription("More options").performClick()
         composeTestRule.onNodeWithTag(MediaAppBarAction.FilterSecondary.testTag).performClick()
@@ -293,6 +306,7 @@ class MediaMainScreenAnalyticsTest {
     @Test
     fun `test that sort button pressed event is tracked when sort action is clicked`() {
         val timelineTabActionUiState = TimelineTabActionUiState(
+            isReady = true,
             normalModeItem = TimelineTabNormalModeActionUiState(enableSort = true)
         )
         setComposeContent(timelineTabActionUiState = timelineTabActionUiState)
@@ -307,6 +321,7 @@ class MediaMainScreenAnalyticsTest {
     fun `test that camera uploads settings button pressed event is tracked when camera uploads settings action is clicked`() {
         val mediaCameraUploadUiState = MediaCameraUploadUiState(status = CUStatusUiState.UpToDate)
         val timelineTabActionUiState = TimelineTabActionUiState(
+            isReady = true,
             normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false)
         )
         setComposeContent(

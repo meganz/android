@@ -655,4 +655,62 @@ class TimelineTabViewModelTest {
 
             assertThat(actual).isEqualTo(timePeriod)
         }
+
+    @Test
+    fun `test that the action state is ready when the displayed photos are set`() = runTest {
+        val photosResult = mock<TimelinePhotosResult> {
+            on { allPhotos } doReturn emptyList()
+            on { nonSensitivePhotos } doReturn emptyList()
+        }
+        whenever(
+            monitorTimelinePhotosUseCase.invoke(request = any())
+        ) doReturn flowOf(photosResult)
+        val now = LocalDateTime.now()
+        val mockFileTypeInfo = mock<VideoFileTypeInfo>()
+        val photo1 = mock<Photo.Image> {
+            on { id } doReturn 1L
+            on { modificationTime } doReturn now
+            on { fileTypeInfo } doReturn mockFileTypeInfo
+        }
+        val photoResult1 = PhotoResult(
+            photo = photo1,
+            isMarkedSensitive = false
+        )
+        val photo1UiState = mock<PhotoUiState.Image>()
+        whenever(
+            photoUiStateMapper.invoke(photo = photo1)
+        ) doReturn photo1UiState
+        val mockTextFileTypeInfo = mock<TextFileTypeInfo>()
+        val photo2 = mock<Photo.Image> {
+            on { id } doReturn 2L
+            on { modificationTime } doReturn now.plusMonths(2)
+            on { fileTypeInfo } doReturn mockTextFileTypeInfo
+        }
+        val photoResult2 = PhotoResult(
+            photo = photo2,
+            isMarkedSensitive = false
+        )
+        val photo2UiState = mock<PhotoUiState.Image>()
+        whenever(
+            photoUiStateMapper.invoke(photo = photo2)
+        ) doReturn photo2UiState
+        val sortResult = mock<TimelineSortedPhotosResult> {
+            on { sortedPhotos } doReturn listOf(photoResult1, photoResult2)
+        }
+        whenever(
+            monitorTimelinePhotosUseCase.sortPhotos(
+                photos = eq(emptyList()),
+                sortOrder = any()
+            )
+        ) doReturn sortResult
+        whenever(
+            photosNodeListCardMapper.invoke(photosDateResults = any())
+        ) doReturn persistentListOf()
+
+        underTest.uiState.test { cancelAndConsumeRemainingEvents() }
+
+        underTest.actionUiState.test {
+            assertThat(expectMostRecentItem().isReady).isTrue()
+        }
+    }
 }

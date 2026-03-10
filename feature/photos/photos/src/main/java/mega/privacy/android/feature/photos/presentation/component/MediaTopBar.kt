@@ -26,7 +26,6 @@ import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
-import mega.privacy.android.feature.photos.presentation.MediaMainUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionModeType
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
@@ -46,13 +45,13 @@ import java.util.Locale
 internal fun MediaTopBar(
     currentTabIndex: Int,
     selectionModeType: MediaSelectionModeType,
-    mediaMainUiState: MediaMainUiState,
     albumsTabUiState: AlbumsTabUiState,
     timelineTabActionUiState: TimelineTabActionUiState,
     timelineFilterUiState: TimelineFilterUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosTabUiState: VideosTabUiState,
     playlistsTabUiState: VideoPlaylistsTabUiState,
+    timelineItemCount: Int,
     timelineSelectedCount: Int,
     selectedTimePeriod: PhotoModificationTimePeriod,
     videosTabQuery: String?,
@@ -74,11 +73,20 @@ internal fun MediaTopBar(
     navigateToRecentlyWatched: () -> Unit,
 ) {
     val shouldShowTimelineActions by remember(
+        currentTabIndex,
         selectedTimePeriod,
-        mediaCameraUploadUiState.enableCameraUploadPageShowing
+        timelineTabActionUiState.isReady
     ) {
         derivedStateOf {
-            selectedTimePeriod == PhotoModificationTimePeriod.All && !mediaCameraUploadUiState.enableCameraUploadPageShowing
+            currentTabIndex == MediaScreen.Timeline.ordinal && selectedTimePeriod == PhotoModificationTimePeriod.All && timelineTabActionUiState.isReady
+        }
+    }
+    val isTimelineFilterApplied by remember(
+        timelineFilterUiState.mediaType,
+        timelineFilterUiState.mediaSource
+    ) {
+        derivedStateOf {
+            timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
         }
     }
     val areAllVideosSelected by remember(videosTabUiState) {
@@ -198,9 +206,7 @@ internal fun MediaTopBar(
             trailingIcons = {
                 when (currentTabIndex) {
                     MediaScreen.Timeline.ordinal -> {
-                        val isFilterApplied =
-                            timelineFilterUiState.mediaType != FilterMediaType.ALL_MEDIA || timelineFilterUiState.mediaSource != FilterMediaSource.AllPhotos
-                        if (isFilterApplied) {
+                        if (isTimelineFilterApplied) {
                             MegaIcon(
                                 modifier = Modifier
                                     .clickable(onClick = onFilterActionClick)
@@ -245,12 +251,14 @@ internal fun MediaTopBar(
                 )
 
                 // Menu actions for timeline tab
-                if (currentTabIndex == MediaScreen.Timeline.ordinal && shouldShowTimelineActions) {
-                    add(
-                        MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
-                            onFilterActionClick()
-                        }
-                    )
+                if (shouldShowTimelineActions) {
+                    if (isTimelineFilterApplied || timelineItemCount > 0) {
+                        add(
+                            MenuActionWithClick(menuAction = MediaAppBarAction.FilterSecondary) {
+                                onFilterActionClick()
+                            }
+                        )
+                    }
 
                     if (timelineTabActionUiState.normalModeItem.enableSort) {
                         add(
