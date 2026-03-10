@@ -84,7 +84,7 @@ class MediaThumbnailFetcher(
         return ImageFetchResult(
             image = drawable.asImage(),
             isSampled = false,
-            dataSource = DataSource.DISK
+            dataSource = DataSource.MEMORY
         )
     }
 

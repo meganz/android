@@ -10,13 +10,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -24,6 +26,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.decode.DataSource
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
@@ -105,6 +109,14 @@ private fun BasicPhotosNode(
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val request = remember(thumbnailRequest) {
+        ImageRequest.Builder(context)
+            .data(thumbnailRequest)
+            .crossfade(enable = true)
+            .build()
+    }
+    var contentScale by remember { mutableStateOf(ContentScale.Crop) }
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -118,16 +130,10 @@ private fun BasicPhotosNode(
                     .clip(RoundedCornerShape(4.dp))
             }
     ) {
-        val context = LocalContext.current
-        val request = remember(thumbnailRequest) {
-            ImageRequest.Builder(context)
-                .data(thumbnailRequest)
-                .crossfade(enable = true)
-                .build()
-        }
         AsyncImage(
             modifier = Modifier
                 .aspectRatio(1f)
+                .background(color = DSTokens.colors.background.surface1)
                 .conditional(isSensitive) {
                     this
                         .alpha(0.5f)
@@ -135,9 +141,16 @@ private fun BasicPhotosNode(
                 }
                 .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG),
             model = request,
-            placeholder = ColorPainter(DSTokens.colors.background.surface2),
+            onState = { state ->
+                contentScale =
+                    if (state is AsyncImagePainter.State.Success && state.result.dataSource == DataSource.MEMORY) {
+                        ContentScale.Inside
+                    } else {
+                        ContentScale.Crop
+                    }
+            },
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = contentScale,
         )
 
         if (shouldShowFavourite) {
@@ -247,10 +260,6 @@ private fun BasicPhotosNodePreview(
 
 internal const val VIDEO_PHOTOS_NODE_DURATION_TEXT_TAG =
     "video_photos_node:text_duration"
-internal const val BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_PLACEHOLDER_TAG =
-    "basic_photos_node:image_thumbnail_placeholder"
-internal const val BASIC_PHOTOS_NODE_IMAGE_LOADING_TAG =
-    "basic_photos_node:image_thumbnail_loading"
 internal const val BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG =
     "basic_photos_node:image_thumbnail_file"
 internal const val BASIC_PHOTOS_NODE_FAVOURITE_ICON_TAG =
