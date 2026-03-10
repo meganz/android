@@ -218,9 +218,7 @@ internal fun MediaTopBar(
                         )
                     }
 
-                    MediaScreen.Videos.ordinal,
-                    MediaScreen.Playlists.ordinal,
-                        -> {
+                    MediaScreen.Videos.ordinal -> {
                         MegaIcon(
                             modifier = Modifier
                                 .clickable(onClick = navigateToRecentlyWatched)
