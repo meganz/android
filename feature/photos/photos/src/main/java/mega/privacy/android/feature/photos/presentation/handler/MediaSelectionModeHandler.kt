@@ -31,6 +31,6 @@ enum class MediaSelectionModeType {
 
     companion object {
         internal fun MediaSelectionModeType.isAnActiveSelection(): Boolean =
-            this == Timeline || this == Albums || this == Videos
+            this == Timeline || this == Albums || this == Videos || this == Playlists
     }
 }
