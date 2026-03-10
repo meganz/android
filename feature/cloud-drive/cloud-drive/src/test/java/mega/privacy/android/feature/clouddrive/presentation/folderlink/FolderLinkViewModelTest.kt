@@ -30,7 +30,10 @@ import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import org.junit.jupiter.api.BeforeEach
@@ -61,6 +64,8 @@ internal class FolderLinkViewModelTest {
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = NodeSortConfigurationUiMapper()
+    private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val setViewTypeUseCase: SetViewType = mock()
 
     private lateinit var underTest: FolderLinkViewModel
 
@@ -77,6 +82,8 @@ internal class FolderLinkViewModelTest {
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            monitorViewTypeUseCase = monitorViewTypeUseCase,
+            setViewTypeUseCase = setViewTypeUseCase,
             args = args,
         )
     }
@@ -92,8 +99,11 @@ internal class FolderLinkViewModelTest {
             nodeUiItemMapper,
             monitorSortCloudOrderUseCase,
             setCloudSortOrderUseCase,
+            monitorViewTypeUseCase,
+            setViewTypeUseCase,
         )
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
     }
 
     private fun mockFolderNode(id: Long = 1L, name: String = "folder"): TypedFolderNode = mock {
@@ -660,6 +670,51 @@ internal class FolderLinkViewModelTest {
             advanceUntilIdle()
 
             verify(setCloudSortOrderUseCase).invoke(SortOrder.ORDER_SIZE_DESC)
+        }
+
+    @Test
+    fun `test that currentViewType is updated in state when monitorViewType emits a new type`() =
+        runTest {
+            val viewTypeFlow = MutableStateFlow(ViewType.LIST)
+            whenever(monitorViewTypeUseCase()).thenReturn(viewTypeFlow)
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            initViewModel(FolderLinkViewModel.Args(uriString = null))
+            advanceUntilIdle()
+
+            viewTypeFlow.value = ViewType.GRID
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().currentViewType).isEqualTo(ViewType.GRID)
+            }
+        }
+
+    @Test
+    fun `test that ChangeViewTypeClicked calls setViewTypeUseCase with GRID when current view type is LIST`() =
+        runTest {
+            whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            initViewModel(FolderLinkViewModel.Args(uriString = null))
+            advanceUntilIdle()
+
+            underTest.processAction(FolderLinkAction.ChangeViewTypeClicked)
+            advanceUntilIdle()
+
+            verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        }
+
+    @Test
+    fun `test that ChangeViewTypeClicked calls setViewTypeUseCase with LIST when current view type is GRID`() =
+        runTest {
+            whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.GRID))
+            whenever(hasCredentialsUseCase()).thenReturn(false)
+            initViewModel(FolderLinkViewModel.Args(uriString = null))
+            advanceUntilIdle()
+
+            underTest.processAction(FolderLinkAction.ChangeViewTypeClicked)
+            advanceUntilIdle()
+
+            verify(setViewTypeUseCase).invoke(ViewType.LIST)
         }
 
     @Test

@@ -12,4 +12,5 @@ sealed interface FolderLinkAction {
     data object NavigateBackEventConsumed : FolderLinkAction
     data object OpenedFileNodeHandled : FolderLinkAction
     data class SortOrderChanged(val sortConfiguration: NodeSortConfiguration) : FolderLinkAction
+    data object ChangeViewTypeClicked : FolderLinkAction
 }

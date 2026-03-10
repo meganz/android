@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -25,6 +26,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
@@ -33,9 +35,13 @@ import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
+import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FolderLinkViewModel.Factory::class)
@@ -49,6 +55,8 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
+    private val monitorViewTypeUseCase: MonitorViewType,
+    private val setViewTypeUseCase: SetViewType,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -57,6 +65,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private var browseFolderJob: Job? = null
 
     init {
+        monitorViewType()
         monitorSortOrder()
         viewModelScope.launch {
             checkCredentials()
@@ -73,12 +82,42 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             FolderLinkAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
             is FolderLinkAction.SortOrderChanged -> setSortOrder(action.sortConfiguration)
+            FolderLinkAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
         }
     }
 
     private fun onNavigateBackEventConsumed() {
         _uiState.update {
             it.copy(navigateBackEvent = consumed)
+        }
+    }
+
+    private fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            runCatching {
+                val toggledViewType = when (_uiState.value.currentViewType) {
+                    ViewType.LIST -> ViewType.GRID
+                    ViewType.GRID -> ViewType.LIST
+                }
+                setViewTypeUseCase(toggledViewType)
+                val event = when (toggledViewType) {
+                    ViewType.LIST -> ViewModeListMenuItemEvent
+                    ViewType.GRID -> ViewModeGridMenuItemEvent
+                }
+                Analytics.tracker.trackEvent(event)
+            }.onFailure {
+                Timber.e(it, "Failed to change view type")
+            }
+        }
+    }
+
+    private fun monitorViewType() {
+        viewModelScope.launch {
+            monitorViewTypeUseCase()
+                .catch { Timber.e(it) }
+                .collect { viewType ->
+                    _uiState.update { it.copy(currentViewType = viewType) }
+                }
         }
     }
 

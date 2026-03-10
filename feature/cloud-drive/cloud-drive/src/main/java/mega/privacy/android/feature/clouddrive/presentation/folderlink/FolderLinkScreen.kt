@@ -42,6 +42,7 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
@@ -155,7 +156,7 @@ private fun FolderLinkContent(
                                 isListView = isListView,
                                 onSortOrderClick = { showSortBottomSheet = true },
                                 onChangeViewTypeClicked = {
-                                    // TODO onAction(ChangeViewTypeClicked)
+                                    onAction(FolderLinkAction.ChangeViewTypeClicked)
                                 },
                                 inSelectionMode = false, // TODO
                             )
@@ -197,6 +198,7 @@ private fun FolderLinkContent(
                         )
                     )
                     showSortBottomSheet = false
+                    it.sortOptionItem.trackAnalyticsEvent()
                 }
             },
             onDismissRequest = { showSortBottomSheet = false },

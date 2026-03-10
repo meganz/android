@@ -421,7 +421,7 @@ internal fun CloudDriveContent(
     }
 }
 
-private fun NodeSortOption.trackAnalyticsEvent() {
+internal fun NodeSortOption.trackAnalyticsEvent() {
     val event = when (this) {
         NodeSortOption.Name -> SortByNameMenuItemEvent
         NodeSortOption.Favourite -> SortByFavouriteMenuItemEvent
