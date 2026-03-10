@@ -274,7 +274,7 @@ class FolderLinkViewModelTest {
             on { this.childrenNodes }.thenReturn(childrenNodes)
         }
         whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
-        whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(fetchFolderNodeResult)
         val folderInfo = mock<FolderInfo> {
             on { id }.thenReturn(NodeId(1234L))
         }
@@ -890,7 +890,7 @@ class FolderLinkViewModelTest {
                 on { this.childrenNodes }.thenReturn(childrenNodes)
             }
             whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
-            whenever(fetchFolderNodesUseCase(anyOrNull())).thenReturn(fetchFolderNodeResult)
+            whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull())).thenReturn(fetchFolderNodeResult)
             val folderInfo = mock<FolderInfo> {
                 on { id }.thenReturn(NodeId(1234L))
             }

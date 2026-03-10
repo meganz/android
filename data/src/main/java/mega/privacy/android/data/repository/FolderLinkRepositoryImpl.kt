@@ -11,11 +11,13 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
 import mega.privacy.android.data.mapper.search.MegaSearchFilterMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -44,6 +46,7 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val imageNodeMapper: ImageNodeMapper,
     private val megaSearchFilterMapper: MegaSearchFilterMapper,
+    private val sortOrderIntMapper: SortOrderIntMapper,
     private val cancelTokenProvider: CancelTokenProvider,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : FolderLinkRepository {
@@ -130,11 +133,12 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun getNodeChildren(handle: Long, order: Int?): List<UnTypedNode> =
+    override suspend fun getNodeChildren(handle: Long, order: SortOrder?): List<UnTypedNode> =
         withContext(ioDispatcher) {
             val token = cancelTokenProvider.getOrCreateCancelToken()
             val filter = megaSearchFilterMapper(parentHandle = NodeId(handle))
-            megaApiFolderGateway.getChildren(filter, order ?: MegaApiJava.ORDER_NONE, token)
+            val orderInt = order?.let { sortOrderIntMapper(it) } ?: MegaApiJava.ORDER_NONE
+            megaApiFolderGateway.getChildren(filter, orderInt, token)
                 .map { convertToUntypedNode(it) }
         }
 

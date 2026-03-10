@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.folderlink
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.repository.FolderLinkRepository
@@ -20,7 +21,7 @@ class GetFolderLinkChildrenNodesUseCase @Inject constructor(
      * @param order         Order for the returned list
      * @return Children nodes of the parent node
      */
-    suspend operator fun invoke(parentHandle: Long, order: Int?): List<TypedNode> =
+    suspend operator fun invoke(parentHandle: Long, order: SortOrder?): List<TypedNode> =
         runCatching { folderLinkRepository.getNodeChildren(parentHandle, order) }
             .getOrElse { throw FetchFolderNodesException.GenericError() }
             .map { addNodeType(it) }

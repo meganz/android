@@ -12,18 +12,27 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
@@ -37,14 +46,18 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
+    private val setCloudSortOrderUseCase: SetCloudSortOrder,
+    private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FolderLinkUiState())
     val uiState: StateFlow<FolderLinkUiState> = _uiState.asStateFlow()
-    private var backPressJob: Job? = null
+    private var browseFolderJob: Job? = null
 
     init {
+        monitorSortOrder()
         viewModelScope.launch {
             checkCredentials()
             if (args.uriString != null) loginToFolder(args.uriString)
@@ -57,13 +70,70 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             FolderLinkAction.DecryptionKeyDialogDismissed -> onDecryptionKeyDialogDismissed()
             is FolderLinkAction.ItemClicked -> onItemClicked(action)
             FolderLinkAction.BackPressed -> handleBackPress()
-            FolderLinkAction.NavigateBackEventConsumed -> _uiState.update {
+            FolderLinkAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
+            FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
+            is FolderLinkAction.SortOrderChanged -> setSortOrder(action.sortConfiguration)
+        }
+    }
+
+    private fun onNavigateBackEventConsumed() {
+        _uiState.update {
+            it.copy(navigateBackEvent = consumed)
+        }
+    }
+
+    private fun monitorSortOrder() {
+        monitorSortCloudOrderUseCase()
+            .catch { Timber.e(it) }
+            .filterNotNull()
+            .onEach { order ->
+                updateSortOrder(order)
+                refreshCurrentFolder()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun updateSortOrder(sortOrder: SortOrder) {
+        val sortConfiguration = nodeSortConfigurationUiMapper(sortOrder)
+        _uiState.update {
+            it.copy(
+                selectedSortOrder = sortOrder,
+                selectedSortConfiguration = sortConfiguration,
+            )
+        }
+    }
+
+    fun setSortOrder(sortConfiguration: NodeSortConfiguration) {
+        viewModelScope.launch {
+            runCatching {
+                val order = nodeSortConfigurationUiMapper(sortConfiguration)
+                setCloudSortOrderUseCase(order)
+            }.onFailure {
+                Timber.e(it, "Failed to set sort order")
+            }
+        }
+    }
+
+    private suspend fun refreshCurrentFolder() {
+        val currentFolder = _uiState.value.currentFolderNode ?: return
+
+        runCatching {
+            val children = getFolderLinkChildrenNodesUseCase(
+                parentHandle = currentFolder.id.longValue,
+                order = _uiState.value.selectedSortOrder,
+            )
+            nodeUiItemMapper(children)
+        }.onSuccess { items ->
+            _uiState.update {
                 it.copy(
-                    navigateBackEvent = consumed
+                    contentState = FolderLinkContentState.Loaded(
+                        items = items,
+                    )
                 )
             }
-
-            FolderLinkAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
+        }.onFailure { error ->
+            Timber.e(error)
+            _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
         }
     }
 
@@ -143,7 +213,8 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     private fun fetchNodes(folderSubHandle: String?) {
         viewModelScope.launch {
             runCatching {
-                val result = fetchFolderNodesUseCase(folderSubHandle)
+                val result =
+                    fetchFolderNodesUseCase(folderSubHandle, _uiState.value.selectedSortOrder)
                 val nodeUiItems = nodeUiItemMapper(result.childrenNodes)
                 _uiState.update {
                     it.copy(
@@ -181,34 +252,21 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     }
 
     private fun openFolder(folder: TypedFolderNode) {
-        viewModelScope.launch {
+        browseFolderJob?.cancel()
+        browseFolderJob = viewModelScope.launch {
             _uiState.update {
                 it.copy(
                     currentFolderNode = folder,
-                    contentState = FolderLinkContentState.Loading
+                    contentState = FolderLinkContentState.Loading,
                 )
             }
-
-            runCatching {
-                getFolderLinkChildrenNodesUseCase(folder.id.longValue, null)
-            }.onSuccess { children ->
-                _uiState.update {
-                    it.copy(
-                        contentState = FolderLinkContentState.Loaded(
-                            items = nodeUiItemMapper(children),
-                        )
-                    )
-                }
-            }.onFailure { error ->
-                Timber.e(error)
-                _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
-            }
+            refreshCurrentFolder()
         }
     }
 
     private fun handleBackPress() {
-        backPressJob?.cancel()
-        backPressJob = viewModelScope.launch {
+        browseFolderJob?.cancel()
+        browseFolderJob = viewModelScope.launch {
             val currentFolderNode = _uiState.value.currentFolderNode
             if (currentFolderNode == null) {
                 // Pressed back before loading link folder, navigate back
@@ -229,7 +287,7 @@ internal class FolderLinkViewModel @AssistedInject constructor(
             runCatching {
                 getFolderLinkChildrenNodesUseCase(
                     parentHandle = newParentNode.id.longValue,
-                    order = null  // TODO Handle sorting
+                    order = _uiState.value.selectedSortOrder,
                 )
             }.onSuccess { children ->
                 _uiState.update {

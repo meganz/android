@@ -9,11 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -29,7 +34,12 @@ import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
+import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
@@ -37,6 +47,7 @@ import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.Fol
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +78,8 @@ private fun FolderLinkContent(
 ) {
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
@@ -140,9 +153,7 @@ private fun FolderLinkContent(
                                 },
                                 sortConfiguration = uiState.selectedSortConfiguration,
                                 isListView = isListView,
-                                onSortOrderClick = {
-                                    // TODO
-                                },
+                                onSortOrderClick = { showSortBottomSheet = true },
                                 onChangeViewTypeClicked = {
                                     // TODO onAction(ChangeViewTypeClicked)
                                 },
@@ -161,8 +172,35 @@ private fun FolderLinkContent(
             nodeSourceData = NodeSourceData.FolderLink,
             onNavigate = onNavigate,
             onActionHandled = { onAction(FolderLinkAction.OpenedFileNodeHandled) },
-            onDownloadEvent = onTransfer
-        ) // TODO sort
+            onDownloadEvent = onTransfer,
+            sortOrder = uiState.selectedSortOrder,
+        )
+    }
+
+    if (showSortBottomSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.FOLDER_LINK),
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                sortDirection = uiState.selectedSortConfiguration.sortDirection,
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    onAction(
+                        FolderLinkAction.SortOrderChanged(
+                            NodeSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection,
+                            )
+                        )
+                    )
+                    showSortBottomSheet = false
+                }
+            },
+            onDismissRequest = { showSortBottomSheet = false },
+        )
     }
 
     BackHandler { onAction(FolderLinkAction.BackPressed) }
