@@ -5,8 +5,10 @@ import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
 import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.os.Build
 import android.provider.Settings
@@ -91,6 +93,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
 import timber.log.Timber
+import androidx.core.net.toUri
 
 @Composable
 internal fun TimelineTabRoute(
@@ -193,7 +196,16 @@ internal fun TimelineTabScreen(
             handleCameraUploadsPermissionsResult()
         }
     val notificationPermissionLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (!isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                activity?.let { currentActivity ->
+                    val shouldShowRationale = ActivityCompat
+                        .shouldShowRequestPermissionRationale(currentActivity, POST_NOTIFICATIONS)
+                    if (!shouldShowRationale) {
+                        currentActivity.openNotificationSettings()
+                    }
+                }
+            }
             handleNotificationPermissionResult()
         }
 
@@ -322,19 +334,9 @@ internal fun TimelineTabScreen(
                     val cameraUploadsPermissions = getCameraUploadsPermissions()
                     cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
                 },
-                onRequestNotificationPermission = exit@{
+                onRequestNotificationPermission = {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val activity = activity ?: return@exit
-
-                        val shouldShowRationale = ActivityCompat
-                            .shouldShowRequestPermissionRationale(activity, POST_NOTIFICATIONS)
-
-                        // Open notification in settings when permission has been exhausted
-                        if (shouldShowRationale) {
-                            notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
-                        } else {
-                            activity.openNotificationSettings()
-                        }
+                        notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
                     }
                 },
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
@@ -610,13 +612,25 @@ private fun trackTimePeriodSelection(timePeriod: PhotoModificationTimePeriod) {
     }
 }
 
+@SuppressLint("QueryPermissionsNeeded")
 private fun Activity?.openNotificationSettings() {
+    if (this == null) return
+
+    val notificationIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+    }
+
+    val intent = if (notificationIntent.resolveActivity(packageManager) != null) {
+        notificationIntent
+    } else {
+        // Fallback intent
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = "package:$packageName".toUri()
+        }
+    }
+
     try {
-        this?.startActivity(
-            Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-        )
+        startActivity(intent.apply { flags = Intent.FLAG_ACTIVITY_NEW_TASK })
     } catch (e: Exception) {
         Timber.e(e, "Failed to open notification settings")
     }
