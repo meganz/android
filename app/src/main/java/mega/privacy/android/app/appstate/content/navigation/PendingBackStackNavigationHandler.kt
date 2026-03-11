@@ -72,7 +72,7 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
-        applyNavOptions(navOptions)
+        applyNavOptions(navOptions, destinations)
         if (backstack.takeLast(destinations.size).containsAll(destinations)) {
             Timber.d("Destinations are already on the backstack")
             return
@@ -209,14 +209,6 @@ class PendingBackStackNavigationHandler(
         }
     }
 
-    fun peekBackStack(): List<NavKey> = backstack.toList()
-
-    fun dropLast(count: Int) {
-        repeat(count) {
-            backstack.removeLastOrNull()
-        }
-    }
-
     private fun replaceAuthRequiredDestinations(newDestination: NoSessionNavKey): List<NavKey> {
         Timber.d("PendingBackStackNavigationHandler::removeAuthRequiredDestinations")
         val authRequiredDestinations = backstack.takeLastWhile { it !is NoSessionNavKey }
@@ -264,8 +256,18 @@ class PendingBackStackNavigationHandler(
     private fun AuthStatus?.sessionOrNull(): String? =
         (this as? AuthStatus.LoggedIn)?.session
 
-    private fun applyNavOptions(navOptions: NavOptions?) {
+    private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
         if (navOptions == null) return
+        if (navOptions.launchSingleTop) {
+            val backStackKeys = backstack.takeLast(destinations.size)
+            if (backStackKeys.size == destinations.size &&
+                backStackKeys.zip(destinations).all { (a, b) -> a::class == b::class }
+            ) {
+                repeat(destinations.size) {
+                    backstack.removeLastOrNull()
+                }
+            }
+        }
         val popUpTo = navOptions.popUpTo ?: return
         val popUpToKey = findPopUpToKey(popUpTo) ?: return
         removeFromBackStackTo(popUpToKey, popUpTo.inclusive)

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogEvent
@@ -62,7 +63,7 @@ class CombinedEventQueueImplTest {
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(expected.keys)
-        assertThat(actual?.isSingleTop).isEqualTo(expected.isSingleTop)
+        assertThat(actual?.navOptions).isEqualTo(expected.navOptions)
     }
 
     @Test
@@ -75,7 +76,7 @@ class CombinedEventQueueImplTest {
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(expected.keys)
-        assertThat(actual?.isSingleTop).isEqualTo(expected.isSingleTop)
+        assertThat(actual?.navOptions).isEqualTo(expected.navOptions)
     }
 
     @Test
@@ -165,7 +166,7 @@ class CombinedEventQueueImplTest {
             val firstItem = awaitItem() as? NavigationQueueEvent
             assertThat(firstItem).isNotNull()
             assertThat(firstItem?.keys).isEqualTo(expectedFirst.keys)
-            assertThat(firstItem?.isSingleTop).isEqualTo(expectedFirst.isSingleTop)
+            assertThat(firstItem?.navOptions).isEqualTo(expectedFirst.navOptions)
             val secondItem = awaitItem() as? AppDialogEvent
             assertThat(secondItem).isNotNull()
             assertThat(secondItem?.dialogDestination).isEqualTo(expectedSecond.dialogDestination)
@@ -199,12 +200,12 @@ class CombinedEventQueueImplTest {
             val firstItem = awaitItem() as? NavigationQueueEvent
             assertThat(firstItem).isNotNull()
             assertThat(firstItem?.keys).isEqualTo(initialKeys)
-            assertThat(firstItem?.isSingleTop).isFalse()
+            assertThat(firstItem?.navOptions).isNull()
 
             val secondItem = awaitItem() as? NavigationQueueEvent
             assertThat(secondItem).isNotNull()
             assertThat(secondItem?.keys).isEqualTo(finalKeys)
-            assertThat(secondItem?.isSingleTop).isFalse()
+            assertThat(secondItem?.navOptions).isNull()
 
             val thirdItem = awaitItem() as? AppDialogEvent
             assertThat(thirdItem).isNotNull()
@@ -213,19 +214,22 @@ class CombinedEventQueueImplTest {
     }
 
     @Test
-    fun `test that isSingleTop is set to true for single key`() = runTest {
+    fun `test that navOptions is passed through for single key`() = runTest {
         mockTimeProvider()
         val key = TestKey1
-        underTest.emit(key, isSingleTop = true)
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.emit(key, navOptions = options)
 
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(listOf(key))
-        assertThat(actual?.isSingleTop).isTrue()
+        assertThat(actual?.navOptions).isEqualTo(options)
     }
 
     @Test
-    fun `test that isSingleTop is set to false for single key by default`() = runTest {
+    fun `test that navOptions is null by default for single key`() = runTest {
         mockTimeProvider()
         val key = TestKey1
         underTest.emit(key)
@@ -233,23 +237,26 @@ class CombinedEventQueueImplTest {
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(listOf(key))
-        assertThat(actual?.isSingleTop).isFalse()
+        assertThat(actual?.navOptions).isNull()
     }
 
     @Test
-    fun `test that isSingleTop is set to true for list of keys`() = runTest {
+    fun `test that navOptions is passed through for list of keys`() = runTest {
         mockTimeProvider()
         val keys = listOf(TestKey1, TestKey2(0))
-        underTest.emit(keys, isSingleTop = true)
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.emit(keys, navOptions = options)
 
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(keys)
-        assertThat(actual?.isSingleTop).isTrue()
+        assertThat(actual?.navOptions).isEqualTo(options)
     }
 
     @Test
-    fun `test that isSingleTop is set to false for list of keys by default`() = runTest {
+    fun `test that navOptions is null by default for list of keys`() = runTest {
         mockTimeProvider()
         val keys = listOf(TestKey1, TestKey2(0))
         underTest.emit(keys)
@@ -257,19 +264,7 @@ class CombinedEventQueueImplTest {
         val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
         assertThat(actual).isNotNull()
         assertThat(actual?.keys).isEqualTo(keys)
-        assertThat(actual?.isSingleTop).isFalse()
-    }
-
-    @Test
-    fun `test that isSingleTop is set to false explicitly`() = runTest {
-        mockTimeProvider()
-        val key = TestKey1
-        underTest.emit(key, isSingleTop = false)
-
-        val actual = underTest.events.tryReceive().getOrNull()?.invoke() as? NavigationQueueEvent
-        assertThat(actual).isNotNull()
-        assertThat(actual?.keys).isEqualTo(listOf(key))
-        assertThat(actual?.isSingleTop).isFalse()
+        assertThat(actual?.navOptions).isNull()
     }
 
     private fun mockTimeProvider(firstTime: Long = 0L, vararg times: Long = longArrayOf(0L)) {

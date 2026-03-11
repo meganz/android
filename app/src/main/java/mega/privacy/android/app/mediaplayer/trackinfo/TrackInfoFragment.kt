@@ -17,7 +17,6 @@ import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.mediaplayer.MediaPlayerActivity
 import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel
@@ -29,12 +28,13 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
-import javax.inject.Inject
 import mega.privacy.android.shared.resources.R as sharedResR
+import javax.inject.Inject
 
 /**
  * The fragment for showing audio track info
@@ -80,7 +80,13 @@ class TrackInfoFragment : Fragment() {
                         onLocationClicked = {
                             uiState.nodeDestination?.let {
                                 lifecycleScope.launch {
-                                    navigationQueue.emit(it, NavPriority.Default, true)
+                                    navigationQueue.emit(
+                                        it,
+                                        NavPriority.Default,
+                                        navOptions {
+                                            launchSingleTop = true
+                                        }
+                                    )
                                     megaNavigator.launchMegaActivityIfNeeded(context)
                                 }
                             } ?: uiState.location?.handleLocationClick(

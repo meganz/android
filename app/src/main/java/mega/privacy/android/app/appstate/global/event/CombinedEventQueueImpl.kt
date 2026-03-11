@@ -2,6 +2,7 @@ package mega.privacy.android.app.appstate.global.event
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.channels.ReceiveChannel
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -42,7 +43,11 @@ class CombinedEventQueueImpl(
         get() = queueChannel.events
 
 
-    override suspend fun emit(navKeys: List<NavKey>, priority: NavPriority, isSingleTop: Boolean) {
+    override suspend fun emit(
+        navKeys: List<NavKey>,
+        priority: NavPriority,
+        navOptions: NavOptions?,
+    ) {
         Timber.d("Emit navigation events: $navKeys")
 
         val pendingNavKeys = mutableListOf<NavKey>()
@@ -53,7 +58,7 @@ class CombinedEventQueueImpl(
                         QueuedEvent(
                             event = NavigationQueueEvent(
                                 keys = pendingNavKeys.toList(),
-                                isSingleTop = isSingleTop
+                                navOptions = navOptions
                             ),
                             priority = priority,
                             timestamp = getTime()
@@ -77,7 +82,7 @@ class CombinedEventQueueImpl(
         if (pendingNavKeys.isNotEmpty()) {
             queueChannel.add(
                 QueuedEvent(
-                    event = NavigationQueueEvent(keys = pendingNavKeys, isSingleTop = isSingleTop),
+                    event = NavigationQueueEvent(keys = pendingNavKeys, navOptions = navOptions),
                     priority = priority,
                     timestamp = getTime()
                 )
@@ -85,8 +90,8 @@ class CombinedEventQueueImpl(
         }
     }
 
-    override suspend fun emit(navKey: NavKey, priority: NavPriority, isSingleTop: Boolean) =
-        emit(listOf(navKey), priority, isSingleTop)
+    override suspend fun emit(navKey: NavKey, priority: NavPriority, navOptions: NavOptions?) =
+        emit(listOf(navKey), priority, navOptions)
 
     override suspend fun emit(
         event: AppDialogEvent,

@@ -704,4 +704,90 @@ class PendingBackStackNavigationHandlerTest {
             DefaultLandingScreen, Destination1, Destination2, Destination3
         )
     }
+
+    @Test
+    fun `test that navigate with launchSingleTop replaces top destination of same type`() {
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(Destination1, options)
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination1)
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop does not replace top destination of different type`() {
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(Destination2, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+    }
+
+    @Test
+    fun `test that navigate list with launchSingleTop replaces matching top destinations`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+        assertThat(backStack.count { it == Destination1 }).isEqualTo(1)
+        assertThat(backStack.count { it == Destination2 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that navigate list with launchSingleTop does not replace when top destinations do not match`() {
+        backStack.addAll(listOf(Destination1, Destination3))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3, Destination1, Destination2
+        )
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop and popUpTo applies both operations`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            launchSingleTop = true
+            popUpTo<Destination1> {
+                inclusive = false
+            }
+        }
+        underTest.navigate(Destination3, options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        )
+    }
+
+    @Test
+    fun `test that navigate with launchSingleTop does not remove when backstack has fewer items than destinations`() {
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigate(listOf(Destination1, Destination2), options)
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination2
+        )
+    }
 }

@@ -74,6 +74,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -407,7 +408,13 @@ class FileInfoActivity : BaseActivity() {
     ) {
         nodeDestination?.let {
             lifecycleScope.launch {
-                navigationQueue.emit(nodeDestination, NavPriority.Default, true)
+                navigationQueue.emit(
+                    nodeDestination,
+                    NavPriority.Default,
+                    navOptions {
+                        launchSingleTop = true
+                    }
+                )
                 megaNavigator.launchMegaActivityIfNeeded(this@FileInfoActivity)
             }
         } ?: locationInfo?.handleLocationClick(

@@ -474,14 +474,7 @@ class MegaActivity : FragmentActivity() {
                                 ) {
                                     when (it) {
                                         is NavigationQueueEvent -> {
-                                            if (it.isSingleTop && doBackStackKeysMatch(
-                                                    navigationHandler.peekBackStack(),
-                                                    it.keys
-                                                )
-                                            ) {
-                                                navigationHandler.dropLast(it.keys.size)
-                                            }
-                                            navigationHandler.navigate(it.keys)
+                                            navigationHandler.navigate(it.keys, it.navOptions)
                                         }
 
                                         is AppDialogEvent -> {
@@ -524,21 +517,6 @@ class MegaActivity : FragmentActivity() {
                 }
             }
         }
-    }
-
-    /**
-     * Checks if the last keys in the back stack match the provided navigation keys.
-     * @param backStack The current back stack of navigation keys
-     * @param keys The navigation keys to compare against
-     * @return true if the last keys in the back stack match the provided keys, false otherwise
-     */
-    private fun doBackStackKeysMatch(backStack: List<NavKey>, keys: List<NavKey>): Boolean {
-        val backStackKeys = backStack.takeLast(keys.size)
-        if (backStackKeys.size != keys.size) return false
-        for (i in keys.indices) {
-            if (backStackKeys[i]::class != keys[i]::class) return false
-        }
-        return true
     }
 
     companion object {
