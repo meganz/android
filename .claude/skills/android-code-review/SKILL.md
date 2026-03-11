@@ -260,6 +260,7 @@ sealed class UiState {
 - [ ] Composables avoid creating side effects outside `LaunchedEffect` / `SideEffect`
 - [ ] `LaunchedEffect` / `SideEffect` / `DisposableEffect` are used correctly
 - [ ] Use `Timber` for logging, do not use Android Logger
+- [ ] Navigation entry metadata uses `buildMetadata { }` DSL instead of direct creation functions
 
 **Common Issues:**
 ```kotlin
@@ -292,6 +293,24 @@ fun LoginScreen(viewModel: LoginViewModel) {
         viewModel.loadUser()
     }
 }
+
+// ❌ Direct metadata creation — does not compose with other metadata extensions
+entry<InfoPsaBottomSheet>(
+    metadata = bottomSheetMetadata(
+        dismissOnBack = false,
+        dismissOnOutsideClick = false
+    )
+) { ... }
+
+// ✅ Use buildMetadata DSL — composable and extensible
+entry<StandardPsaBottomSheet>(
+    metadata = buildMetadata {
+        withBottomSheet(
+            dismissOnBack = false,
+            dismissOnOutsideClick = false
+        )
+    },
+) { ... }
 ```
 
 ---
