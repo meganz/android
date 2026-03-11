@@ -51,6 +51,7 @@ import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
 import mega.privacy.android.domain.qualifier.features.RubbishBin
 import mega.privacy.android.domain.qualifier.features.VideoPlaylist
+import mega.privacy.android.domain.qualifier.features.VideoRecentlyWatched
 import mega.privacy.android.domain.qualifier.features.Videos
 import javax.inject.Singleton
 
@@ -66,20 +67,18 @@ abstract class NodeActionsBottomSheetModule {
     companion object {
 
         /**
-         * Provide cloudDrive toolbar options
+         * Provide bottom sheet menu items shared across all node source sections
          */
         @Provides
-        @ElementsIntoSet
-        @CloudDrive
+        @BaseShareMenuItems
         @Singleton
-        fun provideCloudDriveBottomSheetOptions(
+        fun provideBaseShareMenuItems(
             availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
             removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
             copyMenuAction: CopyBottomSheetMenuItem,
             deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
             disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
             downloadMenuAction: DownloadBottomSheetMenuItem,
-            editMenuAction: EditBottomSheetMenuItem,
             favouriteMenuAction: FavouriteBottomSheetMenuItem,
             removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
             getLinkMenuAction: GetLinkBottomSheetMenuItem,
@@ -88,66 +87,78 @@ abstract class NodeActionsBottomSheetModule {
             leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
             manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
             manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
-            moveMenuAction: MoveBottomSheetMenuItem,
             openLocationMenuAction: OpenLocationBottomSheetMenuItem,
             openWithMenuAction: OpenWithBottomSheetMenuItem,
             removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
             removeShareMenuAction: RemoveShareBottomSheetMenuItem,
             renameMenuAction: RenameBottomSheetMenuItem,
-            hideMenuAction: HideBottomSheetMenuItem,
-            unhideMenuAction: UnhideBottomSheetMenuItem,
             restoreMenuAction: RestoreBottomSheetMenuItem,
             sendToChatMenuAction: SendToChatBottomSheetMenuItem,
             shareMenuAction: ShareBottomSheetMenuItem,
-            shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
-            slideshowMenuAction: SlideshowBottomSheetMenuItem,
             trashMenuAction: TrashBottomSheetMenuItem,
             verifyMenuAction: VerifyBottomSheetMenuItem,
             versionsMenuAction: VersionsBottomSheetMenuItem,
             viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> = setOf(
+            availableOfflineMenuAction,
+            removeOfflineMenuAction,
+            copyMenuAction,
+            deletePermanentlyMenuAction,
+            disputeTakeDownMenuAction,
+            downloadMenuAction,
+            favouriteMenuAction,
+            removeFavouriteMenuAction,
+            getLinkMenuAction,
+            infoMenuAction,
+            labelMenuAction,
+            leaveShareMenuAction,
+            manageLinkMenuAction,
+            manageShareFolderBottomSheetMenuItem,
+            openLocationMenuAction,
+            openWithMenuAction,
+            removeLinkMenuAction,
+            removeShareMenuAction,
+            renameMenuAction,
+            restoreMenuAction,
+            sendToChatMenuAction,
+            shareMenuAction,
+            trashMenuAction,
+            verifyMenuAction,
+            versionsMenuAction,
+            viewInFolderMenuAction,
+        )
+
+        /**
+         * Provide cloudDrive toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @CloudDrive
+        @Singleton
+        fun provideCloudDriveBottomSheetOptions(
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+            editMenuAction: EditBottomSheetMenuItem,
+            moveMenuAction: MoveBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+            shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
+            slideshowMenuAction: SlideshowBottomSheetMenuItem,
             syncBottomSheetMenuItem: SyncBottomSheetMenuItem,
-            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
             addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
                 moveMenuAction,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
                 hideMenuAction,
                 unhideMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
                 syncBottomSheetMenuItem,
                 addToBottomSheetMenuItem,
-                addToAlbumBottomSheetMenuItem
+                addToAlbumBottomSheetMenuItem,
             )
         }
-
 
         /**
          * Provide outgoing shares toolbar options
@@ -157,70 +168,19 @@ abstract class NodeActionsBottomSheetModule {
         @OutgoingShares
         @Singleton
         fun provideOutgoingSharesBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             editMenuAction: EditBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
             shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
             slideshowMenuAction: SlideshowBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
-            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
             addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
-                addToAlbumBottomSheetMenuItem,
                 addToBottomSheetMenuItem,
+                addToAlbumBottomSheetMenuItem,
             )
         }
 
@@ -232,68 +192,17 @@ abstract class NodeActionsBottomSheetModule {
         @IncomingShares
         @Singleton
         fun provideIncomingSharesBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             editMenuAction: EditBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
             moveMenuAction: MoveBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
             shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
             slideshowMenuAction: SlideshowBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
                 moveMenuAction,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
             )
         }
 
@@ -305,70 +214,19 @@ abstract class NodeActionsBottomSheetModule {
         @Links
         @Singleton
         fun provideLinkSharesBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             editMenuAction: EditBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
             shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
             slideshowMenuAction: SlideshowBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
-            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
             addToBottomSheetMenuItem: AddToBottomSheetMenuItem,
+            addToAlbumBottomSheetMenuItem: AddToAlbumBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
-                addToAlbumBottomSheetMenuItem,
                 addToBottomSheetMenuItem,
+                addToAlbumBottomSheetMenuItem,
             )
         }
 
@@ -399,151 +257,49 @@ abstract class NodeActionsBottomSheetModule {
         @Backups
         @Singleton
         fun provideBackupsBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             editMenuAction: EditBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
             moveMenuAction: MoveBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
             hideMenuAction: HideBottomSheetMenuItem,
             unhideMenuAction: UnhideBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
             shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
             slideshowMenuAction: SlideshowBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
                 moveMenuAction,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
                 hideMenuAction,
                 unhideMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
             )
         }
 
         /**
-         * Provide cloudDrive toolbar options
+         * Provide videos bottom sheet options
          */
         @Provides
         @ElementsIntoSet
         @Videos
         @Singleton
         fun provideVideosBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             editMenuAction: EditBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
             moveMenuAction: MoveBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
             hideMenuAction: HideBottomSheetMenuItem,
             unhideMenuAction: UnhideBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
             shareFolderMenuAction: ShareFolderBottomSheetMenuItem,
             slideshowMenuAction: SlideshowBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
             addToPlaylistBottomSheetMenuItem: AddToPlaylistBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
+            return baseItems + setOf(
                 editMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
                 moveMenuAction,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
                 hideMenuAction,
                 unhideMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
                 shareFolderMenuAction,
                 slideshowMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
-                addToPlaylistBottomSheetMenuItem
+                addToPlaylistBottomSheetMenuItem,
             )
         }
 
@@ -555,66 +311,37 @@ abstract class NodeActionsBottomSheetModule {
         @VideoPlaylist
         @Singleton
         fun provideVideoPlaylistsBottomSheetOptions(
-            availableOfflineMenuAction: AvailableOfflineBottomSheetMenuItem,
-            removeOfflineMenuAction: RemoveAvailableOfflineBottomSheetMenuItem,
-            copyMenuAction: CopyBottomSheetMenuItem,
-            deletePermanentlyMenuAction: DeletePermanentlyBottomSheetMenuItem,
-            disputeTakeDownMenuAction: DisputeTakeDownBottomSheetMenuItem,
-            downloadMenuAction: DownloadBottomSheetMenuItem,
-            favouriteMenuAction: FavouriteBottomSheetMenuItem,
-            removeFavouriteMenuAction: RemoveFavouriteBottomSheetMenuItem,
-            getLinkMenuAction: GetLinkBottomSheetMenuItem,
-            infoMenuAction: InfoBottomSheetMenuItem,
-            labelMenuAction: LabelBottomSheetMenuItem,
-            leaveShareMenuAction: LeaveShareBottomSheetMenuItem,
-            manageLinkMenuAction: ManageLinkBottomSheetMenuItem,
-            manageShareFolderBottomSheetMenuItem: ManageShareFolderBottomSheetMenuItem,
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
             moveMenuAction: MoveBottomSheetMenuItem,
-            openLocationMenuAction: OpenLocationBottomSheetMenuItem,
-            openWithMenuAction: OpenWithBottomSheetMenuItem,
-            removeLinkMenuAction: RemoveLinkBottomSheetMenuItem,
-            removeShareMenuAction: RemoveShareBottomSheetMenuItem,
-            renameMenuAction: RenameBottomSheetMenuItem,
             hideMenuAction: HideBottomSheetMenuItem,
             unhideMenuAction: UnhideBottomSheetMenuItem,
-            restoreMenuAction: RestoreBottomSheetMenuItem,
-            sendToChatMenuAction: SendToChatBottomSheetMenuItem,
-            shareMenuAction: ShareBottomSheetMenuItem,
-            trashMenuAction: TrashBottomSheetMenuItem,
-            verifyMenuAction: VerifyBottomSheetMenuItem,
-            versionsMenuAction: VersionsBottomSheetMenuItem,
-            viewInFolderMenuAction: ViewInFolderBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
-            return setOf(
-                availableOfflineMenuAction,
-                removeOfflineMenuAction,
-                copyMenuAction,
-                deletePermanentlyMenuAction,
-                disputeTakeDownMenuAction,
-                downloadMenuAction,
-                favouriteMenuAction,
-                removeFavouriteMenuAction,
-                getLinkMenuAction,
-                infoMenuAction,
-                labelMenuAction,
-                leaveShareMenuAction,
-                manageLinkMenuAction,
-                manageShareFolderBottomSheetMenuItem,
+            return baseItems + setOf(
                 moveMenuAction,
-                openLocationMenuAction,
-                openWithMenuAction,
-                removeLinkMenuAction,
-                removeShareMenuAction,
-                renameMenuAction,
                 hideMenuAction,
                 unhideMenuAction,
-                restoreMenuAction,
-                sendToChatMenuAction,
-                shareMenuAction,
-                trashMenuAction,
-                verifyMenuAction,
-                versionsMenuAction,
-                viewInFolderMenuAction,
+            )
+        }
+
+        /**
+         * Provide VideoRecentlyWatched toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @VideoRecentlyWatched
+        @Singleton
+        fun provideVideoRecentlyWatchedBottomSheetOptions(
+            @BaseShareMenuItems baseItems: Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>,
+            moveMenuAction: MoveBottomSheetMenuItem,
+            hideMenuAction: HideBottomSheetMenuItem,
+            unhideMenuAction: UnhideBottomSheetMenuItem,
+            removeRecentlyWatchedVideoAction: RemoveRecentlyWatchedVideoBottomSheetItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return baseItems + setOf(
+                moveMenuAction,
+                hideMenuAction,
+                unhideMenuAction,
+                removeRecentlyWatchedVideoAction,
             )
         }
     }

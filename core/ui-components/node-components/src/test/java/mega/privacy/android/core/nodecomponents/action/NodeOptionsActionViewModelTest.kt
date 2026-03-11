@@ -88,6 +88,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
@@ -168,6 +169,7 @@ class NodeOptionsActionViewModelTest {
     private val getNodeLocationUseCase = mock<GetNodeLocationUseCase>()
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
+    private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -226,6 +228,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -302,6 +305,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase,
             nodeDestinationMapper,
             navigationEventQueue,
+            removeRecentlyWatchedItemUseCase,
         )
     }
 
@@ -674,6 +678,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -740,6 +745,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -800,6 +806,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -852,6 +859,7 @@ class NodeOptionsActionViewModelTest {
             getNodeLocationUseCase = getNodeLocationUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
+            removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1493,6 +1501,57 @@ class NodeOptionsActionViewModelTest {
             mock<FileNodeContent.UrlContent>()
         )
     )
+
+    @Test
+    fun `test that removeRecentlyWatchedItem invokes removeRecentlyWatchedItemUseCase with the given handle`() =
+        runTest {
+            val handle = 12345L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenReturn(Unit)
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+        }
+
+    @Test
+    fun `test that removeRecentlyWatchedItem on success queues snackbar message and triggers dismiss`() =
+        runTest {
+            val handle = 999L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenReturn(Unit)
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+            verify(snackbarEventQueue).queueMessage(any(), any())
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that removeRecentlyWatchedItem on failure still triggers dismiss`() =
+        runTest {
+            val handle = 888L
+            whenever(removeRecentlyWatchedItemUseCase(handle)).thenThrow(RuntimeException("test failure"))
+
+            initViewModel()
+
+            viewModel.removeRecentlyWatchedItem(handle)
+            advanceUntilIdle()
+
+            verify(removeRecentlyWatchedItemUseCase).invoke(handle)
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
 
     @Test
     fun `test viewFileInFolder calls getNodeLocationUseCase and emits navigation destinations`() =

@@ -210,7 +210,7 @@ internal fun VideoRecentlyWatchedScreen(
                                             onMenuClick(
                                                 NodeOptionsBottomSheetNavKey(
                                                     nodeHandle = videoItem.id.longValue,
-                                                    nodeSourceType = NodeSourceType.CLOUD_DRIVE
+                                                    nodeSourceType = NodeSourceType.VIDEO_RECENTLY_WATCHED
                                                 )
                                             )
                                         },

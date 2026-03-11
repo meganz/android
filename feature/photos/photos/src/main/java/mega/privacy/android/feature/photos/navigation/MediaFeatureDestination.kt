@@ -47,6 +47,9 @@ class MediaFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent
             )
-            videoRecentlyWatchedScreen(navigationHandler = navigationHandler)
+            videoRecentlyWatchedScreen(
+                navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
+            )
         }
 }

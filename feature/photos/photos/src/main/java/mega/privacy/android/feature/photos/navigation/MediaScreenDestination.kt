@@ -510,8 +510,21 @@ fun EntryProviderScope<NavKey>.albumImports(
 
 fun EntryProviderScope<NavKey>.videoRecentlyWatchedScreen(
     navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<VideoRecentlyWatchedNavKey> {
+        val nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
         VideoRecentlyWatchedRoute(
             onBack = navigationHandler::back,
             navigate = navigationHandler::navigate

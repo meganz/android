@@ -29,6 +29,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.OpenWithActi
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveFavouriteActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveLinkActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveOfflineActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveRecentlyWatchedVideoActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
@@ -93,6 +94,7 @@ object NodeActionHandlerModule {
         addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
         addToPlaylistAction: AddToPlaylistActionClickHandler,
         viewInFolderAction: ViewInFolderActionClickHandler,
+        removeRecentlyWatchedVideoActionClickHandler: RemoveRecentlyWatchedVideoActionClickHandler,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -128,7 +130,8 @@ object NodeActionHandlerModule {
             addToActionClickHandler,
             addToAlbumActionClickHandler,
             addToPlaylistAction,
-            viewInFolderAction
+            viewInFolderAction,
+            removeRecentlyWatchedVideoActionClickHandler
         )
     }
 

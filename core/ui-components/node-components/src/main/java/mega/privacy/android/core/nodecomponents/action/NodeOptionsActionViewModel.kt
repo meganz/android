@@ -90,6 +90,7 @@ import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -156,6 +157,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val getNodeLocationUseCase: GetNodeLocationUseCase,
     private val nodeDestinationMapper: NodeDestinationMapper,
     private val navigationEventQueue: NavigationEventQueue,
+    private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -954,6 +956,21 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     fun triggerCollisionsResult(result: NodeNameCollisionsResult) {
         uiState.update {
             it.copy(nodeNameCollisionsResult = triggered(result))
+        }
+    }
+
+    internal fun removeRecentlyWatchedItem(handle: Long) {
+        viewModelScope.launch {
+            runCatching {
+                removeRecentlyWatchedItemUseCase(handle)
+            }.onSuccess {
+                snackbarEventQueue.queueMessage(
+                    sharedResR.string.video_section_message_remove_recently_watched_item
+                )
+            }.onFailure {
+                Timber.e(it)
+            }
+            dismiss()
         }
     }
 
