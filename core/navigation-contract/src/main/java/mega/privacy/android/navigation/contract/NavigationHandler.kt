@@ -1,6 +1,5 @@
 package mega.privacy.android.navigation.contract
 
-import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
 
 /**

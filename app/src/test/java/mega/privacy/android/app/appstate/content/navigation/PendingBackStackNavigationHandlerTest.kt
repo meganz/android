@@ -1,15 +1,16 @@
 package mega.privacy.android.app.appstate.content.navigation
 
-import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
 import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderImpl
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
@@ -37,8 +38,13 @@ class PendingBackStackNavigationHandlerTest {
     private data object NoNodeDestination1 : NoNodeNavKey
     private data object NoNodeDestination2 : NoNodeNavKey
 
+    @Serializable
     private data object Destination1 : NavKey
+
+    @Serializable
     private data object Destination2 : NavKey
+
+    @Serializable
     private data object Destination3 : NavKey
 
     private data object PasscodeDestination : NavKey
@@ -647,7 +653,7 @@ class PendingBackStackNavigationHandlerTest {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 
         val options = navOptions {
-            popUpTo(Destination1::class.qualifiedName!!) {
+            popUpTo<Destination1> {
                 inclusive = false
             }
         }
@@ -663,7 +669,7 @@ class PendingBackStackNavigationHandlerTest {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 
         val options = navOptions {
-            popUpTo(Destination1::class.qualifiedName!!) {
+            popUpTo<Destination1> {
                 inclusive = true
             }
         }
@@ -677,7 +683,7 @@ class PendingBackStackNavigationHandlerTest {
         backStack.addAll(listOf(Destination1, Destination2, Destination3))
 
         val options = navOptions {
-            popUpTo(Destination1::class.qualifiedName!!) {
+            popUpTo<Destination1> {
                 inclusive = false
             }
         }

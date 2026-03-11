@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.content.navigation
 
-import androidx.navigation.NavOptions
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
@@ -57,13 +57,13 @@ class TopLevelBackStackNavigationHandler(
 
     private fun applyNavOptions(navOptions: NavOptions?) {
         if (navOptions == null) return
-        navOptions.popUpToRoute?.let { route ->
-            val popUpToKey = backStack.backStack.lastOrNull { it::class.qualifiedName == route }
-            if (popUpToKey != null) {
-                removeFromBackStackTo(popUpToKey, navOptions.isPopUpToInclusive())
-            }
-        }
+        val popUpTo = navOptions.popUpTo ?: return
+        val popUpToKey = findPopUpToKey(popUpTo) ?: return
+        removeFromBackStackTo(popUpToKey, popUpTo.inclusive)
     }
+
+    private fun findPopUpToKey(popUpTo: NavOptions.PopUpTo): NavKey? =
+        backStack.backStack.lastOrNull { it::class == popUpTo.routeClass }
 
     /**
      * Removes elements from the back stack up to the specified destination.
