@@ -23,7 +23,6 @@ import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.exception.MegaSyncException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.feature.sync.data.gateway.SyncGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncStatsCacheGateway
 import mega.privacy.android.feature.sync.data.gateway.SyncWorkManagerGateway
@@ -49,7 +48,6 @@ internal class SyncRepositoryImpl @Inject constructor(
     private val syncErrorMapper: SyncErrorMapper,
     private val syncTypeMapper: SyncTypeMapper,
     private val syncByWifiToNetworkTypeMapper: SyncByWifiToNetworkTypeMapper,
-    private val accountRepository: AccountRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val appScope: CoroutineScope,
 ) : SyncRepository {
@@ -87,8 +85,6 @@ internal class SyncRepositoryImpl @Inject constructor(
     }
 
     private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> {
-        val storageUsedPercentage =
-            (100 * accountRepository.getUsedStorage() / accountRepository.getMaxStorage()).toInt()
         return (0 until model.size())
             .map { index ->
                 val folderPairModel = model.get(index)
@@ -99,7 +95,6 @@ internal class SyncRepositoryImpl @Inject constructor(
                     model = folderPairModel,
                     megaFolderName = megaFolderName,
                     syncStats = syncStats,
-                    isStorageOverQuota = storageUsedPercentage >= FULL_STORAGE_PERCENTAGE,
                 )
             }
     }
@@ -222,7 +217,5 @@ internal class SyncRepositoryImpl @Inject constructor(
          * issues that are later resolved by the following sync loop.
          */
         const val SYNC_REFRESH_DELAY = 5000L
-
-        const val FULL_STORAGE_PERCENTAGE = 100
     }
 }

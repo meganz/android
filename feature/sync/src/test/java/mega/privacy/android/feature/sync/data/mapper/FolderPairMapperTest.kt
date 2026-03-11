@@ -4,6 +4,7 @@ import com.google.common.truth.Truth
 import mega.privacy.android.data.mapper.backup.SyncErrorMapper
 import mega.privacy.android.data.mapper.sync.SyncTypeMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.sync.SyncError
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
 import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
@@ -47,6 +48,7 @@ internal class FolderPairMapperTest {
         val syncStats: MegaSyncStats = mock()
 
         whenever(syncTypeMapper(MegaSync.SyncType.swigToEnum(model.type))).thenReturn(SyncType.TYPE_TWOWAY)
+        whenever(syncErrorMapper(model.error)).thenReturn(SyncError.NO_SYNC_ERROR)
         whenever(syncStatusMapper(syncStats, model.runState, false)).thenReturn(SyncStatus.SYNCED)
 
         val expected = FolderPair(
@@ -55,14 +57,14 @@ internal class FolderPairMapperTest {
             pairName = "",
             localFolderPath = syncLocalFolder,
             remoteFolder = RemoteFolder(id = NodeId(1L), name = syncRemoteFolder),
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
+            syncError = SyncError.NO_SYNC_ERROR
         )
 
         val actual = underTest(
             model = model,
             megaFolderName = syncRemoteFolder,
             syncStats = syncStats,
-            isStorageOverQuota = false,
         )
 
         Truth.assertThat(actual).isEqualTo(expected)
