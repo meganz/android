@@ -1,5 +1,6 @@
 package mega.privacy.android.app.providers.documentprovider
 
+import android.app.AuthenticationRequiredException
 import android.content.ContentProvider
 import android.content.Context
 import android.database.Cursor
@@ -139,13 +140,21 @@ class CloudDriveDocumentProviderTest {
     }
 
     @Test
-    fun `test that queryRoots returns empty cursor when user not logged in`() = runTest {
-        dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
-        createProvider()
+    fun `test that queryRoots returns one root row with login summary when user not logged in`() =
+        runTest {
+            dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
+            createProvider()
 
-        val cursor: Cursor = underTest.queryRoots(null)
-        assertThat(cursor.count).isEqualTo(0)
-    }
+            val cursor: Cursor = underTest.queryRoots(null)
+            assertThat(cursor.count).isEqualTo(1)
+            cursor.moveToFirst()
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
+                .isEqualTo(CLOUD_DRIVE_ROOT_ID)
+            val expectedSummary = ApplicationProvider.getApplicationContext<Context>()
+                .getString(R.string.login_to_mega) ?: "Log in to MEGA"
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
+                .isEqualTo(expectedSummary)
+        }
 
     @Test
     fun `test that queryDocument throws exception when document id null`() = runTest {
@@ -356,14 +365,19 @@ class CloudDriveDocumentProviderTest {
         }
 
     @Test
-    fun `test that queryChildDocuments returns empty cursor when NotLoggedIn`() = runTest {
-        dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
-        createProvider()
+    fun `test that queryChildDocuments throws AuthenticationRequiredException when NotLoggedIn`() =
+        runTest {
+            dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
+            createProvider()
 
-        val cursor: Cursor =
-            underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
-        assertThat(cursor.count).isEqualTo(0)
-    }
+            assertThrows<AuthenticationRequiredException> {
+                underTest.queryChildDocuments(
+                    parentDocumentId = CLOUD_DRIVE_ROOT_ID,
+                    null,
+                    null
+                )
+            }
+        }
 
     @Test
     fun `test that queryChildDocuments returns child rows when state is ChildData and parentId matches`() =
@@ -410,6 +424,17 @@ class CloudDriveDocumentProviderTest {
 
             underTest.queryChildDocuments(parentDocumentId = "$CLOUD_DRIVE_ROOT_ID:999", null, null)
             verify(mockDataProvider).loadChildrenInBackground("$CLOUD_DRIVE_ROOT_ID:999")
+        }
+
+    @Test
+    fun `test that queryDocument throws AuthenticationRequiredException when NotLoggedIn when documentID is not root`() =
+        runTest {
+            dataProviderState.value = CloudDriveDocumentProviderUiState.NotLoggedIn
+            createProvider()
+
+            assertThrows<AuthenticationRequiredException> {
+                underTest.queryDocument("$CLOUD_DRIVE_ROOT_ID:123", null)
+            }
         }
 
     @Test

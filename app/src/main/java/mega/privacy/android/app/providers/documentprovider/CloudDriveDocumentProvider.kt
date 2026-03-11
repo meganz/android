@@ -1,5 +1,8 @@
 package mega.privacy.android.app.providers.documentprovider
 
+import android.app.AuthenticationRequiredException
+import android.app.PendingIntent
+import android.content.Intent
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.os.Bundle
@@ -17,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import timber.log.Timber
@@ -49,6 +53,8 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             Document.COLUMN_FLAGS,
             Document.COLUMN_SIZE
         )
+
+        private const val LOGIN_PENDING_INTENT_REQUEST_CODE = 1001
     }
 
     private val dependencyContainer: CloudDriveDocumentProviderEntryPoint by lazy {
@@ -72,11 +78,18 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         Timber.d("CloudDriveDocumentProvider onCreate called")
         applicationScope.launch {
 
+            var wasLoggedIn: Boolean? = null
             dataProvider.state.collect { state ->
+                val isLoggedIn = state is HasCredentials
+                if (wasLoggedIn != null && wasLoggedIn != isLoggedIn) {
+                    notifyRootChanged(CLOUD_DRIVE_ROOT_ID)
+                    notifyDocumentChanged(CLOUD_DRIVE_ROOT_ID)
+                }
+                wasLoggedIn = isLoggedIn
                 when (state) {
                     CloudDriveDocumentProviderUiState.Initialising -> {}
 
-                    CloudDriveDocumentProviderUiState.NotLoggedIn -> notifyRootChanged()
+                    CloudDriveDocumentProviderUiState.NotLoggedIn -> {}
 
                     is CloudDriveDocumentProviderUiState.LoadingDocument -> {}
 
@@ -99,20 +112,19 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
     override fun queryRoots(projection: Array<String>?): Cursor {
         Timber.d("CloudDriveDocumentProvider queryRoots projection=$projection,")
-        val result = when (val state = dataProvider.state.value) {
-            is HasCredentials -> {
-                val summary = state.accountName
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
-                    addRootRow(summary)
-                }
-            }
+        val summary = when (val state = dataProvider.state.value) {
+            is HasCredentials -> state.accountName
+            CloudDriveDocumentProviderUiState.NotLoggedIn -> getLoginToMEGAString()
 
-            else -> getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
+            else -> getLoadingString()
         }
+        val result =
+            getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false).apply {
+                addRootRow(summary)
+            }
 
         setNotificationUriForRoot(result)
         return result
-
     }
 
     private fun MatrixCursor.addRootRow(summary: String) {
@@ -120,11 +132,12 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             add(Root.COLUMN_ROOT_ID, CLOUD_DRIVE_ROOT_ID)
             add(
                 Root.COLUMN_TITLE,
-                context?.getString(R.string.app_name) ?: "MEGA"
+                getAppNameString()
             )
             add(Root.COLUMN_SUMMARY, summary)
             add(Root.COLUMN_DOCUMENT_ID, CLOUD_DRIVE_ROOT_ID)
             add(Root.COLUMN_ICON, R.mipmap.ic_launcher)
+            add(Root.COLUMN_FLAGS, 0)
         }
     }
 
@@ -161,7 +174,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             )
 
             CloudDriveDocumentProviderUiState.NotLoggedIn ->
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
+                throwAuthenticationRequired()
 
             is CloudDriveDocumentProviderUiState.ChildData -> loadDocumentAsync(
                 documentId,
@@ -181,22 +194,19 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             }
         }
         setNotificationUriForDocument(documentId, result)
-
         return result
-
     }
 
     private fun documentCursorForRootDocument(projection: Array<String>?): MatrixCursor {
         val row = CloudDriveDocumentRow(
             documentId = CLOUD_DRIVE_ROOT_ID,
-            displayName = context?.getString(R.string.app_name) ?: "MEGA",
+            displayName = getAppNameString(),
             mimeType = Document.MIME_TYPE_DIR,
             size = 0L,
             lastModified = 0L,
             flags = 0
         )
-        val result = documentCursor(row = row, projection = projection)
-        return result
+        return documentCursor(row = row, projection = projection)
     }
 
     private fun loadDocumentAsync(
@@ -261,7 +271,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             )
 
             CloudDriveDocumentProviderUiState.NotLoggedIn ->
-                getMatrixCursor(resolveRootProjection(projection), withLoadingInfo = false)
+                throwAuthenticationRequired()
 
             is CloudDriveDocumentProviderUiState.FileNotFound ->
                 throw FileNotFoundException("Invalid parent document id: $parentDocumentId")
@@ -273,7 +283,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         }
         setNotificationUriForChildDocuments(parentDocumentId, result)
         return result
-
     }
 
     private fun loadChildrenAsync(
@@ -284,6 +293,30 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         return getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
     }
 
+    private fun createLoginPendingIntent(): PendingIntent {
+        val appContext = requireNotNull(context).applicationContext
+
+        val loginIntent = Intent(appContext, MegaActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra("open_from_document_provider", true)
+        }
+
+        return PendingIntent.getActivity(
+            appContext,
+            LOGIN_PENDING_INTENT_REQUEST_CODE,
+            loginIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    private fun throwAuthenticationRequired(): Nothing {
+        throw AuthenticationRequiredException(
+            IllegalStateException(getLoginToMEGAString()),
+            createLoginPendingIntent()
+        )
+    }
+
     private fun getMatrixCursor(
         projection: Array<String>,
         withLoadingInfo: Boolean,
@@ -291,8 +324,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         if (!withLoadingInfo) {
             return MatrixCursor(projection)
         } else {
-            val loadingMessage =
-                context?.getString(R.string.general_loading) ?: "Loading"
+            val loadingMessage = getLoadingString()
             return object : MatrixCursor(resolveDocumentProjection(projection)) {
                 override fun getExtras(): Bundle {
                     return Bundle().apply {
@@ -303,6 +335,11 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             }
         }
     }
+
+    private fun getLoadingString() = context?.getString(R.string.general_loading) ?: "Loading"
+    private fun getAppNameString() = context?.getString(R.string.app_name) ?: "MEGA"
+    private fun getLoginToMEGAString() =
+        context?.getString(R.string.login_to_mega) ?: "Log in to MEGA"
 
     private fun notifyDocumentChanged(documentId: String) {
         context?.let {
@@ -340,7 +377,6 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             }
         }
     }
-
 
     private fun setNotificationUriForDocument(documentId: String, result: MatrixCursor) {
         context?.let {

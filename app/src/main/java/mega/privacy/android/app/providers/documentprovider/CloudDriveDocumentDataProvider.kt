@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -51,6 +53,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase,
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase,
+    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper,
@@ -59,33 +62,39 @@ class CloudDriveDocumentDataProvider @Inject constructor(
 ) {
 
     val state: StateFlow<CloudDriveDocumentProviderUiState> by lazy {
-        monitorUserCredentialsUseCase().flatMapLatest { credentials ->
-            flow {
-                if (credentials == null) {
-                    emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
-                } else {
-                    val accountName = credentials.email ?: ""
-                    emitAll(getRootNodeFlow().mapLatest { if (it?.longValue == -1L) null else it }
-                        .flatMapLatest { rootNodeId ->
-                            if (rootNodeId == null) {
-                                flowOf(
-                                    CloudDriveDocumentProviderUiState.RootNodeNotLoaded(
-                                        accountName
-                                    )
-                                )
-                            } else {
-                                getDataFlows(
-                                    accountName,
-                                    "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}"
-                                )
-                            }
-                        })
+        monitorUserCredentialsUseCase().onStart { emit(getAccountCredentialsUseCase()) }
+            .distinctUntilChangedBy { it?.email }
+            .flatMapLatest { credentials ->
+                flow {
+                    if (credentials == null) {
+                        emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
+                    } else {
+                        val accountName = credentials.email ?: ""
+                        emitAll(
+                            getRootNodeFlow()
+                                .flatMapLatest { rootNodeId ->
+                                    if (rootNodeId == null) {
+                                        flowOf(
+                                            CloudDriveDocumentProviderUiState.RootNodeNotLoaded(
+                                                accountName
+                                            )
+                                        )
+                                    } else {
+                                        getDataFlows(
+                                            accountName,
+                                            "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}"
+                                        )
+                                    }
+                                })
+                    }
                 }
-            }
-        }.catch { Timber.e(it, "CloudDriveDocumentDataProvider state") }.asUiStateFlow(
-            scope = applicationScope,
-            initialValue = CloudDriveDocumentProviderUiState.Initialising
-        )
+            }.catch { e ->
+                Timber.e(e, "CloudDriveDocumentDataProvider state")
+                emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
+            }.asUiStateFlow(
+                scope = applicationScope,
+                initialValue = CloudDriveDocumentProviderUiState.Initialising
+            )
     }
 
     private val refreshRootNodeChannel =
@@ -96,6 +105,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
             getRootNodeWithFastLoginIfNeeded()
         }.getOrNull()
         if (rootNode == null) {
+            emit(null)
             emitAll(refreshRootNodeChannel.receiveAsFlow().mapLatest {
                 getRootNodeWithFastLoginIfNeeded()
             })

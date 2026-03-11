@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
@@ -53,6 +54,7 @@ class CloudDriveDocumentDataProviderTest {
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase = mock()
     private val getNodeByHandleUseCase: GetNodeByHandleUseCase = mock()
     private val backgroundFastLoginUseCase: BackgroundFastLoginUseCase = mock()
+    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase = mock()
     private val monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase = mock()
     private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
@@ -81,6 +83,7 @@ class CloudDriveDocumentDataProviderTest {
             getNodesByIdInChunkUseCase,
             getNodeByHandleUseCase,
             backgroundFastLoginUseCase,
+            getAccountCredentialsUseCase,
             monitorNodeUpdatesUseCase,
             monitorUserCredentialsUseCase,
             monitorHiddenNodesEnabledUseCase,
@@ -101,6 +104,10 @@ class CloudDriveDocumentDataProviderTest {
             if (!docId.startsWith("$prefix:")) null
             else docId.substring(prefix.length + 1).toLongOrNull()?.let { NodeId(it) }
         }
+        initUnderTest()
+    }
+
+    private fun initUnderTest() {
         underTest = CloudDriveDocumentDataProvider(
             applicationScope = testScope,
             getRootNodeIdUseCase = getRootNodeIdUseCase,
@@ -109,6 +116,7 @@ class CloudDriveDocumentDataProviderTest {
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase,
             monitorUserCredentialsUseCase = monitorUserCredentialsUseCase,
+            getAccountCredentialsUseCase = getAccountCredentialsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             cloudDriveDocumentRowMapper = cloudDriveDocumentRowMapper,
@@ -122,40 +130,42 @@ class CloudDriveDocumentDataProviderTest {
         Dispatchers.resetMain()
     }
 
-    private suspend fun stubRootLoad() {
-        whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
-        val rootFolderNode: FolderNode = mock()
-        val rootTypedNode: DefaultTypedFolderNode = mock()
-        whenever(getNodeByHandleUseCase.invoke(1L, false)).thenReturn(rootFolderNode)
-        whenever(addNodeType.invoke(rootFolderNode)).thenReturn(rootTypedNode)
-        val rootRow = CloudDriveDocumentRow(
-            documentId = CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
-            displayName = "MEGA",
-            mimeType = Document.MIME_TYPE_DIR,
-            size = 0L,
-            lastModified = 0L,
-            flags = 0,
-        )
-        whenever(cloudDriveDocumentRowMapper.invoke(rootTypedNode, DOCUMENT_ID_PREFIX))
-            .thenReturn(rootRow)
-    }
-
     @Test
     fun `test that state is NotLoggedIn when credentials null`() = runTest {
+        whenever(getAccountCredentialsUseCase()).thenReturn(null)
         whenever(monitorUserCredentialsUseCase()).thenReturn(flowOf(null))
 
         underTest.state.test {
             skipItems(1) // skip Initialising (StateFlow initial value)
-            assertThat(awaitItem()).isInstanceOf(CloudDriveDocumentProviderUiState.NotLoggedIn::class.java) // NotLoggedIn
+            assertThat(awaitItem()).isInstanceOf(CloudDriveDocumentProviderUiState.NotLoggedIn::class.java)
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that state is RootNodeNotLoaded when credentials exist but root node is null`() =
+        runTest {
+            whenever(getRootNodeIdUseCase()).thenReturn(null)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+
+            underTest.state.test {
+                skipItems(1) // skip Initialising
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(
+                    CloudDriveDocumentProviderUiState.RootNodeNotLoaded::class.java
+                )
+                assertThat((state as CloudDriveDocumentProviderUiState.RootNodeNotLoaded).accountName)
+                    .isEqualTo("test@mega.co.nz")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that state is DocumentData for root when credentials and root available`() = runTest {
         val mockNode: FolderNode = mock()
         val typedNode: DefaultTypedFolderNode = mock()
         whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+        whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
         val rootRow = CloudDriveDocumentRow(
             documentId = CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID,
             displayName = "MEGA",
@@ -188,6 +198,7 @@ class CloudDriveDocumentDataProviderTest {
     fun `test that loadDocumentInBackground emits LoadingDocument then DocumentData when node found`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val handle = 54321L
             val documentId = "$DOCUMENT_ID_PREFIX:$handle"
             val mockNode: FolderNode = mock()
@@ -228,6 +239,7 @@ class CloudDriveDocumentDataProviderTest {
     fun `test that loadDocumentInBackground emits LoadingDocument then FileNotFound when node null`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val documentId = "$DOCUMENT_ID_PREFIX:12345"
             whenever(getNodeByHandleUseCase.invoke(any(), any())).thenReturn(null)
 
@@ -252,6 +264,7 @@ class CloudDriveDocumentDataProviderTest {
         runTest {
             val typedFolder: TypedNode = mock()
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
                 flowOf(listOf(typedFolder) to false)
             )
@@ -289,6 +302,7 @@ class CloudDriveDocumentDataProviderTest {
     fun `test that loadChildrenInBackground emits LoadingChildren then ChildData with empty list when no children`() =
         runTest {
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getNodesByIdInChunkUseCase(any(), any()))
                 .thenReturn(flowOf(emptyList<TypedNode>() to false))
 
@@ -316,6 +330,7 @@ class CloudDriveDocumentDataProviderTest {
             whenever(normalNode.isMarkedSensitive).thenReturn(false)
             whenever(normalNode.isSensitiveInherited).thenReturn(false)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
             whenever(getNodesByIdInChunkUseCase(any(), any())).thenReturn(
@@ -367,6 +382,7 @@ class CloudDriveDocumentDataProviderTest {
     fun `test that when isHiddenNodesEnabled is false all nodes including sensitive are included in ChildData`() =
         runTest {
             val sensitiveNode: TypedNode = mock()
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(sensitiveNode.isMarkedSensitive).thenReturn(true)
             whenever(sensitiveNode.isSensitiveInherited).thenReturn(false)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
@@ -412,6 +428,7 @@ class CloudDriveDocumentDataProviderTest {
         runTest {
             val sensitiveNode: TypedNode = mock()
             val normalNode: TypedNode = mock()
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(sensitiveNode.isMarkedSensitive).thenReturn(true)
             whenever(sensitiveNode.isSensitiveInherited).thenReturn(false)
             whenever(normalNode.isMarkedSensitive).thenReturn(false)
@@ -440,8 +457,8 @@ class CloudDriveDocumentDataProviderTest {
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
-                val childData = awaitItem()
+                awaitItem() // LoadingChildren
+                val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).hasSize(1)
@@ -454,6 +471,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that when showHiddenItems false and isHiddenNodesEnabled true nodes with isSensitiveInherited are filtered out`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val sensitiveInheritedNode: TypedNode = mock()
             val normalNode: TypedNode = mock()
             whenever(sensitiveInheritedNode.isMarkedSensitive).thenReturn(false)
@@ -484,8 +502,8 @@ class CloudDriveDocumentDataProviderTest {
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
-                val childData = awaitItem()
+                awaitItem() // LoadingChildren
+                val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).hasSize(1)
@@ -498,6 +516,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that when showHiddenItems false and isHiddenNodesEnabled true both isMarkedSensitive and isSensitiveInherited are filtered out`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val markedSensitiveNode: TypedNode = mock()
             val inheritedSensitiveNode: TypedNode = mock()
             val normalNode: TypedNode = mock()
@@ -531,8 +550,8 @@ class CloudDriveDocumentDataProviderTest {
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
-                val childData = awaitItem()
+                awaitItem() // LoadingChildren
+                val childData = awaitItem() // ChildData (filtered from first combine emission)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).hasSize(1)
@@ -545,6 +564,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that when filtering sensitive all non-sensitive nodes are included`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val normal1: TypedNode = mock()
             val normal2: TypedNode = mock()
             whenever(normal1.isMarkedSensitive).thenReturn(false)
@@ -599,6 +619,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that when showHiddenItems false and isHiddenNodesEnabled true all sensitive nodes yield empty ChildData`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             val sensitive1: TypedNode = mock()
             val sensitive2: TypedNode = mock()
             whenever(sensitive1.isMarkedSensitive).thenReturn(true)
@@ -618,8 +639,8 @@ class CloudDriveDocumentDataProviderTest {
                 awaitItem()
                 underTest.loadChildrenInBackground(CloudDriveDocumentDataProvider.CLOUD_DRIVE_ROOT_ID)
                 advanceUntilIdle()
-                awaitItem()
-                val childData = awaitItem()
+                awaitItem() // LoadingChildren
+                val childData = awaitItem() // ChildData (filtered from first combine emission, empty)
                 assertThat(childData).isInstanceOf(CloudDriveDocumentProviderUiState.ChildData::class.java)
                 val data = childData as CloudDriveDocumentProviderUiState.ChildData
                 assertThat(data.children).isEmpty()
@@ -628,10 +649,10 @@ class CloudDriveDocumentDataProviderTest {
             verify(cloudDriveDocumentRowMapper, times(0)).invoke(any(), any())
         }
 
-
     @Test
     fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but showHiddenItems is true`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
             val handle = 777L
             val documentId = "$DOCUMENT_ID_PREFIX:$handle"
@@ -674,6 +695,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that loadDocumentInBackground emits DocumentData when document is sensitive but isHiddenNodesEnabled is false`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
             val handle = 666L
             val documentId = "$DOCUMENT_ID_PREFIX:$handle"
@@ -716,6 +738,7 @@ class CloudDriveDocumentDataProviderTest {
     @Test
     fun `test that loadDocumentInBackground emits DocumentData when document is not sensitive and hidden nodes filtering is on`() =
         runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
             whenever(getRootNodeIdUseCase()).thenReturn(ROOT_NODE_ID)
             val handle = 555L
             val documentId = "$DOCUMENT_ID_PREFIX:$handle"
