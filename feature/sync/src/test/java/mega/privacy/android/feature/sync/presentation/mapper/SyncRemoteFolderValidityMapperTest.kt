@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.mapper.sync.SyncRemoteFolderValidityMapper
@@ -47,7 +47,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that when feature flag is disabled, returns ValidFolderSelected`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(false)
 
         val result = underTest(nodeId)
@@ -59,7 +59,7 @@ class SyncRemoteFolderValidityMapperTest {
     fun `test that when feature flag check throws exception, returns ValidFolderSelected`() =
         runTest {
             val nodeId = NodeId(123L)
-            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenThrow(RuntimeException("Test exception"))
 
             val result = underTest(nodeId)
@@ -72,7 +72,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that exact match with Camera Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -95,7 +95,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that child of Camera Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true, false))
             .thenReturn(FolderUsageResult.UsedByCameraUploadChild)
@@ -111,7 +111,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that parent of Camera Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -136,7 +136,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that exact match with Media Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -159,7 +159,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that child of Media Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -182,7 +182,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that parent of Media Uploads shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -207,7 +207,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that UsedBySyncOrBackup shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -230,7 +230,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that UsedBySyncOrBackupParent shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -253,7 +253,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that UsedBySyncOrBackupChild shows correct snackbar`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -278,7 +278,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that NotUsed returns ValidFolderSelected`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
@@ -300,7 +300,7 @@ class SyncRemoteFolderValidityMapperTest {
     @Test
     fun `test that exception in validation returns ValidFolderSelected`() = runTest {
         val nodeId = NodeId(123L)
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(

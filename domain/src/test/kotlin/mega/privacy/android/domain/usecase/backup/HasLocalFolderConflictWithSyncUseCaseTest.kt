@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.backup
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.camerauploads.HasLocalFolderConflictWithSyncUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
@@ -48,7 +48,7 @@ internal class HasLocalFolderConflictWithSyncUseCaseTest {
 
     @Test
     fun `test that false is returned when feature flag is disabled`() = runTest {
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(false)
 
         val result = underTest("/storage/emulated/0/DCIM")
@@ -58,7 +58,7 @@ internal class HasLocalFolderConflictWithSyncUseCaseTest {
 
     @Test
     fun `test that false is returned when local folder path is empty`() = runTest {
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
 
         val result = underTest("")
@@ -72,7 +72,7 @@ internal class HasLocalFolderConflictWithSyncUseCaseTest {
         val syncLocalPath = "/storage/emulated/0/Sync"
         val selectedPath = "/storage/emulated/0/Sync"
 
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(getLocalSyncOrBackupUriPathUseCase()).thenReturn(
             listOf(
@@ -94,7 +94,7 @@ internal class HasLocalFolderConflictWithSyncUseCaseTest {
             val syncLocalPath = "/storage/emulated/0/Sync"
             val selectedPath = "/storage/emulated/0/DCIM"
 
-            whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(true)
             whenever(getLocalSyncOrBackupUriPathUseCase()).thenReturn(
                 listOf(
@@ -113,7 +113,7 @@ internal class HasLocalFolderConflictWithSyncUseCaseTest {
     fun `test that false is returned when URI resolution returns null`() = runTest {
         val syncLocalUri = "content://com.android.externalstorage/tree/primary%3ASync"
 
-        whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
         whenever(getLocalSyncOrBackupUriPathUseCase()).thenReturn(
             listOf(

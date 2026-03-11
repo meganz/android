@@ -2,7 +2,7 @@ package mega.privacy.android.feature.sync.ui.mapper.sync
 
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
@@ -109,7 +109,7 @@ class SyncUriValidityMapper @Inject constructor(
         mediaUploadPath: String,
     ): SyncValidityResult {
         val isNewDCIMLogicEnabled =
-            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
 
         val isCameraMatch = isCameraUploadsEnabledUseCase() &&
                 primaryFolderPath.isNotEmpty() &&

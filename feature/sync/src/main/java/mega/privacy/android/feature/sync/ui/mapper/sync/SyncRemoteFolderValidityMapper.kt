@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.ui.mapper.sync
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.shared.resources.R as sharedR
@@ -33,7 +33,7 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
     suspend operator fun invoke(nodeId: NodeId): SyncValidityResult {
         // Check if DCIMSelectionAsSyncBackup feature flag is enabled
         val isFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         }.getOrElse {
             Timber.e(it, "Error checking feature flag")
             false

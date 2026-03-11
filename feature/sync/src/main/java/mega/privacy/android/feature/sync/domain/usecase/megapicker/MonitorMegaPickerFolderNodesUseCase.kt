@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolderUseCase
 import mega.privacy.android.domain.usecase.backup.GetBackupInfoUseCase
 import mega.privacy.android.domain.usecase.backup.GetDeviceIdAndNameMapUseCase
@@ -67,7 +67,7 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         folderName: String?,
     ): Flow<MegaPickerFolderResult> = flow {
         val isFeatureEnabled =
-            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         val currentDeviceId = runCatching { getDeviceIdUseCase() }.getOrNull()
         val syncedNodeIds = runCatching {
             getSyncedNodeIdsUseCase()

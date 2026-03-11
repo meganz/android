@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeRelationship
 import mega.privacy.android.domain.extension.TimeCache
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
     ): FolderUsageResult {
         // Check if DCIMSelectionAsSyncBackup feature flag is enabled
         val isFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         }.getOrElse {
             false
         }

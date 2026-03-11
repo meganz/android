@@ -112,6 +112,15 @@ enum class ApiFeatures(
         singleCheckPerRun = true,
         defaultValue = false
     ),
+
+    /**
+     * Enable DCIM folder to be selected as Sync/Backup and detect cross device Sync/CU cloud folder conflicts
+     */
+    DCIMSelectionAsSyncBackup(
+        experimentName = "dcims",
+        description = "Enable DCIM folder to be selected as Sync/Backup and detect cross device Sync/CU cloud folder conflicts",
+        defaultValue = false
+    ),
     ;
 
     companion object : FeatureFlagValueProvider {

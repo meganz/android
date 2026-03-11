@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.GetLocalSyncOrBackupUriPathUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCase
@@ -24,7 +24,7 @@ class HasLocalFolderConflictWithSyncUseCase @Inject constructor(
      */
     suspend operator fun invoke(localFolderPath: String): Boolean {
         val isFeatureEnabled = runCatching {
-            getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+            getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         }.getOrElse { false }
 
         if (!isFeatureEnabled) {

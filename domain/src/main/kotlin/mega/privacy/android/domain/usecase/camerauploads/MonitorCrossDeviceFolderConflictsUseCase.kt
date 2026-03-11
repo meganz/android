@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.flow
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.featuretoggle.DomainFeatures
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -37,7 +37,7 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
     }
 
     private suspend fun isFeatureEnabled(): Boolean {
-        return getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
+        return getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
     }
 
     /**
