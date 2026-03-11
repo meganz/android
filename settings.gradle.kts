@@ -80,8 +80,9 @@ include(":feature:photos:photos-snowflake-components")
 include(":feature:contact:contact")
 include(":feature:contact:contact-snowflake-components")
 include(":feature:pdfviewer")
-
 include(":core:ui-components:shared-components")
+include(":shared:nodes")
+
 // Configure modules to use their own name as the build file name
 // app/build.gradle.kts -> app/app.gradle.kts
 // features/home/build.gradle.kts -> features/home/home.gradle.kts

@@ -33,6 +33,7 @@ class ArchitecturePlugin : Plugin<Project> {
         dependencyLayer: ArchitectureLayer,
     ) {
         if (dependencyLayer.path in dependencyExceptions) return
+        if (moduleLayer.path in moduleExceptions) return
         if ((dependencyLayer as? ArchitectureLayer.SnowFlake)?.validFor(moduleLayer) == false) {
             throw GradleException("Snowflake layer module '${dependencyLayer.path}' cannot be used for not related modules '${moduleLayer.path}'.")
         }
@@ -54,6 +55,10 @@ class ArchitecturePlugin : Plugin<Project> {
         ":feature:transfers:transfers-snowflake-components",
         ":shared:resources",
         ":shared:original-core-ui",
+    )
+
+    private val moduleExceptions = listOf(
+        ":core:ui-components:node-components", //this module will be deleted because it's not following the architecture itself
     )
 
     sealed interface ArchitectureLayer {
