@@ -401,7 +401,7 @@ internal class CameraUploadsWorkerTest {
         // mock folder conflict checks
         whenever(monitorCrossDeviceFolderConflictsUseCase()).thenReturn(emptyFlow())
         whenever(hasLocalFolderConflictWithSyncUseCase(any())).thenReturn(false)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any()))
+        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any(), any()))
             .thenReturn(FolderUsageResult.NotUsed)
     }
 
@@ -1842,7 +1842,7 @@ internal class CameraUploadsWorkerTest {
     fun `test that the worker returns failure when remote folder conflicts with sync or backup`() =
         runTest {
             setupDefaultCheckConditionMocks()
-            whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any()))
+            whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(any(), any(), any(), any()))
                 .thenReturn(FolderUsageResult.UsedBySyncOrBackup(null))
 
             val result = underTest.doWork()
@@ -1917,6 +1917,7 @@ internal class CameraUploadsWorkerTest {
             verify(hasLocalFolderConflictWithSyncUseCase).invoke(primaryLocalPath)
             verify(hasLocalFolderConflictWithSyncUseCase).invoke("secondaryPath")
             verify(isFolderUsedBySyncOrBackupAcrossDevicesUseCase, times(2)).invoke(
+                any(),
                 any(),
                 any(),
                 any()

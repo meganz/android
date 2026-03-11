@@ -6,6 +6,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.FolderUsageResult
@@ -26,8 +29,8 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.SetSyncWorkerForegroundPreferenceUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.SetUserPausedSyncUseCase
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
@@ -38,9 +41,10 @@ import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
 @ExperimentalCoroutinesApi
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class MonitorSyncsUseCaseTest {
 
+    private lateinit var testDispatcher: TestDispatcher
+    private lateinit var testScope: TestScope
     private val syncRepository: SyncRepository = mock()
     private val changeSyncLocalRootUseCase: ChangeSyncLocalRootUseCase = mock()
     private val resumeSyncUseCase: ResumeSyncUseCase = mock()
@@ -53,17 +57,25 @@ internal class MonitorSyncsUseCaseTest {
     private val setUserPausedSyncUseCase: SetUserPausedSyncUseCase = mock()
     private val syncNotificationRepository: SyncNotificationRepository = mock()
 
-    private val underTest = MonitorSyncsUseCaseImpl(
-        syncRepository = syncRepository,
-        changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
-        resumeSyncUseCase = resumeSyncUseCase,
-        canReadUriUseCase = canReadUriUseCase,
-        setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
-        isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
-        pauseSyncUseCase = pauseSyncUseCase,
-        setUserPausedSyncUseCase = setUserPausedSyncUseCase,
-        syncNotificationRepository = syncNotificationRepository
-    )
+    private lateinit var underTest: MonitorSyncsUseCaseImpl
+
+    @BeforeEach
+    fun setup() {
+        testDispatcher = UnconfinedTestDispatcher()
+        testScope = TestScope(testDispatcher)
+        underTest = MonitorSyncsUseCaseImpl(
+            syncRepository = syncRepository,
+            changeSyncLocalRootUseCase = changeSyncLocalRootUseCase,
+            resumeSyncUseCase = resumeSyncUseCase,
+            canReadUriUseCase = canReadUriUseCase,
+            setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase = isFolderUsedBySyncOrBackupAcrossDevicesUseCase,
+            pauseSyncUseCase = pauseSyncUseCase,
+            setUserPausedSyncUseCase = setUserPausedSyncUseCase,
+            syncNotificationRepository = syncNotificationRepository,
+            coroutineScope = testScope
+        )
+    }
 
     private val validFolderPairs = listOf(
         FolderPair(
@@ -189,7 +201,8 @@ internal class MonitorSyncsUseCaseTest {
     }
 
     @Test
-    fun `test that duplicate emissions are filtered and rapid emissions are conflated`() = runTest {
+    fun `test that duplicate emissions are filtered and rapid emissions are conflated`() =
+        runTest(testDispatcher) {
         val folderPair = validFolderPairs.first()
         val invalidFolderPair = invalidFolderPairs.first()
         val emissions = listOf(
@@ -337,6 +350,7 @@ internal class MonitorSyncsUseCaseTest {
             }
         }
 
+
     @Test
     fun `test that setSyncWorkerForegroundPreference is not called when sync list is empty`() =
         runTest {
@@ -369,7 +383,8 @@ internal class MonitorSyncsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = conflictingSync.remoteFolder.id,
                     shouldCheckCameraUploads = true,
-                    shouldExcludeCurrentDevice = true
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
                 )
             ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
 
@@ -393,7 +408,8 @@ internal class MonitorSyncsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = sync.remoteFolder.id,
                     shouldCheckCameraUploads = true,
-                    shouldExcludeCurrentDevice = true
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
                 )
             ).thenReturn(FolderUsageResult.NotUsed)
         }
@@ -418,7 +434,8 @@ internal class MonitorSyncsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = conflictingSync.remoteFolder.id,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
 
@@ -442,7 +459,8 @@ internal class MonitorSyncsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = sync.remoteFolder.id,
                     shouldCheckCameraUploads = true,
-                    shouldExcludeCurrentDevice = true
+                    shouldExcludeCurrentDevice = true,
+                    useCache = true,
                 )
             ).thenReturn(FolderUsageResult.NotUsed)
         }
@@ -467,7 +485,8 @@ internal class MonitorSyncsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = conflictingSync.remoteFolder.id,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device-id"))
 
@@ -494,7 +513,8 @@ internal class MonitorSyncsUseCaseTest {
                     isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                         nodeId = sync.remoteFolder.id,
                         shouldCheckCameraUploads = true,
-                        shouldExcludeCurrentDevice = true
+                        shouldExcludeCurrentDevice = true,
+                        useCache = true,
                     )
                 ).thenReturn(FolderUsageResult.UsedByCameraUpload)
             }

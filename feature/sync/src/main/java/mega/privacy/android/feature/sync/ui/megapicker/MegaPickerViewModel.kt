@@ -103,7 +103,8 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                                 nodeId = currentFolder.id,
                                 shouldCheckCameraUploads = true,
-                                shouldExcludeCurrentDevice = false
+                                shouldExcludeCurrentDevice = false,
+                                useCache = false,
                             )
                         } ?: FolderUsageResult.NotUsed
                     }.getOrNull() ?: FolderUsageResult.NotUsed

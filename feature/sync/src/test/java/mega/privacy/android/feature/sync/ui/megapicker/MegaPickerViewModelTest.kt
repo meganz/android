@@ -70,7 +70,6 @@ internal class MegaPickerViewModelTest {
     private val monitorMegaPickerFolderNodesUseCase: MonitorMegaPickerFolderNodesUseCase = mock()
 
     private val typedNodeUiModels: List<TypedNodeUiModel> = emptyList()
-    private val childrenNodes: List<TypedNode> = emptyList()
 
     private lateinit var underTest: MegaPickerViewModel
 
@@ -117,9 +116,6 @@ internal class MegaPickerViewModelTest {
         val rootFolderId = NodeId(123456L)
         val cameraUploadsFolderId = NodeId(146L)
         val mediaUploadsFolderId = NodeId(147L)
-        val mediaUploadsFolder = mock<TypedNode> {
-            on { id } doReturn mediaUploadsFolderId
-        }
         val chatFilesFolderId = NodeId(3211L)
         val rootFolder: FolderNode = mock {
             on { id } doReturn rootFolderId
@@ -717,12 +713,7 @@ internal class MegaPickerViewModelTest {
             parentNodeId = parentFolderId
         )
         verify(getNodeByHandleUseCase).invoke(newFolderId.longValue)
-        verify(monitorMegaPickerFolderNodesUseCase, never()).invoke(
-            any(),
-            nullable(NodeId::class.java),
-            anyBoolean(),
-            nullable(String::class.java)
-        )
+        verifyNoInteractions(monitorMegaPickerFolderNodesUseCase)
     }
 
     @Test
@@ -969,7 +960,6 @@ internal class MegaPickerViewModelTest {
         val childFolder: TypedNode = mock {
             on { id } doReturn childFolderId
         }
-        val childrenNodesWithFolder = listOf(childFolder)
 
         whenever(getRootNodeUseCase()).thenReturn(rootFolder)
         whenever(nodeExistsInCurrentLocationUseCase(any(), any())).thenReturn(false)
@@ -1135,7 +1125,8 @@ internal class MegaPickerViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = false,
             )
         ).thenReturn(FolderUsageResult.UsedByCameraUpload)
 
@@ -1167,7 +1158,8 @@ internal class MegaPickerViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = false,
             )
         ).thenReturn(FolderUsageResult.UsedByMediaUpload)
 
@@ -1199,7 +1191,8 @@ internal class MegaPickerViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = false,
             )
         ).thenReturn(FolderUsageResult.UsedBySyncOrBackup(deviceId = "device123"))
 
@@ -1231,7 +1224,8 @@ internal class MegaPickerViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = false,
             )
         ).thenReturn(FolderUsageResult.UsedByCameraUploadParent)
 
@@ -1265,7 +1259,8 @@ internal class MegaPickerViewModelTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     nodeId = currentFolderId,
                     shouldCheckCameraUploads = true,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = false,
                 )
             ).thenThrow(RuntimeException("API error"))
 
@@ -1300,7 +1295,8 @@ internal class MegaPickerViewModelTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = currentFolderId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = false,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
 
@@ -1468,7 +1464,6 @@ internal class MegaPickerViewModelTest {
     fun `test that child nodes are not disabled when determineNodeRelationshipUseCase returns NoMatch`() =
         runTest {
             val rootFolderId = NodeId(123456L)
-            val backupFolderId = NodeId(999L)
             val clickedFolderId = NodeId(555L)
             val childFolderId = NodeId(789L)
             val rootFolder: FolderNode = mock {

@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.sync.domain.usecase.megapicker
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -25,7 +27,7 @@ import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerFolderResult
 import mega.privacy.android.feature.sync.domain.entity.megapicker.MegaPickerNodeInfo
-import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncedNodeIdsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,7 +40,7 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
     private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase,
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase,
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase,
-    private val getFolderPairsUseCase: GetFolderPairsUseCase,
+    private val getSyncedNodeIdsUseCase: GetSyncedNodeIdsUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getBackupInfoUseCase: GetBackupInfoUseCase,
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
@@ -67,17 +69,21 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         val isFeatureEnabled =
             getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup)
         val currentDeviceId = runCatching { getDeviceIdUseCase() }.getOrNull()
-
+        val syncedNodeIds = runCatching {
+            getSyncedNodeIdsUseCase()
+        }.getOrElse {
+            Timber.e(it, "Error getting synced node ids")
+            emptyList()
+        }
         val excludeFolders = if (currentFolder.id == rootFolderId) {
             runCatching {
-                buildExcludeFoldersAtRoot()
+                buildExcludeFoldersAtRoot(syncedNodeIds)
             }.onFailure {
-                Timber.d(it, "Error getting handles of CU and MyChat files")
+                Timber.e(it, "Error getting handles of CU and MyChat files")
             }.getOrNull()
         } else {
             null
         }
-
         val syncBackupInfoListOtherDevice = runCatching {
             if (isFeatureEnabled) {
                 getBackupInfoUseCase()
@@ -95,21 +101,12 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             Timber.d(it, "Error getting backup info for folder usage check")
             emptyList()
         }
-
         val deviceNameMap = runCatching {
             getDeviceIdAndNameMapUseCase()
         }.getOrElse {
             Timber.d(it, "Error getting device name map")
             emptyMap()
         }
-
-        val syncedFolderIds = runCatching {
-            getFolderPairsUseCase().map { it.remoteFolder.id }
-        }.getOrElse {
-            Timber.d(it, "Error getting folder pairs for sync usage check")
-            emptyList()
-        }
-
         val isSelectEnabledForStopBackup = if (isStopBackup) {
             runCatching {
                 folderName?.let {
@@ -129,13 +126,11 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
                     }
                 }.getOrNull()
             }.toMap()
-
         getTypedNodesFromFolder(currentFolder.id)
             .catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
             }
             .collect { childFolders ->
-                // Pre-fetch paths only for folder nodes (files don't need path comparison for backup check)
                 val folderNodePaths: Map<NodeId, String> = childFolders
                     .filterIsInstance<FolderNode>()
                     .mapNotNull { node ->
@@ -155,7 +150,7 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
                         backupPaths = backupPaths,
                         syncBackupInfoListOtherDevice = syncBackupInfoListOtherDevice,
                         deviceNameMap = deviceNameMap,
-                        syncedFolderIds = syncedFolderIds,
+                        syncedFolderIds = syncedNodeIds,
                     )
                 }
 
@@ -175,23 +170,22 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             }
     }
 
-    private suspend fun buildExcludeFoldersAtRoot(): List<NodeId>? {
-        val cameraUploadsFolderHandle =
-            getCameraUploadsFolderHandleUseCase().takeIf { isCameraUploadsEnabledUseCase() }
-        val mediaUploadsFolderHandle =
-            getMediaUploadsFolderHandleUseCase()?.id.takeIf { isMediaUploadsEnabledUseCase() }
-        val myChatsUploadsFolderHandle = getMyChatsFilesFolderIdUseCase()
-        val syncedFolderHandles = getFolderPairsUseCase().map { it.remoteFolder.id }
+    private suspend fun buildExcludeFoldersAtRoot(syncedNodeIds: List<NodeId>): List<NodeId>? =
+        coroutineScope {
+            val cameraUploadsFolderHandle =
+                async { getCameraUploadsFolderHandleUseCase().takeIf { isCameraUploadsEnabledUseCase() } }
+            val mediaUploadsFolderHandle =
+                async { getMediaUploadsFolderHandleUseCase()?.id.takeIf { isMediaUploadsEnabledUseCase() } }
+            val myChatsUploadsFolderHandle = async { getMyChatsFilesFolderIdUseCase() }
 
-        val list = listOfNotNull(
-            cameraUploadsFolderHandle?.let { NodeId(it) },
-            mediaUploadsFolderHandle,
-            myChatsUploadsFolderHandle,
-        ).filterNot { it == NodeId(-1L) }
-            .plus(syncedFolderHandles)
+            val list = listOfNotNull(
+                cameraUploadsFolderHandle.await()?.let { NodeId(it) },
+                mediaUploadsFolderHandle.await(),
+                myChatsUploadsFolderHandle.await(),
+            ).filterNot { it == NodeId(-1L) }.plus(syncedNodeIds)
 
-        return list.ifEmpty { null }
-    }
+            return@coroutineScope list.ifEmpty { null }
+        }
 
     private fun mapNodeToMegaPickerNodeInfo(
         node: TypedNode,

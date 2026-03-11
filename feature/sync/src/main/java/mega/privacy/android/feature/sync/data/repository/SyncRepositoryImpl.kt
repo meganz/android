@@ -86,15 +86,15 @@ internal class SyncRepositoryImpl @Inject constructor(
             .getOrElse { emptyList() }
     }
 
-    private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> =
-        (0 until model.size())
+    private suspend fun mapToDomain(model: MegaSyncList): List<FolderPair> {
+        val storageUsedPercentage =
+            (100 * accountRepository.getUsedStorage() / accountRepository.getMaxStorage()).toInt()
+        return (0 until model.size())
             .map { index ->
                 val folderPairModel = model.get(index)
                 val megaFolderName =
                     megaApiGateway.getMegaNodeByHandle(folderPairModel.megaHandle)?.name ?: ""
                 val syncStats = syncStatsCacheGateway.getSyncStatsById(folderPairModel.backupId)
-                val storageUsedPercentage =
-                    (100 * accountRepository.getUsedStorage() / accountRepository.getMaxStorage()).toInt()
                 folderPairMapper(
                     model = folderPairModel,
                     megaFolderName = megaFolderName,
@@ -102,6 +102,8 @@ internal class SyncRepositoryImpl @Inject constructor(
                     isStorageOverQuota = storageUsedPercentage >= FULL_STORAGE_PERCENTAGE,
                 )
             }
+    }
+
 
     override suspend fun removeFolderPair(folderPairId: Long) = withContext(ioDispatcher) {
         syncGateway.removeFolderPair(folderPairId)
@@ -200,6 +202,15 @@ internal class SyncRepositoryImpl @Inject constructor(
         newLocalSyncRootUri: String,
     ): Long? = withContext(ioDispatcher) {
         syncGateway.changeSyncLocalRoot(syncBackupId, newLocalSyncRootUri)
+    }
+
+    override suspend fun getSyncedNodeIds(): List<NodeId> = withContext(ioDispatcher) {
+        runCatching {
+            val megaSyncList = syncGateway.getFolderPairs()
+            (0 until megaSyncList.size()).map { index ->
+                NodeId(megaSyncList.get(index).megaHandle)
+            }
+        }.getOrElse { emptyList() }
     }
 
     private companion object {

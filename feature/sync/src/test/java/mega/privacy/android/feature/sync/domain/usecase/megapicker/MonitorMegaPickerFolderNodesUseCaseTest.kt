@@ -24,9 +24,7 @@ import mega.privacy.android.domain.usecase.chat.GetMyChatsFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFullNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
-import mega.privacy.android.feature.sync.domain.entity.FolderPair
-import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
-import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncedNodeIdsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,7 +42,7 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
     private val getCameraUploadsFolderHandleUseCase: GetPrimarySyncHandleUseCase = mock()
     private val getMediaUploadsFolderHandleUseCase: GetSecondaryFolderNodeUseCase = mock()
     private val getMyChatsFilesFolderIdUseCase: GetMyChatsFilesFolderIdUseCase = mock()
-    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
+    private val getSyncedNodeIdsUseCase: GetSyncedNodeIdsUseCase = mock()
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val getBackupInfoUseCase: GetBackupInfoUseCase = mock()
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
@@ -63,7 +61,7 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             getCameraUploadsFolderHandleUseCase = getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase = getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase = getMyChatsFilesFolderIdUseCase,
-            getFolderPairsUseCase = getFolderPairsUseCase,
+            getSyncedNodeIdsUseCase = getSyncedNodeIdsUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getBackupInfoUseCase = getBackupInfoUseCase,
             getDeviceIdUseCase = getDeviceIdUseCase,
@@ -82,7 +80,7 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             getCameraUploadsFolderHandleUseCase,
             getMediaUploadsFolderHandleUseCase,
             getMyChatsFilesFolderIdUseCase,
-            getFolderPairsUseCase,
+            getSyncedNodeIdsUseCase,
             getFeatureFlagValueUseCase,
             getBackupInfoUseCase,
             getDeviceIdUseCase,
@@ -107,7 +105,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
             underTest(rootFolder, rootFolderId, false, null).test {
                 val result = awaitItem()
@@ -117,7 +119,6 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
                 awaitComplete()
             }
         }
-
     @Test
     fun `test that isSelectEnabled is true when currentFolder is not root`() = runTest {
         val rootFolderId = NodeId(123L)
@@ -126,6 +127,9 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
         val childFolder: FolderNode = mock { on { id } doReturn childFolderId }
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(false)
+        whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+        whenever(getDeviceIdUseCase()).thenReturn(null)
+        whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
         whenever(getTypedNodesFromFolder(childFolderId)).thenReturn(flowOf(emptyList()))
 
         underTest(childFolder, rootFolderId, false, null).test {
@@ -149,7 +153,9 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
         whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(cuFolderId.longValue)
         whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+        whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+        whenever(getDeviceIdUseCase()).thenReturn(null)
+        whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
         whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flowOf(listOf(cuFolder)))
 
         underTest(rootFolder, rootFolderId, false, null).test {
@@ -175,7 +181,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flowOf(listOf(childNode)))
 
             underTest(rootFolder, rootFolderId, false, null).test {
@@ -198,6 +208,9 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             }
             whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
                 .thenReturn(false)
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
             whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(emptyList()))
             whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName))
                 .thenReturn(true)
@@ -221,18 +234,9 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
         whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
         whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
         whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-        whenever(getFolderPairsUseCase()).thenReturn(
-            listOf(
-                FolderPair(
-                    id = 1L,
-                    syncType = mega.privacy.android.domain.entity.sync.SyncType.TYPE_TWOWAY,
-                    pairName = "Sync",
-                    localFolderPath = "/path",
-                    remoteFolder = RemoteFolder(syncedRemoteId, "Remote"),
-                    syncStatus = mega.privacy.android.feature.sync.domain.entity.SyncStatus.SYNCED,
-                )
-            )
-        )
+        whenever(getSyncedNodeIdsUseCase()).thenReturn(listOf(syncedRemoteId))
+        whenever(getDeviceIdUseCase()).thenReturn(null)
+        whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
         whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(flowOf(listOf(syncedFolder)))
 
         underTest(rootFolder, rootFolderId, false, null).test {
@@ -254,7 +258,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             whenever(getTypedNodesFromFolder(rootFolderId)).thenReturn(
                 kotlinx.coroutines.flow.flow { throw RuntimeException("Network error") }
             )
@@ -286,9 +294,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
             whenever(getDeviceIdUseCase()).thenReturn("device1")
             whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             whenever(getTypedNodesFromFolder(parentFolderId))
                 .thenReturn(flowOf(listOf<TypedNode>(syncedChild, otherChild)))
             // Mock path lookups: syncedChild path matches backup path (ExactMatch)
@@ -321,7 +331,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
             whenever(getTypedNodesFromFolder(parentFolderId)).thenReturn(flowOf(listOf(childNode)))
 
             underTest(parentFolder, rootFolderId, false, null).test {
@@ -350,18 +364,9 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(
-                listOf(
-                    FolderPair(
-                        id = 1L,
-                        syncType = mega.privacy.android.domain.entity.sync.SyncType.TYPE_TWOWAY,
-                        pairName = "Sync",
-                        localFolderPath = "/path",
-                        remoteFolder = RemoteFolder(syncedChildId, "Synced"),
-                        syncStatus = mega.privacy.android.feature.sync.domain.entity.SyncStatus.SYNCED,
-                    )
-                )
-            )
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(listOf(syncedChildId))
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
             whenever(getTypedNodesFromFolder(parentFolderId))
                 .thenReturn(flowOf(listOf(syncedChild, otherChild)))
 
@@ -403,9 +408,11 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             whenever(getCameraUploadsFolderHandleUseCase()).thenReturn(-1L)
             whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
             whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
-            whenever(getFolderPairsUseCase()).thenReturn(emptyList())
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
             whenever(getDeviceIdUseCase()).thenReturn("device1")
             whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
 
             // When loading root folder, parent is shown as child
             whenever(getTypedNodesFromFolder(rootFolderId))

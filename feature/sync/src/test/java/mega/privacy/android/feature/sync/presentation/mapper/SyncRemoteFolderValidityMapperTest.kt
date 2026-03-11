@@ -74,7 +74,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedByCameraUpload)
 
         val result = underTest(nodeId)
@@ -90,7 +97,7 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true, false))
             .thenReturn(FolderUsageResult.UsedByCameraUploadChild)
 
         val result = underTest(nodeId)
@@ -106,7 +113,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedByCameraUploadParent)
 
         val result = underTest(nodeId)
@@ -124,7 +138,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedByMediaUpload)
 
         val result = underTest(nodeId)
@@ -140,7 +161,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedByMediaUploadChild)
 
         val result = underTest(nodeId)
@@ -156,7 +184,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedByMediaUploadParent)
 
         val result = underTest(nodeId)
@@ -174,7 +209,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedBySyncOrBackup("device-id"))
 
         val result = underTest(nodeId)
@@ -190,7 +232,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedBySyncOrBackupParent("device-id"))
 
         val result = underTest(nodeId)
@@ -206,7 +255,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.UsedBySyncOrBackupChild("device-id"))
 
         val result = underTest(nodeId)
@@ -224,7 +280,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenReturn(FolderUsageResult.NotUsed)
 
         val result = underTest(nodeId)
@@ -239,7 +302,14 @@ class SyncRemoteFolderValidityMapperTest {
         val nodeId = NodeId(123L)
         whenever(getFeatureFlagValueUseCase(DomainFeatures.DCIMSelectionAsSyncBackup))
             .thenReturn(true)
-        whenever(isFolderUsedBySyncOrBackupAcrossDevicesUseCase(nodeId, true, true))
+        whenever(
+            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = true,
+                useCache = false
+            )
+        )
             .thenThrow(RuntimeException("Test exception"))
 
         val result = underTest(nodeId)

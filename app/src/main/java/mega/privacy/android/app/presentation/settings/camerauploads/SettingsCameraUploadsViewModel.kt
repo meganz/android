@@ -877,6 +877,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     nodeId = newPrimaryFolderNodeId,
                     shouldCheckCameraUploads = false,
                     shouldExcludeCurrentDevice = false,
+                    useCache = false,
                 )
                 if (folderUsage != FolderUsageResult.NotUsed) {
                     showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)
@@ -968,6 +969,7 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
                     nodeId = newSecondaryFolderNodeId,
                     shouldCheckCameraUploads = false,
                     shouldExcludeCurrentDevice = false,
+                    useCache = false,
                 )
                 if (folderUsage != FolderUsageResult.NotUsed) {
                     showSnackbar(SharedR.string.error_folder_part_of_sync_or_backup)

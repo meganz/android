@@ -4,10 +4,12 @@ import mega.privacy.android.domain.entity.backup.BackupInfoType
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeRelationship
+import mega.privacy.android.domain.extension.TimeCache
 import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * Use case to check if a folder is used by Sync or Backup across devices
@@ -18,10 +20,15 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
     private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) {
+    private val cachedBackups = TimeCache(CACHE_DURATION) {
+        getBackupInfoUseCase()
+    }
+
     suspend operator fun invoke(
         nodeId: NodeId,
         shouldCheckCameraUploads: Boolean,
         shouldExcludeCurrentDevice: Boolean,
+        useCache: Boolean,
     ): FolderUsageResult {
         // Check if DCIMSelectionAsSyncBackup feature flag is enabled
         val isFeatureEnabled = runCatching {
@@ -33,36 +40,53 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
             return FolderUsageResult.NotUsed
         }
 
-        val backups = getBackupInfoUseCase()
-                .filterNot { shouldExcludeCurrentDevice && it.deviceId == getDeviceIdUseCase() }
+        val allBackups = if (useCache) {
+            cachedBackups.get()
+        } else {
+            cachedBackups.refresh()
+        }
+
+        val currentDeviceId = if (shouldExcludeCurrentDevice) {
+            getDeviceIdUseCase()
+        } else {
+            null
+        }
+
+        val backups = allBackups
+            .filterNot { shouldExcludeCurrentDevice && currentDeviceId != null && it.deviceId == currentDeviceId }
             .filter {
                 it.type == BackupInfoType.BACKUP_UPLOAD
                         || it.type == BackupInfoType.TWO_WAY_SYNC
-                        || (shouldCheckCameraUploads && it.type == BackupInfoType.CAMERA_UPLOADS || it.type == BackupInfoType.MEDIA_UPLOADS)
+                        || (shouldCheckCameraUploads && (it.type == BackupInfoType.CAMERA_UPLOADS || it.type == BackupInfoType.MEDIA_UPLOADS))
             }
+
         for (backup in backups) {
             when (backup.type) {
                 BackupInfoType.CAMERA_UPLOADS -> {
-                    checkCameraUploadsRelationship(nodeId, backup.rootHandle)?.let { return it }
+                    val result = checkCameraUploadsRelationship(nodeId, backup.rootHandle)
+                    result?.let { return it }
                 }
 
                 BackupInfoType.MEDIA_UPLOADS -> {
-                    checkMediaUploadsRelationship(nodeId, backup.rootHandle)?.let { return it }
+                    val result = checkMediaUploadsRelationship(nodeId, backup.rootHandle)
+                    result?.let { return it }
                 }
 
                 else -> {
                     // If not related to Camera/Media Uploads, check all backup entries
-                    val relationship =
-                        determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
+                    val relationship = determineNodeRelationshipUseCase(nodeId, backup.rootHandle)
                     when (relationship) {
-                        NodeRelationship.ExactMatch ->
+                        NodeRelationship.ExactMatch -> {
                             return FolderUsageResult.UsedBySyncOrBackup(backup.deviceId)
+                        }
 
-                        NodeRelationship.TargetIsAncestor ->
+                        NodeRelationship.TargetIsAncestor -> {
                             return FolderUsageResult.UsedBySyncOrBackupChild(backup.deviceId)
+                        }
 
-                        NodeRelationship.TargetIsDescendant ->
+                        NodeRelationship.TargetIsDescendant -> {
                             return FolderUsageResult.UsedBySyncOrBackupParent(backup.deviceId)
+                        }
 
                         else -> { /* continue checking other backups */
                         }
@@ -82,7 +106,8 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         nodeId: NodeId,
         cameraUploadsNodeId: NodeId,
     ): FolderUsageResult? {
-        return when (determineNodeRelationshipUseCase(nodeId, cameraUploadsNodeId)) {
+        val relationship = determineNodeRelationshipUseCase(nodeId, cameraUploadsNodeId)
+        return when (relationship) {
             NodeRelationship.ExactMatch -> FolderUsageResult.UsedByCameraUpload
             NodeRelationship.TargetIsAncestor -> FolderUsageResult.UsedByCameraUploadChild
             NodeRelationship.TargetIsDescendant -> FolderUsageResult.UsedByCameraUploadParent
@@ -98,7 +123,8 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         nodeId: NodeId,
         mediaUploadsNodeId: NodeId,
     ): FolderUsageResult? {
-        return when (determineNodeRelationshipUseCase(nodeId, mediaUploadsNodeId)) {
+        val relationship = determineNodeRelationshipUseCase(nodeId, mediaUploadsNodeId)
+        return when (relationship) {
             NodeRelationship.ExactMatch -> FolderUsageResult.UsedByMediaUpload
             NodeRelationship.TargetIsAncestor -> FolderUsageResult.UsedByMediaUploadChild
             NodeRelationship.TargetIsDescendant -> FolderUsageResult.UsedByMediaUploadParent
@@ -106,3 +132,5 @@ class IsFolderUsedBySyncOrBackupAcrossDevicesUseCase @Inject constructor(
         }
     }
 }
+
+private val CACHE_DURATION = 5.minutes

@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sync.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
@@ -11,15 +10,15 @@ import mega.privacy.android.feature.sync.domain.entity.RemoteFolder
 import mega.privacy.android.feature.sync.domain.entity.SyncDebris
 import mega.privacy.android.feature.sync.domain.entity.SyncStatus
 import mega.privacy.android.feature.sync.domain.repository.SyncDebrisRepository
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.GetSyncDebrisSizeInBytesUseCase
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -27,18 +26,18 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
 
     private lateinit var underTest: GetSyncDebrisSizeInBytesUseCase
 
-    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val syncDebrisRepository: SyncDebrisRepository = mock()
 
     @BeforeAll
     fun setup() {
-        underTest = GetSyncDebrisSizeInBytesUseCase(monitorSyncsUseCase, syncDebrisRepository)
+        underTest = GetSyncDebrisSizeInBytesUseCase(getFolderPairsUseCase, syncDebrisRepository)
     }
 
     @BeforeEach
     fun resetMocks() {
         reset(
-            monitorSyncsUseCase, syncDebrisRepository
+            getFolderPairsUseCase, syncDebrisRepository
         )
     }
 
@@ -66,7 +65,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
             val syncs = listOf(firstSync, secondSync)
             val expectedDebrisSize = firstSyncDebrisSizeInBytes + secondSyncDebrisSizeInBytes
 
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+            whenever(getFolderPairsUseCase()).thenReturn(syncs)
             whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(
                 listOf(
                     SyncDebris(
@@ -111,7 +110,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
             val syncs = listOf(firstSync, secondSync)
             val expectedDebrisSize = firstSyncDebrisSizeInBytes + secondSyncDebrisSizeInBytes
 
-            whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+            whenever(getFolderPairsUseCase()).thenReturn(syncs)
             whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(
                 listOf(
                     SyncDebris(
@@ -136,12 +135,12 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
     fun `test that get sync debris size returns zero when no syncs exist`() = runTest {
         val syncs = emptyList<FolderPair>()
 
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+        whenever(getFolderPairsUseCase()).thenReturn(syncs)
 
         val actualDebrisSize = underTest()
 
         assertThat(actualDebrisSize).isEqualTo(0L)
-        verify(syncDebrisRepository).getSyncDebrisForSyncs(syncs)
+        verifyNoInteractions(syncDebrisRepository)
     }
 
     @Test
@@ -156,7 +155,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
         )
         val syncs = listOf(firstSync)
 
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+        whenever(getFolderPairsUseCase()).thenReturn(syncs)
         whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(emptyList())
 
         val actualDebrisSize = underTest()
@@ -187,7 +186,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
         val syncs = listOf(pathBasedSync, uriBasedSync)
         val expectedDebrisSize = pathBasedDebrisSize + uriBasedDebrisSize
 
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+        whenever(getFolderPairsUseCase()).thenReturn(syncs)
         whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(
             listOf(
                 SyncDebris(
@@ -231,7 +230,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
         val syncs = listOf(firstSync, secondSync)
         val expectedDebrisSize = firstSyncDebrisSizeInBytes + secondSyncDebrisSizeInBytes
 
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+        whenever(getFolderPairsUseCase()).thenReturn(syncs)
         whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(
             listOf(
                 SyncDebris(
@@ -275,7 +274,7 @@ internal class GetSyncDebrisSizeInBytesUseCaseTest {
         val syncs = listOf(firstSync, secondSync)
         val expectedDebrisSize = firstSyncDebrisSizeInBytes + secondSyncDebrisSizeInBytes
 
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(syncs))
+        whenever(getFolderPairsUseCase()).thenReturn(syncs)
         whenever(syncDebrisRepository.getSyncDebrisForSyncs(syncs)).thenReturn(
             listOf(
                 SyncDebris(

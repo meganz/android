@@ -3,7 +3,7 @@ package mega.privacy.android.feature.sync.domain.usecase.worker
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.sync.domain.repository.SyncRepository
-import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.GetFolderPairsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.GetSyncFrequencyUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.worker.StartSyncWorkerUseCase
@@ -20,18 +20,18 @@ internal class StartSyncWorkerUseCaseTest {
     private val syncRepository: SyncRepository = mock()
     private val getSyncFrequencyUseCase: GetSyncFrequencyUseCase = mock()
     private val getSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
-    private val monitorSyncsUseCase: MonitorSyncsUseCase = mock()
+    private val getFolderPairsUseCase: GetFolderPairsUseCase = mock()
     private val underTest: StartSyncWorkerUseCase =
         StartSyncWorkerUseCase(
             syncRepository,
             getSyncFrequencyUseCase,
             getSyncByWiFiUseCase,
-            monitorSyncsUseCase
+            getFolderPairsUseCase
         )
 
     @Test
     fun `test that invoke calls sync repository start sync worker method`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(listOf(mock())))
+        whenever(getFolderPairsUseCase()).thenReturn(listOf(mock()))
         whenever(getSyncFrequencyUseCase()).thenReturn(15)
         whenever(getSyncByWiFiUseCase()).thenReturn(flowOf(true))
 
@@ -42,7 +42,7 @@ internal class StartSyncWorkerUseCaseTest {
 
     @Test
     fun `test that start sync worker will not run if there are no syncs`() = runTest {
-        whenever(monitorSyncsUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(getFolderPairsUseCase()).thenReturn(emptyList())
         whenever(getSyncFrequencyUseCase()).thenReturn(15)
         whenever(getSyncByWiFiUseCase()).thenReturn(flowOf(true))
 

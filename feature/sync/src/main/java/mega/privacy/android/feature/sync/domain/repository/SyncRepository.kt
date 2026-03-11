@@ -119,4 +119,10 @@ interface SyncRepository {
         syncBackupId: Long,
         newLocalSyncRootUri: String,
     ): Long?
+
+    /**
+     * Returns the remote folder NodeIds of all synced folders.
+     * Lightweight alternative to getFolderPairs() when only IDs are needed.
+     */
+    suspend fun getSyncedNodeIds(): List<NodeId>
 }

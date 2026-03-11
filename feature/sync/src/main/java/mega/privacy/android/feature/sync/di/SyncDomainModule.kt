@@ -14,6 +14,7 @@ import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.MonitorSyncsUseCaseImpl
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.PauseResumeSyncsBasedOnBatteryAndWiFiUseCaseImpl
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -24,6 +25,7 @@ internal interface SyncDomainModule {
      *
      */
     @Binds
+    @Singleton
     fun bindMonitorSyncsUseCase(impl: MonitorSyncsUseCaseImpl): MonitorSyncsUseCase
 
     @Binds

@@ -83,7 +83,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -107,7 +108,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(FolderUsageResult.UsedByCameraUpload)
 
@@ -130,7 +132,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
 
@@ -160,14 +163,16 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(FolderUsageResult.NotUsed)
             whenever(
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(secondaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -190,7 +195,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
 
@@ -225,7 +231,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenThrow(RuntimeException("Test exception"))
 
@@ -252,7 +259,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -277,7 +285,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -300,7 +309,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedByCameraUploadParent)
 
@@ -323,7 +333,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedByCameraUploadChild)
 
@@ -348,7 +359,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -373,7 +385,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -398,7 +411,8 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
                 isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                     NodeId(primaryHandle),
                     shouldCheckCameraUploads = false,
-                    shouldExcludeCurrentDevice = false
+                    shouldExcludeCurrentDevice = false,
+                    useCache = true,
                 )
             ).thenReturn(conflictResult)
 
@@ -424,14 +438,16 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedByMediaUpload)
 
@@ -457,14 +473,16 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedByMediaUploadParent)
 
@@ -490,14 +508,16 @@ internal class MonitorCrossDeviceFolderConflictsUseCaseTest {
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(primaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.NotUsed)
         whenever(
             isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 NodeId(secondaryHandle),
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
         ).thenReturn(FolderUsageResult.UsedByMediaUploadChild)
 

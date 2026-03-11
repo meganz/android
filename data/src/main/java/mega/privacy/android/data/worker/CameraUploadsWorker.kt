@@ -1840,6 +1840,7 @@ class CameraUploadsWorker @AssistedInject constructor(
             nodeId = NodeId(primaryHandle),
             shouldCheckCameraUploads = false,
             shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
         if (primaryUsage != FolderUsageResult.NotUsed) {
             Timber.d("Camera Uploads remote folder conflicts with sync/backup: $primaryHandle")
@@ -1861,6 +1862,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 nodeId = NodeId(secondaryHandle),
                 shouldCheckCameraUploads = false,
                 shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
             if (secondaryUsage != FolderUsageResult.NotUsed) {
                 Timber.d("Media Uploads remote folder conflicts with sync/backup: $secondaryHandle")

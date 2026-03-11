@@ -70,7 +70,8 @@ class MonitorCrossDeviceFolderConflictsUseCase @Inject constructor(
         return isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
             nodeId = NodeId(handle),
             shouldCheckCameraUploads = false,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
     }
 

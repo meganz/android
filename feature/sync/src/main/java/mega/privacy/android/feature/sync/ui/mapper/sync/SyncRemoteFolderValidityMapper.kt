@@ -54,7 +54,8 @@ class SyncRemoteFolderValidityMapper @Inject constructor(
             val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                 nodeId = nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = false,
             )
 
             mapFolderUsageResultToSyncValidityResult(result)

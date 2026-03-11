@@ -320,6 +320,7 @@ internal class SettingsCameraUploadsViewModelTest {
                 nodeId = anyValueClass(),
                 shouldCheckCameraUploads = any(),
                 shouldExcludeCurrentDevice = any(),
+                useCache = any(),
             )
         ).thenReturn(FolderUsageResult.NotUsed)
 
@@ -1338,6 +1339,7 @@ internal class SettingsCameraUploadsViewModelTest {
                         nodeId = anyValueClass(),
                         shouldCheckCameraUploads = any(),
                         shouldExcludeCurrentDevice = any(),
+                        useCache = any()
                     )
                 ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
 
@@ -1810,6 +1812,7 @@ internal class SettingsCameraUploadsViewModelTest {
                         nodeId = anyValueClass(),
                         shouldCheckCameraUploads = any(),
                         shouldExcludeCurrentDevice = any(),
+                        useCache = any()
                     )
                 ).thenReturn(FolderUsageResult.UsedBySyncOrBackup("other-device"))
 

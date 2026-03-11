@@ -1,14 +1,18 @@
 package mega.privacy.android.feature.sync.domain.usecase.sync
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.FolderUsageResult
 import mega.privacy.android.domain.entity.sync.SyncError
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.backup.IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
 import mega.privacy.android.domain.usecase.file.CanReadUriUseCase
 import mega.privacy.android.feature.sync.domain.entity.FolderPair
@@ -31,15 +35,11 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
     private val pauseSyncUseCase: PauseSyncUseCase,
     private val setUserPausedSyncUseCase: SetUserPausedSyncUseCase,
     private val syncNotificationRepository: SyncNotificationRepository,
+    @ApplicationScope private val coroutineScope: CoroutineScope,
 ) : MonitorSyncsUseCase {
 
-
-    /**
-     * Invoke.
-     *
-     * @return A [Flow] that emits the syncs
-     */
-    override operator fun invoke(): Flow<List<FolderPair>> = channelFlow {
+    // Shared flow - only one upstream subscription regardless of how many collectors
+    private val sharedFlow: Flow<List<FolderPair>> = channelFlow {
         launch {
             syncRepository.monitorFolderPairChanges()
                 .distinctUntilChanged()
@@ -50,11 +50,13 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
                 .collect { (validSyncs, invalidSyncs) ->
                     // Check for cross-device folder conflicts
                     val conflictingSyncs = validSyncs.filter {
-                        isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                        val result = isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
                             nodeId = it.remoteFolder.id,
                             shouldCheckCameraUploads = true,
-                            shouldExcludeCurrentDevice = true
-                        ) != FolderUsageResult.NotUsed
+                            shouldExcludeCurrentDevice = true,
+                            useCache = true,
+                        )
+                        result != FolderUsageResult.NotUsed
                     }
 
                     // Pause conflicting syncs and mark as user-paused to prevent auto-resume
@@ -93,7 +95,18 @@ internal class MonitorSyncsUseCaseImpl @Inject constructor(
             // if the cancelled sync worker's syncs are completed then set the foreground preference to false
             setSyncWorkerForegroundPreferenceUseCase(false)
         }
-    }
+    }.shareIn(
+        scope = coroutineScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        replay = 1
+    )
+
+    /**
+     * Invoke.
+     *
+     * @return A [Flow] that emits the syncs
+     */
+    override operator fun invoke(): Flow<List<FolderPair>> = sharedFlow
 
     private fun isSyncingCompleted(syncs: List<FolderPair>): Boolean =
         syncs.isNotEmpty() && syncs.all { it.syncStatus == SyncStatus.SYNCED || it.syncStatus == SyncStatus.PAUSED }

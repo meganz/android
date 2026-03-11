@@ -11,6 +11,7 @@ import mega.privacy.android.domain.featuretoggle.DomainFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.DetermineNodeRelationshipUseCase
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.atLeastOnce
@@ -29,12 +30,17 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
 
     private val getDeviceIdUseCase: GetDeviceIdUseCase = mock()
 
-    private val underTest = IsFolderUsedBySyncOrBackupAcrossDevicesUseCase(
-        getBackupInfoUseCase,
-        determineNodeRelationshipUseCase,
-        getDeviceIdUseCase,
-        getFeatureFlagValueUseCase
-    )
+    private lateinit var underTest: IsFolderUsedBySyncOrBackupAcrossDevicesUseCase
+
+    @BeforeEach
+    fun setUp() {
+        underTest = IsFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+            getBackupInfoUseCase,
+            determineNodeRelationshipUseCase,
+            getDeviceIdUseCase,
+            getFeatureFlagValueUseCase
+        )
+    }
 
     @AfterEach
     fun resetAndTearDown() {
@@ -58,7 +64,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
@@ -74,7 +81,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             nodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
@@ -98,7 +106,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             nodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUpload)
@@ -122,7 +131,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUpload)
@@ -159,7 +169,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.UsedByMediaUpload)
@@ -174,7 +185,12 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         whenever(getBackupInfoUseCase()).thenReturn(emptyList())
 
         val result =
-            underTest(nodeId, shouldCheckCameraUploads = true, shouldExcludeCurrentDevice = false)
+            underTest(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false,
+                useCache = true
+            )
 
         assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
         verify(getBackupInfoUseCase).invoke()
@@ -196,7 +212,12 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             .thenReturn(NodeRelationship.ExactMatch)
 
         val result =
-            underTest(nodeId, shouldCheckCameraUploads = true, shouldExcludeCurrentDevice = false)
+            underTest(
+                nodeId,
+                shouldCheckCameraUploads = true,
+                shouldExcludeCurrentDevice = false,
+                useCache = true
+            )
 
         val expected = FolderUsageResult.UsedBySyncOrBackup(deviceId)
         assertThat(result).isEqualTo(expected)
@@ -236,7 +257,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             val expected = FolderUsageResult.UsedBySyncOrBackup(deviceId)
@@ -284,7 +306,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
@@ -312,7 +335,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             parentNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUploadParent)
@@ -338,7 +362,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             childNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedByCameraUploadChild)
@@ -372,7 +397,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             parentNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedByMediaUploadParent)
@@ -404,7 +430,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             childNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedByMediaUploadChild)
@@ -432,7 +459,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             parentNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedBySyncOrBackupParent(deviceId))
@@ -458,7 +486,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
         val result = underTest(
             childNodeId,
             shouldCheckCameraUploads = true,
-            shouldExcludeCurrentDevice = false
+            shouldExcludeCurrentDevice = false,
+            useCache = true,
         )
 
         assertThat(result).isEqualTo(FolderUsageResult.UsedBySyncOrBackupChild(deviceId))
@@ -486,7 +515,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             // Should find the backup, not Camera Uploads (even though nodeId=1 might match CU handle)
@@ -506,7 +536,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             assertThat(result).isEqualTo(FolderUsageResult.NotUsed)
@@ -542,7 +573,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
             )
 
             // Should not find current device's backup, and other backup doesn't match
@@ -573,7 +605,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             // Should find the backup even though it's from current device
@@ -612,7 +645,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
             )
 
             // Should find the other device's backup
@@ -658,7 +692,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = true,
-                shouldExcludeCurrentDevice = false
+                shouldExcludeCurrentDevice = false,
+                useCache = true,
             )
 
             // Should find Media Uploads match
@@ -695,7 +730,8 @@ internal class IsFolderUsedBySyncOrBackupAcrossDevicesUseCaseTest {
             val result = underTest(
                 nodeId,
                 shouldCheckCameraUploads = false,
-                shouldExcludeCurrentDevice = true
+                shouldExcludeCurrentDevice = true,
+                useCache = true,
             )
 
             // Should find the other device's backup, not Camera Uploads or current device
