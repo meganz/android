@@ -39,6 +39,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
+import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -428,7 +429,9 @@ fun MediaMainScreen(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
             AddContentFab(
-                modifier = Modifier.testTag(MEDIA_ALBUMS_FAB_TAG),
+                modifier = Modifier
+                    .applyScrollToHideBehavior()
+                    .testTag(MEDIA_ALBUMS_FAB_TAG),
                 visible = (currentTabIndex == MediaScreen.Albums.ordinal || currentTabIndex == MediaScreen.Playlists.ordinal)
                         && selectionModeType == MediaSelectionModeType.None,
                 onClick = {
@@ -603,7 +606,7 @@ fun MediaMainScreen(
                                         showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
                                         dismissVideoPlaylistRemovedDialog = {
                                             showVideoPlaylistRemovedDialog = false
-                                        }
+                                        },
                                     )
                                 }
                             )
@@ -708,7 +711,7 @@ private fun MediaScreen.MediaContent(
                 resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
                 onNavigate = navigationHandler::navigate,
                 viewModel = albumsTabViewModel,
-                contentPadding = timelineContentPadding.excludeTopPadding()
+                contentPadding = timelineContentPadding.excludeTopPadding(),
             )
         }
 
