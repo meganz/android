@@ -33,7 +33,6 @@ import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
@@ -49,6 +48,7 @@ import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BO
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 
 

@@ -33,28 +33,27 @@ import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
-import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.android.core.ui.components.empty.MegaEmptyView
-import mega.android.core.ui.modifiers.calculateSafeBottomPadding
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
+import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -75,6 +74,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 

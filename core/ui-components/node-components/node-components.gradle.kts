@@ -29,6 +29,7 @@ dependencies {
     //core components
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)
+    implementation(project(":shared:nodes"))
 
     // Compose
     implementation(androidx.bundles.compose.bom)

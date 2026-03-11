@@ -10,12 +10,12 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.core.nodecomponents.list.NodeHeaderItem
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItemSkeleton
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.text
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.SelectVideoListItem
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
+import mega.privacy.android.shared.nodes.components.NodeListViewItemSkeleton
 
 @Composable
 fun SelectVideoListView(

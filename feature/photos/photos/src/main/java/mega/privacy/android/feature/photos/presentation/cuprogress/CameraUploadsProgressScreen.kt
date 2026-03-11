@@ -35,7 +35,6 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.transfers.extension.getProgressPercentString
 import mega.privacy.android.core.transfers.extension.getProgressSizeString
 import mega.privacy.android.core.transfers.extension.getSpeedString
@@ -47,6 +46,7 @@ import mega.privacy.android.feature.photos.presentation.cuprogress.action.Camera
 import mega.privacy.android.feature.transfers.components.CameraUploadsActiveTransferItem
 import mega.privacy.android.feature.transfers.components.CameraUploadsInQueueTransferItem
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as SharedR
 import java.math.BigInteger
 

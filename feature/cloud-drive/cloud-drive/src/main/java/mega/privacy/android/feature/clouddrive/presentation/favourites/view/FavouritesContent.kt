@@ -29,11 +29,9 @@ import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.list.NodesView
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
@@ -53,6 +51,8 @@ import mega.privacy.android.feature.clouddrive.presentation.favourites.model.Fav
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
 

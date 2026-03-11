@@ -37,7 +37,6 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -49,6 +48,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 import java.time.LocalDate
 import java.time.ZoneId

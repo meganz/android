@@ -31,6 +31,7 @@ dependencies {
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":core:transfers"))
     implementation(project(":core:analytics:analytics-tracker"))
+    implementation(project(":shared:nodes"))
 
     implementation(platform(androidx.compose.bom))
     implementation(androidx.hilt.navigation)

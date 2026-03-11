@@ -18,6 +18,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.components.NodeListViewItemSkeleton
 
 /**
  * Composable for showing a list of [NodeUiItem] in a lazy column with optional header for sort and view type

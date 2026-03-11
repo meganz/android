@@ -45,9 +45,7 @@ import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssu
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
-import mega.privacy.android.core.nodecomponents.list.NodeSkeletons
 import mega.privacy.android.core.nodecomponents.list.NodesView
-import mega.privacy.android.core.nodecomponents.list.NodesViewSkeleton
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
@@ -77,6 +75,8 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent

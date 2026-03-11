@@ -34,6 +34,10 @@ dependencies {
     implementation(project(":icon-pack"))
     implementation(project(":core:analytics:analytics-tracker"))
 
+    //core components
+    implementation(lib.mega.core.ui)
+    implementation(lib.mega.core.ui.tokens)
+
     implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
     implementation(lib.mega.analytics)

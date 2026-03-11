@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItemSkeleton
+import mega.privacy.android.shared.nodes.components.NodeListViewItemSkeleton
 import mega.privacy.mobile.home.presentation.recents.view.RecentsDateHeaderSkeleton
 
 @Composable

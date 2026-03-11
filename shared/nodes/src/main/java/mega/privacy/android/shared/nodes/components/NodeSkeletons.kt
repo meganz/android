@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
@@ -271,8 +270,6 @@ fun NodeGridViewItemSkeleton() {
                 text = "",
                 style = AppTheme.typography.bodySmall,
                 overflow = TextOverflow.MiddleEllipsis,
-                modifier = Modifier
-                    .testTag(NODE_TITLE_TEXT_TEST_TAG),
             )
 
             // Name text skeleton
