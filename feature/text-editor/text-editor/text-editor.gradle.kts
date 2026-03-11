@@ -27,6 +27,7 @@ dependencies {
     implementation(androidx.navigation3.runtime)
     implementation(lib.compose.state.events)
     implementation(lib.kotlin.serialisation)
+    implementation(lib.logging.timber)
     implementation(lib.mega.core.ui)
 
     testImplementation(project(":core-test"))

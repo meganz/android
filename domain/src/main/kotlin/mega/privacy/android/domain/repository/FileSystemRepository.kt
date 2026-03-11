@@ -145,6 +145,16 @@ interface FileSystemRepository {
     suspend fun readTextFromPath(path: String): String
 
     /**
+     * Read file content as UTF-8 text in chunks of lines. Use for gradual loading of large files.
+     * Each emission is a list of lines (without newline characters); the last emission may have fewer than [chunkSizeLines].
+     *
+     * @param path Absolute path to the file.
+     * @param chunkSizeLines Maximum number of lines per chunk.
+     * @return Flow of line chunks. Must be collected on a background dispatcher for I/O.
+     */
+    fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>>
+
+    /**
      * Write text to a file at the given path (UTF-8). Overwrites if the file exists.
      *
      * @param path Absolute path to the file.

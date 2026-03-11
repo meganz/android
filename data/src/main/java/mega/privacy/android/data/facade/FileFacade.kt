@@ -186,6 +186,13 @@ internal class FileFacade @Inject constructor(
     override suspend fun readTextFromPath(path: String): String =
         File(path).readText()
 
+    override fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>> =
+        flow {
+            File(path).useLines(Charsets.UTF_8) { lines ->
+                lines.chunked(chunkSizeLines).forEach { emit(it) }
+            }
+        }
+
     override suspend fun writeTextToPath(path: String, text: String) {
         File(path).writeText(text)
     }

@@ -123,6 +123,15 @@ interface FileGateway {
     suspend fun readTextFromPath(path: String): String
 
     /**
+     * Read file content in chunks of lines (UTF-8). For gradual loading of large files.
+     *
+     * @param path absolute path to the file
+     * @param chunkSizeLines maximum lines per emission
+     * @return Flow of line lists; collect on a background dispatcher
+     */
+    fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>>
+
+    /**
      * Write text content to the file at the given path.
      *
      * @param path absolute path to the file

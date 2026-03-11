@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,10 +29,19 @@ import mega.privacy.android.feature.texteditor.presentation.model.TextEditorComp
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeActionRequest
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import mega.privacy.android.navigation.contract.TransferHandler
+import timber.log.Timber
+
+/** Initial cap on displayed lines so first paint is fast; user can load more by scrolling to bottom. */
+private const val INITIAL_DISPLAY_LINES = 1000
+/** Lines to add each time the user triggers load more near the end of scroll. */
+private const val LINES_TO_ADD_ON_LOAD_MORE = 1000
+/** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
+private const val CHUNK_SIZE_LINES = 500
 
 /**
  * ViewModel for the Compose text editor screen.
  * Uses MVI-style intent handling: UI emits actions via [onMenuAction], ViewModel processes them.
+ * Loads large files gradually so the first chunk is shown quickly without blocking the main thread.
  */
 @HiltViewModel(assistedFactory = TextEditorComposeViewModel.Factory::class)
 class TextEditorComposeViewModel @AssistedInject constructor(
@@ -54,34 +64,52 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
+    /** Accumulated lines from gradual load; not restored after process death (user sees first chunk again). */
+    private val fullContentLines = mutableListOf<String>()
+    private var displayLineCap = INITIAL_DISPLAY_LINES
+
+    private fun updateDisplayedContent() {
+        _uiState.update {
+            it.copy(
+                content = fullContentLines.take(displayLineCap).joinToString("\n"),
+                hasMoreLines = fullContentLines.size > displayLineCap,
+                totalLinesLoaded = fullContentLines.size,
+            )
+        }
+    }
+
     init {
         if (args.mode != TextEditorMode.Create) {
             viewModelScope.launch {
-                runCatching {
-                    getTextContentForTextEditorUseCase(
-                        nodeHandle = args.nodeHandle,
-                        nodeSourceType = args.nodeSourceType ?: 0,
-                        localPath = args.localPath,
-                    )
-                }.fold(
-                    onSuccess = { content ->
-                        _uiState.update {
-                            it.copy(
-                                content = content.orEmpty(),
-                                isLoading = false,
-                                errorEvent = consumed,
-                            )
-                        }
-                    },
-                    onFailure = {
+                _uiState.update { it.copy(isFullyLoaded = false) }
+                getTextContentForTextEditorUseCase(
+                    nodeHandle = args.nodeHandle,
+                    localPath = args.localPath,
+                    chunkSizeLines = CHUNK_SIZE_LINES,
+                )
+                    .catch { e ->
+                        Timber.e(e, "Text editor: failed to load content gradually")
                         _uiState.update {
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
+                                loadErrorMessage = e.message.orEmpty().ifBlank { null },
                             )
                         }
-                    },
-                )
+                    }
+                    .collect { chunk ->
+                        fullContentLines.addAll(chunk)
+                        _uiState.update {
+                            it.copy(
+                                content = fullContentLines.take(displayLineCap).joinToString("\n"),
+                                isLoading = false,
+                                errorEvent = consumed,
+                                hasMoreLines = fullContentLines.size > displayLineCap,
+                                totalLinesLoaded = fullContentLines.size,
+                            )
+                        }
+                    }
+                _uiState.update { it.copy(isFullyLoaded = true) }
             }
             viewModelScope.launch {
                 val actions = runCatching {
@@ -145,15 +173,37 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Expands the displayed content by [LINES_TO_ADD_ON_LOAD_MORE] lines when content was capped (gradual load).
+     */
+    fun onLoadMoreLines() {
+        if (fullContentLines.size <= displayLineCap) return
+        displayLineCap = (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
+        updateDisplayedContent()
+    }
+
+    /**
+     * Saves text content. When content was capped for display (gradual load), merges
+     * the user-edited visible portion with the original non-displayed tail.
+     * Contract: [displayLineCap] reflects how many original lines were shown to the user,
+     * so `fullContentLines.drop(displayLineCap)` always yields the untouched tail.
+     * In Create mode [fullContentLines] is empty, so `state.content` is saved as-is.
+     */
     fun saveFile(fromHome: Boolean) {
         if (args.mode == TextEditorMode.View) return
         viewModelScope.launch {
             val state = _uiState.value
+            val fullTextToSave = if (fullContentLines.isNotEmpty()) {
+                val editedLines = state.content.split("\n")
+                (editedLines + fullContentLines.drop(displayLineCap)).joinToString("\n")
+            } else {
+                state.content
+            }
             runCatching {
                 saveTextContentForTextEditorUseCase(
                     nodeHandle = args.nodeHandle,
                     nodeSourceType = args.nodeSourceType ?: 0,
-                    text = state.content,
+                    text = fullTextToSave,
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
                     fromHome = fromHome,
@@ -185,7 +235,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun consumeErrorEvent() {
-        _uiState.update { it.copy(errorEvent = consumed) }
+        _uiState.update { it.copy(errorEvent = consumed, loadErrorMessage = null) }
     }
 
     fun consumeTransferEvent() {

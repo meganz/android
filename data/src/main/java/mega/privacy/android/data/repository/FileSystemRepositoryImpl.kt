@@ -136,6 +136,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         fileGateway.readTextFromPath(path)
     }
 
+    override fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>> =
+        fileGateway.readLinesFromPathInChunks(path, chunkSizeLines).flowOn(ioDispatcher)
+
     override suspend fun writeTextToPath(path: String, text: String) = withContext(ioDispatcher) {
         fileGateway.writeTextToPath(path, text)
     }

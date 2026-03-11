@@ -1,7 +1,10 @@
 package mega.privacy.android.domain.usecase.texteditor
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.transfer.TransferAppData
@@ -24,7 +27,18 @@ private const val TEXT_EDITOR_TEMP_FOLDER = "tempMEGA"
 
 /**
  * Use case to load text content for the text editor.
- * Orchestrates: local path, then node local file, then streaming, then download. All I/O on [ioDispatcher].
+ * Always loads gradually in chunks of lines so the first emission is quick and the UI stays responsive.
+ * Orchestrates: local path, then node local file, then streaming, then download.
+ *
+ * The returned flow uses [flowOn] with [ioDispatcher] so all upstream work
+ * (source resolution, streaming string processing, and file reads) runs off the main thread.
+ * Callers can safely collect on Main.
+ *
+ * For local paths (and after download), lines are read from disk in chunks. For streaming,
+ * the full content is fetched once then emitted in chunks; very large streamed content may use more memory.
+ *
+ * @param chunkSizeLines Max lines per emission (default 500).
+ * @return Flow of line chunks; caller should accumulate and cap display.
  */
 class GetTextContentForTextEditorUseCase @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -39,19 +53,24 @@ class GetTextContentForTextEditorUseCase @Inject constructor(
 ) {
 
     /**
-     * Load text for the given parameters.
-     * @return Content string. Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
+     * Load text gradually in chunks of lines. First emission is quick for responsive UI.
+     * Throws on error; caller (e.g. ViewModel) should catch and map to UI state.
      */
-    suspend operator fun invoke(
+    operator fun invoke(
         nodeHandle: Long,
-        nodeSourceType: Int,
         localPath: String? = null,
-    ): String = withContext(ioDispatcher) {
+        chunkSizeLines: Int = 500,
+    ): Flow<List<String>> = flow {
         when (val resolved = resolveContentSource(nodeHandle, localPath)) {
-            is ContentSource.LocalPath -> fileSystemRepository.readTextFromPath(resolved.path)
-            is ContentSource.StreamingContent -> resolved.content
+            is ContentSource.LocalPath ->
+                emitAll(fileSystemRepository.readLinesFromPathInChunks(resolved.path, chunkSizeLines))
+
+            is ContentSource.StreamingContent -> {
+                val lines = resolved.content.split("\n")
+                lines.chunked(chunkSizeLines).forEach { emit(it) }
+            }
         }
-    }
+    }.flowOn(ioDispatcher)
 
     private suspend fun resolveContentSource(nodeHandle: Long, localPath: String?): ContentSource {
         val contextLocalPath = localPath

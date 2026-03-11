@@ -7,6 +7,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -75,7 +77,39 @@ internal class SaveTextContentForTextEditorUseCaseTest {
             assertThat(it.isEditMode).isTrue()
             assertThat(it.fromHome).isFalse()
         }
+        verify(fileSystemRepository).writeTextToPath(tempFile.absolutePath, "content")
     }
+
+    @Test
+    fun `test that save returns UploadRequired when mode is Create with folder as parent`() =
+        runTest {
+            val folderHandle = 5L
+            val folderNode = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(folderHandle)
+            }
+            val tempFile = File(tempDir, "new-in-folder.txt")
+            whenever(getNodeByIdUseCase(NodeId(folderHandle))).thenReturn(folderNode)
+            whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("new-in-folder.txt")
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
+
+            val saveResult = underTest(
+                nodeHandle = folderHandle,
+                nodeSourceType = 0,
+                text = "content in folder",
+                fileName = "new-in-folder.txt",
+                mode = TextEditorMode.Create,
+                fromHome = false,
+            )
+
+            assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
+            (saveResult as TextEditorSaveResult.UploadRequired).let {
+                assertThat(it.tempPath).isEqualTo(tempFile.absolutePath)
+                assertThat(it.parentHandle).isEqualTo(folderHandle)
+                assertThat(it.isEditMode).isFalse()
+                assertThat(it.fromHome).isFalse()
+            }
+            verify(fileSystemRepository).writeTextToPath(tempFile.absolutePath, "content in folder")
+        }
 
     @Test
     fun `test that save returns UploadRequired when mode is Create with root and fromHome true`() =

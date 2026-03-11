@@ -6,7 +6,6 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,12 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -34,9 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.components.MegaScaffold
@@ -106,17 +98,22 @@ fun TextEditorScreen(
 
                 uiState.errorEvent == triggered -> {
                     TextEditorErrorContent(
-                        message = stringResource(sharedR.string.general_request_failed_message),
+                        message = uiState.loadErrorMessage?.takeIf { it.isNotBlank() }
+                            ?: stringResource(sharedR.string.general_request_failed_message),
                         onDismiss = viewModel::consumeErrorEvent,
                     )
                 }
 
                 else -> {
+                    val onLoadMore = remember(viewModel) { viewModel::onLoadMoreLines }
+                    val onContentChange = remember(viewModel) { viewModel::updateContent }
                     TextEditorContent(
                         content = uiState.content,
                         showLineNumbers = uiState.showLineNumbers,
                         readOnly = uiState.mode == TextEditorMode.View,
-                        onContentChange = viewModel::updateContent,
+                        onContentChange = onContentChange,
+                        hasMoreLines = uiState.hasMoreLines,
+                        onNearEndOfScroll = onLoadMore,
                     )
                 }
             }
@@ -127,86 +124,6 @@ fun TextEditorScreen(
                     (action as? TextEditorBottomBarAction)?.let { viewModel.onBottomBarAction(it) }
                 },
             )
-        }
-    }
-}
-
-/** Gutter width when line numbers are shown (mirrors legacy text_editor_padding_start_with_nLines). */
-private val LineNumberGutterWidth = 36.dp
-
-/** Line number text size (mirrors legacy line_number_size). */
-private val LineNumberTextSize = 10.sp
-
-/** Horizontal padding for line number column (mirrors legacy line_number_padding). */
-private val LineNumberPadding = 6.dp
-
-@Composable
-private fun TextEditorContent(
-    content: String,
-    showLineNumbers: Boolean,
-    readOnly: Boolean,
-    onContentChange: (String) -> Unit,
-) {
-    val lineCount = content.count { it == '\n' } + 1
-    val lineNumbers = remember(lineCount) {
-        (1..lineCount.coerceAtLeast(1)).joinToString("\n") { "$it" }
-    }
-    val textStyle = TextStyle(
-        color = MaterialTheme.colorScheme.onSurface,
-        fontSize = 14.sp,
-    )
-    val verticalScrollState = rememberScrollState()
-
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize()
-                .verticalScroll(verticalScrollState),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-            ) {
-                if (showLineNumbers) {
-                    BasicTextField(
-                        value = lineNumbers,
-                        onValueChange = {},
-                        readOnly = true,
-                        textStyle = textStyle.copy(fontSize = LineNumberTextSize),
-                        modifier = Modifier
-                            .width(LineNumberGutterWidth)
-                            .wrapContentHeight()
-                            .padding(end = LineNumberPadding),
-                        decorationBox = { inner ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                                    .padding(vertical = 4.dp),
-                                contentAlignment = Alignment.TopEnd,
-                            ) {
-                                inner()
-                            }
-                        },
-                    )
-                }
-                BasicTextField(
-                    value = content,
-                    onValueChange = onContentChange,
-                    readOnly = readOnly,
-                    textStyle = textStyle,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                )
-            }
         }
     }
 }
