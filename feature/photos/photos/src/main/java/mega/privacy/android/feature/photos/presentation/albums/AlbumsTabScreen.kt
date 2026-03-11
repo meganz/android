@@ -66,7 +66,7 @@ fun AlbumsTabRoute(
         resetDeleteAlbumsConfirmationEvent = viewModel::resetDeleteAlbumsConfirmationEvent,
         onAlbumSelectionToggle = viewModel::toggleAlbumSelection,
         getPresetNewAlbumName = viewModel::getPresetNewAlbumName,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
     )
 }
 
