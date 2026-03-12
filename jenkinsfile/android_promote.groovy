@@ -161,7 +161,7 @@ pipeline {
     options {
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
 

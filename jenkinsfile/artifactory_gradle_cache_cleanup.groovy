@@ -14,7 +14,7 @@ pipeline {
     options {
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
@@ -63,17 +63,11 @@ pipeline {
                         ]) {
                             String daysToKeep = "2"
                             sh """
-                                echo #### querying old cache files....
-                                curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -X POST -k -H 'Content-Type:text/plain' ${ARTIFACTORY_BASE_URL}/artifactory/api/search/aql --data 'items.find({\"repo\": \"android-mega\",\"path\": {\"\$match\": \"*gradle-cache*\"},\"created\": {\"\$before\": \"${daysToKeep}d\"}})' > aql_results.json
+                                echo #### deleting files in batch
+                                curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -X POST -k -f -H 'Content-Type:text/plain' ${ARTIFACTORY_BASE_URL}/artifactory/api/search/aql --data 'items.delete({\"repo\": \"android-mega\",\"path\": {\"\$match\": \"*gradle-cache*\"},\"created\": {\"\$before\": \"${daysToKeep}d\"}})' > aql_results.json
 
                                 echo #### summary
                                 tail aql_results.json
-                                                                
-                                echo #### deleting files
-                                for name in \$(jq -r '.results[].name' < aql_results.json); do
-                                    echo deleting \$name; 
-                                    curl -u ${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -X DELETE "${ARTIFACTORY_BASE_URL}/artifactory/android-mega/gradle-cache/\$name"; 
-                                done
                             """
                         }
                     }

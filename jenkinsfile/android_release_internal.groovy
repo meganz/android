@@ -39,7 +39,7 @@ pipeline {
         // Stop the build early in case of compile or test failures
         skipStagesAfterUnstable()
         buildDiscarder(logRotator(numToKeepStr: '30', artifactNumToKeepStr: '1'))
-        timeout(time: 2, unit: 'HOURS')
+        timeout(time: 1, unit: 'HOURS')
         gitLabConnection('GitLabConnection')
     }
     environment {
