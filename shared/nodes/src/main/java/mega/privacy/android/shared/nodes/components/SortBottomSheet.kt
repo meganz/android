@@ -1,6 +1,5 @@
-package mega.privacy.android.core.nodecomponents.sheet.sort
+package mega.privacy.android.shared.nodes.components
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding

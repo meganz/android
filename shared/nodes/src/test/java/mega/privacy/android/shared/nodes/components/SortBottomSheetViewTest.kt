@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.sheet.sort
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -12,7 +12,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.shared.nodes.model.SortOptionItem
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shared.resources.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,9 +28,9 @@ class SortBottomSheetViewTest {
         override val displayName: Int,
         override val testTag: String = "sort_option:$displayName",
     ) : SortOptionItem {
-        Name(sharedR.string.action_sort_by_name),
-        Date(sharedR.string.action_sort_by_created),
-        Size(sharedR.string.action_sort_by_size),
+        Name(R.string.action_sort_by_name),
+        Date(R.string.action_sort_by_created),
+        Size(R.string.action_sort_by_size),
     }
 
     @OptIn(ExperimentalMaterial3Api::class)

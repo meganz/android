@@ -69,8 +69,8 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuActi
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode

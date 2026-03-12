@@ -53,8 +53,8 @@ import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
