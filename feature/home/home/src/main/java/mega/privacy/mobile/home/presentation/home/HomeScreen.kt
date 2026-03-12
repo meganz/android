@@ -33,6 +33,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
@@ -43,7 +44,6 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
-import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
@@ -59,6 +59,8 @@ import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.HomeFabOptionsButtonPressedEvent
 import mega.privacy.mobile.analytics.event.HomeSearchBarPressedEvent
+import mega.privacy.mobile.home.presentation.configuration.HomeConfiguration
+import mega.privacy.mobile.home.presentation.home.actions.HomeScreenAction
 import mega.privacy.mobile.home.presentation.home.model.HomeUiState
 import mega.privacy.mobile.home.presentation.home.model.searchNavKey
 
@@ -154,6 +156,10 @@ internal fun HomeScreen(
                         add(MenuActionWithClick(CommonAppBarAction.Search) {
                             Analytics.tracker.trackEvent(HomeSearchBarPressedEvent)
                             navigationHandler.navigate(state.searchNavKey)
+                        })
+
+                        add(MenuActionWithClick(HomeScreenAction.Customize) {
+                            navigationHandler.navigate(HomeConfiguration)
                         })
                     }
                 }
