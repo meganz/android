@@ -436,6 +436,7 @@ class ChatTabsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         (activity as? NavigationDrawerManager)?.addDrawerListener(drawerListener)
         view.post {
+            if (!isVisible) return@post
             (activity as? ManagerActivity?)?.showHideBottomNavigationView(false)
             (activity as? ManagerActivity?)?.invalidateOptionsMenu()
             (activity as? ManagerActivity?)?.findViewById<View>(R.id.toolbar)?.setOnClickListener {
