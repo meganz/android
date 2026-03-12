@@ -326,18 +326,6 @@ class AlbumPhotosSelectionViewModel @AssistedInject constructor(
         }
     }
 
-    fun selectAllPhotos() = viewModelScope.launch {
-        _state.update {
-            val selectedPhotoIds = withContext(defaultDispatcher) {
-                val photoIds = it.photosNodeContentItems
-                    .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
-                    .map { item -> item.node.photo.id }
-                it.selectedPhotoIds + photoIds
-            }
-            it.copy(selectedPhotoIds = selectedPhotoIds)
-        }
-    }
-
     fun clearSelection() {
         _state.update { it.copy(selectedPhotoIds = setOf()) }
     }

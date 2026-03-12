@@ -138,53 +138,6 @@ class AlbumPhotosSelectionViewModelTest {
         }
     }
 
-    @Test
-    fun `test that select all photos behaves correctly`() = runTest {
-        val images = listOf(
-            createImage(id = 1L),
-            createImage(id = 2L),
-            createImage(id = 3L),
-        )
-        val photoUiStates = images.map { createPhotoUiState(it) }
-        images.forEachIndexed { index, photo ->
-            whenever(photoUiStateMapper(photo)).thenReturn(photoUiStates[index])
-        }
-        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(images))
-        whenever(filterCloudDrivePhotos(any())).thenReturn(images)
-        whenever(filterCameraUploadPhotos(any())).thenReturn(images)
-
-        underTest = createSUT()
-        advanceUntilIdle()
-
-        // Wait for photos to be loaded and photosNodeContentTypes to be populated
-        underTest.state.test {
-            var state = awaitItem()
-            var photoNodes = state.photosNodeContentItems
-                .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
-            while (photoNodes.size < 3 || state.isLoading) {
-                state = awaitItem()
-                photoNodes = state.photosNodeContentItems
-                    .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
-            }
-            // Verify photos are loaded before selecting
-            assertThat(photoNodes.size).isEqualTo(3)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        underTest.selectAllPhotos()
-        advanceUntilIdle()
-
-        underTest.state.test {
-            var state = awaitItem()
-            // Wait for selection to be applied - selectAllPhotos adds photo IDs to selectedPhotoIds
-            // We need to wait until the selectedPhotoIds contains all 3 photo IDs
-            while (state.selectedPhotoIds.size < 3) {
-                state = awaitItem()
-            }
-            val actualSelectedPhotoIds = state.selectedPhotoIds
-            assertThat(actualSelectedPhotoIds).isEqualTo(setOf(1L, 2L, 3L))
-        }
-    }
 
     @Test
     fun `test that clear selection behaves correctly`() = runTest {

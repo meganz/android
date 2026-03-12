@@ -27,14 +27,7 @@ data class AlbumPhotosSelectionState(
     val isLoading: Boolean = true,
     val isBusinessAccountExpired: Boolean = false,
     val hiddenNodeEnabled: Boolean = false,
-) {
-    /**
-     * Flag to check if all nodes are selected
-     */
-    val areAllNodesSelected: Boolean = photosNodeContentItems
-        .filterIsInstance<PhotosNodeContentItem.PhotoNodeItem>()
-        .size == selectedPhotoIds.size
-}
+)
 
 typealias PhotoDownload = suspend (
     photo: Photo,

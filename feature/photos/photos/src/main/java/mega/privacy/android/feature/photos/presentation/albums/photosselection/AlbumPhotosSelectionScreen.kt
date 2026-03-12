@@ -129,7 +129,6 @@ fun AlbumPhotosSelectionScreen(
                 isLocationDetermined = state.isLocationDetermined,
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
-                showSelectAll = !state.areAllNodesSelected,
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -141,7 +140,6 @@ fun AlbumPhotosSelectionScreen(
                     Analytics.tracker.trackEvent(AlbumPhotosSelectionFilterMenuToolbarEvent)
                     showSelectLocationDialog = true
                 },
-                onSelectAllClicked = viewModel::selectAllPhotos,
                 onClearSelectionClicked = viewModel::clearSelection
             )
         },
@@ -193,10 +191,8 @@ private fun AlbumPhotosSelectionHeader(
     isLocationDetermined: Boolean,
     numSelectedPhotos: Int,
     showFilterMenu: Boolean,
-    showSelectAll: Boolean,
     onBackClicked: () -> Unit,
     onFilterClicked: () -> Unit,
-    onSelectAllClicked: () -> Unit,
     onClearSelectionClicked: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -205,27 +201,6 @@ private fun AlbumPhotosSelectionHeader(
         MegaTopAppBar(
             title = "$numSelectedPhotos",
             navigationType = AppBarNavigationType.Close(onClearSelectionClicked),
-            actions = buildList {
-                if (showSelectAll) {
-                    add(
-                        MenuActionWithClick(
-                            menuAction = object : MenuActionWithIcon {
-                                override val testTag: String
-                                    get() = ALBUM_PHOTOS_SELECTION_SELECT_ALL_TEST_TAG
-
-                                @Composable
-                                override fun getDescription(): String =
-                                    stringResource(sharedR.string.action_select_all)
-
-                                @Composable
-                                override fun getIconPainter(): Painter =
-                                    rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
-                            },
-                            onClick = onSelectAllClicked
-                        )
-                    )
-                }
-            }
         )
     } else {
         MegaTopAppBar(
