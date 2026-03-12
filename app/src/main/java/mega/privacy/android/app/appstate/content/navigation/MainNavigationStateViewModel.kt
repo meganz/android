@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -48,6 +49,7 @@ class MainNavigationStateViewModel @Inject constructor(
             getNavigationItems()
                 .log("Navigation Items"),
             filteredMainNavItemsFlow
+                .filter { it.isNotEmpty() }
                 .map { itemSet -> itemSet.map { it.screen }.toSet().toImmutableSet() }
                 .log("Main Nav Screens"),
             monitorStartScreenPreferenceDestinationUseCase()
