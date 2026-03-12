@@ -34,6 +34,7 @@ import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheet
 import mega.privacy.android.core.nodecomponents.sheet.sort.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
@@ -146,7 +147,12 @@ private fun FolderLinkContent(
                                 isHiddenNodesEnabled = false,
                                 showHiddenNodes = true,
                                 onMenuClicked = {
-                                    // TODO
+                                    onNavigate(
+                                        NodeOptionsBottomSheetNavKey(
+                                            nodeHandle = it.id.longValue,
+                                            nodeSourceType = NodeSourceType.FOLDER_LINK,
+                                        )
+                                    )
                                 },
                                 onItemClicked = { onAction(FolderLinkAction.ItemClicked(it)) },
                                 onLongClicked = {

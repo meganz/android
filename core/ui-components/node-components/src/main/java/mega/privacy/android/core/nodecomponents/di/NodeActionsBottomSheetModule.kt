@@ -46,6 +46,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.ViewInFolderBottom
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.CloudDrive
+import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
 import mega.privacy.android.domain.qualifier.features.Links
 import mega.privacy.android.domain.qualifier.features.OutgoingShares
@@ -344,5 +345,23 @@ abstract class NodeActionsBottomSheetModule {
                 removeRecentlyWatchedVideoAction,
             )
         }
+
+        /**
+         * Provide cloudDrive toolbar options
+         */
+        @Provides
+        @ElementsIntoSet
+        @FolderLink
+        @Singleton
+        fun provideFolderLinkOptions(
+            copyMenuAction: CopyBottomSheetMenuItem,
+            downloadMenuAction: DownloadBottomSheetMenuItem,
+        ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
+            return setOf(
+                copyMenuAction,
+                downloadMenuAction,
+            )
+        }
+
     }
 }

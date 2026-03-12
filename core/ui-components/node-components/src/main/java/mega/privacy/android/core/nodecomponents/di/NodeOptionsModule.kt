@@ -8,6 +8,7 @@ import dagger.multibindings.IntoSet
 import mega.privacy.android.core.nodecomponents.menu.provider.BackupsMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.CloudDriveMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.FavouritesMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.FolderLinkMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.IncomingSharesMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.LinksMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.NodeMenuOptionsProvider
@@ -98,5 +99,11 @@ abstract class NodeOptionsModule {
     @IntoSet
     abstract fun bindVideoRecentlyWatchedOptionsProvider(
         videoRecentlyWatchedOptionProvider: VideoRecentlyWatchedOptionProvider
+    ): NodeMenuOptionsProvider
+
+    @Binds
+    @IntoSet
+    abstract fun bindFolderLinkOptionsProvider(
+        provider: FolderLinkMenuOptionsProvider
     ): NodeMenuOptionsProvider
 }
