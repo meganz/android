@@ -3,7 +3,7 @@ package mega.privacy.android.domain.qualifier.features
 import javax.inject.Qualifier
 
 /**
- * Annotation for outgoing shares
+ * Annotation for folder link
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier

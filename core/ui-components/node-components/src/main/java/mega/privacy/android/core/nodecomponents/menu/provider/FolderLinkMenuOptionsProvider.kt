@@ -9,7 +9,7 @@ import mega.privacy.android.domain.qualifier.features.FolderLink
 import javax.inject.Inject
 
 /**
- * Options provider for Links source type
+ * Options provider for folder link source type
  */
 class FolderLinkMenuOptionsProvider @Inject constructor(
     @FolderLink private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,

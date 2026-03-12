@@ -347,7 +347,7 @@ abstract class NodeActionsBottomSheetModule {
         }
 
         /**
-         * Provide cloudDrive toolbar options
+         * Provide folder link toolbar options
          */
         @Provides
         @ElementsIntoSet
@@ -362,6 +362,5 @@ abstract class NodeActionsBottomSheetModule {
                 downloadMenuAction,
             )
         }
-
     }
 }

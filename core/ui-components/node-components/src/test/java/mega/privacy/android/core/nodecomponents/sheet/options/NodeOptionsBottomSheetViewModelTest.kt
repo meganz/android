@@ -5,7 +5,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.SnackbarAttributes
-import mega.privacy.android.core.nodecomponents.mapper.NodeAccessPermissionIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
@@ -19,6 +18,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -44,7 +44,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val nodeAccessPermissionIconMapper: NodeAccessPermissionIconMapper = mock()
+    private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
     private val nodeBottomSheetActionMapper = mock<NodeBottomSheetActionMapper>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase = mock()
@@ -71,42 +71,50 @@ class NodeOptionsBottomSheetViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
+            getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
             nodeUiItemMapper = nodeUiItemMapper,
             snackbarEventQueue = snackbarEventQueue,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
-            isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase
+            isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
         )
     }
 
     @Test
-    fun `test that get bottom sheet option invokes getNodeByIdUseCase`() = runTest {
-        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
-        val mockNodeUi = mock<NodeUiItem<TypedNode>>()
-        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
-        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-        whenever(
-            nodeBottomSheetActionMapper(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                any()
-            )
-        ).thenReturn(
-            emptyList()
-        )
+    fun `test that getBottomSheetOptions invokes getNodeByIdUseCase for non folder link source`() =
+        runTest {
+            whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
 
-        viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
+            viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
 
-        verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
-        verify(isNodeInRubbishBinUseCase).invoke(sampleFileNode.id)
-        verify(isNodeInBackupsUseCase).invoke(sampleFileNode.id.longValue)
-        verify(getNodeAccessPermission).invoke(sampleFileNode.id)
-    }
+            verify(getNodeByIdUseCase).invoke(sampleFileNode.id)
+            verify(isNodeInRubbishBinUseCase).invoke(sampleFileNode.id)
+            verify(isNodeInBackupsUseCase).invoke(sampleFileNode.id.longValue)
+            verify(getNodeAccessPermission).invoke(sampleFileNode.id)
+        }
+
+    @Test
+    fun `test that getBottomSheetOptions invokes getFolderLinkNodeByIdUseCase for FOLDER_LINK source`() =
+        runTest {
+            whenever(getPublicNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+            val mockNodeUi = mock<NodeUiItem<TypedNode>>()
+            whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(emptyList())
+
+            viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.FOLDER_LINK)
+
+            verify(getPublicNodeByIdUseCase).invoke(sampleFileNode.id)
+        }
 
     @Test
     fun `test that getBottomSheetOptions updates state with node information when successful`() =
@@ -115,39 +123,25 @@ class NodeOptionsBottomSheetViewModelTest {
                 NodeActionModeMenuItem(1, 1, mock()),
                 NodeActionModeMenuItem(1, 2, mock())
             )
-
             whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
             val mockNodeUi = mock<NodeUiItem<TypedNode>>()
             whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mockNodeUi))
             whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
             whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
-            whenever(
-                nodeBottomSheetActionMapper(
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any(),
-                    any()
-                )
-            ).thenReturn(mockActions)
-            whenever(nodeAccessPermissionIconMapper(any())).thenReturn(123)
+            whenever(nodeBottomSheetActionMapper(any(), any(), any(), any(), any(), any(), any()))
+                .thenReturn(mockActions)
 
             viewModel.uiState.test {
-                // Initial state
                 val initialState = awaitItem()
                 assertThat(initialState.node).isNull()
                 assertThat(initialState.actions).isEmpty()
 
-                // Trigger the action
                 viewModel.getBottomSheetOptions(
                     sampleFileNode.id.longValue,
-                    NodeSourceType.CLOUD_DRIVE
+                    NodeSourceType.CLOUD_DRIVE,
                 )
 
-                // Wait for state update
                 val updatedState = awaitItem()
                 assertThat(updatedState.node).isEqualTo(mockNodeUi)
                 assertThat(updatedState.actions).isNotEmpty()
@@ -159,15 +153,12 @@ class NodeOptionsBottomSheetViewModelTest {
         whenever(getNodeByIdUseCase(any())).thenThrow(RuntimeException("Network error"))
 
         viewModel.uiState.test {
-            // Initial state
             val initialState = awaitItem()
             assertThat(initialState.node).isNull()
             assertThat(initialState.actions).isEmpty()
 
-            // Trigger the action
             viewModel.getBottomSheetOptions(sampleFileNode.id.longValue, NodeSourceType.CLOUD_DRIVE)
 
-            // Wait for state update
             val updatedState = awaitItem()
             assertThat(updatedState.node).isNull()
             assertThat(updatedState.actions).isEmpty()
@@ -176,21 +167,16 @@ class NodeOptionsBottomSheetViewModelTest {
 
     @Test
     fun `test that onConsumeErrorState consumes error`() = runTest {
-        // First trigger an error by setting up a scenario that would cause an error
         whenever(getNodeByIdUseCase(any())).thenReturn(null)
 
         viewModel.uiState.test {
-            // Initial state
             awaitItem()
 
-            // Trigger error
             viewModel.getBottomSheetOptions(999L, NodeSourceType.CLOUD_DRIVE)
-            awaitItem() // Wait for error state
+            awaitItem()
 
-            // Consume error
             viewModel.onConsumeErrorState()
 
-            // Verify error state is updated
             val finalState = awaitItem()
             assertThat(finalState).isNotNull()
         }

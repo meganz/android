@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -35,6 +36,7 @@ import javax.inject.Inject
  * @property isNodeInBackupsUseCase
  * @property monitorConnectivityUseCase
  * @property getNodeByIdUseCase
+ * @property getPublicNodeByIdUseCase
  */
 @HiltViewModel
 class NodeOptionsBottomSheetViewModel @Inject constructor(
@@ -45,6 +47,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
+    private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
     private val snackbarEventQueue: SnackbarEventQueue,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
@@ -75,7 +78,15 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun getBottomSheetOptions(nodeId: Long, nodeSourceType: NodeSourceType) {
         viewModelScope.launch {
             val bottomSheetOptions = nodeMenuProviderRegistry.getBottomSheetOptions(nodeSourceType)
-            val node = async { runCatching { getNodeByIdUseCase(NodeId(nodeId)) }.getOrNull() }
+            val node = async {
+                runCatching {
+                    if (nodeSourceType == NodeSourceType.FOLDER_LINK) {
+                        getPublicNodeByIdUseCase(NodeId(nodeId))
+                    } else {
+                        getNodeByIdUseCase(NodeId(nodeId))
+                    }
+                }.getOrNull()
+            }
             val isNodeInRubbish =
                 runCatching { isNodeInRubbishBinUseCase(NodeId(nodeId)) }.getOrDefault(false)
             val accessPermission =
