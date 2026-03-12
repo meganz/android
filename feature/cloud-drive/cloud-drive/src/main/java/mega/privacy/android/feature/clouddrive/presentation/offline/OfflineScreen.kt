@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -80,6 +81,7 @@ import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
  * @param onBack Callback for back navigation
  * @param viewModel The OfflineViewModel to manage state
  * @param modifier Modifier for the composable
+ * @param onNavigate Callback to navigate to a NavKey destination
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +94,7 @@ fun OfflineScreen(
     modifier: Modifier = Modifier,
     viewModel: OfflineViewModel = hiltViewModel(),
     actionViewModel: OfflineNodeActionsViewModel = hiltViewModel(),
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val actionUiState by actionViewModel.uiState.collectAsStateWithLifecycle()
@@ -101,7 +104,8 @@ fun OfflineScreen(
         applyShareContentUris = actionViewModel::applyShareContentUris,
         consumeShareFilesEvent = actionViewModel::onShareFilesEventConsumed,
         consumeShareNodeLinksEvent = actionViewModel::onShareNodeLinksEventConsumed,
-        consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed
+        consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed,
+        onNavigate = onNavigate,
     )
 
     OfflineScreen(

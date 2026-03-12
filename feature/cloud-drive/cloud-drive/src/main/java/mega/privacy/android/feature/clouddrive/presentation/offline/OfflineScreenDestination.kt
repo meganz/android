@@ -4,9 +4,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.OfflineNavKey
 
 fun EntryProviderScope<NavKey>.offlineScreen(
+    navigationHandler: NavigationHandler,
     onBack: () -> Unit,
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     onNavigateToTransfers: () -> Unit,
@@ -27,6 +29,7 @@ fun EntryProviderScope<NavKey>.offlineScreen(
             onNavigateToTransfers = onNavigateToTransfers,
             onTransfer = onTransfer,
             openFileInformation = openFileInformation,
+            onNavigate = navigationHandler::navigate,
         )
     }
 }

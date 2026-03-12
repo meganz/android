@@ -37,6 +37,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
             shares(navigationHandler, transferHandler)
 
             offlineScreen(
+                navigationHandler = navigationHandler,
                 onBack = navigationHandler::back,
                 onNavigateToFolder = { parentId, name ->
                     navigationHandler.navigate(
@@ -52,7 +53,7 @@ class CloudDriveFeatureDestination : FeatureDestination {
                 onTransfer = transferHandler::setTransferEvent,
                 openFileInformation = { handle ->
                     navigationHandler.navigate(OfflineInfoNavKey(handle = handle))
-                }
+                },
             )
 
             driveSyncScreen(

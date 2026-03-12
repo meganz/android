@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
@@ -26,9 +26,9 @@ fun HandleNodeOptionsActionResult(
     nodeResultFlow: (String) -> Flow<NodeOptionsBottomSheetResult?>,
     clearResultFlow: (String) -> Unit,
 ) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarQueue = rememberSnackBarQueue()
+    val localResources = LocalResources.current
     val nodeBottomSheetResult =
         nodeResultFlow(NodeOptionsBottomSheetNavKey.RESULT).collectAsStateWithLifecycle(null)
     val nodeActionState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
@@ -54,7 +54,7 @@ fun HandleNodeOptionsActionResult(
         consumeShareFolderDialogEvent = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
         onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
         onRestoreSuccess = { data ->
-            val locateActionLabel = context.getString(
+            val locateActionLabel = localResources.getString(
                 sharedResR.string.transfers_notification_location_action
             )
             coroutineScope.launch {

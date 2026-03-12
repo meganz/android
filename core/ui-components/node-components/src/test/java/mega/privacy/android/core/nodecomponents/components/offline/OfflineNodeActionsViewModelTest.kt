@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import org.junit.jupiter.api.AfterEach
@@ -60,6 +61,7 @@ class OfflineNodeActionsViewModelTest {
     private val snackBarHandler: SnackBarHandler = mock()
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper = mock()
     private val nodeShareContentUrisIntentMapper: NodeShareContentUrisIntentMapper = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
 
     private lateinit var underTest: OfflineNodeActionsViewModel
 
@@ -74,6 +76,7 @@ class OfflineNodeActionsViewModelTest {
     private suspend fun stubCommon() {
         whenever(getOfflineFilesUseCase(any())).thenReturn(mapOf())
         whenever(exportNodesUseCase(any())).thenReturn(mapOf())
+        whenever(getFeatureFlagValueUseCase(any())).thenReturn(false)
     }
 
     private fun initViewModel() {
@@ -85,7 +88,8 @@ class OfflineNodeActionsViewModelTest {
             getOfflineFileInformationByIdUseCase = mock(),
             snackBarHandler = snackBarHandler,
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper
+            nodeShareContentUrisIntentMapper = nodeShareContentUrisIntentMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase
         )
     }
 
@@ -439,7 +443,8 @@ class OfflineNodeActionsViewModelTest {
             nodeContentUriIntentMapper,
             nodeShareContentUrisIntentMapper,
             getOfflineFileUseCase,
-            getPathFromNodeContentUseCase
+            getPathFromNodeContentUseCase,
+            getFeatureFlagValueUseCase
         )
     }
 }

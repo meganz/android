@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -17,9 +18,12 @@ import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 import java.io.File
@@ -27,6 +31,9 @@ import java.util.UUID
 
 /**
  * Composable function to handle offline node action clicks
+ *
+ * @param onNavigate Callback to navigate to a NavKey destination.
+ * Used for PDF navigation with either [PdfViewerNavKey] or [LegacyPdfViewerNavKey].
  */
 @Composable
 fun HandleOfflineNodeAction3(
@@ -36,6 +43,7 @@ fun HandleOfflineNodeAction3(
     consumeShareFilesEvent: () -> Unit = {},
     consumeShareNodeLinksEvent: () -> Unit = {},
     consumeOpenFileEvent: () -> Unit = {},
+    onNavigate: (NavKey) -> Unit = {},
 ) {
     val context = LocalContext.current
     val megaNavigator = rememberMegaNavigator()
@@ -76,6 +84,8 @@ fun HandleOfflineNodeAction3(
                 coroutineScope = coroutineScope,
                 sortOrder = sortOrder,
                 megaNavigator = megaNavigator,
+                isPdfViewerComposeEnabled = uiState.isPdfViewerComposeEnabled,
+                onNavigate = onNavigate,
             )
         }
     }
@@ -115,6 +125,8 @@ private suspend fun openFile(
     coroutineScope: CoroutineScope,
     sortOrder: SortOrder,
     megaNavigator: MegaNavigator,
+    isPdfViewerComposeEnabled: Boolean,
+    onNavigate: (NavKey) -> Unit,
 ) {
     when (content) {
         is OfflineNodeActionUiEntity.Image -> {
@@ -146,12 +158,25 @@ private suspend fun openFile(
         }
 
         is OfflineNodeActionUiEntity.Pdf -> {
-            megaNavigator.openPdfActivity(
-                context = context,
-                content = NodeContentUri.LocalContentUri(content.file),
-                type = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                nodeId = content.nodeId
-            )
+            if (isPdfViewerComposeEnabled) {
+                val navKey = PdfViewerNavKey(
+                    nodeHandle = content.nodeId.longValue,
+                    contentUri = content.file.absolutePath,
+                    isLocalContent = true,
+                    shouldStopHttpServer = false,
+                    nodeSourceType = NodeSourceType.OFFLINE,
+                    mimeType = content.mimeType,
+                )
+                onNavigate(navKey)
+            } else {
+                val navKey = LegacyPdfViewerNavKey(
+                    nodeHandle = content.nodeId.longValue,
+                    nodeContentUri = NodeContentUri.LocalContentUri(content.file),
+                    nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                    mimeType = content.mimeType,
+                )
+                onNavigate(navKey)
+            }
         }
 
         is OfflineNodeActionUiEntity.Text -> {
