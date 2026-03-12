@@ -10,7 +10,6 @@ import java.io.File
  *
  */
 @Serializable
-@Polymorphic
 sealed interface NodeContentUri {
     /**
      * Local content uri

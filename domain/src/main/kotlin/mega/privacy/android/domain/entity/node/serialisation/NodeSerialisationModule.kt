@@ -26,28 +26,7 @@ import mega.privacy.android.domain.entity.node.chat.ChatFile
  * NodeSerialisationModule
  */
 val nodeSerialisationModule = SerializersModule {
-    polymorphic(FileTypeInfo::class) {
-        subclass(UnknownFileTypeInfo::class)
-        subclass(PdfFileTypeInfo::class)
-        subclass(ZipFileTypeInfo::class)
-        subclass(UrlFileTypeInfo::class)
-        subclass(StaticImageFileTypeInfo::class)
-        subclass(AudioFileTypeInfo::class)
-        subclass(GifFileTypeInfo::class)
-        subclass(RawFileTypeInfo::class)
-        subclass(SvgFileTypeInfo::class)
-        subclass(TextFileTypeInfo::class)
-        subclass(UnMappedFileTypeInfo::class)
-        subclass(VideoFileTypeInfo::class)
-    }
-    polymorphic(ChatFile::class) {
-        subclass(ChatDefaultFile::class)
-    }
     polymorphic(TypedFileNode::class) {
         subclass(DefaultTypedFileNode::class)
-    }
-    polymorphic(NodeContentUri::class) {
-        subclass(NodeContentUri.LocalContentUri::class)
-        subclass(NodeContentUri.RemoteContentUri::class)
     }
 }
