@@ -94,12 +94,16 @@ fun HomeScreens(
         }
 
         is MainNavState.Data -> {
-            val homeScreenStacks = rememberTopLevelBackStack(currentState.initialDestination)
-            LaunchedOnceEffect(key) {
+            var hasSetStackFromKey by rememberSaveable(key) { mutableStateOf(false) }
+            val homeScreenStacks =
+                rememberTopLevelBackStack(currentState.initialDestination)
+
+            if (hasSetStackFromKey.not()) {
                 key.root?.let {
                     homeScreenStacks.switchTopLevel(it)
                     key.destinations?.let { destinations -> homeScreenStacks.addAll(destinations) }
                 }
+                hasSetStackFromKey = true
             }
 
             LaunchedEffect(currentState.isConnected) {
