@@ -103,12 +103,17 @@ class SelectVideosForPlaylistScreenTest {
             )
         )
 
-        SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
-        SELECT_VIDEOS_LIST_VIEW_TAG.assertIsDisplayedWithTag()
+        listOf(
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_LIST_VIEW_TAG
+        ).assertIsDisplayedWithTag()
 
-        SELECT_VIDEOS_GRID_VIEW_TAG.assertIsNotDisplayedWithTag()
-        SELECT_VIDEOS_LOADING_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
-        SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
+        listOf(
+            SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_GRID_VIEW_TAG,
+            SELECT_VIDEOS_LOADING_VIEW_TEST_TAG,
+            SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG,
+        ).assertIsNotDisplayedWithTag()
     }
 
     @Test
@@ -130,12 +135,31 @@ class SelectVideosForPlaylistScreenTest {
             )
         )
 
-        SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
-        SELECT_VIDEOS_GRID_VIEW_TAG.assertIsDisplayedWithTag()
+        listOf(
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_GRID_VIEW_TAG
+        ).assertIsDisplayedWithTag()
 
-        SELECT_VIDEOS_LIST_VIEW_TAG.assertIsNotDisplayedWithTag()
-        SELECT_VIDEOS_LOADING_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
-        SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
+        listOf(
+            SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_LIST_VIEW_TAG,
+            SELECT_VIDEOS_LOADING_VIEW_TEST_TAG,
+            SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG,
+        ).assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that top bar is displayed as expected when selectedHandles is not empty`() {
+        setComposeContent(
+            uiState = SelectVideosForPlaylistUiState.Data(
+                title = LocalizedText.Literal("Cloud Drive"),
+                isCloudDriveRoot = true,
+                items = emptyList(),
+                selectItemHandles = setOf(1, 2)
+            )
+        )
+        SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
+        SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG.assertIsNotDisplayedWithTag()
     }
 
     @Test

@@ -32,6 +32,7 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeSortOption
@@ -161,27 +162,34 @@ fun SelectVideosForPlaylistScreen(
             }
         },
         topBar = {
-            MegaSearchTopAppBar(
-                modifier = Modifier.testTag(SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG),
-                navigationType = AppBarNavigationType.Back(onBackPressed),
-                title = when {
-                    dataState?.selectItemHandles?.isNotEmpty() == true ->
-                        dataState.selectItemHandles.size.toString()
+            val selectedHandles = dataState?.selectItemHandles
 
-                    dataState?.isCloudDriveRoot == true -> stringResource(sharedR.string.video_section_video_selected_top_bar_title)
-                    else -> dataState?.title?.text ?: ""
-                },
-                query = searchQuery,
-                onQueryChanged = updateSearchQuery,
-                onSearchingModeChanged = { isSearching ->
-                    isSearchBarVisible = isSearching
-                    if (!isSearching) {
-                        updateSearchQuery(null)
-                    }
-                },
-                isSearchingMode = isSearchBarVisible,
-                actions = emptyList()
-            )
+            if (!selectedHandles.isNullOrEmpty()) {
+                MegaTopAppBar(
+                    modifier = Modifier.testTag(SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG),
+                    navigationType = AppBarNavigationType.Back(clearSelection),
+                    title = selectedHandles.size.toString()
+                )
+            } else {
+                MegaSearchTopAppBar(
+                    modifier = Modifier.testTag(SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG),
+                    navigationType = AppBarNavigationType.Back(onBackPressed),
+                    title = when {
+                        dataState?.isCloudDriveRoot == true -> stringResource(sharedR.string.video_section_video_selected_top_bar_title)
+                        else -> dataState?.title?.text ?: ""
+                    },
+                    query = searchQuery,
+                    onQueryChanged = updateSearchQuery,
+                    onSearchingModeChanged = { isSearching ->
+                        isSearchBarVisible = isSearching
+                        if (!isSearching) {
+                            updateSearchQuery(null)
+                        }
+                    },
+                    isSearchingMode = isSearchBarVisible,
+                    actions = emptyList()
+                )
+            }
         }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
@@ -277,6 +285,11 @@ const val SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG = "select_videos:view_empty"
  * The test tag for search top app bar of select videos screen
  */
 const val SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG = "select_videos:top_bar_search"
+
+/**
+ * The test tag for selection top app bar of select videos screen
+ */
+const val SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG = "select_videos:top_bar_selection"
 
 /**
  * The test tag for list view of select videos screen
