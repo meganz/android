@@ -2170,4 +2170,9 @@
     <string name="node_menu_action_make_available_offline">Maak offline beschikbaar</string>
     <string name="device_center_bottom_sheet_item_remove_connection">Verbinding verwijderen</string>
     <string name="device_center_snackbar_message_connection_removed">Verbinding verwijderd</string>
+    <string name="text_editor_show_line_numbers">Regelnummers weergeven</string>
+    <string name="text_editor_hide_line_numbers">Regelnummers verbergen</string>
+    <string name="sync_folder_connection_dialog_title">Map verbonden met een ander apparaat</string>
+    <string name="sync_folder_connection_dialog_message">Deze map is gekoppeld aan uw %1$s-apparaat, waarschijnlijk omdat MEGA is verwijderd zonder dat u zich hebt afgemeld. Een map kan slechts met één apparaat tegelijk worden gesynchroniseerd. Verwijder de bestaande verbinding om de map hier te synchroniseren.</string>
+    <string name="sync_folder_connection_this_device">Verbonden met %1$s</string>
 </resources>

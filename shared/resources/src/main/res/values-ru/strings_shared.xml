@@ -478,9 +478,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Отмена передач&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Сообщение должно содержать не менее 10 символов</string>
+    <string name="report_issue_error_minimum_characters">Запросы должны быть не короче 30 символов</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Опишите проблему, используя не менее 10 символов</string>
+    <string name="report_issue_description_placeholder_message">Опишите проблему не короче 30 символов</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Сохраняйте конфиденциальность разговоров</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2267,4 +2267,14 @@
     <string name="photos_create_album_proscribed_name_error">Недопустимое название альбома. Введите другое название.</string>
     <string name="remove_from_offline_success_message">Файл удалён из локальных</string>
     <string name="create_new_video_playlist_input_title_placeholder">Новый плейлист</string>
+    <string name="text_editor_show_line_numbers">Показывать номера строк</string>
+    <string name="text_editor_hide_line_numbers">Скрывать номера строк</string>
+    <string name="settings_help_rate_app">Оцените нас</string>
+    <string name="search_landing_title">Ищете что-то?</string>
+    <string name="search_landing_subtitle">Поиск файлов и папок</string>
+    <string name="offline_screen_empty_state_description">Нет локальных файлов</string>
+    <string name="general_install_label">Установить</string>
+    <string name="general_app_update_download_success_message">Обновление приложения скачано</string>
+    <string name="error_folder_part_of_camera_uploads">Эта папка уже включена в «Загрузки из камеры». Выберите другую.</string>
+    <string name="error_folder_part_of_media_uploads">Эта папка уже включена в «Загрузки медиа». Выберите другую.</string>
 </resources>

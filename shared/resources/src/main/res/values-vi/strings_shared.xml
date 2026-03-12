@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Đang hủy các phiên truyền tải&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Lời báo&#160;cáo phải có ít nhất 10 ký&#160;tự</string>
+    <string name="report_issue_error_minimum_characters">Các yêu cầu phải có tối thiểu 30 ký tự</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Mô&#160;tả vấn&#160;đề với ít nhất 10 ký&#160;tự</string>
+    <string name="report_issue_description_placeholder_message">Mô tả vấn đề với tối thiểu 30 ký tự</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Giữ các cuộc trò&#160;chuyện được riêng&#160;tư</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -1933,4 +1933,7 @@
     <string name="photos_create_album_proscribed_name_error">Không được phép sử dụng tên này cho album. Nhập một tên khác.</string>
     <string name="remove_from_offline_success_message">Tệp đã bị loại khỏi lưu Ngoại Tuyến</string>
     <string name="create_new_video_playlist_input_title_placeholder">Tạo danh sách phát mới</string>
+    <string name="text_editor_show_line_numbers">Hiện số dòng</string>
+    <string name="text_editor_hide_line_numbers">Ẩn số dòng</string>
+    <string name="settings_help_rate_app">Đánh giá app</string>
 </resources>

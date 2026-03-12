@@ -467,9 +467,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Se anulează transferurile&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 10 caractere</string>
+    <string name="report_issue_error_minimum_characters">Întrebările trebuie să aibă cel puțin 30 de caractere</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Descrieți problema cu cel puțin 10 caractere</string>
+    <string name="report_issue_description_placeholder_message">Descrie problema în cel puțin 30 de caractere</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Păstrați conversațiile private</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2222,4 +2222,9 @@
     <string name="node_menu_action_make_available_offline">Fă disponibil offline</string>
     <string name="device_center_bottom_sheet_item_remove_connection">Elimină conexiunea</string>
     <string name="device_center_snackbar_message_connection_removed">Conexiunea a fost eliminată</string>
+    <string name="text_editor_show_line_numbers">Afișează numerele liniilor</string>
+    <string name="text_editor_hide_line_numbers">Ascunde numerele liniilor</string>
+    <string name="sync_folder_connection_dialog_title">Folder conectat la un alt dispozitiv</string>
+    <string name="sync_folder_connection_dialog_message">Acest folder este conectat la dispozitivul tău %1$s, probabil pentru că MEGA a fost dezinstalat fără să te deconectezi. Un folder poate fi sincronizat doar cu un singur dispozitiv la un moment dat. Elimină conexiunea existentă pentru a-l sincroniza aici.</string>
+    <string name="sync_folder_connection_this_device">Conectat la %1$s</string>
 </resources>

@@ -2067,4 +2067,6 @@
     <string name="settings_help_rate_app">Beri kami nilai</string>
     <string name="node_menu_action_make_available_offline">Sediakan secara offline</string>
     <string name="create_new_video_playlist_input_title_placeholder">Daftar putar baru</string>
+    <string name="text_editor_show_line_numbers">Tampilkan nomor baris</string>
+    <string name="text_editor_hide_line_numbers">Sembunyikan nomor baris</string>
 </resources>

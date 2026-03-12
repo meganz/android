@@ -500,9 +500,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">جاري إلغاء عمليات التراسل...</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">يجب أن تتكون الاستفسارات من 10 أحرف على الأقل</string>
+    <string name="report_issue_error_minimum_characters">يجب ألا تقل الاستفسارات عن 30 حرفاً</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">وصف المشكلة باستخدام 10 محارف على الأقل</string>
+    <string name="report_issue_description_placeholder_message">صف المشكلة بما لا يقل عن 30 حرفاً</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">حافظ على خصوصية المحادثات</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2287,4 +2287,7 @@
     <string name="album_photos_selection_empty_state_no_media_found">لم يتم العثور على أي وسائط</string>
     <string name="home_screen_no_network_desc_with_offline_files">أنت غير متصل بالإنترنت.\nالعناصر التي حفظتها للاستخدام دون اتصال ما زالت متوفرة.</string>
     <string name="home_screen_no_network_view_offline_files_button">عرض الملفات دون اتصال بالإنترنت</string>
+    <string name="text_editor_show_line_numbers">إظهار أرقام الأسطر</string>
+    <string name="text_editor_hide_line_numbers">إخفاء أرقام الأسطر</string>
+    <string name="settings_help_rate_app">قيّمنا</string>
 </resources>

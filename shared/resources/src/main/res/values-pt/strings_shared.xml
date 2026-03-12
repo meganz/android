@@ -467,9 +467,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Cancelando transferências&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">As perguntas devem ter pelo menos 10 caracteres</string>
+    <string name="report_issue_error_minimum_characters">A descrição deve ter pelo menos 30 caracteres</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Descreva o problema usando um mínimo de 10 caracteres</string>
+    <string name="report_issue_description_placeholder_message">Descreva o problema com pelo menos 30 caracteres</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Mantenha as conversas confidenciais</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2231,4 +2231,9 @@
     <string name="device_center_bottom_sheet_item_remove_connection">Remover conexão</string>
     <string name="device_center_snackbar_message_connection_removed">Conexão removida</string>
     <string name="create_new_video_playlist_input_title_placeholder">Nova lista de reprodução</string>
+    <string name="text_editor_show_line_numbers">Mostrar os números das linhas</string>
+    <string name="text_editor_hide_line_numbers">Ocultar os números das linhas</string>
+    <string name="sync_folder_connection_dialog_title">Pasta conectada a outro dispositivo</string>
+    <string name="sync_folder_connection_dialog_message">Esta pasta está conectada ao seu dispositivo %1$s, provavelmente porque o MEGA foi desinstalado fazer logout. Somente é possível sincronizar uma pasta com um dispositivo de cada vez. Remova a conexão existente para poder sincronizar a pasta neste dispositivo.</string>
+    <string name="sync_folder_connection_this_device">Conectada a %1$s</string>
 </resources>

@@ -445,9 +445,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">正在取消傳輸⋯</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">查詢內容必須至少10個字元（5個中文字）</string>
+    <string name="report_issue_error_minimum_characters">查詢必須至少有30個字元</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">問題描述至少10個字元（5個中文字）</string>
+    <string name="report_issue_description_placeholder_message">描述該問題，字數不少於 30 個字</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">保持對話私密</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -1747,7 +1747,7 @@
         <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">在我們的網站上購買（最多可省%1$.0f%%）</string>
+    <string name="external_checkout_button_text">在我們的網站上購買（最多可節省%1$.0f%%）</string>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="other">與您共享連結的人將無法存取相簿。</item>
@@ -2095,4 +2095,7 @@
     <string name="photos_create_album_proscribed_name_error">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <string name="remove_from_offline_success_message">檔案已從可離線使用中移除</string>
     <string name="create_new_video_playlist_input_title_placeholder">新的播放列表</string>
+    <string name="text_editor_show_line_numbers">顯示行數</string>
+    <string name="text_editor_hide_line_numbers">隱藏行數</string>
+    <string name="settings_help_rate_app">請幫我們評分</string>
 </resources>

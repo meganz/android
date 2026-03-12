@@ -2173,4 +2173,9 @@
     <string name="node_menu_action_make_available_offline">Çevrim dışı olarak kullanılabilir yap</string>
     <string name="device_center_bottom_sheet_item_remove_connection">Bağlantıyı kaldır</string>
     <string name="device_center_snackbar_message_connection_removed">Bağlantı kaldırıldı</string>
+    <string name="text_editor_show_line_numbers">Satır numaralarını göster</string>
+    <string name="text_editor_hide_line_numbers">Satır numaralarını gizle</string>
+    <string name="sync_folder_connection_dialog_title">Klasör başka bir cihaza bağlı</string>
+    <string name="sync_folder_connection_dialog_message">Bu klasör %1$s cihazına bağlı; muhtemelen MEGA, çıkış yapılmadan kaldırıldığı için bu durum yaşanıyor. Bir klasör aynı anda yalnızca bir cihaza senkronize edilebilir. Burada senkronize edebilmek için mevcut bağlantıyı kaldırmalısınız.</string>
+    <string name="sync_folder_connection_this_device">%1$s cihazına bağlı</string>
 </resources>

@@ -2039,7 +2039,7 @@
     <!-- Label layout on maps activity that permits send current location. Placeholder is the current location -->
     <string name="current_location_landscape_label">發送您目前所在位置：[A]%1$s[/A]</string>
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
-    <string name="explanation_send_location">此位置將使用不屬於MEGA點對點加密平台的第三方地圖供應商開啟。</string>
+    <string name="explanation_send_location">此位置將使用不屬於MEGA點對點加密平台的第三方地圖業者開啟。</string>
     <!-- Title of the location marker set by the user -->
     <string name="title_marker_maps">發送這個位置</string>
     <!-- Title of the dialog shown when the location is disabled -->
