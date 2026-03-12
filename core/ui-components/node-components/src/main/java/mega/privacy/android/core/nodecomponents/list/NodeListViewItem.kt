@@ -50,6 +50,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 
 /**
  * Node list item using NodeUiItem

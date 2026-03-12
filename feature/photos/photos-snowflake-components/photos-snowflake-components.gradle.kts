@@ -21,6 +21,7 @@ dependencies {
     implementation(project(":shared:resources"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
+    implementation(project(":shared:nodes"))
 
     //core components
     implementation(lib.mega.core.ui)

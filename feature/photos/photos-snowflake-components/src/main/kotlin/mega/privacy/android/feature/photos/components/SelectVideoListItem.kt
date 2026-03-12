@@ -29,11 +29,11 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.list.NodeThumbnailView
-import mega.privacy.android.core.nodecomponents.list.ThumbnailLayoutType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
+import mega.privacy.android.shared.nodes.components.NodeThumbnailView
+import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 
 @Composable
 fun SelectVideoListItem(

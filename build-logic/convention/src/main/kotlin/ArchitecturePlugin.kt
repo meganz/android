@@ -54,11 +54,12 @@ class ArchitecturePlugin : Plugin<Project> {
         ":feature:sync",
         ":feature:transfers:transfers-snowflake-components",
         ":shared:resources",
-        ":shared:original-core-ui",
+        ":shared:original-core-ui", //this should be replaced by core-ui library
     )
 
     private val moduleExceptions = listOf(
         ":core:ui-components:node-components", //this module will be deleted because it's not following the architecture itself
+        ":feature:photos:photos-snowflake-components" //this library should be refactored or moved to shared folder, as it's used by multiple modules
     )
 
     sealed interface ArchitectureLayer {

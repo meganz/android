@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

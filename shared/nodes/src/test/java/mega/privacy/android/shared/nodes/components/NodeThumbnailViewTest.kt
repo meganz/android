@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -33,8 +33,8 @@ class NodeThumbnailViewTest {
         contentDescription: String? = "Test Thumbnail",
         blurImage: Boolean = false,
         layoutType: ThumbnailLayoutType = ThumbnailLayoutType.Grid,
-        modifier: Modifier = Modifier,
-        contentScale: ContentScale = ContentScale.Crop,
+        modifier: Modifier = Modifier.Companion,
+        contentScale: ContentScale = ContentScale.Companion.Crop,
     ) {
         composeTestRule.setContent {
             NodeThumbnailView(
