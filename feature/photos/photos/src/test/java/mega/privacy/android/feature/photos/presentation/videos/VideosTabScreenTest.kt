@@ -7,8 +7,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -16,6 +15,7 @@ import mega.privacy.android.feature.photos.components.DURATION_FILTER_BUTTON_TEX
 import mega.privacy.android.feature.photos.components.LOCATION_FILTER_BUTTON_TEXT_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

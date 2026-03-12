@@ -1,8 +1,8 @@
 package mega.privacy.android.feature.photos.model
 
 import androidx.compose.runtime.Stable
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortOptionItem
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.shared.nodes.model.SortOptionItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 enum class AlbumSortOption(

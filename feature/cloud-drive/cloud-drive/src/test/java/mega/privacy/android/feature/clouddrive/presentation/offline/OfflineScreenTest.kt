@@ -19,9 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.core.nodecomponents.list.GRID_VIEW_TOGGLE_TAG
-import mega.privacy.android.core.nodecomponents.list.SORT_ORDER_TAG
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.core.transfers.widget.TransfersToolabarWidgetUiState
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidgetViewModel
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
@@ -30,6 +28,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineNodeUiItem
 import mega.privacy.android.feature.clouddrive.presentation.offline.model.OfflineUiState
 import mega.privacy.android.feature.transfers.components.widget.TransfersToolbarWidgetStatus
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_TOGGLE_TAG
+import mega.privacy.android.shared.nodes.components.SORT_ORDER_TAG
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent

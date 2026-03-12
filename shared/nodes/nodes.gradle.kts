@@ -19,6 +19,11 @@ android {
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
     namespace = "mega.privacy.android.shard.nodes"
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -59,11 +64,16 @@ dependencies {
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)
 
+    //test
+    testImplementation(project(":core-test"))
+    testImplementation(project(":core-ui-test"))
     testImplementation(project(":core:analytics:analytics-test"))
+    testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.bundles.junit5.api)
     testImplementation(google.hilt.android.test)
     testImplementation(androidx.material3)
     testImplementation(androidx.work.test)
+    testRuntimeOnly(testlib.junit.jupiter.engine)
 }

@@ -32,20 +32,10 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.model.SortOptionItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val SORT_BOTTOM_SHEET_TITLE_TAG = "sort_bottom_sheet:title"
-
-/**
- * Interface for sort option items that can be used in the SortBottomSheet.
- *
- * @property displayName Human-readable name to display in the UI
- */
-interface SortOptionItem {
-    @get:StringRes
-    val displayName: Int
-    val testTag: String
-}
 
 /**
  * Result data class containing the selected sort option and order.

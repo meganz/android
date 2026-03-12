@@ -1,7 +1,6 @@
-package mega.privacy.android.core.nodecomponents.model
+package mega.privacy.android.shared.nodes.model
 
 import androidx.annotation.StringRes
-import mega.privacy.android.core.nodecomponents.sheet.sort.SortOptionItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.shared.resources.R as sharedR

@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.videos
 
 import androidx.compose.runtime.Stable
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 

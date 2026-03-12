@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
@@ -20,16 +20,16 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 
 /**
  * Header View item for [NodesView] or [NodeGridView]
  * @param onSortOrderClick callback triggered when sort order is clicked
  * @param onChangeViewTypeClick callback triggered when view type toggle is clicked
  * @param onEnterMediaDiscoveryClick callback triggered when media discovery button is clicked
- * @param sortOrder current sort order name from resource
+ * @param sortConfiguration current sort configuration (option and direction)
  * @param isListView current view type - true for list view, false for grid view
  * @param showSortOrder whether to show the sort order section
  * @param showChangeViewType whether to show the view type toggle button

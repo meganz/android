@@ -1,10 +1,10 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeSortOption
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import javax.inject.Inject
 
 class NodeSortConfigurationUiMapper @Inject constructor() {

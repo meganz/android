@@ -3,7 +3,7 @@ package mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property parentFolderId Parent folder ID of the current node
  * @property items List of [mega.privacy.android.core.nodecomponents.model.NodeUiItem] to display
  * @property currentViewType ViewType The current ViewType used by the UI
- * @property sortConfiguration [mega.privacy.android.core.nodecomponents.model.NodeSortConfiguration] of current list
+ * @property sortConfiguration [mega.privacy.android.shared.nodes.model.NodeSortConfiguration] of current list
  * @property isLoading Whether the screen is loading
  * @property nodesLoadingState Current state of node loading
  * @property accountType Current account type
