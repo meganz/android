@@ -41,6 +41,8 @@ import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusPro
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
+import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
 import mega.privacy.android.navigation.contract.state.SelectionModeController
@@ -224,7 +226,9 @@ private fun fallback(
     key = FallbackKey(),
 ) {
     LaunchedOnceEffect {
-        outerNavigationHandler.navigate(unknownKey)
+        if (unknownKey !is MainNavItemNavKey) {
+            outerNavigationHandler.navigate(unknownKey)
+        }
         innerNavigationHandler.back()
     }
 }
