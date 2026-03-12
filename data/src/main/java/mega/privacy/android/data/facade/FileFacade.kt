@@ -1079,7 +1079,8 @@ internal class FileFacade @Inject constructor(
     ): UriPath? {
         val documentFile = getDocumentFileFromUri(uriPath.toUri()) ?: return null
         val displayName = newName.removeFileExtension()
-        val newDocumentFile = getDocumentFileFromUri(parentUriPath.toUri())?.let {
+        val parentFile = getDocumentFileFromUri(parentUriPath.toUri())
+        val newDocumentFile = parentFile?.let {
             if (documentFile.isFile) {
                 it.createFile(getMimeTypeFromFileName(newName), displayName)
             } else {
@@ -1093,7 +1094,7 @@ internal class FileFacade @Inject constructor(
         return when {
             fileDoesNotExist -> renameFileSync(documentFile, newName)
             overwrite -> {
-                documentFile.parentFile?.findFile(newName)?.delete()
+                parentFile?.findFile(newName)?.delete()
                 renameFileSync(documentFile, newName)
             }
 

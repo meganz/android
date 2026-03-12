@@ -962,6 +962,59 @@ internal class FileFacadeTest {
     }
 
     @Test
+    fun `test that renameFileOverwriteSync deletes existing file using parent from parentUriPath when documentFile parentFile is null`(): Unit =
+        mockStatic(Uri::class.java).use {
+            mockStatic(MimeTypeMap::class.java).use {
+                val displayName = "renamed"
+                val newName = "$displayName.txt"
+                val existingFile = mock<DocumentFile> {
+                    on { delete() } doReturn true
+                }
+                val parentDoc = mock<DocumentFile> {
+                    on { findFile(newName) } doReturn existingFile
+                }
+                val uriString = "content://foo"
+                val finalUri = mock<Uri> {
+                    on { this.scheme } doReturn "content"
+                    on { toString() } doReturn uriString
+                }
+                val doc = mock<DocumentFile> {
+                    on { parentFile } doReturn null
+                    on { isFile } doReturn true
+                    on { renameTo(newName) } doReturn true
+                    on { uri } doReturn finalUri
+                }
+                val newDocumentFile = mock<DocumentFile> {
+                    on { name } doReturn "other name"
+                    on { delete() } doReturn true
+                }
+                val uri = stubGetDocumentFileFromUri(doc)
+                val parentUri = stubGetDocumentFileFromUri(parentDoc)
+                val uriPath = UriPath(uriString)
+                val parentUriPath = UriPath("content://parent")
+                val mimeTypeMap = mock<MimeTypeMap>()
+                val mimeType = "text/plain"
+
+                whenever(Uri.parse(uriPath.value)) doReturn uri
+                whenever(Uri.parse(parentUriPath.value)) doReturn parentUri
+                whenever(MimeTypeMap.getSingleton()) doReturn mimeTypeMap
+                whenever(mimeTypeMap.getMimeTypeFromExtension("txt")) doReturn mimeType
+                whenever(parentDoc.createFile(mimeType, displayName)) doReturn newDocumentFile
+
+                val actual = underTest.renameFileOverwriteSync(
+                    uriPath,
+                    parentUriPath,
+                    newName,
+                    overwrite = true
+                )
+
+                assertThat(actual).isEqualTo(uriPath)
+                verify(existingFile).delete()
+                verify(doc).renameTo(newName)
+            }
+        }
+
+    @Test
     fun `test that getFileStorageTypeName returns null if file absolute path is null`() = runTest {
 
         val result = underTest.getFileStorageTypeName(null)
