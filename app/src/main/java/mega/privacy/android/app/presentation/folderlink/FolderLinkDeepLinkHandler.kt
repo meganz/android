@@ -5,7 +5,9 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.FolderLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyFolderLinkNavKey
@@ -18,6 +20,13 @@ class FolderLinkDeepLinkHandler @Inject constructor(
     snackbarEventQueue: SnackbarEventQueue,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : DeepLinkHandler(snackbarEventQueue) {
+
+    override val navOptions: NavOptions = navOptions {
+        popUpTo<FolderLinkNavKey> {
+            inclusive = true
+        }
+    }
+
     override suspend fun getNavKeys(
         uri: Uri,
         regexPatternType: RegexPatternType?,

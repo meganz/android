@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.entity.RegexPatternType
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.resources.R as sharedR
@@ -110,6 +111,12 @@ abstract class DeepLinkHandler(
         regexPatternType: RegexPatternType?,
     ): List<NavKey>? = null
 
+
+    /**
+     * Optional [NavOptions] to apply when navigating to the destinations returned by this handler.
+     * Can be used to manipulate the back stack, e.g. pop up to a specific destination before navigating.
+     */
+    open val navOptions: NavOptions? = null
 
     /**
      * Priority of this deep link handlers. Lower values will be handled first. Use big value if you want to handle it last if no other handler can handle it.

@@ -11,12 +11,13 @@ import mega.android.core.ui.components.dialogs.BasicSpinnerDialog
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.app.R
 import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeRtlPreviews
 
 @Composable
 internal fun DeepLinksDialog(
     uiState: DeepLinksUIState,
-    onNavigate: (List<NavKey>) -> Unit,
+    onNavigate: (List<NavKey>, NavOptions?) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -31,7 +32,7 @@ internal fun DeepLinksDialog(
             onDismiss()
 
             if (navKeys.isNotEmpty()) {
-                onNavigate(navKeys)
+                onNavigate(navKeys, navOptions)
             }
         }
     }
@@ -44,7 +45,7 @@ private fun DeepLinksDialogPreview() {
         Box(modifier = Modifier.fillMaxSize()) {
             DeepLinksDialog(
                 uiState = DeepLinksUIState(),
-                onNavigate = {},
+                onNavigate = { _, _ -> },
                 onDismiss = {},
             )
         }

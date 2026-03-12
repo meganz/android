@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import mega.privacy.android.app.deeplinks.view.DeepLinksDialog
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.dialog.AppDialogDestinations
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
@@ -19,12 +20,17 @@ data object DeepLinksDialogDestinations : AppDialogDestinations {
         { navigationHandler, onHandled ->
             deepLinkDialogDestination(
                 remove = navigationHandler::remove,
-                navigateAndClearTo = navigationHandler::navigateAndClearTo,
+                navigate = { destinations, navOptions ->
+                    navigationHandler.navigate(
+                        destinations = destinations,
+                        navOptions = navOptions
+                    )
+                },
                 onDialogHandled = onHandled
             )
             deepLinkAfterFetchNodesDialogDestination(
                 remove = navigationHandler::remove,
-                navigateAndClearTo = navigationHandler::navigateAndClearTo,
+                navigate = navigationHandler::navigate,
                 onDialogHandled = onHandled
             )
         }
@@ -32,7 +38,7 @@ data object DeepLinksDialogDestinations : AppDialogDestinations {
 
 fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
     remove: (NavKey) -> Unit,
-    navigateAndClearTo: (List<NavKey>, NavKey, Boolean) -> Unit,
+    navigate: (List<NavKey>, NavOptions?) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<DeepLinksDialogNavKey>(
@@ -45,7 +51,7 @@ fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
 
         DeepLinksDialog(
             uiState = uiState,
-            onNavigate = { destinations -> navigateAndClearTo(destinations, key, true) },
+            onNavigate = { destinations, navOptions -> navigate(destinations, navOptions) },
             onDismiss = {
                 remove(key)
                 onDialogHandled()
@@ -56,7 +62,7 @@ fun EntryProviderScope<DialogNavKey>.deepLinkDialogDestination(
 
 fun EntryProviderScope<DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
     remove: (NavKey) -> Unit,
-    navigateAndClearTo: (List<NavKey>, NavKey, Boolean) -> Unit,
+    navigate: (List<NavKey>, NavOptions?) -> Unit,
     onDialogHandled: () -> Unit,
 ) {
     entry<DeepLinksAfterFetchNodesDialogNavKey>(
@@ -74,7 +80,7 @@ fun EntryProviderScope<DialogNavKey>.deepLinkAfterFetchNodesDialogDestination(
 
         DeepLinksDialog(
             uiState = uiState,
-            onNavigate = { destinations -> navigateAndClearTo(destinations, key, true) },
+            onNavigate = { destinations, navOptions -> navigate(destinations, navOptions) },
             onDismiss = {
                 remove(key)
                 onDialogHandled()

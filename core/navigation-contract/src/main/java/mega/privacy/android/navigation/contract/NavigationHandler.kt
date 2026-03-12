@@ -72,4 +72,4 @@ interface NavigationHandler : NavigationResultsHandler {
      * @param inclusive Whether to include the new parent in the pop operation
      */
     fun navigateAndClearTo(destination: List<NavKey>, newParent: NavKey, inclusive: Boolean = false)
-} 
+}

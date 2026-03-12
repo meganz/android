@@ -41,25 +41,32 @@ class DeepLinksViewModel @AssistedInject constructor(
 
     private fun consumeDestination() {
         viewModelScope.launch {
-            val (regexPatternType, isLoggedIn) = if (args.regexPatternType == null) {
-                val regexPatternType = getDecodedUrlRegexPatternTypeUseCase(args.uri.toString())
-                val isLoggedIn = getAccountCredentials() != null
+            runCatching {
+                val (regexPatternType, isLoggedIn) = if (args.regexPatternType == null) {
+                    val regexPatternType = getDecodedUrlRegexPatternTypeUseCase(args.uri.toString())
+                    val isLoggedIn = getAccountCredentials() != null
 
-                regexPatternType to isLoggedIn
-            } else {
-                args.regexPatternType to true
-            }
-
-            deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
-                deepLinkHandler.getNavKeysInternal(args.uri, regexPatternType, isLoggedIn)
-            }?.let { navKeys ->
-                navKeys.forEach {
-                    Timber.d("Adding NavKey from deep link: $it")
+                    regexPatternType to isLoggedIn
+                } else {
+                    args.regexPatternType to true
                 }
-                _uiState.update { state -> state.copy(navKeys = navKeys) }
-            } ?: run {
-                // This should only happen in case the link is not supported by MEGA app
-                Timber.e("Deep link not handled: $args.uri")
+
+                deepLinkHandlers.firstNotNullOfOrNull { deepLinkHandler ->
+                    deepLinkHandler.getNavKeysInternal(args.uri, regexPatternType, isLoggedIn)
+                        ?.let { deepLinkHandler to it }
+                }?.let { (handler, navKeys) ->
+                    navKeys.forEach {
+                        Timber.d("Adding NavKey from deep link: $it")
+                    }
+                    _uiState.update { state ->
+                        state.copy(
+                            navKeys = navKeys,
+                            navOptions = handler.navOptions
+                        )
+                    }
+                } ?: error("Deep link not handled: $args.uri")
+            }.onFailure {
+                Timber.e(it)
                 _uiState.update { state -> state.copy(navKeys = emptyList()) }
                 snackbarEventQueue.queueMessage(R.string.open_link_not_valid_link)
             }

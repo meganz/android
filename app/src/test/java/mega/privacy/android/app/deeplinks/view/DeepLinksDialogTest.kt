@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.deeplinks.model.DeepLinksUIState
 import mega.privacy.android.app.presentation.login.LoginNavKey
+import mega.privacy.android.navigation.contract.NavOptions
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,7 +22,7 @@ class DeepLinksDialogTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    private val onNavigate = mock<(List<NavKey>) -> Unit>()
+    private val onNavigate = mock<(List<NavKey>, NavOptions?) -> Unit>()
     private val onDismiss = mock<() -> Unit>()
 
     @Test
@@ -47,7 +48,7 @@ class DeepLinksDialogTest {
 
         composeTestRule.onNodeWithTag(DEEP_LINK_DIALOG_TEST_TAG).assertIsNotDisplayed()
         verify(onDismiss).invoke()
-        verify(onNavigate).invoke(navKeys)
+        verify(onNavigate).invoke(navKeys, null)
     }
 
     private fun initComposeTestRule(uiState: DeepLinksUIState) {
