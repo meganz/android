@@ -128,11 +128,11 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
 
         @Composable
         override fun getDescription() =
-            stringResource(sharedR.string.general_remove)
+            stringResource(sharedR.string.album_content_selection_action_delete_description)
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.ImageX)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
 
         override val highlightIcon: Boolean = true
     }
