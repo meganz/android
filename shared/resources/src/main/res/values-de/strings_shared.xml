@@ -456,9 +456,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Transfers werden abgebrochen&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Anfragen müssen mindestens 10 Zeichen lang sein</string>
+    <string name="report_issue_error_minimum_characters">Anfragen müssen mindestens 30 Zeichen lang sein</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Beschreiben Sie das Problem und verwenden Sie dabei mindestens 10 Zeichen</string>
+    <string name="report_issue_description_placeholder_message">Beschreiben Sie das Problem und verwenden Sie dabei mindestens 30 Zeichen</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Schützen Sie Ihre Unterhaltungen</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2142,10 +2142,7 @@
     <string name="photos_create_album_proscribed_name_error">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
     <string name="remove_from_offline_success_message">Datei nicht mehr offline verfügbar</string>
     <string name="create_new_video_playlist_input_title_placeholder">Neue Playlist</string>
-    <!-- Sync folder connection dialog title -->
-    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
-    <!-- Sync folder connection dialog message. %1$s is the device name -->
-    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
-    <!-- Sync folder connection subtitle -->
-    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <string name="text_editor_show_line_numbers">Zeilennummern anzeigen</string>
+    <string name="text_editor_hide_line_numbers">Zeilennummern ausblenden</string>
+    <string name="settings_help_rate_app">Bewerten Sie uns</string>
 </resources>

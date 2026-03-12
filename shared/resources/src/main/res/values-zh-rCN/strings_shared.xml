@@ -2109,10 +2109,9 @@
     <string name="node_menu_action_make_available_offline">设为离线可用</string>
     <string name="device_center_bottom_sheet_item_remove_connection">移除连接</string>
     <string name="device_center_snackbar_message_connection_removed">连接已移除</string>
-    <!-- Sync folder connection dialog title -->
-    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
-    <!-- Sync folder connection dialog message. %1$s is the device name -->
-    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
-    <!-- Sync folder connection subtitle -->
-    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <string name="text_editor_show_line_numbers">显示行数</string>
+    <string name="text_editor_hide_line_numbers">隐藏行数</string>
+    <string name="sync_folder_connection_dialog_title">文件夹已连接到另一台设备</string>
+    <string name="sync_folder_connection_dialog_message">此文件夹已连接到您的%1$s设备，可能是因为在未登出时卸载了MEGA。一个文件夹一次只能同步到一个设备。请先移除现有连接，然后在此处进行同步。</string>
+    <string name="sync_folder_connection_this_device">已连接到%1$s</string>
 </resources>

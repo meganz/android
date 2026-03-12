@@ -2101,10 +2101,9 @@
     <string name="node_menu_action_make_available_offline">ทำให้ใช้งานออฟไลน์ได้</string>
     <string name="device_center_bottom_sheet_item_remove_connection">ลบการเชื่อมต่อ</string>
     <string name="device_center_snackbar_message_connection_removed">ลบการเชื่อมต่อแล้ว</string>
-    <!-- Sync folder connection dialog title -->
-    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
-    <!-- Sync folder connection dialog message. %1$s is the device name -->
-    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
-    <!-- Sync folder connection subtitle -->
-    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <string name="text_editor_show_line_numbers">แสดงหมายเลขบรรทัด</string>
+    <string name="text_editor_hide_line_numbers">ซ่อนหมายเลขบรรทัด</string>
+    <string name="sync_folder_connection_dialog_title">โฟลเดอร์เชื่อมต่อกับอุปกรณ์อื่นอยู่</string>
+    <string name="sync_folder_connection_dialog_message">โฟลเดอร์นี้เชื่อมโยงกับอุปกรณ์ %1$s ของคุณอยู่ ซึ่งอาจเป็นเพราะมีการถอนการติดตั้ง MEGA โดยไม่ได้ออกจากระบบ โฟลเดอร์จะซิงค์ข้อมูลกับอุปกรณ์ได้เพียงเครื่องเดียวในแต่ละครั้ง กรุณาลบการเชื่อมต่อที่มีอยู่เพื่อเริ่มการซิงค์ข้อมูลที่นี่</string>
+    <string name="sync_folder_connection_this_device">เชื่อมต่อกับ %1$s แล้ว</string>
 </resources>

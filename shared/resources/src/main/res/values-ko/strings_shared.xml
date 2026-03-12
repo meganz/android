@@ -2099,10 +2099,9 @@
     <string name="node_menu_action_make_available_offline">오프라인에서 이용 가능하게 하기</string>
     <string name="device_center_bottom_sheet_item_remove_connection">연결 제거</string>
     <string name="device_center_snackbar_message_connection_removed">연결 제거됨</string>
-    <!-- Sync folder connection dialog title -->
-    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
-    <!-- Sync folder connection dialog message. %1$s is the device name -->
-    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
-    <!-- Sync folder connection subtitle -->
-    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <string name="text_editor_show_line_numbers">줄 번호 보기</string>
+    <string name="text_editor_hide_line_numbers">줄 번호 숨기기</string>
+    <string name="sync_folder_connection_dialog_title">다른 장치와 연결된 폴더</string>
+    <string name="sync_folder_connection_dialog_message">이 링크는 당신의 %1$s 장치에 연결되어 있으며, MEGA를 로그아웃 하지 않고 삭제했기 때문으로 보입니다. 폴더는 한번에 한 장치만 동기화할 수 있습니다. 여기에서 동기화하려면 기존 연결을 제거하세요.</string>
+    <string name="sync_folder_connection_this_device">%1$s에 연결됨</string>
 </resources>

@@ -467,9 +467,9 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Sto annullando i trasferimenti&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Le richieste devono contenere almeno 10 caratteri</string>
+    <string name="report_issue_error_minimum_characters">Le richieste devono contenere almeno 30 caratteri</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">Descrivi il problema con almeno 10 caratteri</string>
+    <string name="report_issue_description_placeholder_message">Descrivi il problema con almeno 30 caratteri</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">Mantieni private le conversazioni</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -2097,10 +2097,7 @@
     <string name="photos_create_album_proscribed_name_error">Il nome di questo album non è permesso. Inserisci un nome diverso.</string>
     <string name="remove_from_offline_success_message">File rimosso dall\’offline</string>
     <string name="create_new_video_playlist_input_title_placeholder">Nuova playlist</string>
-    <!-- Sync folder connection dialog title -->
-    <string name="sync_folder_connection_dialog_title">Folder connected to another device</string>
-    <!-- Sync folder connection dialog message. %1$s is the device name -->
-    <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
-    <!-- Sync folder connection subtitle -->
-    <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <string name="text_editor_show_line_numbers">Mostra i numeri del rigo</string>
+    <string name="text_editor_hide_line_numbers">Nascondi i numeri del rigo</string>
+    <string name="settings_help_rate_app">Votaci</string>
 </resources>
