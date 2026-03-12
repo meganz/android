@@ -391,7 +391,8 @@ internal fun VideoPlaylistDetailScreen(
                                 totalDuration = playlistDetail.uiEntity.totalDuration,
                                 numberOfVideos = playlistDetail.uiEntity.numberOfVideos,
                                 modifier = Modifier.padding(16.dp),
-                                onPlayAllClicked = { onClick(items[0]) }
+                                onPlayAllClicked = { onClick(items[0]) },
+                                enabled = !uiState.isSelectionMode
                             )
                         }
 
@@ -564,6 +565,7 @@ internal fun VideoPlaylistDetailEmptyView(
             totalDuration = totalDuration,
             numberOfVideos = numberOfVideos,
             modifier = Modifier.padding(16.dp),
+            enabled = false,
             onPlayAllClicked = {}
         )
 

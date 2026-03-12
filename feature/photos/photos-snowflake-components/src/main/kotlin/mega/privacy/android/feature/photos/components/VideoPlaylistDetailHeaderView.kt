@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,8 +22,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
@@ -35,6 +38,7 @@ fun VideoPlaylistDetailHeaderView(
     title: String?,
     totalDuration: String?,
     numberOfVideos: Int?,
+    enabled: Boolean,
     onPlayAllClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -71,6 +75,7 @@ fun VideoPlaylistDetailHeaderView(
         }
         if (numberOfVideos != null && numberOfVideos != 0) {
             PlayAllButtonView(
+                enabled = enabled,
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(top = 16.dp, bottom = 10.dp),
@@ -83,34 +88,32 @@ fun VideoPlaylistDetailHeaderView(
 @Composable
 internal fun PlayAllButtonView(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onPlayAllClicked: () -> Unit = {},
 ) {
     Row(
         modifier = modifier
             .height(48.dp)
-            .border(
-                width = 1.dp,
-                color = DSTokens.colors.button.outline,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clickable { onPlayAllClicked() }
+            .background(color = DSTokens.colors.button.secondary, shape = RoundedCornerShape(10.dp))
+            .clickable(enabled = enabled, onClick = onPlayAllClicked)
             .testTag(VIDEO_PLAYLIST_DETAIL_HEADER_PLAY_ALL_TEST_TAG)
     ) {
-        Icon(
+        MegaIcon(
             imageVector = IconPack.Medium.Thin.Outline.Play,
             contentDescription = "play all",
             modifier = Modifier
-                .padding(start = 20.dp, end = 5.dp)
+                .padding(start = 15.dp, end = 5.dp)
                 .size(24.dp)
-                .align(Alignment.CenterVertically)
+                .align(Alignment.CenterVertically),
+            tint = if (enabled) IconColor.Primary else IconColor.Disabled
         )
 
         MegaText(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
-                .padding(end = 20.dp),
+                .padding(end = 15.dp),
             text = stringResource(id = sharedR.string.video_section_playlist_detail_play_all_button),
-            textColor = TextColor.Accent,
+            textColor = if (enabled) TextColor.Accent else TextColor.Disabled,
             style = MaterialTheme.typography.bodyMedium
         )
     }
@@ -125,6 +128,7 @@ private fun VideoPlaylistDetailHeaderViewDefaultThumbnailPreview() {
             title = "Video Playlist",
             totalDuration = null,
             numberOfVideos = 0,
+            enabled = false,
             onPlayAllClicked = {},
         )
     }
@@ -139,6 +143,7 @@ private fun VideoPlaylistDetailHeaderViewNoThumbnailPreview() {
             title = "Video Playlist",
             totalDuration = "1:30:45",
             numberOfVideos = 10,
+            enabled = true,
             onPlayAllClicked = {},
         )
     }
@@ -153,6 +158,7 @@ private fun VideoPlaylistDetailHeaderViewPreview() {
             title = "Video Playlist",
             totalDuration = "1:30:45",
             numberOfVideos = 10,
+            enabled = false,
             onPlayAllClicked = {},
         )
     }

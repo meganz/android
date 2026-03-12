@@ -42,6 +42,11 @@ sealed interface VideoPlaylistDetailUiState {
         val areAllSelected: Boolean
             get() = selectedTypedNodes.isNotEmpty() && playlistDetail?.videos?.size == selectedTypedNodes.size
 
+        /**
+         * The selection mode whether is enabled
+         */
+        val isSelectionMode get() = selectedTypedNodes.isNotEmpty()
+
         val bottomBarActions: List<MenuActionWithIcon>
             get() = if (selectedTypedNodes.isEmpty()) {
                 emptyList()
