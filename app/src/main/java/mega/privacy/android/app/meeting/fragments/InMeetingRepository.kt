@@ -3,6 +3,8 @@ package mega.privacy.android.app.meeting.fragments
 import android.content.Context
 import android.graphics.Bitmap
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
@@ -11,6 +13,7 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -30,6 +33,7 @@ class InMeetingRepository @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context,
+    @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -168,12 +172,12 @@ class InMeetingRepository @Inject constructor(
      * @param hiRes If it's has High resolution
      * @param listener MegaChatVideoListenerInterface
      */
-    fun addChatRemoteVideoListener(
+    suspend fun addChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
         listener: MegaChatVideoListenerInterface,
-    ) {
+    ) = withContext(iODispatcher) {
         if (hiRes) {
             Timber.d("Add Chat remote video listener of client $clientId , with HiRes")
         } else {
@@ -191,12 +195,12 @@ class InMeetingRepository @Inject constructor(
      * @param hiRes If it's has High resolution
      * @param listener MegaChatVideoListenerInterface
      */
-    fun removeChatRemoteVideoListener(
+    suspend fun removeChatRemoteVideoListener(
         chatId: Long,
         clientId: Long,
         hiRes: Boolean,
         listener: MegaChatVideoListenerInterface,
-    ) {
+    ) = withContext(iODispatcher) {
         if (hiRes) {
             Timber.d("Remove Chat remote video listener of client $clientId, with HiRes")
         } else {

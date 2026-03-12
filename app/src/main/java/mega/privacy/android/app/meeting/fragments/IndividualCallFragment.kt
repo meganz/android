@@ -224,6 +224,13 @@ class IndividualCallFragment : MeetingBaseFragment() {
         viewLifecycleOwner.collectFlow(inMeetingViewModel.state.map { it.changesInHiResInSession }
             .distinctUntilChanged()) { session ->
             session?.apply {
+                val clientId = this@IndividualCallFragment.clientId
+                val isMe = inMeetingViewModel.isMe(this@IndividualCallFragment.peerId)
+                Timber.d("changesInHiRes: canReceiveHiRes=$canReceiveVideoHiRes isHiResVideo=$isHiResVideo hasVideo=$hasVideo")
+                Timber.d("changesInHiRes: status=$status isFloating=$isFloatingWindow clientId=$clientId isMe=$isMe")
+                if (isMe) {
+                    return@apply
+                }
                 if (!isFloatingWindow && inMeetingViewModel.isOneToOneCall() == true && isAdded) {
                     if (canReceiveVideoHiRes && isHiResVideo) {
                         Timber.d("Can receive high-resolution video")
@@ -256,6 +263,8 @@ class IndividualCallFragment : MeetingBaseFragment() {
      * @param clientId Client ID of participant
      */
     private fun addListener(clientId: Long) {
+        if (isInvalid(this.peerId, clientId)) return
+
         if (videoListener == null) {
             videoListener = IndividualCallVideoListener(
                 videoTextureView,

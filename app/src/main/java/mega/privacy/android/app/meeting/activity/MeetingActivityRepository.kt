@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Pair
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.controllers.ChatController
@@ -18,6 +18,7 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.call.AudioDevice
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -34,6 +35,7 @@ class MeetingActivityRepository @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     @ApplicationContext private val context: Context,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
+    @IoDispatcher private val iODispatcher: CoroutineDispatcher,
 ) {
 
     /**
@@ -41,7 +43,7 @@ class MeetingActivityRepository @Inject constructor(
      *
      * @return The default avatar color.
      */
-    suspend fun getDefaultAvatar(): Bitmap = withContext(Dispatchers.IO) {
+    suspend fun getDefaultAvatar(): Bitmap = withContext(iODispatcher) {
         AvatarUtil.getDefaultAvatar(
             AvatarUtil.getColorAvatar(megaApi.myUser),
             megaChatApi.myFullname,
@@ -55,18 +57,19 @@ class MeetingActivityRepository @Inject constructor(
      *
      * @return Pair<Boolean, Bitmap> <true, bitmap> if succeed, or <false, null>
      */
-    suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(Dispatchers.IO) {
+    suspend fun loadAvatar(): Pair<Boolean, Bitmap>? = withContext(iODispatcher) {
         AvatarUtil.getCircleAvatar(context, megaApi.myEmail)
     }
 
     /**
      * Get the actual avatar from the server and save it to the cache folder
      */
-    suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(Dispatchers.IO) {
+    suspend fun createAvatar(listener: MegaRequestListenerInterface) = withContext(iODispatcher) {
         megaApi.getUserAvatar(
             megaApi.myUser,
             CacheFolderManager.buildAvatarFile(
-                megaApi.myEmail + JPG_EXTENSION)?.absolutePath,
+                megaApi.myEmail + JPG_EXTENSION
+            )?.absolutePath,
             listener
         )
     }
@@ -84,10 +87,11 @@ class MeetingActivityRepository @Inject constructor(
      * @param chatId Chat ID
      * @param listener IndividualCallVideoListener
      */
-    fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener) {
-        Timber.d("Add Chat video listener")
-        megaChatApi.addChatLocalVideoListener(chatId, listener)
-    }
+    suspend fun addLocalVideo(chatId: Long, listener: IndividualCallVideoListener) =
+        withContext(iODispatcher) {
+            Timber.d("Add Chat video listener")
+            megaChatApi.addChatLocalVideoListener(chatId, listener)
+        }
 
     /**
      * Method of remove the local video
@@ -147,6 +151,7 @@ class MeetingActivityRepository @Inject constructor(
             userHandleString == myUserHandleEncoded -> {
                 AvatarUtil.getAvatarBitmap(mail)
             }
+
             TextUtil.isTextEmpty(mail) -> AvatarUtil.getAvatarBitmap(userHandleString)
             else -> AvatarUtil.getUserAvatar(
                 userHandleString,

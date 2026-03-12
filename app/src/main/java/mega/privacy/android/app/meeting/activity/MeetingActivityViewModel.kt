@@ -1645,7 +1645,9 @@ class MeetingActivityViewModel @Inject constructor(
             }
         }
         enableDeviceCamera(enable = true, isReleasingVideo = false)
-        meetingActivityRepository.addLocalVideo(chatId, listener)
+        viewModelScope.launch {
+            meetingActivityRepository.addLocalVideo(chatId, listener)
+        }
     }
 
     /**
@@ -1659,9 +1661,10 @@ class MeetingActivityViewModel @Inject constructor(
             Timber.e("Listener is null")
             return
         }
-
-        Timber.d("Removing local video")
-        meetingActivityRepository.removeLocalVideo(chatId, listener)
+        viewModelScope.launch {
+            Timber.d("Removing local video")
+            meetingActivityRepository.removeLocalVideo(chatId, listener)
+        }
     }
 
     /**
