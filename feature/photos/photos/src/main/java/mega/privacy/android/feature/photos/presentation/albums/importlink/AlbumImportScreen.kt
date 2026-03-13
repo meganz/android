@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -419,10 +418,6 @@ private fun AlbumImportContent(
     modifier: Modifier = Modifier,
 ) {
     val lazyListState = rememberLazyListState()
-    val configuration = LocalConfiguration.current
-    val smallWidth = remember(configuration) {
-        (configuration.screenWidthDp.dp - 1.dp) / 3
-    }
 
     LaunchedEffect(album != null && isLocalAlbumsLoaded) {
         if (album != null && isLocalAlbumsLoaded) {
@@ -434,7 +429,6 @@ private fun AlbumImportContent(
         album == null -> {
             AlbumDynamicContentGridSkeleton(
                 modifier = modifier.fillMaxSize(),
-                size = smallWidth
             )
         }
 
@@ -453,7 +447,6 @@ private fun AlbumImportContent(
                 modifier = modifier.fillMaxSize(),
                 lazyListState = lazyListState,
                 photos = photos.toImmutableList(),
-                smallWidth = smallWidth,
                 selectedPhotos = selectedPhotos.toImmutableSet(),
                 onClick = { photoUiState ->
                     if (selectedPhotos.isEmpty()) {

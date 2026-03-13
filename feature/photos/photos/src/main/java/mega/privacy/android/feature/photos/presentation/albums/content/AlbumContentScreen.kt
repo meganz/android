@@ -6,6 +6,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -27,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -240,10 +241,6 @@ internal fun AlbumContentScreen(
     val context = LocalContext.current
     val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
-    val configuration = LocalConfiguration.current
-    val smallWidth = remember(configuration) {
-        (configuration.screenWidthDp.dp - 1.dp) / 3
-    }
     val isUserAlbum = remember(uiState.uiAlbum) {
         uiState.uiAlbum?.mediaAlbum is MediaAlbum.User
     }
@@ -463,7 +460,6 @@ internal fun AlbumContentScreen(
                         .testTag(ALBUM_CONTENT_SCREEN_SKELETON)
                         .fillMaxSize()
                         .padding(top = innerPadding.calculateTopPadding()),
-                    size = smallWidth
                 )
             }
 
@@ -483,10 +479,14 @@ internal fun AlbumContentScreen(
                     }
 
                     AlbumDynamicContentGrid(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                            ),
                         lazyListState = lazyListState,
                         photos = uiState.photos,
-                        smallWidth = smallWidth,
                         onClick = { photo ->
                             if (uiState.selectedPhotos.isEmpty()) {
                                 previewPhoto(photo)
@@ -501,14 +501,12 @@ internal fun AlbumContentScreen(
                         shouldApplySensitiveMode = uiState.hiddenNodeEnabled
                                 && uiState.accountType?.isPaid == true
                                 && !uiState.isBusinessAccountExpired,
-                        contentPadding = PaddingValues(
-                            start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateRightPadding(LayoutDirection.Ltr),
-                            bottom = innerPadding.calculateSafeBottomPadding()
-                        ),
                         onSortOrderClick = {
                             showSortBottomSheet = true
                         },
+                        contentPadding = PaddingValues(
+                            bottom = innerPadding.calculateSafeBottomPadding()
+                        ),
                         sortConfiguration = uiState.albumSortConfiguration,
                         isPublicAlbumPhoto = false
                     )

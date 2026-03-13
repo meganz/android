@@ -1,8 +1,11 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package mega.privacy.android.feature.photos.presentation.albums.view
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -40,7 +43,6 @@ import mega.privacy.android.icon.pack.IconPack
 fun AlbumDynamicContentGrid(
     lazyListState: LazyListState,
     photos: ImmutableList<PhotoUiState>,
-    smallWidth: Dp,
     selectedPhotos: ImmutableSet<PhotoUiState>,
     isPublicAlbumPhoto: Boolean,
     modifier: Modifier = Modifier,
@@ -65,111 +67,114 @@ fun AlbumDynamicContentGrid(
         }
     }
 
-    LazyColumn(
-        modifier = modifier,
-        state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(1.dp),
-        contentPadding = contentPadding
-    ) {
-        if (sortConfiguration != null) {
-            this.item(key = "sort_option") {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row(
+    BoxWithConstraints(modifier = modifier) {
+        val smallWidth = (maxWidth - 1.dp) / 3
+
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            state = lazyListState,
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            contentPadding = contentPadding
+        ) {
+            if (sortConfiguration != null) {
+                this.item(key = "sort_option") {
+                    Box(
                         modifier = Modifier
-                            .clickable(onClick = onSortOrderClick)
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .align(Alignment.CenterStart)
-                            .testTag(ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM)
+                            .fillMaxWidth()
                     ) {
-                        MegaText(
-                            style = AppTheme.typography.titleSmall,
-                            textColor = TextColor.Secondary,
-                            text = stringResource(sortConfiguration.sortOption.displayName),
-                        )
-                        Spacer(modifier = Modifier.size(4.dp))
-                        MegaIcon(
-                            imageVector = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
-                                IconPack.Small.Thin.Outline.ArrowUp
-                            } else {
-                                IconPack.Small.Thin.Outline.ArrowDown
-                            },
-                            tint = IconColor.Secondary,
-                            contentDescription = "DropDown arrow",
+                        Row(
                             modifier = Modifier
-                                .align(CenterVertically)
-                                .size(16.dp),
+                                .clickable(onClick = onSortOrderClick)
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .align(Alignment.CenterStart)
+                                .testTag(ALBUM_DYNAMIC_CONTENT_GRID_SORT_ITEM)
+                        ) {
+                            MegaText(
+                                style = AppTheme.typography.titleSmall,
+                                textColor = TextColor.Secondary,
+                                text = stringResource(sortConfiguration.sortOption.displayName),
+                            )
+                            Spacer(modifier = Modifier.size(4.dp))
+                            MegaIcon(
+                                imageVector = if (sortConfiguration.sortDirection == SortDirection.Ascending) {
+                                    IconPack.Small.Thin.Outline.ArrowUp
+                                } else {
+                                    IconPack.Small.Thin.Outline.ArrowDown
+                                },
+                                tint = IconColor.Secondary,
+                                contentDescription = "DropDown arrow",
+                                modifier = Modifier
+                                    .align(CenterVertically)
+                                    .size(16.dp),
+                            )
+                        }
+                    }
+                }
+            }
+
+            this.items(
+                albumContentLayouts,
+                key = { it.key },
+            ) { layout ->
+                when (layout) {
+                    is AlbumContentLayout.HighlightStart -> {
+                        AlbumContentHighlightStart(
+                            size = smallWidth,
+                            photos = layout.content,
+                            onClick = onClick,
+                            onLongPress = onLongPress,
+                            selectedPhotos = selectedPhotos,
+                            shouldApplySensitiveMode = shouldApplySensitiveMode,
+                            isPublicAlbumPhoto = isPublicAlbumPhoto,
+                        )
+                    }
+
+                    is AlbumContentLayout.Uniform -> {
+                        AlbumContentUniform(
+                            size = smallWidth,
+                            photos = layout.content,
+                            onClick = onClick,
+                            onLongPress = onLongPress,
+                            selectedPhotos = selectedPhotos,
+                            shouldApplySensitiveMode = shouldApplySensitiveMode,
+                            isPublicAlbumPhoto = isPublicAlbumPhoto,
+                        )
+                    }
+
+                    is AlbumContentLayout.HighlightEnd -> {
+                        AlbumContentHighlightEnd(
+                            size = smallWidth,
+                            photos = layout.content,
+                            onClick = onClick,
+                            onLongPress = onLongPress,
+                            selectedPhotos = selectedPhotos,
+                            shouldApplySensitiveMode = shouldApplySensitiveMode,
+                            isPublicAlbumPhoto = isPublicAlbumPhoto,
                         )
                     }
                 }
             }
-        }
 
-        this.items(
-            albumContentLayouts,
-            key = { it.key },
-        ) { layout ->
-            when (layout) {
-                is AlbumContentLayout.HighlightStart -> {
-                    AlbumContentHighlightStart(
-                        size = smallWidth,
-                        photos = layout.content,
-                        onClick = onClick,
-                        onLongPress = onLongPress,
-                        selectedPhotos = selectedPhotos,
-                        shouldApplySensitiveMode = shouldApplySensitiveMode,
-                        isPublicAlbumPhoto = isPublicAlbumPhoto,
-                    )
-                }
-
-                is AlbumContentLayout.Uniform -> {
-                    AlbumContentUniform(
-                        size = smallWidth,
-                        photos = layout.content,
-                        onClick = onClick,
-                        onLongPress = onLongPress,
-                        selectedPhotos = selectedPhotos,
-                        shouldApplySensitiveMode = shouldApplySensitiveMode,
-                        isPublicAlbumPhoto = isPublicAlbumPhoto,
-                    )
-                }
-
-                is AlbumContentLayout.HighlightEnd -> {
-                    AlbumContentHighlightEnd(
-                        size = smallWidth,
-                        photos = layout.content,
-                        onClick = onClick,
-                        onLongPress = onLongPress,
-                        selectedPhotos = selectedPhotos,
-                        shouldApplySensitiveMode = shouldApplySensitiveMode,
-                        isPublicAlbumPhoto = isPublicAlbumPhoto,
-                    )
-                }
+            item {
+                Spacer(modifier = Modifier.height(endSpacing))
             }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(endSpacing))
         }
     }
 }
 
 @Composable
 fun AlbumDynamicContentGridSkeleton(
-    size: Dp,
     modifier: Modifier = Modifier,
-    count: Int = 1
+    count: Int = 1,
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(1.dp)
-    ) {
-        repeat(count) {
-            AlbumContentHighlightStartShimmer(size)
-            AlbumContentUniformShimmer(size)
-            AlbumContentHighlightEndShimmer(size)
+    BoxWithConstraints(modifier = modifier) {
+        val size = (maxWidth - 1.dp) / 3
+        Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            repeat(count) {
+                AlbumContentHighlightStartShimmer(size)
+                AlbumContentUniformShimmer(size)
+                AlbumContentHighlightEndShimmer(size)
+            }
         }
     }
 }
