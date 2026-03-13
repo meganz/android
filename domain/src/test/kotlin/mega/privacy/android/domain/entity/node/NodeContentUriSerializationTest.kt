@@ -15,7 +15,7 @@ import java.io.File
  */
 class NodeContentUriSerializationTest {
 
-    private val json = Json { serializersModule = nodeSerialisationModule }
+    private val json = Json
 
     @ParameterizedTest(name = "when shouldStopHttpSever is {0}")
     @ValueSource(booleans = [true, false])
