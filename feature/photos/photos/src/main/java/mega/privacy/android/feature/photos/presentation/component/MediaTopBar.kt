@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,7 @@ internal fun MediaTopBar(
     onFilterActionClick: () -> Unit,
     onSortActionClick: () -> Unit,
     navigateToRecentlyWatched: () -> Unit,
+    onSearchingModeChanged: (Boolean) -> Unit = { },
 ) {
     val shouldShowTimelineActions by remember(
         currentTabIndex,
@@ -118,6 +120,10 @@ internal fun MediaTopBar(
             isPlaylistsTabSearchBarVisible = false
             onUpdatePlaylistSearchQuery(null)
         }
+    }
+
+    LaunchedEffect(isVideosTabSearchBarVisible, isPlaylistsTabSearchBarVisible) {
+        onSearchingModeChanged(isVideosTabSearchBarVisible || isPlaylistsTabSearchBarVisible)
     }
 
     when {
@@ -240,9 +246,7 @@ internal fun MediaTopBar(
                     MenuActionWithClick(menuAction = MediaAppBarAction.Search) {
                         when (currentTabIndex) {
                             MediaScreen.Videos.ordinal -> isVideosTabSearchBarVisible = true
-
                             MediaScreen.Playlists.ordinal -> isPlaylistsTabSearchBarVisible = true
-
                             else -> {
                                 navigateToMediaSearch(MediaSearchNavKey)
                             }

@@ -8,7 +8,6 @@ import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.os.Build
 import android.provider.Settings
@@ -57,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
@@ -93,7 +93,6 @@ import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenMonthsFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenYearsFilterSelectedEvent
 import timber.log.Timber
-import androidx.core.net.toUri
 
 @Composable
 internal fun TimelineTabRoute(
@@ -114,7 +113,6 @@ internal fun TimelineTabRoute(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
-    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
@@ -140,7 +138,6 @@ internal fun TimelineTabRoute(
         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
         handleNotificationPermissionResult = handleNotificationPermissionResult,
         onCUBannerDismissRequest = onCUBannerDismissRequest,
-        onTabsVisibilityChange = onTabsVisibilityChange,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
     )
@@ -165,7 +162,6 @@ internal fun TimelineTabScreen(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
-    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
@@ -227,15 +223,6 @@ internal fun TimelineTabScreen(
                 timelineLazyListState.scrollToItem(index = index)
                 shouldScrollToIndex = -1
             }
-        }
-
-        LaunchedEffect(
-            isScrollingDown,
-            isScrolledToEnd,
-            isScrolledToTop
-        ) {
-            val shouldShowTabs = isScrolledToTop || (!isScrollingDown && !isScrolledToEnd)
-            onTabsVisibilityChange(!shouldShowTabs)
         }
     }
 
@@ -659,7 +646,6 @@ private fun TimelineTabScreenPreview() {
             handleCameraUploadsPermissionsResult = {},
             handleNotificationPermissionResult = {},
             onCUBannerDismissRequest = {},
-            onTabsVisibilityChange = {},
             onNavigateToUpgradeAccount = {},
             onPhotoTimePeriodSelected = {}
         )

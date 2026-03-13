@@ -26,14 +26,9 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.list.TagsRow
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.feature.photos.components.VideoItemView
@@ -45,7 +40,12 @@ import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEnti
 import mega.privacy.android.feature.photos.presentation.videos.view.VideosFilterBottomSheet
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DurationFilterAllDurationsClickedEvent
 import mega.privacy.mobile.analytics.event.DurationFilterBetween10and60SecondsClickedEvent

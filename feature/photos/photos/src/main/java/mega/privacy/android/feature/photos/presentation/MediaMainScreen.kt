@@ -36,10 +36,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
 import mega.android.core.ui.modifiers.applyScrollToHideBehavior
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -382,12 +384,13 @@ fun MediaMainScreen(
 
     var selectedVideoCount by rememberSaveable { mutableIntStateOf(0) }
     var selectedVideoNodes by remember { mutableStateOf(emptyList<TypedNode>()) }
-    var shouldHideTabs by remember { mutableStateOf(false) }
 
     var selectedPlaylistCount by rememberSaveable { mutableIntStateOf(0) }
     var playlistsTabQuery by rememberSaveable { mutableStateOf<String?>(null) }
 
     var showVideoPlaylistRemovedDialog by rememberSaveable { mutableStateOf(false) }
+
+    var isSearchModeForVideosOrPlaylists by rememberSaveable { mutableStateOf(false) }
 
     // Handling back handler for timeline filter
     BackHandler(enabled = showTimelineFilter) {
@@ -430,7 +433,7 @@ fun MediaMainScreen(
         floatingActionButton = {
             AddContentFab(
                 modifier = Modifier
-                    .applyScrollToHideBehavior()
+                    .applyScrollToHideFabBehavior()
                     .testTag(MEDIA_ALBUMS_FAB_TAG),
                 visible = (currentTabIndex == MediaScreen.Albums.ordinal || currentTabIndex == MediaScreen.Playlists.ordinal)
                         && selectionModeType == MediaSelectionModeType.None,
@@ -492,6 +495,9 @@ fun MediaMainScreen(
                 },
                 navigateToRecentlyWatched = {
                     navigationHandler.navigate(VideoRecentlyWatchedNavKey)
+                },
+                onSearchingModeChanged = {
+                    isSearchModeForVideosOrPlaylists = it
                 }
             )
         },
@@ -538,13 +544,15 @@ fun MediaMainScreen(
         }
 
         key(tabEntries.size) {
-            MegaScrollableTabRow(
+            MegaCollapsibleTabRow(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding()),
                 beyondViewportPageCount = 1,
-                hideTabs = selectionModeType.isAnActiveSelection() || shouldHideTabs,
-                pagerScrollEnabled = selectionModeType == MediaSelectionModeType.None,
+                hideTabs =
+                    selectionModeType.isAnActiveSelection() || isSearchModeForVideosOrPlaylists,
+                pagerScrollEnabled =
+                    selectionModeType == MediaSelectionModeType.None && !isSearchModeForVideosOrPlaylists,
                 initialSelectedIndex = currentTabIndex,
                 onTabSelected = { index ->
                     currentTabIndex = index
@@ -600,7 +608,6 @@ fun MediaMainScreen(
                                         handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                                         handleNotificationPermissionResult = handleNotificationPermissionResult,
                                         onCUBannerDismissRequest = onCUBannerDismissRequest,
-                                        onTabsVisibilityChange = { shouldHideTabs = it },
                                         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                                         onPhotoTimePeriodSelected = onPhotoTimePeriodSelected,
                                         showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
@@ -666,7 +673,6 @@ private fun MediaScreen.MediaContent(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
-    onTabsVisibilityChange: (shouldHide: Boolean) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit,
     showVideoPlaylistRemovedDialog: Boolean,
@@ -698,7 +704,6 @@ private fun MediaScreen.MediaContent(
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 handleNotificationPermissionResult = handleNotificationPermissionResult,
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
-                onTabsVisibilityChange = onTabsVisibilityChange,
                 onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                 onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
@@ -715,12 +720,13 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        MediaScreen.Videos -> VideosTabRoute(navigationHandler)
+        MediaScreen.Videos -> VideosTabRoute(navigationHandler = navigationHandler)
+
         MediaScreen.Playlists -> VideoPlaylistsTabRoute(
             showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
             dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
             modifier = modifier,
-            navigate = navigationHandler::navigate
+            navigate = navigationHandler::navigate,
         )
     }
 }

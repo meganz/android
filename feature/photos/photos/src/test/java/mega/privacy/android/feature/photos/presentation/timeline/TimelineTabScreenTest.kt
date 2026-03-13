@@ -343,7 +343,6 @@ class TimelineTabScreenTest {
         handleCameraUploadsPermissionsResult: () -> Unit = {},
         handleNotificationPermissionResult: () -> Unit = {},
         onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit = {},
-        onTabsVisibilityChange: (shouldHide: Boolean) -> Unit = {},
         onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit = {},
         onPhotoTimePeriodSelected: (PhotoModificationTimePeriod) -> Unit = {},
     ) {
@@ -366,7 +365,6 @@ class TimelineTabScreenTest {
                 handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                 handleNotificationPermissionResult = handleNotificationPermissionResult,
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
-                onTabsVisibilityChange = onTabsVisibilityChange,
                 onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
                 onPhotoTimePeriodSelected = onPhotoTimePeriodSelected
             )
