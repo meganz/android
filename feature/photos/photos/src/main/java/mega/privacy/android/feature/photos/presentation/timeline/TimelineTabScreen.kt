@@ -42,8 +42,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -191,6 +193,7 @@ internal fun TimelineTabScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             handleCameraUploadsPermissionsResult()
         }
+    var isNotificationPermissionPermanentlyDenied by rememberSaveable { mutableStateOf(false) }
     val notificationPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (!isGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -198,7 +201,7 @@ internal fun TimelineTabScreen(
                     val shouldShowRationale = ActivityCompat
                         .shouldShowRequestPermissionRationale(currentActivity, POST_NOTIFICATIONS)
                     if (!shouldShowRationale) {
-                        currentActivity.openNotificationSettings()
+                        isNotificationPermissionPermanentlyDenied = true
                     }
                 }
             }
@@ -322,8 +325,22 @@ internal fun TimelineTabScreen(
                     cameraUploadsPermissionsLauncher.launch(cameraUploadsPermissions)
                 },
                 onRequestNotificationPermission = {
+                    if (activity == null) return@TimelineTabContent
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+                        val shouldShowRationale =
+                            ActivityCompat.shouldShowRequestPermissionRationale(
+                                activity,
+                                POST_NOTIFICATIONS
+                            )
+                        val isPermanentlyDenied =
+                            isNotificationPermissionPermanentlyDenied || !shouldShowRationale
+
+                        if (isPermanentlyDenied) {
+                            isNotificationPermissionPermanentlyDenied = true
+                            activity.openNotificationSettings()
+                        } else {
+                            notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+                        }
                     }
                 },
                 onCUBannerDismissRequest = onCUBannerDismissRequest,
