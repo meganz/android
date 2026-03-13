@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -270,76 +269,75 @@ private fun MegaNavigationSuiteScaffoldLayout(
     animationConfig: NavigationAnimationConfig,
     content: @Composable () -> Unit = {},
 ) {
-    LookaheadScope {
-        // Animate the navigation visibility using animateFloatAsState
-        val navigationVisibility by animateFloatAsState(
-            targetValue = if (isNavigationVisible) 1f else 0f,
-            animationSpec = animationConfig.createAnimationSpec(),
-            label = "navigation_visibility"
-        )
-        Layout(
-            modifier = modifier,
-            content = {
-                // Wrap the navigation suite and content composables each in a Box to not propagate the
-                // parent's (Surface) min constraints to its children (see b/312664933).
-                Box(
-                    Modifier.layoutId(NavigationSuiteLayoutIdTag)
-                ) { navigationSuite() }
-                Box(
-                    Modifier.layoutId(ContentLayoutIdTag)
-                ) { content() }
-            }
-        ) { measurables, constraints ->
-            val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-            val isNavigationBar = layoutType == NavigationSuiteType.NavigationBar
-            val layoutHeight = constraints.maxHeight
-            val layoutWidth = constraints.maxWidth
+    // Animate the navigation visibility using animateFloatAsState
+    val navigationVisibility by animateFloatAsState(
+        targetValue = if (isNavigationVisible) 1f else 0f,
+        animationSpec = animationConfig.createAnimationSpec(),
+        label = "navigation_visibility"
+    )
+    Layout(
+        modifier = modifier,
+        content = {
+            // Wrap the navigation suite and content composables each in a Box to not propagate the
+            // parent's (Surface) min constraints to its children (see b/312664933).
+            Box(
+                Modifier.layoutId(NavigationSuiteLayoutIdTag)
+            ) { navigationSuite() }
+            Box(
+                Modifier.layoutId(ContentLayoutIdTag)
+            ) { content() }
+        }
+    ) { measurables, constraints ->
+        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        val isNavigationBar = layoutType == NavigationSuiteType.NavigationBar
+        val layoutHeight = constraints.maxHeight
+        val layoutWidth = constraints.maxWidth
 
-            // Find the navigation suite composable through its layoutId tag
-            val navigationPlaceable =
-                measurables
-                    .fastFirst { it.layoutId == NavigationSuiteLayoutIdTag }
-                    .measure(looseConstraints)
+        // Find the navigation suite composable through its layoutId tag
+        val navigationPlaceable =
+            measurables
+                .fastFirst { it.layoutId == NavigationSuiteLayoutIdTag }
+                .measure(looseConstraints)
 
-            // Calculate animated navigation dimensions
-            val animatedNavigationHeight =
-                (navigationPlaceable.height * navigationVisibility).toInt()
-            val animatedNavigationWidth = (navigationPlaceable.width * navigationVisibility).toInt()
+        // Calculate animated navigation dimensions
+        val animatedNavigationHeight =
+            (navigationPlaceable.height * navigationVisibility).toInt()
+        val animatedNavigationWidth =
+            (navigationPlaceable.width * navigationVisibility).toInt()
 
-            // Find the content composable through its layoutId tag
-            val contentPlaceable =
-                measurables
-                    .fastFirst { it.layoutId == ContentLayoutIdTag }
-                    .measure(
-                        if (isNavigationBar) {
-                            constraints.copy(
-                                minHeight = layoutHeight - animatedNavigationHeight,
-                                maxHeight = layoutHeight - animatedNavigationHeight
-                            )
-                        } else {
-                            constraints.copy(
-                                minWidth = layoutWidth - animatedNavigationWidth,
-                                maxWidth = layoutWidth - animatedNavigationWidth
-                            )
-                        }
-                    )
-
-            layout(layoutWidth, layoutHeight) {
-                if (isNavigationBar) {
-                    // Place content above the navigation component.
-                    contentPlaceable.placeRelative(0, 0)
-                    // Place the navigation component at the bottom of the screen with animated position.
-                    if (animatedNavigationHeight > 0) {
-                        val navigationY = layoutHeight - animatedNavigationHeight
-                        navigationPlaceable.placeRelative(0, navigationY)
+        // Find the content composable through its layoutId tag
+        val contentPlaceable =
+            measurables
+                .fastFirst { it.layoutId == ContentLayoutIdTag }
+                .measure(
+                    if (isNavigationBar) {
+                        constraints.copy(
+                            minHeight = layoutHeight - animatedNavigationHeight,
+                            maxHeight = layoutHeight - animatedNavigationHeight
+                        )
+                    } else {
+                        constraints.copy(
+                            minWidth = layoutWidth - animatedNavigationWidth,
+                            maxWidth = layoutWidth - animatedNavigationWidth
+                        )
                     }
-                } else {
-                    // Place the navigation component at the start of the screen with animated position.
-                    val navigationX = -navigationPlaceable.width + animatedNavigationWidth
-                    navigationPlaceable.placeRelative(navigationX, 0)
-                    // Place content to the side of the navigation component.
-                    contentPlaceable.placeRelative(animatedNavigationWidth, 0)
+                )
+
+        layout(layoutWidth, layoutHeight) {
+            if (isNavigationBar) {
+                // Place content above the navigation component.
+                contentPlaceable.placeRelative(0, 0)
+                // Place the navigation component at the bottom of the screen with animated position.
+                if (animatedNavigationHeight > 0) {
+                    val navigationY = layoutHeight - animatedNavigationHeight
+                    navigationPlaceable.placeRelative(0, navigationY)
                 }
+            } else {
+                // Place the navigation component at the start of the screen with animated position.
+                val navigationX = -navigationPlaceable.width + animatedNavigationWidth
+                navigationPlaceable.placeRelative(navigationX, 0)
+                // Place content to the side of the navigation component.
+                contentPlaceable.placeRelative(animatedNavigationWidth, 0)
             }
         }
     }
