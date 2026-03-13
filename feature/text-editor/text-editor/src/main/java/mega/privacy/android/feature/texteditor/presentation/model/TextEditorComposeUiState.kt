@@ -13,6 +13,10 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param totalLinesLoaded Total lines loaded so far (for gradual load); null when not applicable.
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param loadErrorMessage Optional error message when load fails; shown in error UI when set, cleared when error is consumed.
+ * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit mode, unsaved changes).
+ * @param saveSuccessEvent One-shot event to show "Changes saved" snackbar when save completes successfully.
+ * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
+ * @param appendSuffix One-shot suffix string to append to the text field during edit-mode load-more; null when consumed.
  */
 data class TextEditorComposeUiState(
     val fileName: String = "",
@@ -21,11 +25,14 @@ data class TextEditorComposeUiState(
     val errorEvent: StateEvent = consumed,
     val loadErrorMessage: String? = null,
     val mode: TextEditorMode = TextEditorMode.View,
-    val isFileEdited: Boolean = false,
     val showLineNumbers: Boolean = false,
+    val showDiscardDialog: Boolean = false,
+    val saveSuccessEvent: StateEvent = consumed,
+    val isRestoringContent: Boolean = false,
     val bottomBarActions: List<TextEditorBottomBarAction> = emptyList(),
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val hasMoreLines: Boolean = false,
     val totalLinesLoaded: Int? = null,
     val isFullyLoaded: Boolean = true,
+    val appendSuffix: String? = null,
 )

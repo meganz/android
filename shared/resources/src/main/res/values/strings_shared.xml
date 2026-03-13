@@ -2408,4 +2408,10 @@
     <string name="sync_folder_connection_dialog_message">This folder is linked to your %1$s device, likely because MEGA was uninstalled without signing out. A folder can only be synced to one device at a time. Remove the existing connection to sync it here.</string>
     <!-- Sync folder connection subtitle -->
     <string name="sync_folder_connection_this_device">Connected to %1$s</string>
+    <!-- Dialog message: any unsaved edits will be lost -->
+    <string name="general_dialog_discard_changes_message">Any unsaved edits will be lost.</string>
+    <!-- Positive button label for discard-changes confirmation dialog -->
+    <string name="general_dialog_discard_button">Discard</string>
+    <!-- Message shown when changes are saved successfully (e.g. text editor). -->
+    <string name="general_changes_saved">Changes saved</string>
 </resources>

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -46,7 +46,7 @@ private const val CHUNK_SIZE_LINES = 500
 @HiltViewModel(assistedFactory = TextEditorComposeViewModel.Factory::class)
 class TextEditorComposeViewModel @AssistedInject constructor(
     @Assisted val args: Args,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     private val getTextContentForTextEditorUseCase: GetTextContentForTextEditorUseCase,
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
@@ -68,15 +68,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val fullContentLines = mutableListOf<String>()
     private var displayLineCap = INITIAL_DISPLAY_LINES
 
-    private fun updateDisplayedContent() {
-        _uiState.update {
-            it.copy(
-                content = fullContentLines.take(displayLineCap).joinToString("\n"),
-                hasMoreLines = fullContentLines.size > displayLineCap,
-                totalLinesLoaded = fullContentLines.size,
-            )
-        }
-    }
+    /** Content at last load or last successful save; restored when user discards changes (Pre-Phase 5.3). */
+    private var lastSavedContent: String = ""
+
+    /** Cached displayed content for O(1) dirty-check on the main thread; updated whenever [fullContentLines] or [displayLineCap] change. */
+    private var cachedCleanContent: String = ""
 
     init {
         if (args.mode != TextEditorMode.Create) {
@@ -99,9 +95,15 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     .collect { chunk ->
                         fullContentLines.addAll(chunk)
+                        val (displayed, fullContent) = withContext(defaultDispatcher) {
+                            fullContentLines.take(displayLineCap).joinToString("\n") to
+                                fullContentLines.joinToString("\n")
+                        }
+                        lastSavedContent = fullContent
+                        cachedCleanContent = displayed
                         _uiState.update {
                             it.copy(
-                                content = fullContentLines.take(displayLineCap).joinToString("\n"),
+                                content = displayed,
                                 isLoading = false,
                                 errorEvent = consumed,
                                 hasMoreLines = fullContentLines.size > displayLineCap,
@@ -109,11 +111,14 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             )
                         }
                     }
+                lastSavedContent = withContext(defaultDispatcher) {
+                    fullContentLines.joinToString("\n")
+                }
                 _uiState.update { it.copy(isFullyLoaded = true) }
             }
             viewModelScope.launch {
                 val actions = runCatching {
-                    withContext(ioDispatcher) {
+                    withContext(defaultDispatcher) {
                         val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
                         val accessPermission = getNodeAccessUseCase(NodeId(args.nodeHandle))
                         val isNodeExported = node?.exportedData != null
@@ -130,6 +135,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 _uiState.update { it.copy(bottomBarActions = actions) }
             }
         } else if (args.mode == TextEditorMode.Create) {
+            lastSavedContent = ""
             _uiState.update { it.copy(content = "", isLoading = false, errorEvent = consumed) }
         }
     }
@@ -155,10 +161,62 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val localPath: String? = null,
     )
 
-    fun setViewMode() {
-        _uiState.update {
-            it.copy(mode = TextEditorMode.View)
+    /**
+     * Switches to View mode. When [discardChanges] is true (discard flow), restores content from
+     * [lastSavedContent] and syncs internal line buffer. Heavy work runs on [defaultDispatcher].
+     */
+    fun setViewMode(discardChanges: Boolean = false) {
+        if (!discardChanges) {
+            _uiState.update {
+                it.copy(mode = TextEditorMode.View, showDiscardDialog = false)
+            }
+            return
         }
+        val savedContent = lastSavedContent
+        _uiState.update {
+            it.copy(showDiscardDialog = false, isRestoringContent = true)
+        }
+        viewModelScope.launch {
+            val (lines, displayedContent, cap, hasMoreLines, totalLinesLoaded) = withContext(defaultDispatcher) {
+                val l = savedContent.split("\n")
+                val c = INITIAL_DISPLAY_LINES.coerceAtMost(l.size)
+                RestoreResult(
+                    lines = l,
+                    displayedContent = l.take(c).joinToString("\n"),
+                    displayLineCap = c,
+                    hasMoreLines = l.size > c,
+                    totalLinesLoaded = l.size,
+                )
+            }
+            fullContentLines.clear()
+            fullContentLines.addAll(lines)
+            displayLineCap = cap
+            cachedCleanContent = displayedContent
+            _uiState.update {
+                it.copy(
+                    mode = TextEditorMode.View,
+                    content = displayedContent,
+                    hasMoreLines = hasMoreLines,
+                    totalLinesLoaded = totalLinesLoaded,
+                    isRestoringContent = false,
+                )
+            }
+        }
+    }
+
+    /** Shows the discard-changes confirmation dialog (Edit mode, unsaved). */
+    fun requestShowDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = true) }
+    }
+
+    /** User confirmed Discard: revert to last saved content and switch to View mode. */
+    fun confirmDiscard() {
+        setViewMode(discardChanges = true)
+    }
+
+    /** User dismissed the discard dialog (Cancel). */
+    fun dismissDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = false) }
     }
 
     fun setEditMode() {
@@ -167,37 +225,77 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    fun updateContent(newContent: String) {
-        _uiState.update {
-            it.copy(content = newContent, isFileEdited = true)
+    /**
+     * Returns true when [currentText] (from the text field) differs from [cachedCleanContent].
+     * O(1) lookup — no string concatenation on the main thread.
+     */
+    fun isContentDirty(currentText: String): Boolean =
+        currentText != cachedCleanContent
+
+    /** Clears the one-shot suffix appended during edit-mode load-more. */
+    fun consumeAppendSuffix() {
+        _uiState.update { it.copy(appendSuffix = null) }
+    }
+
+    /**
+     * Expands the displayed content by [LINES_TO_ADD_ON_LOAD_MORE] lines when content was capped.
+     * In Edit mode emits a suffix via [TextEditorComposeUiState.appendSuffix] so the composable
+     * appends it directly to the text field without needing the user's current text.
+     * In View mode rebuilds the full displayed content from [fullContentLines].
+     */
+    fun onLoadMoreLines() {
+        if (fullContentLines.size <= displayLineCap) return
+        val oldCap = displayLineCap
+        displayLineCap = (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
+        viewModelScope.launch {
+            val hasMoreLines = fullContentLines.size > displayLineCap
+            val totalLinesLoaded = fullContentLines.size
+            if (_uiState.value.mode == TextEditorMode.Edit) {
+                val (suffix, cleanContent) = withContext(defaultDispatcher) {
+                    val s = "\n" + fullContentLines.subList(oldCap, displayLineCap).joinToString("\n")
+                    s to fullContentLines.take(displayLineCap).joinToString("\n")
+                }
+                cachedCleanContent = cleanContent
+                _uiState.update {
+                    it.copy(
+                        appendSuffix = suffix,
+                        hasMoreLines = hasMoreLines,
+                        totalLinesLoaded = totalLinesLoaded,
+                    )
+                }
+            } else {
+                val content = withContext(defaultDispatcher) {
+                    fullContentLines.take(displayLineCap).joinToString("\n")
+                }
+                cachedCleanContent = content
+                _uiState.update {
+                    it.copy(
+                        content = content,
+                        hasMoreLines = hasMoreLines,
+                        totalLinesLoaded = totalLinesLoaded,
+                    )
+                }
+            }
         }
     }
 
     /**
-     * Expands the displayed content by [LINES_TO_ADD_ON_LOAD_MORE] lines when content was capped (gradual load).
+     * Saves text content. [currentText] is the text currently in the editor (read from the text
+     * field at save time). When content was capped for display (gradual load), merges the
+     * user-edited visible portion with the original non-displayed tail.
+     * In Create mode [fullContentLines] is empty, so [currentText] is saved as-is.
      */
-    fun onLoadMoreLines() {
-        if (fullContentLines.size <= displayLineCap) return
-        displayLineCap = (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
-        updateDisplayedContent()
-    }
-
-    /**
-     * Saves text content. When content was capped for display (gradual load), merges
-     * the user-edited visible portion with the original non-displayed tail.
-     * Contract: [displayLineCap] reflects how many original lines were shown to the user,
-     * so `fullContentLines.drop(displayLineCap)` always yields the untouched tail.
-     * In Create mode [fullContentLines] is empty, so `state.content` is saved as-is.
-     */
-    fun saveFile(fromHome: Boolean) {
-        if (args.mode == TextEditorMode.View) return
+    fun saveFile(currentText: String, fromHome: Boolean) {
+        if (_uiState.value.mode == TextEditorMode.View) return
         viewModelScope.launch {
             val state = _uiState.value
-            val fullTextToSave = if (fullContentLines.isNotEmpty()) {
-                val editedLines = state.content.split("\n")
-                (editedLines + fullContentLines.drop(displayLineCap)).joinToString("\n")
-            } else {
-                state.content
+            val fullTextToSave = withContext(defaultDispatcher) {
+                if (fullContentLines.isNotEmpty()) {
+                    val editedLines = currentText.split("\n")
+                    (editedLines + fullContentLines.drop(displayLineCap)).joinToString("\n")
+                } else {
+                    currentText
+                }
             }
             runCatching {
                 saveTextContentForTextEditorUseCase(
@@ -211,9 +309,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             }.fold(
                 onSuccess = { saveResult ->
                     when (saveResult) {
-                        is TextEditorSaveResult.UploadRequired ->
+                        is TextEditorSaveResult.UploadRequired -> {
+                            lastSavedContent = fullTextToSave
                             _uiState.update {
                                 it.copy(
+                                    mode = TextEditorMode.View,
                                     transferEvent = triggered(
                                         TransferTriggerEvent.StartUpload.TextFile(
                                             path = saveResult.tempPath,
@@ -222,13 +322,20 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                             fromHomePage = saveResult.fromHome,
                                         )
                                     ),
-                                    isFileEdited = false,
+                                    saveSuccessEvent = triggered,
                                 )
                             }
+                        }
                     }
                 },
-                onFailure = {
-                    _uiState.update { it.copy(errorEvent = triggered) }
+                onFailure = { e ->
+                    Timber.e(e, "Text editor: failed to save content")
+                    _uiState.update {
+                        it.copy(
+                            errorEvent = triggered,
+                            loadErrorMessage = e.message?.ifBlank { null },
+                        )
+                    }
                 },
             )
         }
@@ -240,6 +347,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     fun consumeTransferEvent() {
         _uiState.update { it.copy(transferEvent = consumed()) }
+    }
+
+    fun consumeSaveSuccessEvent() {
+        _uiState.update { it.copy(saveSuccessEvent = consumed) }
     }
 
     /**
@@ -256,6 +367,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     it.copy(showLineNumbers = !it.showLineNumbers)
                 }
             }
+            TextEditorTopBarAction.Save,
+            TextEditorTopBarAction.More -> Unit
         }
     }
 
@@ -294,4 +407,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             }
         }
     }
+
+    private data class RestoreResult(
+        val lines: List<String>,
+        val displayedContent: String,
+        val displayLineCap: Int,
+        val hasMoreLines: Boolean,
+        val totalLinesLoaded: Int,
+    )
 }
