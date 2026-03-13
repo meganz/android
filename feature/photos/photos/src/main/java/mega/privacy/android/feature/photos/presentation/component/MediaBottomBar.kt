@@ -16,6 +16,7 @@ internal fun MediaBottomBar(
     selectionModeType: MediaSelectionModeType,
     nodeActionUiState: NodeActionState,
     albumsActions: List<MenuActionWithIcon>,
+    playlistsActions: List<MenuActionWithIcon>,
     selectedNodes: List<TypedNode>,
     multiNodeActionHandler: MultiNodeActionHandler,
     onActionPressed: (mode: MediaSelectionModeType, action: MenuActionWithIcon) -> Unit,
@@ -24,6 +25,12 @@ internal fun MediaBottomBar(
     SelectionModeBottomBar(
         visible = selectionModeType == MediaSelectionModeType.Albums,
         actions = albumsActions,
+        onActionPressed = { onActionPressed(selectionModeType, it) }
+    )
+
+    SelectionModeBottomBar(
+        visible = selectionModeType == MediaSelectionModeType.Playlists,
+        actions = playlistsActions,
         onActionPressed = { onActionPressed(selectionModeType, it) }
     )
 

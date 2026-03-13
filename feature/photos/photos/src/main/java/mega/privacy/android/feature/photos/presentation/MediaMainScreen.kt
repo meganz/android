@@ -30,17 +30,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.navigation.contract.NavOptions
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
-import mega.android.core.ui.components.tabs.MegaScrollableTabRow
 import mega.android.core.ui.model.SnackbarAttributes
 import mega.android.core.ui.model.TabItems
-import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -73,6 +70,7 @@ import mega.privacy.android.feature.photos.presentation.handler.MediaSelectionMo
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabRoute
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabUiState
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistsTabViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
@@ -86,6 +84,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineF
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
+import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
@@ -469,7 +468,6 @@ fun MediaMainScreen(
                 onAllPlaylistsSelected = onSelectAllPlaylists,
                 onClearPlaylistsSelection = onClearPlaylistsSelection,
                 onUpdatePlaylistSearchQuery = onUpdatePlaylistSearchQuery,
-                removePlaylist = { showVideoPlaylistRemovedDialog = true },
                 onNavigateToCameraUploadsSettings = {
                     MediaAppBarAction.CameraUploadsSettings.toTrackingEvent()
                         ?.let { Analytics.tracker.trackEvent(it) }
@@ -509,6 +507,9 @@ fun MediaMainScreen(
                     AlbumSelectionAction.ManageLink,
                     AlbumSelectionAction.Delete
                 ),
+                playlistsActions = listOf(
+                    VideoPlaylistsTrashMenuAction()
+                ),
                 selectedNodes = when (selectionModeType) {
                     MediaSelectionModeType.Timeline -> selectedPhotosInTypedNode()
                     MediaSelectionModeType.Videos -> selectedVideoNodes
@@ -525,6 +526,12 @@ fun MediaMainScreen(
 
                         MediaSelectionModeType.Albums -> {
                             albumsTabViewModel.handleSelectionAction(action)
+                        }
+
+                        MediaSelectionModeType.Playlists -> {
+                            if (action is VideoPlaylistsTrashMenuAction) {
+                                showVideoPlaylistRemovedDialog = true
+                            }
                         }
 
                         else -> Unit

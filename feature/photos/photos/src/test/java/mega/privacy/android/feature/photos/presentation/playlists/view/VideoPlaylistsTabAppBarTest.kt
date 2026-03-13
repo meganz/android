@@ -27,7 +27,6 @@ class VideoPlaylistsTabAppBarTest {
         isSelectionMode: Boolean = true,
         onSelectAllClicked: () -> Unit = {},
         onCancelSelectionClicked: () -> Unit = {},
-        removePlaylist: () -> Unit = {},
         searchQuery: String? = null,
         updateSearchQuery: (String) -> Unit = {},
         modifier: Modifier = Modifier,
@@ -42,7 +41,6 @@ class VideoPlaylistsTabAppBarTest {
                 isAllSelected = isAllSelected,
                 onSelectAllClicked = onSelectAllClicked,
                 onCancelSelectionClicked = onCancelSelectionClicked,
-                removePlaylist = removePlaylist,
                 modifier = modifier,
                 isSelectionMode = isSelectionMode,
                 searchQuery = searchQuery,
@@ -94,18 +92,5 @@ class VideoPlaylistsTabAppBarTest {
         composeTestRule
             .onNodeWithTag(NodeSelectionAction.SelectAll.testTag)
             .assertIsNotDisplayed()
-    }
-
-    @Test
-    fun `test that VideoPlaylistsTrashMenuAction option is displayed and removePlaylist is invoked`() {
-        val mockRemovePlaylist = mock<() -> Unit>()
-        setComposeContent(isAllSelected = false, removePlaylist = mockRemovePlaylist)
-        composeTestRule
-            .onNodeWithTag(VideoPlaylistsTrashMenuAction().testTag)
-            .assertExists()
-            .assertIsDisplayed()
-            .performClick()
-
-        verify(mockRemovePlaylist).invoke()
     }
 }

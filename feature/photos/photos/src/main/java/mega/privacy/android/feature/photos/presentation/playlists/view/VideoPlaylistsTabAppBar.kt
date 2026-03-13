@@ -16,7 +16,6 @@ fun VideoPlaylistsTabAppBar(
     isSelectionMode: Boolean,
     onSelectAllClicked: () -> Unit,
     onCancelSelectionClicked: () -> Unit,
-    removePlaylist: () -> Unit,
     searchQuery: String?,
     updateSearchQuery: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -31,7 +30,6 @@ fun VideoPlaylistsTabAppBar(
             navigationType = AppBarNavigationType.Close(onCancelSelectionClicked),
             title = String.format(Locale.ROOT, "%s", count),
             actions = buildList {
-                add(VideoPlaylistsTrashMenuAction())
                 if (!isAllSelected) {
                     add(NodeSelectionAction.SelectAll)
                 }
@@ -39,7 +37,6 @@ fun VideoPlaylistsTabAppBar(
             onActionPressed = {
                 when (it) {
                     is NodeSelectionAction.SelectAll -> onSelectAllClicked()
-                    is VideoPlaylistsTrashMenuAction -> removePlaylist()
                     else -> Unit
                 }
             }
