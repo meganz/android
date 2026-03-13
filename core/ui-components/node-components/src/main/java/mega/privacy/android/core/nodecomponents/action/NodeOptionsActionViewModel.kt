@@ -88,6 +88,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
@@ -158,6 +159,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val nodeDestinationMapper: NodeDestinationMapper,
     private val navigationEventQueue: NavigationEventQueue,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
+    private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -488,17 +490,23 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
      *                          It should be true only if the widget is not visible.
      */
     fun downloadNode(withStartMessage: Boolean) {
-        uiState.value.selectedNodes.let { nodes ->
-            uiState.update {
-                it.copy(
-                    downloadEvent = triggered(
-                        TransferTriggerEvent.StartDownloadNode(
-                            nodes = nodes,
-                            withStartMessage = withStartMessage,
-                        )
+        val nodes = uiState.value.selectedNodes
+        val downloadNodes = if (nodeSourceType == NodeSourceType.FOLDER_LINK) {
+            runCatching {
+                nodes.map { mapTypedNodeToPublicLinkUseCase(it) }
+            }.getOrDefault(nodes)
+        } else {
+            nodes
+        }
+        uiState.update {
+            it.copy(
+                downloadEvent = triggered(
+                    TransferTriggerEvent.StartDownloadNode(
+                        nodes = downloadNodes,
+                        withStartMessage = withStartMessage,
                     )
                 )
-            }
+            )
         }
     }
 

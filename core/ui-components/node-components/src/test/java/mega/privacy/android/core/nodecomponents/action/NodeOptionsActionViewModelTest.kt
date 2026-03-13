@@ -63,7 +63,9 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.exception.node.ForeignNodeException
 import mega.privacy.android.domain.usecase.CheckNodeCanBeMovedToTargetNode
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -86,6 +88,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
@@ -170,6 +173,7 @@ class NodeOptionsActionViewModelTest {
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
     private val removeRecentlyWatchedItemUseCase = mock<RemoveRecentlyWatchedItemUseCase>()
+    private val mapTypedNodeToPublicLinkUseCase = mock<MapTypedNodeToPublicLinkUseCase>()
     private val mockRubbishNode = mock<TypedFileNode> {
         on { id } doReturn NodeId(999L)
     }
@@ -229,6 +233,7 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -679,6 +684,7 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -746,6 +752,7 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -807,6 +814,7 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -860,6 +868,7 @@ class NodeOptionsActionViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
+            mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1584,6 +1593,44 @@ class NodeOptionsActionViewModelTest {
             viewModel.uiState.test {
                 val uiState = awaitItem()
                 assertThat(uiState.dismissEvent).isInstanceOf(StateEvent.Triggered::class.java)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode triggers StartDownloadNode with original nodes when source type is not FOLDER_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.CLOUD_DRIVE)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(mockFileNode)
+            }
+        }
+
+    @Test
+    fun `test that downloadNode maps nodes to public link types when source type is FOLDER_LINK`() =
+        runTest {
+            initViewModel(nodeSourceType = NodeSourceType.FOLDER_LINK)
+            val publicLinkFile = mock<PublicLinkFile>()
+            whenever(mapTypedNodeToPublicLinkUseCase(mockFileNode)).thenReturn(publicLinkFile)
+            viewModel.updateSelectedNodes(listOf(mockFileNode))
+
+            viewModel.downloadNode(withStartMessage = false)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val event = state.downloadEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                val trigger =
+                    (event as StateEventWithContentTriggered).content as TransferTriggerEvent.StartDownloadNode
+                assertThat(trigger.nodes).containsExactly(publicLinkFile)
             }
         }
 } 
