@@ -184,6 +184,11 @@ interface PlayerServiceViewModelGateway {
     fun mediaItemToRemoveUpdate(): Flow<Pair<Int, Long>>
 
     /**
+     * Reset the mediaItemToRemove
+     */
+    fun resetMediaItemToRemove()
+
+    /**
      * Update node name
      *
      * @return Flow<String>
