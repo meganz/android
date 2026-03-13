@@ -220,7 +220,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     private val playerSource = MutableLiveData<MediaPlaySources>()
 
-    private val mediaItemToRemove = MutableStateFlow<Pair<Int, Long>>(Pair(-1, -1))
+    private val mediaItemToRemove = MutableStateFlow(NO_MEDIA_ITEM)
+
 
     private val nodeNameUpdate = MutableLiveData<String>()
 
@@ -355,6 +356,8 @@ class AudioPlayerServiceViewModel @Inject constructor(
         )
 
         playerRetry = 0
+        // Reset mediaItemToRemove when building the play sources.
+        resetMediaItemToRemove()
 
         // if we are already playing this music, then the metadata is already
         // in LiveData (_metadata of AudioPlayerService), we don't need (and shouldn't)
@@ -1220,6 +1223,10 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     override fun mediaItemToRemoveUpdate() = mediaItemToRemove
 
+    override fun resetMediaItemToRemove() {
+        mediaItemToRemove.update { NO_MEDIA_ITEM }
+    }
+
     override fun nodeNameUpdate() = nodeNameUpdate.asFlow()
 
     override fun retryUpdate() = retry.asFlow()
@@ -1474,6 +1481,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
 
     companion object {
         private const val MAX_RETRY = 6
+        private val NO_MEDIA_ITEM = -1 to -1L
 
         private const val JOB_KEY_MONITOR_SHUFFLE = "JOB_KEY_MONITOR_SHUFFLE"
         private const val JOB_KEY_BUILD_PLAYER_SOURCES = "KEY_JOB_BUILD_PLAYER_SOURCES"
