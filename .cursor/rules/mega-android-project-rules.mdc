@@ -64,14 +64,7 @@ alwaysApply: true
       @Inject lateinit var megaApi: MegaApiAndroid
   }
   ```
-- **ViewModels**: Use `@HiltViewModel` with constructor injection
-  ```kotlin
-  @HiltViewModel
-  class GlobalStateViewModel @Inject constructor(
-      private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
-      private val monitorUserCredentialsUseCase: MonitorUserCredentialsUseCase
-  ) : ViewModel()
-  ```
+- **ViewModels**: See [viewmodel-conventions.md](.claude/skills/viewmodel/viewmodel-conventions.md) for ViewModel conventions (Hilt, StateFlow, use case injection).
 - **Activities/Fragments**: Use `@AndroidEntryPoint`
 - **Modules**: Create `@Module` classes with `@InstallIn(SingletonComponent::class)`
   ```kotlin
@@ -120,21 +113,7 @@ alwaysApply: true
 - **Flow Returns**: Use cases return `Flow` or `StateFlow` for reactive programming
 
 ### State Management
-- **StateFlow**: Use `StateFlow` for UI state management
-  ```kotlin
-  private val _state = MutableStateFlow(BaseState())
-  val state: StateFlow<BaseState> = _state
-  ```
-- **Unidirectional Data Flow**: State flows down, events flow up
-- **State Classes**: Create dedicated state classes for complex UI states
-  ```kotlin
-  data class GlobalState(
-      val isLoading: Boolean = false,
-      val session: String? = null,
-      val themeMode: ThemeMode = ThemeMode.System
-  )
-  ```
-- **ViewModel State**: Expose state through `StateFlow` in ViewModels
+- See [viewmodel-conventions.md](.claude/skills/viewmodel/viewmodel-conventions.md) for ViewModel state management conventions.
 
 ## Build Configuration
 
@@ -193,22 +172,8 @@ alwaysApply: true
 ### Test Structure
 - **Repository Tests**: Test repository implementations with mocked dependencies
 - **Use Case Tests**: Test use cases with mocked repository dependencies
-- **ViewModel Tests**: Test ViewModels with mocked use case dependencies
+- **ViewModel Tests**: See [viewmodel-test-conventions.md](.claude/skills/viewmodel/viewmodel-test-conventions.md) for ViewModel test conventions.
 - **Mapper Tests**: Test data mappers for all transformation scenarios
-
-### Test Helper Functions
-- **initViewModel Pattern**: Use parameterized helper functions with default values to reduce duplication
-  ```kotlin
-  private fun initViewModel(maxBucketCount: Int = 4) {
-      underTest = RecentsViewModel(
-          getRecentActionsUseCase = getRecentActionsUseCase,
-          // ... other dependencies
-          maxBucketCount = maxBucketCount
-      )
-  }
-  ```
-- **Try to use helper functions**: Don't manually create ViewModels in tests unless necessary; use `initViewModel()` with default values
-- **Custom parameters**: Pass parameters when needed (e.g., `initViewModel(maxBucketCount = 10)`)
 
 ### Test Modules
 - **Core Test**: Shared test utilities and extensions

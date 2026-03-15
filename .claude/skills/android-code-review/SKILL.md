@@ -100,6 +100,8 @@ Build:            Convention plugins (build-logic/convention/), Version Catalogs
 
 ## Review Dimensions & Checklists
 
+> **ViewModel files**: When reviewing `*ViewModel.kt` files, also apply the conventions in [viewmodel-conventions.md](../viewmodel/viewmodel-conventions.md).
+
 ### 1. Architecture & Design
 
 **Checklist:**
@@ -428,6 +430,8 @@ suspend operator fun invoke(backup: Backup): BackupEntity? {
 
 ### 7. Testability
 
+> **ViewModel tests**: When reviewing ViewModel test files (`*ViewModelTest.kt`), also apply the conventions in [viewmodel-test-conventions.md](../viewmodel/viewmodel-test-conventions.md).
+
 **Checklist:**
 - [ ] ViewModel, UseCase and Repository implementation business logics have corresponding unit tests
 - [ ] **Test method naming:** Follow the patterns below (see Test Method Naming)
@@ -436,7 +440,6 @@ suspend operator fun invoke(backup: Backup): BackupEntity? {
 - [ ] ViewModels can be tested without Android framework dependencies
 - [ ] Test coverage meets team requirements (recommended ≥ 80% for core logic)
 - [ ] Test class annotated with `@ExtendWith(CoroutineMainDispatcherExtension::class)` and `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`
-- [ ] `initViewModel()` helper function used to construct ViewModels under test, with default parameters for brevity
 - [ ] Flow emissions tested using Turbine (`underTest.state.test { ... }`)
 
 #### Test Method Naming
@@ -455,30 +458,6 @@ fun `loading state is shown`() { ... }
 fun `test that init emits Loaded when login succeeds`() { ... }
 @Test
 fun `test that init does not call loginToFolderUseCase`() { ... }
-
-// ❌ ViewModel constructed inline in every test — brittle and repetitive
-@Test
-fun `test that loading state`() {
-    val vm = MyViewModel(mockUseCase, mockOtherUseCase, pageSize = 4)
-    ...
-}
-
-// ✅ Use an initViewModel() helper with defaults
-private fun initViewModel(pageSize: Int = 4) {
-    underTest = MyViewModel(
-        useCase = mockUseCase,
-        otherUseCase = mockOtherUseCase,
-        pageSize = pageSize,
-    )
-}
-
-@Test
-fun `test loading state`() = runTest {
-    initViewModel()
-    underTest.state.test {
-        assertThat(awaitItem().isLoading).isTrue()
-    }
-}
 ```
 
 ---
