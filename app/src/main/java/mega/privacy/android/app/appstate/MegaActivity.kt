@@ -33,7 +33,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
@@ -285,7 +284,7 @@ class MegaActivity : FragmentActivity() {
         setContent {
             val navGraphViewModel = hiltViewModel<NavigationGraphViewModel>() // nav graph content
             val presenceViewModel = hiltViewModel<SignalPresenceViewModel>()
-            val snackbarEventsViewModel = viewModel<SnackbarEventsViewModel>()
+            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
             val appTransferViewModel = hiltViewModel<AppTransferViewModel>()
             val requestStatusProgressViewModel = hiltViewModel<RequestStatusProgressViewModel>()
             val loginViewModel = hiltViewModel<LoginViewModel, LoginViewModel.Factory>(

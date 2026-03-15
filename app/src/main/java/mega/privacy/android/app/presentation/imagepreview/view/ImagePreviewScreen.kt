@@ -67,7 +67,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import kotlinx.coroutines.CoroutineScope
@@ -116,7 +116,7 @@ internal fun ImagePreviewScreen(
     onClickSlideshow: () -> Unit,
     onClickInfo: (ImageNode) -> Unit,
     snackbarHostState: SnackbarHostState,
-    viewModel: ImagePreviewViewModel = viewModel(),
+    viewModel: ImagePreviewViewModel = hiltViewModel(),
     onClickFavourite: (ImageNode) -> Unit = {},
     onClickLabel: (ImageNode) -> Unit = {},
     onClickOpenWith: (ImageNode) -> Unit = {},

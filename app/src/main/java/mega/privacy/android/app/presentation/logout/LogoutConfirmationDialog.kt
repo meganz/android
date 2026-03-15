@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.logout.model.LogoutState
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
@@ -17,7 +17,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun LogoutConfirmationDialog(
     onDismissed: () -> Unit = {},
-    logoutViewModel: LogoutViewModel = viewModel(),
+    logoutViewModel: LogoutViewModel = hiltViewModel(),
     onLogoutSuccess: () -> Unit = {},
 ) {
     val logoutState by logoutViewModel.state.collectAsStateWithLifecycle()

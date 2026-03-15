@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.app.R
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
@@ -66,9 +66,9 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.black_white
 fun MediaDiscoveryScreen(
     fileTypeIconMapper: FileTypeIconMapper,
     screenTitle: String? = null,
-    viewModel: MediaDiscoveryViewModel = viewModel(),
-    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
-    photoDownloaderViewModel: PhotoDownloaderViewModel = viewModel(),
+    viewModel: MediaDiscoveryViewModel = hiltViewModel(),
+    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = hiltViewModel(),
+    photoDownloaderViewModel: PhotoDownloaderViewModel = hiltViewModel(),
     onBackClicked: () -> Unit = {},
     onPhotoClicked: (Photo) -> Unit = {},
     onPhotoLongPressed: (Photo) -> Unit = {},

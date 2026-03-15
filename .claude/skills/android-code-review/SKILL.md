@@ -116,6 +116,7 @@ Build:            Convention plugins (build-logic/convention/), Version Catalogs
 - [ ] New repository implementations live in the data layer/package in a `data` module, not in the `app` module
 - [ ] Repositories never inject use cases — this inverts Clean Architecture's dependency flow
 - [ ] Repositories stay focused on data access; business/orchestration logic belongs in use cases
+- [ ] `@HiltViewModel` ViewModels use `hiltViewModel()` in Compose — never `viewModel()` (causes `NoSuchMethodException` crash at runtime)
 
 #### Modular Dependency checklist
 - [ ] **`:feature:`** modules can depend on `:shared`, `:core`, and their own `:*-snowflakes`.
@@ -188,6 +189,17 @@ class DefaultUserRepository @Inject constructor(
     private val userApiGateway: UserApiGateway,
     private val userMapper: UserMapper
 )
+
+// ❌ viewModel() with @HiltViewModel — crashes with NoSuchMethodException (no no-arg constructor)
+@HiltViewModel
+class LoginViewModel @Inject constructor(private val useCase: LoginUseCase) : ViewModel()
+
+@Composable
+fun LoginScreen(viewModel: LoginViewModel = viewModel()) // ❌ CRASH
+
+// ✅ Use hiltViewModel() so Hilt provides constructor dependencies
+@Composable
+fun LoginScreen(viewModel: LoginViewModel = hiltViewModel()) // ✅
 
 // ❌ Business logic in repository — orchestration belongs in use case
 class DefaultUserRepository {

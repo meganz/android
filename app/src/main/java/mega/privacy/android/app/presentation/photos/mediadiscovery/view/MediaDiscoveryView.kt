@@ -60,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.IconColor
@@ -109,8 +109,8 @@ fun MediaDiscoveryView(
     onStorageAlmostFullWarningDismiss: () -> Unit,
     onUpgradeClicked: () -> Unit,
     fileTypeIconMapper: FileTypeIconMapper,
-    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = viewModel(),
-    mediaDiscoveryViewModel: MediaDiscoveryViewModel = viewModel(),
+    mediaDiscoveryGlobalStateViewModel: MediaDiscoveryGlobalStateViewModel = hiltViewModel(),
+    mediaDiscoveryViewModel: MediaDiscoveryViewModel = hiltViewModel(),
     showSettingDialog: Boolean = false,
 
     ) {

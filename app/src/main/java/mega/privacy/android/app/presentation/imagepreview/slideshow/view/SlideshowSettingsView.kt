@@ -34,7 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.imagepreview.slideshow.model.SlideshowSettingViewModel
@@ -321,7 +321,7 @@ fun PreviewSlideshowSettingsView() {
     var repeat by remember { mutableStateOf(false) }
     OriginalTheme(isSystemInDarkTheme()) {
         Scaffold {
-            SlideshowSettingsView(viewModel())
+            SlideshowSettingsView(hiltViewModel())
         }
     }
 }

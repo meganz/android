@@ -9,7 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -38,7 +38,7 @@ import mega.privacy.android.shared.resources.R
 @Composable
 internal fun WebReactivationInstructionsView(
     onMegaUrlClicked: (url: String) -> Unit,
-    viewModel: WebInstructionsViewModel = viewModel(),
+    viewModel: WebInstructionsViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
     val domainName = remember(viewModel) { viewModel.domainName }

@@ -17,7 +17,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.view.GenericInstructionStep
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.view.InstructionStepWithBoldText
@@ -38,7 +38,7 @@ import mega.privacy.android.shared.resources.R
 @Composable
 internal fun WebCancellationInstructionsView(
     onMegaUrlClicked: (url: String) -> Unit,
-    viewModel: WebInstructionsViewModel = viewModel(),
+    viewModel: WebInstructionsViewModel = hiltViewModel(),
 ) {
     val scrollState = rememberScrollState()
     val domainName = remember(viewModel) { viewModel.domainName }

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Util
@@ -65,7 +65,7 @@ internal fun StorageStatusDialogView(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     usePlatformDefaultWidth: Boolean = true,
-    viewModel: StorageStatusViewModel = viewModel(),
+    viewModel: StorageStatusViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
