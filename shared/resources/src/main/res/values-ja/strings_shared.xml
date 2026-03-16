@@ -2115,4 +2115,8 @@
     <string name="sync_folder_connection_dialog_title">フォルダが別のデバイスに接続されています</string>
     <string name="sync_folder_connection_dialog_message">このフォルダはお使いのデバイス「%1$s」にリンクされています。サインアウトせずにMEGAをアンインストールしたことが原因と考えられます。フォルダは、一度に1つのデバイスとしか同期できません。このデバイスで同期するには、既存の接続を解除してください。</string>
     <string name="sync_folder_connection_this_device">%1$sに接続済み</string>
+    <string name="general_dialog_discard_changes_message">保存されていない編集内容は失われます</string>
+    <string name="general_dialog_discard_button">破棄する</string>
+    <string name="general_changes_saved">変更を保存しました</string>
+    <string name="node_option_save_to_mega">MEGAに保存</string>
 </resources>

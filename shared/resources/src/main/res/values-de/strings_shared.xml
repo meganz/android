@@ -2145,4 +2145,5 @@
     <string name="text_editor_show_line_numbers">Zeilennummern anzeigen</string>
     <string name="text_editor_hide_line_numbers">Zeilennummern ausblenden</string>
     <string name="settings_help_rate_app">Bewerten Sie uns</string>
+    <string name="general_dialog_discard_button">Verwerfen</string>
 </resources>

@@ -2171,7 +2171,7 @@
     <!-- Label to reference a recents section -->
     <string name="recents_label">近期的</string>
     <!-- Text of the empty screen when there are not elements in Recents -->
-    <string name="context_empty_recents">[A]近期存取[/A]裡[B]沒有檔案[/B]</string>
+    <string name="context_empty_recents">[A]近期活動[/A]裡[B]沒有檔案[/B]</string>
     <!-- Title of a recents bucket -->
     <string name="title_bucket">還有%1$s和%2$d</string>
     <!-- Title of a media recents bucket that only contains some images -->
@@ -2797,7 +2797,7 @@
     <!-- Action button which allows to show the recent activity. -->
     <string name="show_activity_action">顯示動態</string>
     <!-- Text informing the recent activity is hidden. -->
-    <string name="recents_activity_hidden">[B]近期[/B]動態已隱藏</string>
+    <string name="recents_activity_hidden">[B]近期[/B]活動已隱藏</string>
     <!-- Settings label which allows to enable or disable fingerprint unlock. -->
     <string name="setting_fingerprint">指紋辨識</string>
     <!-- Title of the dialog which allows to enable the fingerprint unlock. -->

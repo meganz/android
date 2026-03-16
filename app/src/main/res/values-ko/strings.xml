@@ -559,7 +559,7 @@
     <!-- Caption of a title, in the context of “About MEGA” or “About us” -->
     <string name="settings_about">대하여</string>
     <!-- Preference screen item action button -->
-    <string name="settings_about_privacy_policy">개인정보 처리 방침</string>
+    <string name="settings_about_privacy_policy">개인정보 처리방침</string>
     <!--  -->
     <string name="settings_about_terms_of_service">이용 약관</string>
     <!-- App means “Application” -->
@@ -807,7 +807,7 @@
     <!-- Title of the screen to select the sound of the notifications -->
     <string name="notification_sound_title">알림음</string>
     <!-- Button to clear the chat history -->
-    <string name="general_clear">비우기</string>
+    <string name="general_clear">지우기</string>
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">대화 기록이 삭제되었습니다</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->

@@ -5,7 +5,7 @@
     <!-- Sync text for the the button to begin sync-->
     <string name="sync_button_label">동기화</string>
     <!-- Sync when storage permission is denied we show banner with text to the user-->
-    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 장치 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요.</string>
+    <string name="sync_storage_permission_banner">당신의 로컬 폴더를 동기화하기 위해 MEGA가 기기 저장소에 접근이 필요합니다. 접근을 승인하려면 여기를 탭하세요.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
     <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요</string>
     <!-- Sync file counts to show ongoing syncing-->
@@ -51,7 +51,7 @@
     <!-- Sync state message for No Stalled Issues -->
     <string name="sync_stalled_issues_empty_message">문제 없음</string>
     <!-- Sync option to choose device folder -->
-    <string name="sync_folder_choose_device_folder_title">장치 폴더</string>
+    <string name="sync_folder_choose_device_folder_title">기기 폴더</string>
     <!-- Sync option to choose Mega folder -->
     <string name="sync_folders_choose_mega_folder_title">MEGA 폴더</string>
     <!-- Sync state Paused -->
@@ -59,7 +59,7 @@
     <!-- Sync state syncing -->
     <string name="sync_list_sync_state_syncing">동기화 중&#8230;</string>
     <!-- Sync permission title for device storage -->
-    <string name="sync_folders_device_storage">장치 폴더</string>
+    <string name="sync_folders_device_storage">기기 폴더</string>
     <!-- Sync permission title for mega storage -->
     <string name="sync_folders_mega_storage">MEGA 폴더</string>
     <!-- Sync while syncing title for Issues info -->
@@ -73,7 +73,7 @@
     <!-- Sync dialog for sync only over Wi-Fi -->
     <string name="sync_dialog_message_wifi_only">와이파이 전용</string>
     <!-- Sync empty state message -->
-    <string name="sync_empty_state_message">당신의 클라우드 드라이브에서 선택한 폴더와 동기화할 장치의 로컬 폴더를 설정해야 합니다</string>
+    <string name="sync_empty_state_message">당신의 클라우드 드라이브에서 선택한 폴더와 동기화할 기기의 로컬 폴더를 설정해야 합니다</string>
     <!-- Sync stalled issue reason is no file issue-->
     <string name="sync_stalled_issue_file_issue">파일 또는 폴더 문제</string>
     <!-- Sync stalled issue reason is move or rename-->
