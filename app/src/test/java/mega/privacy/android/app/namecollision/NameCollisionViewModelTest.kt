@@ -459,6 +459,53 @@ internal class NameCollisionViewModelTest {
     }
 
 
+    @Test
+    fun `test that cancelAll clears pendingCollisions for non-folder-upload context`() =
+        runTest {
+            val paths = listOf(
+                UriPath("/cacheFolder/Mega/file1.txt"),
+                UriPath("/cacheFolder/Mega/file2.txt"),
+            )
+            val nameCollisions = paths.mapIndexed { index, path ->
+                mock<FileNameCollision> {
+                    on { this.path } doReturn path
+                    on { this.isFile } doReturn true
+                    on { this.parentHandle } doReturn 123L
+                    on { this.name } doReturn "file${index + 1}.txt"
+                    on { this.renameName } doReturn null
+                    on { this.pitagTrigger } doReturn PitagTrigger.NotApplicable
+                }
+            }
+            val collisionResults = nameCollisions.map { nameCollision ->
+                mock<NodeNameCollisionResult> {
+                    on { this.nameCollision } doReturn nameCollision
+                }
+            }
+
+            nameCollisions.forEachIndexed { index, nameCollision ->
+                whenever(getNodeNameCollisionResultUseCase(nameCollision)) doReturn collisionResults[index]
+                whenever(getNodeNameCollisionsResultUseCase(nameCollisions.drop(index))) doReturn
+                        collisionResults.drop(index)
+            }
+
+            whenever(reorderNodeNameCollisionsUseCase(nameCollisions)) doReturn NodeCollisionsWithSize(
+                nameCollisions,
+                nameCollisions.size - 1,
+                0,
+            )
+            whenever(getFileVersionsOption(any())).thenReturn(false)
+
+            initUnderTest()
+            underTest.isFolderUploadContext = false
+            underTest.setData(nameCollisions)
+            advanceUntilIdle()
+
+            underTest.cancel(true)
+            advanceUntilIdle()
+
+            assertThat(underTest.shouldFinish()).isTrue()
+        }
+
     companion object {
         @JvmField
         @RegisterExtension
