@@ -36,10 +36,15 @@ internal fun openChatFragment(
         }.let { extras ->
             intent = Intent().apply { putExtras(extras) }
 
+            val currentFragment =
+                supportFragmentManager.findFragmentById(android.R.id.content)
             supportFragmentManager.commit {
-                replace(android.R.id.content, ChatFragment::class.java, extras)
-                if (supportFragmentManager.findFragmentById(android.R.id.content) is ChatTabsFragment) {
+                if (currentFragment is ChatTabsFragment) {
+                    hide(currentFragment)
+                    add(android.R.id.content, ChatFragment::class.java, extras)
                     addToBackStack("ChatFragment")
+                } else {
+                    replace(android.R.id.content, ChatFragment::class.java, extras)
                 }
             }
         }
