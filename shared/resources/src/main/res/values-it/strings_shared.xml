@@ -2100,4 +2100,5 @@
     <string name="text_editor_show_line_numbers">Mostra i numeri del rigo</string>
     <string name="text_editor_hide_line_numbers">Nascondi i numeri del rigo</string>
     <string name="settings_help_rate_app">Votaci</string>
+    <string name="general_dialog_discard_button">Scarta</string>
 </resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- The name of the Device or Folder Sub State when its code is UNSUPPORTED_FILE_SYSTEM -->
-    <string name="general_sync_unsupported_file_system">이 폴더는 당신의 기기의 파일 시스템이 지원하지 않기 때문에 MEGA에서 동기화 하거나 백업할 수 없습니다</string>
+    <string name="general_sync_unsupported_file_system">이 폴더는 기기의 파일 시스템이 지원하지 않기 때문에 MEGA에서 동기화 하거나 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_REMOTE_TYPE -->
     <string name="general_sync_invalid_remote_type">선택한 폴더는 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is INVALID_LOCAL_TYPE -->
@@ -2006,7 +2006,7 @@
     <string name="empty_rubbish_bin_error_message">오류가 발생하였습니다. 휴지통이 비워지지 않았습니다</string>
     <string name="empty_rubbish_bin_menu">휴지통 비우기</string>
     <string name="remove_all_rubbish_bin_confirmation">휴지통에서 모든 항목을 영구적으로 제거하려고 합니다.</string>
-    <string name="general_clear">비우기</string>
+    <string name="general_clear">지우기</string>
     <string name="annotated_empty_rubbish_bin_menu">[B]빈[/B] [A]휴지통[/A]</string>
     <string name="annotated_empty_folder">[B]빈[/B] [A]폴더[/A]</string>
     <string name="general_upload_label">업로드</string>
@@ -2104,4 +2104,7 @@
     <string name="sync_folder_connection_dialog_title">다른 장치와 연결된 폴더</string>
     <string name="sync_folder_connection_dialog_message">이 링크는 당신의 %1$s 장치에 연결되어 있으며, MEGA를 로그아웃 하지 않고 삭제했기 때문으로 보입니다. 폴더는 한번에 한 장치만 동기화할 수 있습니다. 여기에서 동기화하려면 기존 연결을 제거하세요.</string>
     <string name="sync_folder_connection_this_device">%1$s에 연결됨</string>
+    <string name="general_dialog_discard_changes_message">모든 저장하지 않은 편집은 손실됩니다</string>
+    <string name="general_dialog_discard_button">폐기</string>
+    <string name="general_changes_saved">변경 사항 저장됨</string>
 </resources>

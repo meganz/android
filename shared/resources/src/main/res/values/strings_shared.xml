@@ -2343,7 +2343,7 @@
     <!-- Menu option to clear recent activity in recents options bottom sheet -->
     <string name="home_recents_options_menu_clear">Clear recent activity</string>
     <!-- Clear recents confirmation dialog message -->
-    <string name="home_recents_clear_dialog_message">Are you sure you want to clear all recent activity? This can’t be undone.</string>
+    <string name="home_recents_clear_dialog_message">Are you sure you want to clear all recent activity? This cannot be undone.</string>
     <!-- Snackbar shown when user switches to monthly tab and the selected plan (e.g. Pro Lite) is only available with yearly billing. %1$s is the plan name. -->
     <string name="choose_account_screen_plan_available_yearly_billing">%1$s is available with yearly billing</string>
     <!-- Snackbar shown when user switches to yearly tab and the selected plan (e.g. Pro Lite) is only available with monthly billing. %1$s is the plan name. -->

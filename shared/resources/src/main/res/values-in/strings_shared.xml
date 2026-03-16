@@ -445,7 +445,7 @@
     <!-- Transfers scanning folders dialog title to inform that the transfers are being cancelled -->
     <string name="transfers_scanning_folders_dialog_cancel_cancelling_title">Membatalkan transfer&#8230;</string>
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
-    <string name="report_issue_error_minimum_characters">Pertanyaan harus minimal 30 karakter.</string>
+    <string name="report_issue_error_minimum_characters">Pertanyaan harus minimal 30 karakter</string>
     <!-- placeholder message for report issue-->
     <string name="report_issue_description_placeholder_message">Jelaskan masalah tersebut dengan minimal 30 karakter</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
@@ -2069,4 +2069,5 @@
     <string name="create_new_video_playlist_input_title_placeholder">Daftar putar baru</string>
     <string name="text_editor_show_line_numbers">Tampilkan nomor baris</string>
     <string name="text_editor_hide_line_numbers">Sembunyikan nomor baris</string>
+    <string name="general_dialog_discard_button">Buang</string>
 </resources>

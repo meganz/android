@@ -2098,4 +2098,5 @@
     <string name="text_editor_show_line_numbers">顯示行數</string>
     <string name="text_editor_hide_line_numbers">隱藏行數</string>
     <string name="settings_help_rate_app">請幫我們評分</string>
+    <string name="general_dialog_discard_button">捨棄</string>
 </resources>

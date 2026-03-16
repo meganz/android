@@ -2175,4 +2175,8 @@
     <string name="sync_folder_connection_dialog_title">Map verbonden met een ander apparaat</string>
     <string name="sync_folder_connection_dialog_message">Deze map is gekoppeld aan uw %1$s-apparaat, waarschijnlijk omdat MEGA is verwijderd zonder dat u zich hebt afgemeld. Een map kan slechts met één apparaat tegelijk worden gesynchroniseerd. Verwijder de bestaande verbinding om de map hier te synchroniseren.</string>
     <string name="sync_folder_connection_this_device">Verbonden met %1$s</string>
+    <string name="general_dialog_discard_changes_message">Alle niet-opgeslagen wijzigingen gaan verloren</string>
+    <string name="general_dialog_discard_button">Weggooien</string>
+    <string name="general_changes_saved">Wijzigingen opgeslagen</string>
+    <string name="node_option_save_to_mega">Opslaan naar MEGA</string>
 </resources>

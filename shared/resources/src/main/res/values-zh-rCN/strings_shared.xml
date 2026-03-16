@@ -2114,4 +2114,7 @@
     <string name="sync_folder_connection_dialog_title">文件夹已连接到另一台设备</string>
     <string name="sync_folder_connection_dialog_message">此文件夹已连接到您的%1$s设备，可能是因为在未登出时卸载了MEGA。一个文件夹一次只能同步到一个设备。请先移除现有连接，然后在此处进行同步。</string>
     <string name="sync_folder_connection_this_device">已连接到%1$s</string>
+    <string name="general_dialog_discard_button">放弃</string>
+    <string name="general_dialog_discard_changes_message">所有未保存的编辑将会丢失</string>
+    <string name="general_changes_saved">更改已保存</string>
 </resources>

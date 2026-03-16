@@ -4911,7 +4911,7 @@
     <!-- Search drop down chips filter type file type documents -->
     <string name="search_dropdown_chip_filter_type_file_type_documents">Documentos</string>
     <!-- Search drop down chips filter type date added -->
-    <string name="search_dropdown_chip_filter_type_date_added">Fecha de subida</string>
+    <string name="search_dropdown_chip_filter_type_date_added">Fecha de inclusión</string>
     <!-- Search drop down chips filter type last modified -->
     <string name="search_dropdown_chip_filter_type_last_modified">Última modificación</string>
     <!-- Search drop down chips filter type date modified today -->
