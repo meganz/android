@@ -25,9 +25,11 @@ import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpi
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -82,6 +84,7 @@ class GlobalRequestListenerTest {
     private val setLoggedOutFromAnotherLocationUseCase =
         mock<SetLoggedOutFromAnotherLocationUseCase>()
     private val setIsUnverifiedBusinessAccountUseCase = mock<SetUnverifiedBusinessAccountUseCase>()
+    private val getChatFilesFolderIdUseCase = mock<GetChatFilesFolderIdUseCase>()
 
     // Test data
     private val testEmail = "test@example.com"
@@ -95,7 +98,6 @@ class GlobalRequestListenerTest {
         Dispatchers.setMain(testDispatcher)
 
         whenever(dbH.get()).thenReturn(databaseHandler)
-        whenever(databaseHandler.myChatFilesFolderHandle).thenReturn(MegaApiJava.INVALID_HANDLE)
 
         underTest = GlobalRequestListener(
             appEventGateway = appEventGateway,
@@ -121,6 +123,7 @@ class GlobalRequestListenerTest {
             broadcastSslVerificationFailedUseCase = broadcastSslVerificationFailedUseCase,
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
             setIsUnverifiedBusinessAccountUseCase = setIsUnverifiedBusinessAccountUseCase,
+            getChatFilesFolderIdUseCase = getChatFilesFolderIdUseCase,
         )
     }
 
@@ -136,7 +139,8 @@ class GlobalRequestListenerTest {
             loginMutex, updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase, isRichPreviewsEnabledUseCase,
             resetAccountDetailsTimeStampUseCase, broadcastSslVerificationFailedUseCase,
-            setLoggedOutFromAnotherLocationUseCase, setIsUnverifiedBusinessAccountUseCase
+            setLoggedOutFromAnotherLocationUseCase, setIsUnverifiedBusinessAccountUseCase,
+            getChatFilesFolderIdUseCase,
         )
     }
 
@@ -562,4 +566,40 @@ class GlobalRequestListenerTest {
             verify(getFullAccountInfoUseCase, never()).invoke()
             verify(setupMegaChatApiWrapper, never()).invoke()
         }
-} 
+
+    @Test
+    fun `test that onRequestFinish calls getMyChatFilesFolder when FETCH_NODES and API_OK and chat files folder id is null`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_FETCH_NODES
+            }
+            val api = mock<MegaApiJava>()
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+            whenever(getChatFilesFolderIdUseCase()).thenReturn(null)
+
+            underTest.onRequestFinish(api, request, error)
+            advanceUntilIdle()
+
+            verify(megaApi).getMyChatFilesFolder(userAttributeDatabaseUpdater)
+        }
+
+    @Test
+    fun `test that onRequestFinish does not call getMyChatFilesFolder when FETCH_NODES and API_OK and chat files folder id is set`() =
+        runTest {
+            val request = mock<MegaRequest> {
+                on { type } doReturn MegaRequest.TYPE_FETCH_NODES
+            }
+            val api = mock<MegaApiJava>()
+            val error = mock<MegaError> {
+                on { errorCode } doReturn MegaError.API_OK
+            }
+            whenever(getChatFilesFolderIdUseCase()).thenReturn(NodeId(123L))
+
+            underTest.onRequestFinish(api, request, error)
+            advanceUntilIdle()
+
+            verify(megaApi, never()).getMyChatFilesFolder(any())
+        }
+}

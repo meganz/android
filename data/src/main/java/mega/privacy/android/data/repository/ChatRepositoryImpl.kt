@@ -98,6 +98,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -345,7 +346,9 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getChatFilesFolderId(): NodeId? = withContext(ioDispatcher) {
-        localStorageGateway.getChatFilesFolderHandle()?.let { NodeId(it) }
+        // Avoid NodeId(INVALID_HANDLE); treat as not set and return null.
+        localStorageGateway.getChatFilesFolderHandle()?.takeIf { it != MegaApiJava.INVALID_HANDLE }
+            ?.let { NodeId(it) }
     }
 
     override suspend fun getChatRooms(): List<ChatRoom> =
