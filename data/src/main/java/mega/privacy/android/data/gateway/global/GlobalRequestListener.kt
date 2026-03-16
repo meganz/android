@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocati
 import mega.privacy.android.domain.usecase.account.SetUnverifiedBusinessAccountUseCase
 import mega.privacy.android.domain.usecase.backup.SetupDeviceNameUseCase
 import mega.privacy.android.domain.usecase.business.BroadcastBusinessAccountExpiredUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatFilesFolderIdUseCase
 import mega.privacy.android.domain.usecase.chat.UpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.chat.link.IsRichPreviewsEnabledUseCase
 import mega.privacy.android.domain.usecase.chat.link.ShouldShowRichLinkWarningUseCase
@@ -26,7 +27,6 @@ import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.network.BroadcastSslVerificationFailedUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -63,6 +63,7 @@ import javax.inject.Inject
  * @property broadcastSslVerificationFailedUseCase
  * @property setLoggedOutFromAnotherLocationUseCase
  * @property setIsUnverifiedBusinessAccountUseCase
+ * @property getChatFilesFolderIdUseCase
  */
 internal class GlobalRequestListener @Inject constructor(
     private val appEventGateway: AppEventGateway,
@@ -88,6 +89,7 @@ internal class GlobalRequestListener @Inject constructor(
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
     private val setIsUnverifiedBusinessAccountUseCase: SetUnverifiedBusinessAccountUseCase,
+    private val getChatFilesFolderIdUseCase: GetChatFilesFolderIdUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -203,8 +205,14 @@ internal class GlobalRequestListener @Inject constructor(
                     Timber.e(it, "Error checking rich link settings")
                 }
             }
-            if (dbH.get().myChatFilesFolderHandle == INVALID_HANDLE) {
-                megaApi.getMyChatFilesFolder(userAttributeDatabaseUpdater)
+            applicationScope.launch {
+                runCatching {
+                    if (getChatFilesFolderIdUseCase() == null) {
+                        megaApi.getMyChatFilesFolder(userAttributeDatabaseUpdater)
+                    }
+                }.onFailure {
+                    Timber.e(it, "Error checking chat files folder handle")
+                }
             }
             setupMegaChatApiWrapper()
             applicationScope.launch {
