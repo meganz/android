@@ -28,6 +28,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.decorator.rememberAnalyticNavEntryDecorator
 import mega.privacy.android.app.appstate.content.navigation.MainNavigationStateViewModel
 import mega.privacy.android.app.appstate.content.navigation.StorageStatusViewModel
@@ -36,13 +37,11 @@ import mega.privacy.android.app.appstate.content.navigation.model.MainNavState
 import mega.privacy.android.app.appstate.content.navigation.rememberTopLevelBackStack
 import mega.privacy.android.app.main.ads.NewAdsContainer
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
-import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
-import mega.privacy.android.navigation.contract.shared.LocalSharedViewModelStoreOwner
 import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
 import mega.privacy.android.navigation.contract.state.SelectionModeController
