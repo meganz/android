@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Parses the latest TestRail XML export from .testrail/results/ and generates a Slack
+Parses the latest TestRail JSON results from .testrail/results/ and generates a Slack
 update file listing failed and feedback test cases grouped by assigned developer.
 Automated tests (containing "failed by automated test") are excluded.
 
@@ -8,11 +8,11 @@ Output: .testrail/output/SlackUpdate<YYYY-MM-DD>.txt
 """
 
 import glob
+import json
 import os
 import re
 import sys
 import traceback
-import xml.etree.ElementTree as ET
 from collections import defaultdict
 from datetime import date
 
@@ -22,11 +22,11 @@ OUTPUT_DIR = os.path.join(SCRIPT_DIR, "output")
 TEST_VIEW_PATH = "index.php?/tests/view"
 
 
-def find_latest_xml():
-    xml_files = glob.glob(os.path.join(RESULTS_DIR, "*.xml"))
-    if not xml_files:
-        raise FileNotFoundError("No XML files found in .testrail/results/")
-    return max(xml_files, key=os.path.getmtime)
+def find_latest_json():
+    json_files = glob.glob(os.path.join(RESULTS_DIR, "*.json"))
+    if not json_files:
+        raise FileNotFoundError("No JSON files found in .testrail/results/")
+    return max(json_files, key=os.path.getmtime)
 
 
 def extract_version(filename):
@@ -37,9 +37,12 @@ def extract_version(filename):
 
 
 def is_automated(test):
-    full_text = ET.tostring(test, encoding="unicode")
-    cleaned = re.sub(r"\*+", "", full_text).lower()
-    return "failed by automated test" in cleaned
+    """Check if any result comment indicates an automated test."""
+    for comment in test.get("comments", []):
+        cleaned = re.sub(r"\*+", "", comment).lower()
+        if "failed by automated test" in cleaned:
+            return True
+    return False
 
 
 def get_base_url():
@@ -49,31 +52,26 @@ def get_base_url():
     return f"{base.rstrip('/')}/{TEST_VIEW_PATH}"
 
 
-def parse_tests(xml_path):
+def parse_tests(json_path):
     base_url = get_base_url()
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
+
+    with open(json_path, "r") as f:
+        data = json.load(f)
 
     grouped = defaultdict(list)
 
-    for test in root.iter("test"):
-        status_el = test.find("status")
-        if status_el is None or not status_el.text:
-            continue
-        status = status_el.text.strip().lower()
+    for test in data.get("tests", []):
+        status = (test.get("status") or "").strip().lower()
         if status not in ("failed", "feedback"):
             continue
         if is_automated(test):
             continue
 
-        test_id_el = test.find("id")
-        assignee_el = test.find("assignedto")
+        tid = test.get("id", "N/A")
+        numeric_id = str(tid).lstrip("T")
+        assignee = (test.get("assignedto") or "").strip() or "Unassigned"
 
-        tid = test_id_el.text.strip() if test_id_el is not None and test_id_el.text else "N/A"
-        numeric_id = tid.lstrip("T")
-        assignee = assignee_el.text.strip() if assignee_el is not None and assignee_el.text and assignee_el.text.strip() else "Unassigned"
-
-        entry = f"• [{tid}]({base_url}/{numeric_id})"
+        entry = f"• [T{numeric_id}]({base_url}/{numeric_id})"
         if status == "feedback":
             entry += " (Feedback)"
 
@@ -110,9 +108,9 @@ def generate_output(grouped, version):
 
 
 def main():
-    xml_path = find_latest_xml()
-    version = extract_version(xml_path)
-    grouped = parse_tests(xml_path)
+    json_path = find_latest_json()
+    version = extract_version(json_path)
+    grouped = parse_tests(json_path)
 
     output = generate_output(grouped, version)
     output_file = os.path.join(

@@ -91,6 +91,7 @@ replay_pid*
 !/.claude/skills/
 .claude/settings.local.json
 ./review.md
+review.md
 .trees
 
 /.testrail/results/*
