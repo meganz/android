@@ -328,7 +328,10 @@ class NameCollisionViewModel @Inject constructor(
                 }
             }
 
-            else -> currentCollision.value = null
+            else -> {
+                pendingCollisions.clear()
+                currentCollision.value = null
+            }
         }
     }
 
@@ -504,7 +507,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun getAllPendingCollisions(): MutableList<NodeNameCollisionResult> {
         val allPendingCollisions = mutableListOf<NodeNameCollisionResult>().apply {
-            add(currentCollision.value!!)
+            currentCollision.value?.let { add(it) }
             addAll(pendingCollisions)
         }
 
