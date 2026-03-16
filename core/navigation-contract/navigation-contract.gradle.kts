@@ -37,4 +37,7 @@ dependencies {
     testImplementation(testlib.bundles.unit.test)
     testImplementation(testlib.truth)
     testImplementation(testlib.truth.ext)
+    testImplementation(testlib.compose.junit)
+    debugImplementation(testlib.compose.manifest)
+    testImplementation(testlib.roboelectric)
 }
