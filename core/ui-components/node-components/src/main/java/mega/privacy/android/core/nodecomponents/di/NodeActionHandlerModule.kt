@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveRecent
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RemoveShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RenameNodeActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.RestoreActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.SaveToMegaActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SendToChatActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.ShareFolderActionClickHandler
@@ -95,6 +96,7 @@ object NodeActionHandlerModule {
         addToPlaylistAction: AddToPlaylistActionClickHandler,
         viewInFolderAction: ViewInFolderActionClickHandler,
         removeRecentlyWatchedVideoActionClickHandler: RemoveRecentlyWatchedVideoActionClickHandler,
+        saveToCloudDriveActionClickHandler: SaveToMegaActionClickHandler,
     ): Set<SingleNodeAction> {
         return setOf(
             versionsAction,
@@ -131,7 +133,8 @@ object NodeActionHandlerModule {
             addToAlbumActionClickHandler,
             addToPlaylistAction,
             viewInFolderAction,
-            removeRecentlyWatchedVideoActionClickHandler
+            removeRecentlyWatchedVideoActionClickHandler,
+            saveToCloudDriveActionClickHandler
         )
     }
 
@@ -170,6 +173,7 @@ object NodeActionHandlerModule {
         addToActionClickHandler: AddToActionClickHandler,
         addToAlbumActionClickHandler: AddToAlbumActionClickHandler,
         labelAction: LabelActionClickHandler,
+        saveToCloudDriveActionClickHandler: SaveToMegaActionClickHandler,
     ): Set<MultiNodeAction> {
         return setOf(
             openWithAction,
@@ -197,7 +201,8 @@ object NodeActionHandlerModule {
             removeFavouriteAction,
             addToActionClickHandler,
             addToAlbumActionClickHandler,
-            labelAction
+            labelAction,
+            saveToCloudDriveActionClickHandler
         )
     }
 }

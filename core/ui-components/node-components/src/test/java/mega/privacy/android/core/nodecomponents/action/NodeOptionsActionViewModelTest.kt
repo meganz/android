@@ -72,6 +72,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -108,6 +109,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -164,6 +166,7 @@ class NodeOptionsActionViewModelTest {
 
     private val nodeSelectionModeActionMapper = mock<NodeSelectionModeActionMapper>()
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
+    private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val checkNodeCanBeMovedToTargetNode = mock<CheckNodeCanBeMovedToTargetNode>()
@@ -234,6 +237,7 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
             applicationContext = mockContext,
             nodeSourceType = nodeSourceType
         )
@@ -248,6 +252,9 @@ class NodeOptionsActionViewModelTest {
         )
         getRubbishNodeUseCase.stub {
             onBlocking { invoke() } doReturn mockRubbishNode
+        }
+        hasCredentialsUseCase.stub {
+            onBlocking { invoke() } doReturn true
         }
         nodeSelectionModeActionMapper.stub {
             onBlocking {
@@ -298,6 +305,7 @@ class NodeOptionsActionViewModelTest {
             mockMultiNodeActionHandler,
             nodeSelectionModeActionMapper,
             getRubbishNodeUseCase,
+            hasCredentialsUseCase,
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             checkNodeCanBeMovedToTargetNode,
@@ -685,6 +693,7 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -753,6 +762,7 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
         val mockAction = mock<MoveMenuAction>()
@@ -815,6 +825,7 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
         val mockAction = mock<VersionsMenuAction>()
@@ -869,6 +880,7 @@ class NodeOptionsActionViewModelTest {
             navigationEventQueue = navigationEventQueue,
             removeRecentlyWatchedItemUseCase = removeRecentlyWatchedItemUseCase,
             mapTypedNodeToPublicLinkUseCase = mapTypedNodeToPublicLinkUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
         )
 
         assertThrows<IllegalArgumentException> {
@@ -1061,6 +1073,44 @@ class NodeOptionsActionViewModelTest {
         // Should not crash and should still initialize
         viewModel.uiState.test {
             awaitItem()
+        }
+    }
+
+    @Test
+    fun `test that checkIsLoggedIn updates isLoggedIn to true when hasCredentialsUseCase returns true`() =
+        runTest {
+            hasCredentialsUseCase.stub { onBlocking { invoke() } doReturn true }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that checkIsLoggedIn updates isLoggedIn to false when hasCredentialsUseCase returns false`() =
+        runTest {
+            hasCredentialsUseCase.stub { onBlocking { invoke() } doReturn false }
+            initViewModel()
+            advanceUntilIdle()
+
+            viewModel.uiState.test {
+                val uiState = awaitItem()
+                assertThat(uiState.isLoggedIn).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that checkIsLoggedIn handles hasCredentialsUseCase failure gracefully`() = runTest {
+        hasCredentialsUseCase.stub { onBlocking { invoke() } doThrow RuntimeException("test") }
+        initViewModel()
+        advanceUntilIdle()
+
+        viewModel.uiState.test {
+            val uiState = awaitItem()
+            assertThat(uiState.isLoggedIn).isFalse()
         }
     }
 

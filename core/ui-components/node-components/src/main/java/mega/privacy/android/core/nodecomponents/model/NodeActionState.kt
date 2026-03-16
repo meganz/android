@@ -59,5 +59,6 @@ data class NodeActionState(
     val dismissEvent: StateEvent = consumed,
     val addVideoToPlaylistResultEvent: StateEventWithContent<AddVideoToPlaylistResult> = consumed(),
     val actionTriggeredEvent: StateEvent = consumed,
-    val viewInFolderEvent: StateEventWithContent<List<NavKey>> = consumed()
+    val viewInFolderEvent: StateEventWithContent<List<NavKey>> = consumed(),
+    val isLoggedIn: Boolean = false
 )

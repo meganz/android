@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveRecentlyWatc
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RemoveShareBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RenameBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.RestoreBottomSheetMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.SaveToMegaBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.SendToChatBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ShareBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.ShareFolderBottomSheetMenuItem
@@ -354,11 +355,11 @@ abstract class NodeActionsBottomSheetModule {
         @FolderLink
         @Singleton
         fun provideFolderLinkOptions(
-            copyMenuAction: CopyBottomSheetMenuItem,
+            saveToMegaBottomSheetMenuItem: SaveToMegaBottomSheetMenuItem,
             downloadMenuAction: DownloadBottomSheetMenuItem,
         ): Set<NodeBottomSheetMenuItem<MenuActionWithIcon>> {
             return setOf(
-                copyMenuAction,
+                saveToMegaBottomSheetMenuItem,
                 downloadMenuAction,
             )
         }

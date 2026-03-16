@@ -72,6 +72,7 @@ import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
+import mega.privacy.android.domain.usecase.HasCredentialsUseCase
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCase
@@ -160,6 +161,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val navigationEventQueue: NavigationEventQueue,
     private val removeRecentlyWatchedItemUseCase: RemoveRecentlyWatchedItemUseCase,
     private val mapTypedNodeToPublicLinkUseCase: MapTypedNodeToPublicLinkUseCase,
+    private val hasCredentialsUseCase: HasCredentialsUseCase,
     @ApplicationContext private val applicationContext: Context,
     @Assisted private val nodeSourceType: NodeSourceType?,
 ) : ViewModel() {
@@ -172,6 +174,21 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
     init {
         getRubbishBinNode()
+        checkIsLoggedIn()
+    }
+
+    private fun checkIsLoggedIn() {
+        viewModelScope.launch {
+            runCatching {
+                hasCredentialsUseCase()
+            }.onSuccess { hasCredentials ->
+                uiState.update {
+                    it.copy(isLoggedIn = hasCredentials)
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     private fun getRubbishBinNode() {
