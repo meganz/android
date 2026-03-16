@@ -78,7 +78,8 @@ internal fun TextEditorContent(
     hasMoreLines: Boolean = false,
     onNearEndOfScroll: (() -> Unit)? = null,
 ) {
-    val currentText = textFieldState.text.toString()
+    // Only allocate full String when line numbers are visible; avoids O(n) toString() on every recomposition.
+    val currentText = if (showLineNumbers) textFieldState.text.toString() else ""
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     val textStyle = editorTextStyle(MaterialTheme.colorScheme.onSurface)
     val density = LocalDensity.current
@@ -103,10 +104,11 @@ internal fun TextEditorContent(
         }
     }
 
-    // Keep previous offsets while new ones are computed to avoid a one-frame empty gutter flicker.
+    // --- Line number computation (skipped when line numbers are hidden) ---
     var lineStartOffsets by remember { mutableStateOf(listOf(0)) }
     var lineStartOffsetsText by remember { mutableStateOf(currentText) }
-    LaunchedEffect(currentText) {
+    LaunchedEffect(currentText, showLineNumbers) {
+        if (!showLineNumbers) return@LaunchedEffect
         val computedOffsets = computeLineStartOffsets(currentText)
         lineStartOffsets = computedOffsets
         lineStartOffsetsText = currentText
@@ -139,8 +141,9 @@ internal fun TextEditorContent(
             }
     }
 
-    // After content grows from load-more, restore scroll so the user stays at the same place.
-    LaunchedEffect(currentText) {
+    // After content grows from load-more, restore scroll; keyed on text length to avoid full toString() allocation.
+    val textContentLength = textFieldState.text.length
+    LaunchedEffect(textContentLength) {
         scrollPositionToRestoreForLoadMorePx?.let { scrollPx ->
             scrollState.scrollTo(scrollPx)
             scrollPositionToRestoreForLoadMorePx = null
@@ -154,10 +157,11 @@ internal fun TextEditorContent(
         lineStartOffsets,
         scrollState.value,
         viewportHeightPx,
+        showLineNumbers,
     ) {
         derivedStateOf {
+            if (!showLineNumbers) return@derivedStateOf emptyList<Pair<Int, String>>()
             val layout = textLayoutResult ?: return@derivedStateOf emptyList<Pair<Int, String>>()
-            // During fast edits, text/layout/offsets can be out of sync for one frame.
             val layoutText = layout.layoutInput.text.text
             if (layoutText != currentText || layoutText != lineStartOffsetsText) {
                 return@derivedStateOf stableVisibleLinesToShow

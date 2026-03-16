@@ -8,11 +8,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-internal class TextEditorBottomBarActionsResolverTest {
+internal class TextEditorBottomBarActionsMapperTest {
+
+    private val underTest = TextEditorBottomBarActionsMapper()
 
     @Test
     fun `test that View mode with owner and not exported returns Download GetLink Share Edit`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -30,7 +32,7 @@ internal class TextEditorBottomBarActionsResolverTest {
     @Test
     fun `test that Edit mode returns empty list`() {
         assertThat(
-            computeTextEditorBottomBarActions(
+            underTest(
                 TextEditorMode.Edit,
                 AccessPermission.OWNER,
                 false,
@@ -44,7 +46,7 @@ internal class TextEditorBottomBarActionsResolverTest {
     @Test
     fun `test that Create mode returns empty list`() {
         assertThat(
-            computeTextEditorBottomBarActions(
+            underTest(
                 TextEditorMode.Create,
                 AccessPermission.OWNER,
                 false,
@@ -57,7 +59,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Get Link is hidden when access is not OWNER`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.READWRITE,
             false,
@@ -73,7 +75,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Get Link is hidden when node is exported`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             true,
@@ -86,7 +88,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Get Link is hidden when in excluded adapter`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -99,7 +101,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Download is hidden when showDownload is false`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -113,7 +115,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Share is hidden when showShare is false`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -126,7 +128,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Edit is hidden when access is READ only`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.READ,
             false,
@@ -141,7 +143,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Edit is hidden when in excluded adapter`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -155,7 +157,7 @@ internal class TextEditorBottomBarActionsResolverTest {
     @Test
     fun `test that Edit is shown for FULL and READWRITE access`() {
         listOf(AccessPermission.FULL, AccessPermission.READWRITE).forEach { access ->
-            val result = computeTextEditorBottomBarActions(
+            val result = underTest(
                 TextEditorMode.View,
                 access,
                 false,
@@ -170,7 +172,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that unknown access and export yields no Get Link`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             null,
             null,
@@ -186,7 +188,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that Get Link is hidden when node export state is null`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             null,
@@ -200,7 +202,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that showDownload false with excluded adapter shows only Share`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,
@@ -213,7 +215,7 @@ internal class TextEditorBottomBarActionsResolverTest {
 
     @Test
     fun `test that actions are in designer order when all four shown`() {
-        val result = computeTextEditorBottomBarActions(
+        val result = underTest(
             TextEditorMode.View,
             AccessPermission.OWNER,
             false,

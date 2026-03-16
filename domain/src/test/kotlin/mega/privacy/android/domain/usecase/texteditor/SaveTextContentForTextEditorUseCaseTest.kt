@@ -15,13 +15,16 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -48,6 +51,17 @@ internal class SaveTextContentForTextEditorUseCaseTest {
     @TempDir
     lateinit var tempDir: File
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            getNodeByIdUseCase,
+            getRootNodeUseCase,
+            getNodeNameCollisionRenameNameUseCase,
+            getCacheFileUseCase,
+            fileSystemRepository,
+        )
+    }
+
     @Test
     fun `test that save returns UploadRequired when mode is Edit and node exists`() = runTest {
         val parentHandle = 100L
@@ -58,12 +72,10 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         }
         val tempFile = File(tempDir, "notes.txt")
         whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("notes.txt")
         whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
 
         val saveResult = underTest(
             nodeHandle = nodeHandle,
-            nodeSourceType = 0,
             text = "content",
             fileName = "notes.txt",
             mode = TextEditorMode.Edit,
@@ -78,6 +90,7 @@ internal class SaveTextContentForTextEditorUseCaseTest {
             assertThat(it.fromHome).isFalse()
         }
         verify(fileSystemRepository).writeTextToPath(tempFile.absolutePath, "content")
+        verifyNoInteractions(getNodeNameCollisionRenameNameUseCase)
     }
 
     @Test
@@ -94,7 +107,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
 
             val saveResult = underTest(
                 nodeHandle = folderHandle,
-                nodeSourceType = 0,
                 text = "content in folder",
                 fileName = "new-in-folder.txt",
                 mode = TextEditorMode.Create,
@@ -125,7 +137,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
 
             val saveResult = underTest(
                 nodeHandle = 0L,
-                nodeSourceType = 0,
                 text = "new content",
                 fileName = "new.txt",
                 mode = TextEditorMode.Create,
@@ -146,7 +157,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         val result = runCatching {
             underTest(
                 nodeHandle = 1L,
-                nodeSourceType = 0,
                 text = "content",
                 fileName = "a.txt",
                 mode = TextEditorMode.View,
@@ -166,7 +176,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         val result = runCatching {
             underTest(
                 nodeHandle = 999L,
-                nodeSourceType = 0,
                 text = "content",
                 fileName = "a.txt",
                 mode = TextEditorMode.Edit,
@@ -180,6 +189,38 @@ internal class SaveTextContentForTextEditorUseCaseTest {
     }
 
     @Test
+    fun `test that save when Edit and isFromSharedFolder uses unique name from collision use case`() =
+        runTest {
+            val parentHandle = 100L
+            val nodeHandle = 99L
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(nodeHandle)
+                on { parentId } doReturn NodeId(parentHandle)
+            }
+            val tempFile = File(tempDir, "notes (1).txt")
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+            whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("notes (1).txt")
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
+
+            val saveResult = underTest(
+                nodeHandle = nodeHandle,
+                text = "content",
+                fileName = "notes.txt",
+                mode = TextEditorMode.Edit,
+                fromHome = false,
+                isFromSharedFolder = true,
+            )
+
+            assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
+            (saveResult as TextEditorSaveResult.UploadRequired).let {
+                assertThat(it.tempPath).isEqualTo(tempFile.absolutePath)
+                assertThat(it.parentHandle).isEqualTo(parentHandle)
+                assertThat(it.isEditMode).isTrue()
+            }
+            verify(getNodeNameCollisionRenameNameUseCase).invoke(any())
+        }
+
+    @Test
     fun `test that save uses untitled when fileName is empty`() = runTest {
         val parentHandle = 100L
         val nodeHandle = 99L
@@ -189,12 +230,10 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         }
         val tempFile = File(tempDir, "untitled.txt")
         whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-        whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("untitled.txt")
         whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
 
         val saveResult = underTest(
             nodeHandle = nodeHandle,
-            nodeSourceType = 0,
             text = "content",
             fileName = "",
             mode = TextEditorMode.Edit,
@@ -203,6 +242,7 @@ internal class SaveTextContentForTextEditorUseCaseTest {
 
         assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
         assertThat((saveResult as TextEditorSaveResult.UploadRequired).tempPath).isEqualTo(tempFile.absolutePath)
+        verifyNoInteractions(getNodeNameCollisionRenameNameUseCase)
     }
 
     @Test
@@ -220,7 +260,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         val result = runCatching {
             underTest(
                 nodeHandle = nodeHandle,
-                nodeSourceType = 0,
                 text = "content",
                 fileName = "notes.txt",
                 mode = TextEditorMode.Edit,
@@ -232,4 +271,54 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         assertThat(exception).isInstanceOf(IllegalStateException::class.java)
         assertThat(exception?.message).contains("Cannot get temp file")
     }
+
+    @Test
+    fun `test that save when Edit and not from shared folder does not call collision rename use case`() =
+        runTest {
+            val parentHandle = 100L
+            val nodeHandle = 99L
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(nodeHandle)
+                on { parentId } doReturn NodeId(parentHandle)
+            }
+            val tempFile = File(tempDir, "notes.txt")
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
+
+            underTest(
+                nodeHandle = nodeHandle,
+                text = "content",
+                fileName = "notes.txt",
+                mode = TextEditorMode.Edit,
+                isFromSharedFolder = false,
+            )
+
+            verifyNoInteractions(getNodeNameCollisionRenameNameUseCase)
+        }
+
+    @Test
+    fun `test that save deletes stale directory and writes file when Edit and cache path is directory`() =
+        runTest {
+            val parentHandle = 100L
+            val nodeHandle = 99L
+            val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(nodeHandle)
+                on { parentId } doReturn NodeId(parentHandle)
+            }
+            val dirAsFile = File(tempDir, "notes.txt")
+            dirAsFile.mkdirs()
+            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+            whenever(getCacheFileUseCase(any(), any())).thenReturn(dirAsFile)
+
+            val saveResult = underTest(
+                nodeHandle = nodeHandle,
+                text = "content",
+                fileName = "notes.txt",
+                mode = TextEditorMode.Edit,
+                isFromSharedFolder = false,
+            )
+
+            verify(fileSystemRepository).deleteFolderAndItsFiles(dirAsFile.absolutePath)
+            assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
+        }
 }

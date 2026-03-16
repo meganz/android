@@ -18,6 +18,8 @@ import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.mapper.ViewTypeToNodeSourceTypeMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
@@ -57,6 +59,16 @@ private fun inExcludedAdapterForGetLinkAndEdit(nodeSourceType: Int?): Boolean {
 private fun shouldShowDownload(nodeSourceType: Int?): Boolean {
     if (nodeSourceType == null) return true
     return nodeSourceType != OFFLINE_ADAPTER && nodeSourceType != RUBBISH_BIN_ADAPTER
+}
+
+/** True when the editor was opened from a Shared folder (incoming/outgoing shares or links). Save will create a new file with (1)(2) naming instead of overwriting. */
+private fun isFromSharedFolder(nodeSourceType: Int?): Boolean {
+    if (nodeSourceType == null) return false
+    return nodeSourceType in setOf(
+        INCOMING_SHARES_ADAPTER,
+        OUTGOING_SHARES_ADAPTER,
+        LINKS_ADAPTER,
+    )
 }
 
 /** True when Share should be shown for this source type (not folder link, versions, incoming shares, or chat). */
@@ -163,12 +175,12 @@ private fun TextEditorComposeContent(
                 TextEditorComposeViewModel.Args(
                     nodeHandle = navKey.nodeHandle,
                     mode = mode,
-                    nodeSourceType = navKey.nodeSourceType,
                     fileName = navKey.fileName,
                     inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit,
                     showDownload = showDownload,
                     showShare = showShare,
                     transferHandler = transferHandler,
+                    isFromSharedFolder = isFromSharedFolder(navKey.nodeSourceType),
                 )
             )
         }

@@ -48,6 +48,8 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
+    private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper =
+        TextEditorBottomBarActionsMapper()
     private val nodeActionHandler: TextEditorNodeActionHandler = mock()
     private val transferHandler: TransferHandler = mock()
 
@@ -65,12 +67,12 @@ internal class TextEditorComposeViewModelTest {
     private fun initUnderTest(
         nodeHandle: Long = 0L,
         mode: TextEditorMode = TextEditorMode.View,
-        nodeSourceType: Int? = null,
         fileName: String? = null,
         inExcludedAdapterForGetLinkAndEdit: Boolean = false,
         showDownload: Boolean = true,
         showShare: Boolean = true,
         transferHandler: TransferHandler = this.transferHandler,
+        isFromSharedFolder: Boolean = false,
         localPath: String? = null,
         defaultDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher(),
     ) {
@@ -78,12 +80,12 @@ internal class TextEditorComposeViewModelTest {
             args = Args(
                 nodeHandle = nodeHandle,
                 mode = mode,
-                nodeSourceType = nodeSourceType,
                 fileName = fileName,
                 inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit,
                 showDownload = showDownload,
                 showShare = showShare,
                 transferHandler = transferHandler,
+                isFromSharedFolder = isFromSharedFolder,
                 localPath = localPath,
             ),
             defaultDispatcher = defaultDispatcher,
@@ -91,6 +93,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextContentForTextEditorUseCase = saveTextContentForTextEditorUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
+            textEditorBottomBarActionsMapper = textEditorBottomBarActionsMapper,
             nodeActionHandler = nodeActionHandler,
         )
     }
@@ -161,6 +164,33 @@ internal class TextEditorComposeViewModelTest {
     fun `test that null fileName results in empty string in uiState`() {
         initUnderTest(fileName = null)
         assertThat(underTest.uiState.value.fileName).isEmpty()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that fileName is set from node when opening file in View mode`() = runTest {
+        val node = mock<TypedNode>()
+        whenever(node.name).thenReturn("fetched-name.txt")
+        whenever(node.exportedData).thenReturn(null)
+        runBlocking {
+            whenever(getNodeByIdUseCase(any())).thenReturn(node)
+            whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
+        }
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(
+            nodeHandle = 1L,
+            mode = TextEditorMode.View,
+            fileName = "caller-given.txt",
+        )
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.fileName).isEqualTo("fetched-name.txt")
+    }
+
+    @Test
+    fun `test that Create mode keeps fileName from Args`() {
+        initUnderTest(mode = TextEditorMode.Create, fileName = "newfile.txt")
+        assertThat(underTest.uiState.value.fileName).isEqualTo("newfile.txt")
     }
 
     @Test
@@ -264,7 +294,7 @@ internal class TextEditorComposeViewModelTest {
         advanceUntilIdle()
         assertThat(underTest.uiState.value.errorEvent).isEqualTo(triggered)
         assertThat(underTest.uiState.value.isLoading).isFalse()
-        assertThat(underTest.uiState.value.loadErrorMessage).isEqualTo("load failed")
+        assertThat(underTest.uiState.value.errorMessage).isEqualTo("load failed")
     }
 
     @Test
@@ -421,12 +451,12 @@ internal class TextEditorComposeViewModelTest {
 
             assertThat(underTest.uiState.value.hasMoreLines).isTrue()
             val editedContent = (listOf("EDITED") + (2..1000).map { "line$it" }).joinToString("\n")
-            underTest.saveFile(currentText = editedContent, fromHome = false)
+            underTest.saveFile(currentText = editedContent)
             advanceUntilIdle()
 
             val textCaptor = argumentCaptor<String>()
             verify(saveTextContentForTextEditorUseCase).invoke(
-                any(), any(), textCaptor.capture(), any(), any(), any(),
+                any(), textCaptor.capture(), any(), any(), any(), any(),
             )
             val savedLines = textCaptor.firstValue.split("\n")
             assertThat(savedLines.first()).isEqualTo("EDITED")
@@ -458,15 +488,12 @@ internal class TextEditorComposeViewModelTest {
             assertThat(underTest.uiState.value.appendSuffix).isNotNull()
             assertThat(underTest.uiState.value.hasMoreLines).isFalse()
 
-            underTest.saveFile(
-                currentText = allLines.joinToString("\n"),
-                fromHome = false,
-            )
+            underTest.saveFile(currentText = allLines.joinToString("\n"))
             advanceUntilIdle()
 
             val textCaptor = argumentCaptor<String>()
             verify(saveTextContentForTextEditorUseCase).invoke(
-                any(), any(), textCaptor.capture(), any(), any(), any(),
+                any(), textCaptor.capture(), any(), any(), any(), any(),
             )
             val savedLines = textCaptor.firstValue.split("\n")
             assertThat(savedLines).hasSize(1500)
@@ -482,19 +509,19 @@ internal class TextEditorComposeViewModelTest {
                 tempPath = "/tmp/new.txt",
                 parentHandle = 1L,
                 isEditMode = false,
-                fromHome = true,
+                fromHome = false,
             )
             whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
                 .thenReturn(saveResult)
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Create)
             advanceUntilIdle()
 
-            underTest.saveFile(currentText = "brand new content", fromHome = true)
+            underTest.saveFile(currentText = "brand new content")
             advanceUntilIdle()
 
             val textCaptor = argumentCaptor<String>()
             verify(saveTextContentForTextEditorUseCase).invoke(
-                any(), any(), textCaptor.capture(), any(), any(), any(),
+                any(), textCaptor.capture(), any(), any(), any(), any(),
             )
             assertThat(textCaptor.firstValue).isEqualTo("brand new content")
         }
@@ -517,7 +544,7 @@ internal class TextEditorComposeViewModelTest {
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
             advanceUntilIdle()
             underTest.setEditMode()
-            underTest.saveFile(currentText = "edited content", fromHome = false)
+            underTest.saveFile(currentText = "edited content")
             advanceUntilIdle()
 
             verify(saveTextContentForTextEditorUseCase).invoke(
@@ -602,7 +629,7 @@ internal class TextEditorComposeViewModelTest {
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
             advanceUntilIdle()
 
-            underTest.saveFile(currentText = "new text", fromHome = false)
+            underTest.saveFile(currentText = "new text")
             advanceUntilIdle()
 
             val state = underTest.uiState.value
@@ -628,7 +655,7 @@ internal class TextEditorComposeViewModelTest {
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
             advanceUntilIdle()
 
-            underTest.saveFile(currentText = "new text", fromHome = false)
+            underTest.saveFile(currentText = "new text")
             advanceUntilIdle()
             assertThat(underTest.uiState.value.saveSuccessEvent).isEqualTo(triggered)
 
@@ -710,7 +737,7 @@ internal class TextEditorComposeViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that saveFile failure triggers errorEvent and sets loadErrorMessage`() = runTest {
+    fun `test that saveFile failure triggers errorEvent and sets errorMessage`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
             .invoke(any(), anyOrNull(), any())
         whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
@@ -719,12 +746,12 @@ internal class TextEditorComposeViewModelTest {
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
-        underTest.saveFile(currentText = "some text", fromHome = false)
+        underTest.saveFile(currentText = "some text")
         advanceUntilIdle()
 
         val state = underTest.uiState.value
         assertThat(state.errorEvent).isEqualTo(triggered)
-        assertThat(state.loadErrorMessage).isEqualTo("disk full")
+        assertThat(state.errorMessage).isEqualTo("disk full")
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

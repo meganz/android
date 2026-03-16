@@ -22,9 +22,6 @@ import mega.privacy.android.domain.usecase.transfers.downloads.DownloadNodeUseCa
 import java.net.URL
 import javax.inject.Inject
 
-/** Cache folder name for text editor temp/download files (matches data layer constant). */
-private const val TEXT_EDITOR_TEMP_FOLDER = "tempMEGA"
-
 /**
  * Use case to load text content for the text editor.
  * Always loads gradually in chunks of lines so the first emission is quick and the UI stays responsive.

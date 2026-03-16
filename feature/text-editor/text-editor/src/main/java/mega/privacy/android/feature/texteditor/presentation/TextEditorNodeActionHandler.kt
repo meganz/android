@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorNodeActionRequest
 import mega.privacy.android.navigation.contract.TransferHandler
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -32,6 +33,8 @@ class TextEditorNodeActionHandler @Inject constructor(
                             withStartMessage = true,
                         ),
                     )
+                } else {
+                    Timber.w("Text editor: node %d not found for download", request.nodeHandle)
                 }
             }
             is TextEditorNodeActionRequest.GetLink,

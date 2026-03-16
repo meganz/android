@@ -33,8 +33,10 @@ import timber.log.Timber
 
 /** Initial cap on displayed lines so first paint is fast; user can load more by scrolling to bottom. */
 private const val INITIAL_DISPLAY_LINES = 1000
+
 /** Lines to add each time the user triggers load more near the end of scroll. */
 private const val LINES_TO_ADD_ON_LOAD_MORE = 1000
+
 /** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
 private const val CHUNK_SIZE_LINES = 500
 
@@ -51,6 +53,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
+    private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper,
     private val nodeActionHandler: TextEditorNodeActionHandler,
 ) : ViewModel() {
 
@@ -64,7 +67,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    /** Accumulated lines from gradual load; not restored after process death (user sees first chunk again). */
+    /**
+     * Accumulated lines from gradual load; not restored after process death (user sees first chunk again).
+     * Thread safety: all mutations happen on Main (after withContext returns), so no synchronisation is needed.
+     * Do NOT mutate this list inside withContext(defaultDispatcher) blocks.
+     */
     private val fullContentLines = mutableListOf<String>()
     private var displayLineCap = INITIAL_DISPLAY_LINES
 
@@ -89,7 +96,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             it.copy(
                                 isLoading = false,
                                 errorEvent = triggered,
-                                loadErrorMessage = e.message.orEmpty().ifBlank { null },
+                                errorMessage = e.message.orEmpty().ifBlank { null },
                             )
                         }
                     }
@@ -97,7 +104,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         fullContentLines.addAll(chunk)
                         val (displayed, fullContent) = withContext(defaultDispatcher) {
                             fullContentLines.take(displayLineCap).joinToString("\n") to
-                                fullContentLines.joinToString("\n")
+                                    fullContentLines.joinToString("\n")
                         }
                         lastSavedContent = fullContent
                         cachedCleanContent = displayed
@@ -111,28 +118,29 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                             )
                         }
                     }
-                lastSavedContent = withContext(defaultDispatcher) {
-                    fullContentLines.joinToString("\n")
-                }
                 _uiState.update { it.copy(isFullyLoaded = true) }
             }
             viewModelScope.launch {
-                val actions = runCatching {
-                    withContext(defaultDispatcher) {
-                        val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
-                        val accessPermission = getNodeAccessUseCase(NodeId(args.nodeHandle))
-                        val isNodeExported = node?.exportedData != null
-                        computeTextEditorBottomBarActions(
-                            args.mode,
-                            accessPermission,
-                            isNodeExported,
-                            args.inExcludedAdapterForGetLinkAndEdit,
-                            args.showDownload,
-                            args.showShare,
-                        )
-                    }
-                }.getOrElse { emptyList() }
-                _uiState.update { it.copy(bottomBarActions = actions) }
+                val (nodeName, actions) = runCatching {
+                    val node = getNodeByIdUseCase(NodeId(args.nodeHandle))
+                    val accessPermission = getNodeAccessUseCase(NodeId(args.nodeHandle))
+                    val isNodeExported = node?.exportedData != null
+                    val name = node?.name
+                    name to textEditorBottomBarActionsMapper(
+                        args.mode,
+                        accessPermission,
+                        isNodeExported,
+                        args.inExcludedAdapterForGetLinkAndEdit,
+                        args.showDownload,
+                        args.showShare,
+                    )
+                }.getOrElse { null to emptyList() }
+                _uiState.update {
+                    it.copy(
+                        fileName = nodeName ?: it.fileName,
+                        bottomBarActions = actions,
+                    )
+                }
             }
         } else if (args.mode == TextEditorMode.Create) {
             lastSavedContent = ""
@@ -148,12 +156,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     data class Args(
         val nodeHandle: Long,
         val mode: TextEditorMode,
-        val nodeSourceType: Int?,
         val fileName: String?,
         val inExcludedAdapterForGetLinkAndEdit: Boolean = false,
         val showDownload: Boolean = true,
         val showShare: Boolean = true,
         val transferHandler: TransferHandler,
+        /** True when opened from Shared folder (incoming/outgoing shares or links). When true, save creates a new file with (1)(2) naming; when false, Edit mode overwrites the same file. Derived from nodeSourceType by the caller. */
+        val isFromSharedFolder: Boolean = false,
         /** Reserved for send-to-chat flow (e.g. when opening editor from chat). */
         val chatId: Long? = null,
         /** Reserved for send-to-chat flow (e.g. when opening editor from chat). */
@@ -177,7 +186,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             it.copy(showDiscardDialog = false, isRestoringContent = true)
         }
         viewModelScope.launch {
-            val (lines, displayedContent, cap, hasMoreLines, totalLinesLoaded) = withContext(defaultDispatcher) {
+            val (lines, displayedContent, cap, hasMoreLines, totalLinesLoaded) = withContext(
+                defaultDispatcher
+            ) {
                 val l = savedContent.split("\n")
                 val c = INITIAL_DISPLAY_LINES.coerceAtMost(l.size)
                 RestoreResult(
@@ -246,13 +257,15 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     fun onLoadMoreLines() {
         if (fullContentLines.size <= displayLineCap) return
         val oldCap = displayLineCap
-        displayLineCap = (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
+        displayLineCap =
+            (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
         viewModelScope.launch {
             val hasMoreLines = fullContentLines.size > displayLineCap
             val totalLinesLoaded = fullContentLines.size
             if (_uiState.value.mode == TextEditorMode.Edit) {
                 val (suffix, cleanContent) = withContext(defaultDispatcher) {
-                    val s = "\n" + fullContentLines.subList(oldCap, displayLineCap).joinToString("\n")
+                    val s =
+                        "\n" + fullContentLines.subList(oldCap, displayLineCap).joinToString("\n")
                     s to fullContentLines.take(displayLineCap).joinToString("\n")
                 }
                 cachedCleanContent = cleanContent
@@ -284,8 +297,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * field at save time). When content was capped for display (gradual load), merges the
      * user-edited visible portion with the original non-displayed tail.
      * In Create mode [fullContentLines] is empty, so [currentText] is saved as-is.
+     * Save/upload behaviour uses [Args.isFromSharedFolder] only; fromHome is not used in this flow.
      */
-    fun saveFile(currentText: String, fromHome: Boolean) {
+    fun saveFile(currentText: String) {
         if (_uiState.value.mode == TextEditorMode.View) return
         viewModelScope.launch {
             val state = _uiState.value
@@ -300,20 +314,28 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             runCatching {
                 saveTextContentForTextEditorUseCase(
                     nodeHandle = args.nodeHandle,
-                    nodeSourceType = args.nodeSourceType ?: 0,
                     text = fullTextToSave,
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
-                    fromHome = fromHome,
+                    fromHome = false, // Compose flow uses isFromSharedFolder only
+                    isFromSharedFolder = args.isFromSharedFolder,
                 )
             }.fold(
                 onSuccess = { saveResult ->
                     when (saveResult) {
                         is TextEditorSaveResult.UploadRequired -> {
                             lastSavedContent = fullTextToSave
+                            val lines = fullTextToSave.split("\n")
+                            fullContentLines.clear()
+                            fullContentLines.addAll(lines)
+                            displayLineCap = lines.size
+                            cachedCleanContent = fullTextToSave
                             _uiState.update {
                                 it.copy(
+                                    content = fullTextToSave,
                                     mode = TextEditorMode.View,
+                                    hasMoreLines = false,
+                                    totalLinesLoaded = lines.size,
                                     transferEvent = triggered(
                                         TransferTriggerEvent.StartUpload.TextFile(
                                             path = saveResult.tempPath,
@@ -333,7 +355,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(
                             errorEvent = triggered,
-                            loadErrorMessage = e.message?.ifBlank { null },
+                            errorMessage = e.message?.ifBlank { null },
                         )
                     }
                 },
@@ -342,7 +364,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     fun consumeErrorEvent() {
-        _uiState.update { it.copy(errorEvent = consumed, loadErrorMessage = null) }
+        _uiState.update { it.copy(errorEvent = consumed, errorMessage = null) }
     }
 
     fun consumeTransferEvent() {
@@ -358,17 +380,19 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      */
     fun onMenuAction(action: TextEditorTopBarAction) {
         when (action) {
-            TextEditorTopBarAction.Download -> {}
-            TextEditorTopBarAction.GetLink -> {}
-            TextEditorTopBarAction.SendToChat -> {}
-            TextEditorTopBarAction.Share -> {}
             TextEditorTopBarAction.LineNumbers -> {
                 _uiState.update {
                     it.copy(showLineNumbers = !it.showLineNumbers)
                 }
             }
+            // TODO: Wire Download, GetLink, SendToChat, Share when top-bar variants are needed (currently bottom-bar only)
+            TextEditorTopBarAction.Download,
+            TextEditorTopBarAction.GetLink,
+            TextEditorTopBarAction.SendToChat,
+            TextEditorTopBarAction.Share,
             TextEditorTopBarAction.Save,
-            TextEditorTopBarAction.More -> Unit
+            TextEditorTopBarAction.More,
+                -> Unit
         }
     }
 
@@ -403,6 +427,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             }
 
             is TextEditorBottomBarAction.Edit -> setEditMode()
+
             is TextEditorBottomBarAction.SendToChat -> { /* No-op; reserved for later phase */
             }
         }

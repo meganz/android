@@ -45,7 +45,6 @@ import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBottomBarAction
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
@@ -123,10 +122,7 @@ fun TextEditorScreen(
             uiState.mode == TextEditorMode.Edit -> viewModel.setViewMode()
             uiState.mode == TextEditorMode.Create -> {
                 pendingBackAfterSave = true
-                viewModel.saveFile(
-                    currentText = textFieldState.text.toString(),
-                    fromHome = false,
-                )
+                viewModel.saveFile(currentText = textFieldState.text.toString())
             }
             else -> onBack()
         }
@@ -168,10 +164,7 @@ fun TextEditorScreen(
                         else viewModel.setViewMode()
                     },
                     onSave = {
-                        viewModel.saveFile(
-                            currentText = textFieldState.text.toString(),
-                            fromHome = false,
-                        )
+                        viewModel.saveFile(currentText = textFieldState.text.toString())
                     },
                     onMenuAction = viewModel::onMenuAction,
                 )
@@ -200,7 +193,7 @@ fun TextEditorScreen(
                 uiState.errorEvent == triggered -> {
                     pendingBackAfterSave = false
                     TextEditorErrorContent(
-                        message = uiState.loadErrorMessage?.takeIf { it.isNotBlank() }
+                        message = uiState.errorMessage?.takeIf { it.isNotBlank() }
                             ?: stringResource(sharedR.string.general_request_failed_message),
                         onDismiss = {
                             viewModel.consumeErrorEvent()
@@ -235,9 +228,7 @@ fun TextEditorScreen(
             TextEditorBottomBar(
                 visible = uiState.mode != TextEditorMode.Edit && uiState.bottomBarActions.isNotEmpty() && !uiState.isLoading,
                 actions = uiState.bottomBarActions,
-                onActionPressed = { action ->
-                    (action as? TextEditorBottomBarAction)?.let { viewModel.onBottomBarAction(it) }
-                },
+                onActionPressed = viewModel::onBottomBarAction,
             )
         }
     }
@@ -265,17 +256,18 @@ private fun TextEditorErrorContent(
     }
 }
 
+/** Top padding matching legacy loading_layout's layout_marginTop (153dp from top of screen). */
+private val LoadingContentTopPadding = 153.dp
+
 /**
  * Loading view matching legacy text editor: text file icon (96dp) and horizontal indeterminate progress bar below.
- * Legacy: loading_layout has layout_constraintTop_toTopOf="parent" and layout_marginTop="153dp", so content is
- * top-anchored 153dp from the top of the screen (not vertically centered).
  */
 @Composable
 private fun TextEditorLoadingContent() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 153.dp),
+            .padding(top = LoadingContentTopPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
@@ -295,8 +287,8 @@ private fun TextEditorLoadingContent() {
 @Composable
 private fun TextEditorBottomBar(
     visible: Boolean,
-    actions: List<MenuActionWithIcon>,
-    onActionPressed: (MenuActionWithIcon) -> Unit,
+    actions: List<TextEditorBottomBarAction>,
+    onActionPressed: (TextEditorBottomBarAction) -> Unit,
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -315,7 +307,9 @@ private fun TextEditorBottomBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 actions = actions,
                 actionsEnabled = true,
-                onActionPressed = onActionPressed,
+                onActionPressed = { action ->
+                    (action as? TextEditorBottomBarAction)?.let(onActionPressed)
+                },
             )
         }
     }
