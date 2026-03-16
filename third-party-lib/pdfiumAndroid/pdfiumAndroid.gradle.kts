@@ -1,7 +1,7 @@
 plugins { id("com.android.library") }
 
 android {
-    namespace = "com.shockwave.pdfium" // match the actual package structure in the AAR
+    namespace = "mega.privacy.android.thirdpartylib.pdfiumandroid"
     compileSdk = rootProject.extra["compileSdkVersion"] as Int // read from root project
     
     defaultConfig {
