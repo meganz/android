@@ -2198,4 +2198,6 @@
     <string name="device_center_bottom_sheet_item_remove_connection">Eliminar conexión</string>
     <string name="device_center_snackbar_message_connection_removed">Conexión eliminada</string>
     <string name="general_dialog_discard_button">Descartar</string>
+    <string name="sync_folder_connection_dialog_title">Carpeta conectada a otro dispositivo</string>
+    <string name="sync_folder_connection_dialog_message">Esta carpeta está vinculada a tu dispositivo %1$s, probablemente porque MEGA se ha desinstalado sin cerrar sesión. Una carpeta solo puede sincronizarse con un dispositivo a la vez. Elimina la conexión existente para sincronizarla aquí.</string>
 </resources>

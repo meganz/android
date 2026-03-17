@@ -2179,4 +2179,5 @@
     <string name="general_dialog_discard_button">Weggooien</string>
     <string name="general_changes_saved">Wijzigingen opgeslagen</string>
     <string name="node_option_save_to_mega">Opslaan naar MEGA</string>
+    <string name="home_screen_audios_chip_title">Audios</string>
 </resources>

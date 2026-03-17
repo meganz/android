@@ -2187,10 +2187,10 @@
     <string name="meetings_call_recording_consent_dialog_positive_button">Entendi</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">Sair da chamada</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]Mais informações[/A]</string>
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar o plano Pro&#160;Lite</string>
     <string name="account_upgrade_account_buy_button_title_pro_i">Comprar Pro&#160;I</string>
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar Pro&#160;II</string>
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar Pro&#160;III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar o plano Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar o plano Pro&#160;III</string>
     <string name="subscription_type_monthly">Mensal</string>
     <string name="subscription_type_yearly">Anual</string>
     <string name="choose_account_screen_only_price_per_month">Somente %1$s por mês</string>
@@ -2239,4 +2239,6 @@
     <string name="general_dialog_discard_changes_message">As alterações não salvas serão perdidas</string>
     <string name="general_dialog_discard_button">Descartar</string>
     <string name="general_changes_saved">Alterações salvas</string>
+    <string name="node_option_save_to_mega">Salvar no MEGA</string>
+    <string name="home_screen_audios_chip_title">Áudio</string>
 </resources>
