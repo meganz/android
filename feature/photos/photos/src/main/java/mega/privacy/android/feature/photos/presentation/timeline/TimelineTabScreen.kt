@@ -327,16 +327,7 @@ internal fun TimelineTabScreen(
                 onRequestNotificationPermission = {
                     if (activity == null) return@TimelineTabContent
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val shouldShowRationale =
-                            ActivityCompat.shouldShowRequestPermissionRationale(
-                                activity,
-                                POST_NOTIFICATIONS
-                            )
-                        val isPermanentlyDenied =
-                            isNotificationPermissionPermanentlyDenied || !shouldShowRationale
-
-                        if (isPermanentlyDenied) {
-                            isNotificationPermissionPermanentlyDenied = true
+                        if (isNotificationPermissionPermanentlyDenied) {
                             activity.openNotificationSettings()
                         } else {
                             notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
