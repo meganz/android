@@ -77,6 +77,7 @@ class ArchitecturePlugin : Plugin<Project> {
         data class Shared(override val path: String) : ArchitectureLayer {
             override val allowedDependencies: List<Class<out ArchitectureLayer>> = listOf(
                 Core::class.java,
+                Shared::class.java, //this will be removed once shared:resources is moved to resources directory
                 SnowFlake::class.java,
             )
         }

@@ -3,7 +3,7 @@ package mega.privacy.mobile.home.presentation.recents.bucket.model
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 

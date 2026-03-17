@@ -13,6 +13,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.components.FOLDER_VIEW_ICON_TEST_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_CHECKBOX_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_FAVOURITE_ICON_TEST_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_LABEL_TEST_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_LINK_ICON_TEST_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_MORE_ICON_TEST_TAG
+import mega.privacy.android.shared.nodes.components.GRID_VIEW_TAKEN_TEST_TAG
+import mega.privacy.android.shared.nodes.components.NODE_TITLE_TEXT_TEST_TAG
+import mega.privacy.android.shared.nodes.components.NodeGridViewItem
+import mega.privacy.android.shared.nodes.components.THUMBNAIL_FILE_TEST_TAG
+import mega.privacy.android.shared.nodes.components.VIDEO_DURATION_TEST_TAG
+import mega.privacy.android.shared.nodes.components.VIDEO_PLAY_ICON_TEST_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

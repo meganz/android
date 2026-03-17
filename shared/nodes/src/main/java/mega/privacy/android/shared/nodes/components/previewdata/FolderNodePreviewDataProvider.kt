@@ -1,13 +1,13 @@
-package mega.privacy.android.core.nodecomponents.list.previewdata
+package mega.privacy.android.shared.nodes.components.previewdata
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 internal class FolderNodePreviewDataProvider :
     PreviewParameterProvider<List<NodeUiItem<TypedFolderNode>>> {

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -13,12 +13,10 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.list.previewdata.FolderNodePreviewDataProvider
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.shared.nodes.components.NodeListViewItemSkeleton
+import mega.privacy.android.shared.nodes.components.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 
 /**

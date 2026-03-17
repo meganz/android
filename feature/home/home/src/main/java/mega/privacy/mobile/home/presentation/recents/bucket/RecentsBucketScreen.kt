@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -37,9 +35,9 @@ import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.list.NodeListView
+import mega.privacy.android.shared.nodes.components.NodeListView
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.extensions.delayedTrue

@@ -8,6 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

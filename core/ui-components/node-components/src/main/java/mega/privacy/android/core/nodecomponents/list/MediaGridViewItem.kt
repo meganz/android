@@ -29,7 +29,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
-import mega.privacy.android.core.nodecomponents.list.THUMBNAIL_FILE_TEST_TAG
+import mega.privacy.android.shared.nodes.components.THUMBNAIL_FILE_TEST_TAG
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData

@@ -21,7 +21,7 @@ import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_GROUP_DIVIDER_TEST_TAG
 import mega.privacy.android.core.nodecomponents.sheet.options.NODE_OPTIONS_HEADER_DIVIDER_TEST_TAG
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetContent

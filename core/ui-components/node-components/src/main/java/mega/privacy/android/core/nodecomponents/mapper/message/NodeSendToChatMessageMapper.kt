@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import javax.inject.Inject
 

@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,10 +14,8 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.shared.nodes.components.NodeGridViewItemSkeleton
-import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 
 /**

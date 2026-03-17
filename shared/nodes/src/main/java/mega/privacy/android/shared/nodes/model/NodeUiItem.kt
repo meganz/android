@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.model
+package mega.privacy.android.shared.nodes.model
 
 import androidx.compose.runtime.Immutable
 import mega.android.core.ui.model.LocalizedText
@@ -8,18 +8,18 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 
 /**
  * This class is used to display list items on screen
- * @property node [Node]
+ * @property node [mega.privacy.android.domain.entity.node.Node]
  * @param isSelected Node is selected
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @param title Localized title for the node
  * @param subtitle NodeSubtitleText for the node that can be resolved to localized string in Composable
- * @param description Optional localized description for the node
+ * @param mega.privacy.android.domain.entity.node.Node.description Optional localized description for the node
  * @param tags Optional list of tags for the node
  * @param iconRes Drawable resource ID for the node icon
  * @param thumbnailData Data for the thumbnail, can be a URL or any other data type supported by ThumbnailView
  * @param accessPermissionIcon Optional icon resource ID for access permission
  * @param showIsVerified if true, shows a verified icon
- * @param isTakenDown if true, shows a taken down icon
+ * @param mega.privacy.android.domain.entity.node.Node.isTakenDown if true, shows a taken down icon
  * @param showLink if true, shows a link icon
  * @param showFavourite if true, shows a favourite icon
  * @param isSensitive if true, the item is considered sensitive and will be displayed with reduced opacity

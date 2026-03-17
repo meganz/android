@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.INVALID_CHARACTERS
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeId

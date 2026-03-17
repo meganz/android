@@ -1,14 +1,13 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
-import kotlinx.collections.immutable.toImmutableList
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,7 +61,7 @@ class NodesViewTest {
                 isHiddenNodesEnabled = true,
             )
 
-            assertThat(result).isEqualTo(items.toImmutableList())
+            Truth.assertThat(result).isEqualTo(items)
         }
     }
 
@@ -82,9 +81,9 @@ class NodesViewTest {
                 isHiddenNodesEnabled = true,
             )
 
-            assertThat(result).hasSize(2)
-            assertThat(result[0].node.id).isEqualTo(NodeId(1))
-            assertThat(result[1].node.id).isEqualTo(NodeId(3))
+            Truth.assertThat(result).hasSize(2)
+            Truth.assertThat(result[0].node.id).isEqualTo(NodeId(1))
+            Truth.assertThat(result[1].node.id).isEqualTo(NodeId(3))
         }
     }
 
@@ -103,8 +102,8 @@ class NodesViewTest {
                 isHiddenNodesEnabled = true,
             )
 
-            assertThat(result).hasSize(3)
-            assertThat(result).isEqualTo(items.toImmutableList())
+            Truth.assertThat(result).hasSize(3)
+            Truth.assertThat(result).isEqualTo(items)
         }
     }
 
@@ -123,8 +122,8 @@ class NodesViewTest {
                 isHiddenNodesEnabled = false,
             )
 
-            assertThat(result).hasSize(3)
-            assertThat(result).isEqualTo(items.toImmutableList())
+            Truth.assertThat(result).hasSize(3)
+            Truth.assertThat(result).isEqualTo(items)
         }
     }
 
@@ -139,7 +138,7 @@ class NodesViewTest {
                 isHiddenNodesEnabled = true,
             )
 
-            assertThat(result).isEmpty()
+            Truth.assertThat(result).isEmpty()
         }
     }
 
@@ -154,8 +153,8 @@ class NodesViewTest {
                 isHiddenNodesEnabled = false,
             )
 
-            assertThat(result).hasSize(1)
-            assertThat(result).isEqualTo(items.toImmutableList())
+            Truth.assertThat(result).hasSize(1)
+            Truth.assertThat(result).isEqualTo(items)
         }
     }
 
@@ -171,7 +170,7 @@ class NodesViewTest {
             )
 
             // Check that the list is immutable (cannot be modified)
-            assertThat(result).isInstanceOf(kotlin.collections.List::class.java)
+            Truth.assertThat(result).isInstanceOf(List::class.java)
             // The result should be immutable, but the exact type might vary
             // For single items, it might be a SingletonList which is still immutable
         }

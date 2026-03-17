@@ -26,7 +26,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import timber.log.Timber
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 @HiltViewModel(assistedFactory = NodesExplorerViewModel.Factory::class)
 class NodesExplorerViewModel @AssistedInject constructor(

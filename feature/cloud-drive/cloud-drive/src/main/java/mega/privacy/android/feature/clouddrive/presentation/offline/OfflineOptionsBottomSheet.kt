@@ -16,7 +16,7 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.icon.pack.IconPack

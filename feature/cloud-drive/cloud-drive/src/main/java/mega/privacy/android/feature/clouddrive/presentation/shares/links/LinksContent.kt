@@ -22,8 +22,8 @@ import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
-import mega.privacy.android.core.nodecomponents.list.NodesView
-import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType

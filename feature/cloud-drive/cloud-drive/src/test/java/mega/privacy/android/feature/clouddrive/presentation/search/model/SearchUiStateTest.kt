@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.clouddrive.presentation.search.model
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFolderNode

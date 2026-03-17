@@ -6,9 +6,9 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.shard.nodes.R as NodesR
-import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.model.NodeSubtitleText
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.ShareData

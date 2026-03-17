@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper.message
 
 import androidx.annotation.StringRes
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.domain.entity.InvalidNameType
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject

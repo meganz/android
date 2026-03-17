@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.playlists.videoselect.model
 
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
+import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**

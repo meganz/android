@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,11 +18,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
-import mega.privacy.android.core.nodecomponents.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 
 
 /**

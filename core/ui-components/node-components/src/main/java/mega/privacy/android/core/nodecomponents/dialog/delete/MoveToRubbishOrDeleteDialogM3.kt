@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 /**
  * Dialog to move nodes to rubbish bin or delete them permanently

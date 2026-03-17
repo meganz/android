@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import javax.inject.Inject
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 class SelectVideoItemUiEntityMapper @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,

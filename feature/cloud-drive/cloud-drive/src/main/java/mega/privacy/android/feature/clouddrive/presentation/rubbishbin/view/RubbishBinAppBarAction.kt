@@ -7,7 +7,7 @@ import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as SharedR
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 sealed interface RubbishBinAppBarAction : MenuAction {
     object Empty : MenuActionWithIcon {

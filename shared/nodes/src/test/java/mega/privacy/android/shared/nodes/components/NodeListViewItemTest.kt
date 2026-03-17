@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.list
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertIsDisplayed
@@ -9,12 +9,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.icon.pack.R
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
-
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "w720dp-h1280dp-xhdpi")
@@ -26,7 +25,7 @@ class NodeListViewItemTest {
     private fun setContent(
         title: String = "Test Title",
         subtitle: String = "Test Subtitle",
-        icon: Int = IconPackR.drawable.ic_folder_outgoing_medium_solid,
+        icon: Int = R.drawable.ic_folder_outgoing_medium_solid,
         description: String? = null,
         tags: List<String>? = null,
         highlightText: String = "",
@@ -303,7 +302,7 @@ class NodeListViewItemTest {
 
     @Test
     fun `test that permission icon is displayed when accessPermissionIcon is provided`() {
-        setContent(accessPermissionIcon = IconPackR.drawable.ic_sync_01_medium_thin_outline)
+        setContent(accessPermissionIcon = R.drawable.ic_sync_01_medium_thin_outline)
 
         composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true)
             .assertIsDisplayed()
@@ -354,7 +353,7 @@ class NodeListViewItemTest {
             isTakenDown = true,
             showIsVerified = true,
             label = NodeLabel.BLUE,
-            accessPermissionIcon = IconPackR.drawable.ic_sync_01_medium_thin_outline,
+            accessPermissionIcon = R.drawable.ic_sync_01_medium_thin_outline,
             onMoreClicked = {},
             onInfoClicked = {}
         )
@@ -469,7 +468,11 @@ class NodeListViewItemTest {
             isInSelectionMode = true,
             isSelected = true
         )
-        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(hasTestTag(CHECKBOX_TAG))
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(
+            hasTestTag(
+                CHECKBOX_TAG
+            )
+        )
         // Note: The actual checked state would need to be verified through the checkbox's internal state
     }
 
@@ -479,7 +482,11 @@ class NodeListViewItemTest {
             isInSelectionMode = true,
             isSelected = false
         )
-        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(hasTestTag(CHECKBOX_TAG))
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(
+            hasTestTag(
+                CHECKBOX_TAG
+            )
+        )
         // Note: The actual unchecked state would need to be verified through the checkbox's internal state
     }
 
@@ -506,19 +513,26 @@ class NodeListViewItemTest {
             isTakenDown = true,
             showIsVerified = true,
             label = NodeLabel.BLUE,
-            accessPermissionIcon = IconPackR.drawable.ic_sync_01_medium_thin_outline
+            accessPermissionIcon = R.drawable.ic_sync_01_medium_thin_outline
         )
 
         // Checkbox should be displayed
-        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(hasTestTag(CHECKBOX_TAG))
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(
+            hasTestTag(
+                CHECKBOX_TAG
+            )
+        )
 
         // Other icons should still be displayed
-        composeTestRule.onNodeWithTag(FAVOURITE_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(FAVOURITE_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(LINK_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(TAKEN_DOWN_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(TAKEN_DOWN_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(VERSION_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.onNodeWithTag(LABEL_TAG, useUnmergedTree = true).assertIsDisplayed()
-        composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(PERMISSION_ICON_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
 
         // But more/info icons should not be displayed in selection mode
         composeTestRule.onNodeWithTag(MORE_ICON_TAG, useUnmergedTree = true).assertDoesNotExist()
@@ -535,7 +549,11 @@ class NodeListViewItemTest {
         )
 
         // In selection mode, only checkbox should be visible in the trailing area
-        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(hasTestTag(CHECKBOX_TAG))
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true).assertAny(
+            hasTestTag(
+                CHECKBOX_TAG
+            )
+        )
         composeTestRule.onNodeWithTag(MORE_ICON_TAG, useUnmergedTree = true).assertDoesNotExist()
     }
 }

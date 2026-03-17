@@ -18,7 +18,7 @@ android {
     defaultConfig {
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
-    namespace = "mega.privacy.android.shard.nodes"
+    namespace = "mega.privacy.android.shared.nodes"
     testOptions {
         unitTests {
             targetSdk = 34
@@ -34,10 +34,12 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":navigation"))
     implementation(project(":core:formatter"))
     implementation(project(":shared:resources"))
     implementation(project(":icon-pack"))
     implementation(project(":core:analytics:analytics-tracker"))
+    implementation(project(":shared:resources"))
 
     //core components
     implementation(lib.mega.core.ui)

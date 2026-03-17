@@ -26,8 +26,8 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
-import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
-import mega.privacy.android.core.nodecomponents.list.TagsRow
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
+import mega.privacy.android.shared.nodes.components.TagsRow
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest

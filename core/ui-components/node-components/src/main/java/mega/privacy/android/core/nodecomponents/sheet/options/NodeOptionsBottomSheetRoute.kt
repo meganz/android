@@ -55,12 +55,12 @@ import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionH
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderAccessDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogNavKey
 import mega.privacy.android.core.nodecomponents.dialog.sharefolder.ShareFolderDialogResult
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.model.BottomSheetClickHandler
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
-import mega.privacy.android.core.nodecomponents.model.text
+import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult

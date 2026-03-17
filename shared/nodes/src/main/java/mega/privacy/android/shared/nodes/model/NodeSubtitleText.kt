@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.model
+package mega.privacy.android.shared.nodes.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -8,7 +8,7 @@ import androidx.compose.ui.text.intl.Locale
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.shared.resources.R as SharedR
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 /**
  * Represents different types of node subtitles that can be resolved to localized strings

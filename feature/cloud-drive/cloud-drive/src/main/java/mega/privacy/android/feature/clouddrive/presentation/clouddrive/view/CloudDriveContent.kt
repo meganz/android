@@ -45,9 +45,9 @@ import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssu
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
-import mega.privacy.android.core.nodecomponents.list.NodesView
+import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
-import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles

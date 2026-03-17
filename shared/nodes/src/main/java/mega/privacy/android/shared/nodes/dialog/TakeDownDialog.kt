@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog
+package mega.privacy.android.shared.nodes.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,7 +16,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**

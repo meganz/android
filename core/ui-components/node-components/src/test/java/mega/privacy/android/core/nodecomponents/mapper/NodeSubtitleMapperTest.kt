@@ -1,7 +1,7 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
+import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode

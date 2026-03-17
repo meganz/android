@@ -93,7 +93,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressed
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 
 @HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
 class AlbumContentViewModel @AssistedInject constructor(

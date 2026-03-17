@@ -1,6 +1,6 @@
 package mega.privacy.android.core.nodecomponents.mapper
 
-import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.R as NodesR
 import javax.inject.Inject
 
 /**

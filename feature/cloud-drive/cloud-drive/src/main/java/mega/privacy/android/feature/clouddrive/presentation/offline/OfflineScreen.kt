@@ -48,9 +48,9 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.offline.HandleOfflineNodeAction3
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.core.nodecomponents.list.NodeGridViewItem
+import mega.privacy.android.shared.nodes.components.NodeGridViewItem
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.core.nodecomponents.list.NodeListViewItem
+import mega.privacy.android.shared.nodes.components.NodeListViewItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.components.SortBottomSheet

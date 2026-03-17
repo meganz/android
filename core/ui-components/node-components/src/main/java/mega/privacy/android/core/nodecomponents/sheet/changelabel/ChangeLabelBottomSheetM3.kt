@@ -23,8 +23,8 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shard.nodes.R as NodesR
-import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel

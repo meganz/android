@@ -4,7 +4,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.core.nodecomponents.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property title The title of the current folder
  * @property currentFolderId The current folder ID
  * @property parentFolderId Parent folder ID of the current node
- * @property items List of [mega.privacy.android.core.nodecomponents.model.NodeUiItem] to display
+ * @property items List of [NodeUiItem] to display
  * @property currentViewType ViewType The current ViewType used by the UI
  * @property sortConfiguration [mega.privacy.android.shared.nodes.model.NodeSortConfiguration] of current list
  * @property isLoading Whether the screen is loading
