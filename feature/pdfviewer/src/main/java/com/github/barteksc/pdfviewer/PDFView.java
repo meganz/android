@@ -328,7 +328,7 @@ public class PDFView extends RelativeLayout {
     }
 
     void showPage(int pageNb) {
-        if (recycled) {
+        if (recycled || pdfFile == null) {
             return;
         }
 
@@ -353,6 +353,9 @@ public class PDFView extends RelativeLayout {
      * @return offset between 0 and 1
      */
     public float getPositionOffset() {
+        if (pdfFile == null) {
+            return 0f;
+        }
         float offset;
         if (swipeVertical) {
             offset = -currentYOffset / (pdfFile.getDocLen(zoom) - getHeight());
@@ -368,6 +371,9 @@ public class PDFView extends RelativeLayout {
      * @see PDFView#getPositionOffset()
      */
     public void setPositionOffset(float progress, boolean moveHandle) {
+        if (pdfFile == null) {
+            return;
+        }
         if (swipeVertical) {
             moveTo(currentXOffset, (-pdfFile.getDocLen(zoom) + getHeight()) * progress, moveHandle);
         } else {
@@ -468,7 +474,7 @@ public class PDFView extends RelativeLayout {
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        if (isInEditMode() || state != State.SHOWN) {
+        if (isInEditMode() || state != State.SHOWN || pdfFile == null) {
             return;
         }
         animationManager.stopAll();
@@ -483,6 +489,9 @@ public class PDFView extends RelativeLayout {
 
     @Override
     public boolean canScrollHorizontally(int direction) {
+        if (pdfFile == null) {
+            return false;
+        }
         if (swipeVertical) {
             if (direction < 0 && currentXOffset < 0) {
                 return true;
@@ -501,6 +510,9 @@ public class PDFView extends RelativeLayout {
 
     @Override
     public boolean canScrollVertically(int direction) {
+        if (pdfFile == null) {
+            return false;
+        }
         if (swipeVertical) {
             if (direction < 0 && currentYOffset < 0) {
                 return true;
@@ -569,6 +581,9 @@ public class PDFView extends RelativeLayout {
         }
 
         if (state != State.SHOWN) {
+            return;
+        }
+        if (pdfFile == null) {
             return;
         }
 
@@ -753,6 +768,9 @@ public class PDFView extends RelativeLayout {
      * @param part The created PagePart.
      */
     public void onBitmapRendered(PagePart part) {
+        if (pdfFile == null) {
+            return;
+        }
         // when it is first rendered part
         if (state == State.LOADED) {
             state = State.SHOWN;
@@ -780,6 +798,9 @@ public class PDFView extends RelativeLayout {
      * @param moveHandle whether to move scroll handle or not
      */
     public void moveTo(float offsetX, float offsetY, boolean moveHandle) {
+        if (pdfFile == null) {
+            return;
+        }
         if (swipeVertical) {
             // Check X offset
             float scaledPageWidth = toCurrentScale(pdfFile.getMaxPageWidth());
@@ -947,6 +968,9 @@ public class PDFView extends RelativeLayout {
     public void fitToWidth(int page) {
         if (state != State.SHOWN) {
             Log.e(TAG, "Cannot fit, document not rendered yet");
+            return;
+        }
+        if (pdfFile == null) {
             return;
         }
         zoomTo(getWidth() / pdfFile.getPageSize(page).getWidth());
