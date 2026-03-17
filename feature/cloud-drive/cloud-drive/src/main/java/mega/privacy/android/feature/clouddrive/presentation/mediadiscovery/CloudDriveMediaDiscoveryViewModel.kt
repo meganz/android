@@ -25,9 +25,12 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -291,6 +294,61 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
             currentDate != previousDate
         } else {
             currentDate.month != previousDate.month || currentDate.year != previousDate.year
+        }
+    }
+
+    fun updatePeriod(mediaDiscoveryPeriod: MediaDiscoveryPeriod) {
+        _state.update {
+            it.copy(selectedPeriod = mediaDiscoveryPeriod)
+        }
+    }
+
+    fun selectPeriod(dateCard: DateCard) {
+        when (dateCard) {
+            is DateCard.YearsCard -> {
+                updatePeriodStateAndScrollOffset(
+                    MediaDiscoveryPeriod.Months,
+                    _state.value.monthsCardList.indexOfFirst {
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
+            }
+
+            is DateCard.MonthsCard -> {
+                updatePeriodStateAndScrollOffset(
+                    MediaDiscoveryPeriod.Days,
+                    _state.value.daysCardList.indexOfFirst {
+                        it.photo.modificationTime.toLocalDate() == dateCard.photo.modificationTime.toLocalDate()
+                    }
+                )
+            }
+
+            is DateCard.DaysCard -> {
+                updatePeriodStateAndScrollOffset(
+                    MediaDiscoveryPeriod.All,
+                    _state.value.mediaListItemList.indexOfFirst { item ->
+                        when (item) {
+                            is VideoItem -> item.video.id == dateCard.photo.id
+                            is PhotoItem -> item.photo.id == dateCard.photo.id
+                            else -> item.key == dateCard.photo.id.toString()
+                        }
+                    },
+                )
+            }
+        }
+    }
+
+    private fun updatePeriodStateAndScrollOffset(
+        selectedPeriod: MediaDiscoveryPeriod,
+        startIndex: Int = 0,
+        startOffset: Int = 0,
+    ) {
+        _state.update {
+            it.copy(
+                selectedPeriod = selectedPeriod,
+                scrollStartIndex = startIndex,
+                scrollStartOffset = startOffset
+            )
         }
     }
 

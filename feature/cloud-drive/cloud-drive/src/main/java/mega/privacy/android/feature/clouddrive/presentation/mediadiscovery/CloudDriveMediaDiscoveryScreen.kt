@@ -3,28 +3,47 @@ package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery
 import MediaGridViewItem
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.modifiers.excludeTopPadding
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view.MediaDiscoveryCardListView
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import java.text.SimpleDateFormat
@@ -47,22 +66,90 @@ fun CloudDriveMediaDiscoveryRoute(
     CloudDriveMediaDiscoveryScreen(
         uiState = uiState,
         onBack = onBack,
+        onTimeBarTabSelected = viewModel::updatePeriod,
+        onCardClick = viewModel::selectPeriod,
         modifier = modifier,
         contentPadding = contentPadding,
     )
 }
 
-// Todo implement Years, Month, Days chip
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CloudDriveMediaDiscoveryScreen(
     uiState: CloudDriveMediaDiscoveryUiState,
     onBack: () -> Unit,
+    onTimeBarTabSelected: (MediaDiscoveryPeriod) -> Unit,
+    onCardClick: (DateCard) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     fromFolderLink: Boolean = false,
 ) {
-    val fileTypeIconMapper = remember { FileTypeIconMapper() }
+    var isPeriodVisible by remember { mutableStateOf(true) }
 
+    MegaScaffoldWithTopAppBarScrollBehavior(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            // Todo: add top bar for Media Discovery
+        }
+    ) { containerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(containerPadding.excludeTopPadding())
+        ) {
+            when (uiState.selectedPeriod) {
+                MediaDiscoveryPeriod.All -> {
+                    MediaDiscoveryGridView(
+                        uiState = uiState,
+                        onBack = onBack,
+                        contentPadding = contentPadding,
+                        fromFolderLink = fromFolderLink,
+                        onScrollingListener = { isScrolling ->
+                            isPeriodVisible = !isScrolling
+                        }
+                    )
+                }
+
+                else -> {
+                    val dateCards = when (uiState.selectedPeriod) {
+                        MediaDiscoveryPeriod.Years -> uiState.yearsCardList
+                        MediaDiscoveryPeriod.Months -> uiState.monthsCardList
+                        MediaDiscoveryPeriod.Days -> uiState.daysCardList
+                        else -> uiState.daysCardList
+                    }
+                    MediaDiscoveryCardListView(
+                        dateCards = dateCards,
+                        onCardClick = onCardClick,
+                        fromFolderLink = fromFolderLink,
+                        shouldApplySensitiveMode = uiState.isHiddenNodesEnabled &&
+                                uiState.accountType?.isPaid == true &&
+                                !uiState.isBusinessAccountExpired,
+                    )
+                }
+            }
+
+            MediaDiscoveryPeriodChip(
+                selectedMediaDiscoveryPeriod = uiState.selectedPeriod,
+                onTimeBarTabSelected = onTimeBarTabSelected,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .align(Alignment.BottomCenter),
+                isVisible = isPeriodVisible
+            )
+        }
+    }
+}
+
+@Composable
+private fun MediaDiscoveryGridView(
+    uiState: CloudDriveMediaDiscoveryUiState,
+    onBack: () -> Unit,
+    contentPadding: PaddingValues,
+    fromFolderLink: Boolean,
+    onScrollingListener: (Boolean) -> Unit,
+) {
+    val fileTypeIconMapper = remember { FileTypeIconMapper() }
     val gridCells = remember(uiState.currentZoomLevel) {
         when (uiState.currentZoomLevel) {
             ZoomLevel.Grid_1 -> GridCells.Fixed(1)
@@ -70,10 +157,35 @@ internal fun CloudDriveMediaDiscoveryScreen(
             ZoomLevel.Grid_5 -> GridCells.Fixed(5)
         }
     }
+    val lazyGridState = rememberSaveable(
+        uiState.scrollStartIndex,
+        uiState.scrollStartOffset,
+        saver = LazyGridState.Saver,
+    ) {
+        LazyGridState(
+            uiState.scrollStartIndex,
+            uiState.scrollStartOffset,
+        )
+    }
+
+    LaunchedEffect(uiState.scrollStartIndex) {
+        if (uiState.scrollStartIndex > 0) {
+            val startIndex = if (uiState.selectedPeriod == MediaDiscoveryPeriod.All) {
+                uiState.scrollStartIndex
+            } else {
+                // Since CardListView has two headers, the index needs to be incremented by 2.
+                uiState.scrollStartIndex + 2
+            }
+            lazyGridState.animateScrollToItem(startIndex)
+        }
+    }
+
+    LaunchedEffect(lazyGridState.isScrollInProgress) {
+        onScrollingListener(lazyGridState.isScrollInProgress)
+    }
 
     FastScrollLazyVerticalGrid(
-        modifier = modifier,
-        state = rememberLazyGridState(),
+        state = lazyGridState,
         totalItems = uiState.mediaListItemList.size,
         columns = gridCells,
         horizontalArrangement = Arrangement.spacedBy(1.dp),
@@ -167,6 +279,14 @@ internal fun CloudDriveMediaDiscoveryScreen(
                     )
                 }
             }
+        }
+
+        // Bottom spacer so content is not hidden behind TimeSwitchBar
+        item(
+            key = "bottom_spacer",
+            span = { GridItemSpan(maxLineSpan) }
+        ) {
+            Spacer(modifier = Modifier.height(56.dp))
         }
     }
 }

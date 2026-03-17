@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.account.AccountPlanDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -375,6 +377,55 @@ class CloudDriveMediaDiscoveryViewModelTest {
                 assertThat(state.backEvent).isEqualTo(triggered)
             }
         }
+
+    @Test
+    fun `test that onTimeBarTabSelected updates selectedTimeBarTab`() = runTest {
+        underTest.updatePeriod(MediaDiscoveryPeriod.Years)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Years)
+        }
+    }
+
+    @Test
+    fun `test that onCardClick with YearsCard switches to Months tab`() = runTest {
+        val photo = createImagePhoto(id = 1)
+        val yearsCard = DateCard.YearsCard(date = "2026", photo = photo)
+
+        underTest.selectPeriod(yearsCard)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Months)
+        }
+    }
+
+    @Test
+    fun `test that onCardClick with MonthsCard switches to Days tab`() = runTest {
+        val photo = createImagePhoto(id = 1)
+        val monthsCard = DateCard.MonthsCard(date = "March", photo = photo)
+
+        underTest.selectPeriod(monthsCard)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.Days)
+        }
+    }
+
+    @Test
+    fun `test that onCardClick with DaysCard switches to All tab`() = runTest {
+        val photo = createImagePhoto(id = 1)
+        val daysCard = DateCard.DaysCard(date = "16 March", photo = photo, photosCount = "3")
+
+        underTest.selectPeriod(daysCard)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPeriod).isEqualTo(MediaDiscoveryPeriod.All)
+        }
+    }
 
     private fun createAccountLevelDetail(
         accountType: AccountType = AccountType.PRO_I,

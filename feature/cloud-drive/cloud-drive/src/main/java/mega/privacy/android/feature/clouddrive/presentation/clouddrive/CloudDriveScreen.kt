@@ -2,15 +2,19 @@ package mega.privacy.android.feature.clouddrive.presentation.clouddrive
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -75,6 +79,7 @@ fun CloudDriveScreen(
         viewModel = nodeOptionsActionViewModel,
         megaNavigator = megaNavigator,
     )
+    var showMediaDiscovery by remember { mutableStateOf(false) }
 
     BackHandler(enabled = uiState.isInSelectionMode) {
         viewModel.processAction(DeselectAllItems)
@@ -153,10 +158,16 @@ fun CloudDriveScreen(
             )
         },
         floatingActionButton = {
+            val fabBottomPadding by animateDpAsState(
+                targetValue = if (showMediaDiscovery) 48.dp else 0.dp,
+                label = "fabBottomPadding",
+            )
+
             AddContentFab(
                 modifier = Modifier
                     .testTag(CLOUD_DRIVE_FAB_TAG)
-                    .applyScrollToHideFabBehavior(),
+                    .applyScrollToHideFabBehavior()
+                    .padding(bottom = fabBottomPadding),
                 visible = uiState.isUploadAllowed && !uiState.isEmpty,
                 onClick = {
                     Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
@@ -178,6 +189,8 @@ fun CloudDriveScreen(
                 onTransfer = onTransfer,
                 onSortNodes = viewModel::setCloudSortOrder,
                 nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                showMediaDiscovery = showMediaDiscovery,
+                onShowMediaDiscoveryChanged = { showMediaDiscovery = it },
             )
         }
     )

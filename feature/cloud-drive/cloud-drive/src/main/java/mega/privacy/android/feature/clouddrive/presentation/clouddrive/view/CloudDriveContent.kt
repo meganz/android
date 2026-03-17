@@ -111,6 +111,8 @@ internal fun CloudDriveContent(
         creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
     ),
     onPrepareScanDocument: () -> Unit = {},
+    showMediaDiscovery: Boolean = false,
+    onShowMediaDiscoveryChanged: (Boolean) -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
@@ -203,8 +205,6 @@ internal fun CloudDriveContent(
             )
         }
 
-        var showMediaDiscovery by remember { mutableStateOf(false) }
-
         when {
             uiState.isLoading -> {
                 NodesViewSkeleton(
@@ -233,7 +233,7 @@ internal fun CloudDriveContent(
             showMediaDiscovery -> {
                 CloudDriveMediaDiscoveryRoute(
                     onBack = {
-                        showMediaDiscovery = false
+                        onShowMediaDiscoveryChanged(false)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -283,7 +283,7 @@ internal fun CloudDriveContent(
                 onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
                 showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
                 onEnterMediaDiscoveryClick = {
-                    showMediaDiscovery = true
+                    onShowMediaDiscoveryChanged(true)
 //                    navigationHandler.back()
 //                    navigationHandler.navigate(
 //                        MediaDiscoveryNavKey(
