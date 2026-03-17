@@ -294,7 +294,7 @@ internal fun ImagePreviewScreen(
                                 showSaveToDeviceMenu = viewModel::isSaveToDeviceMenuVisible,
                                 showManageLinkMenu = viewModel::isGetLinkMenuVisible,
                                 showMoreMenu = viewModel::isMoreMenuVisible,
-                                showShareMenu = viewModel::isShareMenuVisible,
+                                showShareMenu = viewModel::isShareMenuVisibleInToolbar,
                                 onClickBack = onClickBack,
                                 onClickEdit = { onClickEdit(imageNode) },
                                 onClickSlideshow = onClickSlideshow,

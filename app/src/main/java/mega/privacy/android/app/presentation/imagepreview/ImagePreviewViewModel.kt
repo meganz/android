@@ -315,6 +315,10 @@ class ImagePreviewViewModel @Inject constructor(
 
     suspend fun isShareMenuVisible(imageNode: ImageNode): Boolean {
         return menu?.isShareMenuVisible(imageNode) == true
+    }
+
+    suspend fun isShareMenuVisibleInToolbar(imageNode: ImageNode): Boolean {
+        return menu?.isShareMenuVisible(imageNode) == true
                 && imagePreviewMenuSource == ImagePreviewMenuSource.PUBLIC_FILE
     }
 
