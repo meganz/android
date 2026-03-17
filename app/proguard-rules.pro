@@ -125,6 +125,17 @@
 }
 
 #####################
+# MegaRequestListenerInterface implementations #
+# R8 full mode incorrectly propagates default field values in classes with
+# Kotlin secondary constructors, causing fields set in secondary constructors
+# to read as their default values in callback methods invoked from JNI.
+#####################
+-keep class * implements nz.mega.sdk.MegaRequestListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaTransferListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaChatRequestListenerInterface { *; }
+-keep class * implements nz.mega.sdk.MegaListenerInterface { *; }
+
+#####################
 # Keep Fragment classes #
 #####################
 -keep class * extends androidx.fragment.app.Fragment {
