@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.sync.ui.mapper.solvedissue
 
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode

@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.transfers.model.image
 
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import javax.inject.Inject
 
 /**

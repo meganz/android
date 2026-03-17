@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder

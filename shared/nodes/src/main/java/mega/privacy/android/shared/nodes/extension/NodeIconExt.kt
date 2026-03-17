@@ -1,7 +1,6 @@
-package mega.privacy.android.core.nodecomponents.extension
+package mega.privacy.android.shared.nodes.extension
 
 import androidx.annotation.DrawableRes
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.NodeLabel
@@ -12,6 +11,7 @@ import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 
 /**
  * Get icon drawable for a node based on its type and properties.

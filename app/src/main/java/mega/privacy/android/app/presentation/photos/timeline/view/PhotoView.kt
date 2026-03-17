@@ -53,7 +53,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.icon.pack.IconPack

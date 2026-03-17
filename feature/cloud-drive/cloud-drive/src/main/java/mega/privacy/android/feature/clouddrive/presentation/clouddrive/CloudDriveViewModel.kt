@@ -26,10 +26,6 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -66,10 +62,14 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
 import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
-import mega.privacy.android.shared.resources.R as sharedR
 
 @HiltViewModel(assistedFactory = CloudDriveViewModel.Factory::class)
 class CloudDriveViewModel @AssistedInject constructor(

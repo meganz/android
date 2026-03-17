@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
@@ -54,6 +53,7 @@ import mega.privacy.android.feature.photos.model.TimelinePhotosSource.ALL_PHOTOS
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import java.io.File
 

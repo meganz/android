@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 

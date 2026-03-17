@@ -21,8 +21,6 @@ import mega.privacy.android.app.presentation.filelink.model.FileLinkState
 import mega.privacy.android.app.presentation.folderlink.model.LinkErrorState
 import mega.privacy.android.app.presentation.mapper.UrlDownloadException
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.core.nodecomponents.extension.getIcon
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -52,6 +50,8 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapNodeToPublicLinkUs
 import mega.privacy.android.domain.usecase.setting.MonitorMiscLoadedUseCase
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject

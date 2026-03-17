@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.view.extension.getNodeItemDescription
 import mega.privacy.android.app.presentation.view.previewdataprovider.SampleFolderNodeDataProvider
-import mega.privacy.android.core.nodecomponents.extension.getIcon
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest

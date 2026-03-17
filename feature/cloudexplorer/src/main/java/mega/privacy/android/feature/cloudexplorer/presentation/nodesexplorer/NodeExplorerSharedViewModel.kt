@@ -15,9 +15,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -34,6 +31,9 @@ import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCas
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
 
 abstract class NodeExplorerSharedViewModel(

@@ -36,6 +36,7 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:sync"))
+    implementation(project(":shared:nodes"))
     implementation(project(":shared:resources"))
     implementation(project(":legacy-core-ui"))
     implementation(project(":icon-pack"))

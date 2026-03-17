@@ -1,7 +1,7 @@
 package mega.privacy.mobile.home.presentation.recents.mapper
 
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode

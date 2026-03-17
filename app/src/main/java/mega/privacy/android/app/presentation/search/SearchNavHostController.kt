@@ -8,7 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.compose.material.navigation.BottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout

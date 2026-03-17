@@ -1,10 +1,10 @@
-package mega.privacy.android.core.nodecomponents.mapper
+package mega.privacy.android.shared.nodes.mapper
 
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest

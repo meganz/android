@@ -13,9 +13,9 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
-import mega.privacy.android.core.nodecomponents.mapper.IconType
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.IconType
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ChatBubble
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.RichLinkContentView
 import mega.privacy.android.shared.original.core.ui.preview.BooleanProvider

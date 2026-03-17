@@ -12,10 +12,10 @@ import mega.privacy.android.app.presentation.meeting.chat.view.ChatAvatar
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.navigateToChatViewGraph
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFileLinkActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openFolderLinkActivity
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.FolderInfo
 import mega.privacy.android.domain.entity.contacts.ContactLinkQueryResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.ContactMessageContentView
 
 /**

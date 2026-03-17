@@ -6,7 +6,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionBucketUiEntity
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionsSharesType
 import mega.privacy.android.domain.entity.node.TypedFileNode

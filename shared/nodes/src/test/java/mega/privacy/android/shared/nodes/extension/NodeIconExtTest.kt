@@ -1,12 +1,12 @@
-package mega.privacy.android.core.nodecomponents.extension
+package mega.privacy.android.shared.nodes.extension
 
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest

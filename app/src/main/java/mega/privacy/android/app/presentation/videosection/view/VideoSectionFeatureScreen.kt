@@ -47,7 +47,7 @@ import mega.privacy.android.app.presentation.videosection.view.playlist.VideoPla
 import mega.privacy.android.app.presentation.videosection.view.playlist.videoPlaylistDetailRoute
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.VideoRecentlyWatchedView
 import mega.privacy.android.app.presentation.videosection.view.recentlywatched.videoRecentlyWatchedRoute
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper

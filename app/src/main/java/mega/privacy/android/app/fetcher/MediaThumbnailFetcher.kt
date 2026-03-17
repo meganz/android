@@ -10,7 +10,6 @@ import coil3.fetch.Fetcher
 import coil3.fetch.ImageFetchResult
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.domain.usecase.camerauploads.IsFolderPathExistingUseCase
 import mega.privacy.android.domain.usecase.photos.DownloadPublicAlbumPhotoUseCase
@@ -18,6 +17,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPreviewUseCa
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodePreviewUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadPublicNodeThumbnailUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import javax.inject.Inject

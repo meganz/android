@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.transfers.preview.view.LoadingPreviewInfo
-import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
@@ -31,6 +30,7 @@ import mega.privacy.android.domain.exception.transfers.TransferNotFoundException
 import mega.privacy.android.domain.usecase.transfers.GetTransferByUniqueIdUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.previews.BroadcastTransferTagToCancelUseCase
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

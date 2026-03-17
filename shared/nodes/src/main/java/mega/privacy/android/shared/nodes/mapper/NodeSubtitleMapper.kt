@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.mapper
+package mega.privacy.android.shared.nodes.mapper
 
 import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -53,4 +53,4 @@ class NodeSubtitleMapper @Inject constructor() {
             else -> NodeSubtitleText.Empty
         }
     }
-} 
+}

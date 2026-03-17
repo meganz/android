@@ -23,7 +23,6 @@ dependencies {
 
     implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:navigation-contract"))
-    implementation(project(":core:ui-components:node-components"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":data"))

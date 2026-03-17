@@ -19,10 +19,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -52,6 +48,10 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.clouddrive.presentation.rubbishbin.model.NewRubbishBinUiState
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.RubbishBinNavKey
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -66,8 +66,8 @@ import timber.log.Timber
  * @param setViewType [mega.privacy.android.domain.usecase.viewtype.SetViewType] to set view type
  * @param monitorViewType [mega.privacy.android.domain.usecase.viewtype.MonitorViewType] check view type
  * @param getRubbishBinFolderUseCase [mega.privacy.android.domain.usecase.rubbishbin.GetRubbishBinFolderUseCase]
- * @param nodeUiItemMapper [mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper] to convert TypedNode to NodeUiItem
- * @param nodeSortConfigurationUiMapper [mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper] for sort configuration mapping
+ * @param nodeUiItemMapper [mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper] to convert TypedNode to NodeUiItem
+ * @param nodeSortConfigurationUiMapper [mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper] for sort configuration mapping
  */
 @HiltViewModel(assistedFactory = NewRubbishBinViewModel.Factory::class)
 class NewRubbishBinViewModel @AssistedInject constructor(

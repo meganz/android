@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.mapper
+package mega.privacy.android.shared.nodes.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.shared.nodes.model.NodeSubtitleText
