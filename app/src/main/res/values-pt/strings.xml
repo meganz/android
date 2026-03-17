@@ -3339,21 +3339,21 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Programar reunião</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Obrigado pela assinatura mensal do Pro&#160;Lite</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Obrigado por ativar a assinatura mensal do plano Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Obrigado pela assinatura anual do Pro&#160;Lite</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Obrigado por ativar a assinatura anual do plano Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Obrigado pela assinatura mensal do Pro&#160;I</string>
+    <string name="upgrade_account_successful_pro_1_monthly">Obrigado por ativar a assinatura mensal do plano Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Obrigado pela assinatura anual do Pro&#160;I</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Obrigado por ativar a assinatura anual do plano Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Obrigado pela assinatura mensal do Pro&#160;II</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Obrigado por ativar a assinatura mensal do plano Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Obrigado pela assinatura anual do Pro&#160;II</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Obrigado por ativar a assinatura anual do plano Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Obrigado pela assinatura mensal do Pro&#160;III</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Obrigado por ativar a assinatura mensal do plano Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
-    <string name="upgrade_account_successful_pro_3_yearly">Obrigado pela assinatura anual do Pro&#160;III</string>
+    <string name="upgrade_account_successful_pro_3_yearly">Obrigado por ativar a assinatura anual do plano Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
     <string name="chat_group_chat_info_allow_non_host_participants_option">Permitir adicionar participantes a usuários que não forem anfitriões</string>
     <!-- Title of gif album. -->
@@ -4327,13 +4327,13 @@
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Plano atual</string>
     <!-- Button title, when user taps on Pro Lite plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar Pro&#160;Lite</string>
+    <string name="account_upgrade_account_buy_button_title_pro_lite">Comprar o plano Pro&#160;Lite</string>
     <!-- Button title, when user taps on Pro I plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_i">Comprar Pro&#160;I</string>
+    <string name="account_upgrade_account_buy_button_title_pro_i">Comprar o plano Pro&#160;I</string>
     <!-- Button title, when user taps on Pro II plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar Pro&#160;II</string>
+    <string name="account_upgrade_account_buy_button_title_pro_ii">Comprar o plano Pro&#160;II</string>
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar Pro&#160;III</string>
+    <string name="account_upgrade_account_buy_button_title_pro_iii">Comprar o plano Pro&#160;III</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
     <string name="cloud_drive_subtitle_link_access_password">Somente quem tiver a senha poderá acessar o link</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->

@@ -1739,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1781,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2410,12 +2414,12 @@
     <string name="general_dialog_discard_button">Discard</string>
     <!-- Message shown when changes are saved successfully (e.g. text editor). -->
     <string name="general_changes_saved">Changes saved</string>
-    <!-- Message shown to the user while accessing MEGA via File Manager when passcode lock is enabled -->
-    <string name="saf_passcode_lock_enabled_message">To browse your MEGA files, disable your passcode in the MEGA app. Go to Settings, then tap Security.</string>
-    <!-- Message shown to the user while accessing MEGA via File Manager when there is no network connectivity -->
-    <string name="saf_no_internet_message">Connect to the internet to browse your MEGA files. Files saved for offline are available in the MEGA app.</string>
     <!-- Show in folder link screen to save file/folder to cloud drive -->
     <string name="node_option_save_to_mega">Save to MEGA</string>
     <!--Home screen audios chip title-->
     <string name="home_screen_audios_chip_title">Audios</string>
+    <!-- Message shown to the user while accessing MEGA via File Manager when passcode lock is enabled -->
+    <string name="saf_passcode_lock_enabled_message">To browse your MEGA files, disable your passcode in the MEGA app. Go to Settings, then tap Security.</string>
+    <!-- Message shown to the user while accessing MEGA via File Manager when there is no network connectivity -->
+    <string name="saf_no_internet_message">Connect to the internet to browse your MEGA files. Files saved for offline are available in the MEGA app.</string>
 </resources>

@@ -5625,4 +5625,6 @@
     <!-- Warning informing the user the folder location is trying to open no longer exists. -->
     <string name="location_not_exist">هذا الموقع لم يعد موجوداً.</string>
     <string name="invalid_link">رابط غير صالح. الرجاء المحاولة مرة أخرى أو طلب رابط جديد.</string>
+    <string name="dialog_taken_down_folder_description">تمت إزالة هذا المجلد وفقًا لـ [A]سياسة إرشادات إزالة المحتوى[/A] الخاصة بنا. يمكنك الاعتراض على هذه الإزالة إذا كنت تعتقد أننا قد ارتكبنا خطأ.</string>
+    <string name="dialog_taken_down_file_description">تمت إزالة هذا الملف وفقًا لـ [A]سياسة إرشادات إزالة المحتوى[/A] الخاصة بنا. يمكنك الاعتراض على هذه الإزالة إذا كنت تعتقد أننا قد ارتكبنا خطأ.</string>
 </resources>

@@ -2060,7 +2060,7 @@
     <string name="home_recents_snackbar_activity_hidden">您近期的活動已被隱藏</string>
     <string name="home_recents_button_view_all">查看全部</string>
     <string name="home_recents_options_menu_show_activity">顯示近期活動</string>
-    <string name="home_recents_empty_text_description">您最近的所有檔案和資料夾活動將顯示在此</string>
+    <string name="home_recents_empty_text_description">所有您近期的檔案和資料夾活動將顯示在此</string>
     <string name="home_recents_hidden_text_description">已隱藏近期活動</string>
     <string name="home_recents_bucket_subtitle_added_to">已新增到%s</string>
     <string name="home_recents_bucket_snackbar_files_unavailable">這些檔案已不再可用</string>
@@ -2099,4 +2099,24 @@
     <string name="text_editor_hide_line_numbers">隱藏行數</string>
     <string name="settings_help_rate_app">請幫我們評分</string>
     <string name="general_dialog_discard_button">捨棄</string>
+    <string name="choose_account_screen_subscriptions_not_available_via_google_play">您所在的地區無法透過Google Play進行訂閱。</string>
+    <string name="home_recents_snackbar_activity_cleared">您最近的活動已清除</string>
+    <string name="home_recents_options_menu_clear">清除近期的活動</string>
+    <string name="home_recents_clear_dialog_message">您確定要清除所有近期活動記錄嗎？此操作無法還原。</string>
+    <string name="choose_account_screen_plan_available_yearly_billing">%1$s可按年計費</string>
+    <string name="choose_account_screen_plan_available_monthly_billing">%1$s可按月計費</string>
+    <string name="album_import_error_access_dialog_description">相簿連結已被移除，或相簿已被刪除。請聯繫與您共享該連結的人。</string>
+    <string name="album_import_rename_album_dialog_description">您的相簿中已存在名為%1$s的相簿。請為要儲存的相簿輸入新的名稱。</string>
+    <string name="album_import_snackbar_success_message">%1$s已儲存到雲端硬碟</string>
+    <string name="album_import_snackbar_error_message">%1$s無法儲存到雲端硬碟。稍後再試。如果問題仍然存在，請聯繫與您共享連結的人。</string>
+    <string name="node_menu_action_make_available_offline">離線使用</string>
+    <string name="device_center_bottom_sheet_item_remove_connection">移除連線</string>
+    <string name="device_center_snackbar_message_connection_removed">連線已移除</string>
+    <string name="sync_folder_connection_dialog_title">資料夾已連線到另一個裝置</string>
+    <string name="sync_folder_connection_dialog_message">此資料夾與您的%1$s裝置連線，這可能是因為您在未登出的情況下卸載了MEGA。一個資料夾一次只能同步到一台裝置。請在此移除現有連線以進行同步。</string>
+    <string name="sync_folder_connection_this_device">已連線到%1$s</string>
+    <string name="general_dialog_discard_changes_message">任何未儲存的編輯都將遺失</string>
+    <string name="general_changes_saved">更改已儲存</string>
+    <string name="node_option_save_to_mega">儲存到MEGA</string>
+    <string name="home_screen_audios_chip_title">音訊</string>
 </resources>
