@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState

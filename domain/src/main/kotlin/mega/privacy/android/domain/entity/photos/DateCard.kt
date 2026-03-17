@@ -1,6 +1,4 @@
-package mega.privacy.android.app.presentation.photos.model
-
-import mega.privacy.android.domain.entity.photos.Photo
+package mega.privacy.android.domain.entity.photos
 
 @Deprecated("Please use PhotosNodeListCard")
 sealed class DateCard(

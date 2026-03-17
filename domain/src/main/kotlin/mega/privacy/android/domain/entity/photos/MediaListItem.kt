@@ -1,6 +1,5 @@
-package mega.privacy.android.feature.photos.model
+package mega.privacy.android.domain.entity.photos
 
-import mega.privacy.android.domain.entity.photos.Photo
 import java.time.LocalDateTime
 
 sealed interface MediaListItem {

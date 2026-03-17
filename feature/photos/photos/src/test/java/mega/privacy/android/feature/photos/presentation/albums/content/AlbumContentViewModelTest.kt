@@ -66,7 +66,7 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum

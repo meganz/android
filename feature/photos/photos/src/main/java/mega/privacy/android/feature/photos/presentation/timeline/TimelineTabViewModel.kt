@@ -34,7 +34,7 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
-import mega.privacy.android.feature.photos.model.FilterMediaType.Companion.toMediaTypeValue
+import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
 import mega.privacy.android.feature.photos.model.TimelineGridSize

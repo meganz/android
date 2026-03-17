@@ -33,7 +33,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.feature.photos.components.TimelineFilterViewContent
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.mobile.analytics.event.MediaScreenFilterAllLocationsSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenFilterAllMediaSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenFilterCameraUploadsSelectedEvent

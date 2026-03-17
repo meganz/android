@@ -26,11 +26,11 @@ import mega.privacy.android.app.domain.usecase.GetPublicNodeListByIds
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.toCopyRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.feature.photos.model.MediaListItem
-import mega.privacy.android.feature.photos.model.MediaListItem.PhotoItem
-import mega.privacy.android.feature.photos.model.MediaListItem.VideoItem
-import mega.privacy.android.feature.photos.model.MediaListMedia
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
+import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
+import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
@@ -78,9 +78,9 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -374,7 +374,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
             val item = when (photo) {
                 is Photo.Image -> PhotoItem(photo)
-                is Photo.Video -> MediaListItem.VideoItem(
+                is Photo.Video -> VideoItem(
                     photo,
                     durationInSecondsTextMapper(photo.fileTypeInfo.duration)
                 )

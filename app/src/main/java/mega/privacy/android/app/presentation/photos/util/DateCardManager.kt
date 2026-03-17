@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.photos.util
 
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.Photo
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -43,15 +42,19 @@ internal fun createMonthsCardList(dayPhotos: Map<Photo, Int>): List<DateCard> =
 private fun createMonthCard(photo: Photo): DateCard {
     val sameYear = Year.from(LocalDate.now()) == Year.from(photo.modificationTime)
     val month = SimpleDateFormat(DATE_FORMAT_MONTH, Locale.getDefault()).format(
-        Date.from(photo.modificationTime.toLocalDate().atStartOfDay()
-            .atZone(ZoneId.systemDefault())
-            .toInstant())
+        Date.from(
+            photo.modificationTime.toLocalDate().atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant()
+        )
     )
     val showDate = if (sameYear) {
         month
     } else {
-        SimpleDateFormat("$DATE_FORMAT_MONTH $DATE_FORMAT_YEAR_WITH_MONTH",
-            Locale.getDefault()).format(
+        SimpleDateFormat(
+            "$DATE_FORMAT_MONTH $DATE_FORMAT_YEAR_WITH_MONTH",
+            Locale.getDefault()
+        ).format(
             Date.from(
                 photo.modificationTime.toLocalDate().atStartOfDay()
                     .atZone(ZoneId.systemDefault())

@@ -4,9 +4,9 @@ import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.PhotoResult
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItem
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.shared.resources.R as sharedR

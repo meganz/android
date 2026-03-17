@@ -36,7 +36,7 @@ import mega.privacy.android.app.presentation.photos.view.isDownloadPreview
 import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature.photos.presentation.timeline.model.CameraUploadsBannerType
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid
 import java.text.SimpleDateFormat

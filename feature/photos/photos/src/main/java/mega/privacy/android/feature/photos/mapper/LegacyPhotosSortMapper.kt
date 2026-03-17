@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.mapper
 
 import mega.privacy.android.domain.entity.node.SortDirection
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.Sort
 import javax.inject.Inject
 
 class LegacyPhotosSortMapper @Inject constructor() {

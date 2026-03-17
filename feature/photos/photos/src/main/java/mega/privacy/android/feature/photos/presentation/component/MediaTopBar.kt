@@ -22,7 +22,7 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
 import mega.privacy.android.feature.photos.presentation.CUStatusUiState

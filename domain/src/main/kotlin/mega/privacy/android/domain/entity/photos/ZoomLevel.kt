@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.photos.model
+package mega.privacy.android.domain.entity.photos
 
 enum class ZoomLevel(val portrait: Int, val landscape: Int) {
     Grid_1(1, 2),

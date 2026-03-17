@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.photos.model
+package mega.privacy.android.domain.entity.photos
 
 /**
  * Sort enum class for Timeline

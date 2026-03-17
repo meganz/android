@@ -37,8 +37,8 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.DateCard
-import mega.privacy.android.app.presentation.photos.model.DateCardCount
+import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.DateCardCount
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.original.core.ui.controls.layouts.FastScrollLazyVerticalGrid

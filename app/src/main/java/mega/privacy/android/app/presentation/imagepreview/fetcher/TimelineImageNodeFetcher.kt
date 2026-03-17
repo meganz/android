@@ -16,8 +16,8 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.FilterCameraUploadImageNodesUseCase
 import mega.privacy.android.domain.usecase.FilterCloudDriveImageNodesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineNodesUseCase
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import javax.inject.Inject
 

@@ -60,7 +60,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import mega.android.core.ui.theme.values.IconColor
@@ -70,7 +69,7 @@ import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryGlobalStateViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
-import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.FilterDialog

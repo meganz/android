@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
@@ -73,8 +73,8 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature.photos.provider.PhotosCache.updatePhotos
 import mega.privacy.android.feature_flags.AppFeatures
 import nz.mega.sdk.MegaNode

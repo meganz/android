@@ -8,7 +8,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.view.PhotosFilterView
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import org.junit.Rule
 import org.junit.Test

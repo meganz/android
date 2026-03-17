@@ -1,7 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.timeline.model
 
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 
 data class TimelineFilterRequest(
     val isRemembered: Boolean,

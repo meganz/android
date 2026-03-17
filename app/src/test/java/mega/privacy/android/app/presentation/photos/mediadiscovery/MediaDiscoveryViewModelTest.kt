@@ -61,9 +61,9 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import nz.mega.sdk.MegaNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

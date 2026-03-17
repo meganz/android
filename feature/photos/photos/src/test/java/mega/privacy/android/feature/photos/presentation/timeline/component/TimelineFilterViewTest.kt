@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import org.junit.Rule

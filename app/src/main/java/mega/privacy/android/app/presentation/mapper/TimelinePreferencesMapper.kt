@@ -4,7 +4,7 @@ import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 import javax.inject.Inject
 

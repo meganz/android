@@ -2,7 +2,7 @@ package mega.privacy.android.feature.photos.mapper
 
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.feature.photos.model.FilterMediaSource
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import javax.inject.Inject
 

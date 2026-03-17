@@ -1,6 +1,4 @@
-package mega.privacy.android.feature.photos.model
-
-import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+package mega.privacy.android.domain.entity.photos
 
 /**
  * Filter enum class for Timeline

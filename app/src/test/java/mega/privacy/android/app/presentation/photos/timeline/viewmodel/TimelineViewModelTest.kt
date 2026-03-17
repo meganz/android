@@ -15,7 +15,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.mapper.TimelinePreferencesMapper
-import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.LocationPreference
 import mega.privacy.android.app.presentation.photos.model.MediaTypePreference
 import mega.privacy.android.app.presentation.photos.model.RememberPreferences
@@ -58,10 +58,10 @@ import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadsUseCase
 import mega.privacy.android.feature.photos.domain.usecase.GetNodeListByIds
 import mega.privacy.android.feature.photos.model.CameraUploadsStatus
-import mega.privacy.android.feature.photos.model.FilterMediaType
-import mega.privacy.android.feature.photos.model.Sort
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
-import mega.privacy.android.feature.photos.model.ZoomLevel
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

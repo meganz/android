@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.feature.photos.R as featurePhotosR
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource.CLOUD_DRIVE
 
 /**

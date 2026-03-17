@@ -48,11 +48,7 @@ import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeD
 import mega.privacy.android.core.nodecomponents.list.NodesView
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
 import mega.privacy.android.core.nodecomponents.list.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
 import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
@@ -70,13 +66,18 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.CloudDriveMediaDiscoveryRoute
+import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.CloudDriveMediaDiscoveryViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
-import mega.privacy.android.navigation.destination.MediaDiscoveryNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent
@@ -202,6 +203,8 @@ internal fun CloudDriveContent(
             )
         }
 
+        var showMediaDiscovery by remember { mutableStateOf(false) }
+
         when {
             uiState.isLoading -> {
                 NodesViewSkeleton(
@@ -224,6 +227,24 @@ internal fun CloudDriveContent(
                         onToggleShowUploadOptionsBottomSheet(true)
                     },
                     showAddItems = uiState.isUploadAllowed
+                )
+            }
+
+            showMediaDiscovery -> {
+                CloudDriveMediaDiscoveryRoute(
+                    onBack = {
+                        showMediaDiscovery = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    viewModel = hiltViewModel<CloudDriveMediaDiscoveryViewModel, CloudDriveMediaDiscoveryViewModel.Factory>(
+                        creationCallback = { it.create(uiState.currentFolderId.longValue, false) }
+                    ),
+                    contentPadding = PaddingValues(
+                        top = topPadding,
+                        bottom = contentPadding.calculateSafeBottomPadding()
+                    )
                 )
             }
 
@@ -262,13 +283,14 @@ internal fun CloudDriveContent(
                 onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
                 showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
                 onEnterMediaDiscoveryClick = {
-                    navigationHandler.back()
-                    navigationHandler.navigate(
-                        MediaDiscoveryNavKey(
-                            nodeHandle = uiState.currentFolderId.longValue,
-                            nodeName = uiState.title.get(context),
-                        )
-                    )
+                    showMediaDiscovery = true
+//                    navigationHandler.back()
+//                    navigationHandler.navigate(
+//                        MediaDiscoveryNavKey(
+//                            nodeHandle = uiState.currentFolderId.longValue,
+//                            nodeName = uiState.title.get(context),
+//                        )
+//                    )
                 },
                 inSelectionMode = uiState.isInSelectionMode,
                 isContactVerificationOn = uiState.isContactVerificationOn,

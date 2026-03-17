@@ -25,7 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.model.DateCard
+import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState

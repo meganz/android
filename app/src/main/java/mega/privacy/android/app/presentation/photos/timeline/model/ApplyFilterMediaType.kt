@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.photos.timeline.model
 
-import mega.privacy.android.feature.photos.model.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.feature.photos.model.TimelinePhotosSource
 
 enum class ApplyFilterMediaType(val type: FilterMediaType, val source: TimelinePhotosSource) {
