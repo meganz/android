@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -35,8 +39,11 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -253,6 +260,187 @@ internal fun TextEditorContent(
         }
     }
 }
+
+// ── View mode (virtualised LazyColumn) ─────────────────────────────────────
+
+/**
+ * View-mode only: virtualised list of read-only text chunks.
+ * Use when [readOnly] is true; use [TextEditorContent] for edit mode.
+ */
+@Composable
+internal fun TextEditorContentViewMode(
+    lazyListState: LazyListState,
+    chunkCount: Int,
+    chunkTextProvider: (Int) -> String,
+    chunkStartLineProvider: (Int) -> Int,
+    totalLineCount: Int,
+    showLineNumbers: Boolean,
+) {
+    val textStyle = editorChunkTextStyle(MaterialTheme.colorScheme.onSurface)
+    CompositionLocalProvider(LocalAutofill provides null) {
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .padding(
+                    start = if (showLineNumbers) 0.dp else 16.dp,
+                    end = 16.dp,
+                    top = 8.dp,
+                    bottom = 8.dp,
+                ),
+        ) {
+            items(
+                count = chunkCount,
+                key = { "chunk-$it" },
+                contentType = { "readOnlyChunk" },
+            ) { idx ->
+                ReadOnlyChunkItem(
+                    chunkText = chunkTextProvider(idx),
+                    startLineNumber = chunkStartLineProvider(idx),
+                    maxLineNumber = totalLineCount,
+                    showLineNumbers = showLineNumbers,
+                    textStyle = textStyle,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReadOnlyChunkItem(
+    chunkText: String,
+    startLineNumber: Int,
+    maxLineNumber: Int,
+    showLineNumbers: Boolean,
+    textStyle: TextStyle,
+) {
+    var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    EditorChunkLayout(
+        showLineNumbers = showLineNumbers,
+        gutter = {
+            LineNumberGutterChunk(
+                textLayoutResult = layoutResult,
+                text = chunkText,
+                startLineNumber = startLineNumber,
+                maxLineNumber = maxLineNumber,
+            )
+        },
+    ) {
+        BasicText(
+            text = chunkText,
+            style = textStyle,
+            onTextLayout = { layoutResult = it },
+        )
+    }
+}
+
+@Composable
+private fun EditorChunkLayout(
+    showLineNumbers: Boolean,
+    gutter: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    val density = LocalDensity.current
+    Layout(
+        content = {
+            content()
+            if (showLineNumbers) gutter()
+        },
+        modifier = modifier.fillMaxWidth(),
+    ) { measurables, constraints ->
+        val hasGutter = measurables.size > 1
+        val gutterWidthPx = if (hasGutter) with(density) { LineNumberGutterWidthChunk.roundToPx() } else 0
+
+        val textPlaceable = measurables[0].measure(
+            constraints.copy(
+                minWidth = 0,
+                maxWidth = (constraints.maxWidth - gutterWidthPx).coerceAtLeast(0),
+            )
+        )
+        val gutterPlaceable = if (hasGutter) {
+            measurables[1].measure(
+                Constraints(
+                    minWidth = gutterWidthPx,
+                    maxWidth = gutterWidthPx,
+                    minHeight = textPlaceable.height,
+                    maxHeight = textPlaceable.height,
+                )
+            )
+        } else null
+
+        layout(constraints.maxWidth, textPlaceable.height) {
+            gutterPlaceable?.placeRelative(0, 0)
+            textPlaceable.placeRelative(gutterWidthPx, 0)
+        }
+    }
+}
+
+private val LineNumberGutterWidthChunk = 36.dp
+private val LineNumberTextSizeSmall = 10.sp
+
+@Composable
+private fun LineNumberGutterChunk(
+    textLayoutResult: TextLayoutResult?,
+    text: String,
+    startLineNumber: Int,
+    maxLineNumber: Int,
+) {
+    val density = LocalDensity.current
+    val lineNumberColor = MaterialTheme.colorScheme.onSurface
+    val digitCount = digitCountForMaxLine(maxLineNumber)
+    val paint = remember(digitCount, lineNumberColor) {
+        Paint().apply {
+            isAntiAlias = true
+            textSize = with(density) {
+                (if (digitCount >= 4) LineNumberTextSizeSmall else LineNumberTextSize).toPx()
+            }
+            color = lineNumberColor.toArgb()
+        }
+    }
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = LineNumberGutterPadding)
+            .clearAndSetSemantics { },
+        onDraw = drawScope@{
+            val layout = textLayoutResult ?: return@drawScope
+            val gutterWidthPx = size.width
+            var currentLogicalLine = startLineNumber
+
+            for (visualLine in 0 until layout.lineCount) {
+                val isNewLogicalLine = if (visualLine == 0) {
+                    true
+                } else {
+                    val lineStart = layout.getLineStart(visualLine)
+                    lineStart > 0 && text.getOrNull(lineStart - 1) == '\n'
+                }
+
+                if (isNewLogicalLine) {
+                    val label = currentLogicalLine.toString()
+                    val textWidth = paint.measureText(label)
+                    val x = gutterWidthPx - textWidth
+                    val y = layout.getLineBaseline(visualLine)
+                    drawContext.canvas.nativeCanvas.drawText(label, x, y, paint)
+                    currentLogicalLine++
+                }
+            }
+        },
+    )
+}
+
+private fun editorChunkTextStyle(color: Color): TextStyle = TextStyle(
+    color = color,
+    fontSize = 14.sp,
+    lineHeight = EditorLineHeight,
+    lineHeightStyle = LineHeightStyle(
+        alignment = LineHeightStyle.Alignment.Proportional,
+        trim = LineHeightStyle.Trim.None,
+    ),
+    platformStyle = PlatformTextStyle(includeFontPadding = false),
+)
 
 private fun digitCountForMaxLine(maxLineNumber: Int): Int = when {
     maxLineNumber < 10 -> 1

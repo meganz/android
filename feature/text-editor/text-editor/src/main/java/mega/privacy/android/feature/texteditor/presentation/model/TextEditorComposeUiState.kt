@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param saveSuccessEvent One-shot event to show "Changes saved" snackbar when save completes successfully.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
  * @param appendSuffix One-shot suffix string to append to the text field during edit-mode load-more; null when consumed.
+ * @param totalLineCount Total number of lines in the document (for view-mode virtualised LazyColumn).
  */
 data class TextEditorComposeUiState(
     val fileName: String = "",
@@ -35,4 +36,5 @@ data class TextEditorComposeUiState(
     val totalLinesLoaded: Int? = null,
     val isFullyLoaded: Boolean = true,
     val appendSuffix: String? = null,
+    val totalLineCount: Int = 0,
 )

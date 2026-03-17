@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.Button
@@ -64,6 +65,7 @@ fun TextEditorScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val textFieldState = rememberTextFieldState()
     val scrollState = rememberScrollState()
+    val lazyListState = rememberLazyListState()
     val readOnly = uiState.mode == TextEditorMode.View
     val density = LocalDensity.current
     val lineHeightPx = with(density) { EditorLineHeight.toPx() }
@@ -203,18 +205,29 @@ fun TextEditorScreen(
                 }
 
                 else -> {
-                    val onLoadMore = remember(viewModel) { viewModel::onLoadMoreLines }
-                    val onAppendSuffixConsumed = remember(viewModel) { viewModel::consumeAppendSuffix }
-                    TextEditorContent(
-                        textFieldState = textFieldState,
-                        scrollState = scrollState,
-                        showLineNumbers = uiState.showLineNumbers,
-                        readOnly = readOnly,
-                        appendSuffix = uiState.appendSuffix,
-                        onAppendSuffixConsumed = onAppendSuffixConsumed,
-                        hasMoreLines = uiState.hasMoreLines,
-                        onNearEndOfScroll = onLoadMore,
-                    )
+                    if (readOnly) {
+                        TextEditorContentViewMode(
+                            lazyListState = lazyListState,
+                            chunkCount = viewModel.getChunkCount(),
+                            chunkTextProvider = { viewModel.getChunkText(it) },
+                            chunkStartLineProvider = { viewModel.getChunkStartLine(it) },
+                            totalLineCount = uiState.totalLineCount,
+                            showLineNumbers = uiState.showLineNumbers,
+                        )
+                    } else {
+                        val onLoadMore = remember(viewModel) { viewModel::onLoadMoreLines }
+                        val onAppendSuffixConsumed = remember(viewModel) { viewModel::consumeAppendSuffix }
+                        TextEditorContent(
+                            textFieldState = textFieldState,
+                            scrollState = scrollState,
+                            showLineNumbers = uiState.showLineNumbers,
+                            readOnly = readOnly,
+                            appendSuffix = uiState.appendSuffix,
+                            onAppendSuffixConsumed = onAppendSuffixConsumed,
+                            hasMoreLines = uiState.hasMoreLines,
+                            onNearEndOfScroll = onLoadMore,
+                        )
+                    }
                 }
             }
             if (uiState.isRestoringContent) {

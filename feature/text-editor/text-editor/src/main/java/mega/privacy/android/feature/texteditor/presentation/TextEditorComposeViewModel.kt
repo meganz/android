@@ -40,6 +40,9 @@ private const val LINES_TO_ADD_ON_LOAD_MORE = 1000
 /** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
 private const val CHUNK_SIZE_LINES = 500
 
+/** Number of lines per chunk in view mode (virtualised LazyColumn). */
+internal const val CHUNK_SIZE = 200
+
 /**
  * ViewModel for the Compose text editor screen.
  * Uses MVI-style intent handling: UI emits actions via [onMenuAction], ViewModel processes them.
@@ -115,6 +118,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                 errorEvent = consumed,
                                 hasMoreLines = fullContentLines.size > displayLineCap,
                                 totalLinesLoaded = fullContentLines.size,
+                                totalLineCount = fullContentLines.size,
                             )
                         }
                     }
@@ -209,11 +213,26 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     content = displayedContent,
                     hasMoreLines = hasMoreLines,
                     totalLinesLoaded = totalLinesLoaded,
+                    totalLineCount = fullContentLines.size,
                     isRestoringContent = false,
                 )
             }
         }
     }
+
+    /** Number of chunks for view-mode virtualised list (fixed [CHUNK_SIZE] lines per chunk). */
+    fun getChunkCount(): Int = Math.ceilDiv(fullContentLines.size, CHUNK_SIZE)
+
+    /** Text for chunk [chunkIndex] in view mode (read-only slice of [fullContentLines]). */
+    fun getChunkText(chunkIndex: Int): String {
+        val start = chunkIndex * CHUNK_SIZE
+        val end = (start + CHUNK_SIZE).coerceAtMost(fullContentLines.size)
+        if (start >= fullContentLines.size) return ""
+        return fullContentLines.subList(start, end).joinToString("\n")
+    }
+
+    /** 1-based starting line number for chunk [chunkIndex] in view mode. */
+    fun getChunkStartLine(chunkIndex: Int): Int = chunkIndex * CHUNK_SIZE + 1
 
     /** Shows the discard-changes confirmation dialog (Edit mode, unsaved). */
     fun requestShowDiscardDialog() {
@@ -336,6 +355,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                     mode = TextEditorMode.View,
                                     hasMoreLines = false,
                                     totalLinesLoaded = lines.size,
+                                    totalLineCount = lines.size,
                                     transferEvent = triggered(
                                         TransferTriggerEvent.StartUpload.TextFile(
                                             path = saveResult.tempPath,
@@ -440,4 +460,5 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val hasMoreLines: Boolean,
         val totalLinesLoaded: Int,
     )
+
 }
