@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.extension.getIcon
 import mega.privacy.android.core.nodecomponents.extension.getSharesIcon
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
@@ -121,10 +121,10 @@ class NodeUiItemMapper @Inject constructor(
         return if (node.isNodeKeyDecrypted.not()) {
             if (node is FileNode)
                 LocalizedText.PluralsRes(
-                    resId = R.plurals.shared_items_verify_credentials_undecrypted_file,
+                    resId = NodesR.plurals.shared_items_verify_credentials_undecrypted_file,
                     quantity = 1
                 )
-            else LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+            else LocalizedText.StringRes(NodesR.string.shared_items_verify_credentials_undecrypted_folder)
         } else {
             LocalizedText.Literal(node.name)
         }

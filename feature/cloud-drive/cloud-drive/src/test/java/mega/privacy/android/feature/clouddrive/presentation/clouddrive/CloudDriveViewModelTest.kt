@@ -18,7 +18,7 @@ import kotlinx.coroutines.test.setMain
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
@@ -368,7 +368,7 @@ class CloudDriveViewModelTest {
         advanceUntilIdle()
         underTest.uiState.test {
             val updatedState = awaitItem()
-            assertThat(updatedState.title).isEqualTo(LocalizedText.StringRes(resId = R.string.shared_items_verify_credentials_undecrypted_folder))
+            assertThat(updatedState.title).isEqualTo(LocalizedText.StringRes(resId = NodesR.string.shared_items_verify_credentials_undecrypted_folder))
         }
     }
 

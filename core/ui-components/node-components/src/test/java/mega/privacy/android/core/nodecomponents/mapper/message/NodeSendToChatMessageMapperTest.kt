@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +42,7 @@ class NodeSendToChatMessageMapperTest {
             )
         val expected =
             mContext.getString(
-                R.string.files_send_to_chat_error,
+                NodesR.string.files_send_to_chat_error,
             )
 
         assertThat(underTest).isEqualTo(expected)
@@ -59,7 +59,7 @@ class NodeSendToChatMessageMapperTest {
             )
         val expected =
             mContext.resources.getQuantityString(
-                R.plurals.files_send_to_chat_success,
+                NodesR.plurals.files_send_to_chat_success,
                 1
             )
         assertThat(underTest).isEqualTo(expected)
@@ -76,7 +76,7 @@ class NodeSendToChatMessageMapperTest {
             )
         val expected =
             mContext.resources.getQuantityString(
-                R.plurals.files_send_to_chat_success,
+                NodesR.plurals.files_send_to_chat_success,
                 2
             )
         assertThat(underTest).isEqualTo(expected)

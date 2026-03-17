@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import javax.inject.Inject
 
@@ -24,23 +24,23 @@ class NodeVersionHistoryRemoveMessageMapper @Inject constructor(
             val versionsDeleted =
                 result.totalRequestedToDelete - result.totalNotDeleted
             val firstLine = context.getString(
-                R.string.version_history_deleted_erroneously
+                NodesR.string.version_history_deleted_erroneously
             )
             val secondLine = context.resources.getQuantityString(
-                R.plurals.versions_deleted_succesfully,
+                NodesR.plurals.versions_deleted_succesfully,
                 versionsDeleted,
                 versionsDeleted
             )
             val thirdLine = context.resources.getQuantityString(
-                R.plurals.versions_not_deleted,
+                NodesR.plurals.versions_not_deleted,
                 result.totalNotDeleted,
                 result.totalNotDeleted
             )
             "$firstLine\n$secondLine\n$thirdLine"
         }
 
-        is Throwable -> context.getString(R.string.general_text_error)
+        is Throwable -> context.getString(NodesR.string.general_text_error)
 
-        else -> context.getString(R.string.version_history_deleted)
+        else -> context.getString(NodesR.string.version_history_deleted)
     }
 }

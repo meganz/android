@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import javax.inject.Inject
+import mega.privacy.android.shard.nodes.R as NodesR
 
 class SelectVideoItemUiEntityMapper @Inject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
@@ -39,10 +40,10 @@ class SelectVideoItemUiEntityMapper @Inject constructor(
         return if (node.isNodeKeyDecrypted.not()) {
             if (node is FileNode)
                 LocalizedText.PluralsRes(
-                    resId = R.plurals.shared_items_verify_credentials_undecrypted_file,
+                    resId = NodesR.plurals.shared_items_verify_credentials_undecrypted_file,
                     quantity = 1
                 )
-            else LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+            else LocalizedText.StringRes(NodesR.string.shared_items_verify_credentials_undecrypted_folder)
         } else {
             LocalizedText.Literal(node.name)
         }

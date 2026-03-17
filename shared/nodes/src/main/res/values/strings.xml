@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- TODO: we need to move this to strings_shared.xml -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingQuantity,MissingTranslation">
     <string name="upload_files">Upload files</string>
     <string name="upload_folder">Upload folder</string>
@@ -259,6 +258,6 @@
     <string name="error_not_enough_free_space">Not enough free space on your device</string>
     <string name="error_temporary_unavaible">Resource temporarily not available, please try again later</string>
 
-    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner’s account is over its storage quota. -->
+    <!-- A message shown when uploading, copying or moving something to an incoming share and the owner's account is over its storage quota. -->
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
 </resources>

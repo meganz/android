@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.model.NodeSubtitleText
 import mega.privacy.android.core.nodecomponents.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -528,7 +528,7 @@ class NodeUiItemMapperTest {
 
             assertThat(result).hasSize(1)
             assertThat(result[0].title).isEqualTo(
-                LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+                LocalizedText.StringRes(NodesR.string.shared_items_verify_credentials_undecrypted_folder)
             )
         }
 
@@ -573,7 +573,7 @@ class NodeUiItemMapperTest {
             assertThat(result).hasSize(1)
             assertThat(result[0].title).isEqualTo(
                 LocalizedText.PluralsRes(
-                    R.plurals.shared_items_verify_credentials_undecrypted_file,
+                    NodesR.plurals.shared_items_verify_credentials_undecrypted_file,
                     1
                 )
             )
@@ -633,7 +633,7 @@ class NodeUiItemMapperTest {
 
             assertThat(result).hasSize(1)
             assertThat(result[0].title).isEqualTo(
-                LocalizedText.StringRes(R.string.shared_items_verify_credentials_undecrypted_folder)
+                LocalizedText.StringRes(NodesR.string.shared_items_verify_credentials_undecrypted_folder)
             )
         }
 

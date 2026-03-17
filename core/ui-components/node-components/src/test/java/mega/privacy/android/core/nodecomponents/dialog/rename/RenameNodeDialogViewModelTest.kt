@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeNameErrorMessageMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -197,9 +197,9 @@ class RenameNodeDialogViewModelTest {
     }
 
     private fun provideValidationParameters(): List<Pair<InvalidNameType, Int>> = listOf(
-        InvalidNameType.BLANK_NAME to R.string.invalid_string,
+        InvalidNameType.BLANK_NAME to NodesR.string.invalid_string,
         InvalidNameType.INVALID_NAME to sharedR.string.general_invalid_characters_defined,
-        InvalidNameType.NAME_ALREADY_EXISTS to R.string.same_file_name_warning,
-        InvalidNameType.NO_EXTENSION to R.string.file_without_extension_warning,
+        InvalidNameType.NAME_ALREADY_EXISTS to NodesR.string.same_file_name_warning,
+        InvalidNameType.NO_EXTENSION to NodesR.string.file_without_extension_warning,
     )
 }

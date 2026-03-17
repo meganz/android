@@ -5,7 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +31,11 @@ class NodeMoveRequestMessageMapperTest {
             )
         )
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_move_node_snackbar_success, 1, 1)
+            mContext.resources.getQuantityString(
+                NodesR.plurals.general_move_node_snackbar_success,
+                1,
+                1
+            )
 
         assertThat(underTest).isEqualTo(expected)
     }
@@ -47,7 +51,7 @@ class NodeMoveRequestMessageMapperTest {
                 )
             )
         val expected = mContext.resources.getQuantityString(
-            R.plurals.general_move_node_snackbar_success,
+            NodesR.plurals.general_move_node_snackbar_success,
             mockMoveCount,
             mockMoveCount
         )
@@ -65,7 +69,11 @@ class NodeMoveRequestMessageMapperTest {
                 )
             )
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_move_node_snackbar_fail, 1, 1)
+            mContext.resources.getQuantityString(
+                NodesR.plurals.general_move_node_snackbar_fail,
+                1,
+                1
+            )
 
         assertThat(underTest).isEqualTo(expected)
     }
@@ -81,7 +89,7 @@ class NodeMoveRequestMessageMapperTest {
                 )
             )
         val expected = mContext.resources.getQuantityString(
-            R.plurals.general_move_node_snackbar_fail,
+            NodesR.plurals.general_move_node_snackbar_fail,
             mockMoveCount,
             mockMoveCount
         )
@@ -100,13 +108,13 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_success,
+                NodesR.plurals.general_move_node_snackbar_concat_success,
                 1,
                 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_fail,
+                NodesR.plurals.general_move_node_snackbar_concat_fail,
                 1,
                 1
             )
@@ -128,13 +136,13 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_success,
+                NodesR.plurals.general_move_node_snackbar_concat_success,
                 1,
                 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_fail,
+                NodesR.plurals.general_move_node_snackbar_concat_fail,
                 mockErrorCount,
                 mockErrorCount
             )
@@ -155,13 +163,13 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_success,
+                NodesR.plurals.general_move_node_snackbar_concat_success,
                 mockMoveCount - 1,
                 mockMoveCount - 1
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_fail,
+                NodesR.plurals.general_move_node_snackbar_concat_fail,
                 1,
                 1
             )
@@ -183,13 +191,13 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_success,
+                NodesR.plurals.general_move_node_snackbar_concat_success,
                 mockMoveCount - mockErrorCount,
                 mockMoveCount - mockErrorCount
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.general_move_node_snackbar_concat_fail,
+                NodesR.plurals.general_move_node_snackbar_concat_fail,
                 mockErrorCount,
                 mockErrorCount
             )
@@ -212,13 +220,13 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected = "${
             mContext.resources.getQuantityString(
-                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
                 mockShareCount - mockErrorCount,
                 mockShareCount - mockErrorCount
             )
         }${
             mContext.resources.getQuantityString(
-                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed_concat,
+                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed_concat,
                 mockErrorCount,
                 mockErrorCount
             )
@@ -238,7 +246,7 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected =
             mContext.resources.getQuantityString(
-                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
+                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
                 1,
                 1
             )
@@ -258,7 +266,7 @@ class NodeMoveRequestMessageMapperTest {
             )
         val expected =
             mContext.resources.getQuantityString(
-                R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
                 1,
                 1
             )

@@ -23,14 +23,15 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.list.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.model.label.ChangeLabelState
 import mega.privacy.android.core.nodecomponents.model.label.Label
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.icon.pack.IconPack
-import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.core.nodecomponents.R
 
 @Composable
 internal fun ChangeLabelBottomSheetContentM3(
@@ -88,7 +89,7 @@ private fun ChangeLabelBottomSheetContentM3(
         MegaText(
             modifier = Modifier
                 .padding(horizontal = 16.dp),
-            text = stringResource(id = R.string.title_label),
+            text = stringResource(id = NodesR.string.title_label),
             textColor = TextColor.Secondary,
             style = AppTheme.typography.titleMedium
         )
@@ -127,7 +128,7 @@ private fun ChangeLabelBottomSheetContentM3(
                 item {
                     FlexibleLineListItem(
                         modifier = Modifier.fillMaxWidth(),
-                        title = stringResource(id = R.string.action_remove_label),
+                        title = stringResource(id = NodesR.string.action_remove_label),
                         leadingElement = {
                             MegaIcon(
                                 modifier = Modifier
@@ -154,37 +155,37 @@ private fun ChangeLabelBottomSheetPreview() {
         labelList = listOf(
             Label(
                 label = NodeLabel.RED,
-                labelName = sharedResR.string.label_red,
+                labelName = sharedR.string.label_red,
                 labelColor = R.color.label_red,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.ORANGE,
-                labelName = sharedResR.string.label_orange,
+                labelName = sharedR.string.label_orange,
                 labelColor = R.color.label_orange,
                 isSelected = true
             ),
             Label(
                 label = NodeLabel.YELLOW,
-                labelName = sharedResR.string.label_yellow,
+                labelName = sharedR.string.label_yellow,
                 labelColor = R.color.label_yellow,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.GREEN,
-                labelName = sharedResR.string.label_green,
+                labelName = sharedR.string.label_green,
                 labelColor = R.color.label_green,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.BLUE,
-                labelName = sharedResR.string.label_blue,
+                labelName = sharedR.string.label_blue,
                 labelColor = R.color.label_blue,
                 isSelected = false
             ),
             Label(
                 label = NodeLabel.PURPLE,
-                labelName = sharedResR.string.label_purple,
+                labelName = sharedR.string.label_purple,
                 labelColor = R.color.label_purple,
                 isSelected = false
             ),

@@ -12,7 +12,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.test.AnalyticsTestRule
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedResR
 import org.junit.Rule
 import org.junit.Test
@@ -63,10 +63,10 @@ class HomeFabOptionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithText(R.string.upload_files).assertExists()
-            onNodeWithText(R.string.upload_folder).assertExists()
-            onNodeWithText(R.string.menu_scan_document).assertExists()
-            onNodeWithText(R.string.menu_take_picture).assertExists()
+            onNodeWithText(NodesR.string.upload_files).assertExists()
+            onNodeWithText(NodesR.string.upload_folder).assertExists()
+            onNodeWithText(NodesR.string.menu_scan_document).assertExists()
+            onNodeWithText(NodesR.string.menu_take_picture).assertExists()
             onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_syn_button_option).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_backup_button_option).assertExists()
@@ -81,7 +81,7 @@ class HomeFabOptionsBottomSheetTest {
             onNodeWithText(sharedResR.string.general_upload_label).assertExists()
             onNodeWithText(sharedResR.string.settings_section_sync).assertExists()
             onNodeWithText(sharedResR.string.general_chat).assertExists()
-            onNodeWithText(R.string.fab_label_new_chat).assertExists()
+            onNodeWithText(NodesR.string.fab_label_new_chat).assertExists()
         }
     }
 

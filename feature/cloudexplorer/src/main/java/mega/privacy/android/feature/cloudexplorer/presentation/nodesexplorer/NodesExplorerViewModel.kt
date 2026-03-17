@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeUiItemMapper
 import mega.privacy.android.domain.entity.node.NodesLoadingState
@@ -27,6 +26,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import timber.log.Timber
+import mega.privacy.android.shard.nodes.R as NodesR
 
 @HiltViewModel(assistedFactory = NodesExplorerViewModel.Factory::class)
 class NodesExplorerViewModel @AssistedInject constructor(
@@ -102,7 +102,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
                 getNodeInfoByIdUseCase(args.nodeId)
             }.onSuccess { nodeInfo ->
                 val folderName = if (nodeInfo?.isNodeKeyDecrypted == false) {
-                    LocalizedText.StringRes(resId = R.string.shared_items_verify_credentials_undecrypted_folder)
+                    LocalizedText.StringRes(resId = NodesR.string.shared_items_verify_credentials_undecrypted_folder)
                 } else {
                     LocalizedText.Literal(nodeInfo?.name ?: "")
                 }

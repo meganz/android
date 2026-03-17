@@ -93,6 +93,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenAlbumAddItemsButtonPressed
 import mega.privacy.mobile.analytics.event.PhotoItemSelected
 import mega.privacy.mobile.analytics.event.PhotoItemSelectedEvent
 import timber.log.Timber
+import mega.privacy.android.shard.nodes.R as NodesR
 
 @HiltViewModel(assistedFactory = AlbumContentViewModel.Factory::class)
 class AlbumContentViewModel @AssistedInject constructor(
@@ -703,7 +704,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                     isSensitive = true
                 ) { count ->
                     val message = LocalizedText.PluralsRes(
-                        resId = R.plurals.hidden_nodes_result_message,
+                        resId = NodesR.plurals.hidden_nodes_result_message,
                         quantity = count,
                         formatArgs = listOf(count)
                     )

@@ -7,8 +7,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import mega.android.core.ui.components.dialogs.BasicDialog
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.shard.nodes.R as NodesR
 
 /**
  * Dialog to move nodes to rubbish bin or delete them permanently
@@ -27,9 +27,9 @@ fun MoveToRubbishOrDeleteNodeDialogM3(
 ) {
     val (message, positiveText) = remember(isNodeInRubbish) {
         if (isNodeInRubbish) {
-            R.string.confirmation_delete_from_mega to R.string.rubbish_bin_delete_confirmation_dialog_button_delete
+            NodesR.string.confirmation_delete_from_mega to NodesR.string.rubbish_bin_delete_confirmation_dialog_button_delete
         } else {
-            R.string.confirmation_move_to_rubbish to sharedR.string.general_move
+            NodesR.string.confirmation_move_to_rubbish to sharedR.string.general_move
         }
     }
 

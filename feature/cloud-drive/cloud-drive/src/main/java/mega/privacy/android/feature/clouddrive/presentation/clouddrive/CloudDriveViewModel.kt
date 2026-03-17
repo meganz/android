@@ -24,7 +24,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatusMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeSortConfigurationUiMapper
@@ -70,6 +69,7 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
 import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
 import timber.log.Timber
+import mega.privacy.android.shared.resources.R as sharedR
 
 @HiltViewModel(assistedFactory = CloudDriveViewModel.Factory::class)
 class CloudDriveViewModel @AssistedInject constructor(
@@ -280,7 +280,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             getNodeInfoByIdUseCase(uiState.value.currentFolderId)
         }.onSuccess { nodeInfo ->
             val title = if (nodeInfo?.isNodeKeyDecrypted == false) {
-                LocalizedText.StringRes(resId = R.string.shared_items_verify_credentials_undecrypted_folder)
+                LocalizedText.StringRes(resId = sharedR.string.shared_items_verify_credentials_undecrypted_folder)
             } else {
                 LocalizedText.Literal(nodeInfo?.name ?: "")
             }

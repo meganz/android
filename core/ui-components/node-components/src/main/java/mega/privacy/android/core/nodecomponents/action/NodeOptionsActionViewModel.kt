@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
@@ -687,7 +687,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
                     val message = if (isHidden) {
                         LocalizedText.PluralsRes(
-                            resId = R.plurals.hidden_nodes_result_message,
+                            resId = NodesR.plurals.hidden_nodes_result_message,
                             quantity = selectedNodes.size,
                             formatArgs = listOf(selectedNodes.size)
                         )

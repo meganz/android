@@ -11,7 +11,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -59,9 +59,9 @@ fun UploadingFiles(
         onConsumed = viewModel::onConsumeUploadErrorEvent
     ) { error ->
         if (error is IOException) {
-            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.error_not_enough_free_space))
+            snackbarHostState?.showAutoDurationSnackbar(context.getString(NodesR.string.error_not_enough_free_space))
         } else {
-            snackbarHostState?.showAutoDurationSnackbar(context.getString(R.string.error_temporary_unavaible))
+            snackbarHostState?.showAutoDurationSnackbar(context.getString(NodesR.string.error_temporary_unavaible))
         }
     }
 

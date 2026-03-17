@@ -7,7 +7,7 @@ import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -177,7 +177,7 @@ class OfflineNodeActionsViewModelTest {
             whenever(offlineFileInformation.isFolder).thenReturn(true)
             whenever(offlineFileInformation.handle).thenReturn("123")
             underTest.handleShareOfflineNodes(listOf(offlineFileInformation), false)
-            verify(snackBarHandler).postSnackbarMessage(R.string.error_server_connection_problem)
+            verify(snackBarHandler).postSnackbarMessage(NodesR.string.error_server_connection_problem)
         }
 
     @ParameterizedTest(name = "File type is {0}")

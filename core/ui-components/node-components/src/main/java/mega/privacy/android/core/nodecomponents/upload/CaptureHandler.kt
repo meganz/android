@@ -8,7 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.sharedcomponents.handler.rememberAppSettingsHandler
 import mega.privacy.android.navigation.MegaActivityResultContract
 import mega.privacy.android.navigation.camera.CameraArg
@@ -49,7 +49,7 @@ fun rememberCaptureHandler(
 
     val appSettingsHandler = rememberAppSettingsHandler(
         message = context.getString(SharedR.string.camera_denied_info_message),
-        actionLabel = context.getString(R.string.general_allow),
+        actionLabel = context.getString(NodesR.string.general_allow),
         CAMERA,
         onPermissionsGranted = {
             takePictureLauncher.launch(

@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.INVALID_CHARACTERS
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.node.NodeId
@@ -91,14 +91,14 @@ fun NewTextFileNodeDialog(
                     onDismiss()
                 }.onFailure {
                     errorMessage = when (it) {
-                        is EmptyNodeNameException -> context.getString(R.string.invalid_string)
+                        is EmptyNodeNameException -> context.getString(NodesR.string.invalid_string)
                         is DotNameException -> context.getString(sharedR.string.general_invalid_dot_name_warning)
                         is DoubleDotNameException -> context.getString(sharedR.string.general_invalid_double_dot_name_warning)
                         is InvalidNodeNameException -> context.getString(
                             sharedR.string.general_invalid_characters_defined, INVALID_CHARACTERS
                         )
 
-                        is NodeNameAlreadyExistsException -> context.getString(R.string.same_file_name_warning)
+                        is NodeNameAlreadyExistsException -> context.getString(NodesR.string.same_file_name_warning)
                         else -> null
                     }
                 }

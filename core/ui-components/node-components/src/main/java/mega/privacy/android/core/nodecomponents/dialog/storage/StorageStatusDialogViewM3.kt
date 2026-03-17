@@ -45,10 +45,11 @@ import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.core.nodecomponents.R
 
 // Constants for test tags
 internal const val TITLE_TAG_M3 = "storage_status_dialog_m3:text_title"
@@ -187,7 +188,7 @@ internal fun StorageStatusDialogViewM3(
 
                             Box(modifier = Modifier.testTag(ACHIEVEMENT_TAG_M3)) {
                                 DialogButton(
-                                    buttonText = stringResource(R.string.button_bonus_almost_full_warning),
+                                    buttonText = stringResource(NodesR.string.button_bonus_almost_full_warning),
                                     onButtonClicked = achievementButtonClickListener,
                                 )
                             }
@@ -284,7 +285,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
         StorageState.Orange -> {
             imageResource = R.drawable.ic_storage_almost_full
             contentText = String.format(
-                context.getString(R.string.text_almost_full_warning),
+                context.getString(NodesR.string.text_almost_full_warning),
                 storageString,
                 transferString
             )
@@ -293,31 +294,33 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
         else -> {
             imageResource = R.drawable.ic_storage_full
             contentText = String.format(
-                context.getString(R.string.text_storage_full_warning),
+                context.getString(NodesR.string.text_storage_full_warning),
                 storageString,
                 transferString
             )
         }
     }
-    titleText = context.getString(R.string.action_upgrade_account)
+    titleText = context.getString(NodesR.string.action_upgrade_account)
 
     when (state.accountType) {
         AccountType.PRO_III -> {
             when (state.storageState) {
                 StorageState.Orange -> {
-                    contentText = context.getString(R.string.text_almost_full_warning_pro3_account)
+                    contentText =
+                        context.getString(NodesR.string.text_almost_full_warning_pro3_account)
                 }
 
                 StorageState.Red -> {
-                    contentText = context.getString(R.string.text_storage_full_warning_pro3_account)
+                    contentText =
+                        context.getString(NodesR.string.text_storage_full_warning_pro3_account)
                 }
 
                 else -> {}
             }
             verticalActionButtonText =
-                context.getString(R.string.button_custom_almost_full_warning)
+                context.getString(NodesR.string.button_custom_almost_full_warning)
             horizontalActionButtonText =
-                context.getString(R.string.button_custom_almost_full_warning)
+                context.getString(NodesR.string.button_custom_almost_full_warning)
         }
 
         AccountType.PRO_LITE, AccountType.PRO_I,
@@ -327,7 +330,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
             when (state.storageState) {
                 StorageState.Orange -> {
                     contentText = String.format(
-                        context.getString(R.string.text_almost_full_warning_pro_account),
+                        context.getString(NodesR.string.text_almost_full_warning_pro_account),
                         storageString,
                         transferString
                     )
@@ -335,7 +338,7 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
 
                 StorageState.Red -> {
                     contentText = String.format(
-                        context.getString(R.string.text_storage_full_warning_pro_account),
+                        context.getString(NodesR.string.text_storage_full_warning_pro_account),
                         storageString,
                         transferString
                     )
@@ -351,19 +354,19 @@ private fun getDialogDetail(context: Context, state: StorageStatusDialogState): 
 
         else -> {
             verticalActionButtonText =
-                context.getString(R.string.button_plans_almost_full_warning)
+                context.getString(NodesR.string.button_plans_almost_full_warning)
             horizontalActionButtonText =
-                context.getString(R.string.button_plans_almost_full_warning)
+                context.getString(NodesR.string.button_plans_almost_full_warning)
         }
     }
 
     if (state.overQuotaAlert) {
         if (state.preWarning) {
-            titleText = context.getString(R.string.action_upgrade_account)
-            contentText = context.getString(R.string.pre_overquota_alert_text)
+            titleText = context.getString(NodesR.string.action_upgrade_account)
+            contentText = context.getString(NodesR.string.pre_overquota_alert_text)
         } else {
-            titleText = context.getString(R.string.overquota_alert_title)
-            contentText = context.getString(R.string.overquota_alert_text)
+            titleText = context.getString(NodesR.string.overquota_alert_title)
+            contentText = context.getString(NodesR.string.overquota_alert_text)
         }
     }
 

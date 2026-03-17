@@ -11,7 +11,7 @@ import mega.android.core.ui.components.list.SecondaryHeaderListItem
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionItem
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -51,7 +51,7 @@ fun HomeFabOptionsBottomSheet(
             enableClick = false
         )
         UploadOptionItem(
-            text = stringResource(id = R.string.upload_files),
+            text = stringResource(id = NodesR.string.upload_files),
             icon = IconPack.Medium.Thin.Outline.FileUpload,
             testTag = TEST_TAG_UPLOAD_FILES_ACTION,
             onClick = {
@@ -60,7 +60,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         UploadOptionItem(
-            text = stringResource(id = R.string.upload_folder),
+            text = stringResource(id = NodesR.string.upload_folder),
             icon = IconPack.Medium.Thin.Outline.FolderArrow,
             testTag = TEST_TAG_UPLOAD_FOLDER_ACTION,
             onClick = {
@@ -69,7 +69,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         UploadOptionItem(
-            text = stringResource(id = R.string.menu_scan_document),
+            text = stringResource(id = NodesR.string.menu_scan_document),
             icon = IconPack.Medium.Thin.Outline.FileScan,
             testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
             onClick = {
@@ -78,7 +78,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         UploadOptionItem(
-            text = stringResource(id = R.string.menu_take_picture),
+            text = stringResource(id = NodesR.string.menu_take_picture),
             icon = IconPack.Medium.Thin.Outline.Camera,
             testTag = TEST_TAG_CAPTURE_ACTION,
             onClick = {
@@ -130,7 +130,7 @@ fun HomeFabOptionsBottomSheet(
             enableClick = false
         )
         UploadOptionItem(
-            text = stringResource(R.string.fab_label_new_chat),
+            text = stringResource(NodesR.string.fab_label_new_chat),
             icon = IconPack.Medium.Thin.Outline.MessageChatCircle,
             testTag = TEST_TAG_NEW_CHAT_ACTION,
             onClick = {

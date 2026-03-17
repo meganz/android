@@ -20,7 +20,7 @@ import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnChangeNodeExtensionDialogShown
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnLoadNodeName
 import mega.privacy.android.core.nodecomponents.dialog.rename.RenameNodeDialogAction.OnRenameConfirmed
@@ -141,9 +141,9 @@ private fun RenameConfirmationDialog(
 ) {
     BasicDialog(
         modifier = Modifier.testTag(RENAME_NODE_DIALOG_CONFIRMATION_DIALOG),
-        title = stringResource(id = R.string.file_extension_change_title),
-        description = stringResource(id = R.string.file_extension_change_warning),
-        positiveButtonText = stringResource(id = R.string.action_change_anyway),
+        title = stringResource(id = NodesR.string.file_extension_change_title),
+        description = stringResource(id = NodesR.string.file_extension_change_warning),
+        positiveButtonText = stringResource(id = NodesR.string.action_change_anyway),
         negativeButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = {
             onChangeNodeExtension(newNodeName)

@@ -15,9 +15,9 @@ import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.core.nodecomponents.R
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
-import mega.privacy.android.shared.resources.R as sharedResR
+import mega.privacy.android.shard.nodes.R as NodesR
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Dialog to show when a node is taken down
@@ -36,18 +36,18 @@ fun TakeDownDialog(
         title = SpannableText(
             stringResource(
                 id = if (isFolder) {
-                    R.string.dialog_taken_down_folder_title
+                    NodesR.string.dialog_taken_down_folder_title
                 } else {
-                    R.string.dialog_taken_down_file_title
+                    NodesR.string.dialog_taken_down_file_title
                 }
             )
         ),
         description = SpannableText(
             text = stringResource(
                 if (isFolder) {
-                    R.string.dialog_taken_down_folder_description
+                    NodesR.string.dialog_taken_down_folder_description
                 } else {
-                    R.string.dialog_taken_down_file_description
+                    NodesR.string.dialog_taken_down_file_description
                 }
             ),
             annotations = mapOf(
@@ -65,9 +65,9 @@ fun TakeDownDialog(
                 megaNavigator.openTakedownPolicyLink(context)
             }
         ),
-        positiveButtonText = stringResource(sharedResR.string.general_ok),
+        positiveButtonText = stringResource(sharedR.string.general_ok),
         onPositiveButtonClicked = onDismiss,
-        negativeButtonText = stringResource(R.string.dispute_takendown_file),
+        negativeButtonText = stringResource(NodesR.string.dispute_takendown_file),
         onNegativeButtonClicked = {
             megaNavigator.openDisputeTakedownLink(context)
             onDismiss()

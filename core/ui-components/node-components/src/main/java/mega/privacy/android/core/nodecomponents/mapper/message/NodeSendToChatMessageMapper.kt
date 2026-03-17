@@ -2,7 +2,7 @@ package mega.privacy.android.core.nodecomponents.mapper.message
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import mega.privacy.android.core.nodecomponents.R
+import mega.privacy.android.shard.nodes.R as NodesR
 import mega.privacy.android.domain.entity.node.ChatRequestResult
 import javax.inject.Inject
 
@@ -23,12 +23,12 @@ class NodeSendToChatMessageMapper @Inject constructor(
             is ChatRequestResult.ChatRequestAttachNode -> {
                 when {
                     request.isAllRequestError -> {
-                        context.getString(R.string.files_send_to_chat_error)
+                        context.getString(NodesR.string.files_send_to_chat_error)
                     }
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            R.plurals.files_send_to_chat_success,
+                            NodesR.plurals.files_send_to_chat_success,
                             request.successCount
                         )
                     }
