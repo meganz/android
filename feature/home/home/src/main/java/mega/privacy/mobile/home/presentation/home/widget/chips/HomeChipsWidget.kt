@@ -27,9 +27,11 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.destination.ChatListNavKey
 import mega.privacy.android.navigation.destination.FavouritesNavKey
+import mega.privacy.android.navigation.destination.LegacyAudioSectionNavKey
 import mega.privacy.android.navigation.destination.OfflineNavKey
 import mega.privacy.android.navigation.destination.VideoSectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.AudiosChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ChatChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.FavouritesChipButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineChipButtonPressedEvent
@@ -55,6 +57,7 @@ class HomeChipsWidget @Inject constructor(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         HomeChips(
             isVideosChipVisible = !uiState.isMediaRevampPhase2Enabled,
+            isAudiosChipVisible = uiState.isAudiosChipVisible,
             modifier = modifier,
             onNavigate = navigationHandler::navigate
         )
@@ -64,6 +67,7 @@ class HomeChipsWidget @Inject constructor(
 @Composable
 private fun HomeChips(
     isVideosChipVisible: Boolean,
+    isAudiosChipVisible: Boolean,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -91,6 +95,17 @@ private fun HomeChips(
                 onClick = {
                     Analytics.tracker.trackEvent(VideosChipButtonPressedEvent)
                     onNavigate(VideoSectionNavKey)
+                },
+            )
+        }
+        if (isAudiosChipVisible) {
+            MegaChip(
+                content = stringResource(sharedR.string.home_screen_audios_chip_title),
+                selected = false,
+                leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Music),
+                onClick = {
+                    Analytics.tracker.trackEvent(AudiosChipButtonPressedEvent)
+                    onNavigate(LegacyAudioSectionNavKey)
                 },
             )
         }
@@ -126,6 +141,7 @@ private fun HomeChipsPreview() {
                 item {
                     HomeChips(
                         isVideosChipVisible = it,
+                        isAudiosChipVisible = it,
                         onNavigate = {}
                     )
                 }

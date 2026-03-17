@@ -397,3 +397,6 @@ data class FileExplorerNavKey(val action: String) : NavKey {
         const val RESULT_FOLDER_HANDLE = "result_folder_handle"
     }
 }
+
+@Serializable
+data object LegacyAudioSectionNavKey : NavKey

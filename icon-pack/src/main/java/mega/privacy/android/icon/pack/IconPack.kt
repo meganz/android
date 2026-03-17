@@ -167,6 +167,7 @@ import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage01Image
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineImage04ImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineListSmallImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineMessageChatCircleImageVector
+import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineMusicImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineQueueLineImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquareImageVector
 import mega.privacy.android.icon.pack.vectors.createSmallThinOutlineSquares4ImageVector
@@ -639,6 +640,8 @@ public object IconPack : IconPackInterface {
 
                 override val MessageChatCircle: ImageVector by lazy {
                         createSmallThinOutlineMessageChatCircleImageVector() }
+
+                override val Music: ImageVector by lazy { createSmallThinOutlineMusicImageVector() }
 
                 override val QueueLine: ImageVector by lazy {
                         createSmallThinOutlineQueueLineImageVector() }

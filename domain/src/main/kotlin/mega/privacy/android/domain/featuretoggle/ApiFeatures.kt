@@ -121,6 +121,15 @@ enum class ApiFeatures(
         description = "Enable DCIM folder to be selected as Sync/Backup and detect cross device Sync/CU cloud folder conflicts",
         defaultValue = false
     ),
+
+    /**
+     * Enable Audios chip in Home screen
+     */
+    AudiosChipInHome(
+        experimentName = "acih",
+        description = "Enable Audios chip in Home screen",
+        defaultValue = false
+    )
     ;
 
     companion object : FeatureFlagValueProvider {

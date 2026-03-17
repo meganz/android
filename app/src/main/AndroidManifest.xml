@@ -733,6 +733,7 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:theme="@style/Theme.Mega.PhotoEditor" />
         <activity android:name=".presentation.videosection.VideoSectionActivity" />
+        <activity android:name=".presentation.audiosection.AudioSectionActivity" />
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-2135147798858967~2157690671" />
