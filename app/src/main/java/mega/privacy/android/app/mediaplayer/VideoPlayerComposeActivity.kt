@@ -33,8 +33,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -135,7 +134,6 @@ import javax.inject.Inject
 /**
  * The activity for the video player
  */
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @AndroidEntryPoint
 class VideoPlayerComposeActivity : PasscodeActivity() {
     @Inject

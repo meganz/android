@@ -40,8 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import de.palm.composestateevents.EventEffect
@@ -68,10 +67,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
-@OptIn(
-    ExperimentalPermissionsApi::class,
-    ExperimentalMaterialNavigationApi::class
-)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 internal fun CameraCaptureScreen(
     bottomSheetNavigator: BottomSheetNavigator,

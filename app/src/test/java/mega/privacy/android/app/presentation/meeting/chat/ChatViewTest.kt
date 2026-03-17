@@ -13,8 +13,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.analytics.test.AnalyticsTestRule
@@ -233,7 +232,6 @@ class ChatViewTest {
         composeTestRule.onNodeWithText("Last seen a long time ago").assertIsDisplayed()
     }
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     private fun initComposeRuleContent(state: ChatUiState) {
         composeTestRule.setContent {
             CompositionLocalProvider(

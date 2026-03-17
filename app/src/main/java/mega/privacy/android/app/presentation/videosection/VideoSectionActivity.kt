@@ -28,8 +28,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
@@ -100,7 +99,6 @@ import mega.privacy.mobile.analytics.event.PlaylistsTabEvent
 import timber.log.Timber
 import javax.inject.Inject
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @AndroidEntryPoint
 class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null

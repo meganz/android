@@ -55,8 +55,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT
 import androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
 import androidx.media3.ui.PlayerView
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -85,7 +84,7 @@ import mega.privacy.mobile.analytics.event.LoopButtonPressedEvent
 import mega.privacy.mobile.analytics.event.SnapshotButtonPressedEvent
 
 @androidx.annotation.OptIn(UnstableApi::class)
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun VideoPlayerScreen(
     bottomSheetNavigator: BottomSheetNavigator,

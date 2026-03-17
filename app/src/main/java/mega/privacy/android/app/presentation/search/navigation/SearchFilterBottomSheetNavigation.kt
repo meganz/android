@@ -4,15 +4,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
+import androidx.compose.material.navigation.bottomSheet
 import mega.privacy.android.app.presentation.search.LegacySearchViewModel
 import mega.privacy.android.app.presentation.search.view.SearchFilterBottomSheetContent
 
 internal const val searchFilterBottomSheetRoute = "search/filter_bottom_sheet"
 internal const val searchFilterBottomSheetRouteArg = "filter"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.searchFilterBottomSheetNavigation(
     navHostController: NavHostController,
     searchViewModel: LegacySearchViewModel,

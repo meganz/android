@@ -103,6 +103,7 @@ paging = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
 paging-core = { module = "androidx.paging:paging-common", version.ref = "paging" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
 paging-testing = { module = "androidx.paging:paging-testing", version.ref = "paging" }
+compose-material-navigation = { group = "androidx.compose.material", name = "material-navigation" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
 material3-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout" }

@@ -5,8 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.NodeActionsViewModel
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -29,7 +28,6 @@ import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSh
  * @param listToStringWithDelimitersMapper
  * @param modifier Modifier
  */
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun SearchNavHostController(
     viewModel: LegacySearchViewModel,

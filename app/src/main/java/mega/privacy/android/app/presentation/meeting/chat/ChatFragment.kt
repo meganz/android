@@ -20,8 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
@@ -67,7 +66,6 @@ internal class ChatFragment : Fragment() {
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -5,15 +5,13 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import kotlinx.serialization.Serializable
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerViewModel
 
 @Serializable
 internal object VideoPlayerNavigationGraph
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.videoPlayerComposeNavigationGraph(
     navHostController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,

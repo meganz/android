@@ -6,15 +6,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 
 internal const val ConversationRoute = "conversation"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.chatScreen(
     navController: NavHostController,
     bottomSheetNavigator: BottomSheetNavigator,

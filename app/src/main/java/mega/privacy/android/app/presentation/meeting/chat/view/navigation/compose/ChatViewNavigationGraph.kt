@@ -15,8 +15,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.NavType
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.utils.Constants
 import java.net.URLEncoder
@@ -31,7 +30,6 @@ internal const val ChatNavigationRoutePattern =
 internal fun chatNavigationRoutePattern(chatId: Long, action: String, link: String?) =
     "chat/$chatId/$action?link=$link"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.chatViewNavigationGraph(
     bottomSheetNavigator: BottomSheetNavigator,
     navController: NavHostController,

@@ -12,8 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import androidx.compose.material.navigation.BottomSheetNavigator
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.VIDEO_PLAYLIST_DETAIL
@@ -238,7 +237,6 @@ internal fun VideoSectionNavHost(
     }
 }
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun VideoSectionScreen(
     modifier: Modifier,
@@ -281,7 +279,6 @@ internal fun VideoSectionScreen(
 }
 
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 @Composable
 internal fun VideoSectionNavHost(
     onSortOrderClick: () -> Unit,

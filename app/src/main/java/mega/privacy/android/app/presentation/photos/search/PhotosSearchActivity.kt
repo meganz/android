@@ -17,8 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import dagger.hilt.android.AndroidEntryPoint
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
@@ -73,7 +72,6 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import javax.inject.Inject
 
 @AndroidEntryPoint
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal class PhotosSearchActivity : AppCompatActivity(), MegaSnackbarShower {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase

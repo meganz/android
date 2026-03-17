@@ -23,8 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
+import androidx.compose.material.navigation.bottomSheet
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
@@ -35,7 +34,7 @@ import mega.privacy.android.app.presentation.imagepreview.slideshow.view.Slidesh
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheetRoundedShape
 import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
-import mega.privacy.android.shared.original.core.ui.navigation.rememberExtendedBottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.SlideshowSecureModeActivatedEvent
 import javax.inject.Inject
@@ -62,7 +61,6 @@ class SlideshowActivity : BaseActivity() {
 
     override fun shouldSetStatusBarTextColor() = false
 
-    @OptIn(ExperimentalMaterialNavigationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         setupInsets()
         val insetsController = WindowCompat.getInsetsController(window, window.decorView).apply {
@@ -73,7 +71,7 @@ class SlideshowActivity : BaseActivity() {
         registerScreenLockBroadcastReceiver()
 
         setContent {
-            val bottomSheetNavigator = rememberExtendedBottomSheetNavigator()
+            val bottomSheetNavigator = rememberBottomSheetNavigator()
             val navController = rememberNavController(bottomSheetNavigator)
             val systemUiController = rememberSystemUiController()
             val isDarkMode = true

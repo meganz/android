@@ -5,8 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.bottomSheet
+import androidx.compose.material.navigation.bottomSheet
 import mega.privacy.android.app.presentation.node.NodeActionHandler
 import mega.privacy.android.app.presentation.node.view.NodeOptionsBottomSheetContent
 import mega.privacy.android.core.nodecomponents.mapper.FileTypeIconMapper
@@ -16,7 +15,6 @@ internal const val nodeBottomSheetRoute = "search/node_bottom_sheet"
 internal const val nodeBottomSheetRouteNodeIdArg = "node_id"
 internal const val nodeBottomSheetRouteSourceTypeArg = "source_type"
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
 internal fun NavGraphBuilder.nodeBottomSheetNavigation(
     nodeActionHandler: NodeActionHandler,
     navHostController: NavHostController,
