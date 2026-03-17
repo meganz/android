@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -62,6 +63,7 @@ class CloudDriveDocumentDataProviderTest {
     private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper = mock()
     private val addNodeType: AddNodeType = mock()
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper = mock()
+    private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase = mock()
     private val mockedCredentials: UserCredentials = mock()
 
     private lateinit var underTest: CloudDriveDocumentDataProvider
@@ -91,9 +93,11 @@ class CloudDriveDocumentDataProviderTest {
             cloudDriveDocumentRowMapper,
             addNodeType,
             documentIdToNodeIdMapper,
+            monitorPasscodeLockPreferenceUseCase,
             mockedCredentials,
         )
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
+        whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(flowOf(false))
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
         whenever(mockedCredentials.email).thenReturn("test@mega.co.nz")
@@ -122,6 +126,7 @@ class CloudDriveDocumentDataProviderTest {
             cloudDriveDocumentRowMapper = cloudDriveDocumentRowMapper,
             addNodeType = addNodeType,
             documentIdToNodeIdMapper = documentIdToNodeIdMapper,
+            monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
         )
     }
 
@@ -141,6 +146,42 @@ class CloudDriveDocumentDataProviderTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that state is PasscodeLockEnabled when credentials exist and passcode enabled`() =
+        runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+            whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(flowOf(true))
+
+            underTest.state.test {
+                skipItems(1) // skip Initialising
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(
+                    CloudDriveDocumentProviderUiState.PasscodeLockEnabled::class.java
+                )
+                assertThat((state as CloudDriveDocumentProviderUiState.PasscodeLockEnabled).accountName)
+                    .isEqualTo("test@mega.co.nz")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that state is Offline when credentials exist and updateConnectivity false`() =
+        runTest {
+            whenever(getAccountCredentialsUseCase()).thenReturn(mockedCredentials)
+
+            underTest.state.test {
+                skipItems(1) // skip Initialising
+                awaitItem() // may get RootNodeNotLoaded or other; ensure we're past initial
+                underTest.updateConnectivity(false)
+                advanceUntilIdle()
+                val state = awaitItem()
+                assertThat(state).isInstanceOf(CloudDriveDocumentProviderUiState.Offline::class.java)
+                assertThat((state as CloudDriveDocumentProviderUiState.Offline).accountName)
+                    .isEqualTo("test@mega.co.nz")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that state is RootNodeNotLoaded when credentials exist but root node is null`() =

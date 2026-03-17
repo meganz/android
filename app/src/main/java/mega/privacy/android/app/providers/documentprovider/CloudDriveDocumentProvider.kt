@@ -23,6 +23,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.providers.documentprovider.CloudDriveDocumentDataProvider.Companion.CLOUD_DRIVE_ROOT_ID
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.FileNotFoundException
 
@@ -76,16 +77,20 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
 
     override fun onCreate(): Boolean {
         Timber.d("CloudDriveDocumentProvider onCreate called")
+        context?.let { dataProvider.monitorConnectivity(it) }
         applicationScope.launch {
-
             var wasLoggedIn: Boolean? = null
+            var wasOffline: Boolean? = null
             dataProvider.state.collect { state ->
+                Timber.d("CloudDriveDocumentProvider onCreate state=$state")
                 val isLoggedIn = state is HasCredentials
-                if (wasLoggedIn != null && wasLoggedIn != isLoggedIn) {
+                val isOffline = state is CloudDriveDocumentProviderUiState.Offline
+                if ((wasLoggedIn != null && wasLoggedIn != isLoggedIn) || (wasOffline != null && wasOffline != isOffline)) {
                     notifyRootChanged(CLOUD_DRIVE_ROOT_ID)
                     notifyDocumentChanged(CLOUD_DRIVE_ROOT_ID)
                 }
                 wasLoggedIn = isLoggedIn
+                wasOffline = isOffline
                 when (state) {
                     CloudDriveDocumentProviderUiState.Initialising -> {}
 
@@ -102,6 +107,13 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                     )
 
                     is CloudDriveDocumentProviderUiState.FileNotFound -> notifyDocumentChanged(state.documentId)
+
+                    is CloudDriveDocumentProviderUiState.PasscodeLockEnabled -> {
+                        notifyDocumentChanged(CLOUD_DRIVE_ROOT_ID)
+                        notifyChildDocumentsChanged(CLOUD_DRIVE_ROOT_ID)
+                    }
+
+                    is CloudDriveDocumentProviderUiState.Offline -> {}
 
                     is CloudDriveDocumentProviderUiState.RootNodeNotLoaded -> {}
                 }
@@ -166,6 +178,20 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                     dataProvider.loadDocumentInBackground(documentId)
                 }
                 getMatrixCursor(resolveDocumentProjection(projection), withLoadingInfo = true)
+            }
+
+            is CloudDriveDocumentProviderUiState.PasscodeLockEnabled -> {
+                getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getPasscodeLockEnabledString()
+                )
+            }
+
+            is CloudDriveDocumentProviderUiState.Offline -> {
+                getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getOfflineString()
+                )
             }
 
             CloudDriveDocumentProviderUiState.Initialising -> loadDocumentAsync(
@@ -236,6 +262,18 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         }
 
         val result = when (val state = dataProvider.state.value) {
+            is CloudDriveDocumentProviderUiState.PasscodeLockEnabled ->
+                getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getPasscodeLockEnabledString()
+                )
+
+            is CloudDriveDocumentProviderUiState.Offline ->
+                getErrorCursor(
+                    resolveDocumentProjection(projection),
+                    getOfflineString()
+                )
+
             is CloudDriveDocumentProviderUiState.ChildData -> {
                 if (parentDocumentId == state.parentId) {
                     documentCursor(
@@ -325,7 +363,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
             return MatrixCursor(projection)
         } else {
             val loadingMessage = getLoadingString()
-            return object : MatrixCursor(resolveDocumentProjection(projection)) {
+            return object : MatrixCursor(projection) {
                 override fun getExtras(): Bundle {
                     return Bundle().apply {
                         putBoolean(DocumentsContract.EXTRA_LOADING, true)
@@ -336,10 +374,27 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         }
     }
 
-    private fun getLoadingString() = context?.getString(R.string.general_loading) ?: "Loading"
+    private fun getErrorCursor(projection: Array<String>, errorMessage: String): MatrixCursor {
+        return object : MatrixCursor(projection) {
+            override fun getExtras(): Bundle = Bundle().apply {
+                putString(DocumentsContract.EXTRA_ERROR, errorMessage)
+            }
+        }
+    }
+
+    private fun getLoadingString() =
+        context?.getString(sharedR.string.photos_loading_indicator_text) ?: "Loading"
+
     private fun getAppNameString() = context?.getString(R.string.app_name) ?: "MEGA"
     private fun getLoginToMEGAString() =
         context?.getString(R.string.login_to_mega) ?: "Log in to MEGA"
+
+    private fun getPasscodeLockEnabledString() =
+        context?.getString(sharedR.string.saf_passcode_lock_enabled_message)
+            ?: "To browse your MEGA files, disable your passcode in the MEGA app. Go to Settings, then tap Security."
+
+    private fun getOfflineString() = context?.getString(sharedR.string.saf_no_internet_message)
+        ?: "Connect to the internet to browse your MEGA files. Files saved for offline are available in the MEGA app."
 
     private fun notifyDocumentChanged(documentId: String) {
         context?.let {
@@ -432,6 +487,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
                 }
             }
         }
+
 }
 
 /**

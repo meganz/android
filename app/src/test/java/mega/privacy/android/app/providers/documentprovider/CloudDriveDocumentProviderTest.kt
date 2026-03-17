@@ -16,10 +16,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -57,7 +59,6 @@ class CloudDriveDocumentProviderTest {
 
     private companion object {
         private const val CLOUD_DRIVE_ROOT_ID = "mega_cloud_drive_root"
-        private const val ROOT_DOCUMENT_ID = "mega_cloud_drive_root:1"
     }
 
     @Before
@@ -151,9 +152,44 @@ class CloudDriveDocumentProviderTest {
             assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
                 .isEqualTo(CLOUD_DRIVE_ROOT_ID)
             val expectedSummary = ApplicationProvider.getApplicationContext<Context>()
-                .getString(R.string.login_to_mega) ?: "Log in to MEGA"
+                .getString(R.string.login_to_mega)
             assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
                 .isEqualTo(expectedSummary)
+        }
+
+    @Test
+    fun `test that queryRoots returns one root row with account summary when state is Offline`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value = CloudDriveDocumentProviderUiState.Offline("test@mega.co.nz")
+            advanceUntilIdle()
+
+            val cursor: Cursor = underTest.queryRoots(null)
+            assertThat(cursor.count).isEqualTo(1)
+            cursor.moveToFirst()
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
+                .isEqualTo(CLOUD_DRIVE_ROOT_ID)
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
+                .isEqualTo("test@mega.co.nz")
+        }
+
+    @Test
+    fun `test that queryRoots returns one root row with account summary when state is PasscodeLockEnabled`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value =
+                CloudDriveDocumentProviderUiState.PasscodeLockEnabled("test@mega.co.nz")
+            advanceUntilIdle()
+
+            val cursor: Cursor = underTest.queryRoots(null)
+            assertThat(cursor.count).isEqualTo(1)
+            cursor.moveToFirst()
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_ROOT_ID)))
+                .isEqualTo(CLOUD_DRIVE_ROOT_ID)
+            assertThat(cursor.getString(cursor.getColumnIndex(Root.COLUMN_SUMMARY)))
+                .isEqualTo("test@mega.co.nz")
         }
 
     @Test
@@ -192,9 +228,62 @@ class CloudDriveDocumentProviderTest {
             assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_MIME_TYPE)))
                 .isEqualTo(Document.MIME_TYPE_DIR)
             val expectedRootName = ApplicationProvider.getApplicationContext<Context>()
-                .getString(R.string.app_name) ?: "MEGA"
+                .getString(R.string.app_name)
             assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_DISPLAY_NAME)))
                 .isEqualTo(expectedRootName)
+        }
+
+    @Test
+    fun `test that queryDocument returns root folder row when documentId is root even when state is Offline`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value = CloudDriveDocumentProviderUiState.Offline("test@mega.co.nz")
+            advanceUntilIdle()
+
+            val cursor: Cursor = underTest.queryDocument(CLOUD_DRIVE_ROOT_ID, null)
+
+            assertThat(cursor.count).isEqualTo(1)
+            cursor.moveToFirst()
+            assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_DOCUMENT_ID)))
+                .isEqualTo(CLOUD_DRIVE_ROOT_ID)
+            assertThat(cursor.getString(cursor.getColumnIndex(Document.COLUMN_MIME_TYPE)))
+                .isEqualTo(Document.MIME_TYPE_DIR)
+        }
+
+    @Test
+    fun `test that queryDocument returns error cursor when state is PasscodeLockEnabled`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value =
+                CloudDriveDocumentProviderUiState.PasscodeLockEnabled("test@mega.co.nz")
+            advanceUntilIdle()
+
+            val cursor: Cursor = underTest.queryDocument("$CLOUD_DRIVE_ROOT_ID:123", null)
+
+            assertThat(cursor.count).isEqualTo(0)
+            val passcodeLockEnabledMessage = ApplicationProvider.getApplicationContext<Context>()
+                .getString(sharedR.string.saf_passcode_lock_enabled_message)
+            assertThat(cursor.extras?.getString(DocumentsContract.EXTRA_ERROR))
+                .isEqualTo(passcodeLockEnabledMessage)
+        }
+
+    @Test
+    fun `test that queryDocument returns error cursor with offline message when state is Offline and documentId is not root`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value = CloudDriveDocumentProviderUiState.Offline("test@mega.co.nz")
+            advanceUntilIdle()
+
+            val cursor: Cursor = underTest.queryDocument("$CLOUD_DRIVE_ROOT_ID:123", null)
+
+            assertThat(cursor.count).isEqualTo(0)
+            val noInternetMessage = ApplicationProvider.getApplicationContext<Context>()
+                .getString(sharedR.string.saf_no_internet_message)
+            assertThat(cursor.extras?.getString(DocumentsContract.EXTRA_ERROR))
+                .isEqualTo(noInternetMessage)
         }
 
     @Test
@@ -341,13 +430,49 @@ class CloudDriveDocumentProviderTest {
     }
 
     @Test
-    fun `test that queryChildDocuments when DocumentData state calls loadChildrenInBackground`() = runTest {
-        setStateWithCredentials()
-        createProvider()
+    fun `test that queryChildDocuments returns error cursor with offline message when state is Offline`() =
+        runTest {
+            createProvider()
+            underTest.onCreate()
+            dataProviderState.value = CloudDriveDocumentProviderUiState.Offline("test@mega.co.nz")
+            advanceUntilIdle()
 
-        underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
-        verify(mockDataProvider).loadChildrenInBackground(CLOUD_DRIVE_ROOT_ID)
-    }
+            val cursor: Cursor =
+                underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
+
+            assertThat(cursor.count).isEqualTo(0)
+            val noInternetMessage = ApplicationProvider.getApplicationContext<Context>()
+                .getString(sharedR.string.saf_no_internet_message)
+            assertThat(cursor.extras?.getString(DocumentsContract.EXTRA_ERROR))
+                .isEqualTo(noInternetMessage)
+        }
+
+    @Test
+    fun `test that queryChildDocuments returns error cursor when state is PasscodeLockEnabled`() =
+        runTest {
+            dataProviderState.value =
+                CloudDriveDocumentProviderUiState.PasscodeLockEnabled("test@mega.co.nz")
+            createProvider()
+
+            val cursor: Cursor =
+                underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
+
+            assertThat(cursor.count).isEqualTo(0)
+            val passcodeLockEnabledMessage = ApplicationProvider.getApplicationContext<Context>()
+                .getString(sharedR.string.saf_passcode_lock_enabled_message)
+            assertThat(cursor.extras?.getString(DocumentsContract.EXTRA_ERROR))
+                .isEqualTo(passcodeLockEnabledMessage)
+        }
+
+    @Test
+    fun `test that queryChildDocuments when DocumentData state calls loadChildrenInBackground`() =
+        runTest {
+            setStateWithCredentials()
+            createProvider()
+
+            underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
+            verify(mockDataProvider).loadChildrenInBackground(CLOUD_DRIVE_ROOT_ID)
+        }
 
     @Test
     fun `test that queryChildDocuments returns loading cursor when state is LoadingChildren`() =
@@ -392,14 +517,14 @@ class CloudDriveDocumentProviderTest {
             )
             dataProviderState.value = CloudDriveDocumentProviderUiState.ChildData(
                 accountName = "test@mega.co.nz",
-                parentId = ROOT_DOCUMENT_ID,
+                parentId = CLOUD_DRIVE_ROOT_ID,
                 children = listOf(childRow),
                 hasMore = false,
             )
             createProvider()
 
             val cursor: Cursor =
-                underTest.queryChildDocuments(parentDocumentId = ROOT_DOCUMENT_ID, null, null)
+                underTest.queryChildDocuments(parentDocumentId = CLOUD_DRIVE_ROOT_ID, null, null)
 
             assertThat(cursor.count).isEqualTo(1)
             cursor.moveToFirst()
@@ -416,7 +541,7 @@ class CloudDriveDocumentProviderTest {
         runTest {
             dataProviderState.value = CloudDriveDocumentProviderUiState.ChildData(
                 accountName = "test@mega.co.nz",
-                parentId = ROOT_DOCUMENT_ID,
+                parentId = CLOUD_DRIVE_ROOT_ID,
                 children = emptyList(),
                 hasMore = false,
             )

@@ -44,7 +44,7 @@ sealed interface CloudDriveDocumentProviderUiState {
         CloudDriveDocumentProviderUiState, HasCredentials
 
     /**
-     * Loading root
+     * Initial state
      */
     data object Initialising : CloudDriveDocumentProviderUiState
 
@@ -85,6 +85,22 @@ sealed interface CloudDriveDocumentProviderUiState {
     data class FileNotFound(
         override val accountName: String,
         val documentId: String,
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
+
+    /**
+     * Passcode lock is enabled
+     * @property accountName
+     */
+    data class PasscodeLockEnabled(
+        override val accountName: String,
+    ) : CloudDriveDocumentProviderUiState, HasCredentials
+
+    /**
+     * Device is offline (no internet connectivity)
+     * @property accountName
+     */
+    data class Offline(
+        override val accountName: String,
     ) : CloudDriveDocumentProviderUiState, HasCredentials
 }
 

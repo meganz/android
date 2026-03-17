@@ -1,13 +1,22 @@
 package mega.privacy.android.app.providers.documentprovider
 
+import android.content.Context
+import android.net.ConnectivityManager
+import androidx.annotation.VisibleForTesting
+import android.net.Network
+import android.net.NetworkCapabilities
+import androidx.core.content.getSystemService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -27,6 +36,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
+import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
@@ -59,42 +69,116 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val cloudDriveDocumentRowMapper: CloudDriveDocumentRowMapper,
     private val addNodeType: AddNodeType,
     private val documentIdToNodeIdMapper: DocumentIdToNodeIdMapper,
+    private val monitorPasscodeLockPreferenceUseCase: MonitorPasscodeLockPreferenceUseCase,
 ) {
 
-    val state: StateFlow<CloudDriveDocumentProviderUiState> by lazy {
-        monitorUserCredentialsUseCase().onStart { emit(getAccountCredentialsUseCase()) }
-            .distinctUntilChangedBy { it?.email }
-            .flatMapLatest { credentials ->
-                flow {
-                    if (credentials == null) {
-                        emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
-                    } else {
-                        val accountName = credentials.email ?: ""
-                        emitAll(
-                            getRootNodeFlow()
-                                .flatMapLatest { rootNodeId ->
-                                    if (rootNodeId == null) {
-                                        flowOf(
-                                            CloudDriveDocumentProviderUiState.RootNodeNotLoaded(
-                                                accountName
-                                            )
-                                        )
-                                    } else {
-                                        getDataFlows(
-                                            accountName,
-                                            "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}"
-                                        )
-                                    }
-                                })
-                    }
+    /**
+     * Connectivity state. Updated by [monitorConnectivity] or [updateConnectivity] (e.g. for tests).
+     */
+    private val connectivityState = MutableStateFlow(true)
+
+    /**
+     * Updates connectivity state. For use in tests only; production code uses [monitorConnectivity].
+     */
+    @VisibleForTesting
+    fun updateConnectivity(connected: Boolean) {
+        connectivityState.value = connected
+    }
+
+    /**
+     * Starts monitoring network connectivity and updates [connectivityState].
+     * Call once from the content provider's [android.content.ContentProvider.onCreate]
+     */
+    fun monitorConnectivity(context: Context) {
+        applicationScope.launch {
+            monitorConnectivityFlow(context)
+                .catch {
+                    Timber.e(it, "CloudDriveDocumentDataProvider monitorConnectivity")
                 }
-            }.catch { e ->
-                Timber.e(e, "CloudDriveDocumentDataProvider state")
-                emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
-            }.asUiStateFlow(
-                scope = applicationScope,
-                initialValue = CloudDriveDocumentProviderUiState.Initialising
-            )
+                .collect { connected ->
+                    connectivityState.value = connected
+                }
+        }
+    }
+
+    private fun monitorConnectivityFlow(context: Context) = callbackFlow {
+        val connectivityManager = context.getSystemService<ConnectivityManager>()
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                trySend(true)
+            }
+
+            override fun onLost(network: Network) {
+                trySend(false)
+            }
+
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities,
+            ) {
+                trySend(
+                    networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                )
+            }
+        }
+        connectivityManager?.registerDefaultNetworkCallback(callback)
+        awaitClose { connectivityManager?.unregisterNetworkCallback(callback) }
+    }
+
+    @OptIn(FlowPreview::class)
+    val state: StateFlow<CloudDriveDocumentProviderUiState> by lazy {
+        combine(
+            monitorPasscodeLockPreferenceUseCase().catch {
+                Timber.e(it)
+                emit(false)
+            },
+            connectivityState,
+            monitorUserCredentialsUseCase().onStart { emit(getAccountCredentialsUseCase()) }
+                .catch {
+                    Timber.e(it)
+                    emit(null)
+                }
+                .distinctUntilChangedBy { it?.email },
+        ) { isPasscodeLockEnabled, isConnected, credentials ->
+            Timber.d("CloudDriveDocumentDataProvider isPasscodeLockEnabled=$isPasscodeLockEnabled isConnected=$isConnected credentials=$credentials")
+            Triple(isPasscodeLockEnabled, isConnected, credentials)
+        }.flatMapLatest { (isPasscodeLockEnabled, isConnected, credentials) ->
+            flow {
+                if (credentials == null) {
+                    emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
+                } else if (isPasscodeLockEnabled) {
+                    val accountName = credentials.email ?: ""
+                    emit(CloudDriveDocumentProviderUiState.PasscodeLockEnabled(accountName))
+                } else if (!isConnected) {
+                    val accountName = credentials.email ?: ""
+                    emit(CloudDriveDocumentProviderUiState.Offline(accountName))
+                } else {
+                    val accountName = credentials.email ?: ""
+                    emitAll(
+                        getRootNodeFlow()
+                            .flatMapLatest { rootNodeId ->
+                                if (rootNodeId == null) {
+                                    flowOf(
+                                        CloudDriveDocumentProviderUiState.RootNodeNotLoaded(
+                                            accountName
+                                        )
+                                    )
+                                } else {
+                                    getDataFlows(
+                                        accountName,
+                                        "$CLOUD_DRIVE_ROOT_ID:${rootNodeId.longValue}"
+                                    )
+                                }
+                            })
+                }
+            }
+        }.catch { e ->
+            Timber.e(e, "CloudDriveDocumentDataProvider state")
+            emit(CloudDriveDocumentProviderUiState.NotLoggedIn)
+        }.asUiStateFlow(
+            scope = applicationScope,
+            initialValue = CloudDriveDocumentProviderUiState.Initialising
+        )
     }
 
     private val refreshRootNodeChannel =
