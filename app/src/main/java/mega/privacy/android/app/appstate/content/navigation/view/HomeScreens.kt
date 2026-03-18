@@ -68,6 +68,7 @@ fun HomeScreens(
     var handledStorageState by rememberSaveable { mutableStateOf(StorageState.Unknown) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     var isNetworkChangeHandled by rememberSaveable { mutableStateOf(false) }
+    var isSelectionMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(storageUiState.storageState) {
         if (storageUiState.storageState == StorageState.Red
@@ -110,6 +111,7 @@ fun HomeScreens(
                 if (!currentState.isConnected) {
                     if (!isNetworkChangeHandled) {
                         homeScreenStacks.switchTopLevel(Home)
+                        isSelectionMode = false
                         isNetworkChangeHandled = true
                     }
                 } else {
@@ -143,15 +145,16 @@ fun HomeScreens(
                         homeScreenStacks.topLevelKey::class == destination::class
                     },
                     navContent = { navigationUiController ->
-                        var isSelectionMode by remember { mutableStateOf(false) }
                         val homeScreensOwner = LocalViewModelStoreOwner.current
+                        LaunchedEffect(isSelectionMode) {
+                            navigationUiController.showNavigation(!isSelectionMode)
+                        }
                         Column(Modifier.fillMaxSize()) {
                             val selectionModeController = remember(isSelectionMode) {
                                 SelectionModeController(
                                     isSelectionModeActive = isSelectionMode,
                                     onSelectionModeChanged = {
                                         isSelectionMode = it
-                                        navigationUiController.showNavigation(!isSelectionMode)
                                     },
                                 )
                             }
