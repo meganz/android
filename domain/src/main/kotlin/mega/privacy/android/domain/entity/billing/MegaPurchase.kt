@@ -42,21 +42,16 @@ data class MegaPurchase(
      * product level
      */
     val level: Int = when (sku) {
-        Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> 0
-        Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> 1
-        Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> 2
-        Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> 3
+        Skus.SKU_STARTER_MONTH, Skus.SKU_STARTER_YEAR -> 0
+        Skus.SKU_BASIC_MONTH, Skus.SKU_BASIC_YEAR -> 1
+        Skus.SKU_ESSENTIAL_MONTH, Skus.SKU_ESSENTIAL_YEAR -> 2
+        Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> 3
+        Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> 4
+        Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> 5
+        Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> 6
         else -> -1
     }
 
     val isMonthly: Boolean
-        get() = when (sku) {
-            Skus.SKU_PRO_LITE_MONTH,
-            Skus.SKU_PRO_I_MONTH,
-            Skus.SKU_PRO_II_MONTH,
-            Skus.SKU_PRO_III_MONTH,
-                -> true
-
-            else -> false
-        }
+        get() = sku?.contains("onemonth") == true
 }

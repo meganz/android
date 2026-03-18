@@ -148,15 +148,15 @@ class ChooseAccountViewModelTest {
             subscriptionProIIIYearly
         )
         val expectedList = listOf(
+            localisedSubscriptionProI,
+            localisedSubscriptionProII,
+            localisedSubscriptionProIII,
             LocalisedSubscription(
                 monthlySubscription = null,
                 yearlySubscription = subscriptionProLiteYearly,
                 localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
                 formattedSize = formattedSizeMapper,
             ),
-            localisedSubscriptionProI,
-            localisedSubscriptionProII,
-            localisedSubscriptionProIII
         )
         whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
         whenever(getSubscriptionsUseCase()).thenReturn(

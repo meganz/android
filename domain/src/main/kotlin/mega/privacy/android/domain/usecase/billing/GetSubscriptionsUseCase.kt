@@ -31,20 +31,19 @@ class GetSubscriptionsUseCase @Inject constructor(
         val paymentOptions = getSubscriptionOptionsUseCase().filter { plan ->
             plan.accountType !== AccountType.BUSINESS &&
                     plan.accountType !== AccountType.PRO_FLEXI &&
-                    plan.accountType !== AccountType.STARTER &&
-                    plan.accountType !== AccountType.BASIC &&
-                    plan.accountType !== AccountType.ESSENTIAL &&
                     plan.accountType !== AccountType.UNKNOWN
         }
         val skus = paymentOptions.map { it.sku }.distinct()
         billingRepository.querySkus(skus)
-        val allLocalPricingNull = skus.all { getLocalPricingUseCase(it) == null }
-        if (allLocalPricingNull) {
+        val availablePaymentOptions = paymentOptions.filter { plan ->
+            getLocalPricingUseCase(plan.sku) != null
+        }
+        if (availablePaymentOptions.isEmpty()) {
             throw LocalPricingNotAvailableException()
         }
         return Subscriptions(
-            monthlySubscriptions = buildSubscriptions(paymentOptions, 1),
-            yearlySubscriptions = buildSubscriptions(paymentOptions, 12),
+            monthlySubscriptions = buildSubscriptions(availablePaymentOptions, 1),
+            yearlySubscriptions = buildSubscriptions(availablePaymentOptions, 12),
         )
     }
 

@@ -62,7 +62,7 @@ class ChooseAccountViewModel @Inject constructor(
         viewModelScope.launch {
             val cheapestSubscriptionAvailable =
                 runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
-                    Timber.Forest.e(it)
+                    Timber.e(it)
                     null
                 }
             _state.update {
@@ -120,7 +120,7 @@ class ChooseAccountViewModel @Inject constructor(
             runCatching { getSubscriptionsUseCase() }
                 .onSuccess { (monthlySubscriptions, yearlySubscriptions) ->
                     val allAccountTypes = (monthlySubscriptions.map { it.accountType } +
-                            yearlySubscriptions.map { it.accountType }).distinct().sorted()
+                            yearlySubscriptions.map { it.accountType }).distinct()
                     val localisedSubscriptions = allAccountTypes.mapNotNull { accountType ->
                         val monthly =
                             monthlySubscriptions.firstOrNull { it.accountType == accountType }
@@ -132,6 +132,9 @@ class ChooseAccountViewModel @Inject constructor(
                                 yearlySubscription = yearly
                             )
                         } else null
+                    }.sortedBy { subscription ->
+                        subscription.monthlySubscription?.amount?.value
+                            ?: subscription.yearlySubscription?.amount?.value
                     }
                     _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
                 }.onFailure { error ->
@@ -149,7 +152,7 @@ class ChooseAccountViewModel @Inject constructor(
     private fun loadCurrentSubscriptionPlan() {
         viewModelScope.launch {
             monitorAccountDetailUseCase()
-                .catch { Timber.Forest.e(it) }
+                .catch { Timber.e(it) }
                 .mapNotNull { it.levelDetail }
                 .distinctUntilChanged()
                 .collectLatest { levelDetail ->
@@ -169,7 +172,7 @@ class ChooseAccountViewModel @Inject constructor(
     fun refreshPricing() {
         viewModelScope.launch {
             val pricing = runCatching { getPricing(false) }.getOrElse {
-                Timber.Forest.w(it, "Returning empty pricing as get pricing failed.")
+                Timber.w(it, "Returning empty pricing as get pricing failed.")
                 Pricing(emptyList())
             }
             _state.update {

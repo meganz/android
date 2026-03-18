@@ -1108,6 +1108,33 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
                                 )
                             }
 
+                            Skus.SKU_STARTER_MONTH, Skus.SKU_STARTER_YEAR -> {
+                                account = sharedR.string.starter_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_STARTER_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_starter_yearly
+                                    else sharedR.string.upgrade_account_successful_starter_monthly
+                                )
+                            }
+
+                            Skus.SKU_BASIC_MONTH, Skus.SKU_BASIC_YEAR -> {
+                                account = sharedR.string.basic_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_BASIC_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_basic_yearly
+                                    else sharedR.string.upgrade_account_successful_basic_monthly
+                                )
+                            }
+
+                            Skus.SKU_ESSENTIAL_MONTH, Skus.SKU_ESSENTIAL_YEAR -> {
+                                account = sharedR.string.essential_account
+                                image = R.drawable.ic_generic_plan
+                                purchaseMessage.text = getString(
+                                    if (Skus.SKU_ESSENTIAL_YEAR == activeSubscriptionSku) sharedR.string.upgrade_account_successful_essential_yearly
+                                    else sharedR.string.upgrade_account_successful_essential_monthly
+                                )
+                            }
+
                             else -> {
                                 Timber.w("Unexpected account subscription level")
                                 return@setOnShowListener

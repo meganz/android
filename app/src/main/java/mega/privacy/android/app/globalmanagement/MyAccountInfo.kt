@@ -45,7 +45,6 @@ class MyAccountInfo @Inject constructor(
     private var formattedAvailableSpace = ""
     var usedTransferFormatted = ""
     var totalTransferFormatted = ""
-    var levelAccountDetails = INVALID_VALUE
 
     var isAccountDetailsFinished = false
     var isBusinessAlertShown = false
@@ -81,7 +80,6 @@ class MyAccountInfo @Inject constructor(
         formattedAvailableSpace = ""
         usedTransferFormatted = ""
         totalTransferFormatted = ""
-        levelAccountDetails = INVALID_VALUE
 
         isAccountDetailsFinished = false
         isBusinessAlertShown = false
@@ -167,18 +165,10 @@ class MyAccountInfo @Inject constructor(
             subscriptionRenewTime = accountInfo.subscriptionRenewTime
             proExpirationTime = accountInfo.proExpiration
             subscriptionMethodId = accountInfo.subscriptionMethodId
-
-            when (accountType) {
-                0 -> levelAccountDetails = INVALID_VALUE
-                1 -> levelAccountDetails = 1
-                2 -> levelAccountDetails = 2
-                3 -> levelAccountDetails = 3
-                4 -> levelAccountDetails = 0
-            }
         }
 
         isAccountDetailsFinished = true
-        Timber.d("LEVELACCOUNTDETAILS: $levelAccountDetails")
+        Timber.d("pro level: ${accountInfo.proLevel}")
     }
 
     fun getFormattedPreviousVersionsSize(context: Context): String? {

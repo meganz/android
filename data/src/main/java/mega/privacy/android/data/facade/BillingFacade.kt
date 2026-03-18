@@ -439,7 +439,8 @@ internal class BillingFacade @Inject constructor(
         Timber.d("List of purchases: ${purchases.size}")
         Timber.d("Max purchase: $max")
         activeSubscription.set(max)
-        accountInfoWrapper.updateActiveSubscription(max)
+        purchases.forEach { purchase ->
+            accountInfoWrapper.submitSubscriptions(purchase)
+        }
     }
-
 }

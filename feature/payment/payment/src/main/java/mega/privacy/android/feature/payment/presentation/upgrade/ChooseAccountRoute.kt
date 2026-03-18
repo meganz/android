@@ -9,11 +9,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import mega.privacy.android.analytics.Analytics
 import mega.android.core.ui.extensions.LaunchedOnceEffect
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
-import mega.privacy.android.feature.payment.model.AccountTypeInt
+import mega.privacy.android.feature.payment.model.mapper.toAccountTypeInt
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
 import mega.privacy.android.navigation.ExtraConstant
@@ -167,16 +167,6 @@ private fun onFreeClick(
     }
 }
 
-private fun convertAccountTypeToInt(accountType: AccountType): Int {
-    return when (accountType) {
-        AccountType.PRO_LITE -> AccountTypeInt.PRO_LITE
-        AccountType.PRO_I -> AccountTypeInt.PRO_I
-        AccountType.PRO_II -> AccountTypeInt.PRO_II
-        AccountType.PRO_III -> AccountTypeInt.PRO_III
-        else -> AccountTypeInt.FREE
-    }
-}
-
 /**
  * Creates a bundle for navigation with common extras
  */
@@ -192,7 +182,7 @@ private fun createNavigationBundle(activity: Activity, accountType: AccountType?
         }
         accountType?.let {
             putBoolean(ExtraConstant.EXTRA_UPGRADE_ACCOUNT, it != AccountType.FREE)
-            putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, convertAccountTypeToInt(it))
+            putInt(ExtraConstant.EXTRA_ACCOUNT_TYPE, it.toAccountTypeInt())
         }
     }
 }

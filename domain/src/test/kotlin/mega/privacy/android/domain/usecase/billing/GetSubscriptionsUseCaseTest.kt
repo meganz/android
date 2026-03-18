@@ -198,4 +198,30 @@ class GetSubscriptionsUseCaseTest {
 
             underTest.invoke()
         }
+
+    @Test
+    fun `test that payment options without local pricing are excluded from results`() =
+        runTest {
+            whenever(getSubscriptionOptionsUseCase()).thenReturn(
+                listOf(monthlySubscriptionOption, yearlySubscriptionOption)
+            )
+            whenever(
+                billingRepository.querySkus(
+                    listOf("android.test.purchased.month", SKU_PRO_LITE_YEAR)
+                )
+            ).thenReturn(emptyList())
+            whenever(getLocalPricingUseCase("android.test.purchased.month")).thenReturn(null)
+            whenever(getLocalPricingUseCase(SKU_PRO_LITE_YEAR)).thenReturn(yearlyLocalPricing)
+            whenever(subscriptionMapper(yearlySubscriptionOption, yearlyLocalPricing)).thenReturn(
+                yearlySubscription
+            )
+
+            val actual = underTest.invoke()
+            assertThat(actual).isEqualTo(
+                Subscriptions(
+                    monthlySubscriptions = emptyList(),
+                    yearlySubscriptions = listOf(yearlySubscription),
+                )
+            )
+        }
 }

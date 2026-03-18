@@ -2422,4 +2422,28 @@
     <string name="saf_passcode_lock_enabled_message">To browse your MEGA files, disable your passcode in the MEGA app. Go to Settings, then tap Security.</string>
     <!-- Message shown to the user while accessing MEGA via File Manager when there is no network connectivity -->
     <string name="saf_no_internet_message">Connect to the internet to browse your MEGA files. Files saved for offline are available in the MEGA app.</string>
+    <!-- Starter account type name. -->
+    <string name="starter_account">Starter</string>
+    <!-- Button title, when user taps on Starter plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_starter">Buy Starter</string>
+    <!-- Message informing the account was successfully subscribed to the Starter monthly plan. -->
+    <string name="upgrade_account_successful_starter_monthly">Thank you for your Starter monthly subscription</string>
+    <!-- Message informing the account was successfully subscribed to the Starter yearly plan. -->
+    <string name="upgrade_account_successful_starter_yearly">Thank you for your Starter yearly subscription</string>
+    <!-- Basic account type name. -->
+    <string name="basic_account">Basic</string>
+    <!-- Button title, when user taps on Basic plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_basic">Buy Basic</string>
+    <!-- Message informing the account was successfully subscribed to the Basic monthly plan. -->
+    <string name="upgrade_account_successful_basic_monthly">Thank you for your Basic monthly subscription</string>
+    <!-- Message informing the account was successfully subscribed to the Basic yearly plan. -->
+    <string name="upgrade_account_successful_basic_yearly">Thank you for your Basic yearly subscription</string>
+    <!-- Essential account type name. -->
+    <string name="essential_account">Essential</string>
+    <!-- Button title, when user taps on Essential plan on Upgrade account screen, where user can choose plan to buy. -->
+    <string name="account_upgrade_account_buy_button_title_essential">Buy Essential</string>
+    <!-- Message informing the account was successfully subscribed to the Essential monthly plan. -->
+    <string name="upgrade_account_successful_essential_monthly">Thank you for your Essential monthly subscription</string>
+    <!-- Message informing the account was successfully subscribed to the Essential yearly plan. -->
+    <string name="upgrade_account_successful_essential_yearly">Thank you for your Essential yearly subscription</string>
 </resources>

@@ -50,6 +50,30 @@ enum class UIAccountType(
     PRO_III(
         sharedR.string.pro3_account,
         sharedR.string.account_upgrade_account_buy_button_title_pro_iii,
+    ),
+
+    /**
+     * ESSENTIAL
+     */
+    ESSENTIAL(
+        sharedR.string.essential_account,
+        sharedR.string.account_upgrade_account_buy_button_title_essential,
+    ),
+
+    /**
+     * STARTER
+     */
+    STARTER(
+        sharedR.string.starter_account,
+        sharedR.string.account_upgrade_account_buy_button_title_starter,
+    ),
+
+    /**
+     * BASIC
+     */
+    BASIC(
+        sharedR.string.basic_account,
+        sharedR.string.account_upgrade_account_buy_button_title_basic,
     );
 
     companion object {

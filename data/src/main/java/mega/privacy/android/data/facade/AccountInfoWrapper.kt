@@ -53,10 +53,10 @@ interface AccountInfoWrapper {
     suspend fun handleAccountDetail(newDetail: AccountDetail)
 
     /**
-     * Update active subscription
-     *
+     * submit subscription
+     * @param purchase
      */
-    fun updateActiveSubscription(purchase: MegaPurchase?)
+    fun submitSubscriptions(purchase: MegaPurchase)
 
     /**
      * Subscription payment method

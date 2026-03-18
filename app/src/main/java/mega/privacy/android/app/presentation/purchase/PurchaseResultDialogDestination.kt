@@ -153,6 +153,42 @@ private fun getPurchaseInfo(sku: String): PurchaseInfo? {
             messageRes = R.string.upgrade_account_successful_pro_lite_yearly
         )
 
+        Skus.SKU_STARTER_MONTH -> PurchaseInfo(
+            accountNameRes = sharedR.string.starter_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_starter_monthly
+        )
+
+        Skus.SKU_STARTER_YEAR -> PurchaseInfo(
+            accountNameRes = sharedR.string.starter_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_starter_yearly
+        )
+
+        Skus.SKU_BASIC_MONTH -> PurchaseInfo(
+            accountNameRes = sharedR.string.basic_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_basic_monthly
+        )
+
+        Skus.SKU_BASIC_YEAR -> PurchaseInfo(
+            accountNameRes = sharedR.string.basic_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_basic_yearly
+        )
+
+        Skus.SKU_ESSENTIAL_MONTH -> PurchaseInfo(
+            accountNameRes = sharedR.string.essential_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_essential_monthly
+        )
+
+        Skus.SKU_ESSENTIAL_YEAR -> PurchaseInfo(
+            accountNameRes = sharedR.string.essential_account,
+            imageRes = R.drawable.ic_generic_plan,
+            messageRes = sharedR.string.upgrade_account_successful_essential_yearly
+        )
+
         else -> null
     }
 }

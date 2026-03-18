@@ -20,6 +20,12 @@ fun AccountType.toUIAccountType(): UIAccountType {
 
         AccountType.PRO_III -> UIAccountType.PRO_III
 
+        AccountType.ESSENTIAL -> UIAccountType.ESSENTIAL
+
+        AccountType.STARTER -> UIAccountType.STARTER
+
+        AccountType.BASIC -> UIAccountType.BASIC
+
         else -> UIAccountType.FREE
     }
 }
