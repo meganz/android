@@ -64,8 +64,8 @@ class NodeExplorerSharedViewModelTest {
     private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
 
-    private val nodeId = NodeId(1L)
-    private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
+    private val nodeId = NodeId(1234L)
+    private val nodeSourceType = NodeSourceType.INCOMING_SHARES
     private val args = NodeExplorerSharedViewModel.Args(nodeId, nodeSourceType)
 
     @BeforeEach
@@ -118,6 +118,8 @@ class NodeExplorerSharedViewModelTest {
     fun `test that initial state is correct`() = runTest {
         viewModel.nodeExplorerSharedUiState.test {
             val actual = awaitItem()
+            assertThat(actual.currentFolderId).isEqualTo(nodeId)
+            assertThat(actual.nodeSourceType).isEqualTo(nodeSourceType)
             assertThat(actual.viewType).isEqualTo(ViewType.LIST)
             assertThat(actual.isStorageOverQuota).isFalse()
             assertThat(actual.isHiddenNodesEnabled).isFalse()

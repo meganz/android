@@ -7,4 +7,5 @@ import mega.android.core.ui.model.LocalizedText
  */
 data class NodesExplorerUiState(
     val folderName: LocalizedText = LocalizedText.Literal(""),
+    val isRoot: Boolean = true,
 )

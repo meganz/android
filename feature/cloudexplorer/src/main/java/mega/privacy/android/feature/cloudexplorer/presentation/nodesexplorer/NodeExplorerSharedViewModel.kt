@@ -34,6 +34,7 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import timber.log.Timber
 
 abstract class NodeExplorerSharedViewModel(
@@ -56,6 +57,12 @@ abstract class NodeExplorerSharedViewModel(
     val nodeExplorerSharedUiState = _nodedExplorerSharedUiState.asStateFlow()
 
     init {
+        _nodedExplorerSharedUiState.update { state ->
+            state.copy(
+                currentFolderId = args.nodeId,
+                nodeSourceType = args.nodeSourceType
+            )
+        }
         monitorNodeUpdates()
         monitorHiddenNodes()
         monitorViewType()
@@ -178,7 +185,12 @@ abstract class NodeExplorerSharedViewModel(
                 existingItems = nodeExplorerSharedUiState.value.items,
             )
 
-            _nodedExplorerSharedUiState.update { state -> state.copy(items = nodeUiItems) }
+            _nodedExplorerSharedUiState.update { state ->
+                state.copy(
+                    items = nodeUiItems,
+                    nodesLoadingState = nodesLoadingState,
+                )
+            }
         }
     }
 
@@ -188,10 +200,8 @@ abstract class NodeExplorerSharedViewModel(
         }
     }
 
-    fun updateNodesLoadingState(nodesLoadingState: NodesLoadingState) {
-        _nodedExplorerSharedUiState.update { state ->
-            state.copy(nodesLoadingState = NodesLoadingState.FullyLoaded)
-        }
+    fun fileClicked(item: NodeUiItem<TypedNode>) {
+
     }
 
     abstract fun loadNodes()

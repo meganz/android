@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 
+import androidx.annotation.Nullable
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeInfo
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -32,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -58,8 +62,9 @@ class NodesExplorerViewModelTest {
     private val getFileBrowserNodeChildrenUseCase = mock<GetFileBrowserNodeChildrenUseCase>()
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
     private val getNodeInfoByIdUseCase = mock<GetNodeInfoByIdUseCase>()
+    private val getRootNodeIdUseCase = mock<GetRootNodeIdUseCase>()
 
-    private val nodeId = NodeId(1L)
+    private val nodeId = NodeId(rootNodeHandle)
     private val nodeSourceType = NodeSourceType.CLOUD_DRIVE
     private val args = NodeExplorerSharedViewModel.Args(nodeId, nodeSourceType)
     private val defaultNodeInfo = mock<NodeInfo> {
@@ -82,7 +87,8 @@ class NodesExplorerViewModelTest {
             nodeUiItemMapper,
             getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase,
-            getNodeInfoByIdUseCase
+            getNodeInfoByIdUseCase,
+            getRootNodeIdUseCase,
         )
         whenever(monitorViewTypeUseCase()) doReturn emptyFlow()
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
@@ -92,23 +98,25 @@ class NodesExplorerViewModelTest {
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
         wheneverBlocking { getNodesByIdInChunkUseCase(nodeId) } doReturn emptyFlow()
         wheneverBlocking { getNodeInfoByIdUseCase(nodeId) } doReturn defaultNodeInfo
+        wheneverBlocking { getRootNodeIdUseCase() } doReturn null
     }
 
     private fun initViewModel() {
         viewModel = NodesExplorerViewModel(
-            monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
-            monitorStorageStateUseCase,
-            monitorHiddenNodesEnabledUseCase,
-            monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
-            nodeUiItemMapper,
-            getFileBrowserNodeChildrenUseCase,
-            getNodesByIdInChunkUseCase,
-            getNodeInfoByIdUseCase,
+            monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
+            monitorViewTypeUseCase = monitorViewTypeUseCase,
+            setViewTypeUseCase = setViewTypeUseCase,
+            monitorStorageStateUseCase = monitorStorageStateUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
+            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
+            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
+            nodeUiItemMapper = nodeUiItemMapper,
+            getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
+            getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
+            getNodeInfoByIdUseCase = getNodeInfoByIdUseCase,
+            getRootNodeIdUseCase = getRootNodeIdUseCase,
             args = args
         )
     }
@@ -184,7 +192,31 @@ class NodesExplorerViewModelTest {
         }
     }
 
+    @ParameterizedTest
+    @Nullable
+    @ValueSource(longs = [5432, rootNodeHandle])
+    fun `test that isRoot is updated`(
+        rootId: Long?,
+    ) = runTest {
+        val nodeId = rootId?.let { NodeId(rootId) }
+
+        whenever(getRootNodeIdUseCase()) doReturn nodeId
+
+        initViewModel()
+
+        viewModel.nodesExplorerUiState.test {
+            assertThat(awaitItem().isRoot).also {
+                if (rootId == null || rootId == rootNodeHandle) {
+                    it.isTrue()
+                } else {
+                    it.isFalse()
+                }
+            }
+        }
+    }
+
     companion object {
+        private const val rootNodeHandle = 1234L
         private val testDispatcher = UnconfinedTestDispatcher()
 
         @JvmField

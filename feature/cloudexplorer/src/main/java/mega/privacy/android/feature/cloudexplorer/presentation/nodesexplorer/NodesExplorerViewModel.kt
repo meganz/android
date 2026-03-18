@@ -11,10 +11,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
@@ -25,8 +25,10 @@ import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCas
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import timber.log.Timber
 import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import timber.log.Timber
 
 @HiltViewModel(assistedFactory = NodesExplorerViewModel.Factory::class)
 class NodesExplorerViewModel @AssistedInject constructor(
@@ -43,6 +45,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
+    private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     @Assisted override val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
@@ -62,6 +65,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     val nodesExplorerUiState = _nodesExplorerInternalUiState.asStateFlow()
 
     init {
+        checkRootNode()
         updateFolderName()
     }
 
@@ -93,6 +97,18 @@ class NodesExplorerViewModel @AssistedInject constructor(
             }.onFailure {
                 Timber.e(it)
             }
+        }
+    }
+
+    private fun checkRootNode() {
+        viewModelScope.launch {
+            runCatching { getRootNodeIdUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(NodeId(-1))?.let { id ->
+                    _nodesExplorerInternalUiState.update { state ->
+                        state.copy(isRoot = id == args.nodeId)
+                    }
+                }
         }
     }
 

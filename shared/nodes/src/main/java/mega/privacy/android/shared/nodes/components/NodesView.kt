@@ -178,7 +178,7 @@ fun <T : TypedNode> NodesView(
  * @param isHiddenNodesEnabled whether hidden nodes are enabled
  */
 @Composable
-internal fun <T : TypedNode> rememberNodeItems(
+fun <T : TypedNode> rememberNodeItems(
     nodeUIItems: List<NodeUiItem<T>>,
     showHiddenItems: Boolean,
     isHiddenNodesEnabled: Boolean,
