@@ -181,6 +181,7 @@ class CloudDriveViewModelTest {
             setAlmostFullStorageBannerClosingTimestampUseCase = mock(),
             navKey = CloudDriveNavKey(nodeHandle, nodeSourceType = nodeSourceType),
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            containsMediaItemUseCase = mock()
         )
     }
 

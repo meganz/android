@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
+import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -97,6 +98,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val overQuotaStatusMapper: OverQuotaStatusMapper,
     private val setAlmostFullStorageBannerClosingTimestampUseCase: SetAlmostFullStorageBannerClosingTimestampUseCase,
+    private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     @Assisted private val navKey: CloudDriveNavKey,
 ) : ViewModel() {
 
@@ -153,6 +155,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             getNodesByIdInChunkUseCase(folderOrRootNodeId)
                 .catch { Timber.e(it) }
                 .collect { (nodes, hasMore) ->
+                    val hasMediaItems = containsMediaItemUseCase(nodes)
                     val nodeUiItems = nodeUiItemMapper(
                         nodeList = nodes,
                         nodeSourceType = nodeSourceType,
@@ -169,6 +172,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                                 NodesLoadingState.FullyLoaded
                             },
                             currentFolderId = folderOrRootNodeId,
+                            hasMediaItems = hasMediaItems
                         )
                     }
                 }
@@ -232,6 +236,7 @@ class CloudDriveViewModel @AssistedInject constructor(
         runCatching {
             checkCurrentFolderContactVerification()
             val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
+            val hasMediaItems = containsMediaItemUseCase(nodes)
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
@@ -243,6 +248,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                 state.copy(
                     items = nodeUiItems,
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
+                    hasMediaItems = hasMediaItems
                 )
             }
         }.onFailure {
