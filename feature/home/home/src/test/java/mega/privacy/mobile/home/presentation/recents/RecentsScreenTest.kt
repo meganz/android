@@ -398,7 +398,7 @@ class RecentsScreenTest {
             .atStartOfDay(ZoneId.systemDefault())
             .toEpochSecond()
         val mockBucket = RecentActionBucket(
-            identifier = "$timestamp $isUpdate",
+            id = "$timestamp $isUpdate",
             timestamp = timestamp,
             dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",

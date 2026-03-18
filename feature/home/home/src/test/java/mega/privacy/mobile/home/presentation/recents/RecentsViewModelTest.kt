@@ -522,7 +522,7 @@ class RecentsViewModelTest {
         on { it.timestamp }.thenReturn(timestamp)
         on { it.dateTimestamp }.thenReturn(dateTimestamp)
         on { it.nodes }.thenReturn(nodes)
-        on { it.identifier }.thenReturn(identifier)
+        on { it.id }.thenReturn(identifier)
     }
 
     private fun createMockFileNode(
@@ -537,10 +537,9 @@ class RecentsViewModelTest {
         timestamp: Long = 1234567890L,
         bucket: RecentActionBucket = createMockRecentActionBucket(),
     ): RecentsUiItem {
-        val bucketIdentifier = bucket.identifier
+        val bucketIdentifier = bucket.id
         return mock {
             on { it.bucket }.thenReturn(bucket)
-            on { it.key }.thenReturn(bucketIdentifier)
         }
     }
 
@@ -560,40 +559,40 @@ class RecentsViewModelTest {
     }
 
     @Test
-    fun `test that duplicate items with same key are filtered by distinctBy`() = runTest {
-        val duplicateBucket1 = createMockRecentActionBucket(
+    fun `test that all items are returned from loadRecents`() = runTest {
+        val bucket1 = createMockRecentActionBucket(
             timestamp = 1000L,
-            identifier = "duplicate_bucket"
+            identifier = "bucket_1"
         )
-        val duplicateBucket2 = createMockRecentActionBucket(
+        val bucket2 = createMockRecentActionBucket(
             timestamp = 2000L,
-            identifier = "duplicate_bucket"
+            identifier = "bucket_2"
         )
-        val uniqueBucket = createMockRecentActionBucket(
+        val bucket3 = createMockRecentActionBucket(
             timestamp = 3000L,
-            identifier = "unique_bucket"
+            identifier = "bucket_3"
         )
 
-        val duplicateUiItem1 = createMockRecentsUiItem(bucket = duplicateBucket1)
-        val duplicateUiItem2 = createMockRecentsUiItem(bucket = duplicateBucket2)
-        val uniqueUiItem = createMockRecentsUiItem(bucket = uniqueBucket)
+        val uiItem1 = createMockRecentsUiItem(bucket = bucket1)
+        val uiItem2 = createMockRecentsUiItem(bucket = bucket2)
+        val uiItem3 = createMockRecentsUiItem(bucket = bucket3)
 
         whenever(getRecentActionsUseCase(excludeSensitives = false, maxBucketCount = 4)).thenReturn(
-            listOf(duplicateBucket1, duplicateBucket2, uniqueBucket)
+            listOf(bucket1, bucket2, bucket3)
         )
-        whenever(recentActionUiItemMapper(duplicateBucket1)).thenReturn(duplicateUiItem1)
-        whenever(recentActionUiItemMapper(duplicateBucket2)).thenReturn(duplicateUiItem2)
-        whenever(recentActionUiItemMapper(uniqueBucket)).thenReturn(uniqueUiItem)
+        whenever(recentActionUiItemMapper(bucket1)).thenReturn(uiItem1)
+        whenever(recentActionUiItemMapper(bucket2)).thenReturn(uiItem2)
+        whenever(recentActionUiItemMapper(bucket3)).thenReturn(uiItem3)
 
         initViewModel()
 
         underTest.uiState.test {
             val state = awaitItem()
             assertThat(state.isNodesLoading).isFalse()
-            assertThat(state.recentActionItems).hasSize(2)
-            assertThat(state.recentActionItems).contains(duplicateUiItem1)
-            assertThat(state.recentActionItems).contains(uniqueUiItem)
-            assertThat(state.recentActionItems).doesNotContain(duplicateUiItem2)
+            assertThat(state.recentActionItems).hasSize(3)
+            assertThat(state.recentActionItems).contains(uiItem1)
+            assertThat(state.recentActionItems).contains(uiItem2)
+            assertThat(state.recentActionItems).contains(uiItem3)
         }
     }
 

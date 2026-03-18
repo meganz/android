@@ -47,7 +47,7 @@ class DefaultUpdateRecentActionTest {
         val identifier =
             "M_$isMedia-U_$isUpdate-D_$date-UE_$userEmail-PNH_${parentNodeId.longValue}"
         return RecentActionBucket(
-            identifier = identifier,
+            id = identifier,
             isMedia = isMedia,
             isUpdate = isUpdate,
             timestamp = timestamp,
@@ -68,12 +68,12 @@ class DefaultUpdateRecentActionTest {
         val bucket6 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(0L), "1")
         val bucket7 = createBucket(isMedia = true, isUpdate = true, 0L, NodeId(1L), "2")
 
-        assertThat(bucket1.identifier == bucket2.identifier).isEqualTo(true)
-        assertThat(bucket1.identifier == bucket3.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket4.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket5.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket6.identifier).isEqualTo(false)
-        assertThat(bucket1.identifier == bucket7.identifier).isEqualTo(false)
+        assertThat(bucket1.id == bucket2.id).isEqualTo(true)
+        assertThat(bucket1.id == bucket3.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket4.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket5.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket6.id).isEqualTo(false)
+        assertThat(bucket1.id == bucket7.id).isEqualTo(false)
     }
 
     @Test

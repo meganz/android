@@ -108,7 +108,7 @@ class RecentsWidget @Inject constructor() : HomeWidget {
             onBucketClicked = { item ->
                 navigationHandler.navigate(
                     RecentsBucketScreenNavKey(
-                        identifier = item.bucket.identifier,
+                        identifier = item.bucket.id,
                         isMediaBucket = item.isMediaBucket,
                         folderName = item.parentFolderName.get(context),
                         folderHandle = item.bucket.parentNodeId.longValue,
@@ -350,7 +350,7 @@ internal fun createMockRecentsUiItem(
     nodeLabel: NodeLabel? = null,
 ): RecentsUiItem {
     val mockBucket = RecentActionBucket(
-        identifier = "bucket_$timestamp",
+        id = "bucket_$timestamp",
         timestamp = timestamp,
         dateTimestamp = timestamp,
         userEmail = "test@example.com",

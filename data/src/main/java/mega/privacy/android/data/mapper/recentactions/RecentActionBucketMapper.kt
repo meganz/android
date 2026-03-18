@@ -6,6 +6,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.extension.mapAsync
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -13,18 +15,23 @@ import javax.inject.Inject
  */
 internal class RecentActionBucketMapper @Inject constructor(private val nodeMapper: NodeMapper) {
     suspend operator fun invoke(
-        identifier: String,
-        dateTimestamp: Long,
         megaRecentActionBucket: MegaRecentActionBucket,
         megaNodes: List<MegaNode>,
-    ) = RecentActionBucketUnTyped(
-        identifier = identifier,
-        timestamp = megaRecentActionBucket.timestamp,
-        dateTimestamp = dateTimestamp,
-        userEmail = megaRecentActionBucket.userEmail,
-        parentNodeId = NodeId(megaRecentActionBucket.parentHandle),
-        isUpdate = megaRecentActionBucket.isUpdate,
-        isMedia = megaRecentActionBucket.isMedia,
-        nodes = megaNodes.mapAsync { nodeMapper(it) },
-    )
+    ): RecentActionBucketUnTyped {
+        val systemZoneId = ZoneId.systemDefault()
+        return RecentActionBucketUnTyped(
+            id = megaRecentActionBucket.id,
+            timestamp = megaRecentActionBucket.timestamp,
+            dateTimestamp = Instant.ofEpochSecond(megaRecentActionBucket.timestamp)
+                .atZone(systemZoneId)
+                .toLocalDate()
+                .atStartOfDay(systemZoneId)
+                .toEpochSecond(),
+            userEmail = megaRecentActionBucket.userEmail,
+            parentNodeId = NodeId(megaRecentActionBucket.parentHandle),
+            isUpdate = megaRecentActionBucket.isUpdate,
+            isMedia = megaRecentActionBucket.isMedia,
+            nodes = megaNodes.mapAsync { nodeMapper(it) },
+        )
+    }
 }

@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 /**
  * RecentActionBucket
  *
- * @property identifier An unique identifier based on the data of the bucket, it can be used to identify a bucket
+ * @property id
  * @property timestamp
  * @property dateTimestamp Timestamp of date only (time set to 00:00:00)
  * @property userEmail
@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
  * @property isKeyVerified
  */
 data class RecentActionBucket(
-    val identifier: String,
+    val id: String,
     val timestamp: Long,
     val dateTimestamp: Long,
     val userEmail: String,

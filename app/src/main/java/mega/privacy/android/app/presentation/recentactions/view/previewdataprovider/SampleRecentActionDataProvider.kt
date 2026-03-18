@@ -56,7 +56,7 @@ internal class SampleRecentActionDataProvider :
     )
 
     private val recentBucket1 = RecentActionBucket(
-        identifier = "bucket1",
+        id = "bucket1",
         timestamp = System.currentTimeMillis() / 1000,
         dateTimestamp = Instant.ofEpochSecond(System.currentTimeMillis() / 1000)
             .atZone(ZoneId.systemDefault())

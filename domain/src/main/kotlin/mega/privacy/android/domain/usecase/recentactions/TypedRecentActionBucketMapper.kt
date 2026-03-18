@@ -90,7 +90,7 @@ class TypedRecentActionBucketMapper @Inject constructor(
             }
 
             RecentActionBucket(
-                identifier = bucket.identifier,
+                id = bucket.id,
                 timestamp = bucket.timestamp,
                 dateTimestamp = bucket.dateTimestamp,
                 userEmail = bucket.userEmail,

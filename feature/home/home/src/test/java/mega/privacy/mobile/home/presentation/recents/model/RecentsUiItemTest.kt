@@ -46,26 +46,6 @@ class RecentsUiItemTest {
         assertThat(item.nodeSourceType).isEqualTo(expectedSourceType)
     }
 
-    @ParameterizedTest(name = "key returns {3} when isSingleNode is {0}")
-    @MethodSource("provideKeyTestCases")
-    fun `test that key returns correct value based on isSingleNode and firstNode`(
-        isSingleNode: Boolean,
-        identifier: String,
-        nodes: List<TypedFileNode>,
-        expectedKey: String,
-    ) {
-        val bucket = createMockRecentActionBucket(
-            identifier = identifier,
-            nodes = nodes
-        )
-        val item = createRecentsUiItem(
-            bucket = bucket,
-            isSingleNode = isSingleNode
-        )
-
-        assertThat(item.key).isEqualTo(expectedKey)
-    }
-
     companion object {
         @JvmStatic
         fun provideFirstNodeTestCases(): Stream<Arguments> {
@@ -102,27 +82,6 @@ class RecentsUiItemTest {
             )
         }
 
-        @JvmStatic
-        fun provideKeyTestCases(): Stream<Arguments> {
-            val nodeWithId123 = createMockFileNodeStatic(name = "file1.txt", nodeId = 123L)
-            val nodeWithId456 = createMockFileNodeStatic(name = "file2.txt", nodeId = 456L)
-
-            return Stream.of(
-                Arguments.of(
-                    false,
-                    "bucket-identifier-1",
-                    listOf(nodeWithId123),
-                    "bucket-identifier-1"
-                ),
-                Arguments.of(
-                    false,
-                    "bucket-identifier-3",
-                    listOf(nodeWithId123, nodeWithId456),
-                    "bucket-identifier-3"
-                )
-            )
-        }
-
         private fun createMockFileNodeStatic(
             name: String = "testFile.txt",
             nodeId: Long = 1L,
@@ -148,7 +107,7 @@ class RecentsUiItemTest {
         nodes: List<TypedFileNode> = listOf(createMockFileNode()),
         parentFolderSharesType: RecentActionsSharesType = RecentActionsSharesType.NONE,
     ): RecentActionBucket = mock {
-        on { it.identifier }.thenReturn(identifier)
+        on { it.id }.thenReturn(identifier)
         on { it.nodes }.thenReturn(nodes)
         on { it.timestamp }.thenReturn(1234567890L)
         on { it.dateTimestamp }.thenReturn(1234567890L)

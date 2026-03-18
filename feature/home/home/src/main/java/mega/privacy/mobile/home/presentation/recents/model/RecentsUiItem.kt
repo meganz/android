@@ -55,15 +55,4 @@ data class RecentsUiItem(
         } else {
             NodeSourceType.CLOUD_DRIVE
         }
-
-    /**
-     * Unique key for the item in a list
-     * Adjust for duplicate single node buckets edge case
-     */
-    val key = buildString {
-        append(bucket.identifier)
-        if (isSingleNode) {
-            append("|N:${firstNode?.id?.longValue}")
-        }
-    }
 }

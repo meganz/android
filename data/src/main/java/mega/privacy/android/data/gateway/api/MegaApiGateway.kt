@@ -1171,6 +1171,17 @@ interface MegaApiGateway {
     )
 
     /**
+     * Get recent action bucket by id
+     *
+     * @param id Id of the recent action bucket
+     * @param listener [MegaRequestListenerInterface]
+     */
+    fun getRecentBucketById(
+        id: String,
+        listener: MegaRequestListenerInterface
+    )
+
+    /**
      * Clear the recent actions up to given timestamp
      *
      * @param until Epoch time (in seconds). Recent actions up to this time will be cleared

@@ -516,7 +516,7 @@ class RecentsWidgetTest {
 
         assertThat(clickedItem).isNotNull()
         assertThat(clickedItem).isEqualTo(item)
-        assertThat(clickedItem?.bucket?.identifier).isEqualTo(item.bucket.identifier)
+        assertThat(clickedItem?.bucket?.id).isEqualTo(item.bucket.id)
         assertThat(clickedItem?.bucket?.nodes).hasSize(3)
     }
 
@@ -1092,7 +1092,7 @@ class RecentsWidgetTest {
             .atStartOfDay(ZoneId.systemDefault())
             .toEpochSecond()
         val mockBucket = RecentActionBucket(
-            identifier = "id1",
+            id = "id1",
             timestamp = timestamp,
             dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",

@@ -98,7 +98,7 @@ fun RecentsScreen(
             onBucketClicked = { item ->
                 onNavigate(
                     RecentsBucketScreenNavKey(
-                        identifier = item.bucket.identifier,
+                        identifier = item.bucket.id,
                         isMediaBucket = item.isMediaBucket,
                         folderName = item.bucket.parentFolderName,
                         folderHandle = item.bucket.parentNodeId.longValue,

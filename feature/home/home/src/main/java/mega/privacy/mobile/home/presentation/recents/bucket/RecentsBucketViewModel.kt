@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -27,6 +25,8 @@ import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.recentactions.GetRecentActionBucketByIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
 import mega.privacy.mobile.home.presentation.recents.mapper.RecentsParentFolderNameMapper
 import timber.log.Timber
@@ -67,10 +67,7 @@ class RecentsBucketViewModel @AssistedInject constructor(
     ) {
         viewModelScope.launch {
             runCatching {
-                val bucket = getRecentActionBucketByIdUseCase(
-                    bucketIdentifier = args.identifier,
-                    excludeSensitives = excludeSensitives,
-                )
+                val bucket = getRecentActionBucketByIdUseCase(args.identifier)
                 if (bucket != null) {
                     val nodeUiItems = nodeUiItemMapper(
                         nodeList = bucket.nodes,

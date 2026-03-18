@@ -39,7 +39,7 @@ class GetRecentActionsUseCaseTest {
         on { isNodeKeyDecrypted }.thenReturn(true)
     }
     private val dummyRecentActionBucketUnTyped = RecentActionBucketUnTyped(
-        identifier = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_321",
+        id = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_321",
         timestamp = 0L,
         dateTimestamp = 0L,
         userEmail = "aaa@aaa.com",
@@ -101,7 +101,7 @@ class GetRecentActionsUseCaseTest {
     fun `test that typedRecentActionBucketMapper is invoked with correct parameters`() = runTest {
         val buckets = listOf(
             RecentActionBucketUnTyped(
-                identifier = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_0",
+                id = "M_false-U_false-D_1970-01-01-UE_aaa@aaa.com-PNH_0",
                 timestamp = 0L,
                 dateTimestamp = 0L,
                 userEmail = "aaa@aaa.com",

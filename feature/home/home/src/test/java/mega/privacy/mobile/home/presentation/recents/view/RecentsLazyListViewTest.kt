@@ -258,7 +258,7 @@ class RecentsLazyListViewTest {
             .atStartOfDay(ZoneId.systemDefault())
             .toEpochSecond()
         val mockBucket = RecentActionBucket(
-            identifier = "$timestamp $userName $isMediaBucket",
+            id = "$timestamp $userName $isMediaBucket",
             timestamp = timestamp,
             dateTimestamp = dateTimestamp,
             userEmail = "test@example.com",

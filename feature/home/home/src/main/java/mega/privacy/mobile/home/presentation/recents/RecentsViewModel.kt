@@ -94,7 +94,7 @@ class RecentsViewModel @AssistedInject constructor(
                 getRecentActionsUseCase(
                     excludeSensitives = uiState.value.excludeSensitives,
                     maxBucketCount = maxBucketCount
-                ).map { recentActionUiItemMapper(it) }.distinctBy { it.key }
+                ).map { recentActionUiItemMapper(it) }
             }.onSuccess { buckets ->
                 // Only update state if this coroutine not cancelled
                 if (isActive) {

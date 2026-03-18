@@ -56,12 +56,11 @@ interface RecentActionsRepository {
      * This method is optimized to only fetch nodes for the matching bucket,
      * avoiding unnecessary node fetching for all buckets.
      *
-     * @param bucketIdentifier The unique identifier of the bucket
+     * @param id The unique identifier of the bucket
      * @param excludeSensitives Exclude sensitive nodes
      * @return The matching [RecentActionBucketUnTyped] or null if not found
      */
-    suspend fun getRecentActionBucketByIdentifier(
-        bucketIdentifier: String,
-        excludeSensitives: Boolean,
+    suspend fun getRecentActionBucketById(
+        id: String,
     ): RecentActionBucketUnTyped?
 }

@@ -24,19 +24,14 @@ class GetRecentActionBucketByIdUseCase @Inject constructor(
     /**
      * Get a single recent action bucket by identifier
      *
-     * @param bucketIdentifier The unique identifier of the bucket
-     * @param excludeSensitives Exclude sensitive nodes
+     * @param id The unique identifier of the bucket
      * @return The matching [RecentActionBucket] or null if not found
      */
     suspend operator fun invoke(
-        bucketIdentifier: String,
-        excludeSensitives: Boolean,
+        id: String,
     ): RecentActionBucket? = coroutineScope {
         val matchingBucketDeferred = async {
-            recentActionsRepository.getRecentActionBucketByIdentifier(
-                bucketIdentifier = bucketIdentifier,
-                excludeSensitives = excludeSensitives,
-            )
+            recentActionsRepository.getRecentActionBucketById(id)
         }
         val visibleContactsDeferred = async { contactsRepository.getAllContactsName() }
         val currentUserEmailDeferred = async { getCurrentUserEmail(false) }

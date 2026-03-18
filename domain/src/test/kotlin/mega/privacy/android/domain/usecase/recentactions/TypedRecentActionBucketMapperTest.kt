@@ -87,7 +87,7 @@ class TypedRecentActionBucketMapperTest {
         isMedia: Boolean = false,
         nodes: List<UnTypedNode> = listOf(createFileNode()),
     ): RecentActionBucketUnTyped = RecentActionBucketUnTyped(
-        identifier = identifier,
+        id = identifier,
         timestamp = timestamp,
         dateTimestamp = dateTimestamp,
         userEmail = userEmail,
@@ -131,7 +131,7 @@ class TypedRecentActionBucketMapperTest {
         )
 
         assertThat(result).hasSize(1)
-        assertThat(result[0].identifier).isEqualTo("test-identifier")
+        assertThat(result[0].id).isEqualTo("test-identifier")
         assertThat(result[0].timestamp).isEqualTo(1234567890L)
         assertThat(result[0].userEmail).isEqualTo("test@example.com")
         assertThat(result[0].userName).isEqualTo("Test User")
@@ -282,8 +282,8 @@ class TypedRecentActionBucketMapperTest {
         )
 
         assertThat(result).hasSize(2)
-        assertThat(result[0].identifier).isEqualTo("identifier-1")
-        assertThat(result[1].identifier).isEqualTo("identifier-2")
+        assertThat(result[0].id).isEqualTo("identifier-1")
+        assertThat(result[1].id).isEqualTo("identifier-2")
         assertThat(result[0].isUpdate).isFalse()
         assertThat(result[1].isUpdate).isTrue()
         assertThat(result[0].isMedia).isFalse()

@@ -26,7 +26,7 @@ class DefaultUpdateRecentAction @Inject constructor(
         )
 
         // Update the current bucket
-        recentActions.firstOrNull { currentBucket.identifier == it.identifier }?.let {
+        recentActions.firstOrNull { currentBucket.id == it.id }?.let {
             return@withContext it
         }
 
@@ -35,7 +35,7 @@ class DefaultUpdateRecentAction @Inject constructor(
         // Compare the previous list of actions with the new list of recent actions
         // and only keep the actions from the updated list that differs from the previous cached one
         val filteredActions = recentActions.filter { bucket ->
-            cachedActionList.none { it.identifier == bucket.identifier }
+            cachedActionList.none { it.id == bucket.id }
         }
 
         // We return if only one bucket is changed, cause if more than one is updated or created,

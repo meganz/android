@@ -18,8 +18,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaRecentActionBucket
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneId
 import javax.inject.Inject
 
 /**
@@ -32,8 +30,6 @@ internal class DefaultRecentActionsRepository @Inject constructor(
     private val nodeInfoForRecentActionsMapper: NodeInfoForRecentActionsMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RecentActionsRepository {
-
-    private val systemZoneId = ZoneId.systemDefault()
     private val recentActivityCleared = MutableSharedFlow<Unit>()
 
     override suspend fun getRecentActions(
@@ -46,10 +42,7 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 .map { bucket ->
                     bucket to megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
                 }.mapAsync {
-                    val (identifier, dateTimestamp) = generateIdentifier(it.first)
                     recentActionBucketMapper(
-                        identifier = identifier,
-                        dateTimestamp = dateTimestamp,
                         megaRecentActionBucket = it.first,
                         megaNodes = it.second
                     )
@@ -83,26 +76,25 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         }
     }
 
-    override suspend fun getRecentActionBucketByIdentifier(
-        bucketIdentifier: String,
-        excludeSensitives: Boolean,
+    override suspend fun getRecentActionBucketById(
+        id: String,
     ): RecentActionBucketUnTyped? = withContext(ioDispatcher) {
-        val (matchingBucket, identifier, dateTimestamp) = getMegaRecentAction(excludeSensitives = excludeSensitives)
-            .firstNotNullOfOrNull { bucket ->
-                val (identifier, dateTimestamp) = generateIdentifier(bucket)
-                if (identifier == bucketIdentifier) Triple(
-                    bucket,
-                    identifier,
-                    dateTimestamp
-                ) else null
-            } ?: return@withContext null
-        val megaNodes = megaApiGateway.getNodesFromMegaNodeList(matchingBucket.nodes)
-        recentActionBucketMapper(
-            identifier = identifier,
-            dateTimestamp = dateTimestamp,
-            megaRecentActionBucket = matchingBucket,
-            megaNodes = megaNodes
-        )
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("getRecentActionById") {
+                megaApiGateway.copyBucketList(it.recentActions)
+            }
+            megaApiGateway.getRecentBucketById(id, listener)
+        }
+
+        if (result.size() > 0) {
+            val bucket = megaApiGateway.copyBucket(result.get(0))
+            recentActionBucketMapper(
+                megaRecentActionBucket = bucket,
+                megaNodes = megaApiGateway.getNodesFromMegaNodeList(bucket.nodes)
+            )
+        } else {
+            return@withContext null
+        }
     }
 
     private suspend fun getMegaRecentAction(
@@ -119,29 +111,6 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 megaApiGateway.copyBucket(it)
             }
         }
-
-    /**
-     * Generate identifier from bucket properties
-     * For example: M:true|U:false|D:1766472783|UE:ht@mega.co.nz|PNH:100124500130291
-     * @return Pair of identifier and dateTimestamp
-     */
-    private fun generateIdentifier(bucket: MegaRecentActionBucket): Pair<String, Long> {
-        // Each bucket is created based on date, so timestamp is converted to date only
-        val dateTimestamp = Instant.ofEpochSecond(bucket.timestamp)
-            .atZone(systemZoneId)
-            .toLocalDate()
-            .atStartOfDay(systemZoneId)
-            .toEpochSecond()
-
-        val identifier = buildString {
-            append("M:").append(bucket.isMedia)
-            append("|U:").append(bucket.isUpdate)
-            append("|D:").append(dateTimestamp)
-            append("|UE:").append(bucket.userEmail)
-            append("|PNH:").append(bucket.parentHandle)
-        }
-        return identifier to dateTimestamp
-    }
 
     companion object {
         /**
