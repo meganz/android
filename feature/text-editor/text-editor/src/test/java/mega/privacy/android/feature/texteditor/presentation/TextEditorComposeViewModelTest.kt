@@ -132,19 +132,6 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
-    fun `test that setViewMode updates uiState to view mode`() {
-        initUnderTest(
-            nodeHandle = 1L,
-            mode = TextEditorMode.Edit,
-            fileName = "a.txt",
-        )
-        underTest.setViewMode()
-
-        val state = underTest.uiState.value
-        assertThat(state.mode).isEqualTo(TextEditorMode.View)
-    }
-
-    @Test
     fun `test that Args with View mode sets mode to View`() {
         initUnderTest(
             nodeHandle = 1L,
@@ -194,6 +181,12 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that Create mode is not loading`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        assertThat(underTest.uiState.value.isLoading).isFalse()
+    }
+
+    @Test
     fun `test that onMenuAction Download does not crash`() {
         initUnderTest()
         underTest.onMenuAction(TextEditorTopBarAction.Download)
@@ -235,29 +228,55 @@ internal class TextEditorComposeViewModelTest {
         assertThat(underTest.uiState.value).isEqualTo(before)
     }
 
-    @Test
-    fun `test that Create mode with null params has content empty and not loading`() {
-        initUnderTest(mode = TextEditorMode.Create)
-        assertThat(underTest.uiState.value.totalLineCount).isEqualTo(0)
-        assertThat(underTest.uiState.value.isLoading).isFalse()
-    }
-
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that isContentDirty returns false when no edits after load in Edit mode`() = runTest {
-        val lines = listOf("line1", "line2", "line3")
+    fun `test that isContentDirty returns true when chunk state is edited`() = runTest {
+        val lines = (1..100).map { "line$it" }
         doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(any(), anyOrNull(), any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "modified content") }
+
+        assertThat(underTest.isContentDirty()).isTrue()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that isContentDirty returns false when no chunks are edited`() = runTest {
+        val lines = (1..100).map { "line$it" }
+        doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        underTest.getOrCreateChunkState(0)
         assertThat(underTest.isContentDirty()).isFalse()
     }
 
     @Test
-    fun `test that isContentDirty returns false when no edits in Create mode`() {
+    fun `test that isContentDirty returns false in Create mode with no edits`() {
         initUnderTest(mode = TextEditorMode.Create)
+        underTest.getOrCreateChunkState(0)
         assertThat(underTest.isContentDirty()).isFalse()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that isContentDirty returns true after chunk disposed with edits`() = runTest {
+        val lines = (1..100).map { "line$it" }
+        doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "edited") }
+        underTest.disposeChunkState(0)
+
+        assertThat(underTest.isContentDirty()).isTrue()
     }
 
     @Test
@@ -290,6 +309,52 @@ internal class TextEditorComposeViewModelTest {
 
         val state = underTest.uiState.value
         assertThat(state.mode).isEqualTo(TextEditorMode.Edit)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that setEditMode creates chunks from loaded content`() = runTest {
+        val allLines = (1..1500).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        underTest.setEditMode()
+
+        assertThat(underTest.getChunkCount()).isEqualTo(8)
+        val chunk0State = underTest.getOrCreateChunkState(0)
+        val chunk0Text = chunk0State.text.toString()
+        assertThat(chunk0Text.split("\n").first()).isEqualTo("line1")
+        assertThat(chunk0Text.split("\n")).hasSize(CHUNK_SIZE)
+    }
+
+    @Test
+    fun `test that setViewMode updates uiState to view mode`() {
+        initUnderTest(
+            nodeHandle = 1L,
+            mode = TextEditorMode.Edit,
+            fileName = "a.txt",
+        )
+        underTest.setViewMode()
+
+        val state = underTest.uiState.value
+        assertThat(state.mode).isEqualTo(TextEditorMode.View)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that setViewMode without edits switches directly to View`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        underTest.setViewMode()
+
+        val state = underTest.uiState.value
+        assertThat(state.mode).isEqualTo(TextEditorMode.View)
+        assertThat(state.isRestoringContent).isFalse()
     }
 
     @Test
@@ -370,104 +435,68 @@ internal class TextEditorComposeViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that gradual load updates totalLineCount and isFullyLoaded and getChunkText returns content`() =
-        runTest {
-            val chunk1 = (1..500).map { "line$it" }
-            val chunk2 = (501..1000).map { "line$it" }
-            val chunk3 = (1001..1500).map { "line$it" }
-            doReturn(flowOf(chunk1, chunk2, chunk3)).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
-            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
-            advanceUntilIdle()
+    fun `test that gradual load updates totalLineCount`() = runTest {
+        val chunk1 = (1..500).map { "line$it" }
+        val chunk2 = (501..1000).map { "line$it" }
+        doReturn(flowOf(chunk1, chunk2)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
 
-            val state = underTest.uiState.value
-            assertThat(state.totalLineCount).isEqualTo(1500)
-            assertThat(state.isFullyLoaded).isTrue()
-            assertThat(underTest.getChunkCount()).isAtLeast(1)
-            val firstChunkLines = underTest.getChunkText(0).split("\n")
-            assertThat(firstChunkLines.first()).isEqualTo("line1")
-            assertThat(firstChunkLines.last()).isEqualTo("line200")
-        }
+        val state = underTest.uiState.value
+        assertThat(state.totalLineCount).isEqualTo(1000)
+        assertThat(state.isFullyLoaded).isTrue()
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that saveFile in Edit mode saves full loaded content`() = runTest {
-        val allLines = (1..1500).map { "line$it" }
+    fun `test that getChunkText returns correct lines for chunk index`() = runTest {
+        val allLines = (1..200).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(any(), anyOrNull(), any())
-        val saveResult = TextEditorSaveResult.UploadRequired(
-            tempPath = "/tmp/test.txt",
-            parentHandle = 1L,
-            isEditMode = true,
-            fromHome = false,
-        )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
-            .thenReturn(saveResult)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        val chunk0 = underTest.getChunkText(0)
+        val chunk0Lines = chunk0.split("\n")
+        assertThat(chunk0Lines).hasSize(CHUNK_SIZE)
+        assertThat(chunk0Lines.first()).isEqualTo("line1")
+        assertThat(chunk0Lines.last()).isEqualTo("line${CHUNK_SIZE}")
+
+        val lastChunkIndex = (200 - 1) / CHUNK_SIZE
+        val lastChunk = underTest.getChunkText(lastChunkIndex)
+        val lastChunkLines = lastChunk.split("\n")
+        assertThat(lastChunkLines.last()).isEqualTo("line200")
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that getChunkText returns empty for out of range index`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        assertThat(underTest.getChunkText(999)).isEmpty()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that disposeChunkState flushes edits back to chunk data`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
-        underTest.saveFile()
-        advanceUntilIdle()
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "EDITED\nline2") }
+        underTest.disposeChunkState(0)
 
-        val textCaptor = argumentCaptor<String>()
-        verify(saveTextContentForTextEditorUseCase).invoke(
-            any(), textCaptor.capture(), any(), any(), any(), any(),
-        )
-        val savedLines = textCaptor.firstValue.split("\n")
-        assertThat(savedLines).hasSize(1500)
-        assertThat(savedLines.first()).isEqualTo("line1")
-        assertThat(savedLines.last()).isEqualTo("line1500")
+        val newState = underTest.getOrCreateChunkState(0)
+        assertThat(newState.text.toString()).startsWith("EDITED")
     }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `test that saveFile in Create mode saves initial empty content`() = runTest {
-        val saveResult = TextEditorSaveResult.UploadRequired(
-            tempPath = "/tmp/new.txt",
-            parentHandle = 1L,
-            isEditMode = false,
-            fromHome = false,
-        )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
-            .thenReturn(saveResult)
-        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Create)
-        advanceUntilIdle()
-
-        underTest.saveFile()
-        advanceUntilIdle()
-
-        val textCaptor = argumentCaptor<String>()
-        verify(saveTextContentForTextEditorUseCase).invoke(
-            any(), textCaptor.capture(), any(), any(), any(), any(),
-        )
-        assertThat(textCaptor.firstValue).isEmpty()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `test that saveFile saves when started in View mode and switched to Edit mode`() =
-        runTest {
-            doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
-            val saveResult = TextEditorSaveResult.UploadRequired(
-                tempPath = "/tmp/edited.txt",
-                parentHandle = 1L,
-                isEditMode = true,
-                fromHome = false,
-            )
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
-                .thenReturn(saveResult)
-
-            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
-            advanceUntilIdle()
-            underTest.setEditMode()
-            underTest.saveFile()
-            advanceUntilIdle()
-
-            verify(saveTextContentForTextEditorUseCase).invoke(
-                any(), any(), any(), any(), any(), any(),
-            )
-        }
 
     @Test
     fun `test that requestShowDiscardDialog sets showDiscardDialog to true`() {
@@ -498,9 +527,9 @@ internal class TextEditorComposeViewModelTest {
 
         val state = underTest.uiState.value
         assertThat(state.mode).isEqualTo(TextEditorMode.View)
-        assertThat(underTest.getChunkText(0)).isEqualTo(lines.joinToString("\n"))
         assertThat(state.isRestoringContent).isFalse()
         assertThat(state.showDiscardDialog).isFalse()
+        assertThat(underTest.getChunkText(0)).isEqualTo(lines.joinToString("\n"))
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -525,6 +554,90 @@ internal class TextEditorComposeViewModelTest {
 
             advanceUntilIdle()
             assertThat(underTest.uiState.value.isRestoringContent).isFalse()
+        }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile flushes edits and saves full content`() = runTest {
+        val allLines = (1..100).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        val saveResult = TextEditorSaveResult.UploadRequired(
+            tempPath = "/tmp/test.txt",
+            parentHandle = 1L,
+            isEditMode = true,
+            fromHome = false,
+        )
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(saveResult)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, 5, "EDITED") }
+        underTest.saveFile()
+        advanceUntilIdle()
+
+        val textCaptor = argumentCaptor<String>()
+        verify(saveTextContentForTextEditorUseCase).invoke(
+            any(), textCaptor.capture(), any(), any(), any(), any(),
+        )
+        val savedLines = textCaptor.firstValue.split("\n")
+        assertThat(savedLines.first()).startsWith("EDITED")
+        assertThat(savedLines).hasSize(100)
+        assertThat(savedLines.last()).isEqualTo("line100")
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile in Create mode saves content as-is`() = runTest {
+        val saveResult = TextEditorSaveResult.UploadRequired(
+            tempPath = "/tmp/new.txt",
+            parentHandle = 1L,
+            isEditMode = false,
+            fromHome = false,
+        )
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(saveResult)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Create)
+        advanceUntilIdle()
+
+        val chunkState = underTest.getOrCreateChunkState(0)
+        chunkState.edit { replace(0, length, "brand new content") }
+        underTest.saveFile()
+        advanceUntilIdle()
+
+        val textCaptor = argumentCaptor<String>()
+        verify(saveTextContentForTextEditorUseCase).invoke(
+            any(), textCaptor.capture(), any(), any(), any(), any(),
+        )
+        assertThat(textCaptor.firstValue).isEqualTo("brand new content")
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that saveFile saves when started in View mode and switched to Edit mode`() =
+        runTest {
+            doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+                .invoke(any(), anyOrNull(), any())
+            val saveResult = TextEditorSaveResult.UploadRequired(
+                tempPath = "/tmp/edited.txt",
+                parentHandle = 1L,
+                isEditMode = true,
+                fromHome = false,
+            )
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+                .thenReturn(saveResult)
+
+            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+            advanceUntilIdle()
+            underTest.setEditMode()
+            underTest.saveFile()
+            advanceUntilIdle()
+
+            verify(saveTextContentForTextEditorUseCase).invoke(
+                any(), any(), any(), any(), any(), any(),
+            )
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -581,40 +694,6 @@ internal class TextEditorComposeViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that setViewMode without unsaved changes switches directly to View`() =
-        runTest {
-            doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
-                .invoke(any(), anyOrNull(), any())
-            initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
-            advanceUntilIdle()
-
-            underTest.setViewMode()
-
-            val state = underTest.uiState.value
-            assertThat(state.mode).isEqualTo(TextEditorMode.View)
-            assertThat(state.isRestoringContent).isFalse()
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `test that View mode getChunkText returns full content in chunks`() = runTest {
-        val allLines = (1..1500).map { "line$it" }
-        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
-            .invoke(any(), anyOrNull(), any())
-        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
-        advanceUntilIdle()
-
-        assertThat(underTest.getChunkCount()).isEqualTo(8)
-        val firstChunkLines = underTest.getChunkText(0).split("\n")
-        assertThat(firstChunkLines).hasSize(200)
-        assertThat(firstChunkLines.first()).isEqualTo("line1")
-        assertThat(firstChunkLines.last()).isEqualTo("line200")
-        val lastChunkText = underTest.getChunkText(7)
-        assertThat(lastChunkText.split("\n").last()).isEqualTo("line1500")
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
     fun `test that saveFile failure triggers errorEvent and sets errorMessage`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
             .invoke(any(), anyOrNull(), any())
@@ -634,13 +713,106 @@ internal class TextEditorComposeViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `test that isContentDirty returns false after load in Edit mode`() = runTest {
-        val allLines = (1..1500).map { "line$it" }
+    fun `test that saveFile is no-op when mode is View`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        val before = underTest.uiState.value
+        underTest.saveFile()
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value).isEqualTo(before)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that getChunkStartLine returns 1 for first chunk`() = runTest {
+        val allLines = (1..400).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        assertThat(underTest.getChunkStartLine(0)).isEqualTo(1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that getChunkStartLine returns correct offset for second chunk`() = runTest {
+        val allLines = (1..400).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        assertThat(underTest.getChunkStartLine(1)).isEqualTo(CHUNK_SIZE + 1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that setFocusedEditChunk updates focusedEditChunk in uiState`() = runTest {
+        val allLines = (1..400).map { "line$it" }
         doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
             .invoke(any(), anyOrNull(), any())
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
 
-        assertThat(underTest.isContentDirty()).isFalse()
+        underTest.setFocusedEditChunk(1)
+        assertThat(underTest.uiState.value.focusedEditChunk).isEqualTo(1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that consumeTransferEvent resets transfer event`() = runTest {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        val saveResult = TextEditorSaveResult.UploadRequired(
+            tempPath = "/tmp/test.txt",
+            parentHandle = 1L,
+            isEditMode = true,
+            fromHome = false,
+        )
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            .thenReturn(saveResult)
+
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
+        advanceUntilIdle()
+        underTest.saveFile()
+        advanceUntilIdle()
+
+        underTest.consumeTransferEvent()
+        assertThat(underTest.uiState.value.transferEvent).isEqualTo(consumed())
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that getChunkCount returns correct count in View mode`() = runTest {
+        val allLines = (1..500).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        assertThat(underTest.getChunkCount()).isEqualTo(3)
+    }
+
+    @Test
+    fun `test that getChunkCount returns 1 for Create mode with empty content`() {
+        initUnderTest(mode = TextEditorMode.Create)
+        assertThat(underTest.getChunkCount()).isEqualTo(1)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `test that getChunkCount returns correct count in Edit mode`() = runTest {
+        val allLines = (1..500).map { "line$it" }
+        doReturn(flowOf(allLines)).whenever(getTextContentForTextEditorUseCase)
+            .invoke(any(), anyOrNull(), any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
+        advanceUntilIdle()
+
+        underTest.setEditMode()
+        assertThat(underTest.getChunkCount()).isEqualTo(3)
     }
 }

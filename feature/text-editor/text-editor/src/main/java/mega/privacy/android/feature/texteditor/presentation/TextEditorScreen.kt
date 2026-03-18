@@ -63,6 +63,9 @@ fun TextEditorScreen(
     val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
     var pendingBackAfterSave by remember { mutableStateOf(false) }
 
+    val chunkCount = remember(uiState.totalLineCount, uiState.contentVersion) {
+        viewModel.getChunkCount()
+    }
     val chunkTextProvider = remember(viewModel, uiState.contentVersion) {
         { idx: Int -> viewModel.getChunkText(idx) }
     }
@@ -143,7 +146,10 @@ fun TextEditorScreen(
                             viewModel.requestShowDiscardDialog()
                         else viewModel.setViewMode()
                     },
-                    onSave = { viewModel.saveFile() },
+                    onSave = {
+                        pendingBackAfterSave = true
+                        viewModel.saveFile()
+                    },
                     onMenuAction = viewModel::onMenuAction,
                 )
 
@@ -183,7 +189,7 @@ fun TextEditorScreen(
                 else -> {
                     TextEditorContent(
                         lazyListState = lazyListState,
-                        chunkCount = viewModel.getChunkCount(),
+                        chunkCount = chunkCount,
                         totalLineCount = uiState.totalLineCount,
                         chunkTextProvider = chunkTextProvider,
                         chunkStateProvider = chunkStateProvider,

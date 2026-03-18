@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param errorMessage Optional error message when an operation fails; shown in error UI when set, cleared when error is consumed.
  * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit mode, unsaved changes).
- * @param saveSuccessEvent One-shot event to show "Changes saved" snackbar when save completes successfully.
+ * @param saveSuccessEvent One-shot event fired when save completes successfully; the UI navigates back on consumption.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
  */
 data class TextEditorComposeUiState(

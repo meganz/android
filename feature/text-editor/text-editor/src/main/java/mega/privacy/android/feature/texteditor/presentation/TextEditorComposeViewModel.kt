@@ -85,6 +85,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     /** Set to true when a disposed chunk had edits. */
     private var hasDisposedEdits: Boolean = false
 
+    /** Cached cumulative start-line for each chunk; rebuilt on content/mode changes. */
+    private var cachedStartLines: IntArray = IntArray(0)
+
     /** Content at last load or last successful save; used for discard. */
     private var lastSavedContent: String = ""
 
@@ -127,6 +130,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 if (args.mode == TextEditorMode.Edit) {
                     buildChunksFromLines()
                 }
+                rebuildStartLineCache()
                 _uiState.update { it.copy(isFullyLoaded = true) }
             }
             viewModelScope.launch {
@@ -154,6 +158,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         } else {
             lastSavedContent = ""
             chunkTexts.add("")
+            rebuildStartLineCache()
             _uiState.update {
                 it.copy(isLoading = false, totalLineCount = 0)
             }
@@ -201,20 +206,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(focusedEditChunk = chunkIndex) }
     }
 
-    /** Returns the starting line number (1-based) for a chunk. */
-    fun getChunkStartLine(chunkIndex: Int): Int {
-        var line = 1
-        val source = if (isEditMode()) chunkTexts else null
-        for (i in 0 until chunkIndex) {
-            val text = if (source != null) {
-                chunkStates[i]?.text?.toString() ?: source.getOrElse(i) { "" }
-            } else {
-                getChunkText(i)
-            }
-            line += text.count { it == '\n' } + 1
-        }
-        return line
-    }
+    /** Returns the cached starting line number (1-based) for a chunk. O(1) per call. */
+    fun getChunkStartLine(chunkIndex: Int): Int =
+        cachedStartLines.getOrElse(chunkIndex) { 1 }
 
     /**
      * Returns or lazily creates a [TextFieldState] for [chunkIndex].
@@ -242,13 +236,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    /** Flushes all currently active chunk states back to [chunkTexts]. */
+    /**
+     * Flushes ALL active chunk states back to [chunkTexts] and clears them.
+     * After this call, [chunkTexts] is the single source of truth for all chunk content.
+     */
     private fun flushAllActiveChunks() {
         chunkStates.forEach { (idx, state) ->
             if (idx < chunkTexts.size) {
                 chunkTexts[idx] = state.text.toString()
             }
         }
+        chunkStates.clear()
+        chunkOriginals.clear()
     }
 
     /** Rebuilds [fullContentLines] from [chunkTexts]. */
@@ -269,11 +268,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
+    /** Switches to Edit mode, building per-chunk text slices from the loaded content. */
     fun setEditMode(focusedChunkIndex: Int = 0) {
         buildChunksFromLines()
         chunkStates.clear()
         chunkOriginals.clear()
         hasDisposedEdits = false
+        rebuildStartLineCache()
         val initialChunk = if (chunkTexts.isNotEmpty())
             focusedChunkIndex.coerceIn(0, chunkTexts.size - 1)
         else 0
@@ -287,6 +288,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
+    /**
+     * Switches to View mode.
+     * When [discardChanges] is true, restores content from [lastSavedContent] asynchronously.
+     */
     fun setViewMode(discardChanges: Boolean = false) {
         if (discardChanges) {
             _uiState.update { it.copy(showDiscardDialog = false, isRestoringContent = true) }
@@ -303,6 +308,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                         contentVersion = it.contentVersion + 1,
                     )
                 }
+                rebuildStartLineCache()
             }
             return
         }
@@ -317,20 +323,25 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 contentVersion = it.contentVersion + 1,
             )
         }
+        rebuildStartLineCache()
     }
 
+    /** Shows the discard-changes confirmation dialog. */
     fun requestShowDiscardDialog() {
         _uiState.update { it.copy(showDiscardDialog = true) }
     }
 
+    /** User confirmed discard: reverts content and switches to View mode. */
     fun confirmDiscard() {
         setViewMode(discardChanges = true)
     }
 
+    /** User dismissed the discard dialog. */
     fun dismissDiscardDialog() {
         _uiState.update { it.copy(showDiscardDialog = false) }
     }
 
+    /** Flushes all chunk edits and persists the full document. No-op in View mode. */
     fun saveFile() {
         if (_uiState.value.mode == TextEditorMode.View) return
         flushAllActiveChunks()
@@ -355,15 +366,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     when (saveResult) {
                         is TextEditorSaveResult.UploadRequired -> {
                             lastSavedContent = fullTextToSave
-                            hasDisposedEdits = false
-                            chunkOriginals.clear()
-                            chunkStates.forEach { (idx, state) ->
-                                chunkOriginals[idx] = state.text.toString()
-                            }
                             _uiState.update {
                                 it.copy(
                                     mode = TextEditorMode.View,
                                     totalLineCount = fullContentLines.size,
+                                    contentVersion = it.contentVersion + 1,
                                     transferEvent = triggered(
                                         TransferTriggerEvent.StartUpload.TextFile(
                                             path = saveResult.tempPath,
@@ -375,6 +382,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                                     saveSuccessEvent = triggered,
                                 )
                             }
+                            clearEditState()
+                            rebuildStartLineCache()
                         }
                     }
                 },
@@ -469,6 +478,24 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         chunkOriginals.clear()
         chunkTexts.clear()
         hasDisposedEdits = false
+    }
+
+    private fun rebuildStartLineCache() {
+        val count = getChunkCount()
+        cachedStartLines = IntArray(count)
+        if (isEditMode()) {
+            var line = 1
+            for (i in 0 until count) {
+                cachedStartLines[i] = line
+                val text = chunkStates[i]?.text?.toString()
+                    ?: chunkTexts.getOrElse(i) { "" }
+                line += text.count { it == '\n' } + 1
+            }
+        } else {
+            for (i in 0 until count) {
+                cachedStartLines[i] = i * CHUNK_SIZE + 1
+            }
+        }
     }
 
     private fun ceilDiv(a: Int, b: Int): Int = (a + b - 1) / b

@@ -2,13 +2,13 @@ package mega.privacy.android.feature.texteditor.presentation
 
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +55,7 @@ private val LineNumberTextSizeSmall = 10.sp
  *   All other chunks are [BasicText] with a tap handler that shifts focus.
  *   This keeps memory and layout cost low regardless of file size.
  */
-@Suppress("DEPRECATION")
+@Suppress("DEPRECATION") // LocalAutofill: prevents Compose from notifying platform autofill with large payload
 @Composable
 internal fun TextEditorContent(
     lazyListState: LazyListState,
@@ -69,38 +70,41 @@ internal fun TextEditorContent(
     showLineNumbers: Boolean,
     readOnly: Boolean,
 ) {
-    val textStyle = editorTextStyle(MaterialTheme.colorScheme.onSurface)
+    val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+    val textStyle = remember(onSurfaceColor) { editorTextStyle(onSurfaceColor) }
 
     CompositionLocalProvider(LocalAutofill provides null) {
-        if (readOnly) {
-            ViewModeLazyColumn(
-                lazyListState = lazyListState,
-                chunkCount = chunkCount,
-                totalLineCount = totalLineCount,
-                chunkTextProvider = chunkTextProvider,
-                chunkStartLineProvider = chunkStartLineProvider,
-                showLineNumbers = showLineNumbers,
-                textStyle = textStyle,
-            )
-        } else {
-            EditModeLazyColumn(
-                lazyListState = lazyListState,
-                chunkCount = chunkCount,
-                totalLineCount = totalLineCount,
-                chunkStateProvider = checkNotNull(chunkStateProvider) {
-                    "chunkStateProvider is required when readOnly is false"
-                },
-                chunkStartLineProvider = chunkStartLineProvider,
-                onChunkDisposed = checkNotNull(onChunkDisposed) {
-                    "onChunkDisposed is required when readOnly is false"
-                },
-                isChunkReadOnly = isChunkReadOnly,
-                onChunkFocused = checkNotNull(onChunkFocused) {
-                    "onChunkFocused is required when readOnly is false"
-                },
-                showLineNumbers = showLineNumbers,
-                textStyle = textStyle,
-            )
+        Box(modifier = Modifier.fillMaxSize().then(if (!readOnly) Modifier.imePadding() else Modifier)) {
+            if (readOnly) {
+                ViewModeLazyColumn(
+                    lazyListState = lazyListState,
+                    chunkCount = chunkCount,
+                    totalLineCount = totalLineCount,
+                    chunkTextProvider = chunkTextProvider,
+                    chunkStartLineProvider = chunkStartLineProvider,
+                    showLineNumbers = showLineNumbers,
+                    textStyle = textStyle,
+                )
+            } else {
+                EditModeLazyColumn(
+                    lazyListState = lazyListState,
+                    chunkCount = chunkCount,
+                    totalLineCount = totalLineCount,
+                    chunkStateProvider = requireNotNull(chunkStateProvider) {
+                        "chunkStateProvider must be non-null in edit mode"
+                    },
+                    chunkStartLineProvider = chunkStartLineProvider,
+                    onChunkDisposed = requireNotNull(onChunkDisposed) {
+                        "onChunkDisposed must be non-null in edit mode"
+                    },
+                    isChunkReadOnly = isChunkReadOnly,
+                    onChunkFocused = requireNotNull(onChunkFocused) {
+                        "onChunkFocused must be non-null in edit mode"
+                    },
+                    showLineNumbers = showLineNumbers,
+                    textStyle = textStyle,
+                )
+            }
         }
     }
 }
@@ -119,7 +123,6 @@ private fun ViewModeLazyColumn(
         state = lazyListState,
         modifier = Modifier
             .fillMaxSize()
-            .imePadding()
             .padding(
                 start = if (showLineNumbers) 0.dp else 16.dp,
                 end = 16.dp,
@@ -160,7 +163,6 @@ private fun EditModeLazyColumn(
         state = lazyListState,
         modifier = Modifier
             .fillMaxSize()
-            .imePadding()
             .padding(
                 start = if (showLineNumbers) 0.dp else 16.dp,
                 end = 16.dp,
@@ -228,18 +230,19 @@ private fun EditableChunkItem(
     showLineNumbers: Boolean,
     textStyle: TextStyle,
 ) {
-    var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val layoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
     EditorChunkLayout(
         showLineNumbers = showLineNumbers,
         gutter = {
-            LineNumberGutter(
-                textLayoutResult = layoutResult,
-                text = textFieldState.text.toString(),
+            EditableLineNumberGutter(
+                textFieldState = textFieldState,
+                layoutResultState = layoutResultState,
                 startLineNumber = startLineNumber,
                 maxLineNumber = maxLineNumber,
             )
         },
     ) {
+        // TODO: revisit accessibility — clearAndSetSemantics strips TalkBack from editor chunks
         BasicTextField(
             state = textFieldState,
             readOnly = readOnly,
@@ -248,7 +251,7 @@ private fun EditableChunkItem(
                 .onFocusChanged { if (it.isFocused) onFocused() }
                 .clearAndSetSemantics { },
             lineLimits = TextFieldLineLimits.MultiLine(),
-            onTextLayout = { getResult -> layoutResult = getResult() },
+            onTextLayout = { getResult -> layoutResultState.value = getResult() },
         )
     }
 }
@@ -301,16 +304,11 @@ private fun EditorChunkLayout(
 }
 
 @Composable
-private fun LineNumberGutter(
-    textLayoutResult: TextLayoutResult?,
-    text: String,
-    startLineNumber: Int,
-    maxLineNumber: Int,
-) {
+private fun rememberGutterPaint(maxLineNumber: Int): Paint {
     val density = LocalDensity.current
     val lineNumberColor = MaterialTheme.colorScheme.onSurface
     val digitCount = digitCountForMaxLine(maxLineNumber)
-    val paint = remember(digitCount, lineNumberColor) {
+    return remember(digitCount, lineNumberColor) {
         Paint().apply {
             isAntiAlias = true
             textSize = with(density) {
@@ -319,6 +317,16 @@ private fun LineNumberGutter(
             color = lineNumberColor.toArgb()
         }
     }
+}
+
+@Composable
+private fun LineNumberGutter(
+    textLayoutResult: TextLayoutResult?,
+    text: String,
+    startLineNumber: Int,
+    maxLineNumber: Int,
+) {
+    val paint = rememberGutterPaint(maxLineNumber)
 
     Canvas(
         modifier = Modifier
@@ -327,6 +335,53 @@ private fun LineNumberGutter(
             .clearAndSetSemantics { },
         onDraw = drawScope@{
             val layout = textLayoutResult ?: return@drawScope
+            val gutterWidthPx = size.width
+            var currentLogicalLine = startLineNumber
+
+            for (visualLine in 0 until layout.lineCount) {
+                val isNewLogicalLine = if (visualLine == 0) {
+                    true
+                } else {
+                    val lineStart = layout.getLineStart(visualLine)
+                    lineStart > 0 && text.getOrNull(lineStart - 1) == '\n'
+                }
+
+                if (isNewLogicalLine) {
+                    val label = currentLogicalLine.toString()
+                    val textWidth = paint.measureText(label)
+                    val x = gutterWidthPx - textWidth
+                    val y = layout.getLineBaseline(visualLine)
+                    drawContext.canvas.nativeCanvas.drawText(label, x, y, paint)
+                    currentLogicalLine++
+                }
+            }
+        },
+    )
+}
+
+/**
+ * Gutter variant for editable chunks. Reads [TextFieldState.text] only inside
+ * the draw lambda so keystrokes don't trigger recomposition of the parent item.
+ * The Canvas redraws when [layoutResultState] changes (new text layout from
+ * [BasicTextField.onTextLayout]).
+ */
+@Composable
+private fun EditableLineNumberGutter(
+    textFieldState: TextFieldState,
+    layoutResultState: State<TextLayoutResult?>,
+    startLineNumber: Int,
+    maxLineNumber: Int,
+) {
+    val paint = rememberGutterPaint(maxLineNumber)
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = LineNumberGutterPadding)
+            .clearAndSetSemantics { },
+        onDraw = drawScope@{
+            val layout = layoutResultState.value ?: return@drawScope
+            val text = textFieldState.text
             val gutterWidthPx = size.width
             var currentLogicalLine = startLineNumber
 
