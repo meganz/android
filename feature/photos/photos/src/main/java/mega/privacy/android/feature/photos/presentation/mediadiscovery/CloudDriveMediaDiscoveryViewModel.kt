@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -59,14 +61,17 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val photoToTypedFileNodeMapper: PhotoToTypedFileNodeMapper,
     @Assisted private val folderId: Long,
     @Assisted private val folderName: String,
     @Assisted private val fromFolderLink: Boolean,
+    @Assisted private val nodeSourceType: NodeSourceType,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         CloudDriveMediaDiscoveryUiState(
             folderName = folderName,
-            fromFolderLink = fromFolderLink
+            fromFolderLink = fromFolderLink,
+            nodeSourceType = nodeSourceType
         )
     )
     val state = _state.asStateFlow()
@@ -173,10 +178,12 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
                 )
             }
         } else {
+            val sourceNodes = sourcePhotos.map(photoToTypedFileNodeMapper::invoke)
             _state.update {
                 it.copy(
                     loadPhotosDone = true,
                     sourcePhotos = sourcePhotos,
+                    sourceNodes = sourceNodes,
                     mediaListItemList = mediaListItemList,
                     yearsCardList = yearsCardList,
                     monthsCardList = monthsCardList,
@@ -361,20 +368,19 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
 
     fun selectPhoto(photo: Photo) {
         val id = photo.id
-        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
-        if (id in selectedPhotoIds) {
-            selectedPhotoIds.remove(id)
-        } else {
-            selectedPhotoIds.add(id)
-        }
         _state.update {
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+            val updatedIds = if (id in it.selectedPhotoIds) {
+                it.selectedPhotoIds - id
+            } else {
+                it.selectedPhotoIds + id
+            }
+            it.copy(selectedPhotoIds = updatedIds)
         }
     }
 
     fun selectAllPhotos() {
         _state.update {
-            it.copy(selectedPhotoIds = getAllPhotoIds().toMutableSet())
+            it.copy(selectedPhotoIds = getAllPhotoIds().toSet())
         }
     }
 
@@ -394,6 +400,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
             folderId: Long = -1,
             folderName: String = "",
             fromFolderLink: Boolean = false,
+            nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         ): CloudDriveMediaDiscoveryViewModel
     }
 

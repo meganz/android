@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.feature.photos.presentation.mediadiscovery.cloudDriveMediaDiscoveryScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -54,6 +53,7 @@ class MediaFeatureDestination : FeatureDestination {
             )
             cloudDriveMediaDiscoveryScreen(
                 navigationHandler = navigationHandler,
+                onTransfer = transferHandler::setTransferEvent
             )
         }
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
@@ -40,9 +41,16 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.MediaListItem
@@ -52,6 +60,8 @@ import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.Med
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -64,24 +74,64 @@ import java.util.Locale
 
 @Composable
 fun CloudDriveMediaDiscoveryRoute(
-    onBack: () -> Unit,
+    navigationHandler: NavigationHandler,
     modifier: Modifier = Modifier,
     viewModel: CloudDriveMediaDiscoveryViewModel = hiltViewModel<CloudDriveMediaDiscoveryViewModel, CloudDriveMediaDiscoveryViewModel.Factory>(
         creationCallback = { it.create() }
     ),
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel =
+        hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+            creationCallback = { it.create(null) }
+        ),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onMoreOptionsClicked: () -> Unit = {},
 ) {
+    val multiNodeActionHandler = rememberMultiNodeActionHandler(
+        viewModel = nodeOptionsActionViewModel,
+        navigationHandler = navigationHandler
+    )
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val actionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.selectedPhotosCount) {
+        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+            selectedNodes = uiState.selectedNodes,
+            nodeSourceType = uiState.nodeSourceType
+        )
+    }
+
+    EventEffect(
+        event = actionUiState.actionTriggeredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetActionTriggered
+    ) {
+        viewModel.clearSelectedPhotos()
+    }
+
+    EventEffect(
+        event = actionUiState.dismissEvent,
+        onConsumed = nodeOptionsActionViewModel::resetDismiss,
+    ) {
+        viewModel.clearSelectedPhotos()
+    }
 
     CloudDriveMediaDiscoveryScreen(
         uiState = uiState,
-        onBack = onBack,
+        actionUiState = actionUiState,
+        multiNodeActionHandler = multiNodeActionHandler,
+        onBack = navigationHandler::back,
         onItemClicked = { photo ->
             if (uiState.isInSelectionMode) {
                 viewModel.selectPhoto(photo)
             } else {
-                // Todo open photo or video preview
+                navigationHandler.navigate(
+                    LegacyImagePreviewNavKey(
+                        imageIds = uiState
+                            .sourcePhotos
+                            .map { it.id }
+                            .toSet(),
+                        anchorImageId = photo.id,
+                    )
+                )
             }
         },
         onItemLongPressed = viewModel::selectPhoto,
@@ -99,6 +149,8 @@ fun CloudDriveMediaDiscoveryRoute(
 @Composable
 internal fun CloudDriveMediaDiscoveryScreen(
     uiState: CloudDriveMediaDiscoveryUiState,
+    actionUiState: NodeActionState,
+    multiNodeActionHandler: MultiNodeActionHandler,
     onBack: () -> Unit,
     onItemClicked: (Photo) -> Unit,
     onItemLongPressed: (Photo) -> Unit,
@@ -112,7 +164,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
 ) {
     var isPeriodVisible by remember { mutableStateOf(true) }
 
-    // Todo: Implement dropdown option
+    // Todo: AND-22894 Implement dropdown option
     var isDropdownVisible by remember { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -145,7 +197,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
                                     stringResource(sharedR.string.general_action_filter)
                             },
                             onClick = {
-                                // Todo: Implement dropdown option
+                                // Todo: AND-22894 Implement dropdown option
                                 isDropdownVisible = true
                             }
                         ),
@@ -157,13 +209,20 @@ internal fun CloudDriveMediaDiscoveryScreen(
             }
         },
         bottomBar = {
-            // Todo: Implement NodeSelectionModeBottomBar to handle multi photos action
+            NodeSelectionModeBottomBar(
+                availableActions = actionUiState.availableActions,
+                visibleActions = actionUiState.visibleActions,
+                visible = actionUiState.visibleActions.isNotEmpty() && uiState.isInSelectionMode,
+                multiNodeActionHandler = multiNodeActionHandler,
+                selectedNodes = uiState.selectedNodes.toList(),
+                isSelecting = false,
+            )
         }
     ) { containerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(containerPadding)
+                .padding(containerPadding.excludingBottomPadding())
         ) {
             when (uiState.selectedPeriod) {
                 MediaDiscoveryPeriod.All -> {

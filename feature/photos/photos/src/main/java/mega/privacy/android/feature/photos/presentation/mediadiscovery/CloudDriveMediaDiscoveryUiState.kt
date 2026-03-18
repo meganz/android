@@ -3,6 +3,9 @@ package mega.privacy.android.feature.photos.presentation.mediadiscovery
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
@@ -16,6 +19,7 @@ data class CloudDriveMediaDiscoveryUiState(
     val loadPhotosDone: Boolean = false,
     val selectedPhotoIds: Set<Long> = emptySet(),
     val sourcePhotos: List<Photo> = emptyList(),
+    val sourceNodes: List<TypedFileNode> = emptyList(),
     val mediaListItemList: List<MediaListItem> = emptyList(),
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
     val currentSort: Sort = Sort.NEWEST,
@@ -32,7 +36,13 @@ data class CloudDriveMediaDiscoveryUiState(
     val scrollStartOffset: Int = 0,
     val fromFolderLink: Boolean = false,
     val folderName: String = "",
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
 ) {
+    val selectedNodes: Set<TypedFileNode>
+        get() = sourceNodes
+            .filter { it.id.longValue in selectedPhotoIds }
+            .toSet()
+
     val isInSelectionMode = selectedPhotoIds.isNotEmpty()
     val selectedPhotosCount = selectedPhotoIds.size
     val isAllSelected = selectedPhotoIds.size == sourcePhotos.size

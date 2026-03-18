@@ -16,6 +16,8 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountPlanDetail
@@ -33,17 +35,20 @@ import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
+import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -60,6 +65,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val photoToTypedFileNodeMapper = mock<PhotoToTypedFileNodeMapper>()
 
     private val testFolderId = 123L
     private val testFolderName = "Test Folder"
@@ -99,7 +105,8 @@ class CloudDriveMediaDiscoveryViewModelTest {
         whenever(getPhotosByFolderIdUseCase(any(), any(), any())).thenReturn(
             flowOf(emptyList())
         )
-        whenever(durationInSecondsTextMapper(any())).thenReturn("0:30")
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("0:30")
+        whenever(photoToTypedFileNodeMapper(any())).thenReturn(mock())
     }
 
     private fun initViewModel() {
@@ -112,9 +119,11 @@ class CloudDriveMediaDiscoveryViewModelTest {
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            photoToTypedFileNodeMapper = photoToTypedFileNodeMapper,
             folderId = testFolderId,
             folderName = testFolderName,
             fromFolderLink = testFromFolderLink,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
         )
     }
 
@@ -467,7 +476,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that selectAllPhotos selects all photos from media list`() = runTest {
         val photos = createTestPhotos()
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(durationInSecondsTextMapper(any())).thenReturn("")
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
 
         initViewModel()
 
@@ -531,7 +540,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that isAllSelected is true when all source photos are selected`() = runTest {
         val photos = createTestPhotos()
         whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
-        whenever(durationInSecondsTextMapper(any())).thenReturn("")
+        whenever(durationInSecondsTextMapper(anyOrNull())).thenReturn("")
 
         initViewModel()
 
@@ -586,6 +595,25 @@ class CloudDriveMediaDiscoveryViewModelTest {
         thumbnailFilePath = null,
         previewFilePath = null,
         fileTypeInfo = StaticImageFileTypeInfo("image/jpeg", "jpg"),
+        isSensitive = isSensitive,
+        isSensitiveInherited = isSensitiveInherited,
+    )
+
+    private fun createVideoPhoto(
+        id: Long = 1,
+        modificationTime: LocalDateTime = LocalDateTime.of(2026, 3, 16, 10, 0),
+        isSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+    ): Photo.Video = Photo.Video(
+        id = id,
+        parentId = testFolderId,
+        name = "video_$id.mp4",
+        isFavourite = false,
+        creationTime = modificationTime,
+        modificationTime = modificationTime,
+        thumbnailFilePath = null,
+        previewFilePath = null,
+        fileTypeInfo = VideoFileTypeInfo("video/mp4", "mp4", 30.seconds),
         isSensitive = isSensitive,
         isSensitiveInherited = isSensitiveInherited,
     )

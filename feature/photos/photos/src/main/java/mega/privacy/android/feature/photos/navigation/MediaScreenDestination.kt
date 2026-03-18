@@ -1,6 +1,9 @@
 package mega.privacy.android.feature.photos.navigation
 
 import android.content.Intent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,6 +15,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.ui.NavDisplay
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -40,6 +44,8 @@ import mega.privacy.android.feature.photos.presentation.albums.importlink.AlbumI
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.feature.photos.presentation.albums.photosselection.AlbumPhotosSelectionViewModel
 import mega.privacy.android.feature.photos.presentation.cuprogress.CameraUploadsProgressRoute
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.CloudDriveMediaDiscoveryRoute
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.CloudDriveMediaDiscoveryViewModel
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailRoute
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosForPlaylistRoute
@@ -58,6 +64,7 @@ import mega.privacy.android.navigation.destination.AlbumGetLinkNavKey
 import mega.privacy.android.navigation.destination.AlbumGetMultipleLinksNavKey
 import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
+import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -528,6 +535,63 @@ fun EntryProviderScope<NavKey>.videoRecentlyWatchedScreen(
         VideoRecentlyWatchedRoute(
             onBack = navigationHandler::back,
             navigate = navigationHandler::navigate
+        )
+    }
+}
+
+/**
+ * Entry for Cloud Drive Media Discovery Screen
+ * @param navigationHandler Navigation handler to handle navigation actions
+ * @param onTransfer Callback to handle transfer events
+ */
+fun EntryProviderScope<NavKey>.cloudDriveMediaDiscoveryScreen(
+    navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
+) {
+    entry<CloudDriveMediaDiscoveryNavKey>(
+        metadata = NavDisplay.transitionSpec {
+            EnterTransition.None togetherWith ExitTransition.None
+        }
+    ) { key ->
+        val viewModel =
+            hiltViewModel<CloudDriveMediaDiscoveryViewModel, CloudDriveMediaDiscoveryViewModel.Factory>(
+                creationCallback = {
+                    it.create(
+                        folderId = key.folderId,
+                        folderName = key.folderName,
+                        fromFolderLink = key.fromFolderLink,
+                        nodeSourceType = key.nodeSourceType
+                    )
+                }
+            )
+
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                creationCallback = { it.create(null) }
+            )
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            onNavigate = navigationHandler::navigate,
+            onTransfer = onTransfer,
+            nodeResultFlow = navigationHandler::monitorResult,
+            clearResultFlow = navigationHandler::clearResult,
+        )
+
+        CloudDriveMediaDiscoveryRoute(
+            viewModel = viewModel,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            onMoreOptionsClicked = {
+                if (key.folderId != -1L) {
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheetNavKey(
+                            nodeHandle = key.folderId,
+                            nodeSourceType = key.nodeSourceType,
+                        )
+                    )
+                }
+            },
         )
     }
 }
