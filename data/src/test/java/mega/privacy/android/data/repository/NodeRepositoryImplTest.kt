@@ -150,6 +150,7 @@ internal class NodeRepositoryImplTest {
     val offline: Offline = mock()
     private val tag = "tag"
     private val nodeLabelIntMapper = NodeLabelIntMapper()
+    private val testCaller = "testCaller"
 
     @BeforeAll
     fun setup() {
@@ -759,7 +760,7 @@ internal class NodeRepositoryImplTest {
             val node = NodeId(1L)
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
             assertThrows<IllegalArgumentException> {
-                underTest.exportNode(node, null)
+                underTest.exportNode(node, null, testCaller)
             }
         }
 
@@ -772,7 +773,7 @@ internal class NodeRepositoryImplTest {
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
             assertThrows<IllegalArgumentException> {
-                underTest.exportNode(node, null)
+                underTest.exportNode(node, null, testCaller)
             }
         }
 
@@ -791,7 +792,7 @@ internal class NodeRepositoryImplTest {
                 on { publicLink }.thenReturn(expected)
             }
             whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(megaNode)
-            val actual = underTest.exportNode(node, expireTime)
+            val actual = underTest.exportNode(node, expireTime, testCaller)
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -820,7 +821,7 @@ internal class NodeRepositoryImplTest {
                 },
             )
         }
-        assertThat(underTest.exportNode(node, expireTime)).isEqualTo(expected)
+        assertThat(underTest.exportNode(node, expireTime, testCaller)).isEqualTo(expected)
     }
 
     @Test
@@ -844,7 +845,7 @@ internal class NodeRepositoryImplTest {
                 },
             )
         }
-        assertThat(underTest.exportNode(typedNode)).isEqualTo(expected)
+        assertThat(underTest.exportNode(typedNode, testCaller)).isEqualTo(expected)
     }
 
     @Test
@@ -869,7 +870,7 @@ internal class NodeRepositoryImplTest {
                 )
             }
             assertThrows<MegaException> {
-                underTest.exportNode(node, expireTime)
+                underTest.exportNode(node, expireTime, testCaller)
             }
         }
 

@@ -180,7 +180,10 @@ class GetLinkViewModel @Inject constructor(
         viewModelScope.launch {
             node?.let {
                 runCatching {
-                    exportNodeUseCase(NodeId(it.handle))
+                    exportNodeUseCase(
+                        nodeToExport = NodeId(it.handle),
+                        callerName = "GetLinkViewModel"
+                    )
                 }.onSuccess {
                     updateLink(node?.handle)
                     if (isFirstTime) {
@@ -202,7 +205,11 @@ class GetLinkViewModel @Inject constructor(
         viewModelScope.launch {
             node?.let {
                 runCatching {
-                    exportNodeUseCase(NodeId(it.handle), expiryDate)
+                    exportNodeUseCase(
+                        nodeToExport = NodeId(it.handle),
+                        expireTime = expiryDate,
+                        callerName = "GetLinkViewModel"
+                    )
                 }.onSuccess {
                     onExpiryDateTrackEvent(isChecked = true)
                     updateLink(node?.handle)

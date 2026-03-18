@@ -121,7 +121,7 @@ class GetSeveralLinksViewModel @Inject constructor(
             val pendingExportNodeHandles = pendingExports.map { it.handle }
             viewModelScope.launch {
                 runCatching {
-                    exportNodesUseCase(pendingExportNodeHandles)
+                    exportNodesUseCase(pendingExportNodeHandles, "GetSeveralLinksViewModel")
                 }.onSuccess { exportedNodes ->
                     notifyExportedNodes(exportedNodes)
                 }.onFailure { error ->

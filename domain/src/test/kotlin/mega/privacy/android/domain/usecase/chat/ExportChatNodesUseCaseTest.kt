@@ -26,6 +26,8 @@ internal class ExportChatNodesUseCaseTest {
     }
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()
+    private val callerName = "testCaller"
+    private val propagatedCallerName = "ExportChatNodesUseCase:$callerName"
     private lateinit var underTest: ExportChatNodesUseCase
 
     @BeforeAll
@@ -44,10 +46,10 @@ internal class ExportChatNodesUseCaseTest {
         val node2 = mock<ChatImageFile>()
         val link1 = "link1"
         val link2 = "link2"
-        whenever(nodeRepository.exportNode(node1)).thenReturn(link1)
-        whenever(nodeRepository.exportNode(node2)).thenReturn(link2)
+        whenever(nodeRepository.exportNode(node1, propagatedCallerName)).thenReturn(link1)
+        whenever(nodeRepository.exportNode(node2, propagatedCallerName)).thenReturn(link2)
         val expected = mapOf(node1.id to link1, node2.id to link2)
-        val actual = underTest.invoke(listOf(node1, node2))
+        val actual = underTest.invoke(listOf(node1, node2), callerName)
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -56,10 +58,10 @@ internal class ExportChatNodesUseCaseTest {
         val node1 = mock<ChatImageFile>()
         val node2 = mock<ChatImageFile>()
         val link1 = "link1"
-        whenever(nodeRepository.exportNode(node1)).thenReturn(link1)
-        whenever(nodeRepository.exportNode(node2)).thenReturn("")
+        whenever(nodeRepository.exportNode(node1, propagatedCallerName)).thenReturn(link1)
+        whenever(nodeRepository.exportNode(node2, propagatedCallerName)).thenReturn("")
         val expected = mapOf(node1.id to link1)
-        val actual = underTest.invoke(listOf(node1, node2))
+        val actual = underTest.invoke(listOf(node1, node2), callerName)
         assertThat(actual).isEqualTo(expected)
     }
 
@@ -74,15 +76,16 @@ internal class ExportChatNodesUseCaseTest {
             }
             val link1 = "link1"
             val link2 = "link2"
-            whenever(nodeRepository.exportNode(node1)).thenReturn(link1)
-            whenever(nodeRepository.exportNode(node2)).thenAnswer {
+            whenever(nodeRepository.exportNode(node1, propagatedCallerName)).thenReturn(link1)
+            whenever(nodeRepository.exportNode(node2, propagatedCallerName)).thenAnswer {
                 throw MegaIllegalArgumentException(1)
             }
             val copyNodeId = NodeId(3L)
             whenever(copyTypedNodeUseCase(node2, chatFolderId)).thenReturn(copyNodeId)
-            whenever(exportNodeUseCase(copyNodeId)).thenReturn(link2)
+            whenever(exportNodeUseCase(copyNodeId, callerName = propagatedCallerName))
+                .thenReturn(link2)
             val expected = mapOf(node1.id to link1, node2.id to link2)
-            val actual = underTest.invoke(listOf(node1, node2))
+            val actual = underTest.invoke(listOf(node1, node2), callerName)
             assertThat(actual).isEqualTo(expected)
         }
 

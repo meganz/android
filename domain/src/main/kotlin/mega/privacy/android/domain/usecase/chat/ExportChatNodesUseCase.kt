@@ -20,7 +20,7 @@ class ExportChatNodesUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase,
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase,
-    private val exportNodeUseCase: ExportNodeUseCase
+    private val exportNodeUseCase: ExportNodeUseCase,
 ) {
     /**
      * Invoke
@@ -28,13 +28,18 @@ class ExportChatNodesUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         nodes: List<TypedNode>,
+        callerName: String,
     ): Map<NodeId, String> {
         val myChatFolder = getOrCreateMyChatsFilesFolderIdUseCase()
         return supervisorScope {
             nodes.map { node ->
                 async {
                     runCatching {
-                        node.id to exportNode(node, myChatFolder)
+                        node.id to exportNode(
+                            node,
+                            myChatFolder,
+                            "ExportChatNodesUseCase:$callerName"
+                        )
                     }
                 }
             }
@@ -44,14 +49,18 @@ class ExportChatNodesUseCase @Inject constructor(
             .toMap()
     }
 
-    private suspend fun exportNode(node: TypedNode, myChatFolder: NodeId): String {
+    private suspend fun exportNode(
+        node: TypedNode,
+        myChatFolder: NodeId,
+        callerName: String,
+    ): String {
         return try {
-            nodeRepository.exportNode(node)
+            nodeRepository.exportNode(node, callerName)
         } catch (e: Throwable) {
             if (e is MegaIllegalArgumentException) {
                 // attempt to copy the node to the chat folder
                 val id = copyTypedNodeUseCase(node, myChatFolder)
-                exportNodeUseCase(nodeToExport = id)
+                exportNodeUseCase(nodeToExport = id, callerName = callerName)
             } else {
                 throw e
             }

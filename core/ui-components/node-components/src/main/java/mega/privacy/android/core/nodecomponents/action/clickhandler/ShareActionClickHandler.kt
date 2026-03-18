@@ -66,17 +66,21 @@ class ShareActionClickHandler @Inject constructor(
                             name = node.name
                         )
                     } else {
-                        runCatching { exportNodesUseCase(node.id) }
-                            .onSuccess { exportPath ->
-                                provider.coroutineScope.ensureActive()
-                                startShareIntent(
-                                    context = provider.context,
-                                    path = exportPath,
-                                    name = node.name
-                                )
-                            }.onFailure {
-                                Timber.e(it)
-                            }
+                        runCatching {
+                            exportNodesUseCase(
+                                nodeToExport = node.id,
+                                callerName = "ShareActionClickHandler:single"
+                            )
+                        }.onSuccess { exportPath ->
+                            provider.coroutineScope.ensureActive()
+                            startShareIntent(
+                                context = provider.context,
+                                path = exportPath,
+                                name = node.name
+                            )
+                        }.onFailure {
+                            Timber.e(it)
+                        }
                     }
                 }
 
@@ -145,11 +149,15 @@ class ShareActionClickHandler @Inject constructor(
                         )
                     } else {
                         val uris = nodes.mapNotNull {
-                            runCatching { exportNodesUseCase(nodeToExport = it.id) }
-                                .getOrElse {
-                                    Timber.e(it)
-                                    null
-                                }
+                            runCatching {
+                                exportNodesUseCase(
+                                    nodeToExport = it.id,
+                                    callerName = "ShareActionClickHandler:multiple"
+                                )
+                            }.getOrElse {
+                                Timber.e(it)
+                                null
+                            }
                         }
                         shareLinks(
                             context = context,

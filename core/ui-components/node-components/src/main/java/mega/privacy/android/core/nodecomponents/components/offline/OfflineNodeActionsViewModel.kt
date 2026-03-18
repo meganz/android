@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
 import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
@@ -32,6 +31,7 @@ import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.shared.nodes.R as NodesR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -134,7 +134,7 @@ class OfflineNodeActionsViewModel @Inject constructor(
 
     private suspend fun shareNodes(nodes: List<OfflineFileInformation>) {
         runCatching {
-            exportNodesUseCase(nodes.map { it.handle.toLong() })
+            exportNodesUseCase(nodes.map { it.handle.toLong() }, "OfflineNodeActionsViewModel")
         }.onSuccess { linksMap ->
             if (linksMap.isEmpty()) return@onSuccess
 

@@ -18,6 +18,8 @@ internal class ExportNodesUseCaseTest {
     private lateinit var underTest: ExportNodesUseCase
 
     private val exportNodeUseCase: ExportNodeUseCase = mock()
+    private val callerName = "testCaller"
+    private val propagatedCallerName = "ExportNodesUseCase:$callerName"
 
     @BeforeAll
     fun setUp() {
@@ -39,10 +41,12 @@ internal class ExportNodesUseCaseTest {
             val link1 = "result1"
             val nodeHandle2 = 2L
             val link2 = "result2"
-            whenever(exportNodeUseCase(NodeId(nodeHandle1))).thenReturn(link1)
-            whenever(exportNodeUseCase(NodeId(nodeHandle2))).thenReturn(link2)
+            whenever(exportNodeUseCase(NodeId(nodeHandle1), callerName = propagatedCallerName))
+                .thenReturn(link1)
+            whenever(exportNodeUseCase(NodeId(nodeHandle2), callerName = propagatedCallerName))
+                .thenReturn(link2)
             val expected = mapOf(nodeHandle1 to link1, nodeHandle2 to link2)
-            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2))
+            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2), callerName)
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -53,12 +57,14 @@ internal class ExportNodesUseCaseTest {
             val nodeHandle1 = 1L
             val link1 = "result1"
             val nodeHandle2 = 2L
-            whenever(exportNodeUseCase(NodeId(nodeHandle1))).thenReturn(link1)
-            whenever(exportNodeUseCase(NodeId(nodeHandle2))).thenAnswer {
+            whenever(exportNodeUseCase(NodeId(nodeHandle1), callerName = propagatedCallerName))
+                .thenReturn(link1)
+            whenever(exportNodeUseCase(NodeId(nodeHandle2), callerName = propagatedCallerName))
+                .thenAnswer {
                 throw IllegalArgumentException("Node not found")
             }
             val expected = mapOf(nodeHandle1 to link1)
-            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2))
+            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2), callerName)
             assertThat(actual).isEqualTo(expected)
         }
 
@@ -68,13 +74,15 @@ internal class ExportNodesUseCaseTest {
         runTest {
             val nodeHandle1 = 1L
             val nodeHandle2 = 2L
-            whenever(exportNodeUseCase(NodeId(nodeHandle1))).thenAnswer {
+            whenever(exportNodeUseCase(NodeId(nodeHandle1), callerName = propagatedCallerName))
+                .thenAnswer {
                 throw IllegalArgumentException("Node not found")
             }
-            whenever(exportNodeUseCase(NodeId(nodeHandle2))).thenAnswer {
+            whenever(exportNodeUseCase(NodeId(nodeHandle2), callerName = propagatedCallerName))
+                .thenAnswer {
                 throw IllegalArgumentException("Node not found")
             }
-            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2))
+            val actual = underTest.invoke(listOf(nodeHandle1, nodeHandle2), callerName)
             assertThat(actual).isEmpty()
         }
 }

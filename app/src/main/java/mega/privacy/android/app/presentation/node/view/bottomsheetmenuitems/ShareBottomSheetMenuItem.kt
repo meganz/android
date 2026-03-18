@@ -96,17 +96,21 @@ class ShareBottomSheetMenuItem @Inject constructor(
                             name = node.name
                         )
                     } else {
-                        runCatching { exportNodesUseCase(node.id) }
-                            .onSuccess { exportPath ->
-                                parentCoroutineScope.ensureActive()
-                                startShareIntent(
-                                    context = context,
-                                    path = exportPath,
-                                    name = node.name
-                                )
-                            }.onFailure {
-                                Timber.e(it)
-                            }
+                        runCatching {
+                            exportNodesUseCase(
+                                nodeToExport = node.id,
+                                callerName = "ShareBottomSheetMenuItem"
+                            )
+                        }.onSuccess { exportPath ->
+                            parentCoroutineScope.ensureActive()
+                            startShareIntent(
+                                context = context,
+                                path = exportPath,
+                                name = node.name
+                            )
+                        }.onFailure {
+                            Timber.e(it)
+                        }
                     }
                 }
             }

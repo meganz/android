@@ -868,17 +868,22 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun exportNode(nodeToExport: NodeId, expireTime: Long?): String =
+    override suspend fun exportNode(
+        nodeToExport: NodeId,
+        expireTime: Long?,
+        callerName: String,
+    ): String =
         withContext(ioDispatcher) {
             val node = getMegaNodeByHandle(nodeToExport, true)
-            exportNode(node, expireTime)
+            exportNode(node, expireTime, callerName)
         }
 
-    override suspend fun exportNode(node: TypedNode) = withContext(ioDispatcher) {
-        exportNode(megaNodeMapper(node), null)
-    }
+    override suspend fun exportNode(node: TypedNode, callerName: String): String =
+        withContext(ioDispatcher) {
+            exportNode(megaNodeMapper(node), null, callerName)
+        }
 
-    private suspend fun exportNode(node: MegaNode?, expireTime: Long?): String {
+    private suspend fun exportNode(node: MegaNode?, expireTime: Long?, callerName: String): String {
         requireNotNull(node) { "Node to export not found" }
         require(!node.isTakenDown) { "Node to export is taken down" }
 
@@ -886,7 +891,8 @@ internal class NodeRepositoryImpl @Inject constructor(
             return node.publicLink.orEmpty()
         }
         return suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener("exportNode") { it.link.orEmpty() }
+            val listener =
+                continuation.getRequestListener("exportNode:$callerName") { it.link.orEmpty() }
             megaApiGateway.exportNode(node, expireTime, listener)
         }
     }

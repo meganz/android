@@ -50,7 +50,12 @@ internal class GetShareChatNodesUseCaseTest {
         whenever(getNodePreviewFileUseCase.invoke(node1)).thenReturn(File("path"))
         whenever(getNodePreviewFileUseCase.invoke(node2)).thenReturn(null)
         val chatNodes = listOf(node1, node2)
-        whenever(exportChatNodesUseCase.invoke(chatNodes)).thenReturn(mapOf(NodeId(1L) to "link1"))
+        whenever(
+            exportChatNodesUseCase.invoke(
+                chatNodes,
+                "GetShareChatNodesUseCase",
+            )
+        ).thenReturn(mapOf(NodeId(1L) to "link1"))
         val actual = underTest.invoke(chatNodes)
         Truth.assertThat(actual).isInstanceOf(NodeShareContentUri.RemoteContentUris::class.java)
     }

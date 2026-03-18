@@ -587,21 +587,25 @@ interface NodeRepository {
      *
      * @param nodeToExport the node's [NodeId] that we want to export
      * @param expireTime the time in seconds since epoch to set as expiry date
+     * @param callerName Temporary param to try to identify a Firebase report.
      * @return the [String] The link if the request finished with success, error if not
      */
     suspend fun exportNode(
         nodeToExport: NodeId,
         expireTime: Long?,
+        callerName: String,
     ): String
 
     /**
      * Export node
      *
      * @param node [TypedNode]
+     * @param callerName Temporary param to try to identify a Firebase report.
      * @return the [String] The public link of the node
      */
     suspend fun exportNode(
         node: TypedNode,
+        callerName: String,
     ): String
 
     /**
