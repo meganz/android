@@ -445,6 +445,13 @@ interface FileSystemRepository {
     fun getFileTypeInfoByName(name: String, duration: Int = 0): FileTypeInfo
 
     /**
+     * Check if the node is openable text file
+     *
+     * @param node file node to check
+     */
+    fun isNodeOpenableTextFile(node: FileNode): Boolean
+
+    /**
      * Copy uri
      *
      * @param source

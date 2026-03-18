@@ -9,8 +9,10 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
+import mega.privacy.android.domain.usecase.file.IsNodeOpenableTextFileUseCase
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -18,11 +20,10 @@ import java.io.File
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EditBottomSheetMenuItemTest {
-
-    private val getFileTypeInfoUseCase = mock<GetFileTypeInfoUseCase>()
+    private val isNodeOpenableTextFileUseCase = mock<IsNodeOpenableTextFileUseCase>()
     private val underTest = EditBottomSheetMenuItem(
         menuAction = mock<EditMenuAction>(),
-        getFileTypeInfoUseCase = getFileTypeInfoUseCase
+        isNodeOpenableTextFileUseCase = isNodeOpenableTextFileUseCase
     )
 
     @Test
@@ -34,7 +35,7 @@ class EditBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             }
             val file = File("/path/to/file.txt")
-            whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+            whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
             val result = underTest.shouldDisplay(
                 isNodeInRubbish = false,
                 accessPermission = AccessPermission.OWNER,
@@ -54,7 +55,7 @@ class EditBottomSheetMenuItemTest {
             on { isNodeKeyDecrypted } doReturn true
         }
         val file = File("/path/to/file.txt")
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+        whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
         val result = underTest.shouldDisplay(
             isNodeInRubbish = true,
             accessPermission = AccessPermission.OWNER,
@@ -74,7 +75,7 @@ class EditBottomSheetMenuItemTest {
             on { isNodeKeyDecrypted } doReturn true
         }
         val file = File("/path/to/file.txt")
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+        whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
         val result = underTest.shouldDisplay(
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,
@@ -94,7 +95,7 @@ class EditBottomSheetMenuItemTest {
             on { isNodeKeyDecrypted } doReturn true
         }
         val file = File("/path/to/file.txt")
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+        whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
         val result = underTest.shouldDisplay(
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,
@@ -114,7 +115,7 @@ class EditBottomSheetMenuItemTest {
             on { isNodeKeyDecrypted } doReturn true
         }
         val file = File("/path/to/file.txt")
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+        whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
         val result = underTest.shouldDisplay(
             isNodeInRubbish = false,
             accessPermission = AccessPermission.READ,
@@ -151,7 +152,7 @@ class EditBottomSheetMenuItemTest {
             on { isNodeKeyDecrypted } doReturn false
         }
         val file = File("/path/to/file.txt")
-        whenever(getFileTypeInfoUseCase(file)).thenReturn(TextFileTypeInfo("text/plain", "txt"))
+        whenever(isNodeOpenableTextFileUseCase(any())).thenReturn(true)
         val result = underTest.shouldDisplay(
             isNodeInRubbish = false,
             accessPermission = AccessPermission.OWNER,

@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.document.DocumentEntity
@@ -253,6 +254,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override fun getFileTypeInfoByName(name: String, duration: Int): FileTypeInfo =
         fileTypeInfoMapper(name, duration)
+
+    override fun isNodeOpenableTextFile(node: FileNode) =
+        MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)
 
     override suspend fun createNewImageUri(fileName: String): String? = withContext(ioDispatcher) {
         fileGateway.createNewImageUri(fileName)?.toString()
