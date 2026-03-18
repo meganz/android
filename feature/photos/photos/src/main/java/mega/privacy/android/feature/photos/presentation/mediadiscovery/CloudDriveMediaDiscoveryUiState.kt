@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery
+package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
@@ -9,11 +9,12 @@ import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 
 data class CloudDriveMediaDiscoveryUiState(
     val backEvent: StateEvent = consumed,
     val loadPhotosDone: Boolean = false,
+    val selectedPhotoIds: Set<Long> = emptySet(),
     val sourcePhotos: List<Photo> = emptyList(),
     val mediaListItemList: List<MediaListItem> = emptyList(),
     val currentZoomLevel: ZoomLevel = ZoomLevel.Grid_3,
@@ -28,5 +29,11 @@ data class CloudDriveMediaDiscoveryUiState(
     val showHiddenNodes: Boolean = false,
     val selectedPeriod: MediaDiscoveryPeriod = MediaDiscoveryPeriod.All,
     val scrollStartIndex: Int = 0,
-    val scrollStartOffset: Int = 0
-)
+    val scrollStartOffset: Int = 0,
+    val fromFolderLink: Boolean = false,
+    val folderName: String = "",
+) {
+    val isInSelectionMode = selectedPhotoIds.isNotEmpty()
+    val selectedPhotosCount = selectedPhotoIds.size
+    val isAllSelected = selectedPhotoIds.size == sourcePhotos.size
+}

@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view
+package mega.privacy.android.feature.photos.presentation.mediadiscovery.view
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -12,10 +12,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.chip.SelectionChipStyle
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 
 @Composable
 internal fun MediaDiscoveryPeriodChip(
@@ -49,5 +53,22 @@ internal fun MediaDiscoveryPeriodChip(
                 }
             }
         }
+    }
+}
+
+private class MediaDiscoveryPeriodProvider : PreviewParameterProvider<MediaDiscoveryPeriod> {
+    override val values = MediaDiscoveryPeriod.entries.asSequence()
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MediaDiscoveryPeriodChipPreview(
+    @PreviewParameter(MediaDiscoveryPeriodProvider::class) selectedPeriod: MediaDiscoveryPeriod,
+) {
+    AndroidThemeForPreviews {
+        MediaDiscoveryPeriodChip(
+            selectedMediaDiscoveryPeriod = selectedPeriod,
+            onTimeBarTabSelected = {},
+        )
     }
 }

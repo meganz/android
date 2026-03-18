@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view
+package mega.privacy.android.feature.photos.presentation.mediadiscovery.view
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -30,13 +30,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.DateCardCount
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
+import java.time.LocalDateTime
 
 // Todo: Update card to new designs when available from design team
 @Composable
@@ -129,5 +134,66 @@ internal fun MediaDiscoveryCardListView(
         ) {
             Spacer(modifier = Modifier.height(56.dp))
         }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MediaDiscoveryCardListViewYearsPreview() {
+    AndroidThemeForPreviews {
+        fun samplePhoto(id: Long = 1L) = Photo.Image(
+            id = id,
+            parentId = 1L,
+            name = "photo_$id.jpg",
+            isFavourite = false,
+            creationTime = LocalDateTime.of(2024, 6, 15, 10, 0),
+            modificationTime = LocalDateTime.of(2024, 6, 15, 10, 0),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"),
+        )
+
+        MediaDiscoveryCardListView(
+            dateCards = listOf(
+                DateCard.YearsCard(date = "2024", photo = samplePhoto(1L)),
+                DateCard.YearsCard(date = "2023", photo = samplePhoto(2L)),
+                DateCard.YearsCard(date = "2022", photo = samplePhoto(3L)),
+            ),
+            onCardClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun MediaDiscoveryCardListViewDaysPreview() {
+    AndroidThemeForPreviews {
+        fun samplePhoto(id: Long = 1L) = Photo.Image(
+            id = id,
+            parentId = 1L,
+            name = "photo_$id.jpg",
+            isFavourite = false,
+            creationTime = LocalDateTime.of(2024, 6, 15, 10, 0),
+            modificationTime = LocalDateTime.of(2024, 6, 15, 10, 0),
+            thumbnailFilePath = null,
+            previewFilePath = null,
+            fileTypeInfo = StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"),
+        )
+
+        MediaDiscoveryCardListView(
+            dateCards = listOf(
+                DateCard.DaysCard(
+                    date = "15 Jun 2024",
+                    photo = samplePhoto(1L),
+                    photosCount = "12",
+                ),
+                DateCard.DaysCard(
+                    date = "14 Jun 2024",
+                    photo = samplePhoto(2L),
+                    photosCount = "1",
+                ),
+            ),
+            onCardClick = {},
+        )
     }
 }

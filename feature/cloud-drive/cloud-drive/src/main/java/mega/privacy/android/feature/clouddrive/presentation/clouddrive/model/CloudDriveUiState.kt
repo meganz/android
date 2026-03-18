@@ -47,7 +47,7 @@ data class CloudDriveUiState(
     val showHiddenNodes: Boolean = false,
     val isHiddenNodesEnabled: Boolean = false,
     val isSelecting: Boolean = false,
-    val hasMediaItems: Boolean = false,
+    val hasMediaItems: Boolean = true,
     val selectedSortOrder: SortOrder = SortOrder.ORDER_DEFAULT_ASC,
     val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
     val overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),

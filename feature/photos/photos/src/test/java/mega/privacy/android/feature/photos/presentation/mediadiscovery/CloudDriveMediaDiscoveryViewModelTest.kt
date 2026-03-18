@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery
+package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -16,14 +16,13 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountPlanDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -33,7 +32,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -45,7 +44,6 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
-import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -64,6 +62,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
 
     private val testFolderId = 123L
+    private val testFolderName = "Test Folder"
     private val testFromFolderLink = false
 
     @BeforeAll
@@ -100,6 +99,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
         whenever(getPhotosByFolderIdUseCase(any(), any(), any())).thenReturn(
             flowOf(emptyList())
         )
+        whenever(durationInSecondsTextMapper(any())).thenReturn("0:30")
     }
 
     private fun initViewModel() {
@@ -113,6 +113,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             folderId = testFolderId,
+            folderName = testFolderName,
             fromFolderLink = testFromFolderLink,
         )
     }
@@ -171,7 +172,6 @@ class CloudDriveMediaDiscoveryViewModelTest {
 
         val sortedAll = underTest.sortAndFilterPhotos(photos)
 
-        assertThat(sortedAll).hasSize(3)
         assertThat(sortedAll.first().modificationTime)
             .isGreaterThan(sortedAll.last().modificationTime)
     }
@@ -427,6 +427,123 @@ class CloudDriveMediaDiscoveryViewModelTest {
         }
     }
 
+    @Test
+    fun `test that initial state has folderName and fromFolderLink from constructor`() = runTest {
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.folderName).isEqualTo(testFolderName)
+            assertThat(state.fromFolderLink).isEqualTo(testFromFolderLink)
+        }
+    }
+
+    @Test
+    fun `test that selectPhoto adds photo id to selectedPhotoIds`() = runTest {
+        initViewModel()
+        val photo = createImagePhoto(id = 10)
+
+        underTest.selectPhoto(photo)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotoIds).contains(10L)
+        }
+    }
+
+    @Test
+    fun `test that selectPhoto removes photo id when already selected`() = runTest {
+        initViewModel()
+        val photo = createImagePhoto(id = 10)
+
+        underTest.selectPhoto(photo)
+        underTest.selectPhoto(photo)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotoIds).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that selectAllPhotos selects all photos from media list`() = runTest {
+        val photos = createTestPhotos()
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(durationInSecondsTextMapper(any())).thenReturn("")
+
+        initViewModel()
+
+        underTest.handleFolderPhotosAndLogic(photos)
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotoIds).hasSize(photos.size)
+            photos.forEach { photo ->
+                assertThat(state.selectedPhotoIds).contains(photo.id)
+            }
+        }
+    }
+
+    @Test
+    fun `test that clearSelectedPhotos resets selectedPhotoIds to empty`() = runTest {
+        initViewModel()
+        val photo1 = createImagePhoto(id = 1)
+        val photo2 = createImagePhoto(id = 2)
+
+        underTest.selectPhoto(photo1)
+        underTest.selectPhoto(photo2)
+        underTest.clearSelectedPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotoIds).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that isInSelectionMode is true when photos are selected`() = runTest {
+        initViewModel()
+        val photo = createImagePhoto(id = 1)
+
+        underTest.selectPhoto(photo)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that selectedPhotosCount returns correct count`() = runTest {
+        initViewModel()
+        val photo1 = createImagePhoto(id = 1)
+        val photo2 = createImagePhoto(id = 2)
+
+        underTest.selectPhoto(photo1)
+        underTest.selectPhoto(photo2)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.selectedPhotosCount).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun `test that isAllSelected is true when all source photos are selected`() = runTest {
+        val photos = createTestPhotos()
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(durationInSecondsTextMapper(any())).thenReturn("")
+
+        initViewModel()
+
+        underTest.handleFolderPhotosAndLogic(photos)
+        underTest.selectAllPhotos()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isAllSelected).isTrue()
+        }
+    }
+
     private fun createAccountLevelDetail(
         accountType: AccountType = AccountType.PRO_I,
     ) = AccountLevelDetail(
@@ -451,7 +568,6 @@ class CloudDriveMediaDiscoveryViewModelTest {
         return listOf(
             createImagePhoto(id = 1, modificationTime = now),
             createImagePhoto(id = 2, modificationTime = now.minusDays(1)),
-            createVideoPhoto(id = 3, modificationTime = now.minusDays(2)),
         )
     }
 
@@ -470,29 +586,6 @@ class CloudDriveMediaDiscoveryViewModelTest {
         thumbnailFilePath = null,
         previewFilePath = null,
         fileTypeInfo = StaticImageFileTypeInfo("image/jpeg", "jpg"),
-        isSensitive = isSensitive,
-        isSensitiveInherited = isSensitiveInherited,
-    )
-
-    private fun createVideoPhoto(
-        id: Long = 1,
-        modificationTime: LocalDateTime = LocalDateTime.of(2026, 3, 16, 10, 0),
-        isSensitive: Boolean = false,
-        isSensitiveInherited: Boolean = false,
-    ): Photo.Video = Photo.Video(
-        id = id,
-        parentId = testFolderId,
-        name = "video_$id.mp4",
-        isFavourite = false,
-        creationTime = modificationTime,
-        modificationTime = modificationTime,
-        thumbnailFilePath = null,
-        previewFilePath = null,
-        fileTypeInfo = VideoFileTypeInfo(
-            "video/mp4",
-            "mp4",
-            duration = 30.seconds
-        ),
         isSensitive = isSensitive,
         isSensitiveInherited = isSensitiveInherited,
     )

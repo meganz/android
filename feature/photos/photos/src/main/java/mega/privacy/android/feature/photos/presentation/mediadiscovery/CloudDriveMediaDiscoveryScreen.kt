@@ -1,7 +1,8 @@
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery
+package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import MediaGridViewItem
 import android.annotation.SuppressLint
+import android.text.format.DateFormat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,7 +25,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,18 +36,26 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
-import mega.android.core.ui.modifiers.excludeTopPadding
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.MediaListItem
+import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.ZoomLevel
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view.MediaDiscoveryCardListView
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.resources.R as sharedR
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -58,14 +70,26 @@ fun CloudDriveMediaDiscoveryRoute(
         creationCallback = { it.create() }
     ),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    onMoreOptionsClicked: () -> Unit = {},
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     CloudDriveMediaDiscoveryScreen(
         uiState = uiState,
         onBack = onBack,
-        onTimeBarTabSelected = viewModel::updatePeriod,
+        onItemClicked = { photo ->
+            if (uiState.isInSelectionMode) {
+                viewModel.selectPhoto(photo)
+            } else {
+                // Todo open photo or video preview
+            }
+        },
+        onItemLongPressed = viewModel::selectPhoto,
+        onPeriodSelected = viewModel::updatePeriod,
+        selectAllItems = viewModel::selectAllPhotos,
+        deselectAllItems = viewModel::clearSelectedPhotos,
         onCardClick = viewModel::selectPeriod,
+        onMoreOptionsClicked = onMoreOptionsClicked,
         modifier = modifier,
         contentPadding = contentPadding,
     )
@@ -76,24 +100,70 @@ fun CloudDriveMediaDiscoveryRoute(
 internal fun CloudDriveMediaDiscoveryScreen(
     uiState: CloudDriveMediaDiscoveryUiState,
     onBack: () -> Unit,
-    onTimeBarTabSelected: (MediaDiscoveryPeriod) -> Unit,
+    onItemClicked: (Photo) -> Unit,
+    onItemLongPressed: (Photo) -> Unit,
+    selectAllItems: () -> Unit,
+    deselectAllItems: () -> Unit,
+    onMoreOptionsClicked: () -> Unit,
+    onPeriodSelected: (MediaDiscoveryPeriod) -> Unit,
     onCardClick: (DateCard) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    fromFolderLink: Boolean = false,
 ) {
     var isPeriodVisible by remember { mutableStateOf(true) }
+
+    // Todo: Implement dropdown option
+    var isDropdownVisible by remember { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            // Todo: add top bar for Media Discovery
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedPhotosCount,
+                    isAllSelected = uiState.isAllSelected,
+                    isSelecting = false,
+                    onSelectAllClicked = selectAllItems,
+                    onCancelSelectionClicked = deselectAllItems
+                )
+            } else {
+                MegaTopAppBar(
+                    title = uiState.folderName,
+                    navigationType = AppBarNavigationType.Back(onBack),
+                    actions = listOf(
+                        MenuActionWithClick(
+                            menuAction = object : MenuActionWithIcon {
+                                @Composable
+                                override fun getIconPainter(): Painter =
+                                    rememberVectorPainter(IconPack.Medium.Thin.Outline.SlidersVertical02)
+
+                                override val testTag: String =
+                                    "CloudDriveMediaDiscoveryScreen:top_app_bar_filter"
+
+                                @Composable
+                                override fun getDescription(): String =
+                                    stringResource(sharedR.string.general_action_filter)
+                            },
+                            onClick = {
+                                // Todo: Implement dropdown option
+                                isDropdownVisible = true
+                            }
+                        ),
+                        MenuActionWithClick(CommonAppBarAction.More) {
+                            onMoreOptionsClicked()
+                        }
+                    )
+                )
+            }
+        },
+        bottomBar = {
+            // Todo: Implement NodeSelectionModeBottomBar to handle multi photos action
         }
     ) { containerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(containerPadding.excludeTopPadding())
+                .padding(containerPadding)
         ) {
             when (uiState.selectedPeriod) {
                 MediaDiscoveryPeriod.All -> {
@@ -101,10 +171,11 @@ internal fun CloudDriveMediaDiscoveryScreen(
                         uiState = uiState,
                         onBack = onBack,
                         contentPadding = contentPadding,
-                        fromFolderLink = fromFolderLink,
                         onScrollingListener = { isScrolling ->
                             isPeriodVisible = !isScrolling
-                        }
+                        },
+                        onItemClicked = onItemClicked,
+                        onItemLongPressed = onItemLongPressed,
                     )
                 }
 
@@ -118,7 +189,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
                     MediaDiscoveryCardListView(
                         dateCards = dateCards,
                         onCardClick = onCardClick,
-                        fromFolderLink = fromFolderLink,
+                        fromFolderLink = uiState.fromFolderLink,
                         shouldApplySensitiveMode = uiState.isHiddenNodesEnabled &&
                                 uiState.accountType?.isPaid == true &&
                                 !uiState.isBusinessAccountExpired,
@@ -128,12 +199,12 @@ internal fun CloudDriveMediaDiscoveryScreen(
 
             MediaDiscoveryPeriodChip(
                 selectedMediaDiscoveryPeriod = uiState.selectedPeriod,
-                onTimeBarTabSelected = onTimeBarTabSelected,
+                onTimeBarTabSelected = onPeriodSelected,
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .align(Alignment.BottomCenter),
-                isVisible = isPeriodVisible
+                isVisible = isPeriodVisible && !uiState.isInSelectionMode
             )
         }
     }
@@ -144,8 +215,9 @@ private fun MediaDiscoveryGridView(
     uiState: CloudDriveMediaDiscoveryUiState,
     onBack: () -> Unit,
     contentPadding: PaddingValues,
-    fromFolderLink: Boolean,
     onScrollingListener: (Boolean) -> Unit,
+    onItemClicked: (Photo) -> Unit,
+    onItemLongPressed: (Photo) -> Unit,
 ) {
     val fileTypeIconMapper = remember { FileTypeIconMapper() }
     val gridCells = remember(uiState.currentZoomLevel) {
@@ -190,7 +262,6 @@ private fun MediaDiscoveryGridView(
         verticalArrangement = Arrangement.spacedBy(1.dp),
         contentPadding = contentPadding
     ) {
-        // Todo: Implement custom header item
         item(
             key = "sort_header_item",
             span = { GridItemSpan(maxLineSpan) }
@@ -204,7 +275,7 @@ private fun MediaDiscoveryGridView(
                 onEnterMediaDiscoveryClick = {},
                 sortConfiguration = NodeSortConfiguration.default,
                 isListView = false,
-                showSortOrder = true,
+                showSortOrder = false,
                 showChangeViewType = true,
                 showMediaDiscoveryButton = false,
             )
@@ -232,7 +303,7 @@ private fun MediaDiscoveryGridView(
                     MediaGridViewItem(
                         thumbnailData = ThumbnailRequest(
                             id = NodeId(photo.id),
-                            isPublicNode = fromFolderLink,
+                            isPublicNode = uiState.fromFolderLink,
                         ),
                         defaultImage = fileTypeIconMapper(
                             photo.name.substringAfterLast('.', ""),
@@ -240,8 +311,9 @@ private fun MediaDiscoveryGridView(
                         isSensitive = isSensitive,
                         showBlurEffect = isSensitive,
                         showFavourite = photo.isFavourite,
-                        onClick = { },
-                        onLongClick = { },
+                        isSelected = photo.id in uiState.selectedPhotoIds,
+                        onClick = { onItemClicked(photo) },
+                        onLongClick = { onItemLongPressed(photo) },
                     )
                 }
 
@@ -253,7 +325,7 @@ private fun MediaDiscoveryGridView(
                     MediaGridViewItem(
                         thumbnailData = ThumbnailRequest(
                             id = NodeId(video.id),
-                            isPublicNode = fromFolderLink,
+                            isPublicNode = uiState.fromFolderLink,
                         ),
                         defaultImage = fileTypeIconMapper(
                             video.name.substringAfterLast('.', ""),
@@ -262,8 +334,9 @@ private fun MediaDiscoveryGridView(
                         isSensitive = isSensitive,
                         showBlurEffect = isSensitive,
                         showFavourite = video.isFavourite,
-                        onClick = { },
-                        onLongClick = { },
+                        isSelected = video.id in uiState.selectedPhotoIds,
+                        onClick = { onItemClicked(video) },
+                        onLongClick = { onItemLongPressed(video) },
                     )
                 }
 
@@ -319,19 +392,19 @@ private fun formatSeparatorDate(
 ): String {
     val datePattern = if (currentZoomLevel == ZoomLevel.Grid_1) {
         if (modificationTime.year == LocalDateTime.now().year) {
-            android.text.format.DateFormat.getBestDateTimePattern(
+            DateFormat.getBestDateTimePattern(
                 locale, "dd MMMM"
             )
         } else {
-            android.text.format.DateFormat.getBestDateTimePattern(
+            DateFormat.getBestDateTimePattern(
                 locale, "dd MMMM yyyy"
             )
         }
     } else {
         if (modificationTime.year == LocalDateTime.now().year) {
-            android.text.format.DateFormat.getBestDateTimePattern(locale, "LLLL")
+            DateFormat.getBestDateTimePattern(locale, "LLLL")
         } else {
-            android.text.format.DateFormat.getBestDateTimePattern(locale, "LLLL yyyy")
+            DateFormat.getBestDateTimePattern(locale, "LLLL yyyy")
         }
     }
     return SimpleDateFormat(datePattern, locale).format(

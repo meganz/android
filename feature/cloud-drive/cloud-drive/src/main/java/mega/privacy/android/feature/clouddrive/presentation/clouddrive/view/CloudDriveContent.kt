@@ -66,9 +66,8 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveUiState
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.CloudDriveMediaDiscoveryRoute
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.CloudDriveMediaDiscoveryViewModel
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -111,8 +110,6 @@ internal fun CloudDriveContent(
         creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
     ),
     onPrepareScanDocument: () -> Unit = {},
-    showMediaDiscovery: Boolean = false,
-    onShowMediaDiscoveryChanged: (Boolean) -> Unit = {},
 ) {
     var showNewFolderDialog by remember { mutableStateOf(false) }
     var showNewTextFileDialog by remember { mutableStateOf(false) }
@@ -230,84 +227,70 @@ internal fun CloudDriveContent(
                 )
             }
 
-            showMediaDiscovery -> {
-                CloudDriveMediaDiscoveryRoute(
-                    onBack = {
-                        onShowMediaDiscoveryChanged(false)
-                    },
+            else -> {
+                val folderName = uiState.title.text
+
+                NodesView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    viewModel = hiltViewModel<CloudDriveMediaDiscoveryViewModel, CloudDriveMediaDiscoveryViewModel.Factory>(
-                        creationCallback = { it.create(uiState.currentFolderId.longValue, false) }
-                    ),
-                    contentPadding = PaddingValues(
+                    listContentPadding = PaddingValues(
                         top = topPadding,
                         bottom = contentPadding.calculateSafeBottomPadding()
-                    )
+                    ),
+                    listState = listState,
+                    gridState = gridState,
+                    spanCount = spanCount,
+                    items = uiState.items,
+                    isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                    showHiddenNodes = uiState.showHiddenNodes,
+                    onMenuClicked = {
+                        Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
+                        navigationHandler.navigate(
+                            NodeOptionsBottomSheetNavKey(
+                                nodeHandle = it.id.longValue,
+                                nodeSourceType = uiState.nodeSourceType,
+                            )
+                        )
+                    },
+                    onItemClicked = { onAction(ItemClicked(it)) },
+                    onLongClicked = { onAction(ItemLongClicked(it)) },
+                    sortConfiguration = uiState.selectedSortConfiguration,
+                    isListView = isListView,
+                    onSortOrderClick = {
+                        Analytics.tracker.trackEvent(SortButtonPressedEvent)
+                        showSortBottomSheet = true
+                    },
+                    onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
+                    showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
+                    onEnterMediaDiscoveryClick = {
+                        navigationHandler.navigate(
+                            CloudDriveMediaDiscoveryNavKey(
+                                folderId = uiState.currentFolderId.longValue,
+                                folderName = folderName,
+                                fromFolderLink = false,
+                                nodeSourceType = uiState.nodeSourceType,
+                            )
+                        )
+                    },
+                    inSelectionMode = uiState.isInSelectionMode,
+                    isContactVerificationOn = uiState.isContactVerificationOn,
+                    bannerHeader = if (showOverQuotaWarning) {
+                        {
+                            OverQuotaWarningBanner(
+                                uiState.overQuotaStatus,
+                                onDismissed = {
+                                    onAction(CloudDriveAction.OverQuotaConsumptionWarning)
+                                },
+                                onUpgradeClicked = {
+                                    megaNavigator.openUpgradeAccount(context)
+                                },
+                            )
+                        }
+                    } else null
                 )
             }
-
-            else -> NodesView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                listContentPadding = PaddingValues(
-                    top = topPadding,
-                    bottom = contentPadding.calculateSafeBottomPadding()
-                ),
-                listState = listState,
-                gridState = gridState,
-                spanCount = spanCount,
-                items = uiState.items,
-                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                showHiddenNodes = uiState.showHiddenNodes,
-                onMenuClicked = {
-                    Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
-                    navigationHandler.navigate(
-                        NodeOptionsBottomSheetNavKey(
-                            nodeHandle = it.id.longValue,
-                            nodeSourceType = uiState.nodeSourceType,
-                        )
-                    )
-                },
-                onItemClicked = { onAction(ItemClicked(it)) },
-                onLongClicked = { onAction(ItemLongClicked(it)) },
-                sortConfiguration = uiState.selectedSortConfiguration,
-                isListView = isListView,
-                onSortOrderClick = {
-                    Analytics.tracker.trackEvent(SortButtonPressedEvent)
-                    showSortBottomSheet = true
-                },
-                onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-                showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
-                onEnterMediaDiscoveryClick = {
-                    onShowMediaDiscoveryChanged(true)
-//                    navigationHandler.back()
-//                    navigationHandler.navigate(
-//                        MediaDiscoveryNavKey(
-//                            nodeHandle = uiState.currentFolderId.longValue,
-//                            nodeName = uiState.title.get(context),
-//                        )
-//                    )
-                },
-                inSelectionMode = uiState.isInSelectionMode,
-                isContactVerificationOn = uiState.isContactVerificationOn,
-                bannerHeader = if (showOverQuotaWarning) {
-                    {
-                        OverQuotaWarningBanner(
-                            uiState.overQuotaStatus,
-                            onDismissed = {
-                                onAction(CloudDriveAction.OverQuotaConsumptionWarning)
-                            },
-                            onUpgradeClicked = {
-                                megaNavigator.openUpgradeAccount(context)
-                            },
-                        )
-                    }
-                } else null
-            )
         }
 
         EventEffect(

@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model
+package mega.privacy.android.feature.photos.presentation.mediadiscovery.model
 
 import androidx.annotation.StringRes
 import mega.privacy.android.shared.resources.R as SharedR

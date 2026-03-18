@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-package mega.privacy.android.feature.clouddrive.presentation.mediadiscovery
+package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,10 +27,10 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.MediaListItem.PhotoItem
 import mega.privacy.android.domain.entity.photos.MediaListItem.VideoItem
+import mega.privacy.android.domain.entity.photos.MediaListMedia
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
-import mega.privacy.android.feature.clouddrive.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -38,6 +38,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -59,9 +60,15 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
     @Assisted private val folderId: Long,
+    @Assisted private val folderName: String,
     @Assisted private val fromFolderLink: Boolean,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(CloudDriveMediaDiscoveryUiState())
+    private val _state = MutableStateFlow(
+        CloudDriveMediaDiscoveryUiState(
+            folderName = folderName,
+            fromFolderLink = fromFolderLink
+        )
+    )
     val state = _state.asStateFlow()
 
     init {
@@ -147,8 +154,8 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
                 mediaListItemList.add(MediaListItem.Separator(photo.modificationTime))
             }
             val item = when (photo) {
-                is Photo.Image -> MediaListItem.PhotoItem(photo)
-                is Photo.Video -> MediaListItem.VideoItem(
+                is Photo.Image -> PhotoItem(photo)
+                is Photo.Video -> VideoItem(
                     photo,
                     durationInSecondsTextMapper(photo.fileTypeInfo.duration)
                 )
@@ -352,10 +359,40 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
         }
     }
 
+    fun selectPhoto(photo: Photo) {
+        val id = photo.id
+        val selectedPhotoIds = _state.value.selectedPhotoIds.toMutableSet()
+        if (id in selectedPhotoIds) {
+            selectedPhotoIds.remove(id)
+        } else {
+            selectedPhotoIds.add(id)
+        }
+        _state.update {
+            it.copy(selectedPhotoIds = selectedPhotoIds)
+        }
+    }
+
+    fun selectAllPhotos() {
+        _state.update {
+            it.copy(selectedPhotoIds = getAllPhotoIds().toMutableSet())
+        }
+    }
+
+    fun clearSelectedPhotos() {
+        _state.update {
+            it.copy(selectedPhotoIds = emptySet())
+        }
+    }
+
+    private fun getAllPhotoIds() = _state.value.mediaListItemList
+        .filterIsInstance<MediaListMedia>()
+        .map { it.mediaId }
+
     @AssistedFactory
     interface Factory {
         fun create(
             folderId: Long = -1,
+            folderName: String = "",
             fromFolderLink: Boolean = false,
         ): CloudDriveMediaDiscoveryViewModel
     }

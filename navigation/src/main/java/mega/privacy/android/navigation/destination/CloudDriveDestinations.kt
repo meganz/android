@@ -53,6 +53,22 @@ data class DriveSyncNavKey(
 ) : MainNavItemNavKey
 
 /**
+ * Cloud drive media discovery route args
+ * @property folderId the handle of the folder to display media for
+ * @property folderName the name of the folder
+ * @property fromFolderLink whether the folder is from a folder link
+ * @property nodeSourceType the source type of the node
+ */
+@Serializable
+@Parcelize
+data class CloudDriveMediaDiscoveryNavKey(
+    val folderId: Long,
+    val folderName: String,
+    val fromFolderLink: Boolean = false,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+) : NavKey, Parcelable
+
+/**
  * Favourites route args
  */
 @Serializable

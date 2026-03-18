@@ -54,6 +54,7 @@ dependencies {
     implementation(androidx.material3.adaptive.navigation.suite)
     implementation(lib.kotlin.serialisation)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
     implementation(google.services.mlkit.document.scanner)
     implementation(lib.coil.compose)
     implementation(lib.kotlinx.collections.immutable)
