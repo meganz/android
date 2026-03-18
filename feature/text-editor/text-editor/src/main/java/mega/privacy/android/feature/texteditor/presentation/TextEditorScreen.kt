@@ -16,8 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -32,14 +31,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.yield
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.snackbar.MegaSnackbar
@@ -51,10 +47,10 @@ import mega.privacy.android.feature.texteditor.presentation.model.TextEditorBott
 import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopBarAction
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import kotlin.math.abs
 
 /**
  * Compose screen for viewing and editing text files.
- * Top bar: Back + Line numbers + More (opens Node Options Bottom Sheet). Download, Get link, Send to chat, Share are in the bottom bar.
  */
 @Composable
 fun TextEditorScreen(
@@ -63,68 +59,50 @@ fun TextEditorScreen(
     onOpenNodeOptions: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val textFieldState = rememberTextFieldState()
-    val scrollState = rememberScrollState()
     val lazyListState = rememberLazyListState()
-    val readOnly = uiState.mode == TextEditorMode.View
-    val density = LocalDensity.current
-    val lineHeightPx = with(density) { EditorLineHeight.toPx() }
+    val isEditable = uiState.mode == TextEditorMode.Edit || uiState.mode == TextEditorMode.Create
     var pendingBackAfterSave by remember { mutableStateOf(false) }
 
-    // When entering Edit mode, place cursor at end of first visible line so the user can edit where they're looking.
-    LaunchedEffect(readOnly) {
-        if (readOnly) return@LaunchedEffect
-        val text = textFieldState.text.toString()
-        if (text.isEmpty()) return@LaunchedEffect
-        val lineStarts = buildList {
-            add(0)
-            for (i in text.indices) if (text[i] == '\n') add(i + 1)
-            add(text.length)
-        }
-        val lineCount = lineStarts.size - 1
-        if (lineCount <= 0) return@LaunchedEffect
-        val firstVisibleLineIndex = (scrollState.value / lineHeightPx).toInt().coerceIn(0, lineCount - 1)
-        val endOfLineCursor = ((lineStarts.getOrNull(firstVisibleLineIndex + 1) ?: text.length) - 1).coerceIn(0, text.length)
-        textFieldState.edit { selection = TextRange(endOfLineCursor) }
+    val chunkTextProvider = remember(viewModel, uiState.contentVersion) {
+        { idx: Int -> viewModel.getChunkText(idx) }
     }
-
-    // Sync ViewModel content → TextFieldState.
-    // Append-only: load-more in View mode or initial chunks (content grows as superset).
-    // Full replace: read-only mode or discard-restore (entire buffer replaced).
-    // Ignore: while actively editing, non-append external updates are skipped.
-    LaunchedEffect(uiState.content, readOnly) {
-        val current = textFieldState.text.toString()
-        if (current == uiState.content) return@LaunchedEffect
-
-        val shouldAppendOnly = uiState.content.startsWith(current)
-        when {
-            shouldAppendOnly -> {
-                val suffix = uiState.content.substring(current.length)
-                if (suffix.isNotEmpty()) {
-                    textFieldState.edit { append(suffix) }
-                }
+    val chunkStateProvider: ((Int) -> TextFieldState)? =
+        if (isEditable) {
+            remember(viewModel, uiState.contentVersion) {
+                { idx: Int -> viewModel.getOrCreateChunkState(idx) }
             }
-
-            readOnly -> {
-                val savedScroll = scrollState.value
-                textFieldState.edit { replace(0, length, uiState.content) }
-                yield()
-                scrollState.scrollTo(savedScroll)
-            }
-
-            else -> {}
+        } else {
+            null
         }
+    val chunkStartLineProvider = remember(viewModel, uiState.contentVersion) {
+        { idx: Int -> viewModel.getChunkStartLine(idx) }
+    }
+    val onChunkDisposed: ((Int) -> Unit)? = if (isEditable) {
+        remember(viewModel) { { idx: Int -> viewModel.disposeChunkState(idx) } }
+    } else {
+        null
+    }
+    val focusedChunk = uiState.focusedEditChunk
+    val isChunkReadOnly: (Int) -> Boolean = if (isEditable) {
+        remember(focusedChunk) { { idx: Int -> abs(idx - focusedChunk) > 1 } }
+    } else {
+        remember { { _: Int -> true } }
+    }
+    val onChunkFocused: ((Int) -> Unit)? = if (isEditable) {
+        remember(viewModel) { { idx: Int -> viewModel.setFocusedEditChunk(idx) } }
+    } else {
+        null
     }
 
     BackHandler {
         when {
             uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
-            uiState.mode == TextEditorMode.Edit && viewModel.isContentDirty(textFieldState.text.toString()) ->
+            uiState.mode == TextEditorMode.Edit && viewModel.isContentDirty() ->
                 viewModel.requestShowDiscardDialog()
             uiState.mode == TextEditorMode.Edit -> viewModel.setViewMode()
             uiState.mode == TextEditorMode.Create -> {
                 pendingBackAfterSave = true
-                viewModel.saveFile(currentText = textFieldState.text.toString())
+                viewModel.saveFile()
             }
             else -> onBack()
         }
@@ -161,13 +139,11 @@ fun TextEditorScreen(
                 TextEditorMode.Edit -> TextEditorEditModeTopAppBar(
                     title = uiState.fileName,
                     onClose = {
-                        if (viewModel.isContentDirty(textFieldState.text.toString()))
+                        if (viewModel.isContentDirty())
                             viewModel.requestShowDiscardDialog()
                         else viewModel.setViewMode()
                     },
-                    onSave = {
-                        viewModel.saveFile(currentText = textFieldState.text.toString())
-                    },
+                    onSave = { viewModel.saveFile() },
                     onMenuAction = viewModel::onMenuAction,
                 )
 
@@ -205,29 +181,19 @@ fun TextEditorScreen(
                 }
 
                 else -> {
-                    if (readOnly) {
-                        TextEditorContentViewMode(
-                            lazyListState = lazyListState,
-                            chunkCount = viewModel.getChunkCount(),
-                            chunkTextProvider = { viewModel.getChunkText(it) },
-                            chunkStartLineProvider = { viewModel.getChunkStartLine(it) },
-                            totalLineCount = uiState.totalLineCount,
-                            showLineNumbers = uiState.showLineNumbers,
-                        )
-                    } else {
-                        val onLoadMore = remember(viewModel) { viewModel::onLoadMoreLines }
-                        val onAppendSuffixConsumed = remember(viewModel) { viewModel::consumeAppendSuffix }
-                        TextEditorContent(
-                            textFieldState = textFieldState,
-                            scrollState = scrollState,
-                            showLineNumbers = uiState.showLineNumbers,
-                            readOnly = readOnly,
-                            appendSuffix = uiState.appendSuffix,
-                            onAppendSuffixConsumed = onAppendSuffixConsumed,
-                            hasMoreLines = uiState.hasMoreLines,
-                            onNearEndOfScroll = onLoadMore,
-                        )
-                    }
+                    TextEditorContent(
+                        lazyListState = lazyListState,
+                        chunkCount = viewModel.getChunkCount(),
+                        totalLineCount = uiState.totalLineCount,
+                        chunkTextProvider = chunkTextProvider,
+                        chunkStateProvider = chunkStateProvider,
+                        chunkStartLineProvider = chunkStartLineProvider,
+                        onChunkDisposed = onChunkDisposed,
+                        isChunkReadOnly = isChunkReadOnly,
+                        onChunkFocused = onChunkFocused,
+                        showLineNumbers = uiState.showLineNumbers,
+                        readOnly = !isEditable,
+                    )
                 }
             }
             if (uiState.isRestoringContent) {
@@ -241,7 +207,15 @@ fun TextEditorScreen(
             TextEditorBottomBar(
                 visible = uiState.mode != TextEditorMode.Edit && uiState.bottomBarActions.isNotEmpty() && !uiState.isLoading,
                 actions = uiState.bottomBarActions,
-                onActionPressed = viewModel::onBottomBarAction,
+                onActionPressed = { action ->
+                    if (action is TextEditorBottomBarAction.Edit) {
+                        viewModel.setEditMode(lazyListState.firstVisibleItemIndex)
+                    } else {
+                        (action as? TextEditorBottomBarAction)?.let {
+                            viewModel.onBottomBarAction(it)
+                        }
+                    }
+                },
             )
         }
     }
@@ -269,12 +243,8 @@ private fun TextEditorErrorContent(
     }
 }
 
-/** Top padding matching legacy loading_layout's layout_marginTop (153dp from top of screen). */
 private val LoadingContentTopPadding = 153.dp
 
-/**
- * Loading view matching legacy text editor: text file icon (96dp) and horizontal indeterminate progress bar below.
- */
 @Composable
 private fun TextEditorLoadingContent() {
     Column(

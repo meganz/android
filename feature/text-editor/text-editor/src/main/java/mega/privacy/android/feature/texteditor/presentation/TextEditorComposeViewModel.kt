@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.texteditor.presentation
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.assisted.Assisted
@@ -9,17 +10,17 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForTextEditorUseCase
@@ -31,22 +32,21 @@ import mega.privacy.android.feature.texteditor.presentation.model.TextEditorTopB
 import mega.privacy.android.navigation.contract.TransferHandler
 import timber.log.Timber
 
-/** Initial cap on displayed lines so first paint is fast; user can load more by scrolling to bottom. */
-private const val INITIAL_DISPLAY_LINES = 1000
-
-/** Lines to add each time the user triggers load more near the end of scroll. */
-private const val LINES_TO_ADD_ON_LOAD_MORE = 1000
+/** Number of lines per chunk in both view and edit modes.
+ * Unified so that item indices match 1:1 across mode switches, eliminating scroll jumps. */
+internal const val CHUNK_SIZE = 200
 
 /** Chunk size for gradual file read; balances responsiveness and I/O overhead. */
 private const val CHUNK_SIZE_LINES = 500
 
-/** Number of lines per chunk in view mode (virtualised LazyColumn). */
-internal const val CHUNK_SIZE = 200
-
 /**
  * ViewModel for the Compose text editor screen.
- * Uses MVI-style intent handling: UI emits actions via [onMenuAction], ViewModel processes them.
- * Loads large files gradually so the first chunk is shown quickly without blocking the main thread.
+ *
+ * The full document is stored as [fullContentLines] during loading and view mode.
+ * In edit mode, the document is split into [chunkTexts] (one entry per [CHUNK_SIZE] lines).
+ * Each visible chunk gets its own [TextFieldState] held in [chunkStates];
+ * only the focused one has the cursor. When a chunk scrolls off-screen its edits
+ * are flushed back to [chunkTexts] via [disposeChunkState].
  */
 @HiltViewModel(assistedFactory = TextEditorComposeViewModel.Factory::class)
 class TextEditorComposeViewModel @AssistedInject constructor(
@@ -70,19 +70,23 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     )
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Accumulated lines from gradual load; not restored after process death (user sees first chunk again).
-     * Thread safety: all mutations happen on Main (after withContext returns), so no synchronisation is needed.
-     * Do NOT mutate this list inside withContext(defaultDispatcher) blocks.
-     */
+    /** Per-line list used during loading and in View mode. */
     private val fullContentLines = mutableListOf<String>()
-    private var displayLineCap = INITIAL_DISPLAY_LINES
 
-    /** Content at last load or last successful save; restored when user discards changes (Pre-Phase 5.3). */
+    /** Per-chunk text list used in Edit/Create mode. Variable-size chunks. */
+    private val chunkTexts = mutableListOf<String>()
+
+    /** Active TextFieldStates for visible chunks (created lazily, flushed on dispose). */
+    private val chunkStates = mutableMapOf<Int, TextFieldState>()
+
+    /** Original text per chunk at the moment its TextFieldState was created. */
+    private val chunkOriginals = mutableMapOf<Int, String>()
+
+    /** Set to true when a disposed chunk had edits. */
+    private var hasDisposedEdits: Boolean = false
+
+    /** Content at last load or last successful save; used for discard. */
     private var lastSavedContent: String = ""
-
-    /** Cached displayed content for O(1) dirty-check on the main thread; updated whenever [fullContentLines] or [displayLineCap] change. */
-    private var cachedCleanContent: String = ""
 
     init {
         if (args.mode != TextEditorMode.Create) {
@@ -105,23 +109,24 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     .collect { chunk ->
                         fullContentLines.addAll(chunk)
-                        val (displayed, fullContent) = withContext(defaultDispatcher) {
-                            fullContentLines.take(displayLineCap).joinToString("\n") to
-                                    fullContentLines.joinToString("\n")
-                        }
-                        lastSavedContent = fullContent
-                        cachedCleanContent = displayed
-                        _uiState.update {
-                            it.copy(
-                                content = displayed,
-                                isLoading = false,
-                                errorEvent = consumed,
-                                hasMoreLines = fullContentLines.size > displayLineCap,
-                                totalLinesLoaded = fullContentLines.size,
-                                totalLineCount = fullContentLines.size,
-                            )
+                        if (_uiState.value.isLoading) {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    errorEvent = consumed,
+                                    totalLineCount = fullContentLines.size,
+                                )
+                            }
+                        } else {
+                            _uiState.update { it.copy(totalLineCount = fullContentLines.size) }
                         }
                     }
+                lastSavedContent = withContext(defaultDispatcher) {
+                    fullContentLines.joinToString("\n")
+                }
+                if (args.mode == TextEditorMode.Edit) {
+                    buildChunksFromLines()
+                }
                 _uiState.update { it.copy(isFullyLoaded = true) }
             }
             viewModelScope.launch {
@@ -146,9 +151,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     )
                 }
             }
-        } else if (args.mode == TextEditorMode.Create) {
+        } else {
             lastSavedContent = ""
-            _uiState.update { it.copy(content = "", isLoading = false, errorEvent = consumed) }
+            chunkTexts.add("")
+            _uiState.update {
+                it.copy(isLoading = false, totalLineCount = 0)
+            }
         }
     }
 
@@ -165,65 +173,22 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val showDownload: Boolean = true,
         val showShare: Boolean = true,
         val transferHandler: TransferHandler,
-        /** True when opened from Shared folder (incoming/outgoing shares or links). When true, save creates a new file with (1)(2) naming; when false, Edit mode overwrites the same file. Derived from nodeSourceType by the caller. */
         val isFromSharedFolder: Boolean = false,
-        /** Reserved for send-to-chat flow (e.g. when opening editor from chat). */
         val chatId: Long? = null,
-        /** Reserved for send-to-chat flow (e.g. when opening editor from chat). */
         val messageId: Long? = null,
         val localPath: String? = null,
     )
 
-    /**
-     * Switches to View mode. When [discardChanges] is true (discard flow), restores content from
-     * [lastSavedContent] and syncs internal line buffer. Heavy work runs on [defaultDispatcher].
-     */
-    fun setViewMode(discardChanges: Boolean = false) {
-        if (!discardChanges) {
-            _uiState.update {
-                it.copy(mode = TextEditorMode.View, showDiscardDialog = false)
-            }
-            return
-        }
-        val savedContent = lastSavedContent
-        _uiState.update {
-            it.copy(showDiscardDialog = false, isRestoringContent = true)
-        }
-        viewModelScope.launch {
-            val (lines, displayedContent, cap, hasMoreLines, totalLinesLoaded) = withContext(
-                defaultDispatcher
-            ) {
-                val l = savedContent.split("\n")
-                val c = INITIAL_DISPLAY_LINES.coerceAtMost(l.size)
-                RestoreResult(
-                    lines = l,
-                    displayedContent = l.take(c).joinToString("\n"),
-                    displayLineCap = c,
-                    hasMoreLines = l.size > c,
-                    totalLinesLoaded = l.size,
-                )
-            }
-            fullContentLines.clear()
-            fullContentLines.addAll(lines)
-            displayLineCap = cap
-            cachedCleanContent = displayedContent
-            _uiState.update {
-                it.copy(
-                    mode = TextEditorMode.View,
-                    content = displayedContent,
-                    hasMoreLines = hasMoreLines,
-                    totalLinesLoaded = totalLinesLoaded,
-                    totalLineCount = fullContentLines.size,
-                    isRestoringContent = false,
-                )
-            }
+    /** Total number of chunks in the current mode. */
+    fun getChunkCount(): Int {
+        return if (isEditMode()) {
+            chunkTexts.size.coerceAtLeast(1)
+        } else {
+            ceilDiv(fullContentLines.size, CHUNK_SIZE)
         }
     }
 
-    /** Number of chunks for view-mode virtualised list (fixed [CHUNK_SIZE] lines per chunk). */
-    fun getChunkCount(): Int = Math.ceilDiv(fullContentLines.size, CHUNK_SIZE)
-
-    /** Text for chunk [chunkIndex] in view mode (read-only slice of [fullContentLines]). */
+    /** Returns the text for a read-only chunk (View mode — fixed CHUNK_SIZE slices). */
     fun getChunkText(chunkIndex: Int): String {
         val start = chunkIndex * CHUNK_SIZE
         val end = (start + CHUNK_SIZE).coerceAtMost(fullContentLines.size)
@@ -231,104 +196,150 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         return fullContentLines.subList(start, end).joinToString("\n")
     }
 
-    /** 1-based starting line number for chunk [chunkIndex] in view mode. */
-    fun getChunkStartLine(chunkIndex: Int): Int = chunkIndex * CHUNK_SIZE + 1
-
-    /** Shows the discard-changes confirmation dialog (Edit mode, unsaved). */
-    fun requestShowDiscardDialog() {
-        _uiState.update { it.copy(showDiscardDialog = true) }
+    /** Updates which chunk is the editing focus. Only the focused chunk ±1 are editable. */
+    fun setFocusedEditChunk(chunkIndex: Int) {
+        _uiState.update { it.copy(focusedEditChunk = chunkIndex) }
     }
 
-    /** User confirmed Discard: revert to last saved content and switch to View mode. */
-    fun confirmDiscard() {
-        setViewMode(discardChanges = true)
+    /** Returns the starting line number (1-based) for a chunk. */
+    fun getChunkStartLine(chunkIndex: Int): Int {
+        var line = 1
+        val source = if (isEditMode()) chunkTexts else null
+        for (i in 0 until chunkIndex) {
+            val text = if (source != null) {
+                chunkStates[i]?.text?.toString() ?: source.getOrElse(i) { "" }
+            } else {
+                getChunkText(i)
+            }
+            line += text.count { it == '\n' } + 1
+        }
+        return line
     }
 
-    /** User dismissed the discard dialog (Cancel). */
-    fun dismissDiscardDialog() {
-        _uiState.update { it.copy(showDiscardDialog = false) }
-    }
-
-    fun setEditMode() {
-        _uiState.update {
-            it.copy(mode = TextEditorMode.Edit)
+    /**
+     * Returns or lazily creates a [TextFieldState] for [chunkIndex].
+     * Called by the UI layer when a chunk composable enters composition.
+     */
+    fun getOrCreateChunkState(chunkIndex: Int): TextFieldState {
+        return chunkStates.getOrPut(chunkIndex) {
+            val text = chunkTexts.getOrElse(chunkIndex) { "" }
+            chunkOriginals[chunkIndex] = text
+            TextFieldState(text)
         }
     }
 
     /**
-     * Returns true when [currentText] (from the text field) differs from [cachedCleanContent].
-     * O(1) lookup — no string concatenation on the main thread.
+     * Flushes the content of a chunk's [TextFieldState] back to [chunkTexts]
+     * and releases the state. Called when a chunk composable leaves composition.
      */
-    fun isContentDirty(currentText: String): Boolean =
-        currentText != cachedCleanContent
-
-    /** Clears the one-shot suffix appended during edit-mode load-more. */
-    fun consumeAppendSuffix() {
-        _uiState.update { it.copy(appendSuffix = null) }
+    fun disposeChunkState(chunkIndex: Int) {
+        val state = chunkStates.remove(chunkIndex) ?: return
+        val currentText = state.text.toString()
+        val original = chunkOriginals.remove(chunkIndex)
+        if (currentText != original && chunkIndex < chunkTexts.size) {
+            chunkTexts[chunkIndex] = currentText
+            hasDisposedEdits = true
+        }
     }
 
-    /**
-     * Expands the displayed content by [LINES_TO_ADD_ON_LOAD_MORE] lines when content was capped.
-     * In Edit mode emits a suffix via [TextEditorComposeUiState.appendSuffix] so the composable
-     * appends it directly to the text field without needing the user's current text.
-     * In View mode rebuilds the full displayed content from [fullContentLines].
-     */
-    fun onLoadMoreLines() {
-        if (fullContentLines.size <= displayLineCap) return
-        val oldCap = displayLineCap
-        displayLineCap =
-            (displayLineCap + LINES_TO_ADD_ON_LOAD_MORE).coerceAtMost(fullContentLines.size)
-        viewModelScope.launch {
-            val hasMoreLines = fullContentLines.size > displayLineCap
-            val totalLinesLoaded = fullContentLines.size
-            if (_uiState.value.mode == TextEditorMode.Edit) {
-                val (suffix, cleanContent) = withContext(defaultDispatcher) {
-                    val s =
-                        "\n" + fullContentLines.subList(oldCap, displayLineCap).joinToString("\n")
-                    s to fullContentLines.take(displayLineCap).joinToString("\n")
-                }
-                cachedCleanContent = cleanContent
-                _uiState.update {
-                    it.copy(
-                        appendSuffix = suffix,
-                        hasMoreLines = hasMoreLines,
-                        totalLinesLoaded = totalLinesLoaded,
-                    )
-                }
-            } else {
-                val content = withContext(defaultDispatcher) {
-                    fullContentLines.take(displayLineCap).joinToString("\n")
-                }
-                cachedCleanContent = content
-                _uiState.update {
-                    it.copy(
-                        content = content,
-                        hasMoreLines = hasMoreLines,
-                        totalLinesLoaded = totalLinesLoaded,
-                    )
-                }
+    /** Flushes all currently active chunk states back to [chunkTexts]. */
+    private fun flushAllActiveChunks() {
+        chunkStates.forEach { (idx, state) ->
+            if (idx < chunkTexts.size) {
+                chunkTexts[idx] = state.text.toString()
             }
         }
     }
 
+    /** Rebuilds [fullContentLines] from [chunkTexts]. */
+    private fun rebuildLinesFromChunks() {
+        fullContentLines.clear()
+        chunkTexts.forEach { chunkText ->
+            fullContentLines.addAll(chunkText.split("\n"))
+        }
+    }
+
     /**
-     * Saves text content. [currentText] is the text currently in the editor (read from the text
-     * field at save time). When content was capped for display (gradual load), merges the
-     * user-edited visible portion with the original non-displayed tail.
-     * In Create mode [fullContentLines] is empty, so [currentText] is saved as-is.
-     * Save/upload behaviour uses [Args.isFromSharedFolder] only; fromHome is not used in this flow.
+     * Returns true when the editor has unsaved changes.
      */
-    fun saveFile(currentText: String) {
+    fun isContentDirty(): Boolean {
+        if (hasDisposedEdits) return true
+        return chunkStates.any { (idx, state) ->
+            state.text.toString() != chunkOriginals[idx]
+        }
+    }
+
+    fun setEditMode(focusedChunkIndex: Int = 0) {
+        buildChunksFromLines()
+        chunkStates.clear()
+        chunkOriginals.clear()
+        hasDisposedEdits = false
+        val initialChunk = if (chunkTexts.isNotEmpty())
+            focusedChunkIndex.coerceIn(0, chunkTexts.size - 1)
+        else 0
+        _uiState.update {
+            it.copy(
+                mode = TextEditorMode.Edit,
+                totalLineCount = fullContentLines.size,
+                contentVersion = it.contentVersion + 1,
+                focusedEditChunk = initialChunk,
+            )
+        }
+    }
+
+    fun setViewMode(discardChanges: Boolean = false) {
+        if (discardChanges) {
+            _uiState.update { it.copy(showDiscardDialog = false, isRestoringContent = true) }
+            viewModelScope.launch {
+                val lines = withContext(defaultDispatcher) { lastSavedContent.split("\n") }
+                fullContentLines.clear()
+                fullContentLines.addAll(lines)
+                clearEditState()
+                _uiState.update {
+                    it.copy(
+                        mode = TextEditorMode.View,
+                        isRestoringContent = false,
+                        totalLineCount = fullContentLines.size,
+                        contentVersion = it.contentVersion + 1,
+                    )
+                }
+            }
+            return
+        }
+        flushAllActiveChunks()
+        rebuildLinesFromChunks()
+        clearEditState()
+        _uiState.update {
+            it.copy(
+                mode = TextEditorMode.View,
+                showDiscardDialog = false,
+                totalLineCount = fullContentLines.size,
+                contentVersion = it.contentVersion + 1,
+            )
+        }
+    }
+
+    fun requestShowDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = true) }
+    }
+
+    fun confirmDiscard() {
+        setViewMode(discardChanges = true)
+    }
+
+    fun dismissDiscardDialog() {
+        _uiState.update { it.copy(showDiscardDialog = false) }
+    }
+
+    fun saveFile() {
         if (_uiState.value.mode == TextEditorMode.View) return
+        flushAllActiveChunks()
+        rebuildLinesFromChunks()
+        val snapshot = fullContentLines.toList()
         viewModelScope.launch {
             val state = _uiState.value
             val fullTextToSave = withContext(defaultDispatcher) {
-                if (fullContentLines.isNotEmpty()) {
-                    val editedLines = currentText.split("\n")
-                    (editedLines + fullContentLines.drop(displayLineCap)).joinToString("\n")
-                } else {
-                    currentText
-                }
+                snapshot.joinToString("\n")
             }
             runCatching {
                 saveTextContentForTextEditorUseCase(
@@ -336,7 +347,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     text = fullTextToSave,
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
-                    fromHome = false, // Compose flow uses isFromSharedFolder only
+                    fromHome = false,
                     isFromSharedFolder = args.isFromSharedFolder,
                 )
             }.fold(
@@ -344,18 +355,15 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     when (saveResult) {
                         is TextEditorSaveResult.UploadRequired -> {
                             lastSavedContent = fullTextToSave
-                            val lines = fullTextToSave.split("\n")
-                            fullContentLines.clear()
-                            fullContentLines.addAll(lines)
-                            displayLineCap = lines.size
-                            cachedCleanContent = fullTextToSave
+                            hasDisposedEdits = false
+                            chunkOriginals.clear()
+                            chunkStates.forEach { (idx, state) ->
+                                chunkOriginals[idx] = state.text.toString()
+                            }
                             _uiState.update {
                                 it.copy(
-                                    content = fullTextToSave,
                                     mode = TextEditorMode.View,
-                                    hasMoreLines = false,
-                                    totalLinesLoaded = lines.size,
-                                    totalLineCount = lines.size,
+                                    totalLineCount = fullContentLines.size,
                                     transferEvent = triggered(
                                         TransferTriggerEvent.StartUpload.TextFile(
                                             path = saveResult.tempPath,
@@ -395,15 +403,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(saveSuccessEvent = consumed) }
     }
 
-    /**
-     * Handles top bar action intents from the UI (MVI pattern).
-     */
     fun onMenuAction(action: TextEditorTopBarAction) {
         when (action) {
             TextEditorTopBarAction.LineNumbers -> {
-                _uiState.update {
-                    it.copy(showLineNumbers = !it.showLineNumbers)
-                }
+                _uiState.update { it.copy(showLineNumbers = !it.showLineNumbers) }
             }
             // TODO: Wire Download, GetLink, SendToChat, Share when top-bar variants are needed (currently bottom-bar only)
             TextEditorTopBarAction.Download,
@@ -416,10 +419,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         }
     }
 
-    /**
-     * Handles bottom bar action intents. Download, GetLink, Share are handled via [nodeActionHandler];
-     * Edit switches to edit mode; SendToChat is no-op for now.
-     */
     fun onBottomBarAction(action: TextEditorBottomBarAction) {
         when (action) {
             is TextEditorBottomBarAction.Download -> {
@@ -447,18 +446,30 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             }
 
             is TextEditorBottomBarAction.Edit -> setEditMode()
-
-            is TextEditorBottomBarAction.SendToChat -> { /* No-op; reserved for later phase */
-            }
+            is TextEditorBottomBarAction.SendToChat -> {}
         }
     }
 
-    private data class RestoreResult(
-        val lines: List<String>,
-        val displayedContent: String,
-        val displayLineCap: Int,
-        val hasMoreLines: Boolean,
-        val totalLinesLoaded: Int,
-    )
+    private fun isEditMode(): Boolean {
+        val mode = _uiState.value.mode
+        return mode == TextEditorMode.Edit || mode == TextEditorMode.Create
+    }
 
+    private fun buildChunksFromLines() {
+        chunkTexts.clear()
+        for (i in fullContentLines.indices step CHUNK_SIZE) {
+            val end = (i + CHUNK_SIZE).coerceAtMost(fullContentLines.size)
+            chunkTexts.add(fullContentLines.subList(i, end).joinToString("\n"))
+        }
+        if (chunkTexts.isEmpty()) chunkTexts.add("")
+    }
+
+    private fun clearEditState() {
+        chunkStates.clear()
+        chunkOriginals.clear()
+        chunkTexts.clear()
+        hasDisposedEdits = false
+    }
+
+    private fun ceilDiv(a: Int, b: Int): Int = (a + b - 1) / b
 }

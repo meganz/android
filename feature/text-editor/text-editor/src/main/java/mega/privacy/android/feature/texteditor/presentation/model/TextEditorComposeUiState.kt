@@ -9,19 +9,16 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 /**
  * UI state for the Compose text editor screen.
  *
- * @param hasMoreLines True when content was capped for display and more lines are available; user can load more by scrolling to bottom.
- * @param totalLinesLoaded Total lines loaded so far (for gradual load); null when not applicable.
+ * @param totalLineCount Total number of logical lines in the full document.
+ * @param contentVersion Monotonically increasing counter; the UI re-reads chunk data when it changes.
  * @param isFullyLoaded True when gradual loading has finished and all content is in memory.
  * @param errorMessage Optional error message when an operation fails; shown in error UI when set, cleared when error is consumed.
  * @param showDiscardDialog True when the discard-changes confirmation dialog should be shown (Edit mode, unsaved changes).
  * @param saveSuccessEvent One-shot event to show "Changes saved" snackbar when save completes successfully.
  * @param isRestoringContent True while content is being reverted/updated in background (e.g. discard); show loading overlay.
- * @param appendSuffix One-shot suffix string to append to the text field during edit-mode load-more; null when consumed.
- * @param totalLineCount Total number of lines in the document (for view-mode virtualised LazyColumn).
  */
 data class TextEditorComposeUiState(
     val fileName: String = "",
-    val content: String = "",
     val isLoading: Boolean = false,
     val errorEvent: StateEvent = consumed,
     val errorMessage: String? = null,
@@ -32,9 +29,8 @@ data class TextEditorComposeUiState(
     val isRestoringContent: Boolean = false,
     val bottomBarActions: List<TextEditorBottomBarAction> = emptyList(),
     val transferEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
-    val hasMoreLines: Boolean = false,
-    val totalLinesLoaded: Int? = null,
     val isFullyLoaded: Boolean = true,
-    val appendSuffix: String? = null,
     val totalLineCount: Int = 0,
+    val contentVersion: Int = 0,
+    val focusedEditChunk: Int = 0,
 )
