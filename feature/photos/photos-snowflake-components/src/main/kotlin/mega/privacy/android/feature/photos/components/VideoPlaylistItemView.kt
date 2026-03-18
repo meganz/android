@@ -2,6 +2,7 @@ package mega.privacy.android.feature.photos.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -29,11 +30,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -50,6 +54,7 @@ fun VideoPlaylistItemView(
     onClick: () -> Unit,
     thumbnailList: List<Any?>?,
     modifier: Modifier = Modifier,
+    isSelectionMode: Boolean = false,
     isSystemVideoPlaylist: Boolean = false,
     onLongClick: (() -> Unit)? = null,
     onMenuClick: () -> Unit = {},
@@ -60,9 +65,12 @@ fun VideoPlaylistItemView(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth()
             .height(87.dp)
+            .conditional(isSelected) {
+                background(DSTokens.colors.background.surface1)
+            }
+            .padding(vertical = 8.dp, horizontal = 16.dp)
             .testTag(VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -81,18 +89,30 @@ fun VideoPlaylistItemView(
         )
 
         if (!isSystemVideoPlaylist) {
-            MegaIcon(
-                imageVector = if (isSelected)
-                    IconPack.Medium.Thin.Solid.CheckCircle
-                else
-                    IconPack.Medium.Thin.Outline.MoreVertical,
-                tint = IconColor.Primary,
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .clickable(enabled = !isSelected, onClick = onMenuClick)
-                    .testTag(VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG)
-            )
+            if (isSelectionMode) {
+                Box(
+                    modifier = Modifier.size(24.dp).align(Alignment.CenterVertically),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
+                        modifier = Modifier.testTag(VIDEO_PLAYLIST_ITEM_SELECTED_CHECKBOX_TEST_TAG),
+                    )
+                }
+            } else {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                    tint = IconColor.Primary,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .clickable(onClick = onMenuClick)
+                        .testTag(VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG)
+                )
+            }
         }
     }
 }
@@ -236,30 +256,39 @@ private fun VideoPlaylistItemViewMultipleVideosPreview() {
 /**
  * Test tag for VideoPlaylistItemView
  */
-const val VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG = "video_playlist_item_view_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_VIEW_TEST_TAG = "video_playlist:item_view"
 
 /**
  * Test tag for video playlist item title
  */
-const val VIDEO_PLAYLIST_ITEM_TITLE_TEST_TAG = "video_playlist_item_title_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_TITLE_TEST_TAG =
+    "video_playlist_item:text_title"
 
 /**
  * Test tag for video playlist item info
  */
-const val VIDEO_PLAYLIST_ITEM_INFO_TEST_TAG = "video_playlist_item_info_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_INFO_TEST_TAG = "video_playlist_item:text_info"
 
 /**
  * Test tag for thumbnail view
  */
-const val VIDEO_PLAYLIST_ITEM_THUMBNAIL_VIEW_TEST_TAG =
-    "video_playlist_item_thumbnail_icon_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_THUMBNAIL_VIEW_TEST_TAG =
+    "video_playlist_item:view_thumbnail"
 
 /**
  * Test tag for video playlist item stack icon
  */
-const val VIDEO_PLAYLIST_ITEM_STACK_ICON_TEST_TAG = "video_playlist_item_stack_icon_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_STACK_ICON_TEST_TAG =
+    "video_playlist_item:icon_stack"
+
+/**
+ * Test tag for selected checkbox
+ */
+internal const val VIDEO_PLAYLIST_ITEM_SELECTED_CHECKBOX_TEST_TAG =
+    "video_playlist_item:checkbox_selected"
 
 /**
  * Test tag for tailing icon
  */
-const val VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG = "video_playlist_item_tailing_icon_test_tag"
+internal const val VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG =
+    "video_playlist_item:icon_tailing"

@@ -48,9 +48,11 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.components.util.normalize
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
@@ -72,6 +74,7 @@ fun VideoItemView(
     onClick: () -> Unit,
     thumbnailData: Any?,
     modifier: Modifier = Modifier,
+    isSelectionMode: Boolean = false,
     labelView: @Composable (() -> Unit)? = null,
     tagsRow: (@Composable () -> Unit)? = null,
     description: String? = null,
@@ -89,8 +92,11 @@ fun VideoItemView(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp)
             .fillMaxWidth()
+            .conditional(isSelected) {
+                background(DSTokens.colors.background.surface1)
+            }
+            .padding(vertical = 8.dp, horizontal = 16.dp)
             .defaultMinSize(minHeight = 80.dp)
             .testTag(VIDEO_ITEM_VIEW_TEST_TAG)
     ) {
@@ -118,19 +124,31 @@ fun VideoItemView(
             highlightText = highlightText,
         )
 
-        if (showMenuButton) {
-            MegaIcon(
-                imageVector = if (isSelected)
-                    IconPack.Medium.Thin.Solid.CheckCircle
-                else
-                    IconPack.Medium.Thin.Outline.MoreVertical,
-                tint = IconColor.Primary,
-                contentDescription = null,
-                modifier = Modifier
-                    .clickable(enabled = !isSelected, onClick = onMenuClick)
-                    .padding(top = 25.dp)
-                    .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
-            )
+        if (isSelectionMode) {
+            Box(
+                modifier = Modifier.padding(top = 25.dp).size(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckStateChanged = { },
+                    tapTargetArea = false,
+                    clickable = false,
+                    modifier = Modifier.testTag(VIDEO_ITEM_CHECKBOX_TEST_TAG),
+                )
+            }
+        } else {
+            if (showMenuButton) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                    tint = IconColor.Primary,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clickable(onClick = onMenuClick)
+                        .padding(top = 25.dp)
+                        .testTag(VIDEO_ITEM_MENU_ICON_TEST_TAG),
+                )
+            }
         }
     }
 }
@@ -438,6 +456,11 @@ const val VIDEO_ITEM_SIZE_VIEW_TEST_TAG = "video_item:text_size"
  * Test tag for the video item thumbnail view
  */
 const val VIDEO_ITEM_THUMBNAIL_TEST_TAG = "video_item:image_thumbnail"
+
+/**
+ * Test tag for the video item checkbox
+ */
+const val VIDEO_ITEM_CHECKBOX_TEST_TAG = "video_item:check_box_selected"
 
 /**
  * Test tag for the video item menu icon view

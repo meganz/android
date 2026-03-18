@@ -30,5 +30,10 @@ sealed interface VideosTabUiState {
          * The highlight text for search by tags or description
          */
         val highlightText get() = query.orEmpty()
+
+        /**
+         * The selection mode whether is enabled
+         */
+        val isSelectionMode get() = selectedTypedNodes.isNotEmpty()
     }
 }

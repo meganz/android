@@ -21,5 +21,11 @@ sealed interface VideoPlaylistsTabUiState {
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val selectedPlaylists: Set<VideoPlaylistUiEntity> = emptySet(),
         val query: String? = null,
-    ) : VideoPlaylistsTabUiState
+    ) : VideoPlaylistsTabUiState {
+
+        /**
+         * The selection mode whether is enabled
+         */
+        val isSelectionMode get() = selectedPlaylists.isNotEmpty()
+    }
 }

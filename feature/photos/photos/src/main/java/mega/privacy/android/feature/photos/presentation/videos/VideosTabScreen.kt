@@ -191,6 +191,7 @@ internal fun VideosTabScreen(
                                 duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
+                                isSelectionMode = uiState.isSelectionMode,
                                 isSharedWithPublicLink = videoItem.isSharedItems,
                                 labelView = {
                                     videoItem.nodeLabel?.let { label ->

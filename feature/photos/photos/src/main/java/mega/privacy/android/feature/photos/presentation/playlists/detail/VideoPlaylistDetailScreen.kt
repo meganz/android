@@ -37,6 +37,7 @@ import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
@@ -174,7 +175,9 @@ internal fun VideoPlaylistDetailScreen(
         floatingActionButton = {
             if (dataState?.playlistDetail?.uiEntity?.isSystemVideoPlayer == false) {
                 AddContentFab(
-                    modifier = Modifier.testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
+                    modifier = Modifier
+                        .applyScrollToHideFabBehavior()
+                        .testTag(VIDEO_PLAYLIST_DETAIL_ADD_VIDEO_FAB_TEST_TAG),
                     visible = selectedNodes.isEmpty(),
                     onClick = {
                         val playlistHandle = dataState.playlistDetail.uiEntity.id.longValue
@@ -405,6 +408,7 @@ internal fun VideoPlaylistDetailScreen(
                                 duration = videoItem.durationString,
                                 isFavourite = videoItem.isFavourite,
                                 isSelected = videoItem.isSelected,
+                                isSelectionMode = uiState.isSelectionMode,
                                 isSharedWithPublicLink = videoItem.isSharedItems,
                                 labelView = {
                                     videoItem.nodeLabel?.let { label ->

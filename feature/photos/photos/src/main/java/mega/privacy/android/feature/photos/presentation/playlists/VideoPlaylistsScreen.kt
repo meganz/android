@@ -247,6 +247,7 @@ internal fun VideoPlaylistsTabScreen(
                             },
                             totalDuration = videoPlaylistItem.totalDuration,
                             isSelected = videoPlaylistItem.isSelected,
+                            isSelectionMode = uiState.isSelectionMode,
                             isSystemVideoPlaylist = videoPlaylistItem.isSystemVideoPlayer,
                             onClick = {
                                 if (uiState.selectedPlaylists.isEmpty()) {

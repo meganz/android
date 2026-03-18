@@ -7,6 +7,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.icon.pack.R
@@ -34,6 +36,7 @@ class VideoPlaylistItemViewTest {
         numberOfVideos: Int = 0,
         totalDuration: String? = null,
         isSelected: Boolean = false,
+        isSelectionMode: Boolean = false,
         onClick: () -> Unit = {},
         thumbnailList: List<Any?>? = null,
         modifier: Modifier = Modifier,
@@ -54,7 +57,8 @@ class VideoPlaylistItemViewTest {
                 onClick = onClick,
                 onLongClick = onLongClick,
                 onMenuClick = onMenuClick,
-                modifier = modifier
+                modifier = modifier,
+                isSelectionMode = isSelectionMode
             )
         }
     }
@@ -133,6 +137,33 @@ class VideoPlaylistItemViewTest {
         )
 
         VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that checkbox is displayed and tailing icon is not displayed when isSelectionMode is true`() {
+        setComposeContent(
+            isSelectionMode = true,
+            isSelected = true,
+            isSystemVideoPlaylist = false
+        )
+
+        composeTestRule.onAllNodesWithTag(
+            VIDEO_PLAYLIST_ITEM_SELECTED_CHECKBOX_TEST_TAG,
+            useUnmergedTree = true
+        ).onFirst()
+            .assertIsDisplayed()
+        VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that tailing icon is displayed and checkbox is not displayed when isSelectionMode is false`() {
+        setComposeContent(
+            isSelectionMode = false,
+            isSystemVideoPlaylist = false
+        )
+
+        VIDEO_PLAYLIST_ITEM_TAILING_ICON_TEST_TAG.assertIsDisplayedWithTag()
+        VIDEO_PLAYLIST_ITEM_SELECTED_CHECKBOX_TEST_TAG.assertIsNotDisplayedWithTag()
     }
 
     private fun String.assertIsDisplayedWithTag() =

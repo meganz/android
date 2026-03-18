@@ -11,6 +11,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -65,6 +67,8 @@ class VideoItemViewTest {
         description: String = "",
         tagsRow: @Composable (() -> Unit)? = null,
         highlightText: String = "",
+        isSelectionMode: Boolean = false,
+        isSensitive: Boolean = false,
     ) {
         composeTestRule.setContent {
             VideoItemView(
@@ -86,7 +90,9 @@ class VideoItemViewTest {
                 onMenuClick = onMenuClick,
                 description = description,
                 tagsRow = tagsRow,
-                highlightText = highlightText
+                highlightText = highlightText,
+                isSelectionMode = isSelectionMode,
+                isSensitive = isSensitive
             )
         }
     }
@@ -221,5 +227,51 @@ class VideoItemViewTest {
             useUnmergedTree = true
         ).performClick()
         verify(onMenuClick).invoke()
+    }
+
+    @Test
+    fun `test that checkbox is displayed and menu icon is not displayed when isSelectionMode is true`() {
+        setComposeContent(
+            duration = duration,
+            isSelectionMode = true,
+            isSelected = true
+        )
+
+        composeTestRule.onAllNodesWithTag(VIDEO_ITEM_CHECKBOX_TEST_TAG, useUnmergedTree = true)
+            .onFirst()
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_MENU_ICON_TEST_TAG, true).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that menu icon is displayed and checkbox is not displayed when isSelectionMode is false`() {
+        setComposeContent(
+            duration = duration,
+            isSelectionMode = false,
+            showMenuButton = true
+        )
+
+        VIDEO_ITEM_MENU_ICON_TEST_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_CHECKBOX_TEST_TAG, true).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that menu icon is not displayed when showMenuButton is false`() {
+        setComposeContent(
+            duration = duration,
+            showMenuButton = false
+        )
+
+        composeTestRule.onNodeWithTag(VIDEO_ITEM_MENU_ICON_TEST_TAG, true).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that thumbnail is displayed when isSensitive is true`() {
+        setComposeContent(
+            duration = duration,
+            isSensitive = true
+        )
+
+        VIDEO_ITEM_THUMBNAIL_TEST_TAG.assertIsDisplayedWithTag()
     }
 }
