@@ -56,7 +56,8 @@ fun HandleNodeAction(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenFileContent = { content, _, _ ->
+        // Unused second param: isPdfViewerEnabled from BaseHandleNodeAction (this legacy path does not branch on it).
+        onOpenFileContent = { content, _ ->
             when (content) {
                 is FileNodeContent.Pdf -> {
                     megaNavigator.openPdfActivity(

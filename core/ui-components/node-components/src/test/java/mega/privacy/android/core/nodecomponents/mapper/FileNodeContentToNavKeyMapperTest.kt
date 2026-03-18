@@ -263,7 +263,6 @@ class FileNodeContentToNavKeyMapperTest {
             nodeHandle = nodeHandle,
             mode = TextEditorMode.Edit.value,
             nodeSourceType = expectedViewType,
-            isTextEditorComposeEnabled = false
         )
 
         val result = underTest(
@@ -277,34 +276,31 @@ class FileNodeContentToNavKeyMapperTest {
     }
 
     @Test
-    fun `test that TextContent maps to LegacyTextEditorNavKey with isTextEditorComposeEnabled true`() {
-        val nodeHandle = 333L
-        val expectedViewType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+    fun `test that TextContent maps to LegacyTextEditorNavKey with View mode and default parameters`() {
+        val nodeHandle = 123L
+        val expectedViewType = NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
         val fileNode = createMockFileNode(
             id = nodeHandle,
-            name = "test.txt",
+            name = "readme.txt",
             fileTypeInfo = TextFileTypeInfo("text/plain", "txt")
         )
 
-        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.CLOUD_DRIVE))
+        whenever(nodeSourceTypeToViewTypeMapper(NodeSourceType.INCOMING_SHARES))
             .thenReturn(expectedViewType)
 
-        val content = FileNodeContent.TextContent
+        val result = underTest(
+            content = FileNodeContent.TextContent,
+            fileNode = fileNode,
+            nodeSourceData = NodeSourceData.Default(NodeSourceType.INCOMING_SHARES),
+            textEditorMode = TextEditorMode.View
+        )
+
         val expected = LegacyTextEditorNavKey(
             nodeHandle = nodeHandle,
             mode = TextEditorMode.View.value,
             nodeSourceType = expectedViewType,
-            isTextEditorComposeEnabled = true
+            fileName = null
         )
-
-        val result = underTest(
-            content = content,
-            fileNode = fileNode,
-            nodeSourceData = NodeSourceData.Default(NodeSourceType.CLOUD_DRIVE),
-            textEditorMode = TextEditorMode.View,
-            isTextEditorComposeEnabled = true
-        )
-
         assertThat(result).isEqualTo(expected)
     }
 

@@ -12,7 +12,6 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
@@ -85,25 +84,6 @@ class NodeActionHandlerViewModelTest {
     }
 
     @Test
-    fun `test that state isTextEditorComposeEnabled emits when flag is loaded`() = runTest {
-        reset(getFeatureFlagValueUseCase)
-        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorCompose)).thenReturn(true)
-
-        val viewModelUnderTest = NodeActionHandlerViewModel(
-            getFileNodeContentForFileNodeUseCase = getFileNodeContentForFileNodeUseCase,
-            nodeContentUriIntentMapper = nodeContentUriIntentMapper,
-            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
-        )
-
-        val result = viewModelUnderTest.state
-            .map { it.isTextEditorComposeEnabled }
-            .first { it != null }
-
-        assertThat(result).isTrue()
-        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.TextEditorCompose)
-    }
-
-    @Test
     fun `test that state isPDFViewerEnabled emits when flag is loaded`() = runTest {
         reset(getFeatureFlagValueUseCase)
         whenever(getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)).thenReturn(true)
@@ -123,8 +103,7 @@ class NodeActionHandlerViewModelTest {
     }
 
     @Test
-    fun `test that initial state has null feature flags`() = runTest {
-        assertThat(viewModel.state.value.isTextEditorComposeEnabled).isNull()
+    fun `test that initial state has null PDF viewer flag`() = runTest {
         assertThat(viewModel.state.value.isPDFViewerEnabled).isNull()
     }
 

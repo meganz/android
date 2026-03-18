@@ -13,7 +13,6 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMappe
 import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.GetFileNodeContentForFileNodeUseCase
 import mega.privacy.android.feature_flags.AppFeatures
@@ -23,11 +22,9 @@ import javax.inject.Inject
 /**
  * UI state for [NodeActionHandlerViewModel].
  * Eventually this class will be removed when feature flags are removed, no need to create a separate file for it.
- * @param isTextEditorComposeEnabled Whether the Compose text editor feature is enabled (null until loaded).
  * @param isPDFViewerEnabled Whether the Compose PDF viewer feature is enabled (null until loaded).
  */
 data class NodeActionHandlerUiState(
-    val isTextEditorComposeEnabled: Boolean? = null,
     val isPDFViewerEnabled: Boolean? = null,
 )
 
@@ -46,13 +43,6 @@ class NodeActionHandlerViewModel @Inject constructor(
     val state: StateFlow<NodeActionHandlerUiState> = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            runCatching {
-                getFeatureFlagValueUseCase(ApiFeatures.TextEditorCompose)
-            }.onSuccess { value ->
-                _state.update { it.copy(isTextEditorComposeEnabled = value) }
-            }
-        }
         viewModelScope.launch {
             runCatching {
                 getFeatureFlagValueUseCase(AppFeatures.PdfViewerComposeUI)

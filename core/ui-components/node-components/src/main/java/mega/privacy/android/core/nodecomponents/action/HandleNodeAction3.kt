@@ -42,13 +42,12 @@ fun HandleNodeAction3(
             }
         },
         onActionHandled = onActionHandled,
-        onOpenFileContent = { content: FileNodeContent, isTextEditorComposeEnabled: Boolean, isPDFViewerEnabled: Boolean ->
+        onOpenFileContent = { content: FileNodeContent, isPDFViewerEnabled: Boolean ->
             fileNodeContentToNavKeyMapper(
                 content = content,
                 fileNode = typedFileNode,
                 nodeSourceData = nodeSourceData,
                 sortOrder = sortOrder,
-                isTextEditorComposeEnabled = isTextEditorComposeEnabled,
                 isPDFViewerEnabled = isPDFViewerEnabled,
             )?.let { navKey ->
                 onNavigate(navKey)

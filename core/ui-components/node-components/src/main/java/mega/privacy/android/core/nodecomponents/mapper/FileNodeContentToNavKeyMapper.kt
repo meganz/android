@@ -31,7 +31,6 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
      * @param sortOrder The sort order for media player (default: ORDER_NONE)
      * @param textEditorMode The text editor mode (default: View)
      * @param searchedItems The searched items for media player (default: null)
-     * @param isTextEditorComposeEnabled Whether to use Compose text editor screen (default: false)
      * @return The corresponding NavKey or null if no navigation is found for this content
      */
     operator fun invoke(
@@ -41,7 +40,6 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
         sortOrder: SortOrder = SortOrder.ORDER_NONE,
         textEditorMode: TextEditorMode = TextEditorMode.View,
         searchedItems: List<Long>? = null,
-        isTextEditorComposeEnabled: Boolean = false,
         isPDFViewerEnabled: Boolean = false,
     ): NavKey? {
         val viewType = nodeSourceTypeToViewTypeMapper(nodeSourceData.nodeSourceType)
@@ -95,7 +93,6 @@ class FileNodeContentToNavKeyMapper @Inject constructor(
                 nodeHandle = fileNode.id.longValue,
                 mode = textEditorMode.value,
                 nodeSourceType = viewType,
-                isTextEditorComposeEnabled = isTextEditorComposeEnabled
             )
 
             is FileNodeContent.AudioOrVideo -> LegacyMediaPlayerNavKey(

@@ -26,8 +26,10 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 
@@ -83,8 +85,8 @@ private fun shouldShowShare(nodeSourceType: Int?): Boolean {
 }
 
 /**
- * Legacy text editor destination. When [LegacyTextEditorNavKey.isTextEditorComposeEnabled] is true,
- * shows [TextEditorScreen]; otherwise starts [TextEditorActivity] and pops this destination.
+ * Legacy text editor destination. Uses [FeatureFlagGate] with [ApiFeatures.TextEditorCompose]:
+ * when enabled shows [TextEditorScreen]; when disabled starts [TextEditorActivity] and pops.
  * Tapping More opens the Node Options Bottom Sheet. When the user deletes or moves the node
  * (result Navigation or Transfer), the editor is closed.
  */
@@ -127,34 +129,39 @@ private fun TextEditorEntry(
             }
     }
 
-    if (navKey.isTextEditorComposeEnabled) {
-        val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
-        val nodeSourceType = navKey.nodeSourceType
-        TextEditorComposeContent(
-            navKey = navKey,
-            mode = mode,
-            inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
-            showDownload = shouldShowDownload(nodeSourceType),
-            showShare = shouldShowShare(nodeSourceType),
-            navigationHandler = navigationHandler,
-            removeDestination = removeDestination,
-            viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
-            transferHandler = transferHandler,
-        )
-    } else {
-        LaunchedEffect(Unit) {
-            context.startActivity(
-                TextEditorActivity.createIntent(
-                    context = context,
-                    nodeHandle = navKey.nodeHandle,
-                    mode = navKey.mode,
-                    nodeSourceType = navKey.nodeSourceType,
-                    fileName = navKey.fileName,
+    val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
+    val nodeSourceType = navKey.nodeSourceType
+    // Default empty loading state is intentional; no loading UI for now.
+    FeatureFlagGate(
+        feature = ApiFeatures.TextEditorCompose,
+        disabled = {
+            LaunchedEffect(Unit) {
+                context.startActivity(
+                    TextEditorActivity.createIntent(
+                        context = context,
+                        nodeHandle = navKey.nodeHandle,
+                        mode = navKey.mode,
+                        nodeSourceType = navKey.nodeSourceType,
+                        fileName = navKey.fileName,
+                    )
                 )
+                removeDestination()
+            }
+        },
+        enabled = {
+            TextEditorComposeContent(
+                navKey = navKey,
+                mode = mode,
+                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
+                showDownload = shouldShowDownload(nodeSourceType),
+                showShare = shouldShowShare(nodeSourceType),
+                navigationHandler = navigationHandler,
+                removeDestination = removeDestination,
+                viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
+                transferHandler = transferHandler,
             )
-            removeDestination()
-        }
-    }
+        },
+    )
 }
 
 @Composable

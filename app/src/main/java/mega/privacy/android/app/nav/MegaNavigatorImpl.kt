@@ -109,6 +109,7 @@ import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySearchNavKey
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
@@ -713,14 +714,28 @@ internal class MegaNavigatorImpl @Inject constructor(
         mode: TextEditorMode,
         fileName: String?,
     ) {
-        val textFileIntent = TextEditorActivity.createIntent(
+        navigateForSingleActivity(
             context = context,
-            nodeHandle = currentNodeId.longValue,
-            mode = mode.value,
-            nodeSourceType = nodeSourceType,
-            fileName = fileName,
+            singleActivityDestinations = listOf(
+                LegacyTextEditorNavKey(
+                    nodeHandle = currentNodeId.longValue,
+                    mode = mode.value,
+                    nodeSourceType = nodeSourceType,
+                    fileName = fileName,
+                )
+            ),
+            legacyNavigation = {
+                context.startActivity(
+                    TextEditorActivity.createIntent(
+                        context = context,
+                        nodeHandle = currentNodeId.longValue,
+                        mode = mode.value,
+                        nodeSourceType = nodeSourceType,
+                        fileName = fileName,
+                    )
+                )
+            },
         )
-        context.startActivity(textFileIntent)
     }
 
     override fun openGetLinkActivity(context: Context, vararg handles: Long) {

@@ -27,7 +27,7 @@ import java.io.File
  * @param typedFileNode [TypedFileNode]
  * @param showSnackbar callback to show snackbar messages
  * @param onActionHandled callback after file clicked
- * @param onOpenFileContent
+ * @param onOpenFileContent callback with content and isPDFViewerEnabled (text editor uses FeatureFlagGate at destination)
  * @param onDownloadEvent callback for download event
  */
 @Composable
@@ -35,7 +35,7 @@ fun BaseHandleNodeAction(
     typedFileNode: TypedFileNode,
     showSnackbar: (String) -> Unit,
     onActionHandled: () -> Unit,
-    onOpenFileContent: (FileNodeContent, Boolean, Boolean) -> Unit,
+    onOpenFileContent: (FileNodeContent, Boolean) -> Unit,
     onDownloadEvent: (TransferTriggerEvent) -> Unit = {},
     isLinkNode: Boolean = false,
 ) {
@@ -56,17 +56,7 @@ fun BaseHandleNodeAction(
             runCatching {
                 when (content) {
                     is FileNodeContent.TextContent -> {
-                        val isTextEditorComposeEnabled = runCatching {
-                            nodeActionsViewModel.state
-                                .map { it.isTextEditorComposeEnabled }
-                                .first { it != null }
-                        }.getOrDefault(false)
-
-                        onOpenFileContent(
-                            content,
-                            isTextEditorComposeEnabled ?: false,
-                            false
-                        )
+                        onOpenFileContent(content, false)
                     }
 
                     is FileNodeContent.Pdf -> {
@@ -76,11 +66,7 @@ fun BaseHandleNodeAction(
                                 .first { it != null }
                         }.getOrDefault(false)
 
-                        onOpenFileContent(
-                            content,
-                            false,
-                            isPDFViewerEnabled ?: false
-                        )
+                        onOpenFileContent(content, isPDFViewerEnabled ?: false)
                     }
 
                     is FileNodeContent.Other -> {
@@ -105,11 +91,7 @@ fun BaseHandleNodeAction(
                                     applyNodeContentUri = nodeActionsViewModel::applyNodeContentUri
                                 )
                             } else {
-                                onOpenFileContent(
-                                    FileNodeContent.LocalZipFile(localFile),
-                                    false,
-                                    false
-                                )
+                                onOpenFileContent(FileNodeContent.LocalZipFile(localFile), false)
                             }
                         }
                     }
@@ -119,7 +101,7 @@ fun BaseHandleNodeAction(
                     }
 
                     else -> {
-                        onOpenFileContent(content, false, false)
+                        onOpenFileContent(content, false)
                     }
                 }
             }.onFailure {

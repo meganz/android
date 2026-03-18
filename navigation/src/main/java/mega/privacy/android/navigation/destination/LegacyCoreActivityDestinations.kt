@@ -266,7 +266,6 @@ data class LegacyTextEditorNavKey(
     val mode: String,
     val nodeSourceType: Int? = null,
     val fileName: String? = null,
-    val isTextEditorComposeEnabled: Boolean = false,
 ) : NoSessionNavKey.Optional
 
 @Serializable
