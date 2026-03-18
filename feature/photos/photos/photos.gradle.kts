@@ -32,8 +32,8 @@ dependencies {
     implementation(project(":core:transfers"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":feature:photos:photos-snowflake-components"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
 

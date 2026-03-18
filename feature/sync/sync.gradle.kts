@@ -36,10 +36,10 @@ dependencies {
     implementation(project(":core:formatter"))
     implementation(project(":shared:original-core-ui"))
     implementation(project(":shared:sync"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":shared:nodes"))
-    implementation(project(":shared:resources"))
     implementation(project(":legacy-core-ui"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:analytics:analytics-tracker"))
 
     implementation(lib.kotlin.ktx)

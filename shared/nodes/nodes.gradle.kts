@@ -36,10 +36,9 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":navigation"))
     implementation(project(":core:formatter"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":shared:resources"))
 
     //core components
     implementation(lib.mega.core.ui)

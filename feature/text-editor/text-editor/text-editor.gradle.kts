@@ -16,8 +16,8 @@ android {
 dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
 
     implementation(platform(androidx.compose.bom))
     implementation(androidx.compose.material)

@@ -28,8 +28,8 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
 
     implementation(androidx.bundles.compose.bom)
     implementation(platform(androidx.compose.bom))

@@ -17,13 +17,13 @@ android {
 }
 
 dependencies {
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":core:navigation-contract"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
 
     implementation(lib.mega.core.ui)
     implementation(androidx.material3.window)

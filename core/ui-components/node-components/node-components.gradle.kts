@@ -17,8 +17,8 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":core:formatter"))
     implementation(project(":navigation"))
     implementation(project(":core:ui-components:shared-components"))

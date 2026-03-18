@@ -33,8 +33,8 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":feature:contact:contact-snowflake-components"))
 
     implementation(lib.mega.core.ui)

@@ -20,8 +20,8 @@ dependencies {
 
     lintChecks(project(":lint"))
 
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":core:formatter"))
     implementation(project(":core:navigation-contract"))

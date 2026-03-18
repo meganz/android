@@ -93,6 +93,7 @@ replay_pid*
 ./review.md
 review.md
 .trees
+/.claude/temp
 
 /.testrail/results/*
 /.testrail/output/*

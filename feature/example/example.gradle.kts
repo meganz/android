@@ -22,8 +22,8 @@ dependencies {
     lintChecks(project(":lint"))
 
     implementation(project(":core:analytics:analytics-tracker"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:resources"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":core:navigation-contract"))
     implementation(project(":domain"))
     implementation(project(":navigation"))

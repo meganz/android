@@ -24,7 +24,7 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":shared:original-core-ui"))
     testImplementation(project(":core-ui-test"))
 

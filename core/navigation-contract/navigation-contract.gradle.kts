@@ -11,7 +11,7 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:string-resources"))
 
     // AndroidX
     implementation(androidx.navigation.compose)

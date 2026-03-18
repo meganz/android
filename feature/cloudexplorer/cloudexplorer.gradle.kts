@@ -26,8 +26,8 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":navigation"))
     implementation(project(":data"))
-    implementation(project(":shared:resources"))
-    implementation(project(":icon-pack"))
+    implementation(project(":resources:string-resources"))
+    implementation(project(":resources:icon-pack"))
     implementation(project(":shared:nodes"))
 
     testImplementation(project(":core-test"))

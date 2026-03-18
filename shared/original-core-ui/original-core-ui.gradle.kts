@@ -25,8 +25,8 @@ android {
 dependencies {
     lintChecks(project(":lint"))
 
-    implementation(project(":icon-pack"))
-    implementation(project(":shared:resources"))
+    implementation(project(":resources:icon-pack"))
+    implementation(project(":resources:string-resources"))
     testImplementation(project(":core-ui-test"))
 
     implementation(androidx.constraintlayout.compose)
