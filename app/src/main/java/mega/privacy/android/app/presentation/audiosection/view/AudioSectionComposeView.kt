@@ -3,21 +3,131 @@ package mega.privacy.android.app.presentation.audiosection.view
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.navigation.BottomSheetNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.presentation.audiosection.AudioSectionViewModel
 import mega.privacy.android.app.presentation.audiosection.model.AudioUiEntity
+import mega.privacy.android.app.presentation.node.NodeActionHandler
+import mega.privacy.android.app.presentation.search.model.navigation.removeNodeLinkDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.cannotVerifyUserNavigation
+import mega.privacy.android.app.presentation.search.navigation.changeLabelBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.changeNodeExtensionDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.foreignNodeDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.leaveFolderShareDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.moveToRubbishOrDeleteNavigation
+import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetNavigation
+import mega.privacy.android.app.presentation.search.navigation.nodeBottomSheetRoute
+import mega.privacy.android.app.presentation.search.navigation.overQuotaDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.removeShareFolderDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.renameDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.shareFolderAccessDialogNavigation
+import mega.privacy.android.app.presentation.search.navigation.shareFolderDialogNavigation
 import mega.privacy.android.app.presentation.search.view.LoadingStateView
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.legacy.core.ui.controls.LegacyMegaEmptyView
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.original.core.ui.controls.sheets.MegaBottomSheetLayout
+
+@Composable
+fun AudioSectionComposeScreen(
+    navHostController: NavHostController,
+    onSortOrderClick: () -> Unit,
+    listToStringWithDelimitersMapper: ListToStringWithDelimitersMapper,
+    nodeActionHandler: NodeActionHandler,
+    fileTypeIconMapper: FileTypeIconMapper,
+    bottomSheetNavigator: BottomSheetNavigator,
+    modifier: Modifier = Modifier,
+    viewModel: AudioSectionViewModel = hiltViewModel(),
+) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    MegaBottomSheetLayout(
+        modifier = modifier,
+        bottomSheetNavigator = bottomSheetNavigator,
+    ) {
+        NavHost(
+            modifier = modifier,
+            navController = navHostController,
+            startDestination = audioSectionRoute
+        ) {
+            composable(
+                route = audioSectionRoute
+            ) {
+                AudioSectionComposeView(
+                    viewModel = viewModel,
+                    onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                    onSortOrderClick = onSortOrderClick,
+                    onLongClick = { item, index ->
+                        viewModel.onItemLongClicked(item, index)
+                    },
+                    onMenuClick = { item ->
+                        val type = NodeSourceType.AUDIO
+                        keyboardController?.hide()
+                        navHostController.navigate(
+                            route = nodeBottomSheetRoute.plus("/${item.id.longValue}")
+                                .plus("/${type.name}")
+                        ) {
+                            popUpTo(nodeBottomSheetRoute) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
+            moveToRubbishOrDeleteNavigation(
+                navHostController = navHostController,
+                listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+            renameDialogNavigation(navHostController = navHostController)
+            nodeBottomSheetNavigation(
+                nodeActionHandler = nodeActionHandler,
+                navHostController = navHostController,
+                fileTypeIconMapper = fileTypeIconMapper
+            )
+            changeLabelBottomSheetNavigation(navHostController)
+            changeNodeExtensionDialogNavigation(navHostController)
+            cannotVerifyUserNavigation(navHostController)
+            removeNodeLinkDialogNavigation(
+                navHostController = navHostController,
+                listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+            shareFolderDialogNavigation(
+                navHostController = navHostController,
+                nodeActionHandler = nodeActionHandler,
+                stringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+            removeShareFolderDialogNavigation(
+                navHostController = navHostController,
+                stringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+            leaveFolderShareDialogNavigation(
+                navHostController = navHostController,
+                stringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+            overQuotaDialogNavigation(navHostController = navHostController)
+            foreignNodeDialogNavigation(navHostController = navHostController)
+            shareFolderAccessDialogNavigation(
+                navHostController = navHostController,
+                listToStringWithDelimitersMapper = listToStringWithDelimitersMapper
+            )
+        }
+    }
+}
 
 /**
  * The compose view for audio section
@@ -82,3 +192,5 @@ fun AudioSectionComposeView(
         }
     }
 }
+
+internal const val audioSectionRoute = "audioSection/audio_section"

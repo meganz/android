@@ -39,10 +39,13 @@ class HomeChipsWidgetViewModelTest {
         )
     }
 
-    private fun stubFeatureFlag(enabled: Boolean = false) {
+    private fun stubFeatureFlag(
+        isMediaRevampPhase2Enabled: Boolean = false,
+        isAudiosChipVisible: Boolean = false,
+    ) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.MediaRevampPhase2) } doReturn enabled
-            onBlocking { invoke(ApiFeatures.AudiosChipInHome) } doReturn enabled
+            onBlocking { invoke(ApiFeatures.MediaRevampPhase2) } doReturn isMediaRevampPhase2Enabled
+            onBlocking { invoke(ApiFeatures.AudiosChipInHome) } doReturn isAudiosChipVisible
         }
     }
 
@@ -51,7 +54,7 @@ class HomeChipsWidgetViewModelTest {
     fun `test that isMediaRevampPhase2Enabled is updated correctly`(
         isMediaRevampPhase2Enabled: Boolean
     ) = runTest {
-        stubFeatureFlag(enabled = isMediaRevampPhase2Enabled)
+        stubFeatureFlag(isMediaRevampPhase2Enabled = isMediaRevampPhase2Enabled)
         initViewModel()
 
         underTest.uiState.test {
@@ -62,9 +65,9 @@ class HomeChipsWidgetViewModelTest {
     @ParameterizedTest(name = "when the AudiosChipInHome is {0}")
     @ValueSource(booleans = [true, false])
     fun `test that isAudiosChipVisible is updated correctly`(
-        isAudiosChipVisible: Boolean
+        isAudiosChipVisible: Boolean,
     ) = runTest {
-        stubFeatureFlag(enabled = isAudiosChipVisible)
+        stubFeatureFlag(isAudiosChipVisible = isAudiosChipVisible)
         initViewModel()
 
         underTest.uiState.test {

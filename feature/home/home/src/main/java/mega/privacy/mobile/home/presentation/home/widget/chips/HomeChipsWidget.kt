@@ -87,17 +87,6 @@ private fun HomeChips(
                 onNavigate(FavouritesNavKey)
             },
         )
-        if (isVideosChipVisible) {
-            MegaChip(
-                content = stringResource(sharedR.string.media_videos_tab_title),
-                selected = false,
-                leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Film),
-                onClick = {
-                    Analytics.tracker.trackEvent(VideosChipButtonPressedEvent)
-                    onNavigate(VideoSectionNavKey)
-                },
-            )
-        }
         if (isAudiosChipVisible) {
             MegaChip(
                 content = stringResource(sharedR.string.home_screen_audios_chip_title),
@@ -106,6 +95,17 @@ private fun HomeChips(
                 onClick = {
                     Analytics.tracker.trackEvent(AudiosChipButtonPressedEvent)
                     onNavigate(LegacyAudioSectionNavKey)
+                },
+            )
+        }
+        if (isVideosChipVisible) {
+            MegaChip(
+                content = stringResource(sharedR.string.media_videos_tab_title),
+                selected = false,
+                leadingPainter = rememberVectorPainter(IconPack.Small.Thin.Outline.Film),
+                onClick = {
+                    Analytics.tracker.trackEvent(VideosChipButtonPressedEvent)
+                    onNavigate(VideoSectionNavKey)
                 },
             )
         }
