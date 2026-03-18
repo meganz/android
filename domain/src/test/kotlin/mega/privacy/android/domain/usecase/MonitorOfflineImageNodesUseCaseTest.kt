@@ -18,7 +18,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -64,6 +66,7 @@ class MonitorOfflineImageNodesUseCaseTest {
         )
         val imageNode = mock<ImageNode>()
         whenever(nodeRepository.monitorOfflineNodeUpdates()).thenReturn(flowOf(listOf(offlineNode)))
+        whenever(getOfflineFileInformationByIdUseCase(NodeId(123L), true)).thenReturn(null)
         whenever(photosRepository.fetchImageNode(NodeId(123L), false)).thenReturn(imageNode)
 
         val result = underTest("testPath").first()
@@ -140,4 +143,32 @@ class MonitorOfflineImageNodesUseCaseTest {
             val result = underTest("testPath", filterSvg = false).first()
             assertThat(result).contains(imageNode)
         }
+
+    @Test
+    fun `test that offline file mapper is used before fetchImageNode`() = runTest {
+        val offlineNode = Offline(
+            id = 1,
+            handle = "123",
+            path = "testPath",
+            name = "test.jpg",
+            parentId = 0,
+            type = Offline.FILE,
+            origin = 0,
+            handleIncoming = "0",
+        )
+        val fromMapper = mock<ImageNode>()
+        val offlineFileInfo = mock<OfflineFileInformation>()
+        whenever(nodeRepository.monitorOfflineNodeUpdates())
+            .thenReturn(flowOf(listOf(offlineNode)))
+        whenever(getOfflineFileInformationByIdUseCase(NodeId(123L), true))
+            .thenReturn(offlineFileInfo)
+        whenever(offlineFileInformationToImageNodeMapper(offlineFileInfo, false))
+            .thenReturn(fromMapper)
+        whenever(photosRepository.fetchImageNode(NodeId(123L), false))
+            .thenReturn(mock())
+
+        val result = underTest("testPath").first()
+        assertThat(result).containsExactly(fromMapper)
+        verify(photosRepository, never()).fetchImageNode(NodeId(123L), false)
+    }
 }
