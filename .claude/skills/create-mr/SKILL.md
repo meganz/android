@@ -21,7 +21,8 @@ Merge Request automatically.
 /create-mr                                   # Push current branch and auto-generate description
 /create-mr --title "AND-1234 My fix"         # Override MR title
 /create-mr --base develop                    # Override target branch (default: develop)
-/create-mr --branch kg/AND-1234-my-feature   # Create and switch to a new branch first
+/create-mr --branch kg/AND-1234-my-feature   # Create and switch to a new branch (explicit name)
+/create-mr --branch kg AND-1234 my feature   # Create and switch to a new branch (auto-slugified)
 /create-mr --draft                           # Create as draft MR
 /create-mr --squash                          # Force squash on merge (overrides default)
 /create-mr --no-squash                       # Force no squash on merge (overrides default)
@@ -33,7 +34,8 @@ Merge Request automatically.
 |---------------------|-----------------------------------------------------------------------------|--------------------------------------|
 | `--title <title>`   | Override MR title (default: latest commit message)                          | `--title "AND-1234 Fix login"`       |
 | `--base <branch>`   | Target branch for the MR (default: `develop`)                               | `--base main`                        |
-| `--branch <name>`   | Create a new branch and switch to it before pushing                         | `--branch kg/AND-1234-my-feature`    |
+| `--branch <name>`   | Create a new branch using an explicit full name                             | `--branch kg/AND-1234-my-feature`    |
+| `--branch <prefix> <JIRA> [desc]` | Create a new branch, auto-slugified from prefix + JIRA + description | `--branch kg AND-1234 my feature` → `kg/AND-1234-my-feature` |
 | `--draft`           | Create MR as draft                                                          |                                      |
 | `--squash`          | Force squash on merge, regardless of target branch                          |                                      |
 | `--no-squash`       | Force no squash on merge, regardless of target branch                       |                                      |
@@ -42,7 +44,15 @@ Merge Request automatically.
 
 ### Step 0 — Create new branch (only if `--branch` was passed)
 
-If `--branch <name>` was provided, run:
+If `--branch <value>` was provided, determine the branch name as follows:
+
+- **If the first token contains a `/`** (e.g. `kg/AND-1234-my-feature`) → use it as-is as the branch name.
+- **Otherwise** (e.g. `kg AND-1234 my feature`) → treat as `<prefix> <rest>`:
+  - **Prefix** = first token (e.g. `kg`)
+  - **Rest** = everything after the prefix (e.g. `AND-1234 my feature`)
+  - **Branch name** = `<prefix>/<slug>` where slug = rest lowercased with spaces replaced by hyphens (e.g. `kg/AND-1234-my-feature`)
+
+Then run:
 ```bash
 git checkout -b "<branch-name>"
 ```
