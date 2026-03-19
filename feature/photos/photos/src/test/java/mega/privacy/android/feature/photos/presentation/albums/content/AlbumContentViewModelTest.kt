@@ -33,6 +33,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -66,7 +67,6 @@ import mega.privacy.android.feature.photos.mapper.PhotoUiStateMapper
 import mega.privacy.android.feature.photos.model.AlbumSortConfiguration
 import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.PhotoUiState
-import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.model.FavouriteSystemAlbum
@@ -698,7 +698,7 @@ class AlbumContentViewModelTest {
             whenever(removeAlbumsUseCase(listOf(albumId))).thenReturn(Unit)
             createViewModel()
 
-            underTest.handleAction(AlbumContentSelectionAction.RemoveFromAlbum)
+            underTest.handleAction(AlbumContentSelectionAction.DeleteAlbum)
 
             verify(removeAlbumsUseCase).invoke(listOf(albumId))
             underTest.state.test {
@@ -736,7 +736,7 @@ class AlbumContentViewModelTest {
 
             createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
 
-            underTest.handleAction(AlbumContentSelectionAction.RemoveFromAlbum)
+            underTest.handleAction(AlbumContentSelectionAction.DeleteAlbum)
 
             underTest.state.test {
                 assertThat(awaitItem().showDeleteAlbumConfirmation).isEqualTo(triggered)

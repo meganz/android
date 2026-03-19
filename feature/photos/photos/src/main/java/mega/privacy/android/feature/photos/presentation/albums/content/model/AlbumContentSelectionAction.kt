@@ -123,8 +123,8 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Eye)
     }
 
-    data object RemoveFromAlbum : AlbumContentSelectionAction {
-        override val testTag: String = "album_content_selection_action:remove_from_album"
+    data object DeleteAlbum : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:delete_album"
 
         @Composable
         override fun getDescription() =
@@ -135,6 +135,18 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
             rememberVectorPainter(IconPack.Medium.Thin.Outline.Trash)
 
         override val highlightIcon: Boolean = true
+    }
+
+    data object RemoveFromAlbum : AlbumContentSelectionAction {
+        override val testTag: String = "album_content_selection_action:remove_from_album"
+
+        @Composable
+        override fun getDescription() =
+            stringResource(sharedR.string.general_remove)
+
+        @Composable
+        override fun getIconPainter() =
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.ImageX)
     }
 
     data object RemoveFavourites : AlbumContentSelectionAction {

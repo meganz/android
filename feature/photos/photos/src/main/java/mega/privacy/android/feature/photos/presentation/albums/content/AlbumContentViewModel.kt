@@ -815,7 +815,7 @@ class AlbumContentViewModel @AssistedInject constructor(
                         }
                     }
 
-                    is AlbumContentSelectionAction.RemoveFromAlbum -> {
+                    is AlbumContentSelectionAction.DeleteAlbum -> {
                         if (_state.value.photos.isEmpty()) {
                             Analytics.tracker.trackEvent(AlbumContentDeleteAlbumEvent)
                             deleteAlbum()

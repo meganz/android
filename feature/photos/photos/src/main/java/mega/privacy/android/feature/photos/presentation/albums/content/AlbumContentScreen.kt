@@ -583,7 +583,7 @@ internal fun AlbumContentScreen(
                         add(AlbumContentSelectionAction.ShareLink)
                     }
                 }
-                add(AlbumContentSelectionAction.RemoveFromAlbum)
+                add(AlbumContentSelectionAction.DeleteAlbum)
             }
         )
 
