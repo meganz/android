@@ -7,6 +7,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -36,6 +38,8 @@ class SelectVideoGridItemTest {
         isSensitive: Boolean = false,
         isTakenDown: Boolean = false,
         isFolder: Boolean = false,
+        isAvailableSelected: Boolean = false,
+        isEnabled: Boolean = true,
     ) {
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -50,6 +54,8 @@ class SelectVideoGridItemTest {
                     isSensitive = isSensitive,
                     isTakenDown = isTakenDown,
                     isFolder = isFolder,
+                    isAvailableSelected = isAvailableSelected,
+                    isEnabled = isEnabled
                 )
             }
         }
@@ -81,7 +87,7 @@ class SelectVideoGridItemTest {
         setComposeContent(
             name = name,
             duration = duration,
-            isSelected = true,
+            isAvailableSelected = true,
             isTakenDown = true,
         )
 
@@ -95,7 +101,8 @@ class SelectVideoGridItemTest {
             assertIsDisplayedWithTag()
             assertTextEqualsWithTag(duration)
         }
-        SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithTag(SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG, true).onFirst()
+            .assertIsDisplayed()
         SELECT_VIDEO_GRID_ITEM_GRID_VIEW_TAKEN_TAG.assertIsDisplayedWithTag()
     }
 
@@ -139,14 +146,15 @@ class SelectVideoGridItemTest {
 
     @Test
     fun `test that select icon is displayed when isSelected is true`() {
-        setComposeContent(name = name, isSelected = true)
+        setComposeContent(name = name, isAvailableSelected = true)
 
-        SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithTag(SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG, true).onFirst()
+            .assertIsDisplayed()
     }
 
     @Test
     fun `test that select icon is not displayed when isSelected is false`() {
-        setComposeContent(name = name, isSelected = false)
+        setComposeContent(name = name, isAvailableSelected = false)
 
         SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG.assertIsNotDisplayedWithTag()
     }

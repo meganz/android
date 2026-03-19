@@ -19,13 +19,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
@@ -45,18 +45,21 @@ fun SelectVideoListItem(
     titleMaxLines: Int = 1,
     thumbnailData: ThumbnailData? = null,
     isSelected: Boolean = false,
+    isAvailableSelected: Boolean = false,
     isSensitive: Boolean = false,
     isTakenDown: Boolean = false,
     titleTextStyle: TextStyle = AppTheme.typography.bodyLarge,
     titleColor: TextColor = TextColor.Primary,
     subtitleColor: TextColor = TextColor.Secondary,
+    isEnabled: Boolean = true,
 ) {
     GenericListItem(
         modifier = modifier
-            .alpha(if (isSensitive) 0.5f else 1f)
+            .alpha(if (isSensitive || !isEnabled) 0.5f else 1f)
             .conditional(isSelected) {
                 background(DSTokens.colors.background.surface1)
             },
+        enableClick = isEnabled,
         contentPadding = PaddingValues(
             horizontal = DSTokens.spacings.s4,
             vertical = DSTokens.spacings.s3
@@ -124,11 +127,12 @@ fun SelectVideoListItem(
                 modifier = Modifier.size(24.dp),
                 contentAlignment = Alignment.Center
             ) {
-                if (isSelected) {
-                    MegaIcon(
-                        imageVector = IconPack.Medium.Thin.Solid.CheckCircle,
-                        tint = IconColor.Primary,
-                        contentDescription = null,
+                if (isAvailableSelected) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
                         modifier = Modifier.testTag(SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG),
                     )
                 }
@@ -151,6 +155,8 @@ private fun GenericSelectVideoListItemPreview() {
                         icon = R.drawable.ic_folder_outgoing_medium_solid,
                         isSelected = isSelected,
                         onItemClicked = { },
+                        isAvailableSelected = isSelected,
+                        isEnabled = !isSelected
                     )
                 }
             }
@@ -172,6 +178,8 @@ private fun GenericSelectVideoListItemTakeDownPreview() {
                         isSelected = isSelected,
                         isTakenDown = true,
                         onItemClicked = { },
+                        isAvailableSelected = isSelected,
+                        isEnabled = !isSelected
                     )
                 }
             }

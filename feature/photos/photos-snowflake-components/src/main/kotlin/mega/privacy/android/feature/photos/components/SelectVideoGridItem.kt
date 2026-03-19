@@ -2,7 +2,7 @@ package mega.privacy.android.feature.photos.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -54,11 +55,13 @@ fun SelectVideoGridItem(
     isSensitive: Boolean = false,
     isTakenDown: Boolean = false,
     isFolder: Boolean = false,
+    isAvailableSelected: Boolean = false,
+    isEnabled: Boolean = true,
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .alpha(if (isSensitive) 0.5f else 1f)
+            .alpha(if (isSensitive || !isEnabled) 0.5f else 1f)
             .clip(DSTokens.shapes.extraSmall)
             .background(
                 when {
@@ -66,9 +69,7 @@ fun SelectVideoGridItem(
                     else -> DSTokens.colors.background.pageBackground
                 }
             )
-            .combinedClickable(
-                onClick = { onItemClicked() }
-            )
+            .clickable(enabled = isEnabled, onClick = onItemClicked),
     ) {
         Box(
             modifier = Modifier
@@ -163,14 +164,19 @@ fun SelectVideoGridItem(
                     .testTag(SELECT_VIDEO_GRID_ITEM_NODE_TITLE_TAG),
             )
 
-            if (isSelected) {
-                MegaIcon(
-                    imageVector = IconPack.Medium.Thin.Solid.CheckCircle,
-                    tint = IconColor.Primary,
-                    contentDescription = null,
-                    modifier = Modifier.testTag(SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG),
-                )
-                Spacer(modifier = Modifier.width(DSTokens.spacings.s1))
+            Box(
+                modifier = Modifier.size(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isAvailableSelected) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckStateChanged = { },
+                        tapTargetArea = false,
+                        clickable = false,
+                        modifier = Modifier.testTag(SELECT_VIDEO_GRID_ITEM_SELECT_ICON_TAG),
+                    )
+                }
             }
         }
     }

@@ -68,12 +68,14 @@ fun SelectVideoListView(
                 subtitle = item.subtitle.text(),
                 icon = item.iconRes,
                 isSelected = item.isSelected,
+                isAvailableSelected = item.isVideo,
                 onItemClicked = {
                     onItemsClicked(item)
                 },
                 isSensitive = showHiddenItems && item.isSensitive,
                 isTakenDown = item.isTakenDown,
-                thumbnailData = ThumbnailRequest(item.id)
+                thumbnailData = ThumbnailRequest(item.id),
+                isEnabled = item.isVideo || item.isFolder
             )
         }
 

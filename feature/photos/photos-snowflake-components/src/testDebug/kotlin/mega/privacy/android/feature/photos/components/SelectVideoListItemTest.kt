@@ -7,6 +7,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -37,6 +39,8 @@ class SelectVideoListItemTest {
         isSelected: Boolean = false,
         isSensitive: Boolean = false,
         isTakenDown: Boolean = false,
+        isAvailableSelected: Boolean = false,
+        isEnabled: Boolean = true,
     ) {
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -51,6 +55,8 @@ class SelectVideoListItemTest {
                     isSelected = isSelected,
                     isSensitive = isSensitive,
                     isTakenDown = isTakenDown,
+                    isAvailableSelected = isAvailableSelected,
+                    isEnabled = isEnabled
                 )
             }
         }
@@ -81,7 +87,7 @@ class SelectVideoListItemTest {
         setComposeContent(
             title = title,
             subtitle = subtitle,
-            isSelected = true,
+            isAvailableSelected = true,
             isTakenDown = true,
         )
 
@@ -94,7 +100,8 @@ class SelectVideoListItemTest {
             assertTextEqualsWithTag(subtitle)
         }
         SELECT_VIDEO_LIST_ITEM_ICON_TAG.assertIsDisplayedWithTag()
-        SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithTag(SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG, true).onFirst()
+            .assertIsDisplayed()
         SELECT_VIDEO_LIST_ITEM_TAKEN_DOWN_ICON_TAG.assertIsDisplayedWithTag()
     }
 
@@ -103,10 +110,11 @@ class SelectVideoListItemTest {
         setComposeContent(
             title = title,
             subtitle = subtitle,
-            isSelected = true,
+            isAvailableSelected = true,
         )
 
-        SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithTag(SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG, true).onFirst()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -114,7 +122,7 @@ class SelectVideoListItemTest {
         setComposeContent(
             title = title,
             subtitle = subtitle,
-            isSelected = false,
+            isAvailableSelected = false,
         )
 
         SELECT_VIDEO_LIST_ITEM_SELECTED_ICON_TAG.assertIsNotDisplayedWithTag()

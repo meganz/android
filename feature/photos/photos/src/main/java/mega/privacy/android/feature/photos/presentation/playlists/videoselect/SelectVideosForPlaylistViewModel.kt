@@ -24,15 +24,11 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
@@ -48,6 +44,8 @@ import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.mapper.SelectVideoItemUiEntityMapper
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.navigation.contract.viewmodel.asUiStateFlow
+import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import timber.log.Timber
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -108,10 +106,7 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 folderId
             }
             getNodesByIdInChunkUseCase(folderOrRootNodeId).map { (nodes, hasMore) ->
-                val items = nodes.filter {
-                    it is TypedFolderNode || (it is TypedFileNode && it.type is VideoFileTypeInfo)
-                }
-                items to hasMore
+                nodes to hasMore
             }
         }
 

@@ -75,6 +75,7 @@ class SelectVideoItemUiEntityMapperTest {
                 isFolder = false,
                 duration = expectedDuration,
                 isTakenDown = false,
+                isVideo = true,
             )
         )
     }
@@ -101,6 +102,7 @@ class SelectVideoItemUiEntityMapperTest {
         assertThat(result.duration).isNull()
         assertThat(result.isSensitive).isFalse()
         assertThat(result.isTakenDown).isFalse()
+        assertThat(result.isVideo).isFalse()
     }
 
     @Test
@@ -170,5 +172,23 @@ class SelectVideoItemUiEntityMapperTest {
         val result = underTest(typedFileNode)
 
         assertThat(result.duration).isNull()
+        assertThat(result.isVideo).isFalse()
+    }
+
+    @Test
+    fun `test that TypedFileNode with video type maps to isVideo true`() {
+        val typedFileNode = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(7L))
+            on { name }.thenReturn("video.mov")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mov", 10.seconds))
+            on { isNodeKeyDecrypted }.thenReturn(true)
+            on { isMarkedSensitive }.thenReturn(false)
+            on { isSensitiveInherited }.thenReturn(false)
+            on { isTakenDown }.thenReturn(false)
+        }
+
+        val result = underTest(typedFileNode)
+
+        assertThat(result.isVideo).isTrue()
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,27 +28,26 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.empty.MegaEmptyView
-import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.photos.components.SelectVideosBottomView
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoGridView
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideoListView
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
-import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 
 
@@ -98,17 +96,16 @@ fun SelectVideosForPlaylistRoute(
         onSortNodes = viewModel::setCloudSortOrder,
         onChangeViewTypeClick = viewModel::changeViewTypeClicked,
         onItemClicked = viewModel::itemClicked,
-        clearSelection = viewModel::clearSelection,
         confirmAddVideos = {
             dataState?.selectItemHandles?.takeIf { it.isNotEmpty() }?.let { handles ->
                 viewModel.addVideosToPlaylist(videoIDs = handles.map { NodeId(it) })
             }
         },
         onBackPressed = {
-            if (isNewlyCreated && dataState?.isCloudDriveRoot == true) {
-                navigateAndClearTo()
-            } else {
-                onBack()
+            when {
+                dataState?.selectItemHandles?.isNotEmpty() == true -> viewModel.clearSelection()
+                isNewlyCreated && dataState?.isCloudDriveRoot == true -> navigateAndClearTo()
+                else -> onBack()
             }
         }
     )
@@ -127,7 +124,6 @@ fun SelectVideosForPlaylistScreen(
     gridState: LazyGridState = rememberLazyGridState(),
     onItemClicked: (SelectVideoItemUiEntity) -> Unit = {},
     confirmAddVideos: () -> Unit = {},
-    clearSelection: () -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
     val dataState = uiState as? SelectVideosForPlaylistUiState.Data
@@ -142,10 +138,6 @@ fun SelectVideosForPlaylistScreen(
         }
     }
 
-    BackHandler(dataState?.selectItemHandles?.isNotEmpty() == true) {
-        clearSelection()
-    }
-
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -153,21 +145,13 @@ fun SelectVideosForPlaylistScreen(
         modifier = modifier
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
-        floatingActionButton = {
-            if (dataState?.selectItemHandles?.isNotEmpty() == true) {
-                MegaFab(
-                    onClick = confirmAddVideos,
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check),
-                )
-            }
-        },
         topBar = {
             val selectedHandles = dataState?.selectItemHandles
 
             if (!selectedHandles.isNullOrEmpty()) {
                 MegaTopAppBar(
                     modifier = Modifier.testTag(SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG),
-                    navigationType = AppBarNavigationType.Back(clearSelection),
+                    navigationType = AppBarNavigationType.Back(onBackPressed),
                     title = selectedHandles.size.toString()
                 )
             } else {
@@ -207,35 +191,47 @@ fun SelectVideosForPlaylistScreen(
                         imagePainter = painterResource(id = iconPackR.drawable.ic_video_glass)
                     )
                 } else {
-                    if (uiState.currentViewType == ViewType.LIST) {
-                        SelectVideoListView(
-                            modifier = Modifier.testTag(SELECT_VIDEOS_LIST_VIEW_TAG),
-                            items = uiState.items,
-                            listState = listState,
-                            sortConfiguration = uiState.selectedSortConfiguration,
-                            onChangeViewTypeClick = onChangeViewTypeClick,
-                            onSortOrderClick = { showSortBottomSheet = true },
-                            onItemsClicked = onItemClicked,
-                            isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                            showHiddenItems = uiState.showHiddenItems,
-                            listContentPadding = PaddingValues(
-                                bottom = innerPadding.calculateSafeBottomPadding()
+                    Column {
+                        if (uiState.currentViewType == ViewType.LIST) {
+                            SelectVideoListView(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag(SELECT_VIDEOS_LIST_VIEW_TAG),
+                                items = uiState.items,
+                                listState = listState,
+                                sortConfiguration = uiState.selectedSortConfiguration,
+                                onChangeViewTypeClick = onChangeViewTypeClick,
+                                onSortOrderClick = { showSortBottomSheet = true },
+                                onItemsClicked = onItemClicked,
+                                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                                showHiddenItems = uiState.showHiddenItems,
+                                listContentPadding = PaddingValues(
+                                    bottom = innerPadding.calculateSafeBottomPadding()
+                                )
                             )
-                        )
-                    } else {
-                        SelectVideoGridView(
-                            modifier = Modifier.testTag(SELECT_VIDEOS_GRID_VIEW_TAG),
-                            items = uiState.items,
-                            gridState = gridState,
-                            onItemClicked = onItemClicked,
-                            sortConfiguration = uiState.selectedSortConfiguration,
-                            onChangeViewTypeClick = onChangeViewTypeClick,
-                            onSortOrderClick = { showSortBottomSheet = true },
-                            isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                            showHiddenItems = uiState.showHiddenItems,
-                            listContentPadding = PaddingValues(
-                                bottom = innerPadding.calculateSafeBottomPadding()
+                        } else {
+                            SelectVideoGridView(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .testTag(SELECT_VIDEOS_GRID_VIEW_TAG),
+                                items = uiState.items,
+                                gridState = gridState,
+                                onItemClicked = onItemClicked,
+                                sortConfiguration = uiState.selectedSortConfiguration,
+                                onChangeViewTypeClick = onChangeViewTypeClick,
+                                onSortOrderClick = { showSortBottomSheet = true },
+                                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                                showHiddenItems = uiState.showHiddenItems,
+                                listContentPadding = PaddingValues(
+                                    bottom = innerPadding.calculateSafeBottomPadding()
+                                )
                             )
+                        }
+
+                        SelectVideosBottomView(
+                            isAddedButtonEnabled = uiState.selectItemHandles.isNotEmpty(),
+                            onAddClicked = confirmAddVideos,
+                            onCancelClicked = onBackPressed
                         )
                     }
 

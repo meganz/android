@@ -81,7 +81,9 @@ fun SelectVideoGridView(
                 isSelected = item.isSelected,
                 isSensitive = showHiddenItems && item.isSensitive,
                 isTakenDown = item.isTakenDown,
-                isFolder = item.isFolder
+                isFolder = item.isFolder,
+                isAvailableSelected = item.isVideo,
+                isEnabled = item.isVideo || item.isFolder
             )
         }
 

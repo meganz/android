@@ -34,6 +34,7 @@ class SelectVideoItemUiEntityMapper @Inject constructor(
             durationInSecondsTextMapper((node.type as? VideoFileTypeInfo)?.duration)
         } else null,
         isTakenDown = node.isTakenDown,
+        isVideo = node is TypedFileNode && node.type is VideoFileTypeInfo
     )
 
     private fun getNodeTitle(node: TypedNode): LocalizedText {

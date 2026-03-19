@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property isSensitive Indicates whether the video item is marked as sensitive
  * @property isTakenDown Indicates whether the video item has been taken down
  * @property isFolder Indicates whether the item is a folder
+ * @property isVideo Indicates whether the item is a video
  */
 data class SelectVideoItemUiEntity(
     val id: NodeId,
@@ -29,4 +30,5 @@ data class SelectVideoItemUiEntity(
     val isSensitive: Boolean = false,
     val isTakenDown: Boolean = false,
     val isFolder: Boolean = false,
+    val isVideo: Boolean = false
 )

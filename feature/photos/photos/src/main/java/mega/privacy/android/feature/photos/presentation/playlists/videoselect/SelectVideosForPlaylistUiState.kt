@@ -19,7 +19,7 @@ sealed interface SelectVideosForPlaylistUiState {
      * @property title The title of the current folder or screen
      * @property isCloudDriveRoot Whether the current folder is the root of the cloud drive
      * @property currentViewType The current view type (list or grid)
-     * @property items The list of video items available for selection
+     * @property items The list of video items available for selection in Cloud drive
      * @property navigateBack Event to trigger navigation back action
      * @property nodesLoadingState The current state of node loading
      * @property selectedSortConfiguration The selected sort configuration for the items
