@@ -78,7 +78,7 @@ data class PdfViewerSearchState(
  * @param nodeHandle The handle of the node being viewed
  * @param nodeSourceType The source type of the node (for node options)
  */
-data class PdfViewerState(
+internal data class PdfViewerState(
     val isLoading: Boolean = true,
     val source: PdfViewerSource? = null,
     val title: String? = null,

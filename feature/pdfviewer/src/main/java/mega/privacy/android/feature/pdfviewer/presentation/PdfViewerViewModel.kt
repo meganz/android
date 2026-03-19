@@ -47,7 +47,7 @@ import java.net.URL
  * the UI never pushes computed data back up to the ViewModel.
  */
 @HiltViewModel(assistedFactory = PdfViewerViewModel.Factory::class)
-class PdfViewerViewModel @AssistedInject constructor(
+internal class PdfViewerViewModel @AssistedInject constructor(
     @Assisted private val args: Args,
     @ApplicationContext private val context: Context,
     private val pdfSearchEngineFactory: PdfSearchEngineFactory,

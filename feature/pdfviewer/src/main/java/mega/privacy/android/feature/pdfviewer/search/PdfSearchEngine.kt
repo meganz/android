@@ -10,7 +10,7 @@ import com.shockwave.pdfium.PdfTextMatch
  * Allows the ViewModel to be unit-tested with a fake implementation that returns
  * controlled results without depending on PdfiumCore or Android runtime.
  */
-interface PdfSearchEngine : AutoCloseable {
+internal interface PdfSearchEngine : AutoCloseable {
 
     /**
      * Open a PDF from a byte array.

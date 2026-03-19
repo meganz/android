@@ -34,7 +34,7 @@ import timber.log.Timber
  * @param modifier Modifier for the composable
  */
 @Composable
-fun PdfViewerContent(
+internal fun PdfViewerContent(
     pdfUri: Uri?,
     pdfBytes: ByteArray?,
     currentPage: Int,

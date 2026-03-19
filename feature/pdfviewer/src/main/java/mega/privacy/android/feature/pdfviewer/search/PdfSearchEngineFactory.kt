@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Allows the ViewModel to obtain a search engine without depending on the concrete
  * [PdfSearchEngineImpl] class, enabling unit tests to inject a fake implementation.
  */
-interface PdfSearchEngineFactory {
+internal interface PdfSearchEngineFactory {
 
     /**
      * Creates a new search engine instance.

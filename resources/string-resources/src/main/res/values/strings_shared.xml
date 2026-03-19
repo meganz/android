@@ -2456,4 +2456,6 @@
     <string name="media_discovery_filter_images">Images</string>
     <!-- Media Discovery filter Videos-->
     <string name="media_discovery_filter_videos">Videos</string>
+    <!-- Placeholder text for searching pdf document -->
+    <string name="pdf_viewer_search_placeholder">Search document</string>
 </resources>

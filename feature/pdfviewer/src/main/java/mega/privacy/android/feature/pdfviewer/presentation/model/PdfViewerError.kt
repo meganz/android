@@ -3,7 +3,7 @@ package mega.privacy.android.feature.pdfviewer.presentation.model
 /**
  * Error states for the PDF viewer.
  */
-sealed class PdfViewerError {
+internal sealed class PdfViewerError {
     /**
      * Failed to load PDF file
      */

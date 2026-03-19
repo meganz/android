@@ -35,7 +35,7 @@ import java.io.File
  * @param pdfiumCore PdfiumCore instance (injectable for testing)
  * @param dispatcher Coroutine dispatcher for search operations (injectable for testing)
  */
-class PdfSearchEngineImpl(
+internal class PdfSearchEngineImpl(
     private val context: Context,
     private val pdfiumCore: PdfiumCore = PdfiumCore(context),
     private val dispatcher: CoroutineDispatcher,

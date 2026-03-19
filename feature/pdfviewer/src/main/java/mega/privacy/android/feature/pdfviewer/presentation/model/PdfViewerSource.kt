@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
  * This sealed class abstracts the different ways a PDF can be loaded,
  * replacing the legacy adapter type pattern.
  */
-sealed class PdfViewerSource {
+internal sealed class PdfViewerSource {
     /**
      * Whether this source requires loading bytes from a remote URL.
      * Remote sources need to fetch bytes before the PDF can be displayed.

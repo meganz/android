@@ -18,7 +18,7 @@ import mega.privacy.android.navigation.destination.PdfViewerNavKey
  * @param onOpenNodeOptions Callback to open node options bottom sheet
  * @param onTransfer Callback to handle transfer events
  */
-fun EntryProviderScope<NavKey>.pdfViewerScreen(
+internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     onBack: () -> Unit,
     onNavigateToFileInfo: (Long) -> Unit,
     onOpenNodeOptions: (Long, NodeSourceType) -> Unit,
