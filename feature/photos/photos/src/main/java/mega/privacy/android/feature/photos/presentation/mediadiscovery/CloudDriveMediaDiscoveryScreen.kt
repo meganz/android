@@ -3,6 +3,7 @@ package mega.privacy.android.feature.photos.presentation.mediadiscovery
 import MediaGridViewItem
 import android.annotation.SuppressLint
 import android.text.format.DateFormat
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -36,6 +39,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.dropdown.DropDownItem
+import mega.android.core.ui.components.dropdown.MegaDropDownMenu
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -50,12 +55,16 @@ import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSel
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.photos.DateCard
+import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoveryFilterDialog
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoverySortDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
@@ -138,6 +147,10 @@ fun CloudDriveMediaDiscoveryRoute(
         deselectAllItems = viewModel::clearSelectedPhotos,
         onCardClick = viewModel::selectPeriod,
         onMoreOptionsClicked = onMoreOptionsClicked,
+        onClickZoomIn = viewModel::zoomIn,
+        onClickZoomOut = viewModel::zoomOut,
+        onSetCurrentSort = viewModel::setCurrentSort,
+        onSetCurrentMediaType = viewModel::setCurrentMediaType,
         modifier = modifier,
         contentPadding = contentPadding,
     )
@@ -157,13 +170,17 @@ internal fun CloudDriveMediaDiscoveryScreen(
     onMoreOptionsClicked: () -> Unit,
     onPeriodSelected: (MediaDiscoveryPeriod) -> Unit,
     onCardClick: (DateCard) -> Unit,
+    onClickZoomIn: () -> Unit,
+    onClickZoomOut: () -> Unit,
+    onSetCurrentSort: (Sort) -> Unit,
+    onSetCurrentMediaType: (FilterMediaType) -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var isPeriodVisible by remember { mutableStateOf(true) }
-
-    // Todo: AND-22894 Implement dropdown option
     var isDropdownVisible by remember { mutableStateOf(false) }
+    var showSortByDialog by remember { mutableStateOf(false) }
+    var showFilterDialog by remember { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
@@ -195,7 +212,6 @@ internal fun CloudDriveMediaDiscoveryScreen(
                                     stringResource(sharedR.string.general_action_filter)
                             },
                             onClick = {
-                                // Todo: AND-22894 Implement dropdown option
                                 isDropdownVisible = true
                             }
                         ),
@@ -222,6 +238,45 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 .fillMaxSize()
                 .padding(containerPadding.excludingBottomPadding())
         ) {
+            val hasPhotos = uiState.sourcePhotos.isNotEmpty()
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopEnd)
+                    .padding(end = 58.dp)
+            ) {
+                MegaDropDownMenu(
+                    modifier = Modifier.width(173.dp),
+                    expanded = isDropdownVisible,
+                    onDismissRequest = { isDropdownVisible = false },
+                    onItemClick = { item ->
+                        isDropdownVisible = false
+                        when (item.id) {
+                            MediaDiscoveryDropDownAction.Filter.ordinal -> showFilterDialog = true
+                            MediaDiscoveryDropDownAction.SortBy.ordinal -> showSortByDialog = true
+                            MediaDiscoveryDropDownAction.ZoomIn.ordinal -> onClickZoomIn()
+                            MediaDiscoveryDropDownAction.ZoomOut.ordinal -> onClickZoomOut()
+                        }
+                    },
+                    dropdownItems = MediaDiscoveryDropDownAction.entries.map { action ->
+                        DropDownItem(
+                            id = action.ordinal,
+                            text = stringResource(action.textRes),
+                            enabled = when (action) {
+                                MediaDiscoveryDropDownAction.Filter -> true
+                                MediaDiscoveryDropDownAction.SortBy -> hasPhotos
+                                MediaDiscoveryDropDownAction.ZoomIn ->
+                                    uiState.currentZoomLevel != ZoomLevel.Grid_1 && hasPhotos
+
+                                MediaDiscoveryDropDownAction.ZoomOut ->
+                                    uiState.currentZoomLevel != ZoomLevel.Grid_5 && hasPhotos
+                            },
+                        )
+                    },
+                )
+            }
+
             when (uiState.selectedPeriod) {
                 MediaDiscoveryPeriod.All -> {
                     MediaDiscoveryGridView(
@@ -233,6 +288,8 @@ internal fun CloudDriveMediaDiscoveryScreen(
                         },
                         onItemClicked = onItemClicked,
                         onItemLongPressed = onItemLongPressed,
+                        zoomIn = onClickZoomIn,
+                        zoomOut = onClickZoomOut,
                     )
                 }
 
@@ -265,6 +322,28 @@ internal fun CloudDriveMediaDiscoveryScreen(
             )
         }
     }
+
+    if (showSortByDialog) {
+        MediaDiscoverySortDialog(
+            selectedOrder = uiState.currentSort.ordinal,
+            onDismissRequest = { showSortByDialog = false },
+            onOptionSelected = { sort ->
+                onSetCurrentSort(Sort.entries[sort])
+                showSortByDialog = false
+            },
+        )
+    }
+
+    if (showFilterDialog) {
+        MediaDiscoveryFilterDialog(
+            selectedOrder = uiState.currentMediaType.ordinal,
+            onDismissRequest = { showFilterDialog = false },
+            onOptionSelected = { ordinal ->
+                onSetCurrentMediaType(FilterMediaType.entries[ordinal])
+                showFilterDialog = false
+            },
+        )
+    }
 }
 
 @Composable
@@ -275,6 +354,8 @@ private fun MediaDiscoveryGridView(
     onScrollingListener: (Boolean) -> Unit,
     onItemClicked: (Photo) -> Unit,
     onItemLongPressed: (Photo) -> Unit,
+    zoomIn: () -> Unit,
+    zoomOut: () -> Unit,
 ) {
     val fileTypeIconMapper = remember { FileTypeIconMapper() }
     val gridCells = remember(uiState.currentZoomLevel) {
@@ -312,6 +393,11 @@ private fun MediaDiscoveryGridView(
     }
 
     FastScrollLazyVerticalGrid(
+        modifier = Modifier
+            .photosZoomGestureDetector(
+                onZoomIn = zoomIn,
+                onZoomOut = zoomOut,
+            ),
         state = lazyGridState,
         totalItems = uiState.mediaListItemList.size,
         columns = gridCells,
@@ -473,4 +559,11 @@ private fun formatSeparatorDate(
                 .toInstant()
         )
     )
+}
+
+private enum class MediaDiscoveryDropDownAction(@StringRes val textRes: Int) {
+    Filter(sharedR.string.general_action_filter),
+    SortBy(sharedR.string.action_sort_by_header),
+    ZoomIn(sharedR.string.media_discovery_screen_dropdown_action_zoom_in),
+    ZoomOut(sharedR.string.media_discovery_screen_dropdown_action_zoom_out),
 }

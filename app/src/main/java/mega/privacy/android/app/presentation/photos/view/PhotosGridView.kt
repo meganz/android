@@ -332,30 +332,3 @@ private fun dateText(
         )
     )
 }
-
-fun Modifier.photosZoomGestureDetector(
-    onZoomIn: () -> Unit,
-    onZoomOut: () -> Unit,
-) = then(pointerInput(Unit) {
-    awaitEachGesture {
-        awaitFirstDown(requireUnconsumed = false)
-        do {
-            val event = awaitPointerEvent(
-                pass = PointerEventPass.Initial
-            )
-            if (event.changes.any { it.isConsumed })
-                break
-            val zoomChange = event.calculateZoom()
-            if (zoomChange != 1.0f) {
-                if (zoomChange > 1.0f) {
-                    onZoomIn()
-                } else {
-                    onZoomOut()
-                }
-                // Consume event in case to trigger scroll
-                event.changes.map { it.consume() }
-                break
-            }
-        } while (event.changes.any { it.pressed })
-    }
-})

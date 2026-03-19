@@ -390,6 +390,48 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
         }
     }
 
+    fun setCurrentSort(sort: Sort) {
+        _state.update { it.copy(currentSort = sort) }
+        viewModelScope.launch {
+            handlePhotoItems(
+                sortedPhotosWithoutHandleSensitive = sortAndFilterPhotos(_state.value.sourcePhotos)
+            )
+        }
+    }
+
+    fun setCurrentMediaType(filterMediaType: FilterMediaType) {
+        _state.update { it.copy(currentMediaType = filterMediaType) }
+        viewModelScope.launch {
+            handlePhotoItems(
+                sortedPhotosWithoutHandleSensitive = sortAndFilterPhotos(_state.value.sourcePhotos)
+            )
+        }
+    }
+
+    fun zoomIn() {
+        val currentIndex = ZoomLevel.entries.indexOf(_state.value.currentZoomLevel)
+        if (currentIndex > 0) {
+            _state.update { it.copy(currentZoomLevel = ZoomLevel.entries[currentIndex - 1]) }
+            viewModelScope.launch {
+                handlePhotoItems(
+                    sortedPhotosWithoutHandleSensitive = sortAndFilterPhotos(_state.value.sourcePhotos)
+                )
+            }
+        }
+    }
+
+    fun zoomOut() {
+        val currentIndex = ZoomLevel.entries.indexOf(_state.value.currentZoomLevel)
+        if (currentIndex < ZoomLevel.entries.size - 1) {
+            _state.update { it.copy(currentZoomLevel = ZoomLevel.entries[currentIndex + 1]) }
+            viewModelScope.launch {
+                handlePhotoItems(
+                    sortedPhotosWithoutHandleSensitive = sortAndFilterPhotos(_state.value.sourcePhotos)
+                )
+            }
+        }
+    }
+
     private fun getAllPhotoIds() = _state.value.mediaListItemList
         .filterIsInstance<MediaListMedia>()
         .map { it.mediaId }

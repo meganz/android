@@ -44,7 +44,6 @@ import mega.privacy.android.app.presentation.photos.view.FilterDialog
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
 import mega.privacy.android.app.presentation.photos.view.SortByDialog
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
-import mega.privacy.android.app.presentation.photos.view.photosZoomGestureDetector
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
@@ -53,6 +52,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosSkeletonView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper

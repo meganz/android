@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
+import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -550,6 +551,82 @@ class CloudDriveMediaDiscoveryViewModelTest {
         underTest.state.test {
             val state = awaitItem()
             assertThat(state.isAllSelected).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that setCurrentSort updates currentSort in state`() = runTest {
+        initViewModel()
+
+        underTest.setCurrentSort(Sort.OLDEST)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentSort).isEqualTo(Sort.OLDEST)
+        }
+    }
+
+    @Test
+    fun `test that setCurrentMediaType updates currentMediaType in state`() = runTest {
+        initViewModel()
+
+        underTest.setCurrentMediaType(FilterMediaType.IMAGES)
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentMediaType).isEqualTo(FilterMediaType.IMAGES)
+        }
+    }
+
+    @Test
+    fun `test that zoomIn decreases zoom level`() = runTest {
+        initViewModel()
+
+        // Default is Grid_3, zoom in should go to Grid_1
+        underTest.zoomIn()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentZoomLevel).isEqualTo(ZoomLevel.Grid_1)
+        }
+    }
+
+    @Test
+    fun `test that zoomOut increases zoom level`() = runTest {
+        initViewModel()
+
+        // Default is Grid_3, zoom out should go to Grid_5
+        underTest.zoomOut()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentZoomLevel).isEqualTo(ZoomLevel.Grid_5)
+        }
+    }
+
+    @Test
+    fun `test that zoomIn does not go below Grid_1`() = runTest {
+        initViewModel()
+
+        underTest.zoomIn() // Grid_3 -> Grid_1
+        underTest.zoomIn() // Grid_1 -> should stay Grid_1
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentZoomLevel).isEqualTo(ZoomLevel.Grid_1)
+        }
+    }
+
+    @Test
+    fun `test that zoomOut does not go above Grid_5`() = runTest {
+        initViewModel()
+
+        underTest.zoomOut() // Grid_3 -> Grid_5
+        underTest.zoomOut() // Grid_5 -> should stay Grid_5
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.currentZoomLevel).isEqualTo(ZoomLevel.Grid_5)
         }
     }
 
