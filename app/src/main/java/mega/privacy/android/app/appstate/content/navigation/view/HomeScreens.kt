@@ -27,6 +27,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.LaunchedOnceEffect
@@ -53,6 +54,7 @@ import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.mobile.home.presentation.home.Home
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,6 +111,7 @@ fun HomeScreens(
 
             LaunchedEffect(currentState.isConnected) {
                 if (!currentState.isConnected) {
+                    delay(1.seconds)
                     if (!isNetworkChangeHandled) {
                         homeScreenStacks.switchTopLevel(Home)
                         isSelectionMode = false
