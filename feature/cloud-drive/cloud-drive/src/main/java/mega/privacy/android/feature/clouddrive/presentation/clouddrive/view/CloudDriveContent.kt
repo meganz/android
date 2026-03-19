@@ -262,7 +262,7 @@ internal fun CloudDriveContent(
                         showSortBottomSheet = true
                     },
                     onChangeViewTypeClicked = { onAction(ChangeViewTypeClicked) },
-                    showMediaDiscoveryButton = uiState.hasMediaItems && !uiState.isCloudDriveRoot,
+                    showMediaDiscoveryButton = uiState.isMediaDiscoveryAllowed,
                     onEnterMediaDiscoveryClick = {
                         navigationHandler.navigate(
                             CloudDriveMediaDiscoveryNavKey(

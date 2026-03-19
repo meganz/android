@@ -1,10 +1,10 @@
 package mega.privacy.android.shared.nodes.mapper
 
-import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import javax.inject.Inject
 
 /**

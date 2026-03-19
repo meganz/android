@@ -362,6 +362,50 @@ class CloudDriveUiStateTest {
         assertThat(state.isUploadAllowed).isFalse()
     }
 
+    @Test
+    fun `test that isMediaDiscoveryAllow returns true when all conditions are met`() {
+        val state = CloudDriveUiState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasMediaItems = true,
+            isCloudDriveRoot = false
+        )
+
+        assertThat(state.isMediaDiscoveryAllowed).isTrue()
+    }
+
+    @Test
+    fun `test that isMediaDiscoveryAllow returns false when nodeSourceType is not CLOUD_DRIVE`() {
+        val state = CloudDriveUiState(
+            nodeSourceType = NodeSourceType.RUBBISH_BIN,
+            hasMediaItems = true,
+            isCloudDriveRoot = false
+        )
+
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isMediaDiscoveryAllow returns false when hasMediaItems is false`() {
+        val state = CloudDriveUiState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasMediaItems = false,
+            isCloudDriveRoot = false
+        )
+
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
+    }
+
+    @Test
+    fun `test that isMediaDiscoveryAllow returns false when isCloudDriveRoot is true`() {
+        val state = CloudDriveUiState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasMediaItems = true,
+            isCloudDriveRoot = true
+        )
+
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
+    }
+
     private fun createTestItems(
         selected: List<Boolean>,
         sensitive: List<Boolean>,
