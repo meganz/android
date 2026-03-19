@@ -117,6 +117,7 @@ fun OfflineScreen(
         onItemClicked = viewModel::onItemClicked,
         onItemLongClicked = viewModel::onLongItemClicked,
         onOpenFile = actionViewModel::handleOpenOfflineFile,
+        onOpenWithFile = actionViewModel::handleOpenWithIntent,
         onDismissOfflineWarning = viewModel::dismissOfflineWarning,
         onNavigateToFolder = onNavigateToFolder,
         onNavigateToTransfers = onNavigateToTransfers,
@@ -154,6 +155,7 @@ internal fun OfflineScreen(
     onNavigateToFolder: (nodeId: Int, name: String) -> Unit,
     onNavigateToTransfers: () -> Unit,
     onOpenFile: (OfflineFileInformation) -> Unit,
+    onOpenWithFile: (OfflineFileInformation) -> Unit,
     onDismissOfflineWarning: () -> Unit,
     onSearch: (String) -> Unit,
     shareOfflineFiles: (List<OfflineFileInformation>) -> Unit,
@@ -392,7 +394,7 @@ internal fun OfflineScreen(
                 dismissOfflineBottomSheet()
             },
             onOpenWithFile = { file ->
-                onOpenFile(file)
+                onOpenWithFile(file)
                 dismissOfflineBottomSheet()
             },
             onDeleteOfflineFile = { file ->
