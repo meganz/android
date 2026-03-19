@@ -49,13 +49,18 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dropdown.DropDownItem
 import mega.android.core.ui.components.dropdown.MegaDropDownMenu
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.components.state.EmptyStateView
+import mega.android.core.ui.components.text.SpannableText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
+import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -84,11 +89,13 @@ import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoveryFilterDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoverySortDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryCardListView
+import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryLoadingView
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -430,37 +437,58 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 )
             }
 
-            when (uiState.selectedPeriod) {
-                MediaDiscoveryPeriod.All -> {
-                    MediaDiscoveryGridView(
-                        uiState = uiState,
-                        onBack = onBack,
-                        contentPadding = contentPadding,
-                        onScrollingListener = { isScrolling ->
-                            isPeriodVisible = !isScrolling
-                        },
-                        onItemClicked = onItemClicked,
-                        onItemLongPressed = onItemLongPressed,
-                        zoomIn = onClickZoomIn,
-                        zoomOut = onClickZoomOut,
+            when {
+                !uiState.loadPhotosDone -> {
+                    MediaDiscoveryLoadingView(
+                        modifier = Modifier.fillMaxSize(),
+                        onChangeViewType = onBack
+                    )
+                }
+
+                uiState.mediaListItemList.isEmpty() -> {
+                    EmptyStateView(
+                        modifier = Modifier.fillMaxSize(),
+                        illustration = R.drawable.il_glass_image,
+                        description = SpannableText(
+                            text = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found)
+                        )
                     )
                 }
 
                 else -> {
-                    val dateCards = when (uiState.selectedPeriod) {
-                        MediaDiscoveryPeriod.Years -> uiState.yearsCardList
-                        MediaDiscoveryPeriod.Months -> uiState.monthsCardList
-                        MediaDiscoveryPeriod.Days -> uiState.daysCardList
-                        else -> uiState.daysCardList
+                    when (uiState.selectedPeriod) {
+                        MediaDiscoveryPeriod.All -> {
+                            MediaDiscoveryGridView(
+                                uiState = uiState,
+                                onBack = onBack,
+                                contentPadding = contentPadding,
+                                onScrollingListener = { isScrolling ->
+                                    isPeriodVisible = !isScrolling
+                                },
+                                onItemClicked = onItemClicked,
+                                onItemLongPressed = onItemLongPressed,
+                                zoomIn = onClickZoomIn,
+                                zoomOut = onClickZoomOut,
+                            )
+                        }
+
+                        else -> {
+                            val dateCards = when (uiState.selectedPeriod) {
+                                MediaDiscoveryPeriod.Years -> uiState.yearsCardList
+                                MediaDiscoveryPeriod.Months -> uiState.monthsCardList
+                                MediaDiscoveryPeriod.Days -> uiState.daysCardList
+                                else -> uiState.daysCardList
+                            }
+                            MediaDiscoveryCardListView(
+                                dateCards = dateCards,
+                                onCardClick = onCardClick,
+                                fromFolderLink = uiState.fromFolderLink,
+                                shouldApplySensitiveMode = uiState.isHiddenNodesEnabled &&
+                                        uiState.accountType?.isPaid == true &&
+                                        !uiState.isBusinessAccountExpired,
+                            )
+                        }
                     }
-                    MediaDiscoveryCardListView(
-                        dateCards = dateCards,
-                        onCardClick = onCardClick,
-                        fromFolderLink = uiState.fromFolderLink,
-                        shouldApplySensitiveMode = uiState.isHiddenNodesEnabled &&
-                                uiState.accountType?.isPaid == true &&
-                                !uiState.isBusinessAccountExpired,
-                    )
                 }
             }
 
@@ -473,7 +501,9 @@ internal fun CloudDriveMediaDiscoveryScreen(
                     .padding(bottom = if (uiState.isUploadAllowed) 76.dp else 0.dp)
                     .align(Alignment.BottomCenter)
                     .applyScrollToHideFabBehavior(),
-                isVisible = uiState.mediaListItemList.isNotEmpty() && !uiState.isInSelectionMode
+                isVisible = isPeriodVisible
+                        && uiState.mediaListItemList.isNotEmpty()
+                        && !uiState.isInSelectionMode
             )
         }
 
@@ -580,8 +610,7 @@ private fun MediaDiscoveryGridView(
         ) {
             NodeHeaderItem(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 8.dp),
+                    .padding(horizontal = 8.dp),
                 onSortOrderClick = {},
                 onChangeViewTypeClick = onBack,
                 onEnterMediaDiscoveryClick = {},
@@ -656,7 +685,13 @@ private fun MediaDiscoveryGridView(
                     MediaDiscoverySeparator(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 16.dp)
+                            .conditional(it == 0) {
+                                padding(bottom = 12.dp)
+                            }
+                            .conditional(it > 0) {
+                                padding(vertical = 12.dp)
+                            },
                         currentZoomLevel = uiState.currentZoomLevel,
                         modificationTime = item.modificationTime,
                     )
@@ -735,4 +770,72 @@ private enum class MediaDiscoveryDropDownAction(@StringRes val textRes: Int) {
     SortBy(sharedR.string.action_sort_by_header),
     ZoomIn(sharedR.string.media_discovery_screen_dropdown_action_zoom_in),
     ZoomOut(sharedR.string.media_discovery_screen_dropdown_action_zoom_out),
+}
+
+@CombinedThemePreviews
+@Composable
+private fun CloudDriveMediaDiscoveryLoadingPreview() {
+    AndroidThemeForPreviews {
+        CloudDriveMediaDiscoveryScreen(
+            uiState = CloudDriveMediaDiscoveryUiState(loadPhotosDone = false),
+            actionUiState = NodeActionState(),
+            multiNodeActionHandler = MultiNodeActionHandler { _, _ -> },
+            showUploadOptionsBottomSheet = false,
+            onBack = {},
+            onItemClicked = {},
+            onItemLongPressed = {},
+            selectAllItems = {},
+            deselectAllItems = {},
+            onMoreOptionsClicked = {},
+            onPeriodSelected = {},
+            onCardClick = {},
+            onFabClicked = {},
+            onUploadFilesClicked = {},
+            onUploadFolderClicked = {},
+            onScanDocumentClicked = {},
+            onCaptureClicked = {},
+            onNewFolderClicked = {},
+            onNewTextFileClicked = {},
+            onDismissUploadSheet = {},
+            onTransfersClicked = {},
+            onClickZoomIn = {},
+            onClickZoomOut = {},
+            onSetCurrentSort = {},
+            onSetCurrentMediaType = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun CloudDriveMediaDiscoveryEmptyPreview() {
+    AndroidThemeForPreviews {
+        CloudDriveMediaDiscoveryScreen(
+            uiState = CloudDriveMediaDiscoveryUiState(loadPhotosDone = true),
+            actionUiState = NodeActionState(),
+            multiNodeActionHandler = MultiNodeActionHandler { _, _ -> },
+            showUploadOptionsBottomSheet = false,
+            onBack = {},
+            onItemClicked = {},
+            onItemLongPressed = {},
+            selectAllItems = {},
+            deselectAllItems = {},
+            onMoreOptionsClicked = {},
+            onPeriodSelected = {},
+            onCardClick = {},
+            onFabClicked = {},
+            onUploadFilesClicked = {},
+            onUploadFolderClicked = {},
+            onScanDocumentClicked = {},
+            onCaptureClicked = {},
+            onNewFolderClicked = {},
+            onNewTextFileClicked = {},
+            onDismissUploadSheet = {},
+            onTransfersClicked = {},
+            onClickZoomIn = {},
+            onClickZoomOut = {},
+            onSetCurrentSort = {},
+            onSetCurrentMediaType = {},
+        )
+    }
 }
