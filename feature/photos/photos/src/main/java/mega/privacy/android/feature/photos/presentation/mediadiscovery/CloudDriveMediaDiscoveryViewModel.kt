@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.photos.DateCard
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import timber.log.Timber
@@ -61,8 +63,9 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
     private val photoToTypedFileNodeMapper: PhotoToTypedFileNodeMapper,
-    @Assisted private val folderId: Long,
+    @Assisted val folderId: Long,
     @Assisted private val folderName: String,
     @Assisted private val fromFolderLink: Boolean,
     @Assisted private val nodeSourceType: NodeSourceType,
@@ -78,6 +81,7 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
 
     init {
         monitorMediaDiscovery()
+        checkWritePermission()
     }
 
     private fun monitorMediaDiscovery() {
@@ -435,6 +439,21 @@ class CloudDriveMediaDiscoveryViewModel @AssistedInject constructor(
     private fun getAllPhotoIds() = _state.value.mediaListItemList
         .filterIsInstance<MediaListMedia>()
         .map { it.mediaId }
+
+    private fun checkWritePermission() {
+        viewModelScope.launch {
+            runCatching {
+                val accessPermission = getNodeAccessPermission(NodeId(folderId))
+                val hasWritePermission = accessPermission == AccessPermission.OWNER ||
+                        accessPermission == AccessPermission.READWRITE ||
+                        accessPermission == AccessPermission.FULL
+                _state.update { it.copy(hasWritePermission = hasWritePermission) }
+            }.onFailure {
+                Timber.e(it, "Failed to check write permission")
+                _state.update { it.copy(hasWritePermission = false) }
+            }
+        }
+    }
 
     @AssistedFactory
     interface Factory {

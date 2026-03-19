@@ -2,7 +2,10 @@ package mega.privacy.android.feature.photos.presentation.mediadiscovery
 
 import MediaGridViewItem
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.text.format.DateFormat
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,12 +35,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dropdown.DropDownItem
@@ -44,16 +51,29 @@ import mega.android.core.ui.components.dropdown.MegaDropDownMenu
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
+import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
+import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentHandler
+import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
+import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
+import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
+import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.photos.DateCard
@@ -62,6 +82,8 @@ import mega.privacy.android.domain.entity.photos.MediaListItem
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoveryFilterDialog
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.component.MediaDiscoverySortDialog
@@ -70,11 +92,16 @@ import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.Medi
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -84,6 +111,7 @@ import java.util.Locale
 @Composable
 fun CloudDriveMediaDiscoveryRoute(
     navigationHandler: NavigationHandler,
+    onTransfer: (TransferTriggerEvent) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CloudDriveMediaDiscoveryViewModel = hiltViewModel<CloudDriveMediaDiscoveryViewModel, CloudDriveMediaDiscoveryViewModel.Factory>(
         creationCallback = { it.create() }
@@ -92,6 +120,7 @@ fun CloudDriveMediaDiscoveryRoute(
         hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
             creationCallback = { it.create(null) }
         ),
+    scanDocumentViewModel: ScanDocumentViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onMoreOptionsClicked: () -> Unit = {},
 ) {
@@ -101,6 +130,44 @@ fun CloudDriveMediaDiscoveryRoute(
     )
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val actionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
+    val megaNavigator = rememberMegaNavigator()
+    val megaResultContract = rememberMegaResultContract()
+    val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackBarHostState.current
+
+    var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
+    var pitagTrigger by rememberSaveable { mutableStateOf(PitagTrigger.NotApplicable) }
+    var uploadUris by rememberSaveable { mutableStateOf(emptyList<Uri>()) }
+    val parentId = NodeId(viewModel.folderId)
+    val uploadHandler = rememberUploadHandler(
+        parentId = parentId,
+        onFilesSelected = { uris ->
+            pitagTrigger = PitagTrigger.Picker
+            uploadUris = uris
+        },
+        megaNavigator = megaNavigator,
+        megaResultContract = megaResultContract
+    )
+
+    val captureHandler = rememberCaptureHandler(
+        onPhotoCaptured = { uri ->
+            pitagTrigger = PitagTrigger.CameraCapture
+            uploadUris = listOf(uri)
+        },
+        megaResultContract = megaResultContract
+    )
+
+    val nameCollisionLauncher = rememberLauncherForActivityResult(
+        contract = megaResultContract.nameCollisionActivityContract
+    ) { message ->
+        if (!message.isNullOrEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(message)
+            }
+        }
+    }
 
     LaunchedEffect(uiState.selectedPhotosCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
@@ -127,6 +194,7 @@ fun CloudDriveMediaDiscoveryRoute(
         uiState = uiState,
         actionUiState = actionUiState,
         multiNodeActionHandler = multiNodeActionHandler,
+        showUploadOptionsBottomSheet = showUploadOptionsBottomSheet,
         onBack = navigationHandler::back,
         onItemClicked = { photo ->
             if (uiState.isInSelectionMode) {
@@ -147,12 +215,71 @@ fun CloudDriveMediaDiscoveryRoute(
         deselectAllItems = viewModel::clearSelectedPhotos,
         onCardClick = viewModel::selectPeriod,
         onMoreOptionsClicked = onMoreOptionsClicked,
+        onFabClicked = {
+            Analytics.tracker.trackEvent(CloudDriveFABPressedEvent)
+            showUploadOptionsBottomSheet = true
+        },
+        onUploadFilesClicked = { uploadHandler.onUploadFilesClicked() },
+        onUploadFolderClicked = { uploadHandler.onUploadFolderClicked() },
+        onScanDocumentClicked = { scanDocumentViewModel.prepareDocumentScanner() },
+        onCaptureClicked = { captureHandler.onCaptureClicked() },
+        onNewFolderClicked = { showNewFolderDialog = true },
+        onNewTextFileClicked = { showNewTextFileDialog = true },
+        onDismissUploadSheet = { showUploadOptionsBottomSheet = false },
+        onTransfersClicked = { navigationHandler.navigate(TransfersNavKey()) },
         onClickZoomIn = viewModel::zoomIn,
         onClickZoomOut = viewModel::zoomOut,
         onSetCurrentSort = viewModel::setCurrentSort,
         onSetCurrentMediaType = viewModel::setCurrentMediaType,
         modifier = modifier,
         contentPadding = contentPadding,
+    )
+
+    BackHandler(enabled = uiState.isInSelectionMode) {
+        viewModel.clearSelectedPhotos()
+    }
+
+    UploadingFiles(
+        nameCollisionLauncher = nameCollisionLauncher,
+        parentNodeId = parentId,
+        uris = uploadUris,
+        pitagTrigger = pitagTrigger,
+        onStartUpload = { transferTriggerEvent ->
+            onTransfer(transferTriggerEvent)
+            pitagTrigger = PitagTrigger.NotApplicable
+            uploadUris = emptyList()
+        },
+    )
+
+    if (showNewFolderDialog) {
+        NewFolderNodeDialog(
+            parentNode = parentId,
+            onCreateFolder = { folderId ->
+                showNewFolderDialog = false
+                if (folderId != null) {
+                    navigationHandler.navigate(
+                        CloudDriveNavKey(
+                            nodeHandle = folderId.longValue,
+                            nodeSourceType = uiState.nodeSourceType
+                        )
+                    )
+                }
+            },
+            onDismiss = { showNewFolderDialog = false }
+        )
+    }
+
+    if (showNewTextFileDialog) {
+        NewTextFileNodeDialog(
+            parentNode = parentId,
+            onDismiss = { showNewTextFileDialog = false }
+        )
+    }
+
+    @SuppressLint("ComposeViewModelForwarding")
+    ScanDocumentHandler(
+        parentNodeId = parentId,
+        viewModel = scanDocumentViewModel
     )
 }
 
@@ -162,6 +289,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
     uiState: CloudDriveMediaDiscoveryUiState,
     actionUiState: NodeActionState,
     multiNodeActionHandler: MultiNodeActionHandler,
+    showUploadOptionsBottomSheet: Boolean,
     onBack: () -> Unit,
     onItemClicked: (Photo) -> Unit,
     onItemLongPressed: (Photo) -> Unit,
@@ -170,6 +298,15 @@ internal fun CloudDriveMediaDiscoveryScreen(
     onMoreOptionsClicked: () -> Unit,
     onPeriodSelected: (MediaDiscoveryPeriod) -> Unit,
     onCardClick: (DateCard) -> Unit,
+    onFabClicked: () -> Unit,
+    onUploadFilesClicked: () -> Unit,
+    onUploadFolderClicked: () -> Unit,
+    onScanDocumentClicked: () -> Unit,
+    onCaptureClicked: () -> Unit,
+    onNewFolderClicked: () -> Unit,
+    onNewTextFileClicked: () -> Unit,
+    onDismissUploadSheet: () -> Unit,
+    onTransfersClicked: () -> Unit,
     onClickZoomIn: () -> Unit,
     onClickZoomOut: () -> Unit,
     onSetCurrentSort: (Sort) -> Unit,
@@ -184,6 +321,15 @@ internal fun CloudDriveMediaDiscoveryScreen(
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            AddContentFab(
+                modifier = Modifier
+                    .testTag(MEDIA_DISCOVERY_FAB_TAG)
+                    .applyScrollToHideFabBehavior(),
+                visible = uiState.isUploadAllowed && uiState.loadPhotosDone,
+                onClick = onFabClicked
+            )
+        },
         topBar = {
             if (uiState.isInSelectionMode) {
                 NodeSelectionModeAppBar(
@@ -197,6 +343,13 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 MegaTopAppBar(
                     title = uiState.folderName,
                     navigationType = AppBarNavigationType.Back(onBack),
+                    trailingIcons = {
+                        TransfersToolbarWidget(
+                            onClick = {
+                                onTransfersClicked()
+                            }
+                        )
+                    },
                     actions = listOf(
                         MenuActionWithClick(
                             menuAction = object : MenuActionWithIcon {
@@ -317,8 +470,22 @@ internal fun CloudDriveMediaDiscoveryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
-                    .align(Alignment.BottomCenter),
-                isVisible = isPeriodVisible && !uiState.isInSelectionMode
+                    .padding(bottom = if (uiState.isUploadAllowed) 76.dp else 0.dp)
+                    .align(Alignment.BottomCenter)
+                    .applyScrollToHideFabBehavior(),
+                isVisible = uiState.mediaListItemList.isNotEmpty() && !uiState.isInSelectionMode
+            )
+        }
+
+        if (showUploadOptionsBottomSheet) {
+            UploadOptionsBottomSheet(
+                onUploadFilesClicked = onUploadFilesClicked,
+                onUploadFolderClicked = onUploadFolderClicked,
+                onScanDocumentClicked = onScanDocumentClicked,
+                onCaptureClicked = onCaptureClicked,
+                onNewFolderClicked = onNewFolderClicked,
+                onNewTextFileClicked = onNewTextFileClicked,
+                onDismissSheet = onDismissUploadSheet,
             )
         }
     }
@@ -345,6 +512,8 @@ internal fun CloudDriveMediaDiscoveryScreen(
         )
     }
 }
+
+internal const val MEDIA_DISCOVERY_FAB_TAG = "media_discovery_screen:add_content_fab"
 
 @Composable
 private fun MediaDiscoveryGridView(

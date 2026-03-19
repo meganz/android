@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,9 +44,7 @@ import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssu
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaWarningBanner
 import mega.privacy.android.core.nodecomponents.dialog.newfolderdialog.NewFolderNodeDialog
 import mega.privacy.android.core.nodecomponents.dialog.textfile.NewTextFileNodeDialog
-import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.core.nodecomponents.list.UnverifiedContactShareBanner
-import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.upload.UploadOptionsBottomSheet
 import mega.privacy.android.core.nodecomponents.upload.UploadingFiles
@@ -72,9 +69,11 @@ import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -111,8 +110,8 @@ internal fun CloudDriveContent(
     ),
     onPrepareScanDocument: () -> Unit = {},
 ) {
-    var showNewFolderDialog by remember { mutableStateOf(false) }
-    var showNewTextFileDialog by remember { mutableStateOf(false) }
+    var showNewFolderDialog by rememberSaveable { mutableStateOf(false) }
+    var showNewTextFileDialog by rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val resources = LocalResources.current

@@ -583,6 +583,7 @@ fun EntryProviderScope<NavKey>.cloudDriveMediaDiscoveryScreen(
             viewModel = viewModel,
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
+            onTransfer = onTransfer,
             onMoreOptionsClicked = {
                 if (key.folderId != -1L) {
                     navigationHandler.navigate(

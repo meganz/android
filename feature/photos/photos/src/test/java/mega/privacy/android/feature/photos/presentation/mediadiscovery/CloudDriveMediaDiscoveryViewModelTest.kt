@@ -16,18 +16,19 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.AccountPlanDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.photos.DateCard
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.Sort
 import mega.privacy.android.domain.entity.photos.ZoomLevel
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscoverySettingsUseCase
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.model.MediaDiscoveryPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.mapper.PhotoToTypedFileNodeMapper
 import org.junit.jupiter.api.BeforeAll
@@ -66,6 +68,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
+    private val getNodeAccessPermission = mock<GetNodeAccessPermission>()
     private val photoToTypedFileNodeMapper = mock<PhotoToTypedFileNodeMapper>()
 
     private val testFolderId = 123L
@@ -89,6 +92,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
             monitorHiddenNodesEnabledUseCase,
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
+            getNodeAccessPermission,
         )
         commonStub()
     }
@@ -120,6 +124,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
+            getNodeAccessPermission = getNodeAccessPermission,
             photoToTypedFileNodeMapper = photoToTypedFileNodeMapper,
             folderId = testFolderId,
             folderName = testFolderName,
@@ -553,6 +558,90 @@ class CloudDriveMediaDiscoveryViewModelTest {
             assertThat(state.isAllSelected).isTrue()
         }
     }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for OWNER permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.OWNER)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for READWRITE permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READWRITE)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to true for FULL permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.FULL)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isTrue()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for READ permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READ)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for UNKNOWN permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.UNKNOWN)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false for null permission`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(null)
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isFalse()
+        }
+
+    @Test
+    fun `test that checkWritePermission sets hasWritePermission to false when exception is thrown`() =
+        runTest {
+            getNodeAccessPermission.stub {
+                onBlocking { invoke(NodeId(testFolderId)) }.thenThrow(RuntimeException("Test exception"))
+            }
+
+            initViewModel()
+
+            assertThat(underTest.state.value.hasWritePermission).isFalse()
+        }
 
     @Test
     fun `test that setCurrentSort updates currentSort in state`() = runTest {

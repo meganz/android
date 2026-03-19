@@ -37,6 +37,7 @@ data class CloudDriveMediaDiscoveryUiState(
     val fromFolderLink: Boolean = false,
     val folderName: String = "",
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+    val hasWritePermission: Boolean = false,
 ) {
     val selectedNodes: Set<TypedFileNode>
         get() = sourceNodes
@@ -46,4 +47,7 @@ data class CloudDriveMediaDiscoveryUiState(
     val isInSelectionMode = selectedPhotoIds.isNotEmpty()
     val selectedPhotosCount = selectedPhotoIds.size
     val isAllSelected = selectedPhotoIds.size == sourcePhotos.size
+    val isUploadAllowed = hasWritePermission
+            && nodeSourceType != NodeSourceType.RUBBISH_BIN
+            && !isInSelectionMode
 }
