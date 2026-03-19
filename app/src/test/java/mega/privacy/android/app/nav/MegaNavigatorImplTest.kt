@@ -27,6 +27,7 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.times
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -77,6 +78,7 @@ class MegaNavigatorImplTest {
     @BeforeEach
     fun cleanUp() {
         reset(
+            context,
             nodeContentUriIntentMapper,
             getFileTypeInfoUseCase,
             getFileTypeInfoByNameUseCase,
@@ -227,5 +229,19 @@ class MegaNavigatorImplTest {
             underTest.sendMessageConsideringSingleActivity(context, message)
 
             verifyNoInteractions(snackbarEventQueue)
+        }
+
+    @Test
+    fun `test that openTextEditorActivityForOfflineFile starts an activity with the given context`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openTextEditorActivityForOfflineFile(
+                context = context,
+                localPath = "/data/offline/note.txt",
+                fileName = "note.txt",
+            )
+
+            verify(context, times(1)).startActivity(any())
         }
 }

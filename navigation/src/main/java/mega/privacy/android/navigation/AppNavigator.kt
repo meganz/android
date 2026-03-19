@@ -407,6 +407,21 @@ interface AppNavigator {
     )
 
     /**
+     * Open Text Editor Activity for an offline (local) text file.
+     * Uses local path and OFFLINE_ADAPTER so the file can be opened without network.
+     * Opens in view mode (no MODE extra is set).
+     *
+     * @param context Context
+     * @param localPath Absolute path to the local text file
+     * @param fileName Display name of the file
+     */
+    fun openTextEditorActivityForOfflineFile(
+        context: Context,
+        localPath: String,
+        fileName: String,
+    )
+
+    /**
      * Open Get Link Activity
      *
      * @param context Context

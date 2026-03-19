@@ -68,6 +68,8 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
@@ -736,6 +738,20 @@ internal class MegaNavigatorImpl @Inject constructor(
                 )
             },
         )
+    }
+
+    override fun openTextEditorActivityForOfflineFile(
+        context: Context,
+        localPath: String,
+        fileName: String,
+    ) {
+        val intent = Intent(context, TextEditorActivity::class.java).apply {
+            putExtra(INTENT_EXTRA_KEY_PATH, localPath)
+            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
+            putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileName)
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        context.startActivity(intent)
     }
 
     override fun openGetLinkActivity(context: Context, vararg handles: Long) {
