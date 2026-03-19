@@ -2230,4 +2230,26 @@
     <string name="general_dialog_discard_changes_message">Orice modificări nesalvate vor fi pierdute</string>
     <string name="general_dialog_discard_button">Înlătură</string>
     <string name="general_changes_saved">Modificările au fost salvate</string>
+    <string name="home_screen_audios_chip_title">Audio</string>
+    <string name="node_option_save_to_mega">Salvează pe MEGA</string>
+    <string name="basic_account">Basic</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Cumpără Esențial</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Cumpără Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">Vă mulțumim pentru abonamentul lunar Starter</string>
+    <string name="external_checkout_information_description">Sunteți pe cale să deschideți un site extern (%1$s). MEGA se ocupă de tranzacții și de asistența pentru clienți.</string>
+    <string name="saf_passcode_lock_enabled_message">Pentru a răsfoi fișierele MEGA, dezactivați codul de acces în aplicația MEGA. Accesați Setări, apoi atingeți Securitate.</string>
+    <string name="saf_no_internet_message">Conectați-vă la internet pentru a răsfoi fișierele MEGA. Fișierele salvate pentru utilizare offline sunt disponibile în aplicația MEGA.</string>
+    <string name="upgrade_account_successful_starter_yearly">Vă mulțumim pentru abonamentul dvs. Starter anual.</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Cumpără Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">Vă mulțumim pentru abonamentul dvs. Basic lunar.</string>
+    <string name="upgrade_account_successful_basic_yearly">Vă mulțumim pentru abonamentul dvs. Basic anual.</string>
+    <string name="upgrade_account_successful_essential_monthly">Vă mulțumim pentru abonamentul dvs. Essential lunar.</string>
+    <string name="upgrade_account_successful_essential_yearly">Vă mulțumim pentru abonamentul dvs. Essential anual.</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Zoom in</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Zoom out</string>
+    <string name="media_discovery_filter_all_media">Toate media</string>
+    <string name="media_discovery_filter_images">Imagini</string>
+    <string name="media_discovery_filter_videos">Videoclipuri</string>
 </resources>

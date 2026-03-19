@@ -2108,4 +2108,24 @@
     <string name="general_dialog_discard_button">폐기</string>
     <string name="general_changes_saved">변경 사항 저장됨</string>
     <string name="node_option_save_to_mega">MEGA에 저장</string>
+    <string name="home_screen_audios_chip_title">오디오</string>
+    <string name="saf_no_internet_message">MEGA 파일을 탐색하려면 인터넷에 연결하세요. 오프라인을 위해 저장된 파일은 MEGA 앱에서만 이용 가능합니다.</string>
+    <string name="starter_account">Starter</string>
+    <string name="saf_passcode_lock_enabled_message">MEGA 파일을 탐색하려면, MEGA 앱에서 암호를 비활성화 하세요. 설정에 간 다음, 보안을 탭하세요.</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Starter 구입</string>
+    <string name="upgrade_account_successful_starter_monthly">Starter 월간 구독에 감사드립니다</string>
+    <string name="upgrade_account_successful_starter_yearly">Starter 연간 구독에 감사드립니다</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Basic 구입</string>
+    <string name="upgrade_account_successful_basic_monthly">Basic 월간 구독에 감사드립니다</string>
+    <string name="upgrade_account_successful_basic_yearly">Basic 연간 구독에 감사드립니다</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Essential 구입</string>
+    <string name="upgrade_account_successful_essential_monthly">Essential 월간 구독에 감사드립니다</string>
+    <string name="upgrade_account_successful_essential_yearly">Essential 연간 구독에 감사드립니다</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">확대</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">축소</string>
+    <string name="media_discovery_filter_all_media">모든 미디어</string>
+    <string name="media_discovery_filter_images">이미지</string>
+    <string name="media_discovery_filter_videos">동영상</string>
 </resources>

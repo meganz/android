@@ -2231,4 +2231,25 @@
     <string name="sync_folder_connection_this_device">Connecté à %1$s</string>
     <string name="general_dialog_discard_changes_message">Toute modification non enregistrée sera perdue</string>
     <string name="general_changes_saved">Modifications enregistrées</string>
+    <string name="home_screen_audios_chip_title">Audio</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Acheter Essential</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Acheter Basic</string>
+    <string name="upgrade_account_successful_starter_monthly">Merci pour votre abonnement mensuel à Starter</string>
+    <string name="upgrade_account_successful_basic_monthly">Merci pour votre abonnement mensuel à Basic</string>
+    <string name="upgrade_account_successful_basic_yearly">Merci pour votre abonnement annuel à Basic</string>
+    <string name="upgrade_account_successful_essential_monthly">Merci pour votre abonnement mensuel à Essential</string>
+    <string name="upgrade_account_successful_essential_yearly">Merci pour votre abonnement annuel à Essential</string>
+    <string name="node_option_save_to_mega">Sauvegarder sur MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">Pour parcourir vos fichiers MEGA, désactivez votre code d\’accès dans l\’application MEGA. Allez dans Paramètres, puis appuyez sur Sécurité.</string>
+    <string name="saf_no_internet_message">Connectez-vous à Internet pour parcourir vos fichiers MEGA. Les fichiers enregistrés hors ligne sont disponibles dans l\’appli MEGA.</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Acheter Starter</string>
+    <string name="upgrade_account_successful_starter_yearly">Merci pour votre abonnement annuel à Starter</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Zoomer avant</string>
+    <string name="media_discovery_filter_all_media">Tous les médias</string>
+    <string name="media_discovery_filter_images">Images</string>
+    <string name="media_discovery_filter_videos">Vidéos</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Zoomer arrière</string>
 </resources>

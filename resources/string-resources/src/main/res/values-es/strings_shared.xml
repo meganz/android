@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">La carpeta no se puede sincronizar porque el usuario que la ha compartido ha alcanzado el límite de su límite de almacenamiento</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">La carpeta no se puede sincronizar porque es una carpeta compartida a la que no tienes acceso completo.</string>
+    <string name="general_sync_share_non_full_access">La carpeta no se puede sincronizar porque es una carpeta compartida a la que no tienes acceso completo</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="general_sync_put_nodes_error">Los archivos de esta carpeta no se pueden sincronizar ni se puede hacer un backup. Reactiva la sincronización o el backup desde la aplicación de escritorio.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
@@ -857,15 +857,15 @@
     <!-- Add to album some files exist message -->
     <plurals name="album_add_to_files_exist_message">
         <item quantity="one">Se ha añadido 1 archivo a “%1$s”. No se pueden añadir archivos duplicados.</item>
-        <item quantity="many">%2$d archivos añadidos a “%1$s%1$s”. No se pueden añadir archivos duplicados.</item>
+        <item quantity="many">%2$d archivos añadidos a “%1$s”. No se pueden añadir archivos duplicados.</item>
         <item quantity="other">%2$d archivos añadidos a “%1$s”. No se pueden añadir archivos duplicados.</item>
     </plurals>
     <!-- Snack bar message informing that profile's QR code is uploaded to the Cloud Drive-->
-    <string name="transfers_start_upload_profile_qr_code_message">Guardando %1$s en la Nube...</string>
+    <string name="transfers_start_upload_profile_qr_code_message">Guardando %1$s en la Nube&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Subiendo&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% subiendo...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% subiendo&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inactivo</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -965,7 +965,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">¿Ya tienes una cuenta de MEGA? [A]Inicia sesión[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Cargando archivo...</string>
+    <string name="transfers_fake_preview_text">Cargando archivo&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">¿Cancelar vista previa?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -1081,7 +1081,7 @@
     <!-- Title for the Free Plan card -->
     <string name="free_plan_card_title">Empieza con nuestro plan gratuito</string>
     <!-- Description for the Free Plan card -->
-    <string name="free_plan_card_description">No tienes que comprometerte con un plan de pago ahora mismo, nuestro plan gratuito ofrece una generosa cantidad de almacenamiento y cuota de transferencia.</string>
+    <string name="free_plan_card_description">No tienes que comprometerte con un plan de pago ahora mismo, nuestro plan gratuito ofrece una generosa cantidad de almacenamiento y cuota de transferencia</string>
     <!-- Feature text for Free Plan transfer quota -->
     <string name="free_plan_card_transfer_feature">Transferencias limitadas</string>
     <!-- Button text for Free Plan card -->
@@ -1117,7 +1117,7 @@
     <!-- Benefit: Automatically sync the folders on your mobile device -->
     <string name="pro_plan_benefit_auto_sync_mobile">Sincronización automática de las carpetas de tu dispositivo móvil</string>
     <!-- Benefit: Host calls and meetings with unlimited participants and no time restrictions -->
-    <string name="pro_plan_benefit_host_calls_unlimited">Llamadas y reuniones con participantes ilimitados y sin restricciones de tiempo.</string>
+    <string name="pro_plan_benefit_host_calls_unlimited">Llamadas y reuniones con participantes ilimitados y sin restricciones de tiempo</string>
     <!-- Benefit: Schedule rubbish bin clearing between 7 days and 10 years -->
     <string name="pro_plan_benefit_schedule_rubbish_bin_clearing">Limpieza automática de la papelera entre 7 días y 10 años</string>
     <!-- Benefit: Priority support -->
@@ -1383,7 +1383,7 @@
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_rename_file_explanation">A los archivos con el mismo nombre, pero con contenido diferente, se les añadirá un sufijo como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas las carpetas se combinarán y los archivos con el mismo nombre, pero con contenido diferente, se renombrarán añadiendo un sufijo como (1).</string>
+    <string name="sync_stalled_issue_choose_merge_folder_explanation">Todas las carpetas se combinarán y los archivos con el mismo nombre, pero con contenido diferente, se renombrarán añadiendo un sufijo como (1)</string>
     <!-- Explanation text when choose the merge folder is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_last_modified_file_explanation">El archivo actualizado más recientemente reemplazará al anterior en ambas ubicaciones</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
@@ -1409,7 +1409,7 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Visita [A]https://%1$s[/A] en tu navegador web.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Comprobando las subidas...</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Comprobando las subidas&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">Subiendo: %d elementos restantes</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
@@ -1445,7 +1445,7 @@
     <!-- The snackbar message for informing the user about some invitations correctly sent, but not others because they are already in the received contact requests because the users already invited them. -->
     <plurals name="contacts_invites_sent_but_others_already_received">
         <item quantity="one">%1$d usuario invitado, pero uno o más usuarios ya te han invitado</item>
-        <item quantity="many">%1$d DE usuarios invitados, pero uno o más usuarios ya te han invitado</item>
+        <item quantity="many">%1$d de usuarios invitados, pero uno o más usuarios ya te han invitado</item>
         <item quantity="other">%1$d usuarios invitados, pero uno o más usuarios ya te han invitado</item>
     </plurals>
     <!--  Error shown when the user tries to resend the sign up link multiple times at once. -->
@@ -1683,9 +1683,9 @@
     <!--header for the Camera Uploads transfer in queue items -->
     <string name="camera_uploads_tranfer_header_in_queue">En cola</string>
     <!--Title for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_title">Todo al día.</string>
+    <string name="camera_uploads_tranfer_empty_view_title">Todo al día</string>
     <!--description for the Camera Uploads transfer empty view -->
-    <string name="camera_uploads_tranfer_empty_view_description">Las fotos y los videos nuevos aparecerán aquí después de que los hagas.</string>
+    <string name="camera_uploads_tranfer_empty_view_description">Las fotos y los videos nuevos aparecerán aquí después de que los hagas</string>
     <!--Title for the Camera Uploads transfer top bar -->
     <string name="camera_uploads_tranfer_top_bar_title">Progreso</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
@@ -1717,7 +1717,7 @@
     <!--Media screen albums tab title-->
     <string name="media_albums_tab_title">Álbumes</string>
     <!--Media screen videos tab title-->
-    <string name="media_videos_tab_title">Videos</string>
+    <string name="media_videos_tab_title">Vídeos</string>
     <!--Media screen playlists tab title-->
     <string name="media_playlists_tab_title">Listas de reproducción</string>
     <!--Media screen timeline filter by Years chip text-->
@@ -1760,8 +1760,8 @@
     <string name="album_name_exists_error_message">Ya existe un álbum con este nombre. Introducir un nombre diferente.</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_detail_title">
-        <item quantity="one">El bono caducará en %1$d día.</item>
-        <item quantity="many">El bono caducará en %1$d días.</item>
+        <item quantity="one">El bono caducará en %1$d día</item>
+        <item quantity="many">El bono caducará en %1$d días</item>
         <item quantity="other">El bono caducará en %1$d días</item>
     </plurals>
     <!-- Dialog confirmation text for removing photos in an album -->
@@ -2015,7 +2015,7 @@
     <string name="album_get_link_copy_key_action">Copiar clave</string>
     <string name="album_get_link_copy_key_success_message">Clave copiada al portapapeles</string>
     <string name="album_get_link_share_link_dialog_title">¿Compartir también la clave de descifrado?</string>
-    <string name="album_get_link_share_link_dialog_description">La clave de descifrado se ha exportado y se compartirá con el enlace.</string>
+    <string name="album_get_link_share_link_dialog_description">La clave de descifrado se ha exportado y se compartirá junto con el enlace.</string>
     <string name="album_get_link_share_link_dialog_share_action_only_link">Compartir solo el enlace</string>
     <string name="album_get_link_share_link_dialog_share_action_link_key">Compartir enlace y clave</string>
     <string name="album_get_link_share_link_with_key">Enlace: %1$s\n\nClave: %2$s</string>
@@ -2200,4 +2200,28 @@
     <string name="general_dialog_discard_button">Descartar</string>
     <string name="sync_folder_connection_dialog_title">Carpeta conectada a otro dispositivo</string>
     <string name="sync_folder_connection_dialog_message">Esta carpeta está vinculada a tu dispositivo %1$s, probablemente porque MEGA se ha desinstalado sin cerrar sesión. Una carpeta solo puede sincronizarse con un dispositivo a la vez. Elimina la conexión existente para sincronizarla aquí.</string>
+    <string name="home_screen_audios_chip_title">Audio</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Comprar Starter</string>
+    <string name="basic_account">Basic</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Comprar Essential</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Comprar Basic</string>
+    <string name="upgrade_account_successful_starter_monthly">Gracias por tu suscripción mensual al plan Starter</string>
+    <string name="upgrade_account_successful_starter_yearly">Gracias por tu suscripción anual al plan Starter</string>
+    <string name="upgrade_account_successful_basic_monthly">Gracias por tu suscripción mensual al plan Basic</string>
+    <string name="upgrade_account_successful_basic_yearly">Gracias por tu suscripción anual al plan Basic</string>
+    <string name="upgrade_account_successful_essential_monthly">Gracias por tu suscripción mensual al plan Essential</string>
+    <string name="upgrade_account_successful_essential_yearly">Gracias por tu suscripción anual al plan Essential</string>
+    <string name="sync_folder_connection_this_device">Conectado a %1$s</string>
+    <string name="general_dialog_discard_changes_message">Cualquier cambio no guardado se perderá</string>
+    <string name="general_changes_saved">Cambios guardados</string>
+    <string name="node_option_save_to_mega">Guardar en MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">Para navegar por tus archivos de MEGA, desactiva tu código de acceso en la app de MEGA. Ve a Ajustes y luego toca Seguridad.</string>
+    <string name="saf_no_internet_message">Conéctate a Internet para navegar por tus archivos de MEGA. Los archivos disponibles sin conexión están en la app de MEGA.</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Aumentar zoom</string>
+    <string name="media_discovery_filter_all_media">Imágenes y vídeos</string>
+    <string name="media_discovery_filter_images">Imágenes</string>
+    <string name="media_discovery_filter_videos">Videos</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Disminuir zoom</string>
 </resources>

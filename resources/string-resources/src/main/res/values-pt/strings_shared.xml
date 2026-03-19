@@ -2204,7 +2204,7 @@
     <string name="home_recents_snackbar_activity_cleared">A sua atividade recente foi deletada</string>
     <string name="home_recents_options_menu_clear">Deletar a atividade recente</string>
     <string name="home_recents_clear_dialog_message">Você tem certeza de que quer deletar toda a atividade recente? Esta ação não pode ser desfeita.</string>
-    <string name="album_import_screen_subtitle_album_link_text">Link do álbum</string>
+    <string name="album_import_screen_subtitle_album_link_text">Link de álbum</string>
     <string name="album_import_error_access_dialog_title">Não foi possível acessar o álbum</string>
     <string name="album_import_error_access_dialog_description">O link para o álbum foi removido ou o álbum foi deletado. Entre em contato com a pessoa que compartilhou o link com você.</string>
     <string name="album_import_input_decryption_key_dialog_title">Digite a chave de decodificação</string>
@@ -2241,4 +2241,23 @@
     <string name="general_changes_saved">Alterações salvas</string>
     <string name="node_option_save_to_mega">Salvar no MEGA</string>
     <string name="home_screen_audios_chip_title">Áudio</string>
+    <string name="saf_passcode_lock_enabled_message">Para navegar pelos seus arquivos no MEGA, desative o seu código de desbloqueio no aplicativo do MEGA. Acesse as Configurações e depois pressione Segurança.</string>
+    <string name="saf_no_internet_message">Conecte-se à Internet para navegar pelos seus arquivos no MEGA. Arquivos salvos para uso offline estão disponíveis no aplicativo do MEGA.</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Comprar o plano Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">Obrigado por ativar a assinatura mensal do plano Starter</string>
+    <string name="upgrade_account_successful_starter_yearly">Obrigado por ativar a assinatura anual do plano Starter</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Comprar o plano Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">Obrigado por ativar a assinatura mensal do plano Basic</string>
+    <string name="upgrade_account_successful_basic_yearly">Obrigado por ativar a assinatura anual do plano Basic</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Comprar o plano Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">Obrigado por ativar a assinatura mensal do plano Essential</string>
+    <string name="upgrade_account_successful_essential_yearly">Obrigado por ativar a assinatura anual do plano Essential</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Aumentar o zoom</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Diminuir o zoom</string>
+    <string name="media_discovery_filter_all_media">Todos os arquivos de mídia</string>
+    <string name="media_discovery_filter_images">Imagens</string>
+    <string name="media_discovery_filter_videos">Vídeos</string>
 </resources>

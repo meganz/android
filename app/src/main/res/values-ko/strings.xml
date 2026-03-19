@@ -2475,7 +2475,7 @@
     <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
     <string name="link_and_key_sent">링크와 키가 전송되었습니다</string>
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
-    <string name="link_and_password_sent">링크와 비밀번호가 전송되었습니다</string>
+    <string name="link_and_password_sent">링크와 암호가 전송되었습니다</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Pro로 업그레이드</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -2641,7 +2641,7 @@
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">전화 번호 추가</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
-    <string name="backup_recovery_key_subtitle">비밀번호를 기억하나요?\nMEGA는 당신이 비밀번호를 잊으면 재설정해드릴 수 없습니다.</string>
+    <string name="backup_recovery_key_subtitle">암호를 기억하나요?\nMEGA는 당신이 암호를 잊으면 재설정해드릴 수 없습니다.</string>
     <!-- Action to change name -->
     <string name="change_name_action">이름 변경</string>
     <!-- Action to add photo -->
@@ -2899,7 +2899,7 @@
     <!-- Warnign shown after trying to upload an empty folder -->
     <string name="no_uploads_empty_folder">선택한 폴더는 비어있습니다. 업로드할 파일이 없습니다.</string>
     <!-- Error shown when user is trying to change the password typing the same as the current one. -->
-    <string name="error_same_password">현재 비밀번호를 입력하였습니다</string>
+    <string name="error_same_password">현재 암호를 입력하였습니다</string>
     <!-- Title of pop-up error message for taken down file -->
     <string name="error_file_not_available">파일을 더 이상 이용할 수 없습니다</string>
     <!-- Body of pop-up error message for taken down file. -->
@@ -3965,7 +3965,7 @@
     <!-- Button title, when user taps on Pro III plan on Upgrade account screen, where user can choose plan to buy. -->
     <string name="account_upgrade_account_buy_button_title_pro_iii">Pro&#160;III 구입</string>
     <!-- SubTitle of the link access section where information is displayed to the user about links access where only user who has password can access link-->
-    <string name="cloud_drive_subtitle_link_access_password">비밀번호가 있는 사람만 링크를 열 수 있습니다</string>
+    <string name="cloud_drive_subtitle_link_access_password">암호가 있는 사람만 링크를 열 수 있습니다</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
     <plurals name="general_name_collision_file_apply_for_all">
         <item quantity="other">모든 %1$d개의 중복에 적용</item>

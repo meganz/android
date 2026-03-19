@@ -2120,4 +2120,23 @@
     <string name="general_changes_saved">変更を保存しました</string>
     <string name="node_option_save_to_mega">MEGAに保存</string>
     <string name="home_screen_audios_chip_title">音声</string>
+    <string name="upgrade_account_successful_starter_monthly">Starter月額プランをご購入いただきありがとうございます。</string>
+    <string name="upgrade_account_successful_starter_yearly">Starter年額プランをご購入いただきありがとうございます。</string>
+    <string name="upgrade_account_successful_basic_monthly">Basic月額プランをご購入いただきありがとうございます。</string>
+    <string name="upgrade_account_successful_basic_yearly">Basic年額プランをご購入いただきありがとうございます。</string>
+    <string name="upgrade_account_successful_essential_monthly">Essential月額プランをご購入いただきありがとうございます。</string>
+    <string name="upgrade_account_successful_essential_yearly">Essential年額プランをご購入いただきありがとうございます。</string>
+    <string name="saf_passcode_lock_enabled_message">MEGAファイルを閲覧するには、MEGAアプリでパスコードを無効にしてください。「設定」を開き、「セキュリティ」をタップします。</string>
+    <string name="saf_no_internet_message">MEGAファイルを閲覧するには、インターネットに接続してください。オフライン用に保存されたファイルは、MEGAアプリで利用できます。</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Starterを購入</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Basicを購入</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Essentialを購入</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">ズームイン</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">ズームアウト</string>
+    <string name="media_discovery_filter_all_media">すべてのメディア</string>
+    <string name="media_discovery_filter_images">画像</string>
+    <string name="media_discovery_filter_videos">動画</string>
 </resources>

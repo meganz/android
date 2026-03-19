@@ -2119,4 +2119,23 @@
     <string name="general_changes_saved">更改已儲存</string>
     <string name="node_option_save_to_mega">儲存到MEGA</string>
     <string name="home_screen_audios_chip_title">音訊</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">放大</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">縮小</string>
+    <string name="media_discovery_filter_all_media">所有媒體</string>
+    <string name="media_discovery_filter_images">圖片</string>
+    <string name="media_discovery_filter_videos">影片</string>
+    <string name="saf_passcode_lock_enabled_message">若要瀏覽您的MEGA檔案，請在MEGA應用程式中停用密碼。進入設定，然後點選安全性。</string>
+    <string name="saf_no_internet_message">連線到網路即可瀏覽您的MEGA檔案。已儲存為離線使用的檔案可在MEGA應用程式中存取。</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">購買Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">感謝您訂閱Starter月付方案</string>
+    <string name="upgrade_account_successful_starter_yearly">感謝您訂閱Starter年付方案</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">購買Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">感謝您訂閱Basic月付方案</string>
+    <string name="upgrade_account_successful_basic_yearly">感謝您訂閱Basic年付方案</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">購買Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">感謝您訂閱Essential月付方案</string>
+    <string name="upgrade_account_successful_essential_yearly">感謝您訂閱Essential年付方案</string>
 </resources>

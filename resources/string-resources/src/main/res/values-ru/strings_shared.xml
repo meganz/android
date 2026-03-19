@@ -2278,4 +2278,11 @@
     <string name="error_folder_part_of_camera_uploads">Эта папка уже включена в «Загрузки из камеры». Выберите другую.</string>
     <string name="error_folder_part_of_media_uploads">Эта папка уже включена в «Загрузки медиа». Выберите другую.</string>
     <string name="general_dialog_discard_button">Не сохранять</string>
+    <string name="home_screen_audios_chip_title">Аудио</string>
+    <string name="node_menu_action_make_available_offline">Сделать доступным локально</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Увеличить</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Уменьшить</string>
+    <string name="media_discovery_filter_all_media">Все медиа</string>
+    <string name="media_discovery_filter_images">Изображения</string>
+    <string name="media_discovery_filter_videos">Видео</string>
 </resources>

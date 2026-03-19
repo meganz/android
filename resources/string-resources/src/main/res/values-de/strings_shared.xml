@@ -2146,4 +2146,23 @@
     <string name="text_editor_hide_line_numbers">Zeilennummern ausblenden</string>
     <string name="settings_help_rate_app">Bewerten Sie uns</string>
     <string name="general_dialog_discard_button">Verwerfen</string>
+    <string name="home_screen_audios_chip_title">Sprache</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Starter kaufen</string>
+    <string name="basic_account">Basic</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Essential kaufen</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Basic kaufen</string>
+    <string name="upgrade_account_successful_starter_monthly">Vielen Dank für den Abschluss Ihres Starter-Monatsabonnements</string>
+    <string name="upgrade_account_successful_starter_yearly">Vielen Dank für den Abschluss Ihres Starter-Jahresabonnements</string>
+    <string name="upgrade_account_successful_basic_monthly">Vielen Dank für den Abschluss Ihres Basic-Monatsabonnements</string>
+    <string name="upgrade_account_successful_basic_yearly">Vielen Dank für den Abschluss Ihres Basic-Jahresabonnements</string>
+    <string name="upgrade_account_successful_essential_monthly">Vielen Dank für den Abschluss Ihres Essential-Monatsabonnements</string>
+    <string name="upgrade_account_successful_essential_yearly">Vielen Dank für den Abschluss Ihres Essential-Jahresabonnements</string>
+    <string name="node_menu_action_make_available_offline">Offline bereitstellen</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Vergrößern</string>
+    <string name="media_discovery_filter_all_media">Alle Medien</string>
+    <string name="media_discovery_filter_images">Bilder</string>
+    <string name="media_discovery_filter_videos">Videos</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Verkleinern</string>
 </resources>

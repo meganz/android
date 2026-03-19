@@ -2182,4 +2182,10 @@
     <string name="general_dialog_discard_changes_message">Kaydedilmeyen tüm değişiklikler kaybolacak</string>
     <string name="general_changes_saved">Değişiklikler kaydedildi</string>
     <string name="node_option_save_to_mega">MEGA’ya kaydet</string>
+    <string name="home_screen_audios_chip_title">Sesli</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Yakınlaştır</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Uzaklaştır</string>
+    <string name="media_discovery_filter_all_media">Tüm medya</string>
+    <string name="media_discovery_filter_images">Fotoğraflar</string>
+    <string name="media_discovery_filter_videos">Videolar</string>
 </resources>

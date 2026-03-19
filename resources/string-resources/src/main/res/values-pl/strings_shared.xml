@@ -2302,4 +2302,10 @@
     <string name="general_dialog_discard_changes_message">Wszelkie niezapisane zmiany zostaną utracone</string>
     <string name="general_changes_saved">Zapisano zmiany</string>
     <string name="node_option_save_to_mega">Zapisz do MEGA</string>
+    <string name="home_screen_audios_chip_title">Dzwięk</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Zmniejsz</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Powiększ</string>
+    <string name="media_discovery_filter_all_media">Wszystkie media</string>
+    <string name="media_discovery_filter_images">Obrazy</string>
+    <string name="media_discovery_filter_videos">Filmy</string>
 </resources>

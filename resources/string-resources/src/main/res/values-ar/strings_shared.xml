@@ -2342,4 +2342,18 @@
     <string name="search_placeholder_rubbish_bin">ابحث في سلة المحذوفات</string>
     <string name="search_placeholder_incoming_shares">ابحث في المشاركات الواردة</string>
     <string name="search_placeholder_outgoing_shares">البحث في المشاركات الصادرة</string>
+    <string name="home_screen_audios_chip_title">صوتي</string>
+    <string name="account_upgrade_account_buy_button_title_starter">اشترِ Starter</string>
+    <string name="basic_account">الأساسية</string>
+    <string name="starter_account">Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">شكرًا لك على اشتراكك الشهري في باقة Starter</string>
+    <string name="upgrade_account_successful_starter_yearly">شكرًا لك على اشتراكك السنوي في باقة Starter</string>
+    <string name="upgrade_account_successful_essential_monthly">شكرًا لك على اشتراكك الشهري في باقة Essential</string>
+    <string name="upgrade_account_successful_essential_yearly">شكرًا لك على اشتراكك السنوي في باقة Essential</string>
+    <string name="node_menu_action_make_available_offline">اجعله متاح بدون اتصال</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">تكبير</string>
+    <string name="media_discovery_filter_all_media">كل الوسائط</string>
+    <string name="media_discovery_filter_images">صور</string>
+    <string name="media_discovery_filter_videos">مقاطع الفيديو</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">تصغير</string>
 </resources>

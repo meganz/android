@@ -2117,4 +2117,25 @@
     <string name="general_dialog_discard_button">放弃</string>
     <string name="general_dialog_discard_changes_message">所有未保存的编辑将会丢失</string>
     <string name="general_changes_saved">更改已保存</string>
+    <string name="home_screen_audios_chip_title">语音</string>
+    <string name="node_option_save_to_mega">保存到MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">要浏览您的 MEGA 文件，请在 MEGA 应用中禁用应用密码。进入设置，然后点击“安全”。</string>
+    <string name="saf_no_internet_message">连接到互联网以浏览您的 MEGA 文件。已离线保存的文件可在 MEGA 应用中使用。</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">订阅Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">感谢您订阅 Starter 月度方案</string>
+    <string name="upgrade_account_successful_starter_yearly">感谢您订阅 Starter 年度方案</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">订阅Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">感谢您订阅 Basic 月度方案</string>
+    <string name="upgrade_account_successful_basic_yearly">感谢您订阅 Basic 年度方案</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">订阅Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">感谢您订阅 Essential 月度方案</string>
+    <string name="upgrade_account_successful_essential_yearly">感谢您订阅 Essential 年度方案</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">放大</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">缩小</string>
+    <string name="media_discovery_filter_all_media">所有媒体</string>
+    <string name="media_discovery_filter_images">图片</string>
+    <string name="media_discovery_filter_videos">视频</string>
 </resources>

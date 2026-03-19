@@ -227,7 +227,7 @@
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">Compartilhado com</string>
     <!-- shows the owner of an incoming shared folder -->
-    <string name="file_properties_owner">Dono</string>
+    <string name="file_properties_owner">Proprietário</string>
     <!-- positive button on dialog to invite a contact -->
     <string name="contact_invite">Convidar</string>
     <!-- option to reinvite a contact -->
@@ -2219,7 +2219,7 @@
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
     <string name="ignore_call_incoming">Ignorar</string>
     <!-- Subtitle of the call screen when a user muted the current individual call. The placeholder indicates the user who muted the call -->
-    <string name="muted_contact_micro">%s silenciou esta chamada</string>
+    <string name="muted_contact_micro">%s está silenciado</string>
     <!-- Subtitle of the call screen when I muted the current individual call -->
     <string name="muted_own_micro">Silenciado</string>
     <!-- Subtitle of the call screen when the call is on hold -->
@@ -3407,9 +3407,9 @@
     <!-- Label for scheduled weekly meetings -->
     <string name="meetings_list_scheduled_meeting_weekly_label">%s semanal</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_title">Visualização na galeria</string>
+    <string name="settings_media_discovery_view_title">Visualização em galeria</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
-    <string name="settings_media_discovery_view_context">Abre em uma grade visual pastas que só contem imagens e/ou vídeos, para que você possa navegar pelas miniaturas e filtrar por data.</string>
+    <string name="settings_media_discovery_view_context">Abre em uma grade visual pastas que contêm apenas imagens e/ou vídeos, para que você possa navegar pelas miniaturas e filtrar por data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
     <string name="cloud_drive_media_discovery_banner_context">Como essa pasta contém apenas imagens e vídeos, nós a abrimos automaticamente com a visualização na galeria. Você pode aproveitar o seu conteúdo visual com um layout mais envolvente. Para desativar esta função, acesse as Configurações.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
@@ -4313,7 +4313,7 @@
     <!-- Text when link of file gets updated after setting password to copy link again-->
     <string name="general_link_updated_copy_again">Link atualizado - copie novamente.</string>
     <!-- Album import link label -->
-    <string name="album_import_link">Link do álbum</string>
+    <string name="album_import_link">Link de álbum</string>
     <!-- Album import error access title -->
     <string name="album_import_error_access_title">Não foi possível acessar o álbum</string>
     <!-- Album import error access description -->

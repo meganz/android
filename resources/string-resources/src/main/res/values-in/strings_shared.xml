@@ -2070,4 +2070,22 @@
     <string name="text_editor_show_line_numbers">Tampilkan nomor baris</string>
     <string name="text_editor_hide_line_numbers">Sembunyikan nomor baris</string>
     <string name="general_dialog_discard_button">Buang</string>
+    <string name="home_screen_audios_chip_title">Audio</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Beli Starter</string>
+    <string name="basic_account">Basic</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Beli Essential</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Beli Basic</string>
+    <string name="upgrade_account_successful_starter_monthly">Terima kasih atas langganan bulanan Starter anda</string>
+    <string name="upgrade_account_successful_starter_yearly">Terima kasih atas langganan tahunan Starter anda</string>
+    <string name="upgrade_account_successful_basic_monthly">Terima kasih atas langganan bulanan Basic anda</string>
+    <string name="upgrade_account_successful_basic_yearly">Terima kasih atas langganan tahunan Basic anda</string>
+    <string name="upgrade_account_successful_essential_monthly">Terima kasih atas langganan bulanan Essential anda</string>
+    <string name="upgrade_account_successful_essential_yearly">Terima kasih atas langganan tahunan Essential anda</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Perbesar</string>
+    <string name="media_discovery_filter_all_media">Semua media</string>
+    <string name="media_discovery_filter_images">Gambar-gambar</string>
+    <string name="media_discovery_filter_videos">Video</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Perkecil</string>
 </resources>

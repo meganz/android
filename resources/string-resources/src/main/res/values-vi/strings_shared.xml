@@ -1937,4 +1937,11 @@
     <string name="text_editor_hide_line_numbers">Ẩn số dòng</string>
     <string name="settings_help_rate_app">Đánh giá app</string>
     <string name="general_dialog_discard_button">Hủy bỏ</string>
+    <string name="home_screen_audios_chip_title">Âm thanh</string>
+    <string name="node_menu_action_make_available_offline">Lưu sử dụng ngoại tuyến</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Phóng ra</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Thu vào</string>
+    <string name="media_discovery_filter_all_media">Tất cả phương tiện số</string>
+    <string name="media_discovery_filter_images">Hình Ảnh</string>
+    <string name="media_discovery_filter_videos">Videos</string>
 </resources>

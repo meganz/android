@@ -2179,5 +2179,24 @@
     <string name="general_dialog_discard_button">Weggooien</string>
     <string name="general_changes_saved">Wijzigingen opgeslagen</string>
     <string name="node_option_save_to_mega">Opslaan naar MEGA</string>
-    <string name="home_screen_audios_chip_title">Audios</string>
+    <string name="home_screen_audios_chip_title">Audio</string>
+    <string name="saf_passcode_lock_enabled_message">Om uw MEGA-bestanden te bekijken, schakelt u de toegangscode in de MEGA-applicatie uit. Ga naar Instellingen en tik vervolgens op Beveiliging.</string>
+    <string name="saf_no_internet_message">Maak verbinding met internet om uw MEGA-bestanden te bekijken. Bestanden die offline zijn opgeslagen, zijn beschikbaar in de MEGA-applicatie.</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">Koop Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">Bedankt voor uw Starter-maandabonnement</string>
+    <string name="upgrade_account_successful_starter_yearly">Bedankt voor uw Starter-jaarabonnement</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">Koop Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">Bedankt voor uw Basic maandabonnement</string>
+    <string name="upgrade_account_successful_basic_yearly">Bedankt voor uw Basic jaarabonnement</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">Koop Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">Bedankt voor uw maandelijkse Essential-abonnement</string>
+    <string name="upgrade_account_successful_essential_yearly">Bedankt voor uw jaarlijkse Essential-abonnement</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">Inzoomen</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">Uitzoomen</string>
+    <string name="media_discovery_filter_all_media">Alle media</string>
+    <string name="media_discovery_filter_images">Afbeeldingen</string>
+    <string name="media_discovery_filter_videos">Video’s</string>
 </resources>

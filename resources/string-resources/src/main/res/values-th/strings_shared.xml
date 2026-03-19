@@ -2109,4 +2109,25 @@
     <string name="general_dialog_discard_changes_message">การแก้ไขที่ยังไม่ได้บันทึกจะหายไป</string>
     <string name="general_dialog_discard_button">ละทิ้ง</string>
     <string name="general_changes_saved">บันทึกการเปลี่ยนแปลงเรียบร้อยแล้ว</string>
+    <string name="home_screen_audios_chip_title">เสียง</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_in">ขยาย</string>
+    <string name="media_discovery_screen_dropdown_action_zoom_out">ย่อ</string>
+    <string name="media_discovery_filter_all_media">สื่อทั้งหมด</string>
+    <string name="media_discovery_filter_images">รูปภาพ</string>
+    <string name="media_discovery_filter_videos">วิดีโอ</string>
+    <string name="node_option_save_to_mega">บันทึกไปยัง MEGA</string>
+    <string name="saf_passcode_lock_enabled_message">ปิดใช้งานรหัสในแอป MEGA เพื่อเข้าถึงไฟล์ โดยไปที่การตั้งค่า แล้วแตะความปลอดภัย</string>
+    <string name="saf_no_internet_message">เชื่อมต่ออินเทอร์เน็ตเพื่อเข้าถึงไฟล์ สำหรับไฟล์ที่บันทึกออฟไลน์ไว้สามารถดูได้ในแอป MEGA</string>
+    <string name="starter_account">Starter</string>
+    <string name="account_upgrade_account_buy_button_title_starter">ซื้อแผน Starter</string>
+    <string name="upgrade_account_successful_starter_monthly">ขอบคุณที่สมัครใช้งานแผน Starter รายเดือน</string>
+    <string name="upgrade_account_successful_starter_yearly">ขอบคุณที่สมัครใช้งานแผน Starter รายปี</string>
+    <string name="basic_account">Basic</string>
+    <string name="account_upgrade_account_buy_button_title_basic">ซื้อแผน Basic</string>
+    <string name="upgrade_account_successful_basic_monthly">ขอบคุณที่สมัครใช้งานแผน Basic รายเดือน</string>
+    <string name="upgrade_account_successful_basic_yearly">ขอบคุณที่สมัครใช้งานแผน Basic รายปี</string>
+    <string name="essential_account">Essential</string>
+    <string name="account_upgrade_account_buy_button_title_essential">ซื้อแผน Essential</string>
+    <string name="upgrade_account_successful_essential_monthly">ขอบคุณที่สมัครใช้งานแผน Essential รายเดือน</string>
+    <string name="upgrade_account_successful_essential_yearly">ขอบคุณที่สมัครใช้งานแผน Essential รายปี</string>
 </resources>
