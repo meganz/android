@@ -12,9 +12,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  *
  * @property activeTransfers List of in progress transfers.
  * @property selectedActiveTransfersIds List of selected in progress transfers ids. If not null, even empty, indicates selected mode is on.
- * @property isStorageOverQuota Whether the storage is over quota.
- * @property isTransferOverQuota Whether the transfer is over quota.
- * @property overQuotaStatus over quota status
+ * @property overQuotaStatus Over-quota status (storage/transfer, blocking vs non-blocking).
  * @property areTransfersPaused Whether the transfers are paused.
  * @property completedTransfers List of successfully completed transfers.
  * @property selectedCompletedTransfersIds List of selected completed transfers. If not null, even empty, indicates selected mode is on.
@@ -27,8 +25,6 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 data class TransfersUiState(
     val activeTransfers: List<InProgressTransfer> = listOf(),
     val selectedActiveTransfersIds: List<Long>? = null,
-    val isStorageOverQuota: Boolean = false,
-    val isTransferOverQuota: Boolean = false,
     val overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
     val areTransfersPaused: Boolean = false,
     val completedTransfers: List<CompletedTransfer> = listOf(),

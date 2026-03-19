@@ -307,8 +307,6 @@ internal fun TransfersView(
                     ) { _, modifier ->
                         ActiveTransfersView(
                             activeTransfers = activeTransfers,
-                            isTransferOverQuota = isTransferOverQuota,
-                            isStorageOverQuota = isStorageOverQuota,
                             hasInternetConnection = hasInternetConnection,
                             overQuotaStatus = overQuotaStatus,
                             isTabSelected = selectedTab == 0,

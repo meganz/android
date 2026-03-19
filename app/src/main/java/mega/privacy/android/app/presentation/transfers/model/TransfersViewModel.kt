@@ -151,11 +151,7 @@ class TransfersViewModel @Inject constructor(
             }.catch { Timber.e(it) }
                 .collectLatest { overQuotaStatus ->
                     _uiState.update {
-                        it.copy(
-                            overQuotaStatus = overQuotaStatus,
-                            isStorageOverQuota = overQuotaStatus.hasStorageIssue,
-                            isTransferOverQuota = overQuotaStatus.hasTransferIssue,
-                        )
+                        it.copy(overQuotaStatus = overQuotaStatus)
                     }
                 }
         }

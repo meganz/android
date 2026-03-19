@@ -282,7 +282,7 @@ class TransfersViewModelTest {
             }
         }
 
-    @ParameterizedTest(name = " when isStorageOverQuota: {0}")
+    @ParameterizedTest(name = "test that MonitorStorageStateUseCase updates state when storage state: {0}")
     @EnumSource(StorageState::class)
     fun `test that MonitorStorageStateUseCase updates state with storage state`(
         storageState: StorageState,
@@ -295,21 +295,21 @@ class TransfersViewModelTest {
 
         underTest.uiState.test {
             var actual = awaitItem()
-            assertThat(actual.isStorageOverQuota).isFalse()
+            assertThat(actual.overQuotaStatus.hasStorageIssue).isFalse()
             assertThat(actual.overQuotaStatus.hasIssues).isFalse()
             flow.emit(storageState)
             advanceUntilIdle()
 
             if (storageState == StorageState.Red || storageState == StorageState.PayWall) {
                 actual = awaitItem()
-                assertThat(actual.isStorageOverQuota).isTrue()
+                assertThat(actual.overQuotaStatus.hasStorageIssue).isTrue()
                 assertThat(actual.overQuotaStatus).isEqualTo(
                     OverQuotaStatus(storage = OverQuotaIssue.Storage.Full)
                 )
                 flow.emit(StorageState.Green)
 
                 actual = awaitItem()
-                assertThat(actual.isStorageOverQuota).isFalse()
+                assertThat(actual.overQuotaStatus.hasStorageIssue).isFalse()
                 assertThat(actual.overQuotaStatus.hasIssues).isFalse()
             } else {
                 cancelAndIgnoreRemainingEvents()
@@ -328,17 +328,17 @@ class TransfersViewModelTest {
 
             underTest.uiState.test {
                 var actual = awaitItem()
-                assertThat(actual.isTransferOverQuota).isFalse()
+                assertThat(actual.overQuotaStatus.hasTransferIssue).isFalse()
                 assertThat(actual.overQuotaStatus.hasIssues).isFalse()
                 flow.emit(true)
                 actual = awaitItem()
-                assertThat(actual.isTransferOverQuota).isTrue()
+                assertThat(actual.overQuotaStatus.hasTransferIssue).isTrue()
                 assertThat(actual.overQuotaStatus).isEqualTo(
                     OverQuotaStatus(transfer = OverQuotaIssue.Transfer.TransferOverQuotaFreeUser)
                 )
                 flow.emit(false)
                 actual = awaitItem()
-                assertThat(actual.isTransferOverQuota).isFalse()
+                assertThat(actual.overQuotaStatus.hasTransferIssue).isFalse()
                 assertThat(actual.overQuotaStatus.hasIssues).isFalse()
             }
         }

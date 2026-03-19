@@ -13,18 +13,14 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.app.presentation.transfers.model.image.ActiveTransferImageViewModel
+import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaIssue
 import mega.privacy.android.core.nodecomponents.components.banners.OverQuotaStatus
-import mega.privacy.android.app.presentation.transfers.model.image.TransferImageUiState
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.InProgressTransfer
@@ -218,7 +214,6 @@ class ActiveTransfersViewTest {
 
     private fun initComposeTestRule(
         inProgressTransfers: List<InProgressTransfer> = emptyList(),
-        isOverQuota: Boolean = false,
         overQuotaStatus: OverQuotaStatus = OverQuotaStatus(),
         areTransfersPaused: Boolean = false,
         onReorderPreview: (from: Int, to: Int) -> Unit = { _, _ -> },
@@ -230,24 +225,22 @@ class ActiveTransfersViewTest {
             CompositionLocalProvider(LocalViewModelStoreOwner provides viewModelStoreOwner) {
                 ActiveTransfersView(
                     activeTransfers = inProgressTransfers,
-                    isTransferOverQuota = isOverQuota,
-                    isStorageOverQuota = isOverQuota,
+                    selectedActiveTransfersIds = null,
+                    hasInternetConnection = true,
                     overQuotaStatus = overQuotaStatus,
                     areTransfersPaused = areTransfersPaused,
                     enableSwipeToDismiss = true,
                     onPlayPauseClicked = { },
                     onReorderPreview = onReorderPreview,
                     onReorderConfirmed = onReorderConfirmed,
-                    selectedActiveTransfersIds = null,
                     onActiveTransferSelected = {},
-                    lazyListState = rememberLazyListState(),
                     onUpgradeClick = onUpgradeClick,
                     onConsumeQuotaWarning = onConsumeQuotaWarning,
                     onCancelActiveTransfer = {},
                     onSetActiveTransferToCancel = {},
                     onUndoCancelActiveTransfer = {},
-                    hasInternetConnection = true,
                     isTabSelected = true,
+                    lazyListState = rememberLazyListState(),
                 )
             }
         }

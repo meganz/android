@@ -46,8 +46,6 @@ import mega.privacy.mobile.analytics.event.ActiveTransfersUndoSwipeToCancelSnack
 internal fun ActiveTransfersView(
     activeTransfers: List<InProgressTransfer>,
     selectedActiveTransfersIds: List<Long>?,
-    isTransferOverQuota: Boolean,
-    isStorageOverQuota: Boolean,
     hasInternetConnection: Boolean,
     overQuotaStatus: OverQuotaStatus,
     areTransfersPaused: Boolean,
@@ -113,8 +111,7 @@ internal fun ActiveTransfersView(
                 ) { item ->
                     ActiveTransferItem(
                         activeTransfer = item,
-                        isTransferOverQuota = isTransferOverQuota,
-                        isStorageOverQuota = isStorageOverQuota,
+                        overQuotaStatus = overQuotaStatus,
                         hasInternetConnection = hasInternetConnection,
                         areTransfersPaused = areTransfersPaused,
                         enableSwipeToDismiss = enableSwipeToDismiss,
@@ -160,8 +157,7 @@ internal fun ActiveTransfersView(
 @Composable
 internal fun ActiveTransferItem(
     activeTransfer: InProgressTransfer,
-    isTransferOverQuota: Boolean,
-    isStorageOverQuota: Boolean,
+    overQuotaStatus: OverQuotaStatus,
     areTransfersPaused: Boolean,
     hasInternetConnection: Boolean,
     isSelected: Boolean?,
@@ -191,11 +187,11 @@ internal fun ActiveTransferItem(
         progress = progress.floatValue,
         speed = getSpeedString(
             areTransfersPaused = areTransfersPaused,
-            isTransferOverQuota = isTransferOverQuota && isDownload,
-            isStorageOverQuota = isStorageOverQuota && isDownload.not(),
+            isTransferOverQuota = overQuotaStatus.isDownloadBlocked && isDownload,
+            isStorageOverQuota = overQuotaStatus.isUploadBlocked && isDownload.not(),
         ),
         isPaused = isPaused,
-        hasIssues = (isDownload && isTransferOverQuota) || (isDownload.not() && isStorageOverQuota) || !hasInternetConnection,
+        hasIssues = (isDownload && overQuotaStatus.hasTransferIssue) || (isDownload.not() && overQuotaStatus.hasStorageIssue) || !hasInternetConnection,
         areTransfersPaused = areTransfersPaused,
         enableSwipeToDismiss = enableSwipeToDismiss,
         onPlayPauseClicked = {
