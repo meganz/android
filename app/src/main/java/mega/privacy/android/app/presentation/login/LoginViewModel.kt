@@ -36,6 +36,7 @@ import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.extensions.newError
+import mega.privacy.android.app.presentation.login.mapper.AccountBlockedTypeStringMapper
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
@@ -188,6 +189,7 @@ class LoginViewModel @AssistedInject constructor(
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getSessionLinkUseCase: GetSessionLinkUseCase,
     private val fetchNodeProvider: FetchNodeProvider,
+    private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
     @Assisted val isInSingleActivity: Boolean,
 ) : ViewModel() {
 
@@ -401,6 +403,10 @@ class LoginViewModel @AssistedInject constructor(
                 .filter { it.type in blockedTypes }
                 .collectLatest {
                     if (it.type == AccountBlockedType.VERIFICATION_EMAIL) resetLoginState() else stopLogin()
+                    if (isInSingleActivity) {
+                        val mappedText = accountBlockedTypeStringMapper(it)
+                        triggerAccountBlockedEvent(it.copy(text = mappedText))
+                    }
                 }
         }
     }
