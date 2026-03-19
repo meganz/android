@@ -26,6 +26,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerDetails
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
+import mega.privacy.android.app.presentation.login.mapper.AccountBlockedTypeStringMapper
 import mega.privacy.android.app.presentation.login.model.AccountBlockedUiState
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.RkLink
@@ -144,6 +145,7 @@ internal class LoginViewModelTest {
     private val saveEphemeralCredentialsUseCase: SaveEphemeralCredentialsUseCase = mock()
     private val clearEphemeralCredentialsUseCase: ClearEphemeralCredentialsUseCase = mock()
     private val monitorAccountBlockedUseCase = mock<MonitorAccountBlockedUseCase>()
+    private val accountBlockedTypeStringMapper = mock<AccountBlockedTypeStringMapper>()
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
@@ -192,6 +194,10 @@ internal class LoginViewModelTest {
     @BeforeEach
     fun setUp() = runTest {
         stubCommon()
+        initViewModel(isInSingleActivity = false)
+    }
+
+    private fun initViewModel(isInSingleActivity: Boolean = false) {
         underTest = LoginViewModel(
             applicationScope = applicationScope,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
@@ -219,6 +225,7 @@ internal class LoginViewModelTest {
             saveEphemeralCredentialsUseCase = saveEphemeralCredentialsUseCase,
             clearEphemeralCredentialsUseCase = clearEphemeralCredentialsUseCase,
             monitorAccountBlockedUseCase = monitorAccountBlockedUseCase,
+            accountBlockedTypeStringMapper = accountBlockedTypeStringMapper,
             getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             loginMutex = mock(),
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
@@ -249,7 +256,7 @@ internal class LoginViewModelTest {
             getUserDataUseCase = getUserDataUseCase,
             getSessionLinkUseCase = getSessionLinkUseCase,
             fetchNodeProvider = mock(),
-            isInSingleActivity = false
+            isInSingleActivity = isInSingleActivity
         )
     }
 
@@ -833,6 +840,79 @@ internal class LoginViewModelTest {
                     )
                 )
             }
+        }
+
+    @Test
+    fun `test that resetAccountBlockedEvent sets accountBlockedEvent to consumed`() = runTest {
+        val accountBlockedEvent = AccountBlockedEvent(
+            handle = 1L,
+            type = AccountBlockedType.VERIFICATION_EMAIL,
+            text = "blocked"
+        )
+        underTest.triggerAccountBlockedEvent(accountBlockedEvent)
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().accountBlockedEvent).isInstanceOf(
+                StateEventWithContentTriggered::class.java
+            )
+        }
+
+        underTest.resetAccountBlockedEvent()
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().accountBlockedEvent).isInstanceOf(
+                StateEventWithContentConsumed::class.java
+            )
+        }
+    }
+
+    @Test
+    fun `test that when not single activity monitorAccountBlockedUseCase emit does not trigger account blocked event in state`() =
+        runTest {
+            val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
+            whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
+            initViewModel(isInSingleActivity = false)
+            advanceUntilIdle()
+
+            accountBlockedFlow.emit(
+                AccountBlockedEvent(
+                    handle = -1L,
+                    type = AccountBlockedType.TOS_COPYRIGHT,
+                    text = "server message"
+                )
+            )
+            advanceUntilIdle()
+            assertThat(underTest.state.value.accountBlockedEvent).isInstanceOf(
+                StateEventWithContentConsumed::class.java
+            )
+            verifyNoInteractions(accountBlockedTypeStringMapper)
+        }
+
+    @Test
+    fun `test that when single activity and monitorAccountBlockedUseCase emits then state receives event with text from mapper`() =
+        runTest {
+            val mappedText = "mapped message"
+            whenever(accountBlockedTypeStringMapper(any())).thenReturn(mappedText)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+            val accountBlockedFlow = MutableSharedFlow<AccountBlockedEvent>()
+            whenever(monitorAccountBlockedUseCase()).thenReturn(accountBlockedFlow)
+            initViewModel(isInSingleActivity = true)
+            advanceUntilIdle()
+
+            val emittedEvent = AccountBlockedEvent(
+                handle = -1L,
+                type = AccountBlockedType.TOS_COPYRIGHT,
+                text = "original"
+            )
+            accountBlockedFlow.emit(emittedEvent)
+            advanceUntilIdle()
+
+            val event =
+                (underTest.state.value.accountBlockedEvent as? StateEventWithContentTriggered)?.content
+            assertThat(event).isNotNull()
+            assertThat(event?.type).isEqualTo(AccountBlockedType.TOS_COPYRIGHT)
+            assertThat(event?.text).isEqualTo(mappedText)
+            verify(accountBlockedTypeStringMapper).invoke(any())
         }
 
     @Test
