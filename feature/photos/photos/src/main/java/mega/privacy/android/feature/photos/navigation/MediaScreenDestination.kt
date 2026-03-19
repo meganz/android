@@ -68,7 +68,7 @@ import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKe
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
-import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
+import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
 import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
@@ -226,9 +226,10 @@ fun EntryProviderScope<NavKey>.mediaSearchScreen(
             onOpenAlbum = navigationHandler::navigate,
             onOpenImagePreviewScreen = { photo ->
                 navigationHandler.navigate(
-                    LegacyImagePreviewNavKey(
-                        imageIds = state.photos.map { it.id }.toSet(),
-                        anchorImageId = photo.id
+                    LegacyImageViewerNavKey(
+                        nodeHandle = photo.id,
+                        parentNodeHandle = -1L,
+                        nodeIds = state.photos.map { it.id },
                     )
                 )
             },
@@ -496,7 +497,7 @@ fun EntryProviderScope<NavKey>.albumImports(
                 }
             },
             onPreviewPhoto = {
-                navigationHandler.navigate(LegacyImagePreviewNavKey(setOf(it.id), it.id))
+                navigationHandler.navigate(LegacyImageViewerNavKey(nodeHandle = it.id, parentNodeHandle = -1L, nodeIds = listOf(it.id)))
             },
             onNavigateFileExplorer = {
                 navigationHandler.navigate(

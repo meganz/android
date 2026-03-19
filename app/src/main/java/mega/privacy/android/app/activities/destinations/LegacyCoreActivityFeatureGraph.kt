@@ -105,7 +105,6 @@ class LegacyCoreActivityFeatureGraph(
                 navigationHandler::back,
                 navigationHandler::returnResult
             )
-            legacyImagePreview(navigationHandler::back)
             contactAttachmentLegacyDestination(navigationHandler::remove)
             businessExpiredAlertLegacyDestination(navigationHandler::back)
             leftMeetingDestination(navigationHandler::remove)

@@ -51,12 +51,25 @@ fun EntryProviderScope<NavKey>.legacyImageViewerScreen(
                     params = mapOf(PublicFileImageNodeFetcher.URL to (key.url ?: "")),
                 )
 
-                else -> ImagePreviewActivity.createIntent(
-                    context = context,
-                    fileNodeId = key.nodeHandle,
-                    parentNodeId = key.parentNodeHandle,
-                    nodeSourceType = key.nodeSourceType
-                )
+                else -> {
+                    val nodeIds = key.nodeIds
+                    if (nodeIds != null) {
+                        ImagePreviewActivity.createIntent(
+                            context = context,
+                            imageSource = ImagePreviewFetcherSource.DEFAULT,
+                            menuOptionsSource = ImagePreviewMenuSource.DEFAULT,
+                            anchorImageNodeId = NodeId(key.nodeHandle),
+                            params = mapOf(DefaultImageNodeFetcher.NODE_IDS to nodeIds.toLongArray()),
+                        )
+                    } else {
+                        ImagePreviewActivity.createIntent(
+                            context = context,
+                            fileNodeId = key.nodeHandle,
+                            parentNodeId = key.parentNodeHandle,
+                            nodeSourceType = key.nodeSourceType
+                        )
+                    }
+                }
             }
             intent?.let {
                 context.startActivity(it)

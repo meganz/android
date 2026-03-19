@@ -370,12 +370,6 @@ data class LegacyVideoToPlaylistNavKey(
 }
 
 @Serializable
-data class LegacyImagePreviewNavKey(
-    val imageIds: Set<Long>,
-    val anchorImageId: Long,
-) : NavKey
-
-@Serializable
 data class ContactAttachmentNavKey(
     val chatId: Long,
     val messageId: Long,

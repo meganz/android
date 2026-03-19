@@ -61,7 +61,7 @@ import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.Medi
 import mega.privacy.android.feature.photos.presentation.mediadiscovery.view.MediaDiscoveryPeriodChip
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
-import mega.privacy.android.navigation.destination.LegacyImagePreviewNavKey
+import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -124,12 +124,10 @@ fun CloudDriveMediaDiscoveryRoute(
                 viewModel.selectPhoto(photo)
             } else {
                 navigationHandler.navigate(
-                    LegacyImagePreviewNavKey(
-                        imageIds = uiState
-                            .sourcePhotos
-                            .map { it.id }
-                            .toSet(),
-                        anchorImageId = photo.id,
+                    LegacyImageViewerNavKey(
+                        nodeHandle = photo.id,
+                        parentNodeHandle = -1L,
+                        nodeIds = uiState.sourcePhotos.map { it.id },
                     )
                 )
             }
