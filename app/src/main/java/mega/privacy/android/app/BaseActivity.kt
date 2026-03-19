@@ -1239,21 +1239,45 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
             val intentForLog = intent
             lifecycleScope.launch {
                 if (getFeatureFlagValueUseCase(AppFeatures.SingleActivity)) {
-                    val exception = IllegalStateException(
-                        "Trying to show ${this@BaseActivity::class.java.simpleName} " +
-                                "while SingleActivity feature flag is activated. " +
-                                "$intentForLog - action: ${intentForLog?.action} - extras: ${intentForLog?.extras}"
-                    )
+                    val warningMessage = if (intentForLog.isCleanLauncherIntent()) {
+                        null
+                    } else {
+                        val exception = IllegalStateException(
+                            "Trying to show ${this@BaseActivity::class.java.simpleName} " +
+                                    "while SingleActivity feature flag is activated. " +
+                                    "$intentForLog - action: ${intentForLog?.action} - extras: ${intentForLog?.extras}"
+                        )
 
-                    crashReporter.report(exception)
-                    Timber.e(exception)
-
+                        crashReporter.report(exception)
+                        Timber.e(exception)
+                        getString(R.string.general_error)
+                    }
                     startActivity(
-                        MegaActivity.getIntent(this@BaseActivity, getString(R.string.general_error))
+                        MegaActivity.getIntent(
+                            this@BaseActivity,
+                            warningMessage
+                        )
                     )
                     finish()
                 }
             }
         }
+    }
+
+    fun Intent?.isCleanLauncherIntent(): Boolean {
+        if (this == null) return false
+
+        val isLauncherCategory = hasCategory(Intent.CATEGORY_LAUNCHER)
+        val isMainAction = action == Intent.ACTION_MAIN || action == null
+
+        val hasNoExtras = extras == null || extras?.isEmpty == true
+        val hasNoData = data == null
+        val hasNoType = type == null
+
+        return isLauncherCategory &&
+                isMainAction &&
+                hasNoExtras &&
+                hasNoData &&
+                hasNoType
     }
 }
