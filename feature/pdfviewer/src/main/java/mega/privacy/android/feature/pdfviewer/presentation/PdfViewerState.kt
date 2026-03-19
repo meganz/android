@@ -2,6 +2,7 @@ package mega.privacy.android.feature.pdfviewer.presentation
 
 import android.graphics.RectF
 import com.shockwave.pdfium.PdfTextMatch
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerError
 import mega.privacy.android.feature.pdfviewer.presentation.model.PdfViewerSource
 
@@ -75,7 +76,7 @@ data class PdfViewerSearchState(
  * @param isFromFolderLink Whether the file is from a folder link
  * @param isFromFileLink Whether the file is from a file link
  * @param nodeHandle The handle of the node being viewed
- * @param navigationEvent Event for navigation actions
+ * @param nodeSourceType The source type of the node (for node options)
  */
 data class PdfViewerState(
     val isLoading: Boolean = true,
@@ -96,6 +97,7 @@ data class PdfViewerState(
     val isFromFolderLink: Boolean = false,
     val isFromFileLink: Boolean = false,
     val nodeHandle: Long = -1L,
+    val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val pdfBytes: PdfBytes? = null,
 ) {
     /**
