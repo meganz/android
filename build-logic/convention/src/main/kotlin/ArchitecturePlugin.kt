@@ -53,7 +53,6 @@ class ArchitecturePlugin : Plugin<Project> {
     private val dependencyExceptions = listOf(
         ":feature:sync",
         ":feature:transfers:transfers-snowflake-components",
-        ":shared:resources",
         ":shared:original-core-ui", //this should be replaced by core-ui library
     )
 
@@ -71,26 +70,34 @@ class ArchitecturePlugin : Plugin<Project> {
                 Core::class.java,
                 Shared::class.java,
                 SnowFlake::class.java,
+                Resources::class.java,
             )
         }
 
         data class Shared(override val path: String) : ArchitectureLayer {
             override val allowedDependencies: List<Class<out ArchitectureLayer>> = listOf(
                 Core::class.java,
-                Shared::class.java, //this will be removed once shared:resources is moved to resources directory
                 SnowFlake::class.java,
+                Resources::class.java,
             )
         }
 
         data class SnowFlake(override val path: String) : ArchitectureLayer {
             override val allowedDependencies: List<Class<out ArchitectureLayer>> = listOf(
-                Core::class.java
+                Core::class.java,
+                Resources::class.java,
             )
         }
 
         data class Core(override val path: String) : ArchitectureLayer {
             override val allowedDependencies: List<Class<out ArchitectureLayer>> = listOf(
-                Core::class.java
+                Resources::class.java,
+                Core::class.java //this should be removed once the modules are refactored to avoid circular dependencies
+            )
+        }
+
+        data class Resources(override val path: String) : ArchitectureLayer {
+            override val allowedDependencies: List<Class<out ArchitectureLayer>> = listOf(
             )
         }
     }
@@ -103,6 +110,7 @@ class ArchitecturePlugin : Plugin<Project> {
             this.startsWith(":feature:") -> ArchitectureLayer.Feature(this)
             this.startsWith(":shared:") -> ArchitectureLayer.Shared(this)
             this.startsWith(":core:") -> ArchitectureLayer.Core(this)
+            this.startsWith(":resources:") -> ArchitectureLayer.Resources(this)
             else -> null
         }
 }
