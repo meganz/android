@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
@@ -42,6 +43,7 @@ import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveEmptyView
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trackAnalyticsEvent
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
@@ -75,26 +77,6 @@ internal fun FolderLinkScreen(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler,
     )
-    FolderLinkContent(
-        uiState = uiState,
-        singleNodeActionHandler = singleNodeActionHandler,
-        onNavigate = onNavigate,
-        onBack = onBack,
-        onAction = viewModel::processAction,
-        onTransfer = onTransfer,
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FolderLinkContent(
-    uiState: FolderLinkUiState,
-    singleNodeActionHandler: SingleNodeActionHandler,
-    onNavigate: (NavKey) -> Unit,
-    onBack: () -> Unit,
-    onAction: (FolderLinkAction) -> Unit,
-    onTransfer: (TransferTriggerEvent) -> Unit,
-) {
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -109,7 +91,11 @@ private fun FolderLinkContent(
                 subtitle = if (uiState.isRootFolder) {
                     stringResource(sharedR.string.folder_link_subtitle)
                 } else null,
-                navigationType = AppBarNavigationType.Back { onAction(FolderLinkAction.BackPressed) },
+                navigationType = AppBarNavigationType.Back {
+                    viewModel.processAction(
+                        FolderLinkAction.BackPressed
+                    )
+                },
                 trailingIcons = {
                     TransfersToolbarWidget {
                         onNavigate(TransfersNavKey())
@@ -138,46 +124,135 @@ private fun FolderLinkContent(
             }
         },
     ) { contentPadding ->
-        Column(
+        FolderLinkContent(
+            uiState = uiState,
+            isListView = isListView,
+            spanCount = spanCount,
+            onNavigate = onNavigate,
+            onAction = viewModel::processAction,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(contentPadding.excludingBottomPadding()),
-        ) {
-            when (val contentState = uiState.contentState) {
-                FolderLinkContentState.Loading -> {
-                    NodesViewSkeleton(
-                        isListView = isListView,
-                        spanCount = spanCount,
-                        delay = NodeSkeletons.defaultDelay,
+            bottomPadding = contentPadding.calculateBottomPadding(),
+            onShowSortBottomSheet = { showSortBottomSheet = true },
+        )
+    }
+
+    uiState.openedFileNode?.let { fileNode ->
+        HandleNodeAction3(
+            typedFileNode = fileNode,
+            nodeSourceData = NodeSourceData.FolderLink,
+            onNavigate = onNavigate,
+            onActionHandled = { viewModel.processAction(FolderLinkAction.OpenedFileNodeHandled) },
+            onDownloadEvent = onTransfer,
+            sortOrder = uiState.selectedSortOrder,
+        )
+    }
+
+    if (showSortBottomSheet) {
+        SortBottomSheet(
+            title = stringResource(sharedR.string.action_sort_by_header),
+            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.FOLDER_LINK),
+            sheetState = sortBottomSheetState,
+            selectedSort = SortBottomSheetResult(
+                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
+                sortDirection = uiState.selectedSortConfiguration.sortDirection,
+            ),
+            onSortOptionSelected = { result ->
+                result?.let {
+                    viewModel.processAction(
+                        FolderLinkAction.SortOrderChanged(
+                            NodeSortConfiguration(
+                                sortOption = it.sortOptionItem,
+                                sortDirection = it.sortDirection,
+                            )
+                        )
                     )
+                    showSortBottomSheet = false
+                    it.sortOptionItem.trackAnalyticsEvent()
                 }
+            },
+            onDismissRequest = { showSortBottomSheet = false },
+        )
+    }
 
-                is FolderLinkContentState.DecryptionKeyRequired -> {
-                    // TODO: show decryption key dialog in later MR
-                    MegaText(text = if (contentState.isKeyIncorrect) "Invalid decryption key" else "Decryption key required")
-                }
+    BackHandler { viewModel.processAction(FolderLinkAction.BackPressed) }
 
-                FolderLinkContentState.Expired ->
-                    MegaText(text = "This link has expired")
+    EventEffect(
+        event = uiState.navigateBackEvent,
+        onConsumed = { viewModel.processAction(FolderLinkAction.NavigateBackEventConsumed) },
+        action = onBack,
+    )
+}
 
-                FolderLinkContentState.Unavailable ->
-                    MegaText(text = "This link is unavailable")
+@Composable
+internal fun FolderLinkContent(
+    uiState: FolderLinkUiState,
+    isListView: Boolean,
+    spanCount: Int,
+    onNavigate: (NavKey) -> Unit,
+    onAction: (FolderLinkAction) -> Unit,
+    modifier: Modifier = Modifier,
+    bottomPadding: Dp = 0.dp,
+    onShowSortBottomSheet: () -> Unit = {},
+) {
+    Column(modifier = modifier) {
+        when (val contentState = uiState.contentState) {
+            FolderLinkContentState.Loading -> {
+                NodesViewSkeleton(
+                    modifier = Modifier.testTag(FOLDER_LINK_LOADING_TAG),
+                    isListView = isListView,
+                    spanCount = spanCount,
+                    delay = NodeSkeletons.defaultDelay,
+                )
+            }
 
-                is FolderLinkContentState.Loaded -> {
-                    AnimatedContent(
-                        targetState = uiState.currentFolderNode?.id,
-                        transitionSpec = { fadeTransition },
-                        label = "folder_nav_fade",
-                    ) { parentNodeId ->
-                        key(parentNodeId) {
-                            val listState = rememberLazyListState()
-                            val gridState = rememberLazyGridState()
+            is FolderLinkContentState.DecryptionKeyRequired -> {
+                // TODO: show decryption key dialog in later MR
+                MegaText(
+                    modifier = Modifier.testTag(FOLDER_LINK_DECRYPTION_KEY_TAG),
+                    text = if (contentState.isKeyIncorrect) "Invalid decryption key" else "Decryption key required",
+                )
+            }
+
+            FolderLinkContentState.Expired ->
+                MegaText(
+                    modifier = Modifier.testTag(FOLDER_LINK_EXPIRED_TAG),
+                    text = "This link has expired",
+                )
+
+            FolderLinkContentState.Unavailable ->
+                MegaText(
+                    modifier = Modifier.testTag(FOLDER_LINK_UNAVAILABLE_TAG),
+                    text = "This link is unavailable",
+                )
+
+            is FolderLinkContentState.Loaded -> {
+                AnimatedContent(
+                    targetState = uiState.currentFolderNode?.id,
+                    transitionSpec = { fadeTransition },
+                    label = "folder_nav_fade",
+                ) { parentNodeId ->
+                    key(parentNodeId) {
+                        val listState = rememberLazyListState()
+                        val gridState = rememberLazyGridState()
+
+                        if (contentState.items.isEmpty()) {
+                            CloudDriveEmptyView(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(bottom = 56.dp),
+                                isRootCloudDrive = false,
+                                showAddItems = false,
+                                onAddItemsClicked = {}
+                            )
+                        } else {
                             NodesView(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .weight(1f),
                                 listContentPadding = PaddingValues(
-                                    bottom = contentPadding.calculateBottomPadding() + 100.dp,
+                                    bottom = bottomPadding + 100.dp,
                                 ),
                                 listState = listState,
                                 gridState = gridState,
@@ -201,7 +276,7 @@ private fun FolderLinkContent(
                                 },
                                 sortConfiguration = uiState.selectedSortConfiguration,
                                 isListView = isListView,
-                                onSortOrderClick = { showSortBottomSheet = true },
+                                onSortOrderClick = onShowSortBottomSheet,
                                 onChangeViewTypeClicked = {
                                     onAction(FolderLinkAction.ChangeViewTypeClicked)
                                 },
@@ -213,54 +288,11 @@ private fun FolderLinkContent(
             }
         }
     }
-
-    uiState.openedFileNode?.let { fileNode ->
-        HandleNodeAction3(
-            typedFileNode = fileNode,
-            nodeSourceData = NodeSourceData.FolderLink,
-            onNavigate = onNavigate,
-            onActionHandled = { onAction(FolderLinkAction.OpenedFileNodeHandled) },
-            onDownloadEvent = onTransfer,
-            sortOrder = uiState.selectedSortOrder,
-        )
-    }
-
-    if (showSortBottomSheet) {
-        SortBottomSheet(
-            title = stringResource(sharedR.string.action_sort_by_header),
-            options = NodeSortOption.getOptionsForSourceType(NodeSourceType.FOLDER_LINK),
-            sheetState = sortBottomSheetState,
-            selectedSort = SortBottomSheetResult(
-                sortOptionItem = uiState.selectedSortConfiguration.sortOption,
-                sortDirection = uiState.selectedSortConfiguration.sortDirection,
-            ),
-            onSortOptionSelected = { result ->
-                result?.let {
-                    onAction(
-                        FolderLinkAction.SortOrderChanged(
-                            NodeSortConfiguration(
-                                sortOption = it.sortOptionItem,
-                                sortDirection = it.sortDirection,
-                            )
-                        )
-                    )
-                    showSortBottomSheet = false
-                    it.sortOptionItem.trackAnalyticsEvent()
-                }
-            },
-            onDismissRequest = { showSortBottomSheet = false },
-        )
-    }
-
-    BackHandler { onAction(FolderLinkAction.BackPressed) }
-
-    EventEffect(
-        event = uiState.navigateBackEvent,
-        onConsumed = { onAction(FolderLinkAction.NavigateBackEventConsumed) },
-        action = onBack,
-    )
 }
-
 
 internal const val FOLDER_LINK_APP_BAR_TAG = "folder_link_screen:main_app_bar"
 internal const val FOLDER_LINK_BOTTOM_BAR_TAG = "folder_link_screen:bottom_bar"
+internal const val FOLDER_LINK_LOADING_TAG = "folder_link_screen:loading"
+internal const val FOLDER_LINK_DECRYPTION_KEY_TAG = "folder_link_screen:decryption_key"
+internal const val FOLDER_LINK_EXPIRED_TAG = "folder_link_screen:expired"
+internal const val FOLDER_LINK_UNAVAILABLE_TAG = "folder_link_screen:unavailable"
