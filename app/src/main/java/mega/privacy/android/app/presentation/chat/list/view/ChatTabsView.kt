@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.modifiers.applyScrollToHideBehavior
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.rememberScrollToHideBehavior
@@ -47,7 +48,6 @@ import mega.privacy.android.app.presentation.meeting.model.NoteToSelfChatUIState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingManagementUiState
 import mega.privacy.android.app.presentation.meeting.view.dialog.CancelScheduledMeetingDialog
 import mega.privacy.android.app.presentation.meeting.view.dialog.ForceAppUpdateDialog
-import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.icon.pack.IconPack
@@ -171,12 +171,13 @@ fun ChatTabsView(
                 pagerEnabled = false,
                 pagerState = pagerState,
                 selectedTabIndex = pagerState.currentPage,
-                onTabSelected = {
-                    if (pagerState.currentPage == it) {
+                onTabSelected = { index, isUserInteraction ->
+                    if (pagerState.currentPage == index && isUserInteraction) {
                         scrollToTop = !scrollToTop
                         false
+                    } else {
+                        true
                     }
-                    true
                 }
             ) {
                 ChatTab.entries.forEachIndexed { index, item ->

@@ -41,6 +41,8 @@ import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle2me
 
 /**
  * Tabs with Mega style.
+ *
+ * @onTabSelected Callback when tab selected. index and is user interaction.
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -49,7 +51,7 @@ fun Tabs(
     pagerModifier: Modifier = Modifier,
     pagerState: PagerState? = null,
     selectedTabIndex: Int = 0,
-    onTabSelected: (Int) -> Boolean = { true },
+    onTabSelected: (Int, Boolean) -> Boolean = { _, _ -> true },
     shouldTabsShown: Boolean = true,
     pagerEnabled: Boolean = false,
     cells: @Composable TabsScope.() -> Unit,
@@ -87,7 +89,7 @@ fun Tabs(
                     selected = pagerState.currentPage == index,
                     onClick = {
                         coroutineScope.launch {
-                            if (onTabSelected(index)) {
+                            if (onTabSelected(index, true)) {
                                 pagerState.animateScrollToPage(index)
                             }
                         }
@@ -116,7 +118,7 @@ fun Tabs(
 
 
     LaunchedEffect(pagerState.currentPage) {
-        onTabSelected(pagerState.currentPage)
+        onTabSelected(pagerState.currentPage, false)
     }
 }
 
