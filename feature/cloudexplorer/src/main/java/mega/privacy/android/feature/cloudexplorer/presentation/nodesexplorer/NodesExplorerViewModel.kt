@@ -15,32 +15,22 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import mega.privacy.android.shared.nodes.R as NodesR
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = NodesExplorerViewModel.Factory::class)
 class NodesExplorerViewModel @AssistedInject constructor(
     monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
-    monitorViewTypeUseCase: MonitorViewType,
-    setViewTypeUseCase: SetViewType,
     monitorStorageStateUseCase: MonitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
-    monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
-    setCloudSortOrderUseCase: SetCloudSortOrder,
-    nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     nodeUiItemMapper: NodeUiItemMapper,
     private val getFileBrowserNodeChildrenUseCase: GetFileBrowserNodeChildrenUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
@@ -49,14 +39,9 @@ class NodesExplorerViewModel @AssistedInject constructor(
     @Assisted override val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-    monitorViewTypeUseCase = monitorViewTypeUseCase,
-    setViewTypeUseCase = setViewTypeUseCase,
     monitorStorageStateUseCase = monitorStorageStateUseCase,
     monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
     monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-    monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
-    setCloudSortOrderUseCase = setCloudSortOrderUseCase,
-    nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
     nodeUiItemMapper = nodeUiItemMapper,
     args = args,
 ) {

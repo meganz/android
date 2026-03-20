@@ -40,12 +40,12 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 fun NodeHeaderItem(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
-    onEnterMediaDiscoveryClick: () -> Unit,
     sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
     showSortOrder: Boolean,
     showChangeViewType: Boolean,
     modifier: Modifier = Modifier,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
     showMediaDiscoveryButton: Boolean = false,
 ) {
     Row(

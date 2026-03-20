@@ -14,19 +14,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -35,8 +26,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,35 +35,22 @@ import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
-import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
-import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
-import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.nodes.components.NodeGridViewItemSkeleton
-import mega.privacy.android.shared.nodes.components.NodeHeaderItem
-import mega.privacy.android.shared.nodes.components.NodeListViewItemSkeleton
-import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
-import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
-import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.components.rememberNodeItems
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.resources.R as sharedR
@@ -82,7 +58,6 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 fun NodesExplorerScreen(
     viewModel: NodesExplorerViewModel,
-    isTabContent: Boolean,
     onNavigateBack: () -> Unit,
     onNavigateToFolder: (NodeId) -> Unit,
 ) {
@@ -94,181 +69,67 @@ fun NodesExplorerScreen(
         uiStateShared = uiStateShared,
         onNavigateBack = onNavigateBack,
         consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-        isTabContent = isTabContent,
         onFolderClick = onNavigateToFolder,
         onFileClick = viewModel::fileClicked,
-        onViewTypeClick = viewModel::updateViewType,
-        onSortNodes = viewModel::updateNodeSortConfiguration,
+        onRefreshNodes = viewModel::refreshNodes,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun NodesExplorerScreen(
-    isTabContent: Boolean,
     uiState: NodesExplorerUiState,
     uiStateShared: NodesExplorerSharedUiState,
     onNavigateBack: () -> Unit,
     consumeNavigateBack: () -> Unit,
     onFolderClick: (NodeId) -> Unit,
     onFileClick: (NodeUiItem<TypedNode>) -> Unit,
-    onViewTypeClick: () -> Unit,
-    onSortNodes: (NodeSortConfiguration) -> Unit,
+    onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
 ) = with(uiStateShared) {
-    val isListView = viewType == ViewType.LIST
-    val spanCount = rememberDynamicSpanCount(isListView = isListView)
-    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-    val topPadding = if (isTabContent) 12.dp else 0.dp
-
     EventEffect(
         event = navigateBack,
         onConsumed = consumeNavigateBack,
     ) { onNavigateBack() }
 
-    Column(
-        modifier = modifier
-            .padding(contentPadding().excludingBottomPadding())
-    ) {
+    val visibleItems = rememberNodeItems(
+        nodeUIItems = items,
+        showHiddenItems = showHiddenNodes,
+        isHiddenNodesEnabled = isHiddenNodesEnabled,
+    )
+    val onItemClicked: (NodeUiItem<TypedNode>) -> Unit = { item ->
         when {
-            isLoading -> NodesViewSkeleton(
-                isListView = isListView,
-                spanCount = spanCount,
-                contentPadding = PaddingValues(top = topPadding),
-                delay = NodeSkeletons.defaultDelay,
-            )
-
-            items.isEmpty() -> if (uiState.isRoot) {
-                EmptyRoot()
-            } else {
-                EmptyFolder()
-            }
-
-            else -> {
-                val isNextPageLoading = nodesLoadingState == NodesLoadingState.PartiallyLoaded
-                val visibleItems = rememberNodeItems(
-                    nodeUIItems = items,
-                    showHiddenItems = showHiddenNodes,
-                    isHiddenNodesEnabled = isHiddenNodesEnabled,
-                )
-
-                if (isListView) {
-                    NodesExplorerListView(
-                        items = visibleItems,
-                        isNextPageLoading = isNextPageLoading,
-                        nodeSortConfiguration = nodeSortConfiguration,
-                        isSelectionModeEnabled = isSelectionModeEnabled,
-                        isHiddenNodesEnabled = isHiddenNodesEnabled,
-                        onFolderClick = onFolderClick,
-                        onFileClick = onFileClick,
-                        onViewTypeClick = onViewTypeClick,
-                        onSortOrderClick = { showSortBottomSheet = true },
-                    )
-                } else {
-                    NodesExplorerGridView(
-                        items = visibleItems,
-                        isNextPageLoading = isNextPageLoading,
-                        nodeSortConfiguration = nodeSortConfiguration,
-                        isSelectionModeEnabled = isSelectionModeEnabled,
-                        isHiddenNodesEnabled = isHiddenNodesEnabled,
-                        spanCount = spanCount,
-                        onFolderClick = onFolderClick,
-                        onFileClick = onFileClick,
-                        onViewTypeClick = onViewTypeClick,
-                        onSortOrderClick = { showSortBottomSheet = true },
-                    )
-                }
-            }
-        }
-
-        if (showSortBottomSheet) {
-            SortBottomSheet(
-                title = stringResource(sharedR.string.action_sort_by_header),
-                options = NodeSortOption.getOptionsForSourceType(nodeSourceType),
-                sheetState = sortBottomSheetState,
-                selectedSort = SortBottomSheetResult(
-                    sortOptionItem = nodeSortConfiguration.sortOption,
-                    sortDirection = nodeSortConfiguration.sortDirection
-                ),
-                onSortOptionSelected = { result ->
-                    result?.let {
-                        onSortNodes(
-                            NodeSortConfiguration(
-                                sortOption = it.sortOptionItem,
-                                sortDirection = it.sortDirection
-                            )
-                        )
-                        showSortBottomSheet = false
-                    }
-                },
-                onDismissRequest = {
-                    showSortBottomSheet = false
-                }
-            )
+            item.isFolderNode -> onFolderClick(item.id)
+            isSelectionModeEnabled -> onFileClick(item)
         }
     }
-}
-
-@Composable
-internal fun NodesExplorerListView(
-    items: List<NodeUiItem<TypedNode>>,
-    isNextPageLoading: Boolean,
-    nodeSortConfiguration: NodeSortConfiguration,
-    isSelectionModeEnabled: Boolean,
-    isHiddenNodesEnabled: Boolean,
-    onFolderClick: (NodeId) -> Unit,
-    onFileClick: (NodeUiItem<TypedNode>) -> Unit,
-    onViewTypeClick: () -> Unit,
-    onSortOrderClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val listState = rememberLazyListState()
-
-    FastScrollLazyColumn(
-        state = listState,
-        totalItems = items.size,
-        modifier = modifier.semantics { testTagsAsResourceId = true },
-    ) {
-        item(key = "header") {
-            NodeHeaderItem(
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClick = onViewTypeClick,
-                onEnterMediaDiscoveryClick = { },
-                sortConfiguration = nodeSortConfiguration,
-                isListView = true,
-                showSortOrder = true,
-                showChangeViewType = true,
-                showMediaDiscoveryButton = false,
-                modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .padding(bottom = 8.dp),
-            )
-        }
-
-        items(
-            count = items.size,
-            key = { items[it].id.longValue }
-        ) {
+    NodeViewWithHeader(
+        items = visibleItems,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        nodesLoadingState = nodesLoadingState,
+        emptyView = {
+            if (uiState.isRoot) EmptyRoot()
+            else EmptyFolder()
+        },
+        itemListView = {
             NodeExplorerListItem(
-                item = items[it],
+                item = it,
                 isInSelectionMode = isSelectionModeEnabled,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
-                onItemClicked = { item ->
-                    when {
-                        item.isFolderNode -> onFolderClick(item.id)
-                        isSelectionModeEnabled -> onFileClick(item)
-                    }
-                },
+                onItemClicked = onItemClicked
             )
-        }
-
-        if (isNextPageLoading) {
-            items(count = 5, key = { "loading_$it" }) {
-                NodeListViewItemSkeleton()
-            }
-        }
-    }
+        },
+        itemGridView = {
+            NodeExplorerGridItem(
+                item = it,
+                isInSelectionMode = isSelectionModeEnabled,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                onItemClicked = onItemClicked
+            )
+        },
+        onRefreshNodes = onRefreshNodes,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -354,74 +215,6 @@ private fun NodeExplorerListItem(
     onClickListener = { onItemClicked(item) },
     enableClick = true,
 )
-
-@Composable
-internal fun NodesExplorerGridView(
-    items: List<NodeUiItem<TypedNode>>,
-    isNextPageLoading: Boolean,
-    nodeSortConfiguration: NodeSortConfiguration,
-    isSelectionModeEnabled: Boolean,
-    isHiddenNodesEnabled: Boolean,
-    spanCount: Int,
-    onFolderClick: (NodeId) -> Unit,
-    onFileClick: (NodeUiItem<TypedNode>) -> Unit,
-    onViewTypeClick: () -> Unit,
-    onSortOrderClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val gridState = rememberLazyGridState()
-
-    FastScrollLazyVerticalGrid(
-        state = gridState,
-        columns = GridCells.Fixed(spanCount),
-        totalItems = items.size,
-        modifier = modifier
-            .padding(horizontal = 8.dp)
-            .semantics { testTagsAsResourceId = true },
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(0.dp),
-    ) {
-        item(
-            key = "header",
-            span = { GridItemSpan(currentLineSpan = spanCount) }
-        ) {
-            NodeHeaderItem(
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClick = onViewTypeClick,
-                onEnterMediaDiscoveryClick = { },
-                sortConfiguration = nodeSortConfiguration,
-                isListView = false,
-                showSortOrder = true,
-                showChangeViewType = true,
-                showMediaDiscoveryButton = false,
-            )
-        }
-        items(
-            count = items.size,
-            key = {
-                items[it].id.longValue
-            },
-        ) {
-            NodeExplorerGridItem(
-                item = items[it],
-                isInSelectionMode = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                onItemClicked = { item ->
-                    when {
-                        item.isFolderNode -> onFolderClick(item.id)
-                        isSelectionModeEnabled -> onFileClick(item)
-                    }
-                },
-            )
-        }
-        if (isNextPageLoading) {
-            items(count = 4, key = { "loading_$it" }) {
-                NodeGridViewItemSkeleton()
-            }
-        }
-    }
-}
 
 @Composable
 private fun NodeExplorerGridItem(
@@ -560,15 +353,13 @@ private fun EmptyRoot() {
 fun NodesExplorerScreenPreview() {
     AndroidThemeForPreviews {
         NodesExplorerScreen(
-            isTabContent = false,
             uiState = NodesExplorerUiState(),
             uiStateShared = NodesExplorerSharedUiState(),
             onNavigateBack = {},
             consumeNavigateBack = {},
             onFolderClick = {},
             onFileClick = {},
-            onViewTypeClick = {},
-            onSortNodes = {},
+            onRefreshNodes = {},
         )
     }
 }

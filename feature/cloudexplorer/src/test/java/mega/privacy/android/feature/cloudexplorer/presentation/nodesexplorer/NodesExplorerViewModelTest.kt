@@ -10,9 +10,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeInfo
@@ -20,16 +17,14 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeInfoByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
-import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -50,14 +45,9 @@ class NodesExplorerViewModelTest {
     private lateinit var viewModel: NodesExplorerViewModel
 
     private val monitorNodeUpdatesByIdUseCase = mock<MonitorNodeUpdatesByIdUseCase>()
-    private val monitorViewTypeUseCase = mock<MonitorViewType>()
-    private val setViewTypeUseCase = mock<SetViewType>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
-    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
-    private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
     private val getFileBrowserNodeChildrenUseCase = mock<GetFileBrowserNodeChildrenUseCase>()
     private val getNodesByIdInChunkUseCase = mock<GetNodesByIdInChunkUseCase>()
@@ -76,25 +66,18 @@ class NodesExplorerViewModelTest {
     fun setUp() {
         reset(
             monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
             nodeUiItemMapper,
             getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase,
             getNodeInfoByIdUseCase,
             getRootNodeIdUseCase,
         )
-        whenever(monitorViewTypeUseCase()) doReturn emptyFlow()
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
-        whenever(monitorSortCloudOrderUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
         wheneverBlocking { getNodesByIdInChunkUseCase(nodeId) } doReturn emptyFlow()
         wheneverBlocking { getNodeInfoByIdUseCase(nodeId) } doReturn defaultNodeInfo
@@ -104,14 +87,9 @@ class NodesExplorerViewModelTest {
     private fun initViewModel() {
         viewModel = NodesExplorerViewModel(
             monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase = monitorViewTypeUseCase,
-            setViewTypeUseCase = setViewTypeUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase = setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
             nodeUiItemMapper = nodeUiItemMapper,
             getFileBrowserNodeChildrenUseCase = getFileBrowserNodeChildrenUseCase,
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,

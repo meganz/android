@@ -3,7 +3,6 @@ package mega.privacy.android.feature.cloudexplorer.navigation
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
@@ -42,7 +41,6 @@ class CloudExplorerFeatureDestination : FeatureDestination {
 
             NodesExplorerScreen(
                 viewModel = viewModel,
-                isTabContent = false,
                 onNavigateBack = { onNavigateBack(key) },
                 onNavigateToFolder = {
                     onNavigate(

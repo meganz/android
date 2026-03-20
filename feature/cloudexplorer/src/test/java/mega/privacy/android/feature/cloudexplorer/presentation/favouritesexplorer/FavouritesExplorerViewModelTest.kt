@@ -11,16 +11,11 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.BeforeEach
@@ -43,14 +38,9 @@ class FavouritesExplorerViewModelTest {
     private lateinit var viewModel: FavouritesExplorerViewModel
 
     private val monitorNodeUpdatesByIdUseCase = mock<MonitorNodeUpdatesByIdUseCase>()
-    private val monitorViewTypeUseCase = mock<MonitorViewType>()
-    private val setViewTypeUseCase = mock<SetViewType>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
-    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
-    private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
     private val getAllFavoritesUseCase = mock<GetAllFavoritesUseCase>()
 
@@ -58,22 +48,15 @@ class FavouritesExplorerViewModelTest {
     fun setUp() {
         reset(
             monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
             nodeUiItemMapper,
             getAllFavoritesUseCase
         )
-        whenever(monitorViewTypeUseCase()) doReturn emptyFlow()
         whenever(monitorStorageStateUseCase()) doReturn emptyFlow()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
-        whenever(monitorSortCloudOrderUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
         whenever(getAllFavoritesUseCase()) doReturn emptyFlow()
         wheneverBlocking {
@@ -88,14 +71,9 @@ class FavouritesExplorerViewModelTest {
     private fun initViewModel() {
         viewModel = FavouritesExplorerViewModel(
             monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
             nodeUiItemMapper,
             getAllFavoritesUseCase,
         )

@@ -13,27 +13,17 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
-import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
-import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import mega.privacy.android.domain.usecase.viewtype.SetViewType
-import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
 import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,7 +34,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -54,14 +43,9 @@ class NodeExplorerSharedViewModelTest {
     private lateinit var viewModel: NodeExplorerSharedViewModel
 
     private val monitorNodeUpdatesByIdUseCase = mock<MonitorNodeUpdatesByIdUseCase>()
-    private val monitorViewTypeUseCase = mock<MonitorViewType>()
-    private val setViewTypeUseCase = mock<SetViewType>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
-    private val monitorSortCloudOrderUseCase = mock<MonitorSortCloudOrderUseCase>()
-    private val setCloudSortOrderUseCase = mock<SetCloudSortOrder>()
-    private val nodeSortConfigurationUiMapper = mock<NodeSortConfigurationUiMapper>()
     private val nodeUiItemMapper = mock<NodeUiItemMapper>()
 
     private val nodeId = NodeId(1234L)
@@ -72,21 +56,14 @@ class NodeExplorerSharedViewModelTest {
     fun setUp() {
         reset(
             monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
             nodeUiItemMapper,
         )
-        whenever(monitorViewTypeUseCase()) doReturn flowOf()
         whenever(monitorStorageStateUseCase()) doReturn flowOf()
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn flowOf()
         whenever(monitorShowHiddenItemsUseCase()) doReturn flowOf()
-        whenever(monitorSortCloudOrderUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(nodeId, nodeSourceType)) doReturn emptyFlow()
 
         initViewModel()
@@ -98,14 +75,9 @@ class NodeExplorerSharedViewModelTest {
     ) {
         viewModel = object : NodeExplorerSharedViewModel(
             monitorNodeUpdatesByIdUseCase,
-            monitorViewTypeUseCase,
-            setViewTypeUseCase,
             monitorStorageStateUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase,
-            monitorSortCloudOrderUseCase,
-            setCloudSortOrderUseCase,
-            nodeSortConfigurationUiMapper,
             nodeUiItemMapper,
             args = args
         ) {
@@ -120,35 +92,12 @@ class NodeExplorerSharedViewModelTest {
             val actual = awaitItem()
             assertThat(actual.currentFolderId).isEqualTo(nodeId)
             assertThat(actual.nodeSourceType).isEqualTo(nodeSourceType)
-            assertThat(actual.viewType).isEqualTo(ViewType.LIST)
             assertThat(actual.isStorageOverQuota).isFalse()
             assertThat(actual.isHiddenNodesEnabled).isFalse()
             assertThat(actual.showHiddenNodes).isFalse()
             assertThat(actual.items).isEmpty()
             assertThat(actual.navigateBack).isEqualTo(consumed)
         }
-    }
-
-    @Test
-    fun `test that view type is updated when use case emits`() = runTest {
-        val viewTypeFlow = MutableStateFlow(ViewType.LIST)
-
-        whenever(monitorViewTypeUseCase()) doReturn viewTypeFlow
-
-        initViewModel()
-
-        viewModel.nodeExplorerSharedUiState.test {
-            assertThat(awaitItem().viewType).isEqualTo(ViewType.LIST)
-            viewTypeFlow.value = ViewType.GRID
-            assertThat(awaitItem().viewType).isEqualTo(ViewType.GRID)
-        }
-    }
-
-    @Test
-    fun `test that updateViewType should toggle view type and track event`() = runTest {
-        viewModel.updateViewType()
-
-        verify(setViewTypeUseCase).invoke(ViewType.GRID)
     }
 
     @ParameterizedTest
@@ -194,51 +143,15 @@ class NodeExplorerSharedViewModelTest {
     }
 
     @Test
-    fun `test that monitorSortOrder should update state and refresh nodes`() = runTest {
-        val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-        val nodeSortConfiguration =
-            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
-        val sortOrderFlow = MutableStateFlow<SortOrder?>(null)
-
-        whenever(nodeSortConfigurationUiMapper(sortOrder)) doReturn nodeSortConfiguration
-        whenever(monitorSortCloudOrderUseCase()) doReturn sortOrderFlow
-
-        val refreshNodesMock = mock<() -> Unit>()
-        initViewModel(refreshNodesImpl = refreshNodesMock)
-
-        sortOrderFlow.value = sortOrder
-
-        viewModel.nodeExplorerSharedUiState.test {
-            val actual = awaitItem()
-            assertThat(actual.sortOrder).isEqualTo(sortOrder)
-            assertThat(actual.nodeSortConfiguration).isEqualTo(nodeSortConfiguration)
-        }
-        verify(refreshNodesMock).invoke()
-    }
-
-    @Test
-    fun `test that updateNodeSortConfiguration should call use case`() = runTest {
-        val nodeSortConfiguration =
-            NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
-        val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-
-        whenever(nodeSortConfigurationUiMapper(nodeSortConfiguration)) doReturn sortOrder
-
-        viewModel.updateNodeSortConfiguration(nodeSortConfiguration)
-
-        verify(setCloudSortOrderUseCase).invoke(sortOrder)
-    }
-
-    @Test
     fun `test that setItems should map nodes to UI items and update state`() = runTest {
         val nodes = listOf<TypedNode>(mock())
         val nodeUiItems = listOf<NodeUiItem<TypedNode>>(mock())
 
         whenever(
             nodeUiItemMapper(
-                nodes,
-                emptyList(),
-                nodeSourceType,
+                nodeList = nodes,
+                existingItems = emptyList(),
+                nodeSourceType = nodeSourceType,
             )
         ) doReturn nodeUiItems
 
@@ -290,7 +203,6 @@ class NodeExplorerSharedViewModelTest {
             assertThat(awaitItem().navigateBack).isEqualTo(triggered)
         }
 
-        // Now, consume it
         viewModel.onNavigateBackEventConsumed()
 
         viewModel.nodeExplorerSharedUiState.test {
