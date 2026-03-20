@@ -126,7 +126,7 @@ private fun ViewModeLazyColumn(
             .padding(
                 start = if (showLineNumbers) 0.dp else 16.dp,
                 end = 16.dp,
-                top = 8.dp,
+                // No top padding: aligns with collapsing top bar when bars are visible
                 bottom = 8.dp,
             ),
     ) {
@@ -166,7 +166,7 @@ private fun EditModeLazyColumn(
             .padding(
                 start = if (showLineNumbers) 0.dp else 16.dp,
                 end = 16.dp,
-                top = 8.dp,
+                // No top padding: aligns with collapsing top bar when bars are visible
                 bottom = 8.dp,
             ),
     ) {
