@@ -1,6 +1,7 @@
 package mega.privacy.android.data.mapper
 
 import mega.privacy.android.domain.entity.AppVersion
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -13,7 +14,15 @@ internal class AppVersionMapper @Inject constructor() {
      * Returns null if the string cannot be parsed.
      */
     operator fun invoke(version: String): AppVersion? {
-        val parts = version.split(".")
+        Timber.d("WhatsNew::$version")
+        val sanitizedVersion = if (version.contains("(")) {
+            // Debug version has (9999_debug) suffix
+            version.removeRange(
+                version.indexOfFirst { it == '(' },
+                version.length
+            )
+        } else version
+        val parts = sanitizedVersion.split(".")
         val major = parts.getOrNull(0)?.toIntOrNull() ?: return null
         val minor = parts.getOrNull(1)?.toIntOrNull() ?: return null
         val patch = parts.getOrNull(2)?.toIntOrNull()

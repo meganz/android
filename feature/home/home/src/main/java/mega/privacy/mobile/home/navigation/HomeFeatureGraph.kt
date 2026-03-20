@@ -8,7 +8,6 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.mobile.home.presentation.configuration.homeConfigurationScreen
 import mega.privacy.mobile.home.presentation.recents.bucket.recentsBucketScreen
 import mega.privacy.mobile.home.presentation.recents.recentsScreen
-
 class HomeFeatureGraph : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit
         get() = { navigationHandler, transferHandler ->

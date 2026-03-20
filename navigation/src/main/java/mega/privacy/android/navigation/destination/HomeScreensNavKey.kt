@@ -6,8 +6,12 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
+
+@Serializable
+data object WhatsNewNavKey : DialogNavKey
 
 @Serializable
 data object RecentsScreenNavKey : NavKey

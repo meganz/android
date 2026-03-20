@@ -16,6 +16,12 @@ class AppVersionMapperTest {
     }
 
     @Test
+    fun `test that a full version string is mapped to an AppVersion with debug suffix`() {
+        val result = underTest("14.2(9999_debug)")
+        assertThat(result).isEqualTo(AppVersion(major = 14, minor = 2, patch = null))
+    }
+
+    @Test
     fun `test that a full version string is mapped to an AppVersion with all fields`() {
         val result = underTest("14.2.1")
         assertThat(result).isEqualTo(AppVersion(major = 14, minor = 2, patch = 1))

@@ -47,6 +47,7 @@ import mega.privacy.android.app.presentation.storage.OverQuotaDialogDestinations
 import mega.privacy.android.app.presentation.transfers.navigation.TransfersFeatureDestination
 import mega.privacy.android.app.presentation.transfers.transferoverquota.view.dialog.TransferOverQuotaDialogDestinations
 import mega.privacy.android.app.presentation.twofactorauthentication.Enable2FADialogDestinations
+import mega.privacy.android.app.presentation.whatsnew.WhatsNewDialogDestinations
 import mega.privacy.android.app.sslverification.SSLAppDialogDestinations
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.data.database.LegacyDatabaseMigration
@@ -201,7 +202,8 @@ internal class AppModule {
             BusinessGraceDialogDestinations,
             SecurityUpgradeDialogDestinations,
             FreePlanParticipantsLimitDialogDestination,
-            Enable2FADialogDestinations
+            Enable2FADialogDestinations,
+            WhatsNewDialogDestinations
         )
 
     @Provides

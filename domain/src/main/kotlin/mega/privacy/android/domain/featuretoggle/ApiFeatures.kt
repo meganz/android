@@ -129,8 +129,16 @@ enum class ApiFeatures(
         experimentName = "acih",
         description = "Enable Audios chip in Home screen",
         defaultValue = false
-    )
-    ;
+    ),
+
+    /**
+     * Enable Whats New feature dialog
+     */
+    WhatsNewFeatureDialog(
+        experimentName = "wnfd",
+        description = "Enable Whats New feature dialog",
+        defaultValue = false
+    );
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

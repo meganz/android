@@ -51,8 +51,10 @@ import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.WhatsNewNavKey
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.mobile.home.presentation.home.Home
+import mega.privacy.mobile.home.presentation.whatsnew.WhatsNewViewModel
 import mega.privacy.mobile.navigation.snowflake.MainNavigationScaffold
 import kotlin.time.Duration.Companion.seconds
 

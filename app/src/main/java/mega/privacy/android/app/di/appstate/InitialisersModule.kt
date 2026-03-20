@@ -27,6 +27,7 @@ import mega.privacy.android.app.appstate.global.initialisation.postlogin.SetupLe
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartCameraUploadsAfterStorageStateEventInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.StartTransferWorkerInitializer
 import mega.privacy.android.app.appstate.global.initialisation.postlogin.UpdateActiveTransfersInitializer
+import mega.privacy.android.app.appstate.global.initialisation.postlogin.WhatsNewInitializer
 import mega.privacy.android.app.consent.initialiser.ConsentInitialiser
 import mega.privacy.android.app.listeners.global.initialisers.ReloadEventInitialiser
 import mega.privacy.android.app.presentation.login.logoutdialog.RemoteLogoutInitialiser
@@ -195,5 +196,10 @@ class InitialisersModule {
     @Provides
     @IntoSet
     fun provideClearCompletedTransfersCacheInitializer(initialiser: ClearCompletedTransfersCacheInitializer): PostLoginInitialiser =
+        initialiser
+
+    @Provides
+    @IntoSet
+    fun provideWhatsNewInitializer(initialiser: WhatsNewInitializer): PostLoginInitialiser =
         initialiser
 }
