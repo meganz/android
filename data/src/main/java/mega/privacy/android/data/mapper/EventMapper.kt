@@ -4,7 +4,6 @@ import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
-import mega.privacy.android.domain.entity.ChangeToHttpsEvent
 import mega.privacy.android.domain.entity.CommitDbEvent
 import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.Event
@@ -41,12 +40,6 @@ internal class EventMapper @Inject constructor(
 
         MegaEvent.EVENT_ACCOUNT_CONFIRMATION -> {
             AccountConfirmationEvent(
-                handle = megaEvent.handle,
-            )
-        }
-
-        MegaEvent.EVENT_CHANGE_TO_HTTPS -> {
-            ChangeToHttpsEvent(
                 handle = megaEvent.handle,
             )
         }

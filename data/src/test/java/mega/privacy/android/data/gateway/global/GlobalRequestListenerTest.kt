@@ -15,7 +15,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -77,7 +76,6 @@ class GlobalRequestListenerTest {
         mock<UpdatePushNotificationSettingsUseCase>()
     private val shouldShowRichLinkWarningUseCase = mock<ShouldShowRichLinkWarningUseCase>()
     private val isRichPreviewsEnabledUseCase = mock<IsRichPreviewsEnabledUseCase>()
-    private val setUseHttpsUseCase = mock<SetUseHttpsUseCase>()
     private val resetAccountDetailsTimeStampUseCase = mock<ResetAccountDetailsTimeStampUseCase>()
     private val broadcastSslVerificationFailedUseCase =
         mock<BroadcastSslVerificationFailedUseCase>()
@@ -118,7 +116,6 @@ class GlobalRequestListenerTest {
             updatePushNotificationSettingsUseCase = updatePushNotificationSettingsUseCase,
             shouldShowRichLinkWarningUseCase = shouldShowRichLinkWarningUseCase,
             isRichPreviewsEnabledUseCase = isRichPreviewsEnabledUseCase,
-            setUseHttpsUseCase = setUseHttpsUseCase,
             resetAccountDetailsTimeStampUseCase = resetAccountDetailsTimeStampUseCase,
             broadcastSslVerificationFailedUseCase = broadcastSslVerificationFailedUseCase,
             setLoggedOutFromAnotherLocationUseCase = setLoggedOutFromAnotherLocationUseCase,
@@ -330,7 +327,6 @@ class GlobalRequestListenerTest {
             underTest.onRequestFinish(api, request, error)
             advanceUntilIdle()
 
-            verify(setUseHttpsUseCase).invoke(true)
             verify(resetAccountDetailsTimeStampUseCase).invoke()
         }
 

@@ -5,7 +5,6 @@ import mega.privacy.android.data.mapper.account.AccountBlockedTypeMapper
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.AccountConfirmationEvent
 import mega.privacy.android.domain.entity.BusinessStatusEvent
-import mega.privacy.android.domain.entity.ChangeToHttpsEvent
 import mega.privacy.android.domain.entity.CommitDbEvent
 import mega.privacy.android.domain.entity.DisconnectEvent
 import mega.privacy.android.domain.entity.Event
@@ -74,7 +73,6 @@ class EventMapperTest {
     private fun provideEventTypeParameters() = listOf(
         arrayOf(MegaEvent.EVENT_COMMIT_DB, CommitDbEvent::class),
         arrayOf(MegaEvent.EVENT_ACCOUNT_CONFIRMATION, AccountConfirmationEvent::class),
-        arrayOf(MegaEvent.EVENT_CHANGE_TO_HTTPS, ChangeToHttpsEvent::class),
         arrayOf(MegaEvent.EVENT_DISCONNECT, DisconnectEvent::class),
         arrayOf(MegaEvent.EVENT_ACCOUNT_BLOCKED, AccountBlockedEvent::class),
         arrayOf(MegaEvent.EVENT_STORAGE, StorageStateEvent::class),

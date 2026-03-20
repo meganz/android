@@ -646,13 +646,6 @@ interface MegaApiGateway {
     fun setLogLevel(logLevel: Int)
 
     /**
-     * Set use https only
-     *
-     * @param enabled
-     */
-    fun setUseHttpsOnly(enabled: Boolean)
-
-    /**
      * Get logged in user
      *
      * @return the current user if logged in, otherwise null

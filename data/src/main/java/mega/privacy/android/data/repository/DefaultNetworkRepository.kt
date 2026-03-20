@@ -130,12 +130,6 @@ internal class DefaultNetworkRepository @Inject constructor(
 
     override fun isConnectedToInternet() = monitorConnectivity.value.connected
 
-    override suspend fun setUseHttps(enabled: Boolean) {
-        withContext(ioDispatcher) {
-            megaApi.setUseHttpsOnly(enabled)
-        }
-    }
-
     override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
 
     @Suppress("DEPRECATION")

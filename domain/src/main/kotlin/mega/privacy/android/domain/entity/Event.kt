@@ -41,10 +41,6 @@ data class AccountConfirmationEvent(
     override val handle: Long,
 ) : Event
 
-data class ChangeToHttpsEvent(
-    override val handle: Long,
-) : Event
-
 data class DisconnectEvent(
     override val handle: Long,
 ) : Event

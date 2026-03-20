@@ -468,8 +468,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun setLogLevel(logLevel: Int) = MegaApiAndroid.setLogLevel(logLevel)
 
-    override fun setUseHttpsOnly(enabled: Boolean) = megaApi.useHttpsOnly(enabled)
-
     override suspend fun getLoggedInUser(): MegaUser? = megaApi.myUser
 
     override fun getThumbnail(

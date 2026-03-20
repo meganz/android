@@ -11,7 +11,6 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.LoginMutex
-import mega.privacy.android.domain.usecase.SetUseHttpsUseCase
 import mega.privacy.android.domain.usecase.account.GetFullAccountInfoUseCase
 import mega.privacy.android.domain.usecase.account.ResetAccountDetailsTimeStampUseCase
 import mega.privacy.android.domain.usecase.account.SetLoggedOutFromAnotherLocationUseCase
@@ -58,7 +57,6 @@ import javax.inject.Inject
  * @property updatePushNotificationSettingsUseCase
  * @property shouldShowRichLinkWarningUseCase
  * @property isRichPreviewsEnabledUseCase
- * @property setUseHttpsUseCase
  * @property resetAccountDetailsTimeStampUseCase
  * @property broadcastSslVerificationFailedUseCase
  * @property setLoggedOutFromAnotherLocationUseCase
@@ -84,7 +82,6 @@ internal class GlobalRequestListener @Inject constructor(
     private val updatePushNotificationSettingsUseCase: UpdatePushNotificationSettingsUseCase,
     private val shouldShowRichLinkWarningUseCase: ShouldShowRichLinkWarningUseCase,
     private val isRichPreviewsEnabledUseCase: IsRichPreviewsEnabledUseCase,
-    private val setUseHttpsUseCase: SetUseHttpsUseCase,
     private val resetAccountDetailsTimeStampUseCase: ResetAccountDetailsTimeStampUseCase,
     private val broadcastSslVerificationFailedUseCase: BroadcastSslVerificationFailedUseCase,
     private val setLoggedOutFromAnotherLocationUseCase: SetLoggedOutFromAnotherLocationUseCase,
@@ -188,7 +185,6 @@ internal class GlobalRequestListener @Inject constructor(
 
             broadcastFetchNodesFinishUseCase()
             runCatching {
-                setUseHttpsUseCase(true)
                 resetAccountDetailsTimeStampUseCase()
             }.onFailure {
                 Timber.e(it)

@@ -31,13 +31,6 @@ interface NetworkRepository {
     fun isConnectedToInternet(): Boolean
 
     /**
-     * Set use https
-     *
-     * @param enabled
-     */
-    suspend fun setUseHttps(enabled: Boolean)
-
-    /**
      * Is Metered Connection
      *
      * @return [Boolean]
