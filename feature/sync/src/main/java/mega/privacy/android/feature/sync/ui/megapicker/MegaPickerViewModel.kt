@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.FolderUsageResult
@@ -97,23 +98,25 @@ internal class MegaPickerViewModel @AssistedInject constructor(
 
             is MegaPickerAction.CurrentFolderSelected -> {
                 viewModelScope.launch {
-                    // NEW: Validate against Camera/Media Uploads and existing sync/backup folders
-                    val folderUsageResult = runCatching {
-                        state.value.currentFolder?.let { currentFolder ->
-                            isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
-                                nodeId = currentFolder.id,
-                                shouldCheckCameraUploads = true,
-                                shouldExcludeCurrentDevice = false,
-                                useCache = false,
-                            )
-                        } ?: FolderUsageResult.NotUsed
-                    }.getOrNull() ?: FolderUsageResult.NotUsed
+                    // Skip sync/backup validation for stop backup flow - user is just picking a move destination
+                    if (!isStopBackup) {
+                        val folderUsageResult = runCatching {
+                            state.value.currentFolder?.let { currentFolder ->
+                                isFolderUsedBySyncOrBackupAcrossDevicesUseCase(
+                                    nodeId = currentFolder.id,
+                                    shouldCheckCameraUploads = true,
+                                    shouldExcludeCurrentDevice = false,
+                                    useCache = false,
+                                )
+                            } ?: FolderUsageResult.NotUsed
+                        }.getOrNull() ?: FolderUsageResult.NotUsed
 
-                    val errorMessage = getFolderUsageMessage(folderUsageResult)
+                        val errorMessage = getFolderUsageMessage(folderUsageResult)
 
-                    if (errorMessage != null) {
-                        _state.update { it.copy(snackbarMessageId = errorMessage) }
-                        return@launch
+                        if (errorMessage != null) {
+                            _state.update { it.copy(snackbarMessageId = errorMessage) }
+                            return@launch
+                        }
                     }
 
                     if (action.allFilesAccessPermissionGranted) {
@@ -322,6 +325,8 @@ internal class MegaPickerViewModel @AssistedInject constructor(
                 folderName,
             ).catch {
                 Timber.e(it)
+            }.onCompletion {
+                _state.update { it.copy(isLoading = false) }
             }.collectLatest { result ->
                 _state.update {
                     it.copy(

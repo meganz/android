@@ -1317,6 +1317,36 @@ internal class MegaPickerViewModelTest {
     }
 
     @Test
+    fun `test that folder usage validation is skipped when isStopBackup is true`() = runTest {
+        val currentFolderId = NodeId(2323L)
+        val currentFolderName = "some folder"
+        val folderName = "BackupFolder"
+        val currentFolder: TypedFolderNode = mock {
+            on { id } doReturn currentFolderId
+            on { name } doReturn currentFolderName
+        }
+        whenever(getRootNodeUseCase()).thenReturn(currentFolder)
+        whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName)).thenReturn(false)
+
+        initViewModel(isStopBackup = true, folderName = folderName)
+
+        underTest.handleAction(
+            MegaPickerAction.CurrentFolderSelected(
+                allFilesAccessPermissionGranted = true,
+                disableBatteryOptimizationPermissionGranted = true
+            )
+        )
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.navigateNextEvent).isEqualTo(triggered)
+            assertThat(state.snackbarMessageId).isNull()
+        }
+        // Verify that isFolderUsedBySyncOrBackupAcrossDevicesUseCase was NOT called
+        verifyNoInteractions(isFolderUsedBySyncOrBackupAcrossDevicesUseCase)
+    }
+
+    @Test
     fun `test that child nodes are disabled when they match backup or sync folders`() = runTest {
         val rootFolderId = NodeId(123456L)
         val clickedFolderId = NodeId(555L)

@@ -111,6 +111,7 @@ internal fun MegaPickerScreen(
                 isLoading = isLoading,
                 isSelectEnabled = isSelectEnabled,
                 isStopBackupMegaPicker = isStopBackupMegaPicker,
+                showSelectAtRoot = isStopBackupMegaPicker,
             )
         },
         snackbarHost = {
@@ -153,10 +154,11 @@ private fun MegaPickerScreenContent(
     isSelectEnabled: Boolean,
     isStopBackupMegaPicker: Boolean,
     modifier: Modifier = Modifier,
+    showSelectAtRoot: Boolean = false,
 ) {
     val isAtRoot = currentFolder == null ||
             currentFolder.parentId.longValue == MegaApiJava.INVALID_HANDLE
-    val showSelectButtonArea = !isAtRoot && !isLoading
+    val showSelectButtonArea = (!isAtRoot || showSelectAtRoot) && !isLoading
 
     Box(modifier = modifier.fillMaxSize()) {
         // Main content area

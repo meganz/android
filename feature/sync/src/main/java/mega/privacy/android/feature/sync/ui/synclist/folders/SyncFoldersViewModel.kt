@@ -172,6 +172,11 @@ internal class SyncFoldersViewModel @Inject constructor(
             }.distinctUntilChanged().collect {
                 if (it != null) {
                     Timber.d("Selected mega folder: $it")
+                    // Hide stop-backup dialog before closing the mega picker so returning from the
+                    // picker does not briefly flash the confirmation dialog.
+                    _uiState.update { state ->
+                        state.copy(showConfirmRemoveSyncFolderDialog = false)
+                    }
                     handleAction(
                         SyncFoldersAction.OnRemoveBackupFolderDialogConfirmed(
                             StopBackupOption.MOVE,

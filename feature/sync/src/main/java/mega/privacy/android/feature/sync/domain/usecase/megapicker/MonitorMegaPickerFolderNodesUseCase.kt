@@ -66,6 +66,38 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
         isStopBackup: Boolean,
         folderName: String?,
     ): Flow<MegaPickerFolderResult> = flow {
+        // Fast path for stop backup flow - no need to check sync/backup usage
+        // User is just picking a destination to move the backup folder to
+        if (isStopBackup) {
+            val isSelectEnabled = runCatching {
+                folderName?.let {
+                    !nodeExistsInCurrentLocationUseCase(currentFolder.id, it)
+                } ?: true
+            }.getOrElse { true }
+
+            getTypedNodesFromFolder(currentFolder.id)
+                .catch { Timber.d(it, "Error getting child folders") }
+                .collect { childFolders ->
+                    emit(
+                        MegaPickerFolderResult(
+                            currentFolder = currentFolder,
+                            nodes = childFolders.map { node ->
+                                MegaPickerNodeInfo(
+                                    node = node,
+                                    isDisabled = false,
+                                    isUsedBySyncOrBackup = false,
+                                    backupId = null,
+                                    deviceName = null,
+                                )
+                            },
+                            isSelectEnabled = isSelectEnabled,
+                        )
+                    )
+                }
+            return@flow
+        }
+
+        // Original logic for sync setup flow
         val isFeatureEnabled =
             getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup)
         val currentDeviceId = runCatching { getDeviceIdUseCase() }.getOrNull()
@@ -107,15 +139,6 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             Timber.d(it, "Error getting device name map")
             emptyMap()
         }
-        val isSelectEnabledForStopBackup = if (isStopBackup) {
-            runCatching {
-                folderName?.let {
-                    !nodeExistsInCurrentLocationUseCase(currentFolder.id, it)
-                } ?: true
-            }.getOrElse { true }
-        } else {
-            null
-        }
 
         // Pre-fetch all backup root paths
         val backupPaths: Map<NodeId, String> =
@@ -154,11 +177,9 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
                     )
                 }
 
-                val isSelectEnabled = isSelectEnabledForStopBackup ?: run {
-                    val notAtRoot = currentFolder.id != rootFolderId
-                    val noChildUsedBySyncOrBackup = !nodes.any { it.isUsedBySyncOrBackup }
-                    notAtRoot && noChildUsedBySyncOrBackup
-                }
+                val notAtRoot = currentFolder.id != rootFolderId
+                val noChildUsedBySyncOrBackup = !nodes.any { it.isUsedBySyncOrBackup }
+                val isSelectEnabled = notAtRoot && noChildUsedBySyncOrBackup
 
                 emit(
                     MegaPickerFolderResult(

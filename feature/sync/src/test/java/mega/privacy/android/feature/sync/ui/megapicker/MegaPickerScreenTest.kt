@@ -827,6 +827,124 @@ internal class MegaPickerScreenTest {
     }
 
     @Test
+    fun `test that select button is displayed at root when isStopBackupMegaPicker is true and isSelectEnabled is true`() {
+        val rootFolder = createMockCurrentFolder(
+            id = 1L,
+            name = "Root",
+            parentId = MegaApiJava.INVALID_HANDLE
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = rootFolder,
+                nodes = emptyList(),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = true,
+                isStopBackupMegaPicker = true,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_select))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_select))
+            .assertIsEnabled()
+    }
+
+    @Test
+    fun `test that select button is displayed at root when currentFolder is null and isStopBackupMegaPicker is true`() {
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = null,
+                nodes = emptyList(),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = true,
+                isStopBackupMegaPicker = true,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_select))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that select button click at root triggers callback when isStopBackupMegaPicker is true`() {
+        val rootFolder = createMockCurrentFolder(
+            id = 1L,
+            name = "Root",
+            parentId = MegaApiJava.INVALID_HANDLE
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = rootFolder,
+                nodes = emptyList(),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = true,
+                isStopBackupMegaPicker = true,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_select))
+            .performClick()
+
+        verify(mockCurrentFolderSelected).invoke()
+    }
+
+    @Test
+    fun `test that select button is not displayed at root when isStopBackupMegaPicker is false`() {
+        val rootFolder = createMockCurrentFolder(
+            id = 1L,
+            name = "Root",
+            parentId = MegaApiJava.INVALID_HANDLE
+        )
+
+        composeTestRule.setContent {
+            MegaPickerScreen(
+                currentFolder = rootFolder,
+                nodes = emptyList(),
+                folderClicked = mockFolderClicked,
+                disabledFolderClicked = mockDisabledFolderClicked,
+                currentFolderSelected = mockCurrentFolderSelected,
+                fileTypeIconMapper = mockFileTypeIconMapper,
+                snackbarMessageId = null,
+                snackbarMessageShown = mockSnackbarMessageShown,
+                isLoading = false,
+                isSelectEnabled = true,
+                isStopBackupMegaPicker = false,
+            )
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(sharedR.string.general_select_folder))
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that screen displays mixed enabled and disabled folders`() {
         val folders = listOf(
             TypedNodeUiModel(createMockFolderNode(1L, "Enabled Folder 1"), isDisabled = false),

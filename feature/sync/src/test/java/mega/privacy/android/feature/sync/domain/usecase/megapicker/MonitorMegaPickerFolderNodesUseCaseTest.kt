@@ -206,11 +206,7 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             val currentFolder: FolderNode = mock {
                 on { id } doReturn currentFolderId
             }
-            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
-                .thenReturn(false)
-            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
-            whenever(getDeviceIdUseCase()).thenReturn(null)
-            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            // For stop backup, we only need these two use cases
             whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(emptyList()))
             whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName))
                 .thenReturn(true)
@@ -218,6 +214,78 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
             underTest(currentFolder, rootFolderId, true, folderName).test {
                 val result = awaitItem()
                 assertThat(result.isSelectEnabled).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is true when isStopBackup and folder does not exist in current location`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val folderName = "NewFolder"
+            val currentFolder: FolderNode = mock {
+                on { id } doReturn currentFolderId
+            }
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(emptyList()))
+            whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName))
+                .thenReturn(false)
+
+            underTest(currentFolder, rootFolderId, true, folderName).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isTrue()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that stop backup flow does not call unnecessary use cases`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val folderName = "TestFolder"
+            val currentFolder: FolderNode = mock {
+                on { id } doReturn currentFolderId
+            }
+            // Only mock the necessary use cases for stop backup
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(emptyList()))
+            whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName))
+                .thenReturn(false)
+
+            underTest(currentFolder, rootFolderId, true, folderName).test {
+                val result = awaitItem()
+                // Verify nodes are not disabled for stop backup
+                assertThat(result.nodes).isEmpty()
+                assertThat(result.isSelectEnabled).isTrue()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that nodes are not disabled when isStopBackup is true even if they would be excluded in sync flow`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val currentFolderId = NodeId(456L)
+            val folderName = "TestFolder"
+            val excludedFolderId = NodeId(789L)
+            val currentFolder: FolderNode = mock {
+                on { id } doReturn currentFolderId
+            }
+            val childFolder: TypedNode = mock { on { id } doReturn excludedFolderId }
+            // Only mock the necessary use cases for stop backup
+            whenever(getTypedNodesFromFolder(currentFolderId)).thenReturn(flowOf(listOf(childFolder)))
+            whenever(nodeExistsInCurrentLocationUseCase(currentFolderId, folderName))
+                .thenReturn(false)
+
+            underTest(currentFolder, rootFolderId, true, folderName).test {
+                val result = awaitItem()
+                // Verify nodes are NOT disabled even though they would be in sync flow
+                assertThat(result.nodes).hasSize(1)
+                assertThat(result.nodes[0].isDisabled).isFalse()
+                assertThat(result.nodes[0].isUsedBySyncOrBackup).isFalse()
                 awaitComplete()
                 cancelAndIgnoreRemainingEvents()
             }

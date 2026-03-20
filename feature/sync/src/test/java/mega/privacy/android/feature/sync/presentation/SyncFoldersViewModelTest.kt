@@ -4,6 +4,7 @@ import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -196,6 +197,7 @@ internal class SyncFoldersViewModelTest {
         )
 
         whenever(monitorStalledIssuesUseCase()).thenReturn(flowOf(stalledIssues))
+        whenever(monitorSelectedMegaFolderUseCase()).thenReturn(flow { awaitCancellation() })
     }
 
     @AfterEach
@@ -320,6 +322,44 @@ internal class SyncFoldersViewModelTest {
                 )
                 assertThat(state.movedFolderName).isEqualTo(remoteFolder.name)
             }
+        }
+
+    @Test
+    fun `test that selected mega folder hides stop backup dialog before move completes`() =
+        runTest {
+            val remoteFolder = RemoteFolder(NodeId(999L), "Picked Folder")
+            val selectedMegaFolderFlow = MutableStateFlow<RemoteFolder?>(null)
+            whenever(monitorSelectedMegaFolderUseCase()).thenReturn(selectedMegaFolderFlow)
+            whenever(syncUiItemMapper(folderPairs)).thenReturn(syncUiItems)
+            val syncUiItem = syncUiItems.first { it.syncType == SyncType.TYPE_BACKUP }
+            whenever(removeFolderPairUseCase(syncUiItem.id)).thenReturn(Unit)
+            initViewModel()
+            underTest.handleAction(SyncFoldersAction.RemoveFolderClicked(syncUiItem))
+
+            underTest.uiState.test {
+                val dialogVisible = awaitItem()
+                assertThat(dialogVisible.showConfirmRemoveSyncFolderDialog).isTrue()
+                assertThat(dialogVisible.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                selectedMegaFolderFlow.value = remoteFolder
+
+                val dialogHiddenStillRemoving = awaitItem()
+                assertThat(dialogHiddenStillRemoving.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(dialogHiddenStillRemoving.syncUiItemToRemove).isEqualTo(syncUiItem)
+
+                val moveCompleted = awaitItem()
+                assertThat(moveCompleted.syncUiItemToRemove).isNull()
+                assertThat(moveCompleted.showConfirmRemoveSyncFolderDialog).isFalse()
+                assertThat(moveCompleted.snackbarMessage).isEqualTo(
+                    sharedResR.string.sync_snackbar_message_confirm_backup_moved,
+                )
+                assertThat(moveCompleted.movedFolderName).isEqualTo(remoteFolder.name)
+            }
+
+            verify(moveDeconfiguredBackupNodesUseCase).invoke(
+                deconfiguredBackupRoot = syncUiItem.megaStorageNodeId,
+                backupDestination = remoteFolder.id,
+            )
         }
 
     @Test
