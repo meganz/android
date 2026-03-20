@@ -20,13 +20,15 @@ fun EntryProviderScope<NavKey>.folderLinkScreen(
         }
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                creationCallback = { it.create(NodeSourceType.FAVOURITES) }
+                creationCallback = { it.create(NodeSourceType.FOLDER_LINK) }
             )
         FolderLinkScreen(
             viewModel = viewModel,
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
             onBack = navigationHandler::back,
             onNavigate = navigationHandler::navigate,
-            onTransfer = transferHandler::setTransferEvent
+            onTransfer = transferHandler::setTransferEvent,
         )
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,

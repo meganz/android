@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -25,18 +26,18 @@ import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
-import mega.privacy.android.shared.nodes.components.NodesView
-import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
+import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -45,27 +46,42 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trac
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
+import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FolderLinkScreen(
     viewModel: FolderLinkViewModel,
+    nodeOptionsActionViewModel: NodeOptionsActionViewModel,
+    navigationHandler: NavigationHandler,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val singleNodeActionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
+        viewModel = nodeOptionsActionViewModel,
+        navigationHandler = navigationHandler,
+    )
     FolderLinkContent(
         uiState = uiState,
+        singleNodeActionHandler = singleNodeActionHandler,
         onNavigate = onNavigate,
         onBack = onBack,
         onAction = viewModel::processAction,
-        onTransfer = onTransfer
+        onTransfer = onTransfer,
     )
 }
 
@@ -73,6 +89,7 @@ internal fun FolderLinkScreen(
 @Composable
 private fun FolderLinkContent(
     uiState: FolderLinkUiState,
+    singleNodeActionHandler: SingleNodeActionHandler,
     onNavigate: (NavKey) -> Unit,
     onBack: () -> Unit,
     onAction: (FolderLinkAction) -> Unit,
@@ -82,12 +99,16 @@ private fun FolderLinkContent(
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val isLoaded = uiState.contentState is FolderLinkContentState.Loaded
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
             MegaTopAppBar(
                 modifier = Modifier.testTag(FOLDER_LINK_APP_BAR_TAG),
-                title = uiState.title.text, // TODO update after finalized design
+                title = uiState.title.text,
+                subtitle = if (uiState.isRootFolder) {
+                    stringResource(sharedR.string.folder_link_subtitle)
+                } else null,
                 navigationType = AppBarNavigationType.Back { onAction(FolderLinkAction.BackPressed) },
                 trailingIcons = {
                     TransfersToolbarWidget {
@@ -96,7 +117,26 @@ private fun FolderLinkContent(
                 },
             )
         },
-        bottomBar = {},
+        bottomBar = {
+            uiState.currentFolderNode?.let { folderNode ->
+                // TODO hide on selection mode
+                if (isLoaded && uiState.isRootFolder) {
+                    InlineAnchoredButtonGroup(
+                        modifier = Modifier
+                            .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
+                        primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
+                        primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
+                        onPrimaryButtonClick = {
+                            singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
+                        },
+                        textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
+                        onTextOnlyButtonClick = {
+                            singleNodeActionHandler(DownloadMenuAction(), folderNode)
+                        }
+                    )
+                }
+            }
+        },
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -151,6 +191,7 @@ private fun FolderLinkContent(
                                         NodeOptionsBottomSheetNavKey(
                                             nodeHandle = it.id.longValue,
                                             nodeSourceType = NodeSourceType.FOLDER_LINK,
+                                            partiallyExpand = false
                                         )
                                     )
                                 },
@@ -222,3 +263,4 @@ private fun FolderLinkContent(
 
 
 internal const val FOLDER_LINK_APP_BAR_TAG = "folder_link_screen:main_app_bar"
+internal const val FOLDER_LINK_BOTTOM_BAR_TAG = "folder_link_screen:bottom_bar"
