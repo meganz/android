@@ -65,7 +65,6 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
     private val addVideosToPlaylistUseCase: AddVideosToPlaylistUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
-    private val queryFlow = MutableStateFlow<String?>(null)
     private val selectedVideoHandlesFlow = MutableStateFlow<Set<Long>>(emptySet())
 
     internal val navigateToFolderEvent: StateFlow<StateEventWithContent<SelectVideoItemUiEntity>>
@@ -128,23 +127,22 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
             Triple(items, loadingState, showHiddenItems)
         }
 
-    private fun getUiConfigFlow(): Flow<Triple<String?, NodeSortConfiguration, ViewType>> = combine(
-        queryFlow,
-        sortOrder,
-        monitorViewTypeUseCase().catch { Timber.e(it) },
-    ) { query, sortOrder, viewType ->
-        val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-        Triple(query, sortOrderPair, viewType)
-    }
+    private fun getUiConfigFlow(): Flow<Pair<NodeSortConfiguration, ViewType>> =
+        combine(
+            sortOrder,
+            monitorViewTypeUseCase().catch { Timber.e(it) },
+        ) { sortOrder, viewType ->
+            val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
+            sortOrderPair to viewType
+        }
 
     internal val uiState: StateFlow<SelectVideosForPlaylistUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             updatedNodesFlow().catch { Timber.d(it) },
             getUiConfigFlow(),
             selectedVideoHandlesFlow,
-        ) { (entities, loadingState, showHiddenItems), (query, sortOrderPair, viewType), selectedHandles ->
-            val items = entities.queryItems(query ?: "")
-                .map { it.copy(isSelected = it.id.longValue in selectedHandles) }
+        ) { (entities, loadingState, showHiddenItems), (sortOrderPair, viewType), selectedHandles ->
+            val items = entities.map { it.copy(isSelected = it.id.longValue in selectedHandles) }
 
             SelectVideosForPlaylistUiState.Data(
                 title = LocalizedText.Literal(args.nodeName ?: ""),
@@ -152,7 +150,6 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
                 items = items,
                 showHiddenItems = showHiddenItems,
                 selectedSortConfiguration = sortOrderPair,
-                query = query,
                 currentViewType = viewType,
                 nodesLoadingState = loadingState,
                 selectItemHandles = selectedHandles
@@ -170,11 +167,6 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
             filterNot { it.isMarkedSensitive || it.isSensitiveInherited }
         }
 
-    private fun List<SelectVideoItemUiEntity>.queryItems(query: String) =
-        filter {
-            it.name.contains(query, ignoreCase = true)
-        }
-
     internal fun itemClicked(item: SelectVideoItemUiEntity) {
         if (item.isFolder && selectedVideoHandlesFlow.value.isEmpty()) {
             navigateToFolderEvent.update { triggered(item) }
@@ -185,12 +177,6 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     internal fun resetNavigateToFolderEvent() {
         navigateToFolderEvent.update { consumed() }
-    }
-
-    internal fun searchQuery(queryString: String?) {
-        if (queryFlow.value != queryString) {
-            queryFlow.update { queryString }
-        }
     }
 
     internal fun setCloudSortOrder(sortConfiguration: NodeSortConfiguration) {
@@ -237,6 +223,12 @@ class SelectVideosForPlaylistViewModel @AssistedInject constructor(
 
     internal fun clearSelection() {
         selectedVideoHandlesFlow.update { emptySet() }
+    }
+
+    internal fun selectAll() {
+        val state = uiState.value as? SelectVideosForPlaylistUiState.Data ?: return
+        val allIds = state.items.filter { it.isSelectable }.map { it.id.longValue }.toSet()
+        selectedVideoHandlesFlow.update { allIds }
     }
 
     internal fun addVideosToPlaylist(

@@ -424,7 +424,7 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
         SelectVideosForPlaylistRoute(
             isNewlyCreated = key.isNewlyCreated,
             playlistHandle = key.playlistHandle,
-            onNavigateToFolder = navigationHandler::navigate,
+            navigate = navigationHandler::navigate,
             returnResult = { key, numberOfAddedVideos ->
                 navigationHandler.returnResult(key, numberOfAddedVideos)
             },

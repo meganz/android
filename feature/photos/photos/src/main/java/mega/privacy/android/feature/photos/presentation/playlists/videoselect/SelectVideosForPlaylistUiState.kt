@@ -4,10 +4,10 @@ import androidx.compose.runtime.Stable
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 
 @Stable
 sealed interface SelectVideosForPlaylistUiState {
@@ -24,8 +24,8 @@ sealed interface SelectVideosForPlaylistUiState {
      * @property nodesLoadingState The current state of node loading
      * @property selectedSortConfiguration The selected sort configuration for the items
      * @property showHiddenItems Whether hidden items are shown
-     * @property query The current search query, if any
      * @property selectItemHandles The list of selected item handles
+     * @property areAllSelected Whether all items are selected
      */
     data class Data(
         val title: LocalizedText = LocalizedText.Literal(""),
@@ -36,7 +36,10 @@ sealed interface SelectVideosForPlaylistUiState {
         val nodesLoadingState: NodesLoadingState = NodesLoadingState.Loading,
         val selectedSortConfiguration: NodeSortConfiguration = NodeSortConfiguration.default,
         val showHiddenItems: Boolean = false,
-        val query: String? = null,
         val selectItemHandles: Set<Long> = emptySet(),
-    ) : SelectVideosForPlaylistUiState
+    ) : SelectVideosForPlaylistUiState {
+
+        val areAllSelected: Boolean
+            get() = selectItemHandles.isNotEmpty() && selectItemHandles.size == items.count { it.isSelectable }
+    }
 }

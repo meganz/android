@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property isTakenDown Indicates whether the video item has been taken down
  * @property isFolder Indicates whether the item is a folder
  * @property isVideo Indicates whether the item is a video
+ * @property isSelectable Indicates whether the item is selectable
  */
 data class SelectVideoItemUiEntity(
     val id: NodeId,
@@ -31,4 +32,6 @@ data class SelectVideoItemUiEntity(
     val isTakenDown: Boolean = false,
     val isFolder: Boolean = false,
     val isVideo: Boolean = false
-)
+) {
+    val isSelectable: Boolean get() = !isFolder && isVideo
+}

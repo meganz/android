@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
@@ -76,12 +77,21 @@ class SelectVideosForPlaylistViewModelTest {
         name = "video.mp4",
         title = LocalizedText.Literal("video.mp4"),
         isFolder = false,
+        isVideo = true,
+    )
+    private val videoEntity2 = SelectVideoItemUiEntity(
+        id = NodeId(2L),
+        name = "video2.mp4",
+        title = LocalizedText.Literal("video2.mp4"),
+        isFolder = false,
+        isVideo = true,
     )
     private val folderEntity = SelectVideoItemUiEntity(
         id = folderNodeId,
         name = folderName,
         title = LocalizedText.Literal(folderName),
         isFolder = true,
+        isVideo = false,
     )
 
     @BeforeEach
@@ -347,56 +357,6 @@ class SelectVideosForPlaylistViewModelTest {
     }
 
     @Test
-    fun `test that searchQuery updates query in uiState`() = runTest {
-        stubInitialValues()
-
-        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
-            val initial = awaitItem()
-            assertThat(initial.query).isNull()
-
-            underTest.searchQuery("test")
-            advanceUntilIdle()
-            val afterSearch = awaitItem()
-            assertThat(afterSearch.query).isEqualTo("test")
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `test that items are filtered by query`() = runTest {
-        val testName = "match.mp4"
-        val typedVideo = mock<TypedFileNode> {
-            on { id }.thenReturn(NodeId(1L))
-            on { name }.thenReturn(testName)
-            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
-        }
-        val testVideoEntity = SelectVideoItemUiEntity(
-            id = NodeId(1L),
-            name = testName,
-            title = LocalizedText.Literal(testName),
-            isFolder = false,
-        )
-        whenever(selectVideoItemUiEntityMapper(any())).thenReturn(testVideoEntity)
-        stubInitialValues(
-            nodesWithHasMore = listOf<TypedNode>(typedVideo) to false,
-        )
-
-        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
-            val initial = awaitItem()
-            assertThat(initial.items).hasSize(1)
-
-            underTest.searchQuery("match")
-            advanceUntilIdle()
-            assertThat(awaitItem().items).hasSize(1)
-
-            underTest.searchQuery("nomatch")
-            advanceUntilIdle()
-            assertThat(awaitItem().items).isEmpty()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun `test that setCloudSortOrder invokes setCloudSortOrderUseCase`() = runTest {
         stubInitialValues()
 
@@ -512,4 +472,189 @@ class SelectVideosForPlaylistViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+
+    @Test
+    fun `test that selectAll selects all video items and excludes folders`() = runTest {
+        val typedVideo1 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("v1.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val typedVideo2 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(2L))
+            on { name }.thenReturn("v2.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val typedFolder = mock<TypedFolderNode> {
+            on { id }.thenReturn(folderNodeId)
+            on { name }.thenReturn(folderName)
+        }
+        whenever(selectVideoItemUiEntityMapper(typedVideo1)).thenReturn(videoEntity)
+        whenever(selectVideoItemUiEntityMapper(typedVideo2)).thenReturn(videoEntity2)
+        whenever(selectVideoItemUiEntityMapper(typedFolder)).thenReturn(folderEntity)
+        stubInitialValues(
+            nodesWithHasMore = listOf<TypedNode>(typedVideo1, typedVideo2, typedFolder) to false,
+        )
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            val initial = awaitItem()
+            assertThat(initial.items).hasSize(3)
+            assertThat(initial.selectItemHandles).isEmpty()
+
+            underTest.selectAll()
+            advanceUntilIdle()
+
+            val afterSelectAll = awaitItem()
+            assertThat(afterSelectAll.selectItemHandles).containsExactly(
+                videoEntity.id.longValue,
+                videoEntity2.id.longValue,
+            )
+            assertThat(afterSelectAll.selectItemHandles).doesNotContain(folderNodeId.longValue)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAll selects only items that are video and not folder`() = runTest {
+        val nonVideoEntity = SelectVideoItemUiEntity(
+            id = NodeId(3L),
+            name = "file.txt",
+            title = LocalizedText.Literal("file.txt"),
+            isFolder = false,
+            isVideo = false,
+        )
+        val typedNode1 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("v.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val typedNode2 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(3L))
+            on { name }.thenReturn("file.txt")
+        }
+        whenever(selectVideoItemUiEntityMapper(typedNode1)).thenReturn(videoEntity)
+        whenever(selectVideoItemUiEntityMapper(typedNode2)).thenReturn(nonVideoEntity)
+        stubInitialValues(
+            nodesWithHasMore = listOf<TypedNode>(typedNode1, typedNode2) to false,
+        )
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            skipItems(1)
+            underTest.selectAll()
+            advanceUntilIdle()
+
+            val state = awaitItem()
+            assertThat(state.selectItemHandles).containsExactly(videoEntity.id.longValue)
+            assertThat(state.selectItemHandles).doesNotContain(nonVideoEntity.id.longValue)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAll results in empty selection when no video items in state`() =
+        runTest {
+            whenever(selectVideoItemUiEntityMapper(any())).thenReturn(folderEntity)
+            val fileNode = mock<TypedFolderNode>()
+            stubInitialValues(
+                nodesWithHasMore = listOf<TypedNode>(fileNode) to false,
+            )
+            underTest.selectAll()
+            advanceUntilIdle()
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                assertThat(awaitItem().selectItemHandles).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that areAllSelected is true after selectAll when all items are videos`() = runTest {
+        val typedVideo1 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("v1.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val typedVideo2 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(2L))
+            on { name }.thenReturn("v2.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        whenever(selectVideoItemUiEntityMapper(typedVideo1)).thenReturn(videoEntity)
+        whenever(selectVideoItemUiEntityMapper(typedVideo2)).thenReturn(videoEntity2)
+        stubInitialValues(
+            nodesWithHasMore = listOf<TypedNode>(typedVideo1, typedVideo2) to false,
+        )
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            skipItems(1)
+            underTest.selectAll()
+            advanceUntilIdle()
+
+            assertThat(awaitItem().areAllSelected).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that areAllSelected is false when only some items are selected`() = runTest {
+        val typedVideo1 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(1L))
+            on { name }.thenReturn("v1.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        val typedVideo2 = mock<TypedFileNode> {
+            on { id }.thenReturn(NodeId(2L))
+            on { name }.thenReturn("v2.mp4")
+            on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+        }
+        whenever(selectVideoItemUiEntityMapper(typedVideo1)).thenReturn(videoEntity)
+        whenever(selectVideoItemUiEntityMapper(typedVideo2)).thenReturn(videoEntity2)
+        stubInitialValues(
+            nodesWithHasMore = listOf<TypedNode>(typedVideo1, typedVideo2) to false,
+        )
+
+        underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+            val initial = awaitItem()
+            assertThat(initial.areAllSelected).isFalse()
+
+            underTest.itemClicked(videoEntity)
+            advanceUntilIdle()
+
+            assertThat(awaitItem().areAllSelected).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that selectAll does not emit new state when all videos are already selected`() =
+        runTest {
+            val typedVideo1 = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(1L))
+                on { name }.thenReturn("v1.mp4")
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+            }
+            val typedVideo2 = mock<TypedFileNode> {
+                on { id }.thenReturn(NodeId(2L))
+                on { name }.thenReturn("v2.mp4")
+                on { type }.thenReturn(VideoFileTypeInfo("video", "mp4", 10.seconds))
+            }
+            whenever(selectVideoItemUiEntityMapper(typedVideo1)).thenReturn(videoEntity)
+            whenever(selectVideoItemUiEntityMapper(typedVideo2)).thenReturn(videoEntity2)
+            stubInitialValues(
+                nodesWithHasMore = listOf<TypedNode>(typedVideo1, typedVideo2) to false,
+            )
+
+            underTest.uiState.filterIsInstance<SelectVideosForPlaylistUiState.Data>().test {
+                skipItems(1)
+                underTest.selectAll()
+                advanceUntilIdle()
+                assertThat(awaitItem().areAllSelected).isTrue()
+
+                underTest.selectAll()
+                advanceUntilIdle()
+                expectNoEvents()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

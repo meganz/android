@@ -31,12 +31,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.NavigationEventEffect
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
 import mega.privacy.android.core.formatter.formatFileSize
@@ -44,7 +46,6 @@ import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.components.AddContentFab
 import mega.privacy.android.core.nodecomponents.components.selectionmode.SelectionModeBottomBar
-import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveFavouriteMenuAction
@@ -52,11 +53,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.UnhideMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
@@ -72,10 +69,13 @@ import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlay
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.feature.photos.presentation.videos.model.VideoUiEntity
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.shared.nodes.components.NodeLabelCircle
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Locale
 
@@ -148,7 +148,6 @@ internal fun VideoPlaylistDetailScreen(
     onMenuClick: (NavKey) -> Unit = {},
     onSortNodes: (NodeSortConfiguration) -> Unit = {},
     multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(),
-    snackBarQueue: SnackbarEventQueue = rememberSnackBarQueue(),
 ) {
     val resources = LocalResources.current
     val lazyListState = rememberLazyListState()
@@ -158,6 +157,7 @@ internal fun VideoPlaylistDetailScreen(
     var showRemovedVideosDialog by rememberSaveable { mutableStateOf(false) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val snackbarHostState = LocalSnackBarHostState.current
 
     val dataState = uiState as? VideoPlaylistDetailUiState.Data
     val selectedNodes = dataState?.selectedTypedNodes ?: emptySet()
@@ -321,7 +321,7 @@ internal fun VideoPlaylistDetailScreen(
                                     deletedVideoPlaylistTitles.size
                                 )
                             }
-                            snackBarQueue.queueMessage(deletedMessage)
+                            snackbarHostState?.showAutoDurationSnackbar(deletedMessage)
                         }
                         onBack()
                     }
@@ -339,23 +339,22 @@ internal fun VideoPlaylistDetailScreen(
                             number,
                             title
                         )
-                        snackBarQueue.queueMessage(message)
+                        snackbarHostState?.showAutoDurationSnackbar(message)
                     }
                 }
 
-                LaunchedEffect(numberOfAddedVideos) {
+                LaunchedEffect(numberOfAddedVideos, uiState.playlistDetail?.uiEntity?.title) {
                     val number = numberOfAddedVideos ?: 0
-                    if (number > 0) {
-                        val title = uiState.playlistDetail?.uiEntity?.title ?: ""
-                        val message = resources.getQuantityString(
-                            sharedR.plurals.video_section_playlist_detail_add_videos_message,
-                            number,
-                            number,
-                            title
-                        )
-                        snackBarQueue.queueMessage(message)
-                        clearResultFlow(SelectVideosForPlaylistNavKey.RESULT)
-                    }
+                    if (number <= 0) return@LaunchedEffect
+                    val title = uiState.playlistDetail?.uiEntity?.title ?: return@LaunchedEffect
+                    val message = resources.getQuantityString(
+                        sharedR.plurals.video_section_playlist_detail_add_videos_message,
+                        number,
+                        number,
+                        title
+                    )
+                    snackbarHostState?.showAutoDurationSnackbar(message)
+                    clearResultFlow(SelectVideosForPlaylistNavKey.RESULT)
                 }
 
                 val playlistDetail = uiState.playlistDetail
