@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.collectLatest
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.R
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
 import mega.privacy.android.domain.entity.chat.MeetingTooltipItem
 import mega.privacy.android.icon.pack.R as IconR
@@ -217,7 +217,9 @@ private fun ListView(
     }
 
     LaunchedEffect(scrollToTop) {
-        listState.animateScrollToItem(0)
+        if (scrollToTop) {
+            listState.animateScrollToItem(0)
+        }
     }
 
     LaunchedEffect(selectedIds) {
