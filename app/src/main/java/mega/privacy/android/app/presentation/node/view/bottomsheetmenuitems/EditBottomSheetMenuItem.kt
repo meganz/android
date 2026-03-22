@@ -1,32 +1,34 @@
 package mega.privacy.android.app.presentation.node.view.bottomsheetmenuitems
 
-import android.content.Intent
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.model.menu.MenuAction
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.presentation.node.model.menuaction.EditMenuAction
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.SEARCH_ADAPTER
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission.FULL
 import mega.privacy.android.domain.entity.shares.AccessPermission.OWNER
 import mega.privacy.android.domain.entity.shares.AccessPermission.READWRITE
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import javax.inject.Inject
 
 /**
- * Edit bottom sheet menu action
+ * Edit bottom sheet menu action for opening text files in the text editor.
+ * Navigation is performed via the injected [MegaNavigator].
  *
  * @param menuAction [EditMenuAction]
+ * @param megaNavigator Used to open the text editor activity.
  */
 class EditBottomSheetMenuItem @Inject constructor(
     override val menuAction: EditMenuAction,
+    private val megaNavigator: MegaNavigator,
 ) : NodeBottomSheetMenuItem<MenuActionWithIcon> {
     override suspend fun shouldDisplay(
         isNodeInRubbish: Boolean,
@@ -50,13 +52,15 @@ class EditBottomSheetMenuItem @Inject constructor(
         navController: NavHostController,
         parentCoroutineScope: CoroutineScope,
     ): () -> Unit = {
-        val textFileIntent = Intent(navController.context, TextEditorActivity::class.java)
-            .apply {
-                putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.id.longValue)
-                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, SEARCH_ADAPTER)
-                putExtra(TextEditorViewModel.MODE, TextEditorMode.Edit.value)
-            }
-        navController.context.startActivity(textFileIntent)
+        megaNavigator.openTextEditor(
+            context = navController.context,
+            params = OpenTextEditorParams.CloudNode(
+                nodeId = NodeId(node.id.longValue),
+                nodeSourceType = SEARCH_ADAPTER,
+                mode = TextEditorMode.Edit,
+                fileName = node.name,
+            ),
+        )
         onDismiss()
     }
 }

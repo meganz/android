@@ -1,8 +1,11 @@
 package mega.privacy.android.app.textEditor
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,6 +13,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
@@ -24,14 +28,17 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import nz.mega.sdk.MegaApiJava
 
 /**
  * Returns true when the node options bottom sheet result indicates the editor should close
@@ -85,10 +92,93 @@ private fun shouldShowShare(nodeSourceType: Int?): Boolean {
 }
 
 /**
+ * Builds the legacy [Intent] for [TextEditorActivity] from [navKey].
+ * Used when [ApiFeatures.TextEditorCompose] is disabled.
+ */
+private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavKey): Intent {
+    return when {
+        navKey.chatId != null && navKey.messageId != null ->
+            Intent(context, TextEditorActivity::class.java).apply {
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_CHAT)
+                putExtra(ChatNavKey.LEGACY_MESSAGE_ID, navKey.messageId)
+                putExtra(ChatNavKey.LEGACY_CHAT_ID, navKey.chatId)
+            }
+        navKey.localPath != null -> {
+            val nodeSourceType = navKey.nodeSourceType ?: OFFLINE_ADAPTER
+            Intent(context, TextEditorActivity::class.java).apply {
+                putExtra(Constants.INTENT_EXTRA_KEY_PATH, navKey.localPath)
+                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, nodeSourceType)
+                putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, navKey.fileName)
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+        }
+        else ->
+            TextEditorActivity.createIntent(
+                context = context,
+                nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
+                mode = navKey.mode,
+                nodeSourceType = navKey.nodeSourceType,
+                fileName = navKey.fileName,
+            )
+    }
+}
+
+/**
+ * Builds [TextEditorComposeViewModel.Args] from [navKey] and [transferHandler].
+ */
+private fun buildTextEditorViewModelArgs(
+    navKey: LegacyTextEditorNavKey,
+    transferHandler: TransferHandler,
+): TextEditorComposeViewModel.Args {
+    val nodeSourceType = navKey.nodeSourceType
+    return when {
+        navKey.chatId != null && navKey.messageId != null ->
+            TextEditorComposeViewModel.Args(
+                nodeHandle = MegaApiJava.INVALID_HANDLE,
+                mode = TextEditorMode.View,
+                fileName = null,
+                inExcludedAdapterForGetLinkAndEdit = true,
+                showDownload = true,
+                showShare = false,
+                transferHandler = transferHandler,
+                chatId = navKey.chatId,
+                messageId = navKey.messageId,
+            )
+        navKey.localPath != null -> {
+            val sourceType = nodeSourceType ?: OFFLINE_ADAPTER
+            TextEditorComposeViewModel.Args(
+                nodeHandle = MegaApiJava.INVALID_HANDLE,
+                mode = TextEditorMode.View,
+                fileName = navKey.fileName ?: "",
+                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(sourceType),
+                showDownload = shouldShowDownload(sourceType),
+                showShare = shouldShowShare(sourceType),
+                transferHandler = transferHandler,
+                localPath = navKey.localPath,
+            )
+        }
+        else -> {
+            val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
+            val mode = textEditorModeFromValue(navKey.mode)
+            TextEditorComposeViewModel.Args(
+                nodeHandle = nodeHandle,
+                mode = mode,
+                fileName = navKey.fileName,
+                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
+                showDownload = shouldShowDownload(nodeSourceType),
+                showShare = shouldShowShare(nodeSourceType),
+                transferHandler = transferHandler,
+                isFromSharedFolder = isFromSharedFolder(nodeSourceType),
+            )
+        }
+    }
+}
+
+/**
  * Legacy text editor destination. Uses [FeatureFlagGate] with [ApiFeatures.TextEditorCompose]:
  * when enabled shows [TextEditorScreen]; when disabled starts [TextEditorActivity] and pops.
- * Tapping More opens the Node Options Bottom Sheet. When the user deletes or moves the node
- * (result Navigation or Transfer), the editor is closed.
+ * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
+ * moves the node (result Navigation or Transfer), the editor is closed.
  */
 fun EntryProviderScope<NavKey>.legacyTextEditorScreen(
     navigationHandler: NavigationHandler,
@@ -116,49 +206,36 @@ private fun TextEditorEntry(
 ) {
     val context = LocalContext.current
     val removeDestination: () -> Unit = { navigationHandler.back() }
+    val legacyIntent = buildTextEditorIntent(context, navKey)
 
-    // Close editor when user deletes/moves the node or navigates away from the sheet.
-    LaunchedEffect(Unit) {
-        navigationHandler.monitorResult<NodeOptionsBottomSheetResult>(NodeOptionsBottomSheetNavKey.RESULT)
-            .distinctUntilChanged()
-            .collect { result ->
-                if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
-                    navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
-                    removeDestination()
+    if (navKey.chatId == null && navKey.localPath == null) {
+        LaunchedEffect(Unit) {
+            navigationHandler.monitorResult<NodeOptionsBottomSheetResult>(NodeOptionsBottomSheetNavKey.RESULT)
+                .distinctUntilChanged()
+                .collect { result ->
+                    if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
+                        navigationHandler.clearResult(NodeOptionsBottomSheetNavKey.RESULT)
+                        removeDestination()
+                    }
                 }
-            }
+        }
     }
 
-    val mode = TextEditorMode.entries.find { it.value == navKey.mode } ?: TextEditorMode.View
-    val nodeSourceType = navKey.nodeSourceType
-    // Default empty loading state is intentional; no loading UI for now.
     FeatureFlagGate(
         feature = ApiFeatures.TextEditorCompose,
         disabled = {
             LaunchedEffect(Unit) {
-                context.startActivity(
-                    TextEditorActivity.createIntent(
-                        context = context,
-                        nodeHandle = navKey.nodeHandle,
-                        mode = navKey.mode,
-                        nodeSourceType = navKey.nodeSourceType,
-                        fileName = navKey.fileName,
-                    )
-                )
+                context.startActivity(legacyIntent)
                 removeDestination()
             }
         },
         enabled = {
             TextEditorComposeContent(
                 navKey = navKey,
-                mode = mode,
-                inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit(nodeSourceType),
-                showDownload = shouldShowDownload(nodeSourceType),
-                showShare = shouldShowShare(nodeSourceType),
                 navigationHandler = navigationHandler,
                 removeDestination = removeDestination,
-                viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
                 transferHandler = transferHandler,
+                viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
             )
         },
     )
@@ -167,29 +244,41 @@ private fun TextEditorEntry(
 @Composable
 private fun TextEditorComposeContent(
     navKey: LegacyTextEditorNavKey,
-    mode: TextEditorMode,
-    inExcludedAdapterForGetLinkAndEdit: Boolean,
-    showDownload: Boolean,
-    showShare: Boolean,
     navigationHandler: NavigationHandler,
     removeDestination: () -> Unit,
-    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
     transferHandler: TransferHandler,
+    viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
 ) {
+    val args = remember(navKey, transferHandler) {
+        buildTextEditorViewModelArgs(navKey, transferHandler)
+    }
+    val onOpenNodeOptions: () -> Unit = remember(
+        navKey.chatId,
+        navKey.messageId,
+        navKey.localPath,
+        navKey.nodeHandle,
+        navKey.nodeSourceType,
+        navigationHandler,
+        viewTypeToNodeSourceTypeMapper,
+    ) {
+        val nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE
+        val sourceType = navKey.nodeSourceType
+        val showNodeOptions = navKey.chatId == null && navKey.localPath == null
+        {
+            if (showNodeOptions) {
+                navigationHandler.navigate(
+                    NodeOptionsBottomSheetNavKey(
+                        nodeHandle = nodeHandle,
+                        nodeSourceType = viewTypeToNodeSourceTypeMapper(sourceType),
+                    )
+                )
+            }
+        }
+    }
+
     val viewModel =
         hiltViewModel<TextEditorComposeViewModel, TextEditorComposeViewModel.Factory> { factory ->
-            factory.create(
-                TextEditorComposeViewModel.Args(
-                    nodeHandle = navKey.nodeHandle,
-                    mode = mode,
-                    fileName = navKey.fileName,
-                    inExcludedAdapterForGetLinkAndEdit = inExcludedAdapterForGetLinkAndEdit,
-                    showDownload = showDownload,
-                    showShare = showShare,
-                    transferHandler = transferHandler,
-                    isFromSharedFolder = isFromSharedFolder(navKey.nodeSourceType),
-                )
-            )
+            factory.create(args)
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     EventEffect(
@@ -201,13 +290,6 @@ private fun TextEditorComposeContent(
     TextEditorScreen(
         viewModel = viewModel,
         onBack = removeDestination,
-        onOpenNodeOptions = {
-            navigationHandler.navigate(
-                NodeOptionsBottomSheetNavKey(
-                    nodeHandle = navKey.nodeHandle,
-                    nodeSourceType = viewTypeToNodeSourceTypeMapper(navKey.nodeSourceType),
-                )
-            )
-        },
+        onOpenNodeOptions = onOpenNodeOptions,
     )
 }

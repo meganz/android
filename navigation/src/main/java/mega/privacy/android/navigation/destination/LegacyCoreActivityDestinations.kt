@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
@@ -260,12 +261,19 @@ data class LegacyImageViewerNavKey(
     val url: String? = null,
 ) : NoSessionNavKey.Optional
 
+/**
+ * Single NavKey for all text editor entry points (cloud node, local/zip file, chat attachment).
+ * Branch in the destination by: chatId != null -> chat; localPath != null -> local file; else -> cloud node.
+ */
 @Serializable
 data class LegacyTextEditorNavKey(
-    val nodeHandle: Long,
-    val mode: String,
+    val nodeHandle: Long? = null,
+    val mode: String = TextEditorMode.View.value,
     val nodeSourceType: Int? = null,
     val fileName: String? = null,
+    val localPath: String? = null,
+    val chatId: Long? = null,
+    val messageId: Long? = null,
 ) : NoSessionNavKey.Optional
 
 @Serializable

@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.resources.R
 import java.io.File
@@ -77,11 +78,13 @@ fun HandleNodeAction(
                 }
 
                 FileNodeContent.TextContent -> {
-                    megaNavigator.openTextEditorActivity(
+                    megaNavigator.openTextEditor(
                         context = context,
-                        currentNodeId = typedFileNode.id,
-                        nodeSourceType = nodeSourceType,
-                        mode = TextEditorMode.View
+                        params = OpenTextEditorParams.CloudNode(
+                            nodeId = typedFileNode.id,
+                            nodeSourceType = nodeSourceType,
+                            mode = TextEditorMode.View,
+                        ),
                     )
                 }
 

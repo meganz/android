@@ -423,23 +423,6 @@ class FileLinkViewModel @Inject constructor(
     }
 
     /**
-     * Update intent value for text editor
-     */
-    fun updateTextEditorIntent(intent: Intent) {
-        with(state.value) {
-            intent.apply {
-                putExtra(Constants.URL_FILE_LINK, url)
-                putExtra(Constants.EXTRA_SERIALIZE_STRING, serializedData)
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                    Constants.FILE_LINK_ADAPTER
-                )
-            }
-            _state.update { it.copy(openFile = triggered(intent)) }
-        }
-    }
-
-    /**
      * Start the server if not started
      * also setMax buffer size based on available buffer size
      * @param intent [Intent]

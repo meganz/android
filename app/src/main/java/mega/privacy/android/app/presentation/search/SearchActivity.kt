@@ -65,7 +65,6 @@ import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.snackbar.MegaSnackbarShower
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -82,11 +81,14 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -478,10 +480,15 @@ class SearchActivity : AppCompatActivity(), MegaSnackbarShower {
     }
 
     private fun openTextEditorActivity(currentFileNode: TypedFileNode, viewType: Int?) {
-        val textFileIntent = Intent(this, TextEditorActivity::class.java)
-        textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, currentFileNode.id.longValue)
-            .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
-        startActivity(textFileIntent)
+        megaNavigator.openTextEditor(
+            context = this,
+            params = OpenTextEditorParams.CloudNode(
+                nodeId = NodeId(currentFileNode.id.longValue),
+                nodeSourceType = viewType,
+                mode = TextEditorMode.View,
+                fileName = currentFileNode.name,
+            ),
+        )
     }
 
     private fun openPdfActivity(

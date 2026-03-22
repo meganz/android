@@ -38,11 +38,9 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.zipbrowser.view.ZipBrowserScreen
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -56,6 +54,7 @@ import mega.privacy.android.domain.entity.zipbrowser.ZipEntryType
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import timber.log.Timber
 import java.io.File
@@ -138,15 +137,13 @@ class ZipBrowserComposeActivity : PasscodeActivity() {
                             isPdf -> openPdfFile(zipFile)
 
                             isOpenableTextFile(zipFile.length()) -> {
-                                startActivity(
-                                    Intent(
-                                        this@ZipBrowserComposeActivity,
-                                        TextEditorActivity::class.java
-                                    ).apply {
-                                        putExtra(INTENT_EXTRA_KEY_FILE_NAME, zipFile.name)
-                                        putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, ZIP_ADAPTER)
-                                        putExtra(INTENT_EXTRA_KEY_PATH, zipFile.absolutePath)
-                                    }
+                                megaNavigator.openTextEditor(
+                                    context = this@ZipBrowserComposeActivity,
+                                    params = OpenTextEditorParams.LocalFile(
+                                        localPath = zipFile.absolutePath,
+                                        fileName = zipFile.name,
+                                        nodeSourceType = ZIP_ADAPTER,
+                                    ),
                                 )
                             }
 

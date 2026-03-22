@@ -31,6 +31,7 @@ import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.resources.R as sharedR
 
@@ -81,12 +82,14 @@ fun NewTextFileNodeDialog(
                     fileName = fileName.text.trim() + ".txt",
                     parentNodeId = parentNode,
                 ).onSuccess { (parentNode, fileName) ->
-                    megaNavigator.openTextEditorActivity(
+                    megaNavigator.openTextEditor(
                         context = context,
-                        currentNodeId = parentNode,
-                        fileName = fileName,
-                        nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
-                        mode = TextEditorMode.Create
+                        params = OpenTextEditorParams.CloudNode(
+                            nodeId = parentNode,
+                            nodeSourceType = NodeSourceTypeInt.FILE_BROWSER_ADAPTER,
+                            mode = TextEditorMode.Create,
+                            fileName = fileName,
+                        ),
                     )
                     onDismiss()
                 }.onFailure {

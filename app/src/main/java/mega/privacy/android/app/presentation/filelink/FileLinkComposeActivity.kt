@@ -39,7 +39,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
@@ -49,6 +48,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -305,9 +305,13 @@ class FileLinkComposeActivity : PasscodeActivity(),
                 }
 
                 nameType.isOpenableTextFile(sizeInBytes) -> {
-                    val intent =
-                        Intent(this@FileLinkComposeActivity, TextEditorActivity::class.java)
-                    viewModel.updateTextEditorIntent(intent)
+                    megaNavigator.openTextEditor(
+                        context = this@FileLinkComposeActivity,
+                        params = OpenTextEditorParams.FileLink(
+                            serializedNode = viewModel.state.value.serializedData,
+                            urlFileLink = viewModel.state.value.url,
+                        ),
+                    )
                 }
 
                 else -> {

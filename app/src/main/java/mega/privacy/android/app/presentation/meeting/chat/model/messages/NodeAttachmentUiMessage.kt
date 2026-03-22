@@ -24,9 +24,7 @@ import mega.privacy.android.app.presentation.meeting.chat.view.message.attachmen
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
@@ -34,7 +32,8 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.navigation.destination.ChatNavKey
-import mega.privacy.android.navigation.destination.ChatNavKey.Companion.LEGACY_MESSAGE_ID
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -146,8 +145,8 @@ data class NodeAttachmentUiMessage(
         coroutineScope.launch {
             runCatching {
                 val fileNode = message.fileNode
-                EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-                    .megaNavigator().openMediaPlayerActivityFromChat(
+                EntryPointAccessors.fromApplication(context.applicationContext, MegaNavigatorEntryPoint::class.java)
+                    .megaNavigator.openMediaPlayerActivityFromChat(
                         context = context,
                         contentUri = uri,
                         fileNode = fileNode,
@@ -206,11 +205,12 @@ data class NodeAttachmentUiMessage(
     }
 
     private fun handleTextEditor(context: Context, msgId: Long, chatId: Long) {
-        context.startActivity(
-            Intent(context, TextEditorActivity::class.java)
-                .putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_CHAT)
-                .putExtra(LEGACY_MESSAGE_ID, msgId)
-                .putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId)
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaNavigatorEntryPoint::class.java,
+        ).megaNavigator.openTextEditor(
+            context = context,
+            params = OpenTextEditorParams.Chat(chatId = chatId, messageId = msgId),
         )
     }
 
@@ -263,9 +263,9 @@ data class NodeAttachmentUiMessage(
     ) {
         Timber.d("The file is zip, open in-app.")
         EntryPointAccessors.fromApplication(
-            context,
+            context.applicationContext,
             MegaNavigatorEntryPoint::class.java
-        ).megaNavigator().openZipBrowserActivity(
+        ).megaNavigator.openZipBrowserActivity(
             context = context,
             zipFilePath = localFile.absolutePath,
             nodeHandle = fileNode.id.longValue

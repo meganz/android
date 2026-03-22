@@ -782,17 +782,6 @@ class FolderLinkViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Update intent value for text editor
-     */
-    fun updateTextEditorIntent(intent: Intent, fileNode: FileNode) {
-        intent.apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FOLDER_LINK_ADAPTER)
-        }
-        _state.update { it.copy(openFile = triggered(intent)) }
-    }
-
     internal fun openOtherTypeFile(context: Context, fileNode: TypedNode) {
         viewModelScope.launch {
             val typedFileNode = fileNode as? TypedFileNode ?: return@launch

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.utils;
 
 import static mega.privacy.android.app.utils.Constants.DISABLED_RETENTION_TIME;
-import static mega.privacy.android.app.utils.Constants.FROM_CHAT;
-import static mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.MAX_ALLOWED_CHARACTERS_AND_EMOJIS;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_1_HOUR;
@@ -27,7 +25,6 @@ import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
 import static mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning;
-import static mega.privacy.android.navigation.destination.ChatNavKey.LEGACY_MESSAGE_ID;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 import static nz.mega.sdk.MegaUser.VISIBILITY_VISIBLE;
 
@@ -57,6 +54,8 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import dagger.hilt.android.EntryPointAccessors;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,9 +70,9 @@ import mega.privacy.android.app.listeners.ExportListener;
 import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
-import mega.privacy.android.app.textEditor.TextEditorActivity;
 import mega.privacy.android.domain.entity.settings.ChatSettings;
-import mega.privacy.android.navigation.destination.ChatNavKey;
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint;
+import mega.privacy.android.navigation.OpenTextEditorParams;
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiManager;
 import mega.privacy.android.thirdpartylib.twemoji.EmojiRange;
@@ -1040,10 +1039,10 @@ public class ChatUtil {
      * @param chatId  Chat identifier.
      */
     public static void manageTextFileIntent(Context context, long msgId, long chatId) {
-        context.startActivity(new Intent(context, TextEditorActivity.class)
-                .putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
-                .putExtra(LEGACY_MESSAGE_ID, msgId)
-                .putExtra(ChatNavKey.LEGACY_CHAT_ID, chatId));
+        EntryPointAccessors.fromApplication(
+                context.getApplicationContext(),
+                MegaNavigatorEntryPoint.class
+        ).getMegaNavigator().openTextEditor(context, new OpenTextEditorParams.Chat(chatId, msgId));
     }
 
     /**

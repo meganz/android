@@ -48,7 +48,6 @@ import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenu
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.ColorUtils
@@ -63,12 +62,14 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.resources.R as sharedR
@@ -402,9 +403,15 @@ class FolderLinkComposeActivity : PasscodeActivity(),
                 }
 
                 nameType.isOpenableTextFile(fileNode.size) -> {
-                    val intent =
-                        Intent(this@FolderLinkComposeActivity, TextEditorActivity::class.java)
-                    viewModel.updateTextEditorIntent(intent, fileNode)
+                    megaNavigator.openTextEditor(
+                        context = this@FolderLinkComposeActivity,
+                        params = OpenTextEditorParams.CloudNode(
+                            nodeId = fileNode.id,
+                            nodeSourceType = FOLDER_LINK_ADAPTER,
+                            mode = TextEditorMode.View,
+                            fileName = fileNode.name,
+                        ),
+                    )
                 }
 
                 else -> {

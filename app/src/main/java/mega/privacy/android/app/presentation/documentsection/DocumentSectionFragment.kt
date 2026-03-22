@@ -44,7 +44,6 @@ import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingActiv
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.search.view.MiniAudioPlayerView
 import mega.privacy.android.app.presentation.validator.toolbaractions.ToolbarActionsValidator
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -53,9 +52,12 @@ import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
-import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.mobile.analytics.event.HideNodeMultiSelectMenuItemEvent
 import nz.mega.sdk.MegaChatApiJava
@@ -79,6 +81,9 @@ class DocumentSectionFragment : Fragment() {
 
     @Inject
     lateinit var toolbarActionsValidator: ToolbarActionsValidator
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var actionMode: ActionMode? = null
 
@@ -190,15 +195,15 @@ class DocumentSectionFragment : Fragment() {
 
                 document.fileTypeInfo is TextFileTypeInfo
                         && document.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> {
-                    Intent(context, TextEditorActivity::class.java).apply {
-                        putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
-                        putExtra(
-                            INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                            DOCUMENTS_BROWSE_ADAPTER
-                        )
-                    }.let {
-                        activity.startActivity(it)
-                    }
+                    megaNavigator.openTextEditor(
+                        context = activity,
+                        params = OpenTextEditorParams.CloudNode(
+                            nodeId = NodeId(nodeHandle),
+                            nodeSourceType = DOCUMENTS_BROWSE_ADAPTER,
+                            mode = TextEditorMode.View,
+                            fileName = document.name,
+                        ),
+                    )
                 }
 
                 else -> {

@@ -106,8 +106,11 @@ import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeShareDataUseCase
+import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
+import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
@@ -927,13 +930,20 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test EditAction single node handle calls megaNavigator`() {
+    fun `test that EditAction handle calls openTextEditor with CloudNode Edit mode`() {
         val action = EditActionClickHandler(mockMegaNavigator)
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockMegaNavigator).openTextEditorActivity(any(), any(), any(), any(), anyOrNull())
+        verify(mockMegaNavigator).openTextEditor(
+            any(),
+            argThat { params ->
+                params is OpenTextEditorParams.CloudNode &&
+                        params.mode == TextEditorMode.Edit &&
+                        params.nodeSourceType == NodeSourceTypeInt.FILE_BROWSER_ADAPTER
+            },
+        )
     }
 
     // DisputeTakeDownAction Tests

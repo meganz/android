@@ -6,6 +6,7 @@ package mega.privacy.android.core.nodecomponents.model
  */
 object NodeSourceTypeInt {
     const val FILE_BROWSER_ADAPTER: Int = 2000
+    const val OFFLINE_ADAPTER: Int = 2004
     const val RUBBISH_BIN_ADAPTER: Int = 2002
     const val OUTGOING_SHARES_ADAPTER: Int = 2009
     const val INCOMING_SHARES_ADAPTER: Int = 2010

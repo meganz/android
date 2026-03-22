@@ -49,6 +49,7 @@ import mega.privacy.android.app.presentation.settings.compose.navigation.Setting
 import mega.privacy.android.app.presentation.transfers.TransfersActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
+import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
@@ -59,6 +60,7 @@ import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
@@ -69,8 +71,12 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt
 import mega.privacy.android.domain.entity.AccountType
@@ -98,6 +104,7 @@ import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
@@ -709,49 +716,79 @@ internal class MegaNavigatorImpl @Inject constructor(
         context.startActivity(intent)
     }
 
-    override fun openTextEditorActivity(
+    override fun openTextEditor(
         context: Context,
-        currentNodeId: NodeId,
-        nodeSourceType: Int?,
-        mode: TextEditorMode,
-        fileName: String?,
+        params: OpenTextEditorParams,
     ) {
-        navigateForSingleActivity(
-            context = context,
-            singleActivityDestinations = listOf(
-                LegacyTextEditorNavKey(
-                    nodeHandle = currentNodeId.longValue,
-                    mode = mode.value,
-                    nodeSourceType = nodeSourceType,
-                    fileName = fileName,
-                )
-            ),
-            legacyNavigation = {
-                context.startActivity(
-                    TextEditorActivity.createIntent(
-                        context = context,
-                        nodeHandle = currentNodeId.longValue,
-                        mode = mode.value,
-                        nodeSourceType = nodeSourceType,
-                        fileName = fileName,
+        when (params) {
+            is OpenTextEditorParams.CloudNode -> navigateForSingleActivity(
+                context = context,
+                singleActivityDestinations = listOf(
+                    LegacyTextEditorNavKey(
+                        nodeHandle = params.nodeId.longValue,
+                        mode = params.mode.value,
+                        nodeSourceType = params.nodeSourceType,
+                        fileName = params.fileName,
                     )
-                )
-            },
-        )
-    }
-
-    override fun openTextEditorActivityForOfflineFile(
-        context: Context,
-        localPath: String,
-        fileName: String,
-    ) {
-        val intent = Intent(context, TextEditorActivity::class.java).apply {
-            putExtra(INTENT_EXTRA_KEY_PATH, localPath)
-            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, OFFLINE_ADAPTER)
-            putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileName)
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                ),
+                legacyNavigation = {
+                    context.startActivity(
+                        TextEditorActivity.createIntent(
+                            context = context,
+                            nodeHandle = params.nodeId.longValue,
+                            mode = params.mode.value,
+                            nodeSourceType = params.nodeSourceType,
+                            fileName = params.fileName,
+                        ).apply {
+                            if (params.fromHome) putExtra(FROM_HOME_PAGE, true)
+                        }
+                    )
+                },
+            )
+            is OpenTextEditorParams.LocalFile -> navigateForSingleActivity(
+                context = context,
+                singleActivityDestination = LegacyTextEditorNavKey(
+                    localPath = params.localPath,
+                    fileName = params.fileName,
+                    nodeSourceType = params.nodeSourceType,
+                ),
+                legacyNavigation = {
+                    context.startActivity(
+                        Intent(context, TextEditorActivity::class.java).apply {
+                            putExtra(INTENT_EXTRA_KEY_PATH, params.localPath)
+                            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, params.nodeSourceType)
+                            putExtra(INTENT_EXTRA_KEY_FILE_NAME, params.fileName)
+                            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                        }
+                    )
+                },
+            )
+            is OpenTextEditorParams.Chat -> navigateForSingleActivity(
+                context = context,
+                singleActivityDestination = LegacyTextEditorNavKey(
+                    chatId = params.chatId,
+                    messageId = params.messageId,
+                ),
+                legacyNavigation = {
+                    context.startActivity(
+                        Intent(context, TextEditorActivity::class.java).apply {
+                            putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_CHAT)
+                            putExtra(LEGACY_MESSAGE_ID, params.messageId)
+                            putExtra(ChatNavKey.LEGACY_CHAT_ID, params.chatId)
+                        }
+                    )
+                },
+            )
+            is OpenTextEditorParams.FileLink -> {
+                val intent = Intent(context, TextEditorActivity::class.java).apply {
+                    putExtra(EXTRA_SERIALIZE_STRING, params.serializedNode)
+                    putExtra(URL_FILE_LINK, params.urlFileLink)
+                    putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FILE_LINK_ADAPTER)
+                    putExtra(TextEditorViewModel.MODE, params.mode.value)
+                }
+                context.startActivity(intent)
+            }
         }
-        context.startActivity(intent)
     }
 
     override fun openGetLinkActivity(context: Context, vararg handles: Long) {

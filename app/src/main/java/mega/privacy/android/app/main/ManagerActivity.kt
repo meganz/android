@@ -287,6 +287,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -317,6 +318,7 @@ import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature.sync.ui.views.SyncPromotionViewModel
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyImageViewerNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
@@ -6980,14 +6982,39 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
                         intent?.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
                     }
 
-                    is LegacyTextEditorNavKey -> TextEditorActivity.createIntent(
-                        context = this@ManagerActivity,
-                        nodeHandle = it.nodeHandle,
-                        mode = it.mode,
-                        nodeSourceType = it.nodeSourceType,
-                        fileName = it.fileName,
-                    ).also { intent ->
-                        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                    is LegacyTextEditorNavKey -> {
+                        // This block is only reached when SingleActivity is disabled and
+                        // ManagerActivity is acting as the legacy nav-key-to-intent bridge.
+                        // The navigator starts the activity directly and returns null so
+                        // the caller skips the default startActivity path.
+                        val editorChatId = it.chatId
+                        val editorMessageId = it.messageId
+                        val editorLocalPath = it.localPath
+                        val params = when {
+                            editorChatId != null && editorMessageId != null ->
+                                OpenTextEditorParams.Chat(
+                                    chatId = editorChatId,
+                                    messageId = editorMessageId,
+                                )
+                            editorLocalPath != null ->
+                                OpenTextEditorParams.LocalFile(
+                                    localPath = editorLocalPath,
+                                    fileName = it.fileName.orEmpty(),
+                                    nodeSourceType = it.nodeSourceType ?: Constants.OFFLINE_ADAPTER,
+                                )
+                            else ->
+                                OpenTextEditorParams.CloudNode(
+                                    nodeId = NodeId(it.nodeHandle ?: INVALID_HANDLE),
+                                    nodeSourceType = it.nodeSourceType,
+                                    mode = textEditorModeFromValue(it.mode),
+                                    fileName = it.fileName,
+                                )
+                        }
+                        megaNavigator.openTextEditor(
+                            context = this@ManagerActivity,
+                            params = params,
+                        )
+                        null
                     }
 
                     is LegacyMediaPlayerNavKey -> mediaPlayerIntentMapper(

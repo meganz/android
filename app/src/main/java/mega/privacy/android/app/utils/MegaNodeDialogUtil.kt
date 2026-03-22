@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.DialogInterface.BUTTON_NEGATIVE
 import android.content.DialogInterface.BUTTON_POSITIVE
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View.GONE
@@ -26,17 +25,13 @@ import mega.privacy.android.app.interfaces.ActionBackupNodeCallback
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
+import dagger.hilt.android.EntryPointAccessors
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.listeners.RemoveListener
 import mega.privacy.android.app.listeners.RenameListener
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
@@ -49,11 +44,14 @@ import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboardDelayed
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.resources.R as sharedResR
+import nz.mega.sdk.MegaApiJava
 import mega.privacy.android.thirdpartylib.twemoji.EmojiEditText
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -467,13 +465,19 @@ object MegaNodeDialogUtil {
                     }
 
                     TYPE_NEW_TXT_FILE -> {
-                        val textFileEditor = Intent(context, TextEditorActivity::class.java)
-                            .putExtra(MODE, TextEditorMode.Create.value)
-                            .putExtra(INTENT_EXTRA_KEY_FILE_NAME, typedString)
-                            .putExtra(INTENT_EXTRA_KEY_HANDLE, node?.handle)
-                            .putExtra(FROM_HOME_PAGE, fromHome)
-
-                        context.startActivity(textFileEditor)
+                        EntryPointAccessors.fromApplication(
+                            context.applicationContext,
+                            MegaNavigatorEntryPoint::class.java,
+                        ).megaNavigator.openTextEditor(
+                            context = context,
+                            params = OpenTextEditorParams.CloudNode(
+                                nodeId = NodeId(node?.handle ?: MegaApiJava.INVALID_HANDLE),
+                                nodeSourceType = null,
+                                mode = TextEditorMode.Create,
+                                fileName = typedString,
+                                fromHome = fromHome,
+                            ),
+                        )
                     }
                 }
 
@@ -668,7 +672,7 @@ object MegaNodeDialogUtil {
                                 } else {
                                     snackbarShower.showSnackbar(
                                         activity.getString(
-                                            if (megaError.errorCode == MegaError.API_OK) sharedResR.string.node_moved_success_message
+                                            if (megaError.errorCode == MegaError.API_OK) sharedR.string.node_moved_success_message
                                             else R.string.context_no_moved
                                         )
                                     )

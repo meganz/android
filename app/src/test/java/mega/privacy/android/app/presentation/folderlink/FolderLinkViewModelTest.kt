@@ -700,20 +700,6 @@ class FolderLinkViewModelTest {
         }
 
     @Test
-    fun `test that openFile is triggered when updateTextEditorIntent is invoked`() = runTest {
-        val intent = mock<Intent>()
-        val fileNode = mock<FileNode> {
-            on { id.longValue }.thenReturn(1234L)
-        }
-
-        underTest.updateTextEditorIntent(intent, fileNode)
-        underTest.state.test {
-            val res = awaitItem()
-            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
-        }
-    }
-
-    @Test
     fun `test that node handle is extracted from importNode when multiple node is not selected`() =
         runTest {
             val base64Handle = "1234"

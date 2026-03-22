@@ -19,14 +19,14 @@ import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
-import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionUiEntity
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.MegaNavigatorEntryPoint
-import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionUiEntity
 import mega.privacy.android.core.nodecomponents.components.offline.OfflineNodeActionsViewModel
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import timber.log.Timber
 import java.io.File
@@ -195,9 +195,9 @@ private suspend fun openZipFile(
     coroutineScope: CoroutineScope,
 ) {
     EntryPointAccessors.fromApplication(
-        context,
+        context.applicationContext,
         MegaNavigatorEntryPoint::class.java
-    ).megaNavigator().openZipBrowserActivity(
+    ).megaNavigator.openZipBrowserActivity(
         context = context,
         zipFilePath = content.file.absolutePath,
         nodeHandle = content.nodeId.longValue,
@@ -232,16 +232,24 @@ private suspend fun openTextEditorActivity(
     content: OfflineNodeActionUiEntity.Text,
     snackBarHostState: SnackbarHostState?,
 ) {
-    val intent = Intent(context, TextEditorActivity::class.java).apply {
-        putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, content.file.name)
-        putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.OFFLINE_ADAPTER)
-        putExtra(Constants.INTENT_EXTRA_KEY_PATH, content.file.absolutePath)
+    runCatching {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaNavigatorEntryPoint::class.java,
+        ).megaNavigator.openTextEditor(
+            context = context,
+            params = OpenTextEditorParams.LocalFile(
+                localPath = content.file.absolutePath,
+                fileName = content.file.name,
+                nodeSourceType = Constants.OFFLINE_ADAPTER,
+            ),
+        )
+    }.onFailure { error ->
+        Timber.e(error)
+        snackBarHostState?.showAutoDurationSnackbar(
+            message = context.getString(R.string.intent_not_available)
+        )
     }
-    safeLaunchActivity(
-        context = context,
-        intent = intent,
-        snackBarHostState = snackBarHostState
-    )
 }
 
 private suspend fun handleOtherFiles(
@@ -308,8 +316,8 @@ private suspend fun openVideoOrAudioFile(
 ) {
     coroutineScope.launch {
         runCatching {
-            EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-                .megaNavigator().openMediaPlayerActivityByLocalFile(
+            EntryPointAccessors.fromApplication(context.applicationContext, MegaNavigatorEntryPoint::class.java)
+                .megaNavigator.openMediaPlayerActivityByLocalFile(
                     context = context,
                     localFile = content.file,
                     fileTypeInfo = content.fileTypeInfo,

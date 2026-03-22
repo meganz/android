@@ -393,16 +393,6 @@ class FileLinkViewModelTest {
         }
 
     @Test
-    fun `test that openFile is triggered when updateTextEditorIntent is invoked`() = runTest {
-        val intent = mock<Intent>()
-        underTest.updateTextEditorIntent(intent)
-        underTest.state.test {
-            val res = awaitItem()
-            assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
-        }
-    }
-
-    @Test
     fun `test that downloadEvent is updated to trigger event when handle save file and download worker feature flag is true`() =
         runTest {
             val fileNode = mockFileNode()

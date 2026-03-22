@@ -390,35 +390,15 @@ interface AppNavigator {
     )
 
     /**
-     * Open text editor activity
+     * Open text editor. Routes by [params]: CloudNode/LocalFile/Chat use SingleActivity NavKey when
+     * enabled; FileLink starts legacy Activity directly (Compose not supported for file link yet).
      *
      * @param context Context
-     * @param currentNodeId the NodeId of the current node
-     * @param mode the mode of the text editor, e.g., "view", "edit"
-     * @param nodeSourceType the adapter type of the view
-     * @param fileName the name of the file to be created
+     * @param params Determines source (cloud node, local/zip file, chat attachment, or file link)
      */
-    fun openTextEditorActivity(
+    fun openTextEditor(
         context: Context,
-        currentNodeId: NodeId,
-        nodeSourceType: Int?,
-        mode: TextEditorMode,
-        fileName: String? = null,
-    )
-
-    /**
-     * Open Text Editor Activity for an offline (local) text file.
-     * Uses local path and OFFLINE_ADAPTER so the file can be opened without network.
-     * Opens in view mode (no MODE extra is set).
-     *
-     * @param context Context
-     * @param localPath Absolute path to the local text file
-     * @param fileName Display name of the file
-     */
-    fun openTextEditorActivityForOfflineFile(
-        context: Context,
-        localPath: String,
-        fileName: String,
+        params: OpenTextEditorParams,
     )
 
     /**

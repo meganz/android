@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.destination.LegacyPdfViewerNavKey
 import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
@@ -143,7 +144,7 @@ private suspend fun openFile(
                         context = context,
                         localFile = content.file,
                         fileTypeInfo = content.fileTypeInfo,
-                        viewType = 2004, // Constants.OFFLINE_ADAPTER
+                        viewType = NodeSourceTypeInt.OFFLINE_ADAPTER,
                         handle = content.nodeId.longValue,
                         offlineParentId = content.parentId,
                         sortOrder = sortOrder,
@@ -179,10 +180,13 @@ private suspend fun openFile(
         }
 
         is OfflineNodeActionUiEntity.Text -> {
-            megaNavigator.openTextEditorActivityForOfflineFile(
+            megaNavigator.openTextEditor(
                 context = context,
-                localPath = content.file.absolutePath,
-                fileName = content.file.name,
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = content.file.absolutePath,
+                    fileName = content.file.name,
+                    nodeSourceType = NodeSourceTypeInt.OFFLINE_ADAPTER,
+                ),
             )
         }
 

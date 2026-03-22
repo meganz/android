@@ -3,6 +3,7 @@ package mega.privacy.android.app.nav
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,14 +13,18 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.OpenTextEditorParams
+import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,7 +32,9 @@ import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argThat
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.times
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -232,16 +239,148 @@ class MegaNavigatorImplTest {
         }
 
     @Test
-    fun `test that openTextEditorActivityForOfflineFile starts an activity with the given context`() =
+    fun `test that openTextEditor LocalFile offline emits nav key when SingleActivity is enabled`() =
         runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
             whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
 
-            underTest.openTextEditorActivityForOfflineFile(
+            underTest.openTextEditor(
                 context = context,
-                localPath = "/data/offline/note.txt",
-                fileName = "note.txt",
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = "/data/offline/note.txt",
+                    fileName = "note.txt",
+                    nodeSourceType = Constants.OFFLINE_ADAPTER,
+                ),
             )
 
-            verify(context, times(1)).startActivity(any())
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 &&
+                            navKeys[0] is LegacyTextEditorNavKey &&
+                            (navKeys[0] as LegacyTextEditorNavKey).let {
+                                it.localPath == "/data/offline/note.txt" &&
+                                        it.fileName == "note.txt" &&
+                                        it.nodeSourceType == Constants.OFFLINE_ADAPTER
+                            }
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
         }
+
+    @Test
+    fun `test that openTextEditor LocalFile offline starts legacy activity when SingleActivity is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = "/data/offline/note.txt",
+                    fileName = "note.txt",
+                    nodeSourceType = Constants.OFFLINE_ADAPTER,
+                ),
+            )
+
+            verify(context).startActivity(any())
+        }
+
+    @Test
+    fun `test that openTextEditor LocalFile zip emits nav key when SingleActivity is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = "/data/zip/readme.txt",
+                    fileName = "readme.txt",
+                    nodeSourceType = Constants.ZIP_ADAPTER,
+                ),
+            )
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 &&
+                            navKeys[0] is LegacyTextEditorNavKey &&
+                            (navKeys[0] as LegacyTextEditorNavKey).let {
+                                it.localPath == "/data/zip/readme.txt" &&
+                                        it.fileName == "readme.txt" &&
+                                        it.nodeSourceType == Constants.ZIP_ADAPTER
+                            }
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+        }
+
+    @Test
+    fun `test that openTextEditor LocalFile zip starts legacy activity when SingleActivity is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.LocalFile(
+                    localPath = "/data/zip/readme.txt",
+                    fileName = "readme.txt",
+                    nodeSourceType = Constants.ZIP_ADAPTER,
+                ),
+            )
+
+            verify(context).startActivity(any())
+        }
+
+    @Test
+    fun `test that openTextEditor Chat emits nav key when SingleActivity is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(true)
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.Chat(chatId = 123L, messageId = 456L),
+            )
+
+            verify(navigationQueue).emit(
+                argThat<List<NavKey>> { navKeys ->
+                    navKeys.size == 1 &&
+                            navKeys[0] is LegacyTextEditorNavKey &&
+                            (navKeys[0] as LegacyTextEditorNavKey).let {
+                                it.chatId == 123L && it.messageId == 456L
+                            }
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+        }
+
+    @Test
+    fun `test that openTextEditor Chat starts legacy activity when SingleActivity is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.SingleActivity)).thenReturn(false)
+
+            underTest.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.Chat(chatId = 123L, messageId = 456L),
+            )
+
+            verify(context).startActivity(any())
+        }
+
+    @Test
+    fun `test that openTextEditor FileLink starts activity directly`() = runTest {
+        underTest.openTextEditor(
+            context = context,
+            params = OpenTextEditorParams.FileLink(
+                serializedNode = "serialized_node_data",
+                urlFileLink = "https://mega.nz/file/abc123",
+            ),
+        )
+
+        verify(context).startActivity(any())
+    }
 }

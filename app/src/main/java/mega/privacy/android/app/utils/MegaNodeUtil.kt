@@ -15,10 +15,7 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -31,9 +28,6 @@ import mega.privacy.android.app.listeners.ExportListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.presentation.extensions.getStorageState
-import mega.privacy.android.app.textEditor.TextEditorActivity
-import mega.privacy.android.app.textEditor.TextEditorViewModel.Companion.MODE
-import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_COPY_FROM
@@ -43,7 +37,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY
 import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE
 import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
-import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.FileUtil.getLocalFile
 import mega.privacy.android.app.utils.FileUtil.getTappedNodeLocalFile
@@ -62,9 +55,12 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showSnackbar
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.MegaNavigatorEntryPoint
+import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -1081,19 +1077,6 @@ object MegaNodeUtil {
         }
     }
 
-    /**
-     * Use for companion object injection
-     */
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface MegaNavigatorEntryPoint {
-        /**
-         * Get [MegaNavigator]
-         *
-         * @return [MegaNavigator] instance
-         */
-        fun megaNavigator(): MegaNavigator
-    }
 
     /**
      * Launch ZipBrowserActivity to preview a zip file.
@@ -1113,7 +1096,7 @@ object MegaNodeUtil {
         nodeHandle: Long,
     ) {
         EntryPointAccessors.fromApplication(context, MegaNavigatorEntryPoint::class.java)
-            .megaNavigator()
+            .megaNavigator
             .openZipBrowserActivity(
                 context = context,
                 zipFilePath = zipFilePath,
@@ -1236,18 +1219,30 @@ object MegaNodeUtil {
         urlFileLink: String?,
         mode: String,
     ) {
-        val textFileIntent = Intent(context, TextEditorActivity::class.java)
-
+        val navigator = EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            MegaNavigatorEntryPoint::class.java,
+        ).megaNavigator
         if (adapterType == FILE_LINK_ADAPTER) {
-            textFileIntent.putExtra(EXTRA_SERIALIZE_STRING, node.serialize())
-                .putExtra(URL_FILE_LINK, urlFileLink)
+            navigator.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.FileLink(
+                    serializedNode = node.serialize(),
+                    urlFileLink = urlFileLink,
+                    mode = textEditorModeFromValue(mode),
+                ),
+            )
         } else {
-            textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, node.handle)
+            navigator.openTextEditor(
+                context = context,
+                params = OpenTextEditorParams.CloudNode(
+                    nodeId = NodeId(node.handle),
+                    nodeSourceType = adapterType,
+                    mode = textEditorModeFromValue(mode),
+                    fileName = null,
+                ),
+            )
         }
-
-        textFileIntent.putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, adapterType)
-            .putExtra(MODE, mode)
-        context.startActivity(textFileIntent)
     }
 
     /**
