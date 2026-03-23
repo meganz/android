@@ -25,6 +25,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Remo
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RenameSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RestoreSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.RubbishBinSelectionMenuItem
+import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SaveToMegaSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.SendToChatSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareFolderSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
@@ -226,8 +227,10 @@ abstract class NodeSelectionModeModule {
         @Singleton
         fun provideFolderLinkToolbarItems(
             downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
         ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
-            downloadSelectionMenuItem
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
         )
     }
 }
