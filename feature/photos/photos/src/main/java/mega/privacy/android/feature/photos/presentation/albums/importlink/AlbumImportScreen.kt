@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -195,7 +194,6 @@ fun AlbumImportScreen(
                 photos = state.photos,
                 selectedPhotos = state.selectedPhotos,
                 onShareLink = { onShareLink(state.link.orEmpty()) },
-                onSelectAllPhotos = albumImportViewModel::selectAllPhotos,
                 onClearSelection = albumImportViewModel::clearSelection,
                 onBack = {
                     if (state.selectedPhotos.isNotEmpty()) {
@@ -291,7 +289,6 @@ private fun AlbumImportTopBar(
     photos: List<PhotoUiState>,
     selectedPhotos: Set<PhotoUiState>,
     onShareLink: () -> Unit,
-    onSelectAllPhotos: () -> Unit,
     onClearSelection: () -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -303,26 +300,6 @@ private fun AlbumImportTopBar(
             modifier = modifier,
             title = selectedPhotos.size.toString(),
             navigationType = AppBarNavigationType.Close(onClearSelection),
-            actions = buildList {
-                if (selectedPhotos.size != photos.size) {
-                    add(
-                        MenuActionWithClick(
-                            menuAction = object : MenuActionWithIcon {
-                                override val testTag: String = "album_import_top_bar:select_all"
-
-                                @Composable
-                                override fun getDescription(): String =
-                                    stringResource(sharedR.string.action_select_all)
-
-                                @Composable
-                                override fun getIconPainter(): Painter =
-                                    rememberVectorPainter(IconPack.Medium.Thin.Outline.CheckStack)
-                            },
-                            onClick = onSelectAllPhotos
-                        )
-                    )
-                }
-            }
         )
     } else {
         MegaTopAppBar(

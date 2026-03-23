@@ -497,7 +497,13 @@ fun EntryProviderScope<NavKey>.albumImports(
                 }
             },
             onPreviewPhoto = {
-                navigationHandler.navigate(LegacyImageViewerNavKey(nodeHandle = it.id, parentNodeHandle = -1L, nodeIds = listOf(it.id)))
+                navigationHandler.navigate(
+                    LegacyImageViewerNavKey(
+                        nodeHandle = it.id,
+                        parentNodeHandle = -1L,
+                        nodeIds = listOf(it.id)
+                    )
+                )
             },
             onNavigateFileExplorer = {
                 navigationHandler.navigate(
