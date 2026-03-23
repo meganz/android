@@ -3,6 +3,7 @@ package mega.privacy.android.feature.texteditor.presentation
 import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -44,6 +45,10 @@ internal val EditorLineHeight = 20.sp
 
 private val LineNumberGutterWidth = 36.dp
 private val LineNumberGutterPadding = 6.dp
+
+/** Extra bottom content padding in view mode so the last chunk scrolls fully clear of the
+ *  fast-scroll thumb (40 dp) with comfortable breathing room. */
+private val ViewModeBottomContentPadding = 80.dp
 private val LineNumberTextSize = 12.sp
 private val LineNumberTextSizeSmall = 10.sp
 
@@ -129,6 +134,7 @@ private fun ViewModeLazyColumn(
                 // No top padding: aligns with collapsing top bar when bars are visible
                 bottom = 8.dp,
             ),
+        contentPadding = PaddingValues(bottom = ViewModeBottomContentPadding),
     ) {
         items(
             count = chunkCount,

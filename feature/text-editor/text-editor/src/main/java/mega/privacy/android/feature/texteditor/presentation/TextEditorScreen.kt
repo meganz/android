@@ -11,6 +11,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -160,6 +161,7 @@ fun TextEditorScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val changesSavedMessage = stringResource(sharedR.string.general_changes_saved)
+    val lineTooltipTemplate = stringResource(sharedR.string.text_editor_fast_scroll_line_tooltip)
     LaunchedEffect(uiState.saveSuccessEvent) {
         if (uiState.saveSuccessEvent == triggered) {
             viewModel.consumeSaveSuccessEvent()
@@ -222,19 +224,31 @@ fun TextEditorScreen(
                 }
 
                 else -> {
-                    TextEditorContent(
-                        lazyListState = lazyListState,
-                        chunkCount = chunkCount,
-                        totalLineCount = uiState.totalLineCount,
-                        chunkTextProvider = chunkTextProvider,
-                        chunkStateProvider = chunkStateProvider,
-                        chunkStartLineProvider = chunkStartLineProvider,
-                        onChunkDisposed = onChunkDisposed,
-                        isChunkReadOnly = isChunkReadOnly,
-                        onChunkFocused = onChunkFocused,
-                        showLineNumbers = uiState.showLineNumbers,
-                        readOnly = !isEditable,
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        TextEditorContent(
+                            lazyListState = lazyListState,
+                            chunkCount = chunkCount,
+                            totalLineCount = uiState.totalLineCount,
+                            chunkTextProvider = chunkTextProvider,
+                            chunkStateProvider = chunkStateProvider,
+                            chunkStartLineProvider = chunkStartLineProvider,
+                            onChunkDisposed = onChunkDisposed,
+                            isChunkReadOnly = isChunkReadOnly,
+                            onChunkFocused = onChunkFocused,
+                            showLineNumbers = uiState.showLineNumbers,
+                            readOnly = !isEditable,
+                        )
+                        TextEditorFastScrollbar(
+                            state = lazyListState,
+                            itemCount = chunkCount,
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .fillMaxHeight(),
+                            tooltipText = { index ->
+                                lineTooltipTemplate.format(chunkStartLineProvider(index).coerceAtLeast(1))
+                            },
+                        )
+                    }
                 }
             }
             if (uiState.isRestoringContent) {

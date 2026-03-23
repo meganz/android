@@ -29,6 +29,7 @@ dependencies {
     implementation(lib.kotlin.serialisation)
     implementation(lib.logging.timber)
     implementation(lib.mega.core.ui)
+    implementation(lib.mega.core.ui.tokens)
 
     testImplementation(project(":core-test"))
     testImplementation(platform(testlib.junit5.bom))

@@ -2466,4 +2466,6 @@
     <string name="pdf_viewer_dialog_text_enter_password">Enter the password to open this file.</string>
     <!-- Error message shown below the input field when an incorrect PDF password is entered -->
     <string name="pdf_viewer_dialog_error_incorrect_password">Incorrect password</string>
+    <!-- Fast scroll thumb tooltip: line number at current position. %1$d is the 1-based line number -->
+    <string name="text_editor_fast_scroll_line_tooltip">Line %1$d</string>
 </resources>
