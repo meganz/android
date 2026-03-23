@@ -127,6 +127,23 @@ class NewTextFileNodeDialogViewModelTest {
     }
 
     @Test
+    fun `test that createTextFile with valid name and md format creates text file successfully`() =
+        runTest {
+            val parentNodeId = NodeId(123L)
+            val fileName = "newFile.md"
+
+            whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
+
+            val result = viewModel.createTextFile(fileName, parentNodeId)
+
+            assertThat(result.isSuccess).isTrue()
+            val (actualParentNodeId, actualFileName) = result.getOrThrow()
+            assertThat(actualFileName).isEqualTo(fileName)
+            assertThat(actualParentNodeId).isEqualTo(parentNodeId)
+            verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+        }
+
+    @Test
     fun `test that createTextFile with valid name trims whitespace`() = runTest {
         val parentNodeId = NodeId(123L)
         val fileNameWithSpaces = "  newFile.txt  "
