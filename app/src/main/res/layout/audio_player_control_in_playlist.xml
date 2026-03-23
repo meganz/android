@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/white_black">
+    android:layout_height="wrap_content">
 
     <androidx.media3.ui.DefaultTimeBar
         android:id="@id/exo_progress"
