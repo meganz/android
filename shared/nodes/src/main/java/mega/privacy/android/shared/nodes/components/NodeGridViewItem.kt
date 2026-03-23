@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -40,18 +39,19 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.model.HighlightedText
+import mega.android.core.ui.modifiers.itemContainerStyle
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 
 /**
  * Node grid view item using NodeUiItem
@@ -70,10 +70,11 @@ fun <T : TypedNode> NodeGridViewItem(
     modifier: Modifier = Modifier,
     isInSelectionMode: Boolean = false,
     isHiddenNodesEnabled: Boolean = false,
+    enabled: Boolean = true,
     highlightText: String = "",
+    onMenuClicked: ((NodeUiItem<T>) -> Unit)? = null,
+    onLongClicked: ((NodeUiItem<T>) -> Unit)? = null,
     onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClicked: (NodeUiItem<T>) -> Unit,
-    onMenuClicked: (NodeUiItem<T>) -> Unit,
 ) {
     NodeGridViewItem(
         name = nodeUiItem.title.text,
@@ -88,9 +89,10 @@ fun <T : TypedNode> NodeGridViewItem(
         isVideoNode = nodeUiItem.isVideoNode,
         highlightText = highlightText,
         onClick = { onItemClicked(nodeUiItem) },
-        onLongClick = { onLongClicked(nodeUiItem) },
-        onMenuClick = { onMenuClicked(nodeUiItem) },
+        onLongClick = onLongClicked?.let { { onLongClicked(nodeUiItem) } },
+        onMenuClick = onMenuClicked?.let { { onMenuClicked(nodeUiItem) } },
         isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
+        enabled = enabled,
         showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
         isHighlighted = nodeUiItem.isHighlighted,
         showLink = nodeUiItem.showLink,
@@ -138,8 +140,9 @@ fun NodeGridViewItem(
     isVideoNode: Boolean = false,
     highlightText: String = "",
     onClick: () -> Unit = {},
-    onLongClick: () -> Unit = {},
-    onMenuClick: (() -> Unit) = {},
+    onLongClick: (() -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null,
+    enabled: Boolean = true,
     isSensitive: Boolean = false,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
@@ -150,18 +153,15 @@ fun NodeGridViewItem(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .alpha(if (isSensitive) 0.5f else 1f)
-            .clip(DSTokens.shapes.extraSmall)
-            .background(
-                when {
-                    isSelected -> DSTokens.colors.background.surface1
-                    isHighlighted -> DSTokens.colors.background.surface2
-                    else -> DSTokens.colors.background.pageBackground
-                }
+            .itemContainerStyle(
+                enabled = enabled && !isSensitive,
+                selected = isSelected,
+                highlighted = isHighlighted
             )
+            .clip(DSTokens.shapes.extraSmall)
             .combinedClickable(
                 onClick = { onClick() },
-                onLongClick = { onLongClick() },
+                onLongClick = onLongClick,
             )
     ) {
         Box(
@@ -317,7 +317,7 @@ fun NodeGridViewItem(
                     modifier = Modifier.testTag(GRID_VIEW_CHECKBOX_TAG)
                 )
                 Spacer(modifier = Modifier.width(DSTokens.spacings.s1))
-            } else {
+            } else if (onMenuClick != null) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)

@@ -28,6 +28,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemViewModel
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -60,91 +61,143 @@ fun NodeViewWithHeader(
         )
     },
 ) {
-    val viewModel =
-        hiltViewModel<NodeHeaderItemViewModel, NodeHeaderItemViewModel.Factory> { factory ->
-            factory.create(nodeSourceType = nodeSourceType)
-        }
-    val headerUiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    if (headerUiState.isLoading) {
-        loadingListContent()
+    val previewHeaderData = LocalNodeHeaderPreviewData.current
+    if (previewHeaderData != null) {
+        NodeViewWithHeaderLoaded(
+            headerData = previewHeaderData,
+            items = items,
+            nodeSourceType = nodeSourceType,
+            nodesLoadingState = nodesLoadingState,
+            emptyView = emptyView,
+            itemListView = itemListView,
+            itemGridView = itemGridView,
+            onRefreshNodes = onRefreshNodes,
+            modifier = modifier,
+            loadingListContent = loadingListContent,
+            loadingGridContent = loadingGridContent,
+            onUpdateViewType = {},
+            onUpdateNodeSortConfiguration = { },
+        )
     } else {
-        val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
-        val isNextPageLoading = nodesLoadingState is NodesLoadingState.PartiallyLoaded
-        val uiState = headerUiState as NodeHeaderItemUiState.Data
-        val isList = uiState.viewType == ViewType.LIST
-        val spanCount = rememberDynamicSpanCount()
+        val viewModel =
+            hiltViewModel<NodeHeaderItemViewModel, NodeHeaderItemViewModel.Factory> { factory ->
+                factory.create(nodeSourceType = nodeSourceType)
+            }
+        val headerUiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        when {
-            nodesLoadingState is NodesLoadingState.Loading -> if (isList) {
-                loadingListContent()
+        if (headerUiState.isLoading) {
+            loadingListContent()
+        } else {
+            NodeViewWithHeaderLoaded(
+                headerData = headerUiState as NodeHeaderItemUiState.Data,
+                items = items,
+                nodeSourceType = nodeSourceType,
+                nodesLoadingState = nodesLoadingState,
+                emptyView = emptyView,
+                itemListView = itemListView,
+                itemGridView = itemGridView,
+                onRefreshNodes = onRefreshNodes,
+                modifier = modifier,
+                loadingListContent = loadingListContent,
+                loadingGridContent = loadingGridContent,
+                onUpdateViewType = viewModel::updateViewType,
+                onUpdateNodeSortConfiguration = viewModel::updateNodeSortConfiguration,
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun NodeViewWithHeaderLoaded(
+    headerData: NodeHeaderItemUiState.Data,
+    items: List<NodeUiItem<TypedNode>>,
+    nodeSourceType: NodeSourceType,
+    nodesLoadingState: NodesLoadingState,
+    emptyView: @Composable () -> Unit,
+    itemListView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    itemGridView: @Composable (NodeUiItem<TypedNode>) -> Unit,
+    onRefreshNodes: () -> Unit,
+    modifier: Modifier,
+    loadingListContent: @Composable () -> Unit,
+    loadingGridContent: @Composable (Int) -> Unit,
+    onUpdateViewType: () -> Unit,
+    onUpdateNodeSortConfiguration: (NodeSortConfiguration) -> Unit,
+) {
+    val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val isNextPageLoading = nodesLoadingState is NodesLoadingState.PartiallyLoaded
+    val isList = headerData.viewType == ViewType.LIST
+    val spanCount = rememberDynamicSpanCount()
+
+    when {
+        nodesLoadingState is NodesLoadingState.Loading -> if (isList) {
+            loadingListContent()
+        } else {
+            loadingGridContent(spanCount)
+        }
+
+        items.isEmpty() -> emptyView()
+        else -> {
+            val nodeSortConfiguration = headerData.nodeSortConfiguration
+            val header: @Composable () -> Unit = {
+                NodeHeaderItem(
+                    onSortOrderClick = { showSortBottomSheet = true },
+                    onChangeViewTypeClick = onUpdateViewType,
+                    sortConfiguration = nodeSortConfiguration,
+                    isListView = isList,
+                    showSortOrder = true,
+                    showChangeViewType = true,
+                    modifier = Modifier.conditional(isList) {
+                        padding(horizontal = 8.dp)
+                        padding(bottom = 8.dp)
+                    },
+                )
+            }
+            if (isList) {
+                NodesListView(
+                    items = items,
+                    isNextPageLoading = isNextPageLoading,
+                    itemView = itemListView,
+                    nodeHeader = header,
+                    modifier = modifier,
+                )
             } else {
-                loadingGridContent(spanCount)
+                NodesGridView(
+                    items = items,
+                    isNextPageLoading = isNextPageLoading,
+                    spanCount = spanCount,
+                    itemView = itemGridView,
+                    nodeHeader = header,
+                    modifier = modifier,
+                )
             }
 
-            items.isEmpty() -> emptyView()
-            else -> {
-                val nodeSortConfiguration = uiState.nodeSortConfiguration
-                val header: @Composable () -> Unit = {
-                    NodeHeaderItem(
-                        onSortOrderClick = { showSortBottomSheet = true },
-                        onChangeViewTypeClick = viewModel::updateViewType,
-                        sortConfiguration = nodeSortConfiguration,
-                        isListView = isList,
-                        showSortOrder = true,
-                        showChangeViewType = true,
-                        modifier = Modifier.conditional(isList) {
-                            padding(horizontal = 8.dp)
-                            padding(bottom = 8.dp)
-                        },
-                    )
-                }
-                if (isList) {
-                    NodesListView(
-                        items = items,
-                        isNextPageLoading = isNextPageLoading,
-                        itemView = itemListView,
-                        nodeHeader = header,
-                        modifier = modifier,
-                    )
-                } else {
-                    NodesGridView(
-                        items = items,
-                        isNextPageLoading = isNextPageLoading,
-                        spanCount = spanCount,
-                        itemView = itemGridView,
-                        nodeHeader = header,
-                        modifier = modifier,
-                    )
-                }
-
-                if (showSortBottomSheet) {
-                    SortBottomSheet(
-                        title = stringResource(sharedR.string.action_sort_by_header),
-                        options = NodeSortOption.getOptionsForSourceType(nodeSourceType),
-                        sheetState = sortBottomSheetState,
-                        selectedSort = SortBottomSheetResult(
-                            sortOptionItem = nodeSortConfiguration.sortOption,
-                            sortDirection = nodeSortConfiguration.sortDirection
-                        ),
-                        onSortOptionSelected = { result ->
-                            result?.let {
-                                viewModel.updateNodeSortConfiguration(
-                                    NodeSortConfiguration(
-                                        sortOption = it.sortOptionItem,
-                                        sortDirection = it.sortDirection
-                                    )
+            if (showSortBottomSheet) {
+                SortBottomSheet(
+                    title = stringResource(sharedR.string.action_sort_by_header),
+                    options = NodeSortOption.getOptionsForSourceType(nodeSourceType),
+                    sheetState = sortBottomSheetState,
+                    selectedSort = SortBottomSheetResult(
+                        sortOptionItem = nodeSortConfiguration.sortOption,
+                        sortDirection = nodeSortConfiguration.sortDirection
+                    ),
+                    onSortOptionSelected = { result ->
+                        result?.let {
+                            onUpdateNodeSortConfiguration(
+                                NodeSortConfiguration(
+                                    sortOption = it.sortOptionItem,
+                                    sortDirection = it.sortDirection
                                 )
-                                onRefreshNodes()
-                                showSortBottomSheet = false
-                            }
-                        },
-                        onDismissRequest = {
+                            )
+                            onRefreshNodes()
                             showSortBottomSheet = false
                         }
-                    )
-                }
+                    },
+                    onDismissRequest = {
+                        showSortBottomSheet = false
+                    }
+                )
             }
         }
     }

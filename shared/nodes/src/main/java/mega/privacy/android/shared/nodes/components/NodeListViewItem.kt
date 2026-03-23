@@ -2,7 +2,6 @@ package mega.privacy.android.shared.nodes.components
 
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -15,12 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -35,21 +32,21 @@ import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.components.util.normalize
 import mega.android.core.ui.model.HighlightedText
-import mega.android.core.ui.modifiers.conditional
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.IndicatorColor
 import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.text
 
 /**
  * Node list item using NodeUiItem
@@ -72,11 +69,12 @@ fun <T : TypedNode> NodeListViewItem(
     subtitleColor: TextColor = TextColor.Secondary,
     isInSelectionMode: Boolean = false,
     isHiddenNodesEnabled: Boolean = false,
+    enabled: Boolean = true,
     highlightText: String = "",
-    onMoreClicked: ((NodeUiItem<T>) -> Unit),
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClicked: ((NodeUiItem<T>) -> Unit),
+    onMoreClicked: ((NodeUiItem<T>) -> Unit)? = null,
+    onLongClicked: ((NodeUiItem<T>) -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
 ) {
     NodeListViewItem(
         title = nodeUiItem.title.text,
@@ -101,11 +99,12 @@ fun <T : TypedNode> NodeListViewItem(
         showFavourite = nodeUiItem.showFavourite,
         isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
         showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
+        enabled = enabled,
         isHighlighted = nodeUiItem.isHighlighted,
-        onMoreClicked = { onMoreClicked(nodeUiItem) },
+        onMoreClicked = onMoreClicked?.let { { onMoreClicked(nodeUiItem) } },
         onInfoClicked = onInfoClicked,
         onItemClicked = { onItemClicked(nodeUiItem) },
-        onLongClicked = { onLongClicked(nodeUiItem) },
+        onLongClicked = onLongClicked?.let { { onLongClicked(nodeUiItem) } },
     )
 }
 
@@ -166,23 +165,20 @@ fun NodeListViewItem(
     showLink: Boolean = false,
     showFavourite: Boolean = false,
     isSensitive: Boolean = false,
+    enabled: Boolean = true,
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
-    enableClick: Boolean = true,
+    enableClick: Boolean = enabled,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onItemClicked: () -> Unit,
     onLongClicked: (() -> Unit)? = null,
 ) {
     GenericListItem(
-        modifier = modifier
-            .alpha(if (isSensitive) 0.5f else 1f)
-            .conditional(isHighlighted) {
-                background(DSTokens.colors.background.surface2)
-            }
-            .conditional(isSelected) {
-                background(DSTokens.colors.background.surface1)
-            },
+        modifier = modifier,
+        selected = isSelected,
+        highlighted = isHighlighted,
+        enabled = enabled && !isSensitive,
         contentPadding = PaddingValues(
             horizontal = DSTokens.spacings.s4,
             vertical = DSTokens.spacings.s3
@@ -205,35 +201,38 @@ fun NodeListViewItem(
                 horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s2),
                 modifier = Modifier.padding(bottom = DSTokens.spacings.s1)
             ) {
-                if (label != null) {
-                    NodeLabelCircle(
-                        label = label,
-                        modifier = Modifier
-                            .testTag(LABEL_TAG),
-                    )
-                }
-                if (highlightText.isNotBlank()) {
-                    MegaText(
-                        text = HighlightedText(
-                            full = title,
-                            highlighted = highlightText,
-                        ),
-                        textColor = if (isTakenDown) TextColor.Error else titleColor,
-                        modifier = Modifier
-                            .weight(1f, fill = false)
-                            .testTag(TITLE_TAG),
-                    )
-                } else {
-                    MegaText(
-                        text = title,
-                        overflow = TextOverflow.MiddleEllipsis,
-                        maxLines = titleMaxLines,
-                        textColor = if (isTakenDown) TextColor.Error else titleColor,
-                        style = titleTextStyle,
-                        modifier = Modifier
-                            .weight(1f, fill = false)
-                            .testTag(TITLE_TAG),
-                    )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // New row to avoid horizontal spacing between label and title
+                    if (label != null) {
+                        NodeLabelCircle(
+                            label = label,
+                            modifier = Modifier
+                                .testTag(LABEL_TAG),
+                        )
+                    }
+                    if (highlightText.isNotBlank()) {
+                        MegaText(
+                            text = HighlightedText(
+                                full = title,
+                                highlighted = highlightText,
+                            ),
+                            textColor = if (isTakenDown) TextColor.Error else titleColor,
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .testTag(TITLE_TAG),
+                        )
+                    } else {
+                        MegaText(
+                            text = title,
+                            overflow = TextOverflow.MiddleEllipsis,
+                            maxLines = titleMaxLines,
+                            textColor = if (isTakenDown) TextColor.Error else titleColor,
+                            style = titleTextStyle,
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .testTag(TITLE_TAG),
+                        )
+                    }
                 }
                 if (showFavourite) {
                     MegaIcon(
@@ -303,13 +302,13 @@ fun NodeListViewItem(
                     )
                 }
                 if (showIsVerified) {
-                    Icon(
+                    MegaIcon(
                         imageVector = IconPack.Medium.Thin.Solid.CheckCircle,
                         contentDescription = "Verified",
                         modifier = Modifier
                             .size(16.dp)
                             .testTag(VERIFIED_ICON_TAG),
-                        tint = DSTokens.colors.indicator.blue
+                        indicatorColorTint = IndicatorColor.Blue
                     )
                 }
             }
@@ -317,13 +316,15 @@ fun NodeListViewItem(
                 val normalizedHighlight = remember(highlightText) { highlightText.normalize() }
                 val normalizedDescription = remember(description) { description.normalize() }
                 if (normalizedDescription.contains(normalizedHighlight, ignoreCase = true)) {
-                    HighlightedText(
+                    MegaText(
                         modifier = Modifier
                             .testTag(DESCRIPTION_TAG)
                             .padding(vertical = DSTokens.spacings.s2),
-                        text = description,
-                        highlightText = highlightText,
-                        highlightFontWeight = FontWeight.Bold,
+                        text = HighlightedText(
+                            full = description,
+                            highlighted = highlightText,
+                            highlightFontWeight = FontWeight.Bold,
+                        ),
                         textColor = subtitleColor,
                         style = AppTheme.typography.bodySmall,
                     )
@@ -372,27 +373,25 @@ fun NodeListViewItem(
                         modifier = Modifier.testTag(CHECKBOX_TAG),
                     )
                 }
-            } else {
-                if (onMoreClicked != null) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .wrapContentSize(unbounded = true, align = Alignment.Center)
-                            .size(48.dp)
-                            .clickable { onMoreClicked() }
-                            .testTag(MORE_ICON_TAG),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        MegaIcon(
-                            imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
-                            contentDescription = "More",
-                            tint = IconColor.Secondary,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                } else {
-                    Spacer(modifier = Modifier.size(24.dp))
+            } else if (onMoreClicked != null) {
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .wrapContentSize(unbounded = true, align = Alignment.Center)
+                        .size(48.dp)
+                        .clickable { onMoreClicked() }
+                        .testTag(MORE_ICON_TAG),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MegaIcon(
+                        imageVector = IconPack.Medium.Thin.Outline.MoreVertical,
+                        contentDescription = "More",
+                        tint = IconColor.Secondary,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
+            } else {
+                Spacer(modifier = Modifier.size(24.dp))
             }
         },
         onClickListener = onItemClicked,
