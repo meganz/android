@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -123,11 +124,9 @@ class NodesExplorerViewModelTest {
         ) doReturn nodeUiItems
 
         initViewModel()
-
-        viewModel.loadNodes()
         advanceUntilIdle()
 
-        verify(getNodesByIdInChunkUseCase).invoke(nodeId)
+        verify(getNodesByIdInChunkUseCase, times(1)).invoke(nodeId)
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.StorageState
@@ -35,10 +36,8 @@ abstract class NodeExplorerSharedViewModel(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    args: Args,
+    private val args: Args,
 ) : ViewModel() {
-    private val argsInternal: Args = args
-    open val args: Args get() = argsInternal
 
     private val _nodedExplorerSharedUiState = MutableStateFlow(NodesExplorerSharedUiState())
     val nodeExplorerSharedUiState = _nodedExplorerSharedUiState.asStateFlow()
@@ -50,17 +49,18 @@ abstract class NodeExplorerSharedViewModel(
                 nodeSourceType = args.nodeSourceType
             )
         }
-        monitorNodeUpdates()
         monitorHiddenNodes()
         monitorStorageOverQuota()
     }
 
-    open fun monitorNodeUpdates() {
+    fun monitorNodeUpdates() {
         viewModelScope.launch {
             monitorNodeUpdatesByIdUseCase(
-                nodeId = argsInternal.nodeId,
-                nodeSourceType = argsInternal.nodeSourceType,
-            ).catch { Timber.e(it) }
+                nodeId = args.nodeId,
+                nodeSourceType = args.nodeSourceType,
+            ).onStart {
+                loadNodes()
+            }.catch { Timber.e(it) }
                 .collectLatest { change ->
                     if (change == NodeChanges.Remove) {
                         _nodedExplorerSharedUiState.update { state -> state.copy(navigateBack = triggered) }
@@ -106,7 +106,7 @@ abstract class NodeExplorerSharedViewModel(
         viewModelScope.launch {
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
-                nodeSourceType = argsInternal.nodeSourceType,
+                nodeSourceType = args.nodeSourceType,
                 existingItems = nodeExplorerSharedUiState.value.items,
             )
 

@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -45,20 +44,11 @@ class FavouritesExplorerViewModel @Inject constructor(
     private val _favouritesExplorerInternalUiState = MutableStateFlow(FavouritesExplorerUiState())
     val favouritesExplorerUiState = _favouritesExplorerInternalUiState.asStateFlow()
 
-    override fun loadNodes() {
-        viewModelScope.launch {
-            setItems(
-                nodes = getAllFavoritesUseCase().first().filterIsInstance<TypedFolderNode>(),
-                nodesLoadingState = NodesLoadingState.FullyLoaded,
-            )
-        }
-    }
-
-    override fun refreshNodes() {
+    init {
         loadNodes()
     }
 
-    override fun monitorNodeUpdates() {
+    override fun loadNodes() {
         viewModelScope.launch {
             getAllFavoritesUseCase()
                 .catch { Timber.e(it) }
@@ -69,5 +59,9 @@ class FavouritesExplorerViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    override fun refreshNodes() {
+        loadNodes()
     }
 }

@@ -41,6 +41,10 @@ class IncomingSharesExplorerViewModel @Inject constructor(
         MutableStateFlow(IncomingSharesExplorerUiState())
     val incomingSharesExplorerUiState = _incomingSharesExplorerInternalUiState.asStateFlow()
 
+    init {
+        monitorNodeUpdates()
+    }
+
     override fun loadNodes() {
         viewModelScope.launch {
             setItems(

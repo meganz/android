@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.kotlin.any
-import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -104,11 +104,9 @@ class FavouritesExplorerViewModelTest {
         ) doReturn nodeUiItems
 
         initViewModel()
-
-        viewModel.loadNodes()
         advanceUntilIdle()
 
-        verify(getAllFavoritesUseCase, atLeast(1)).invoke()
+        verify(getAllFavoritesUseCase, times(1)).invoke()
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 
@@ -130,7 +128,7 @@ class FavouritesExplorerViewModelTest {
         viewModel.refreshNodes()
         advanceUntilIdle()
 
-        verify(getAllFavoritesUseCase, atLeast(1)).invoke()
+        verify(getAllFavoritesUseCase, times(2)).invoke()
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 
@@ -152,7 +150,7 @@ class FavouritesExplorerViewModelTest {
         viewModel.monitorNodeUpdates()
         advanceUntilIdle()
 
-        verify(getAllFavoritesUseCase, atLeast(1)).invoke()
+        verify(getAllFavoritesUseCase, times(2)).invoke()
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 

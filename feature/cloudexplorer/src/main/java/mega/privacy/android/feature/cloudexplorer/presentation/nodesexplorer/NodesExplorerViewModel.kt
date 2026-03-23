@@ -36,7 +36,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val getNodeInfoByIdUseCase: GetNodeInfoByIdUseCase,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
-    @Assisted override val args: Args,
+    @Assisted private val args: Args,
 ) : NodeExplorerSharedViewModel(
     monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
     monitorStorageStateUseCase = monitorStorageStateUseCase,
@@ -50,6 +50,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     val nodesExplorerUiState = _nodesExplorerInternalUiState.asStateFlow()
 
     init {
+        monitorNodeUpdates()
         checkRootNode()
         updateFolderName()
     }
@@ -57,7 +58,7 @@ class NodesExplorerViewModel @AssistedInject constructor(
     override fun loadNodes() {
         viewModelScope.launch {
             getNodesByIdInChunkUseCase(args.nodeId)
-                .catch { Timber.Forest.e(it) }
+                .catch { Timber.e(it) }
                 .collect { (nodes, hasMore) ->
                     updateFolderName()
                     setItems(

@@ -26,6 +26,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -66,8 +67,6 @@ class IncomingSharesExplorerViewModelTest {
                 nodeSourceType = NodeSourceType.INCOMING_SHARES,
             )
         } doReturn emptyList()
-
-        initViewModel()
     }
 
     private fun initViewModel() {
@@ -83,6 +82,7 @@ class IncomingSharesExplorerViewModelTest {
 
     @Test
     fun `test that initial state is correct`() = runTest {
+        initViewModel()
         viewModel.incomingSharesExplorerUiState.test {
             assertThat(awaitItem()).isNotNull()
         }
@@ -102,10 +102,10 @@ class IncomingSharesExplorerViewModelTest {
             )
         ) doReturn nodeUiItems
 
-        viewModel.loadNodes()
+        initViewModel()
         advanceUntilIdle()
 
-        verify(getIncomingSharesChildrenNodeUseCase).invoke(-1L)
+        verify(getIncomingSharesChildrenNodeUseCase, times(1)).invoke(-1L)
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 
@@ -123,10 +123,13 @@ class IncomingSharesExplorerViewModelTest {
             )
         ) doReturn nodeUiItems
 
+        initViewModel()
+        advanceUntilIdle()
+
         viewModel.refreshNodes()
         advanceUntilIdle()
 
-        verify(getIncomingSharesChildrenNodeUseCase).invoke(-1L)
+        verify(getIncomingSharesChildrenNodeUseCase, times(2)).invoke(-1L)
         assertThat(viewModel.nodeExplorerSharedUiState.value.items).isEqualTo(nodeUiItems)
     }
 

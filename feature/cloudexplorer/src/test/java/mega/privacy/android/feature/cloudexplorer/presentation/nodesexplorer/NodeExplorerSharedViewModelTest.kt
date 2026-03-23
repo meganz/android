@@ -176,12 +176,39 @@ class NodeExplorerSharedViewModelTest {
             ) doReturn nodeChangesFlow.filterNotNull()
 
             initViewModel()
+            viewModel.monitorNodeUpdates()
+            advanceUntilIdle()
 
             nodeChangesFlow.value = NodeChanges.Remove
+            advanceUntilIdle()
 
             viewModel.nodeExplorerSharedUiState.test {
                 assertThat(awaitItem().navigateBack).isEqualTo(triggered)
             }
+        }
+
+    @Test
+    fun `test that monitorNodeUpdates should invoke refreshNodes when change is not Remove`() =
+        runTest {
+            val nodeChangesFlow = MutableStateFlow<NodeChanges?>(null)
+
+            whenever(
+                monitorNodeUpdatesByIdUseCase(
+                    nodeId,
+                    nodeSourceType
+                )
+            ) doReturn nodeChangesFlow.filterNotNull()
+
+            var refreshCalled = false
+            initViewModel(refreshNodesImpl = { refreshCalled = true })
+
+            viewModel.monitorNodeUpdates()
+            advanceUntilIdle()
+
+            nodeChangesFlow.value = NodeChanges.Attributes
+            advanceUntilIdle()
+
+            assertThat(refreshCalled).isTrue()
         }
 
     @Test
@@ -196,8 +223,11 @@ class NodeExplorerSharedViewModelTest {
         ) doReturn nodeChangesFlow.filterNotNull()
 
         initViewModel()
-        nodeChangesFlow.value = NodeChanges.Remove
+        viewModel.monitorNodeUpdates()
+        advanceUntilIdle()
 
+        nodeChangesFlow.value = NodeChanges.Remove
+        advanceUntilIdle()
 
         viewModel.nodeExplorerSharedUiState.test {
             assertThat(awaitItem().navigateBack).isEqualTo(triggered)
