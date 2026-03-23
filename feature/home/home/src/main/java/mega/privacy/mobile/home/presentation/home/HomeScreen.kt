@@ -158,9 +158,11 @@ internal fun HomeScreen(
                             navigationHandler.navigate(state.searchNavKey)
                         })
 
-                        add(MenuActionWithClick(HomeScreenAction.Customize) {
-                            navigationHandler.navigate(HomeConfiguration)
-                        })
+                        if (state.isHomeCustomizationEnabled) {
+                            add(MenuActionWithClick(HomeScreenAction.Customize) {
+                                navigationHandler.navigate(HomeConfiguration)
+                            })
+                        }
                     }
                 }
             )

@@ -59,11 +59,13 @@ class HomeViewModel @Inject constructor(
                 },
             monitorConnectivityUseCase().catch { Timber.e(it) },
             monitorSearchRevampFeatureFlag().catch { Timber.e(it) },
-        ) { widgets, hasInternetConnection, isSearchRevampEnabled ->
+            monitorHomeCustomizationFeatureFlag().catch { Timber.e(it) },
+        ) { widgets, hasInternetConnection, isSearchRevampEnabled, isHomeCustomizationEnabled ->
             if (hasInternetConnection) {
                 HomeUiState.Data(
                     widgets = widgets,
-                    isSearchRevampEnabled = isSearchRevampEnabled
+                    isSearchRevampEnabled = isSearchRevampEnabled,
+                    isHomeCustomizationEnabled = isHomeCustomizationEnabled
                 )
             } else {
                 val hasOfflineFiles = runCatching { hasOfflineFilesUseCase() }.getOrDefault(false)
@@ -77,5 +79,9 @@ class HomeViewModel @Inject constructor(
 
     private fun monitorSearchRevampFeatureFlag() = flow {
         emit(getFeatureFlagValueUseCase(AppFeatures.SearchRevamp))
+    }
+
+    private fun monitorHomeCustomizationFeatureFlag() = flow {
+        emit(getFeatureFlagValueUseCase(AppFeatures.HomeCustomization))
     }
 }

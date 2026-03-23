@@ -304,5 +304,8 @@ class HomeViewModelTest {
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(AppFeatures.SearchRevamp) } doReturn enabled
         }
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.HomeCustomization) } doReturn enabled
+        }
     }
 }
