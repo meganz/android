@@ -112,7 +112,10 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     .collect { chunk ->
                         fullContentLines.addAll(chunk)
-                        if (_uiState.value.isLoading) {
+                        // In Edit mode keep isLoading=true until buildChunksFromLines() is
+                        // called below; showing the edit UI with empty chunks would cause a
+                        // blank screen while the rest of the file is still streaming in.
+                        if (_uiState.value.isLoading && args.mode != TextEditorMode.Edit) {
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
@@ -129,6 +132,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 }
                 if (args.mode == TextEditorMode.Edit) {
                     buildChunksFromLines()
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorEvent = consumed,
+                            totalLineCount = fullContentLines.size,
+                        )
+                    }
                 }
                 rebuildStartLineCache()
                 _uiState.update { it.copy(isFullyLoaded = true) }
@@ -267,6 +277,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
             state.text.toString() != chunkOriginals[idx]
         }
     }
+
+    /**
+     * When the editor was opened in [TextEditorMode.Edit], leaving edit with no unsaved changes
+     * should pop the destination. When opened in [TextEditorMode.View] (then user chose Edit),
+     * the same action should return to view mode on this screen instead.
+     */
+    fun shouldPopDestinationOnCleanEditExit(): Boolean = args.mode == TextEditorMode.Edit
 
     /** Switches to Edit mode, building per-chunk text slices from the loaded content. */
     fun setEditMode(focusedChunkIndex: Int = 0) {

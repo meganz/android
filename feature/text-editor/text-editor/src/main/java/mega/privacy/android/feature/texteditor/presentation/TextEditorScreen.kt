@@ -140,7 +140,9 @@ fun TextEditorScreen(
             uiState.showDiscardDialog -> viewModel.dismissDiscardDialog()
             uiState.mode == TextEditorMode.Edit && viewModel.isContentDirty() ->
                 viewModel.requestShowDiscardDialog()
-            uiState.mode == TextEditorMode.Edit -> viewModel.setViewMode()
+            uiState.mode == TextEditorMode.Edit ->
+                if (viewModel.shouldPopDestinationOnCleanEditExit()) onBack()
+                else viewModel.setViewMode()
             uiState.mode == TextEditorMode.Create -> {
                 pendingBackAfterSave = true
                 viewModel.saveFile()
@@ -315,11 +317,15 @@ private fun CollapsingTopBar(
                         Unit
                     }
                 }
-                val onClose = remember(viewModel) {
+                val onClose = remember(viewModel, onBack) {
                     {
-                        if (viewModel.isContentDirty())
+                        if (viewModel.isContentDirty()) {
                             viewModel.requestShowDiscardDialog()
-                        else viewModel.setViewMode()
+                        } else if (viewModel.shouldPopDestinationOnCleanEditExit()) {
+                            onBack()
+                        } else {
+                            viewModel.setViewMode()
+                        }
                     }
                 }
                 val onSave = remember(viewModel) {

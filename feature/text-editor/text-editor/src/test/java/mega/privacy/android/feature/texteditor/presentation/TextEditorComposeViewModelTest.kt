@@ -280,6 +280,18 @@ internal class TextEditorComposeViewModelTest {
     }
 
     @Test
+    fun `test that shouldPopDestinationOnCleanEditExit is true when opened in Edit mode`() {
+        initUnderTest(mode = TextEditorMode.Edit)
+        assertThat(underTest.shouldPopDestinationOnCleanEditExit()).isTrue()
+    }
+
+    @Test
+    fun `test that shouldPopDestinationOnCleanEditExit is false when opened in View mode`() {
+        initUnderTest(mode = TextEditorMode.View)
+        assertThat(underTest.shouldPopDestinationOnCleanEditExit()).isFalse()
+    }
+
+    @Test
     fun `test that consumeErrorEvent consumes errorEvent`() {
         initUnderTest()
         underTest.consumeErrorEvent()
