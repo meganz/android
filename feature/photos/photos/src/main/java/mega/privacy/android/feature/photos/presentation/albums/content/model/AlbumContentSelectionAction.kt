@@ -158,7 +158,7 @@ sealed interface AlbumContentSelectionAction : MenuActionWithIcon {
 
         @Composable
         override fun getIconPainter() =
-            rememberVectorPainter(IconPack.Medium.Thin.Outline.Star)
+            rememberVectorPainter(IconPack.Medium.Thin.Outline.HeartBroken)
 
         override val highlightIcon: Boolean = true
     }
