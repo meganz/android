@@ -8,6 +8,9 @@ sealed interface FolderLinkAction {
     data class DecryptionKeyEntered(val key: String) : FolderLinkAction
     data object DecryptionKeyDialogDismissed : FolderLinkAction
     data class ItemClicked(val nodeUiItem: NodeUiItem<TypedNode>) : FolderLinkAction
+    data class ItemLongClicked(val nodeUiItem: NodeUiItem<TypedNode>) : FolderLinkAction
+    data object SelectAllItems : FolderLinkAction
+    data object DeselectAllItems : FolderLinkAction
     data object BackPressed : FolderLinkAction
     data object NavigateBackEventConsumed : FolderLinkAction
     data object OpenedFileNodeHandled : FolderLinkAction

@@ -1,8 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.folderlink.model
 
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.domain.entity.node.TypedNode
-
 sealed interface FolderLinkContentState {
     data object Loading : FolderLinkContentState
 
@@ -15,7 +12,5 @@ sealed interface FolderLinkContentState {
 
     data object Unavailable : FolderLinkContentState
 
-    data class Loaded(
-        val items: List<NodeUiItem<TypedNode>> = emptyList(),
-    ) : FolderLinkContentState
+    data object Loaded : FolderLinkContentState
 }

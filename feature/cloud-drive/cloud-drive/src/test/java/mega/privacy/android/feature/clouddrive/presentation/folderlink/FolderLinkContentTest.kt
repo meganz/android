@@ -88,7 +88,8 @@ class FolderLinkContentTest {
     fun `test that empty view is displayed when Loaded with no items`() {
         setupComposeContent(
             uiState = FolderLinkUiState(
-                contentState = FolderLinkContentState.Loaded(items = emptyList()),
+                contentState = FolderLinkContentState.Loaded,
+                items = emptyList(),
             )
         )
 

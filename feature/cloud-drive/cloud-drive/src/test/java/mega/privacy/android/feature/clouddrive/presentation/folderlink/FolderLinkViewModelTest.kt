@@ -417,10 +417,10 @@ internal class FolderLinkViewModelTest {
 
         underTest.uiState.test {
             val state = awaitItem()
-            val loaded = state.contentState as FolderLinkContentState.Loaded
+            assertThat(state.contentState).isInstanceOf(FolderLinkContentState.Loaded::class.java)
             assertThat(state.currentFolderNode).isEqualTo(folder)
             assertThat(state.title).isEqualTo(LocalizedText.Literal("SubFolder"))
-            assertThat(loaded.items).isEqualTo(childUiItems)
+            assertThat(state.items).isEqualTo(childUiItems)
         }
     }
 
@@ -716,6 +716,204 @@ internal class FolderLinkViewModelTest {
 
             verify(setViewTypeUseCase).invoke(ViewType.LIST)
         }
+
+    private fun createNodeUiItem(node: TypedNode): NodeUiItem<TypedNode> =
+        NodeUiItem(node = node, isSelected = false)
+
+    private suspend fun initLoadedViewModelWithItems(
+        url: String = "https://mega.nz/folder/abc",
+        nodes: List<TypedNode>,
+    ): List<NodeUiItem<TypedNode>> {
+        val items = nodes.map { createNodeUiItem(it) }
+        whenever(hasCredentialsUseCase()).thenReturn(false)
+        whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(fetchFolderNodesUseCase(anyOrNull(), anyOrNull()))
+            .thenReturn(FetchFolderNodesResult())
+        whenever(
+            nodeUiItemMapper(
+                any(), anyOrNull(), any(), any(), any(), anyOrNull(), anyOrNull(), any()
+            )
+        ).thenReturn(items)
+        initViewModel(FolderLinkViewModel.Args(uriString = url))
+        return items
+    }
+
+    @Test
+    fun `test that ItemLongClicked toggles item selection`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isTrue()
+            assertThat(state.items[0].isSelected).isTrue()
+            assertThat(state.items[1].isSelected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that ItemClicked in selection mode toggles item selection`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+        underTest.processAction(FolderLinkAction.ItemClicked(items[1]))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isTrue()
+            assertThat(state.items[0].isSelected).isTrue()
+            assertThat(state.items[1].isSelected).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that SelectAllItems selects all items`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.SelectAllItems)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isTrue()
+            assertThat(state.isAllSelected).isTrue()
+            assertThat(state.items[0].isSelected).isTrue()
+            assertThat(state.items[1].isSelected).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that DeselectAllItems deselects all items`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.SelectAllItems)
+        advanceUntilIdle()
+        underTest.processAction(FolderLinkAction.DeselectAllItems)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items[0].isSelected).isFalse()
+            assertThat(state.items[1].isSelected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that toggling selection twice deselects item`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+        val selectedItem = underTest.uiState.value.items[0]
+        underTest.processAction(FolderLinkAction.ItemLongClicked(selectedItem))
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items[0].isSelected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that BackPressed deselects all when in selection mode`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isInSelectionMode).isTrue()
+
+        underTest.processAction(FolderLinkAction.BackPressed)
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            val state = awaitItem()
+            assertThat(state.isInSelectionMode).isFalse()
+            assertThat(state.items[0].isSelected).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that selectedItemsCount returns correct count`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(0)
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(1)
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[1]))
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.selectedItemsCount).isEqualTo(2)
+    }
+
+    @Test
+    fun `test that selectedNodes returns correct nodes`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.selectedNodes).isEmpty()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+
+        val selectedNodes = underTest.uiState.value.selectedNodes
+        assertThat(selectedNodes).hasSize(1)
+        assertThat(selectedNodes[0].id).isEqualTo(NodeId(1L))
+    }
+
+    @Test
+    fun `test that isAllSelected returns true when all items are selected`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.SelectAllItems)
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.isAllSelected).isTrue()
+    }
+
+    @Test
+    fun `test that isAllSelected returns false when not all items are selected`() = runTest {
+        val node1 = mockFolderNode(id = 1L)
+        val node2 = mockFolderNode(id = 2L)
+        val items = initLoadedViewModelWithItems(nodes = listOf(node1, node2))
+        advanceUntilIdle()
+
+        underTest.processAction(FolderLinkAction.ItemLongClicked(items[0]))
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.isAllSelected).isFalse()
+    }
 
     @Test
     fun `test that refreshCurrentFolder re-fetches children with new sort order when monitor emits`() =

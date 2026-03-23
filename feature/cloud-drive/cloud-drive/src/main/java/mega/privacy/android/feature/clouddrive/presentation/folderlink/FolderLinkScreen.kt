@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -32,10 +33,14 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.SingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
 import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SaveToMegaMenuAction
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
@@ -52,6 +57,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
@@ -73,9 +79,16 @@ internal fun FolderLinkScreen(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val nodeOptionsActionUiState by nodeOptionsActionViewModel.uiState.collectAsStateWithLifecycle()
     val singleNodeActionHandler: SingleNodeActionHandler = rememberSingleNodeActionHandler(
         viewModel = nodeOptionsActionViewModel,
         navigationHandler = navigationHandler,
+    )
+    val megaNavigator = rememberMegaNavigator()
+    val selectionModeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(
+        navigationHandler = navigationHandler,
+        viewModel = nodeOptionsActionViewModel,
+        megaNavigator = megaNavigator,
     )
     val isListView = uiState.currentViewType == ViewType.LIST
     val spanCount = rememberDynamicSpanCount(isListView = isListView)
@@ -83,43 +96,78 @@ internal fun FolderLinkScreen(
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val isLoaded = uiState.contentState is FolderLinkContentState.Loaded
 
+    LaunchedEffect(uiState.selectedItemsCount) {
+        nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
+            uiState.selectedNodes.toSet(),
+            NodeSourceType.FOLDER_LINK,
+        )
+    }
+
+    EventEffect(
+        event = nodeOptionsActionUiState.actionTriggeredEvent,
+        onConsumed = nodeOptionsActionViewModel::resetActionTriggered,
+        action = {
+            viewModel.processAction(FolderLinkAction.DeselectAllItems)
+        }
+    )
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         topBar = {
-            MegaTopAppBar(
-                modifier = Modifier.testTag(FOLDER_LINK_APP_BAR_TAG),
-                title = uiState.title.text,
-                subtitle = if (uiState.isRootFolder) {
-                    stringResource(sharedR.string.folder_link_subtitle)
-                } else null,
-                navigationType = AppBarNavigationType.Back {
-                    viewModel.processAction(
-                        FolderLinkAction.BackPressed
-                    )
-                },
-                trailingIcons = {
-                    TransfersToolbarWidget {
-                        onNavigate(TransfersNavKey())
-                    }
-                },
-            )
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeAppBar(
+                    count = uiState.selectedItemsCount,
+                    isAllSelected = uiState.isAllSelected,
+                    isSelecting = false,
+                    onSelectAllClicked = { viewModel.processAction(FolderLinkAction.SelectAllItems) },
+                    onCancelSelectionClicked = { viewModel.processAction(FolderLinkAction.DeselectAllItems) },
+                )
+            } else {
+                MegaTopAppBar(
+                    modifier = Modifier.testTag(FOLDER_LINK_APP_BAR_TAG),
+                    title = uiState.title.text,
+                    subtitle = if (uiState.isRootFolder) {
+                        stringResource(sharedR.string.folder_link_subtitle)
+                    } else null,
+                    navigationType = AppBarNavigationType.Back {
+                        viewModel.processAction(
+                            FolderLinkAction.BackPressed
+                        )
+                    },
+                    trailingIcons = {
+                        TransfersToolbarWidget {
+                            onNavigate(TransfersNavKey())
+                        }
+                    },
+                )
+            }
         },
         bottomBar = {
-            uiState.currentFolderNode?.let { folderNode ->
-                // TODO hide on selection mode
-                if (isLoaded && uiState.isRootFolder) {
-                    InlineAnchoredButtonGroup(
-                        modifier = Modifier
-                            .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
-                        primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
-                        primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
-                        onPrimaryButtonClick = {
-                            singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
-                        },
-                        textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
-                        onTextOnlyButtonClick = {
-                            singleNodeActionHandler(DownloadMenuAction(), folderNode)
-                        }
-                    )
+            if (uiState.isInSelectionMode) {
+                NodeSelectionModeBottomBar(
+                    availableActions = nodeOptionsActionUiState.availableActions,
+                    visibleActions = nodeOptionsActionUiState.visibleActions,
+                    visible = nodeOptionsActionUiState.visibleActions.isNotEmpty(),
+                    multiNodeActionHandler = selectionModeActionHandler,
+                    selectedNodes = uiState.selectedNodes,
+                    isSelecting = false,
+                )
+            } else {
+                uiState.currentFolderNode?.let { folderNode ->
+                    if (isLoaded && uiState.isRootFolder) {
+                        InlineAnchoredButtonGroup(
+                            modifier = Modifier
+                                .testTag(FOLDER_LINK_BOTTOM_BAR_TAG),
+                            primaryButtonText = stringResource(sharedR.string.node_option_save_to_mega),
+                            primaryButtonLeadingIcon = rememberVectorPainter(IconPack.Medium.Thin.Outline.CloudUpload),
+                            onPrimaryButtonClick = {
+                                singleNodeActionHandler(SaveToMegaMenuAction(), folderNode)
+                            },
+                            textOnlyButtonText = stringResource(sharedR.string.general_save_to_device),
+                            onTextOnlyButtonClick = {
+                                singleNodeActionHandler(DownloadMenuAction(), folderNode)
+                            }
+                        )
+                    }
                 }
             }
         },
@@ -227,7 +275,7 @@ internal fun FolderLinkContent(
                     text = "This link is unavailable",
                 )
 
-            is FolderLinkContentState.Loaded -> {
+            FolderLinkContentState.Loaded -> {
                 AnimatedContent(
                     targetState = uiState.currentFolderNode?.id,
                     transitionSpec = { fadeTransition },
@@ -237,7 +285,7 @@ internal fun FolderLinkContent(
                         val listState = rememberLazyListState()
                         val gridState = rememberLazyGridState()
 
-                        if (contentState.items.isEmpty()) {
+                        if (uiState.items.isEmpty()) {
                             CloudDriveEmptyView(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -257,7 +305,7 @@ internal fun FolderLinkContent(
                                 listState = listState,
                                 gridState = gridState,
                                 spanCount = spanCount,
-                                items = contentState.items,
+                                items = uiState.items,
                                 isNextPageLoading = false,
                                 isHiddenNodesEnabled = false,
                                 showHiddenNodes = true,
@@ -271,16 +319,14 @@ internal fun FolderLinkContent(
                                     )
                                 },
                                 onItemClicked = { onAction(FolderLinkAction.ItemClicked(it)) },
-                                onLongClicked = {
-                                    // TODO onAction(ItemLongClicked(it))
-                                },
+                                onLongClicked = { onAction(FolderLinkAction.ItemLongClicked(it)) },
                                 sortConfiguration = uiState.selectedSortConfiguration,
                                 isListView = isListView,
                                 onSortOrderClick = onShowSortBottomSheet,
                                 onChangeViewTypeClicked = {
                                     onAction(FolderLinkAction.ChangeViewTypeClicked)
                                 },
-                                inSelectionMode = false, // TODO
+                                inSelectionMode = uiState.isInSelectionMode,
                             )
                         }
                     }
