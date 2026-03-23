@@ -2,7 +2,6 @@ package mega.privacy.android.core.nodecomponents.components.offline
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,6 +37,7 @@ import java.util.UUID
 fun HandleOfflineNodeAction3(
     uiState: OfflineNodeActionsUiState,
     applyShareContentUris: (List<File>, String) -> Intent,
+    applyNodeContentUri: (Intent, File, String, Boolean) -> Unit,
     sortOrder: SortOrder = SortOrder.ORDER_NONE,
     consumeShareFilesEvent: () -> Unit = {},
     consumeShareNodeLinksEvent: () -> Unit = {},
@@ -79,6 +79,7 @@ fun HandleOfflineNodeAction3(
             openFile(
                 context = context,
                 content = it,
+                applyNodeContentUri = applyNodeContentUri,
                 snackBarHostState = snackBarHostState,
                 coroutineScope = coroutineScope,
                 sortOrder = sortOrder,
@@ -120,6 +121,7 @@ private fun startShareLinksIntent(context: Context, title: String?, links: Strin
 private suspend fun openFile(
     context: Context,
     content: OfflineNodeActionUiEntity,
+    applyNodeContentUri: (Intent, File, String, Boolean) -> Unit,
     snackBarHostState: SnackbarHostState?,
     coroutineScope: CoroutineScope,
     sortOrder: SortOrder,
@@ -219,8 +221,7 @@ private suspend fun openFile(
 
         is OfflineNodeActionUiEntity.Other -> {
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.fromFile(content.file), content.mimeType)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                applyNodeContentUri(this, content.file, content.mimeType, false)
             }
             safeLaunchActivity(
                 context = context,
