@@ -102,6 +102,7 @@ fun OfflineScreen(
     HandleOfflineNodeAction3(
         uiState = actionUiState,
         applyShareContentUris = actionViewModel::applyShareContentUris,
+        applyNodeContentUri = actionViewModel::applyNodeContentUri,
         consumeShareFilesEvent = actionViewModel::onShareFilesEventConsumed,
         consumeShareNodeLinksEvent = actionViewModel::onShareNodeLinksEventConsumed,
         consumeOpenFileEvent = actionViewModel::onOpenFileEventConsumed,
