@@ -8,6 +8,7 @@ sealed interface HomeUiState {
     data class Data(
         val widgets: List<HomeWidgetItem>,
         val isSearchRevampEnabled: Boolean = false,
+        val isHomeCustomizationEnabled: Boolean = false,
     ) : HomeUiState
 
     data class Offline(
