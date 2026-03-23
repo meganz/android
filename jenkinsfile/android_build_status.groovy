@@ -27,47 +27,13 @@ NODE_LABELS = 'mac-jenkins-slave-android'
  */
 ARCHIVE_FOLDER = "archive"
 
+CODE_REVIEW_CMD = "code_review"
+CODE_REVIEW_OUTPUT_FILE = "code_review_report.md"
+
 /**
  * common.groovy file with common methods
  */
 def common
-
-/**
- * Decide whether we should skip the current build. If MR title starts with "Draft:"
- * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
- * been removed from MR title, newly triggered builds will resume to normal.
- *
- * @return true if current stage should be skipped. Otherwise return false.
- */
-def shouldSkipBuild() {
-    String mrTitle = env.GITLAB_OA_TITLE
-    if (mrTitle != null && !mrTitle.isEmpty()) {
-        return mrTitle.toLowerCase().startsWith("draft:") ||
-                mrTitle.toLowerCase().startsWith("wip:")
-    }
-    // If title is null, this build is probably triggered by 'jenkins rebuild' comment.
-    // In such case, build should not be skipped.
-    return false
-}
-
-/**
- * Fetch the message of the last commit from environment variable.
- *
- * @return The commit message text if GitLab plugin has sent a valid commit message, which is
- * denoted as a Code Block in Gitlab.
- *
- * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
- */
-String getLastCommitMessage() {
-    println("entering getLastCommitMessage()")
-    def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
-    if (lastCommitMessage == null) {
-        return '**N/A**'
-    } else {
-        // use markdown backticks to format commit message into a code block
-        return "\n```\n$lastCommitMessage\n```\n".stripIndent().stripMargin()
-    }
-}
 
 pipeline {
     agent { label NODE_LABELS }
@@ -165,7 +131,7 @@ pipeline {
                         String duration = getBuildDurationStr()
                         String buildMessage = ":white_check_mark: Build Succeeded!(Build: ${env.BUILD_NUMBER}) (Duration: ${duration})\n\n" +
                                 "**Last Commit:** (${env.GIT_COMMIT})" + getLastCommitMessage() +
-                                "**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
+                                "\n\n**Build Warnings:**\n" + getBuildWarnings() + "\n\n"
 
                         // Create the String to be posted as a comment in Gitlab
                         String mergeRequestMessage
@@ -197,7 +163,7 @@ pipeline {
         }
         stage('Preparation') {
             when {
-                expression { (!shouldSkipBuild()) }
+                expression { !shouldSkipBuild() }
             }
             steps {
                 script {
@@ -216,12 +182,12 @@ pipeline {
         }
         stage("Build, Test and Lint") {
             when {
-                expression { (!shouldSkipBuild()) }
+                expression { !shouldSkipBuild() }
             }
             parallel {
                 stage('Build APK (GMS+QA)') {
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
 
@@ -268,18 +234,18 @@ pipeline {
                 stage('Unit Test and Code Coverage') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
                         script {
                             common.downloadDependencyLibForSdk()
                         }
                         gitlabCommitStatus(name: 'Unit Test and Code Coverage') {
-                            script { 
+                            script {
                                 util.useArtifactory() {
                                     def moduleList = common.getUnitTestModuleList()
                                     def failedModules = []
-                                    
+
                                     try {
                                         sh "./gradlew --no-daemon runAllUnitTestsWithCoverage"
                                     } finally {
@@ -318,7 +284,7 @@ pipeline {
                 stage('Lint Check') {
                     agent { label NODE_LABELS }
                     when {
-                        expression { (!shouldSkipBuild()) }
+                        expression { !shouldSkipBuild() && !isCodeReviewOnly() }
                     }
                     steps {
                         gitlabCommitStatus(name: 'Lint Check') {
@@ -361,6 +327,43 @@ pipeline {
                 }  //stage('Lint Check')
             }
         }
+
+        stage('Code Review') {
+            agent { label NODE_LABELS }
+            when {
+                expression { shouldRunCodeReview() }
+            }
+            steps {
+                gitlabCommitStatus(name: 'Code Review') {
+                    script {
+                        def skillFile = "${WORKSPACE}/.claude/skills/android-code-review/SKILL.md"
+                        def targetBranch = env.GITLAB_OA_TARGET_BRANCH ?: 'develop'
+
+                        util.useGitLab() {
+                            withCredentials([string(credentialsId: 'ANTHROPIC_API_KEY', variable: 'ANTHROPIC_API_KEY')]) {
+                                try {
+                                    sh "./gradlew --no-daemon codeReview --skill '${skillFile}' --output '${CODE_REVIEW_OUTPUT_FILE}' --target-branch '${targetBranch}'"
+                                    common.sendFileToMRComment(CODE_REVIEW_OUTPUT_FILE)
+                                } catch (Exception e) {
+                                    String failMsg = ":x: **Code Review Failed** (Build: ${env.BUILD_NUMBER})<br/>" +
+                                            "Error: ${e.message ?: 'Unknown error'}<br/>" +
+                                            "Please check the [build log](${env.BUILD_URL}) for details."
+                                    common.sendToMR(failMsg)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: CODE_REVIEW_OUTPUT_FILE, allowEmptyArchive: true
+                }
+                cleanup {
+                    cleanWs(cleanWhenFailure: true)
+                }
+            }
+        } //stage('Code Review')
     }
 }
 
@@ -466,21 +469,21 @@ static String wrapBuildWarnings(String rawWarning) {
  */
 def generateLintSummary(String module) {
     def reportsDir = "$WORKSPACE/${module}/build/reports"
-    
+
     // Find lint XML result files, which matches "lint-*.xml"
     def lintResultsFiles = sh(
-        script: "ls ${reportsDir}/lint-*.xml 2>/dev/null || true",
-        returnStdout: true
+            script: "ls ${reportsDir}/lint-*.xml 2>/dev/null || true",
+            returnStdout: true
     ).trim().split("\\r?\\n").findAll { it }
 
     if (!lintResultsFiles) {
         print("No lint-*.xml file found in ${reportsDir}")
         return [
-                "fatalCount": 0,
-                "errorCount": 0,
-                "warningCount": 0,
+                "fatalCount"      : 0,
+                "errorCount"      : 0,
+                "warningCount"    : 0,
                 "informationCount": 0,
-                "errorMessage": "No lint results found"
+                "errorMessage"    : "No lint results found"
         ]
     }
 
@@ -490,11 +493,11 @@ def generateLintSummary(String module) {
 
     // Generate JSON report from XML
     sh "./gradlew --no-daemon generateLintReport --lint-results ${lintResultsFile} --target-file ${targetFile}"
-    
+
     // Parse JSON report
     def lintJsonFile = readFile(targetFile)
     def lintJsonContent = new HashMap(new groovy.json.JsonSlurper().parseText(lintJsonFile))
-    
+
     print("lintSummary($module) = ${lintJsonContent}")
     return lintJsonContent
 }
@@ -582,19 +585,19 @@ def checkFatalErrors(def lintJsonContent) {
 
 /**
  * Detects which modules have failed unit tests by checking their test result files.
- * 
+ *
  * @param moduleList List of all modules that were tested
  * @return List of module names that have failed tests
  */
 def detectFailedTestModules(List<String> moduleList) {
     def failedModules = []
-    
-    for (String module in moduleList) {        
+
+    for (String module in moduleList) {
         // Check if failure can be found in XML test reports under "build/unittest/junit"
         if (fileExists("${module}/build/unittest/junit")) {
             def testResultFiles = sh(
-                script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
-                returnStdout: true
+                    script: "grep -irE \"failures=\\\"[1-9][0-9]*\\\"\" ${module}/build/unittest/junit/* 2>/dev/null || true",
+                    returnStdout: true
             ).trim().split("\\r?\\n").findAll { it }
 
             if (testResultFiles) {
@@ -605,7 +608,7 @@ def detectFailedTestModules(List<String> moduleList) {
             println("No test result files found for module: ${module}")
         }
     }
-    
+
     println("Failed modules detected: ${failedModules}")
     return new ArrayList<>(failedModules)
 }
@@ -618,7 +621,70 @@ def detectFailedTestModules(List<String> moduleList) {
 String getBuildDurationStr() {
     long BUILD_END_TIME = System.currentTimeMillis()
     long durationMillis = BUILD_END_TIME - BUILD_START_TIME
-    int minutes = (int)(durationMillis / 1000 / 60)
-    int seconds = (int)((int)(durationMillis / 1000) % 60)
+    int minutes = (int) (durationMillis / 1000 / 60)
+    int seconds = (int) ((int) (durationMillis / 1000) % 60)
     return String.format("%dm %02ds", minutes, seconds)
+}
+
+/**
+ * Decide whether we should skip the current build. If MR title starts with "Draft:"
+ * or "WIP:", then CI pipeline skips all stages in a build. After these 2 tags have
+ * been removed from MR title, newly triggered builds will resume to normal.
+ *
+ * @return true if current stage should be skipped. Otherwise return false.
+ */
+def shouldSkipBuild() {
+    String mrTitle = env.GITLAB_OA_TITLE
+    if (mrTitle != null && !mrTitle.isEmpty()) {
+        return mrTitle.toLowerCase().startsWith("draft:") ||
+                mrTitle.toLowerCase().startsWith("wip:")
+    }
+    // If title is null, this build is probably triggered by 'jenkins rebuild' comment.
+    // In such case, build should not be skipped.
+    return false
+}
+
+/**
+ * Fetch the message of the last commit from environment variable.
+ *
+ * @return The commit message text if GitLab plugin has sent a valid commit message, which is
+ * denoted as a Code Block in Gitlab.
+ *
+ * Otherwise, return a Bold "N/A" normally when CI build is triggered by MR comment "jenkins rebuild".
+ */
+String getLastCommitMessage() {
+    println("entering getLastCommitMessage()")
+    def lastCommitMessage = env.GITLAB_OA_LAST_COMMIT_MESSAGE
+    if (lastCommitMessage == null) {
+        return '**N/A**'
+    } else {
+        // use markdown backticks to format commit message into a code block
+        return "\n```\n$lastCommitMessage\n```\n".stripIndent().stripMargin()
+    }
+}
+
+/**
+ * Decide whether the Code Review stage should run.
+ * - On MR OPEN (initial creation) if not a Draft/WIP.
+ * - On-demand via "code_review" comment (NOTE action).
+ * Note: does NOT run automatically on subsequent pushes (PUSH action) to keep CI cost low.
+ *
+ * @return true if code review should run, false otherwise.
+ */
+def shouldRunCodeReview() {
+    boolean isNewMr = env.GITLAB_OA_ACTION == "open"
+    boolean isTriggeredByCommand = env.GITLAB_OBJECT_KIND == "note" &&
+            env.GITLAB_COMMENT_TRIGGER != null &&
+            env.GITLAB_COMMENT_TRIGGER.trim() == CODE_REVIEW_CMD
+    return isNewMr || isTriggeredByCommand
+}
+
+/**
+ * Returns true when the build was triggered solely by the "code_review" comment,
+ * meaning all other stages should be skipped.
+ */
+def isCodeReviewOnly() {
+    return env.GITLAB_OBJECT_KIND == "note" &&
+            env.GITLAB_COMMENT_TRIGGER != null &&
+            env.GITLAB_COMMENT_TRIGGER.trim() == CODE_REVIEW_CMD
 }

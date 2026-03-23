@@ -113,9 +113,42 @@ void sendToMR(String message) {
     def mrNumber = getMrNumber()
     if (mrNumber != null && !mrNumber.isEmpty()) {
         withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
-            env.MARKDOWN_LINK = message
+            env.MESSAGE_BODY = message
             env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
-            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MARKDOWN_LINK}\" ${MERGE_REQUEST_URL}'
+            sh 'curl --request POST --header PRIVATE-TOKEN:$TOKEN --form body=\"${MESSAGE_BODY}\" ${MERGE_REQUEST_URL}'
+        }
+    }
+}
+
+/**
+ * Send a large markdown file as a GitLab MR comment using a JSON payload.
+ * Wraps the content in a collapsible <details> block and uses jq to safely
+ * encode the file as JSON. Use this instead of sendToMR() for large content
+ * such as code review reports.
+ *
+ * @param filePath absolute or workspace-relative path to the markdown file to send
+ */
+void sendFileToMRComment(String filePath) {
+    println("####### Entering common.sendLargeTextToMR() #######")
+
+    def mrNumber = getMrNumber()
+    if (mrNumber != null && !mrNumber.isEmpty()) {
+        withCredentials([usernamePassword(credentialsId: 'Gitlab-Access-Token', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
+            def jsonPayloadFile = "${WORKSPACE}/.mr_comment_payload_${System.currentTimeMillis()}.json"
+            env.MR_COMMENT_SOURCE_FILE = filePath
+            env.MR_COMMENT_PAYLOAD_FILE = jsonPayloadFile
+            env.MERGE_REQUEST_URL = "${env.GITLAB_BASE_URL}/api/v4/projects/199/merge_requests/${mrNumber}/notes"
+            sh '''
+                jq -n --rawfile body ${MR_COMMENT_SOURCE_FILE} \
+                    '{"body": ("<details><summary>Code Review Report</summary>" + $body + "</details>")}' \
+                    > ${MR_COMMENT_PAYLOAD_FILE}
+                curl --request POST \
+                     --header "PRIVATE-TOKEN:$TOKEN" \
+                     --header "Content-Type: application/json" \
+                     --data @${MR_COMMENT_PAYLOAD_FILE} \
+                     ${MERGE_REQUEST_URL}
+                rm -f ${MR_COMMENT_PAYLOAD_FILE}
+            '''
         }
     }
 }

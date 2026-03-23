@@ -29,6 +29,8 @@ ucropnedit = "4.1.6"
 sqlcipher = "4.9.0"
 slack-compose-lints = "1.4.2"
 profileinstaller = "1.4.1"
+okhttp3 = "4.12.0"
+okio = "3.17.0"
 
 [libraries]
 bannerviewpager = { module = "com.github.zhpanvip:BannerViewPager", version.ref = "bannerviewpager" }
@@ -69,23 +71,25 @@ nocturn = { module = "mega.privacy.android.nocturn:nocturn", version.ref = "noct
 karma-annotation = { module = "com.mega.karma:annotation", version.ref = "karma" }
 karma-compiler = { module = "com.mega.karma:compiler", version.ref = "karma" }
 karma-core = { module = "com.mega.karma:core", version.ref = "karma" }
-kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialisation"}
-eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit"}
-eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit"}
-json = { module = "org.json:json", version.ref = "json"}
+kotlin-serialisation = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialisation" }
+eclipse-jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "eclipse-jgit" }
+eclipse-jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "eclipse-jgit" }
+json = { module = "org.json:json", version.ref = "json" }
 zoomable-telephoto = { module = "me.saket.telephoto.mega:zoomable", version.ref = "mega-telephoto" }
 zoomable-image-coil = { module = "me.saket.telephoto.mega:zoomable-image-coil3", version.ref = "mega-telephoto" }
 zoomable-image-core = { module = "me.saket.telephoto.mega:zoomable-image-core", version.ref = "mega-telephoto" }
 zoomable-image-subsampling-image = { module = "me.saket.telephoto.mega:sub-sampling-image", version.ref = "mega-telephoto" }
 telephoto-flick = { module = "me.saket.telephoto:flick", version.ref = "telephoto" }
-mega-core-ui = { group = "mega.android.core", name  = "ui", version.ref = "mega-core-ui" }
-mega-core-ui-tokens = { group = "mega.android.core", name  = "ui-tokens", version.ref = "mega-core-ui"}
+mega-core-ui = { group = "mega.android.core", name = "ui", version.ref = "mega-core-ui" }
+mega-core-ui-tokens = { group = "mega.android.core", name = "ui-tokens", version.ref = "mega-core-ui" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
-commonmark-java = {module = "org.commonmark:commonmark", version.ref = "commonmark-java"}
+commonmark-java = { module = "org.commonmark:commonmark", version.ref = "commonmark-java" }
 ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
 profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "profileinstaller" }
+okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp3" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]
