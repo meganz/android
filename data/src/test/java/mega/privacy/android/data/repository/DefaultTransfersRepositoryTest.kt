@@ -182,7 +182,10 @@ class DefaultTransfersRepositoryTest {
             transferAppDataStringMapper,
             activeTransferTotalsMapper,
             monitorFetchNodesFinishUseCase,
-            megaUploadOptionsMapper
+            megaUploadOptionsMapper,
+            displayPathFromUriCache,
+            parentNodeCache,
+            transferPathCache,
         )
     }
 
@@ -1830,6 +1833,83 @@ class DefaultTransfersRepositoryTest {
         underTest.transferOverQuotaTimestamp = value
 
         assertThat(underTest.transferOverQuotaTimestamp).isEqualTo(value)
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    inner class OnLogoutSuccessTests {
+
+        @Test
+        fun `test that onLogoutSuccess resets paused transfers asked resume over quota timestamp error status and atomic timestamp`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+                stubPauseTransfers(true)
+                underTest.pauseTransfers(true)
+                underTest.setAskedResumeTransfers()
+
+                val currentTime = 99L
+                whenever(deviceGateway.getCurrentTimeInMillis()).thenReturn(currentTime)
+                underTest.setTransferOverQuotaErrorTimestamp()
+
+                val failedTransfer = mock<Transfer> {
+                    on { it.state } doReturn TransferState.STATE_FAILED
+                }
+                val finishEvent = mock<TransferEvent.TransferFinishEvent> {
+                    on { it.transfer } doReturn failedTransfer
+                }
+                whenever(completedTransferMapper(finishEvent)).thenReturn(mock())
+                underTest.addCompletedTransfers(listOf(finishEvent))
+
+                underTest.transferOverQuotaTimestamp = AtomicLong(42L)
+
+                assertThat(underTest.monitorPausedTransfers().value).isTrue()
+                assertThat(underTest.monitorAskedResumeTransfers().value).isTrue()
+                assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value)
+                    .isEqualTo(Instant.fromEpochMilliseconds(currentTime))
+                assertThat(underTest.monitorTransferInErrorStatus().value).isTrue()
+                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(42L)
+
+                underTest.onLogoutSuccess()
+
+                assertThat(underTest.monitorPausedTransfers().value).isFalse()
+                assertThat(underTest.monitorAskedResumeTransfers().value).isFalse()
+                assertThat(underTest.monitorTransferOverQuotaErrorTimestamp().value).isNull()
+                assertThat(underTest.monitorTransferInErrorStatus().value).isFalse()
+                assertThat(underTest.transferOverQuotaTimestamp.get()).isEqualTo(0L)
+
+                verify(displayPathFromUriCache).clear()
+                verify(parentNodeCache).clear()
+                verify(transferPathCache).clear()
+            }
+
+        @Test
+        fun `test that onLogoutSuccess clears in progress transfers and active transfers`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+
+                val uniqueId = 7L
+                val transfer = mock<Transfer> {
+                    on { it.uniqueId } doReturn uniqueId
+                    on { it.isFolderTransfer } doReturn false
+                }
+                val inProgressTransfer = mock<InProgressTransfer.Download> {
+                    on { it.uniqueId } doReturn uniqueId
+                }
+                whenever(inProgressTransferMapper(transfer)).thenReturn(inProgressTransfer)
+                underTest.updateInProgressTransfers(listOf(transfer))
+
+                val activeTransfer =
+                    stubTransfer(uniqueId = 8L, transferType = TransferType.DOWNLOAD)
+                underTest.putActiveTransfer(activeTransfer)
+
+                assertThat(underTest.monitorInProgressTransfers().value).isNotEmpty()
+                assertThat(underTest.getActiveTransfers()).isNotEmpty()
+
+                underTest.onLogoutSuccess()
+
+                assertThat(underTest.monitorInProgressTransfers().value).isEmpty()
+                assertThat(underTest.getActiveTransfers()).isEmpty()
+            }
     }
 
     @Nested

@@ -72,6 +72,7 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
@@ -122,7 +123,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     @DisplayPathFromUriCache private val displayPathFromUriCache: MapCache<String, String>,
     @ParentNodeCache private val parentNodeCache: MapCache<Long, MegaNode?>,
     @TransferPathCache private val transferPathCache: MapCache<Pair<Long, TransferType>, String>,
-) : TransferRepository {
+) : TransferRepository, LogoutTask {
 
     private val monitorPausedTransfers = MutableStateFlow(false)
 
@@ -155,6 +156,24 @@ internal class DefaultTransfersRepository @Inject constructor(
                 }
             }
         }
+    }
+
+    override suspend fun onLogoutSuccess() {
+        resetCachedValues()
+    }
+
+    private suspend fun resetCachedValues() {
+        monitorPausedTransfers.emit(false)
+        monitorAskedResumeTransfers.emit(false)
+        monitorTransferOverQuotaErrorTimestamp.emit(null)
+        monitorTransferInErrorStatus.emit(false)
+        inProgressTransfersFlow.emit(emptyMap())
+        activeTransfersFlows.forEach { (_, flow) ->
+            flow.emit(emptyMap())
+        }
+        transferOverQuotaTimestamp = AtomicLong()
+        clearCompletedTransfersCache()
+        Timber.d("Reset default transfers repository cached values")
     }
 
     override fun startUpload(
@@ -439,9 +458,9 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getInProgressTransfersFromSdk(): List<Transfer> =
         withContext(ioDispatcher) {
             (megaApiGateway.getTransfers(MegaTransfer.TYPE_UPLOAD)
-                        + megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
+                    + megaApiGateway.getTransfers(MegaTransfer.TYPE_DOWNLOAD))
                 .map { transferMapper(it) }
-            .sortedBy { it.priority }
+                .sortedBy { it.priority }
         }
 
     override fun monitorCompletedTransfersByStateWithLimit(

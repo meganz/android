@@ -215,6 +215,11 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindDomainTransfersRepository(repository: DefaultTransfersRepository): TransferRepository
 
+    @ExperimentalContracts
+    @Binds
+    @IntoSet
+    abstract fun bindDefaultTransfersRepositoryLogoutTask(repository: DefaultTransfersRepository): LogoutTask
+
     @Binds
     abstract fun bindCameraUploadsRepository(repository: CameraUploadsRepositoryImpl): CameraUploadsRepository
 
