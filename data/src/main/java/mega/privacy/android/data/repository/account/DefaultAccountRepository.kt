@@ -8,12 +8,15 @@ import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -92,6 +95,7 @@ import mega.privacy.android.domain.exception.account.QueryChangeEmailLinkExcepti
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
@@ -179,7 +183,9 @@ internal class DefaultAccountRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     @ExcludeFileName val excludeFileNames: Set<String>,
     private val getDomainNameUseCase: GetDomainNameUseCase,
-) : AccountRepository {
+) : AccountRepository, LogoutTask {
+    private val accountDetail = MutableStateFlow(AccountDetail())
+
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
         val email = user?.email ?: megaChatApiGateway.getMyEmail() ?: ""
@@ -539,7 +545,14 @@ internal class DefaultAccountRepository @Inject constructor(
             megaApiGateway.getIncomingSharesNode(null),
         )
         // keep previous info if new info null
-        myAccountInfoFacade.handleAccountDetail(newDetail)
+        accountDetail.update { oldDetail ->
+            oldDetail.copy(
+                storageDetail = newDetail.storageDetail ?: oldDetail.storageDetail,
+                sessionDetail = newDetail.sessionDetail ?: oldDetail.sessionDetail,
+                levelDetail = newDetail.levelDetail ?: oldDetail.levelDetail,
+                transferDetail = newDetail.transferDetail ?: oldDetail.transferDetail,
+            )
+        }
 
         // Send broadcast to to App Event
         appEventGateway.broadcastMyAccountUpdate(
@@ -551,8 +564,11 @@ internal class DefaultAccountRepository @Inject constructor(
         return newDetail
     }
 
-    override fun monitorAccountDetail(): Flow<AccountDetail> =
-        myAccountInfoFacade.monitorAccountDetail()
+    override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()
+
+    override suspend fun onLogoutSuccess() {
+        accountDetail.update { AccountDetail() }
+    }
 
     override suspend fun isMegaApiLoggedIn(): Boolean =
         withContext(ioDispatcher) {
@@ -783,7 +799,10 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
 
-    override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
+    override suspend fun resetAccountInfo() {
+        myAccountInfoFacade.resetAccountInfo()
+        onLogoutSuccess()
+    }
     override suspend fun update2FADialogPreference(show2FA: Boolean) =
         withContext(ioDispatcher) { accountPreferencesGateway.setDisplay2FADialog(show2FA) }
 

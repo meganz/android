@@ -1,7 +1,5 @@
 package mega.privacy.android.data.facade
 
-import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import nz.mega.sdk.MegaRequest
 
@@ -45,14 +43,6 @@ interface AccountInfoWrapper {
     suspend fun handleAccountDetail(request: MegaRequest)
 
     /**
-     * Handle account detail
-     *
-     *
-     * @param newDetail
-     */
-    suspend fun handleAccountDetail(newDetail: AccountDetail)
-
-    /**
      * submit subscription
      * @param purchase
      */
@@ -62,12 +52,6 @@ interface AccountInfoWrapper {
      * Subscription payment method
      */
     val subscriptionMethodId: Int
-
-    /**
-     * Monitor account detail
-     *
-     */
-    fun monitorAccountDetail(): Flow<AccountDetail>
 
     /**
      * Resets account info.

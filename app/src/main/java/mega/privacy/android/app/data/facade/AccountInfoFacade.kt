@@ -3,10 +3,6 @@ package mega.privacy.android.app.data.facade
 import android.content.Context
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -16,7 +12,6 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.feature.payment.model.AccountTypeInt
 import mega.privacy.android.shared.resources.R as sharedR
@@ -40,7 +35,6 @@ class AccountInfoFacade @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val db: Lazy<DatabaseHandler>,
 ) : AccountInfoWrapper {
-    private val accountDetail = MutableStateFlow(AccountDetail())
     private val submittedPurchaseTokens = mutableSetOf<String>()
 
     override val storageCapacityUsedAsFormattedString: String
@@ -75,20 +69,6 @@ class AccountInfoFacade @Inject constructor(
             Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
         }
     }
-
-    override suspend fun handleAccountDetail(newDetail: AccountDetail) {
-        val oldDetail = accountDetail.value
-        accountDetail.update {
-            oldDetail.copy(
-                storageDetail = newDetail.storageDetail ?: oldDetail.storageDetail,
-                sessionDetail = newDetail.sessionDetail ?: oldDetail.sessionDetail,
-                levelDetail = newDetail.levelDetail ?: oldDetail.levelDetail,
-                transferDetail = newDetail.transferDetail ?: oldDetail.transferDetail
-            )
-        }
-    }
-
-    override fun monitorAccountDetail(): Flow<AccountDetail> = accountDetail.asStateFlow()
 
     override suspend fun resetAccountInfo() = myAccountInfo.resetDefaults()
 

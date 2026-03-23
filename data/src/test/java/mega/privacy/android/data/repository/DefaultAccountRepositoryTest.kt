@@ -26,6 +26,7 @@ import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.AccountDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
@@ -47,6 +48,7 @@ import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -93,6 +95,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullSource
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -150,6 +153,7 @@ class DefaultAccountRepositoryTest {
                 emailMap = emptyMap()
             )
         }
+    private val accountDetailMapper = mock<AccountDetailMapper>()
     private val storageStateMapper = mock<StorageStateMapper>()
 
     private val pricing = mock<MegaPricing> {
@@ -215,10 +219,14 @@ class DefaultAccountRepositoryTest {
             cookieSettingsMapper,
             cookieSettingsIntMapper,
             credentialsPreferencesGateway,
+            accountDetailMapper,
             storageStateMapper,
             uiPreferencesGateway,
             getDomainNameUseCase,
         )
+        whenever(
+            accountDetailMapper(any(), any(), anyOrNull(), anyOrNull(), anyOrNull())
+        ).thenReturn(AccountDetail())
     }
 
 
@@ -242,7 +250,7 @@ class DefaultAccountRepositoryTest {
             achievementsOverviewMapper = achievementsOverviewMapper,
             dbHandler = { dbHandler },
             myAccountCredentialsMapper = myAccountCredentialsMapper,
-            accountDetailMapper = mock(),
+            accountDetailMapper = accountDetailMapper,
             accountSessionMapper = accountSessionMapper,
             chatPreferencesGateway = chatPreferencesGateway,
             callsPreferencesGateway = callsPreferencesGateway,

@@ -2,8 +2,10 @@ package mega.privacy.android.data.di
 
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import mega.privacy.android.data.repository.AdsRepositoryImpl
 import mega.privacy.android.data.repository.AndroidBillingRepository
 import mega.privacy.android.data.repository.AudioSectionRepositoryImpl
@@ -142,6 +144,7 @@ import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
 import mega.privacy.android.domain.repository.psa.PsaRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
 import javax.inject.Singleton
@@ -240,8 +243,17 @@ internal abstract class RepositoryModule {
     abstract fun bindFavouritesRepository(repository: DefaultFavouritesRepository): FavouritesRepository
 
     @ExperimentalContracts
+    @Singleton
     @Binds
     abstract fun bindAccountRepository(repository: DefaultAccountRepository): AccountRepository
+
+    companion object {
+        @ExperimentalContracts
+        @Provides
+        @IntoSet
+        fun provideAccountRepositoryLogoutTask(repository: DefaultAccountRepository): LogoutTask =
+            repository
+    }
 
     @Binds
     abstract fun bindTimeSystemRepository(repository: DefaultTimeSystemRepository): TimeSystemRepository
