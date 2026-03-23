@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.net.toUri
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -74,7 +75,6 @@ import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import javax.inject.Inject
-import androidx.core.net.toUri
 
 @AndroidEntryPoint
 @SuppressLint("NewApi")
@@ -172,10 +172,7 @@ class SettingsFragment :
 
                         isChecked = state.showHiddenItems
                     }
-
                     findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isVisible =
-                        !state.isSingleActivityEnabled
-                    findPreference<SwitchPreferenceCompat>(KEY_SUB_FOLDER_MEDIA_DISCOVERY)?.isVisible =
                         !state.isSingleActivityEnabled
                 }
             }
