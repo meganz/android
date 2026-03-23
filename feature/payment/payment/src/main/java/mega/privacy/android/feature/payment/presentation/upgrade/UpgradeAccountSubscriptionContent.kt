@@ -22,7 +22,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.feature.payment.components.ProPlanCard
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.components.upgradeAccountSkeleton
-import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
@@ -52,7 +52,7 @@ internal fun LazyListScope.subscriptionUnavailableContent(
  * Content shown when subscription feature is available: period chips, save badge, and plan cards.
  */
 internal fun LazyListScope.subscriptionAvailableContent(
-    uiState: ChooseAccountState,
+    uiState: UpgradeAccountState,
     isMonthly: Boolean,
     onMonthlyChange: (Boolean) -> Unit,
     chosenPlan: AccountType?,

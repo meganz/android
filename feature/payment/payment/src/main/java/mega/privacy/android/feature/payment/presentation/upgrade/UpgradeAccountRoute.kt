@@ -33,12 +33,12 @@ import mega.privacy.mobile.analytics.event.MaybeLaterUpgradeAccountButtonPressed
 import mega.privacy.mobile.analytics.event.UpgradeAccountPlanScreenEvent
 
 @Composable
-fun ChooseAccountRoute(
+fun UpgradeAccountRoute(
     isNewCreationAccount: Boolean,
     isUpgradeAccount: Boolean,
     openFromSource: UpgradeAccountSource,
     onBack: () -> Unit = {},
-    chooseAccountViewModel: ChooseAccountViewModel = hiltViewModel<ChooseAccountViewModel>(),
+    chooseAccountViewModel: UpgradeAccountViewModel = hiltViewModel<UpgradeAccountViewModel>(),
     billingViewModel: BillingViewModel = hiltViewModel<BillingViewModel>(),
     accountStorageViewModel: AccountStorageViewModel = hiltViewModel<AccountStorageViewModel>(),
 ) {
@@ -68,7 +68,7 @@ fun ChooseAccountRoute(
         }
     }
 
-    NewChooseAccountScreen(
+    UpgradeAccountScreen(
         uiState = uiState,
         accountStorageUiState = accountStorageUiState,
         isNewCreationAccount = isNewCreationAccount,

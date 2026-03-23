@@ -18,10 +18,10 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
-import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
-import mega.privacy.android.feature.payment.presentation.upgrade.NewChooseAccountScreen
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountScreen
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITIONAL_BENEFITS
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
@@ -38,7 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class NewChooseAccountScreenTest {
+class UpgradeAccountScreenTest {
     private val localisedPriceCurrencyCodeStringMapper = LocalisedPriceCurrencyCodeStringMapper()
     private val formattedSizeMapper = FormattedSizeMapper()
 
@@ -262,7 +262,7 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that skeleton is shown when subscriptions list is empty`() {
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = emptyList(),
                 isSubscriptionFeatureAvailable = true,
             )
@@ -301,7 +301,7 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that subscription unavailable banner is shown when isSubscriptionFeatureAvailable is false`() {
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             )
@@ -317,7 +317,7 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that pro plan cards are not shown when isSubscriptionFeatureAvailable is false`() {
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             )
@@ -331,7 +331,7 @@ class NewChooseAccountScreenTest {
     fun `test that bottom bar is not shown when isSubscriptionFeatureAvailable is false`() {
         setContent(
             isUpgradeAccount = true,
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             )
@@ -344,7 +344,7 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that subscription period chips are not shown when isSubscriptionFeatureAvailable is false`() {
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             )
@@ -359,7 +359,7 @@ class NewChooseAccountScreenTest {
     @Test
     fun `test that save up to badge is not shown when isSubscriptionFeatureAvailable is false`() {
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             )
@@ -373,7 +373,7 @@ class NewChooseAccountScreenTest {
     fun `test that onSubscriptionUnavailableLearnMoreClick is called when Learn more is clicked`() {
         var learnMoreClicked = false
         setContent(
-            uiState = ChooseAccountState(
+            uiState = UpgradeAccountState(
                 localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
                 isSubscriptionFeatureAvailable = false,
             ),
@@ -397,12 +397,12 @@ class NewChooseAccountScreenTest {
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
         onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
-        uiState: ChooseAccountState = ChooseAccountState(
+        uiState: UpgradeAccountState = UpgradeAccountState(
             localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
             isSubscriptionFeatureAvailable = true,
         ),
     ) = composeRule.setContent {
-        NewChooseAccountScreen(
+        UpgradeAccountScreen(
             onInAppCheckoutClick = onBuyPlanClick,
             onFreePlanClicked = onFreePlanClick,
             maybeLaterClicked = maybeLaterClicked,

@@ -6,15 +6,15 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 
-internal class ChooseAccountPreviewProvider :
-    PreviewParameterProvider<ChooseAccountState> {
-    override val values: Sequence<ChooseAccountState>
+internal class UpgradeAccountPreviewProvider :
+    PreviewParameterProvider<UpgradeAccountState> {
+    override val values: Sequence<UpgradeAccountState>
         get() = sequenceOf(
-            ChooseAccountState(
+            UpgradeAccountState(
                 localisedSubscriptionsList = localisedSubscriptionsList
             )
         )

@@ -15,7 +15,7 @@ import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
  * @property subscriptionCycle current subscription cycle (monthly/yearly), default UNKNOWN
  * @constructor Create default Upgrade Account state
  */
-data class ChooseAccountState(
+data class UpgradeAccountState(
     val localisedSubscriptionsList: List<LocalisedSubscription> = emptyList(),
     val product: List<Product> = emptyList(),
     val cheapestSubscriptionAvailable: LocalisedSubscription? = null,

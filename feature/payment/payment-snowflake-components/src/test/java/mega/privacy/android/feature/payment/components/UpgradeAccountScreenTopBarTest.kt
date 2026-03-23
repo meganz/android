@@ -12,7 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ChooseAccountScreenTopBarTest {
+class UpgradeAccountScreenTopBarTest {
 
     @get:Rule
     var composeRule = createAndroidComposeRule<ComponentActivity>()
@@ -37,7 +37,7 @@ class ChooseAccountScreenTopBarTest {
         maybeLaterClicked: () -> Unit = {},
         onBack: () -> Unit = {},
     ) = composeRule.setContent {
-        ChooseAccountScreenTopBar(
+        UpgradeAccountScreenTopBar(
             isUpgradeAccount = isUpgradeAccount,
             maybeLaterClicked = maybeLaterClicked,
             onBack = onBack

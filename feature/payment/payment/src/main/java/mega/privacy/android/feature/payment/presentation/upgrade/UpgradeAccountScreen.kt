@@ -53,12 +53,12 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
-import mega.privacy.android.feature.payment.components.ChooseAccountScreenTopBar
+import mega.privacy.android.feature.payment.components.UpgradeAccountScreenTopBar
 import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
-import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.ProFeature
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
@@ -70,12 +70,12 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewChooseAccountScreen(
+fun UpgradeAccountScreen(
     onInAppCheckoutClick: (Subscription) -> Unit,
     maybeLaterClicked: () -> Unit,
     onFreePlanClicked: () -> Unit,
     onBack: () -> Unit,
-    uiState: ChooseAccountState = ChooseAccountState(),
+    uiState: UpgradeAccountState = UpgradeAccountState(),
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
@@ -186,7 +186,7 @@ fun NewChooseAccountScreen(
     MegaScaffold(
         modifier = Modifier.semantics { testTagsAsResourceId = true },
         topBar = {
-            ChooseAccountScreenTopBar(
+            UpgradeAccountScreenTopBar(
                 alpha = alpha,
                 isUpgradeAccount = isUpgradeAccount,
                 maybeLaterClicked = maybeLaterClicked,
@@ -329,7 +329,7 @@ fun NewChooseAccountScreen(
 }
 
 fun isCurrentPlan(
-    uiState: ChooseAccountState,
+    uiState: UpgradeAccountState,
     subscriptionAccountType: AccountType,
     isMonthly: Boolean,
     isUpgradeAccount: Boolean,
@@ -387,11 +387,11 @@ fun getCampaignName(context: Context, offerId: String?, discountPercentage: Int)
 
 @CombinedThemePreviews
 @Composable
-internal fun NewChooseAccountScreenPreview(
-    @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
+internal fun ChooseAccountScreenPreview(
+    @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
 ) {
     AndroidTheme(isSystemInDarkTheme()) {
-        NewChooseAccountScreen(
+        UpgradeAccountScreen(
             uiState = state,
             accountStorageUiState = AccountStorageUIState(
                 baseStorage = 15L * 1024 * 1024 * 1024,
@@ -410,10 +410,10 @@ internal fun NewChooseAccountScreenPreview(
 @CombinedThemePreviews
 @Composable
 internal fun UpgradeAccountScreenPreview(
-    @PreviewParameter(ChooseAccountPreviewProvider::class) state: ChooseAccountState,
+    @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
 ) {
     AndroidTheme(isSystemInDarkTheme()) {
-        NewChooseAccountScreen(
+        UpgradeAccountScreen(
             uiState = state,
             accountStorageUiState = AccountStorageUIState(
                 baseStorage = 15L * 1024 * 1024 * 1024,

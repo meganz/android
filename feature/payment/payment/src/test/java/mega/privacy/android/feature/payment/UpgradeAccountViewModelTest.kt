@@ -34,7 +34,7 @@ import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel
 import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,9 +51,9 @@ import org.mockito.kotlin.wheneverBlocking
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ChooseAccountViewModelTest {
+class UpgradeAccountViewModelTest {
 
-    private lateinit var underTest: ChooseAccountViewModel
+    private lateinit var underTest: UpgradeAccountViewModel
 
     private val getPricing = mock<GetPricing>()
     private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
@@ -92,7 +92,7 @@ class ChooseAccountViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = ChooseAccountViewModel(
+        underTest = UpgradeAccountViewModel(
             getPricing = getPricing,
             getSubscriptionsUseCase = getSubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,

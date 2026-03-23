@@ -33,7 +33,7 @@ import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.megaNavigator
 import nz.mega.sdk.MegaError
@@ -311,8 +311,8 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                                 activity.startActivity(
                                     (intent?.setClass(
                                         activity,
-                                        ChooseAccountActivity::class.java
-                                    ) ?: Intent(activity, ChooseAccountActivity::class.java))
+                                        UpgradeAccountActivity::class.java
+                                    ) ?: Intent(activity, UpgradeAccountActivity::class.java))
                                         .apply {
                                             this.action = action
                                             this.data = data
@@ -341,7 +341,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     }
                 }
             } else {
-                Timber.d("Go to ChooseAccountActivity")
+                Timber.d("Go to UpgradeAccountActivity")
                 viewModel.updateIsAccountConfirmed(false)
                 if (MegaApplication.getChatManagement().isPendingJoinLink()) {
                     LoginActivity.isBackFromLoginPage = false
@@ -354,7 +354,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                     MegaApplication.getChatManagement().pendingJoinLink = null
                     activity.finish()
                 } else if (loginUiState.isAlreadyLoggedIn) {
-                    activity.startActivity(Intent(activity, ChooseAccountActivity::class.java))
+                    activity.startActivity(Intent(activity, UpgradeAccountActivity::class.java))
                     activity.finish()
                 }
             }

@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUse
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature.payment.model.ChooseAccountState
+import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
@@ -39,7 +39,7 @@ import javax.inject.Inject
  * @property state The current UI state
  */
 @HiltViewModel
-class ChooseAccountViewModel @Inject constructor(
+class UpgradeAccountViewModel @Inject constructor(
     private val getPricing: GetPricing,
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
@@ -51,8 +51,8 @@ class ChooseAccountViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ChooseAccountState())
-    val state: StateFlow<ChooseAccountState> = _state
+    private val _state = MutableStateFlow(UpgradeAccountState())
+    val state: StateFlow<UpgradeAccountState> = _state
 
     private val isUpgradeAccountFlow =
         savedStateHandle.get<Boolean>(EXTRA_IS_UPGRADE_ACCOUNT) ?: false

@@ -8,13 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.core.sharedcomponents.container.AppContainerProvider
 import mega.privacy.android.core.sharedcomponents.serializable
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountViewModel.Companion.EXTRA_IS_UPGRADE_ACCOUNT
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel.Companion.EXTRA_IS_UPGRADE_ACCOUNT
 import mega.privacy.android.navigation.ExtraConstant
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import javax.inject.Inject
 
 @AndroidEntryPoint
-open class ChooseAccountActivity : AppCompatActivity() {
+open class UpgradeAccountActivity : AppCompatActivity() {
 
     @Inject
     lateinit var appContainerProvider: AppContainerProvider
@@ -38,7 +38,7 @@ open class ChooseAccountActivity : AppCompatActivity() {
                 useLegacyStatusBarColor = false,
                 includePsa = false,
             ) {
-                ChooseAccountRoute(
+                UpgradeAccountRoute(
                     isNewCreationAccount = intent.getBooleanExtra(
                         ExtraConstant.NEW_CREATION_ACCOUNT,
                         false
@@ -66,7 +66,7 @@ open class ChooseAccountActivity : AppCompatActivity() {
             context: Context,
             source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
         ) {
-            val intent = Intent(context, ChooseAccountActivity::class.java).apply {
+            val intent = Intent(context, UpgradeAccountActivity::class.java).apply {
                 putExtra(EXTRA_IS_UPGRADE_ACCOUNT, true)
                 putExtra(ExtraConstant.EXTRA_NEW_ACCOUNT, false)
                 putExtra(ExtraConstant.NEW_CREATION_ACCOUNT, false)

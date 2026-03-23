@@ -21,7 +21,7 @@ import mega.privacy.android.shared.resources.R
  * Composable function to display the top bar for the Choose Account screen.
  */
 @Composable
-fun ChooseAccountScreenTopBar(
+fun UpgradeAccountScreenTopBar(
     modifier: Modifier = Modifier,
     alpha: Float = 1f,
     isUpgradeAccount: Boolean,

@@ -99,7 +99,7 @@ import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature.payment.presentation.cancelaccountplan.CancelAccountPlanActivity
-import mega.privacy.android.feature.payment.presentation.upgrade.ChooseAccountActivity
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
 import mega.privacy.android.feature_flags.AppFeatures
@@ -279,7 +279,7 @@ internal class MegaNavigatorImpl @Inject constructor(
         navigateIfInSingleActivity(
             singleActivityDestination = UpgradeAccountNavKey(source = source)
         ) {
-            ChooseAccountActivity.navigateToUpgradeAccount(
+            UpgradeAccountActivity.navigateToUpgradeAccount(
                 context = context, source = source
             )
         }
