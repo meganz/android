@@ -5,10 +5,9 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 
 @Serializable
-data class ShareToMegaNavKey(val shareUris: List<UriPath>?) : NoSessionNavKey.Mandatory
+data class ShareToMegaNavKey(val shareUris: List<UriPath>) : NavKey
 
 @Serializable
 data object ChatExplorerNavKey : NavKey

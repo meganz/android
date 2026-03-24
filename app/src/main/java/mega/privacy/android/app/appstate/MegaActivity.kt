@@ -175,7 +175,7 @@ class MegaActivity : FragmentActivity() {
                 intent.action = null
             }
 
-            Intent.ACTION_SEND_MULTIPLE -> {
+            Intent.ACTION_SEND_MULTIPLE, Intent.ACTION_SEND -> {
                 getShareUris()?.let { shareUris ->
                     navigationEventQueue.emit(ShareToMegaNavKey(shareUris))
                 } ?: Timber.w("Action send multiple but nothing to share")

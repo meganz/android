@@ -8,21 +8,39 @@ import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.Chat
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaScreen
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ChatExplorerNavKey
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
+import mega.privacy.android.navigation.destination.ShareToMegaNavKey
 
 class CloudExplorerFeatureDestination : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
         { navigationHandler, transferHandler ->
+            shareToMegaDestination(
+                onNavigateBack = { navigationHandler.remove(it) },
+                onNavigate = { navigationHandler.navigate(it) },
+            )
             nodeExplorerDestination(
                 onNavigateBack = { navigationHandler.remove(it) },
                 onNavigate = { navigationHandler.navigate(it) },
             )
             chatExplorerDestination()
         }
+
+    fun EntryProviderScope<NavKey>.shareToMegaDestination(
+        onNavigateBack: (NavKey) -> Unit,
+        onNavigate: (NavKey) -> Unit,
+    ) {
+        entry<ShareToMegaNavKey>(
+            metadata = transparentMetadata()
+        ) { key ->
+            ShareToMegaScreen()
+        }
+    }
 
     fun EntryProviderScope<NavKey>.nodeExplorerDestination(
         onNavigateBack: (NavKey) -> Unit,
