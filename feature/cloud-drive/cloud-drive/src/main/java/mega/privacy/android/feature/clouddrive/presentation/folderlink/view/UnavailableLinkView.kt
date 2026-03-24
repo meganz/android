@@ -1,11 +1,11 @@
-package mega.privacy.android.app.presentation.folderlink.view
+package mega.privacy.android.feature.clouddrive.presentation.folderlink.view
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,27 +14,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.app.R
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.lists.BulletListView
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.resources.R as sharedR
 
-@Deprecated("Use the revamp version")
 @Composable
 internal fun UnavailableLinkView(
     @StringRes title: Int,
@@ -67,7 +60,7 @@ internal fun UnavailableLinkView(
             text = stringResource(title),
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h6Medium,
+            style = AppTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 6.dp)
@@ -81,16 +74,13 @@ internal fun UnavailableLinkView(
         MegaText(
             text = stringResource(subtitle),
             textColor = TextColor.Primary,
-            style = MaterialTheme.typography.subtitle1medium,
+            style = AppTheme.typography.titleMedium,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        BulletListView(
+        BulletList(
             items = bulletPoints.map { stringResource(it) },
-            textStyle = MaterialTheme.typography.body1,
-            textColor = TextColor.Secondary,
-            spacing = 16.dp,
         )
 
         if (isInLandscapeMode) {
@@ -99,20 +89,36 @@ internal fun UnavailableLinkView(
     }
 }
 
-
-@CombinedThemePreviews
 @Composable
-private fun UnavailableFolderLinkViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        UnavailableLinkView(
-            title = sharedR.string.folder_link_unavailable_title,
-            subtitle = sharedR.string.general_link_unavailable_subtitle,
-            bulletPoints = listOf(
-                sharedR.string.folder_link_unavailable_deleted,
-                sharedR.string.folder_link_unavailable_disabled,
-                sharedR.string.general_link_unavailable_invalid_url,
-                R.string.folder_link_unavaible_ToS_violation
-            )
-        )
+private fun BulletList(
+    items: List<String>,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        items.forEach { point ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                MegaText(
+                    text = "•",
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Medium,
+                    ),
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                MegaText(
+                    text = point,
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyLarge,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
     }
 }

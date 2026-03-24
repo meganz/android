@@ -1,8 +1,7 @@
-package mega.privacy.android.app.presentation.folderlink.view
+package mega.privacy.android.feature.clouddrive.presentation.folderlink.view
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,15 +17,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.h6Medium
 import mega.privacy.android.shared.resources.R as sharedR
 
-@Deprecated("Use the revamp version")
 @Composable
 internal fun ExpiredLinkView(
     @StringRes title: Int,
@@ -53,7 +48,7 @@ internal fun ExpiredLinkView(
             text = stringResource(title),
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.h6Medium,
+            style = AppTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 6.dp)
@@ -65,22 +60,11 @@ internal fun ExpiredLinkView(
             text = stringResource(sharedR.string.general_link_expired),
             textColor = TextColor.Primary,
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body1,
+            style = AppTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(112.dp))
-    }
-}
-
-
-@CombinedThemePreviews
-@Composable
-private fun ExpiredFolderLinkViewPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
-        ExpiredLinkView(
-            title = sharedR.string.folder_link_expired_title
-        )
     }
 }

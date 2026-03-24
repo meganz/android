@@ -36,9 +36,22 @@ data class FolderLinkUiState(
      * Get title based on current folder
      */
     val title = when {
+        contentState is FolderLinkContentState.Expired || contentState is FolderLinkContentState.Unavailable -> {
+            LocalizedText.Literal("")
+        }
+
         currentFolderNode?.name != null -> LocalizedText.Literal(currentFolderNode.name)
         isRootFolder -> LocalizedText.StringRes(sharedR.string.photos_empty_screen_brand_name_text)
         else -> LocalizedText.Literal("")
+    }
+
+    /**
+     * Get subtitle based on current folder
+     */
+    val subTitle = when {
+        contentState is FolderLinkContentState.Expired || contentState is FolderLinkContentState.Unavailable -> null
+        isRootFolder -> LocalizedText.StringRes(sharedR.string.folder_link_subtitle)
+        else -> null
     }
 
     /**

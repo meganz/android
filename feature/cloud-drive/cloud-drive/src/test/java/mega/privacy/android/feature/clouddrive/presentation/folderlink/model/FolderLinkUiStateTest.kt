@@ -106,6 +106,74 @@ class FolderLinkUiStateTest {
         assertThat(underTest.title).isEqualTo(LocalizedText.Literal(""))
     }
 
+    @Test
+    fun `test that title returns empty Literal when contentState is Expired`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Expired,
+            rootNode = mockFolderNode(id = 1L, name = "Root"),
+            currentFolderNode = mockFolderNode(id = 1L, name = "Root"),
+        )
+
+        assertThat(underTest.title).isEqualTo(LocalizedText.Literal(""))
+    }
+
+    @Test
+    fun `test that title returns empty Literal when contentState is Unavailable`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Unavailable,
+            rootNode = mockFolderNode(id = 1L, name = "Root"),
+            currentFolderNode = mockFolderNode(id = 1L, name = "Root"),
+        )
+
+        assertThat(underTest.title).isEqualTo(LocalizedText.Literal(""))
+    }
+
+    @Test
+    fun `test that subTitle returns StringRes when isRootFolder is true and contentState is Loaded`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Loaded,
+            rootNode = null,
+            currentFolderNode = null,
+        )
+
+        assertThat(underTest.subTitle).isEqualTo(
+            LocalizedText.StringRes(sharedR.string.folder_link_subtitle)
+        )
+    }
+
+    @Test
+    fun `test that subTitle returns null when isRootFolder is false`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Loaded,
+            rootNode = mockFolderNode(id = 1L),
+            currentFolderNode = mockFolderNode(id = 2L),
+        )
+
+        assertThat(underTest.subTitle).isNull()
+    }
+
+    @Test
+    fun `test that subTitle returns null when contentState is Expired`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Expired,
+            rootNode = null,
+            currentFolderNode = null,
+        )
+
+        assertThat(underTest.subTitle).isNull()
+    }
+
+    @Test
+    fun `test that subTitle returns null when contentState is Unavailable`() {
+        val underTest = FolderLinkUiState(
+            contentState = FolderLinkContentState.Unavailable,
+            rootNode = null,
+            currentFolderNode = null,
+        )
+
+        assertThat(underTest.subTitle).isNull()
+    }
+
     private fun mockFolderNode(
         id: Long = 1L,
         name: String = "folder",

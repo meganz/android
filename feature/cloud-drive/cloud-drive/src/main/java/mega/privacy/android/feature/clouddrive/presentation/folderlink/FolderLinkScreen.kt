@@ -53,6 +53,8 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trac
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.ExpiredLinkView
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transition.fadeTransition
@@ -125,9 +127,7 @@ internal fun FolderLinkScreen(
                 MegaTopAppBar(
                     modifier = Modifier.testTag(FOLDER_LINK_APP_BAR_TAG),
                     title = uiState.title.text,
-                    subtitle = if (uiState.isRootFolder) {
-                        stringResource(sharedR.string.folder_link_subtitle)
-                    } else null,
+                    subtitle = uiState.subTitle?.text,
                     navigationType = AppBarNavigationType.Back {
                         viewModel.processAction(
                             FolderLinkAction.BackPressed
@@ -264,15 +264,22 @@ internal fun FolderLinkContent(
             }
 
             FolderLinkContentState.Expired ->
-                MegaText(
+                ExpiredLinkView(
+                    title = sharedR.string.folder_link_expired_title,
                     modifier = Modifier.testTag(FOLDER_LINK_EXPIRED_TAG),
-                    text = "This link has expired",
                 )
 
             FolderLinkContentState.Unavailable ->
-                MegaText(
+                UnavailableLinkView(
+                    title = sharedR.string.folder_link_unavailable_title,
+                    subtitle = sharedR.string.general_link_unavailable_subtitle,
+                    bulletPoints = listOf(
+                        sharedR.string.folder_link_unavailable_deleted,
+                        sharedR.string.folder_link_unavailable_disabled,
+                        sharedR.string.general_link_unavailable_invalid_url,
+                        sharedR.string.folder_link_unavailable_tos_violation,
+                    ),
                     modifier = Modifier.testTag(FOLDER_LINK_UNAVAILABLE_TAG),
-                    text = "This link is unavailable",
                 )
 
             FolderLinkContentState.Loaded -> {
