@@ -1739,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1781,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2470,12 +2474,12 @@
     <string name="select_videos_search_empty_view_description">Search videos in your Cloud drive</string>
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
     <string name="folder_link_unavailable_tos_violation">The folder link has been removed as it violated our Terms of Service.</string>
+    <!--Error message to show when adding a new text file with invalid text extension-->
+    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
     <!-- Title for the decryption key dialog when a folder/file link requires a key -->
     <string name="link_decryption_key_dialog_title">Enter decryption key</string>
     <!-- Two line message for the decryption key dialog prompting user to enter the key -->
     <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the sender.</string>
     <!-- Error message shown when an invalid decryption key is entered -->
     <string name="link_decryption_key_dialog_error_invalid_key">Invalid decryption key</string>
-    <!--Error message to show when adding a new text file with invalid text extension-->
-    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
 </resources>

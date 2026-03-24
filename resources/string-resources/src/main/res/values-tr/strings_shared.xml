@@ -2188,4 +2188,8 @@
     <string name="media_discovery_filter_all_media">Tüm medya</string>
     <string name="media_discovery_filter_images">Fotoğraflar</string>
     <string name="media_discovery_filter_videos">Videolar</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Şifreyi girin</string>
+    <string name="folder_link_unavailable_tos_violation">Hizmet Şartlarımızı ihlal ettiği için klasör bağlantısı kaldırıldı.</string>
+    <string name="link_decryption_key_dialog_title">Şifre çözme anahtarını girin</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Geçersiz şifre çözme anahtarı</string>
 </resources>

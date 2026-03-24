@@ -2252,4 +2252,14 @@
     <string name="media_discovery_filter_all_media">Toate media</string>
     <string name="media_discovery_filter_images">Imagini</string>
     <string name="media_discovery_filter_videos">Videoclipuri</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Introduceți parola</string>
+    <string name="folder_link_subtitle">Linkul folderului</string>
+    <string name="search_pdf_placeholder">Caută documentul</string>
+    <string name="pdf_viewer_search_placeholder">Caută documentul</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Introduceți parola pentru a deschide acest fișier</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Parolă incorectă</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Linia %1$d</string>
+    <string name="folder_link_unavailable_tos_violation">Linkul folderului a fost eliminat deoarece a încălcat Termenii de utilizare a serviciului.</string>
+    <string name="link_decryption_key_dialog_title">Introduceți cheia de decriptare</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Cheie de decriptare nevalidă</string>
 </resources>

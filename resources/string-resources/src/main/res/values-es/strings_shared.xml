@@ -725,7 +725,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass y MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Establece contraseñas y fechas de caducidad para los enlaces a carpetas y archivos.</string>
+    <string name="payment_ads_free_intro_additional_security_description">Haz que navegar por la web sea más seguro, más rápido y más sencillo con nuestro gestor de contraseñas y VPN de alta velocidad</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Descubre los planes Pro</string>
     <!-- Label for call option on settings -->
@@ -2224,4 +2224,9 @@
     <string name="media_discovery_filter_images">Imágenes</string>
     <string name="media_discovery_filter_videos">Videos</string>
     <string name="media_discovery_screen_dropdown_action_zoom_out">Disminuir zoom</string>
+    <string name="folder_link_subtitle">Enlace de carpeta</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Introduce la contraseña</string>
+    <string name="folder_link_unavailable_tos_violation">El enlace de carpeta ha sido eliminado por infringir nuestros Términos de servicio.</string>
+    <string name="link_decryption_key_dialog_title">Introducir la clave de descifrado</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">La clave de descifrado no es válida</string>
 </resources>

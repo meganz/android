@@ -429,7 +429,7 @@
     <!-- Error message when the user writes a character not allowed for naming a file or folder -->
     <string name="general_invalid_characters_defined">Os seguintes caracteres não são permitidos: %1$s</string>
     <!-- Sync settings section title-->
-    <string name="settings_section_sync">Sincronizar</string>
+    <string name="settings_section_sync">Sincronização</string>
     <!-- Transfers scanning folders dialog title when the app is creating the needed folders -->
     <string name="transfers_scanning_folders_dialog_creating_folders_title">Criando pastas&#8230;</string>
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
@@ -2260,4 +2260,17 @@
     <string name="media_discovery_filter_all_media">Todos os arquivos de mídia</string>
     <string name="media_discovery_filter_images">Imagens</string>
     <string name="media_discovery_filter_videos">Vídeos</string>
+    <string name="search_pdf_placeholder">Pesquisar documento</string>
+    <string name="folder_link_subtitle">Link de pasta</string>
+    <string name="pdf_viewer_search_placeholder">Pesquisar no documento</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Digite a senha</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Digite a senha para acessar este arquivo</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Senha incorreta</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Linha %1$d</string>
+    <string name="folder_link_unavailable_tos_violation">O link da pasta foi removido por infringir os nossos Termos de serviço.</string>
+    <string name="select_videos_search_empty_view_description">Pesquisar vídeos na sua Nuvem de arquivos</string>
+    <string name="link_decryption_key_dialog_title">Digite a chave de decodificação</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Chave de decodificação inválida</string>
+    <string name="new_text_file_invalid_extension_error_message">Use uma extensão de arquivo válida (por exemplo, .txt)</string>
+    <string name="link_decryption_key_dialog_message">Digite a chave para acessar este link.\nNão tem a chave? Entre em contato com o proprietário do link.</string>
 </resources>

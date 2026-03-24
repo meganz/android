@@ -2088,4 +2088,8 @@
     <string name="media_discovery_filter_images">Gambar-gambar</string>
     <string name="media_discovery_filter_videos">Video</string>
     <string name="media_discovery_screen_dropdown_action_zoom_out">Perkecil</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Masukkan password</string>
+    <string name="folder_link_unavailable_tos_violation">Tautan folder telah dihapus karena melanggar Persyaratan Layanan kami.</string>
+    <string name="link_decryption_key_dialog_title">Masukkan kunci dekripsi</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Decryption key salah</string>
 </resources>

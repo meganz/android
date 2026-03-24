@@ -1944,4 +1944,8 @@
     <string name="media_discovery_filter_all_media">Tất cả phương tiện số</string>
     <string name="media_discovery_filter_images">Hình Ảnh</string>
     <string name="media_discovery_filter_videos">Videos</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Nhập mật khẩu</string>
+    <string name="folder_link_unavailable_tos_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ.</string>
+    <string name="link_decryption_key_dialog_title">Nhập chìa khóa giải mã</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Chìa khóa giải mã không hợp lệ</string>
 </resources>

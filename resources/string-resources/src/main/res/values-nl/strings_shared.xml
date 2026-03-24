@@ -2199,4 +2199,14 @@
     <string name="media_discovery_filter_all_media">Alle media</string>
     <string name="media_discovery_filter_images">Afbeeldingen</string>
     <string name="media_discovery_filter_videos">Video’s</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Wachtwoord invoeren</string>
+    <string name="search_pdf_placeholder">Zoek document</string>
+    <string name="pdf_viewer_search_placeholder">Zoek document</string>
+    <string name="folder_link_subtitle">Map link</string>
+    <string name="pdf_viewer_dialog_text_enter_password">Voer het wachtwoord in om dit bestand te openen</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">Onjuist wachtwoord</string>
+    <string name="text_editor_fast_scroll_line_tooltip">Lijn%1$d</string>
+    <string name="folder_link_unavailable_tos_violation">De maplink is verwijderd omdat het onze Algemene Voorwaarden schendt.</string>
+    <string name="link_decryption_key_dialog_title">Vul decoderingssleutel in</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Ongeldige decoderingssleutel</string>
 </resources>
