@@ -17,7 +17,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.domain.entity.camerauploads.HeartbeatStatus
 import mega.privacy.android.domain.usecase.camerauploads.SendCameraUploadsBackupHeartBeatUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SendMediaUploadsBackupHeartBeatUseCase
@@ -47,8 +46,6 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
     private lateinit var executor: Executor
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
-
-    private val applicationWrapper = mock<ApplicationWrapper>()
     private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
     private val sendCameraUploadsBackupHeartBeatUseCase =
         mock<SendCameraUploadsBackupHeartBeatUseCase>()
@@ -83,7 +80,6 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
                     { _, _ -> }, workExecutor,
                 )
             ),
-            applicationWrapper = applicationWrapper,
             backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             sendCameraUploadsBackupHeartBeatUseCase = sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase = sendMediaUploadsBackupHeartBeatUseCase,
@@ -98,13 +94,11 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
 
         val inOrder = inOrder(
             backgroundFastLoginUseCase,
-            applicationWrapper,
             sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase,
         )
 
         inOrder.verify(backgroundFastLoginUseCase).invoke()
-        inOrder.verify(applicationWrapper).setHeartBeatAlive(true)
         inOrder.verify(sendCameraUploadsBackupHeartBeatUseCase).invoke(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
             lastNodeHandle = -1L
@@ -134,7 +128,6 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
 
         verifyNoInteractions(
             backgroundFastLoginUseCase,
-            applicationWrapper,
             sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase,
         )
@@ -149,13 +142,11 @@ internal class SyncHeartbeatCameraUploadWorkerTest {
 
         val inOrder = inOrder(
             backgroundFastLoginUseCase,
-            applicationWrapper,
             sendCameraUploadsBackupHeartBeatUseCase,
             sendMediaUploadsBackupHeartBeatUseCase,
         )
 
         inOrder.verify(backgroundFastLoginUseCase).invoke()
-        inOrder.verify(applicationWrapper).setHeartBeatAlive(true)
         inOrder.verify(sendCameraUploadsBackupHeartBeatUseCase).invoke(
             heartbeatStatus = HeartbeatStatus.UP_TO_DATE,
             lastNodeHandle = -1L

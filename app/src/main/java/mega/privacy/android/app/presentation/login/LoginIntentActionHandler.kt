@@ -492,7 +492,7 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         }
                     }
 
-                    if (loginUiState.rootNodesExists && loginUiState.fetchNodesUpdate == null && !MegaApplication.isIsHeartBeatAlive) {
+                    if (loginUiState.rootNodesExists && loginUiState.fetchNodesUpdate == null) {
                         Timber.d("rootNode != null")
 
                         var newIntent: Intent? = null
@@ -556,7 +556,6 @@ fun LoginIntentActionHandler(viewModel: LoginViewModel, uiState: LoginState) {
                         activity.finish()
                     } else {
                         Timber.d("rootNode is null or heart beat is alive -> do fast login")
-                        MegaApplication.setHeartBeatAlive(false)
                         viewModel.fastLogin(activity.intent?.action == Constants.ACTION_REFRESH_API_SERVER)
                     }
 

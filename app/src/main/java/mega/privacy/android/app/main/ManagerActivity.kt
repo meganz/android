@@ -200,7 +200,6 @@ import mega.privacy.android.app.presentation.notification.model.NotificationNavi
 import mega.privacy.android.app.presentation.offline.offlinecompose.OfflineComposeFragment
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
-import mega.privacy.android.app.utils.Constants.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.QRCodeComposeActivity
@@ -233,7 +232,6 @@ import mega.privacy.android.app.service.push.MegaMessageService
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_NONE
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_WARNING
-import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -243,6 +241,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.ACTION_SHOW_CU_PROGRESS_VIEW
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil
@@ -287,12 +286,12 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
-import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.RestoreNodeResult
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -1484,9 +1483,8 @@ class ManagerActivity : PasscodeActivity(), NavigationView.OnNavigationItemSelec
         savedInstanceState: Bundle?,
     ): Boolean {
         var selectDrawerItemPending = true
-        val isHeartBeatAlive: Boolean = MegaApplication.isIsHeartBeatAlive
         rootNode = megaApi.rootNode
-        if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
+        if (rootNode == null || LoginActivity.isBackFromLoginPage) {
             Timber.d("Action: %s", intent?.action)
             if (savedInstanceState != null || !handleRedirectIntentActions(intent)) {
                 refreshSession()

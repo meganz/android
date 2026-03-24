@@ -31,7 +31,6 @@ import mega.privacy.android.data.facade.security.SetLogoutFlagWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.global.SetupMegaChatApiWrapper
 import mega.privacy.android.data.wrapper.ApplicationIpAddressWrapper
-import mega.privacy.android.data.wrapper.ApplicationWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadsNotificationManagerWrapper
 import mega.privacy.android.data.wrapper.CookieEnabledCheckWrapper
@@ -160,17 +159,6 @@ abstract class UtilWrapperModule {
             object : CameraUploadsNotificationManagerWrapper {
                 override fun getForegroundInfo() =
                     cameraUploadsNotificationManager.getForegroundInfo()
-            }
-
-        /**
-         * Provides the [ApplicationWrapper]
-         */
-        @Provides
-        fun provideApplicationWrapper() =
-            object : ApplicationWrapper {
-                override fun setHeartBeatAlive(isAlive: Boolean) {
-                    MegaApplication.setHeartBeatAlive(isAlive)
-                }
             }
 
         /**

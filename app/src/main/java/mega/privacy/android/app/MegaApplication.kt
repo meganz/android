@@ -573,14 +573,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         var isLoggingOut = false
 
         /**
-         * Is is heart beat alive
-         */
-        @JvmStatic
-        @Volatile
-        var isIsHeartBeatAlive = false
-            private set
-
-        /**
          * Is show info chat messages
          */
         @JvmStatic
@@ -650,16 +642,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         @JvmStatic
         fun setIsWebOpenDueToEmailVerification(isWebOpenDueToEmailVerification: Boolean) {
             this.isWebOpenDueToEmailVerification = isWebOpenDueToEmailVerification
-        }
-
-        /**
-         * Set heart beat alive
-         *
-         * @param heartBeatAlive
-         */
-        @JvmStatic
-        fun setHeartBeatAlive(heartBeatAlive: Boolean) {
-            isIsHeartBeatAlive = heartBeatAlive
         }
 
         /**
