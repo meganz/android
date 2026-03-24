@@ -4467,7 +4467,7 @@
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
     <string name="meetings_custom_recurrence_second_week_monthly_section">Segundo</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">Tercero</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">Tercer</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
     <string name="meetings_custom_recurrence_fourth_week_monthly_section">Cuarto</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->

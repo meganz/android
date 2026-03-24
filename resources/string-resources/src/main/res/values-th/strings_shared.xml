@@ -2130,4 +2130,15 @@
     <string name="account_upgrade_account_buy_button_title_essential">ซื้อแผน Essential</string>
     <string name="upgrade_account_successful_essential_monthly">ขอบคุณที่สมัครใช้งานแผน Essential รายเดือน</string>
     <string name="upgrade_account_successful_essential_yearly">ขอบคุณที่สมัครใช้งานแผน Essential รายปี</string>
+    <string name="search_pdf_placeholder">ค้นหาในเอกสาร</string>
+    <string name="pdf_viewer_search_placeholder">ค้นหาในเอกสาร</string>
+    <string name="pdf_viewer_dialog_title_enter_password">กรอกรหัสผ่าน</string>
+    <string name="folder_link_subtitle">ลิงก์โฟลเดอร์</string>
+    <string name="pdf_viewer_dialog_text_enter_password">กรอกรหัสผ่านเพื่อเปิดไฟล์นี้</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">รหัสผ่านไม่ถูกต้อง</string>
+    <string name="text_editor_fast_scroll_line_tooltip">บรรทัดที่ %1$d</string>
+    <string name="select_videos_search_empty_view_description">ค้นหาวิดีโอในคลาวด์ไดร์ฟของคุณ</string>
+    <string name="folder_link_unavailable_tos_violation">ลิงก์โฟลเดอร์ถูกลบออกเนื่องจากละเมิดเงื่อนไขการให้บริการของเรา</string>
+    <string name="link_decryption_key_dialog_title">กรอกคีย์เพื่อถอดรหัสลับ</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">คีย์ถอดรหัสลับไม่ถูกต้อง</string>
 </resources>

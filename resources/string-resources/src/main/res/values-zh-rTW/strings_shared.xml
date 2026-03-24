@@ -419,7 +419,7 @@
     <!-- Transfers scanning folders dialog title when the app is starting transfers but some files still needs to be added to the queue  -->
     <string name="transfers_scanning_folders_dialog_starting_transfers_title">開始傳輸⋯</string>
     <!-- Transfers scanning folders dialog info to explain why the app shouldn't be closed -->
-    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請不要關閉應用程式。如果關閉，未在佇列中的傳輸將遺失。</string>
+    <string name="transfers_scanning_folders_dialog_cancel_info_subtitle">請不要關閉應用程式。如果關閉，未排入佇列的傳輸將遺失。</string>
     <!-- Transfers scanning folders dialog sub-title when the app is scanning multiple folders. This is the folders pluralization part to implement double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle. Example: "134 folders". Example with double pluralization in transfers_scanning_folders_dialog_scanning_files_and_folders_subtitle: "Found 134 folders and 5689 files."-->
     <plurals name="transfers_scanning_folders_dialog_scanning_folders_subtitle">
         <item quantity="other">%1$d個資料夾</item>
@@ -447,7 +447,7 @@
     <!-- error warning message for report issue when not enough characters are typed and user tries to send report-->
     <string name="report_issue_error_minimum_characters">查詢必須至少有30個字元</string>
     <!-- placeholder message for report issue-->
-    <string name="report_issue_description_placeholder_message">描述該問題，字數不少於 30 個字</string>
+    <string name="report_issue_description_placeholder_message">描述該問題，字數不少於30個字</string>
     <!--Title text to start a conversation from Recent Chat screen empty view-->
     <string name="chat_recent_list_empty_title">保持對話私密</string>
     <!--Subtitle text from Recent Chat screen empty view-->
@@ -1829,7 +1829,7 @@
     <!-- Title of the empty screen when a folder is empty -->
     <string name="context_empty_folder_title">此資料夾是空的</string>
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
-    <string name="context_empty_cloud_drive_title">您的雲端硬碟尚無任何內容</string>
+    <string name="context_empty_cloud_drive_title">您的私人保險庫中尚無內容</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
     <string name="context_empty_cloud_drive_description">使用零知識加密技術保護資料安全</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
@@ -1845,7 +1845,7 @@
     <string name="payment_ads_free_intro_title">想要無廣告的MEGA嗎？</string>
     <string name="payment_ads_free_intro_description">升級到具有更多儲存空間和功能的Pro方案。我們的Pro方案每月僅%1$s起。</string>
     <plurals name="remove_links_warning_text">
-        <item quantity="other">連結將不再公開</item>
+        <item quantity="other">連結將不再公開。</item>
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="other">取消共享%1$d個資料夾？</item>
@@ -1937,7 +1937,7 @@
     <string name="camera_uploads_progress_screen_label_transfer_over_quota">已超出傳輸配額</string>
     <string name="camera_uploads_progress_screen_label_storage_over_quota">已超出儲存配額</string>
     <string name="camera_uploads_progress_screen_label_transfer_paused">已暫停</string>
-    <string name="camera_uploads_progress_screen_label_transfer_queued">已佇列</string>
+    <string name="camera_uploads_progress_screen_label_transfer_queued">已排入佇列</string>
     <string name="camera_uploads_progress_screen_label_transfer_completing">正在完成</string>
     <string name="camera_uploads_progress_screen_label_transfer_retrying">正在重試</string>
     <string name="label_file_speed_byte">%1$s&#160;B/秒</string>
@@ -2138,4 +2138,11 @@
     <string name="account_upgrade_account_buy_button_title_essential">購買Essential</string>
     <string name="upgrade_account_successful_essential_monthly">感謝您訂閱Essential月付方案</string>
     <string name="upgrade_account_successful_essential_yearly">感謝您訂閱Essential年付方案</string>
+    <string name="search_pdf_placeholder">搜尋文件</string>
+    <string name="pdf_viewer_search_placeholder">搜尋文件</string>
+    <string name="folder_link_subtitle">資料夾連結</string>
+    <string name="pdf_viewer_dialog_title_enter_password">輸入密碼</string>
+    <string name="folder_link_unavailable_tos_violation">該資料夾連結因違反我們的服務條款而被刪除。</string>
+    <string name="link_decryption_key_dialog_title">請輸入解密金鑰</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">無效的金鑰</string>
 </resources>

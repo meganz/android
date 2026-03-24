@@ -343,7 +343,7 @@
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">항목 삭제됨</string>
     <!-- error message -->
-    <string name="context_no_removed">오류. MEGA에서 삭제되지 않았습니다</string>
+    <string name="context_no_removed">오류. 삭제 실패</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">항목 %d개 복사됨</string>
     <!-- error message when sending multiple files -->
@@ -1723,15 +1723,15 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="invalid_code">잘못된 코드</string>
     <!-- Text of the dialog shown when the storage of a FREE account is almost full -->
-    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning">클라우드 드라이브가 거의 찼습니다. Pro로 업그레이드하고 최대 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
-    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
+    <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
     <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 MEGA 고객 지원에 연락하여 맞춤 요금제를 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
-    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
-    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$sTB의 저장소와 %2$sTB의 전송 할당량을 받으세요.</string>
+    <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
     <string name="text_storage_full_warning_pro3_account">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->

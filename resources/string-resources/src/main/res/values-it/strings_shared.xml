@@ -2108,4 +2108,8 @@
     <string name="media_discovery_filter_videos">Video</string>
     <string name="media_discovery_screen_dropdown_action_zoom_in">Aumenta lo zoom</string>
     <string name="media_discovery_screen_dropdown_action_zoom_out">Diminuisci lo zoom</string>
+    <string name="pdf_viewer_dialog_title_enter_password">Inserisci la password</string>
+    <string name="folder_link_unavailable_tos_violation">Il link della cartella è stato rimosso perché viola i nostri Termini di servizio.</string>
+    <string name="link_decryption_key_dialog_title">Inserisci la chiave di decrittazione</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">Chiave di decriptazione non valida</string>
 </resources>

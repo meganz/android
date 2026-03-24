@@ -1903,8 +1903,8 @@
     <string name="camera_uploads_progress_screen_label_storage_over_quota">已超出存储空间上限</string>
     <string name="camera_uploads_progress_screen_label_transfer_paused">已暂停</string>
     <string name="camera_uploads_progress_screen_label_transfer_queued">已在队列中</string>
-    <string name="camera_uploads_progress_screen_label_transfer_completing">正在完成</string>
-    <string name="camera_uploads_progress_screen_label_transfer_retrying">正在重试</string>
+    <string name="camera_uploads_progress_screen_label_transfer_completing">完成中</string>
+    <string name="camera_uploads_progress_screen_label_transfer_retrying">重试中</string>
     <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <string name="label_file_upload_size_peta_byte">%1$s&#160;PB</string>
@@ -1926,34 +1926,34 @@
     <string name="album_get_link_share_link_dialog_share_action_only_link">仅共享链接</string>
     <string name="album_get_link_share_link_dialog_share_action_link_key">共享链接和密钥</string>
     <string name="album_get_link_share_link_with_key">链接：%1$s\n\n密钥：%2$s</string>
-    <string name="album_has_hidden_nodes_dialog_description">此相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目仍将隐藏在您的云盘中。</string>
+    <string name="album_has_hidden_nodes_dialog_description">此相册包含隐藏的项目。共享相册意味着与您共享的人可以看到隐藏的项目。这些项目在您的云盘中仍将保持隐藏状态。</string>
     <plurals name="album_link_copied_success_message">
-        <item quantity="other">已复制链接到剪贴板</item>
+        <item quantity="other">链接已复制到剪贴板</item>
     </plurals>
     <plurals name="general_num_items_template">
         <item quantity="other">%1$d个项目</item>
     </plurals>
     <string name="section_saved_for_offline_new">离线</string>
-    <string name="title_bucket">%1$s和%2$d及另外</string>
-    <string name="create_action_bucket">由%s[A]创建[/A]</string>
-    <string name="update_action_bucket">由%s[A]更新[/A]</string>
+    <string name="title_bucket">%1$s和%2$d及更多</string>
+    <string name="create_action_bucket">[A]由[/A]创建%s</string>
+    <string name="update_action_bucket">[A]由[/A]更新%s</string>
     <string name="label_yesterday">昨天</string>
-    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密的文件夹]</string>
+    <string name="shared_items_verify_credentials_undecrypted_folder">[未解密文件夹]</string>
     <string name="section_recents">近期</string>
     <plurals name="title_media_bucket_only_images">
-        <item quantity="other">%d个图片</item>
+        <item quantity="other">%d张图片</item>
     </plurals>
     <plurals name="title_media_bucket_only_videos">
         <item quantity="other">%d个视频</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="other">%1$d个图片&#160;</item>
+        <item quantity="other">%1$d张图片&#160;</item>
     </plurals>
     <plurals name="title_media_bucket_images_and_videos_2">
         <item quantity="other">和%1$d个视频</item>
     </plurals>
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="other">[文件未解密]</item>
+        <item quantity="other">[未解密文件]</item>
     </plurals>
     <plurals name="album_get_link_screen_title">
         <item quantity="other">分享链接</item>
@@ -1966,32 +1966,32 @@
     <string name="shares_screen_incoming_shares_tab_title">传入</string>
     <string name="shares_screen_outgoing_shares_tab_title">传出</string>
     <string name="shares_screen_links_shares_tab_title">链接</string>
-    <string name="shares_screen_incoming_empty">[B]无 [/B][A]传入的共享文件夹[/A]</string>
+    <string name="shares_screen_incoming_empty">[B]无[/B][A]传入的共享文件夹[/A]</string>
     <string name="shares_screen_outgoing_empty">[B]无 [/B][A]传出的共享文件夹[/A]</string>
-    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未验证的联系人共享。为确保额外的安全性，我们建议您在联系人中验证他们的凭证。点击您要验证的联系人旁边的三点，然后点击信息。</string>
+    <string name="incoming_shared_folder_contact_not_approved_alert_text">%s是由您尚未验证的联系人共享。为确保额外的安全性，我们建议您在联系人中验证其身份。点击您要验证的联系人旁边的三个点，然后点击信息。</string>
     <string name="homepage_favourites_empty_hint">[B]未[/B][B]找到[/B][A]收藏[/A]</string>
     <string name="general_create_label">创建</string>
     <string name="general_new_text_file">新建文本文档</string>
     <string name="general_new_folder">新建文件夹</string>
     <string name="album_get_multiple_links_list_title">链接</string>
-    <string name="album_get_multiple_links_copy_all_action">全部复制</string>
+    <string name="album_get_multiple_links_copy_all_action">复制全部</string>
     <string name="section_my_account">我的帐户</string>
     <string name="folder_created_success_message">文件夹已创建</string>
     <string name="folder_not_created_error_message">错误。文件夹未创建</string>
-    <string name="unable_to_open_selected_file_message">无法打开已选文件</string>
+    <string name="unable_to_open_selected_file_message">无法打开选择的文件</string>
     <string name="camera_denied_info_message">MEGA需要访问您的相机才能拍摄照片和视频。</string>
-    <string name="incoming_share_storage_quota_warning_message">由于目标用户帐户已超出其存储空间，无法发送此文件。</string>
+    <string name="incoming_share_storage_quota_warning_message">由于接收者帐户存储空间不足，无法发送此文件。</string>
     <string name="general_ok_only">好的</string>
     <string name="empty_rubbish_bin_success_message">已清空回收站</string>
-    <string name="empty_rubbish_bin_error_message">发生错误。回收站未被清空</string>
+    <string name="empty_rubbish_bin_error_message">发生错误。回收站尚未清空</string>
     <string name="empty_rubbish_bin_menu">清空回收站</string>
     <string name="remove_all_rubbish_bin_confirmation">您即将永久移除回收站中的所有项目。</string>
     <string name="general_clear">清除</string>
-    <string name="annotated_empty_rubbish_bin_menu">[A]回收站[/A][B]为空[/B]</string>
-    <string name="annotated_empty_folder">[A]文件夹[/A][B]为空[/B]</string>
+    <string name="annotated_empty_rubbish_bin_menu">[B]空[/B][A]回收站[/A]</string>
+    <string name="annotated_empty_folder">[B]空[/B][A] 文件夹[/A]</string>
     <string name="general_upload_label">上传</string>
     <string name="empty_file_browser_folder">空文件夹</string>
-    <string name="logout_offline_content_deletion_warning">登出帐户后，您保存在离线的内容将被删除。</string>
+    <string name="logout_offline_content_deletion_warning">登出帐户将会删除您保存的离线可用内容。</string>
     <string name="offline_screen_title">离线</string>
     <string name="offline_screen_remove_from_offline_selection_menu">从离线中移除</string>
     <string name="offline_item_deletion_confirmation_title">要从离线中移除吗？</string>
@@ -2006,7 +2006,7 @@
     </plurals>
     <string name="albums_multiple_delete_success_message">%d个相册已删除</string>
     <string name="home_screen_no_network_desc">您已离线。\n如果您将文件设为离线可用，您仍然可以在没有网络连接的情况下访问它们。</string>
-    <string name="home_screen_no_network_desc_with_offline_files">您现在为离线状态。\n您为离线使用保存的项目仍然可用。</string>
+    <string name="home_screen_no_network_desc_with_offline_files">您目前处于离线状态。\n您为离线使用保存的项目仍然可用。</string>
     <string name="home_screen_no_network_view_offline_files_button">查看离线文件</string>
     <string name="timeline_tab_cu_permission_warning_banner_action">更新权限</string>
     <string name="timeline_tab_cu_permission_warning_banner_description">为了确保我们不会错过您所有的回忆，MEGA需要完全访问您的照片库。</string>
@@ -2045,8 +2045,8 @@
     <string name="general_app_update_download_success_message">应用更新已下载</string>
     <string name="general_first_name">名</string>
     <string name="general_last_name">姓</string>
-    <string name="meetings_call_recording_consent_dialog_title">此通话正在录音</string>
-    <string name="meetings_call_recording_consent_dialog_message">继续通话即表示您允许录音。录音仅存储在录制者的设备上。</string>
+    <string name="meetings_call_recording_consent_dialog_title">通话正在录制</string>
+    <string name="meetings_call_recording_consent_dialog_message">留在通话中即表示您同意录制。录制内容仅保存在录制者的设备上。</string>
     <string name="meetings_call_recording_consent_dialog_positive_button">好的，明白了</string>
     <string name="meetings_call_recording_consent_dialog_negative_button">离开通话</string>
     <string name="meetings_call_recording_consent_dialog_learn_more_option">[A]了解更多[/A]</string>
@@ -2077,7 +2077,7 @@
     <string name="error_folder_part_of_sync_or_backup">此文件夹已是同步或备份的一部分。请选择其他文件夹。</string>
     <string name="cu_warning_banner_notification_disabled_warning">开启通知，以便在上传失败或停止同步时了解情况。</string>
     <string name="ssl_error_dialog_secure_connection_failed_title">安全连接失败</string>
-    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA无法安全连接。\n\n如果您使用的是公共Wi-Fi，请先尝试通过浏览器登录。\n\n您的互联网服务提供商或安全软件也可能阻止了连接。\n\n[A]了解更多[/A]</string>
+    <string name="ssl_error_dialog_secure_connection_failed_body">MEGA无法安全连接。\n\n如果您使用的是公共Wi-Fi，请先尝试通过浏览器登录。\n\n您的网络服务商或安全软件也可能干扰了连接。\n\n[A]了解更多[/A]</string>
     <string name="album_import_screen_subtitle_album_link_text">相册链接</string>
     <string name="album_import_error_access_dialog_title">无法访问相册</string>
     <string name="album_import_input_decryption_key_dialog_title">请输入解密密钥</string>
@@ -2087,10 +2087,10 @@
     <string name="album_import_saving_dialog_progress_text">正在保存&#8230;</string>
     <string name="album_import_storage_exceeded_dialog_title">无法保存相册</string>
     <string name="album_import_storage_exceeded_dialog_description">您没有足够的存储空间将此相册保存到云盘。立即升级以获得更多存储空间。</string>
-    <string name="photos_loading_indicator_text">正在加载</string>
+    <string name="photos_loading_indicator_text">加载中</string>
     <string name="photos_network_error_message">无网络连接</string>
     <string name="photos_save_to_cloud_drive_button_text">保存到云盘</string>
-    <string name="photos_create_album_duplicate_name_error">已存在有该名称的相册。请输入不同的名称。</string>
+    <string name="photos_create_album_duplicate_name_error">已存在同名相册。请输入不同的名称。</string>
     <string name="photos_create_album_proscribed_name_error">不允许使用此相册名。请输入不同的名称。</string>
     <string name="remove_from_offline_success_message">文件已从离线中移除</string>
     <string name="payment_ads_free_intro_description">升级到Pro方案，享受充足的存储空间以及更多功能。我们的Pro方案起价仅为每月%1$s。</string>
@@ -2117,7 +2117,7 @@
     <string name="general_dialog_discard_button">放弃</string>
     <string name="general_dialog_discard_changes_message">所有未保存的编辑将会丢失</string>
     <string name="general_changes_saved">更改已保存</string>
-    <string name="home_screen_audios_chip_title">语音</string>
+    <string name="home_screen_audios_chip_title">音频</string>
     <string name="node_option_save_to_mega">保存到MEGA</string>
     <string name="saf_passcode_lock_enabled_message">要浏览您的 MEGA 文件，请在 MEGA 应用中禁用应用密码。进入设置，然后点击“安全”。</string>
     <string name="saf_no_internet_message">连接到互联网以浏览您的 MEGA 文件。已离线保存的文件可在 MEGA 应用中使用。</string>
@@ -2138,4 +2138,11 @@
     <string name="media_discovery_filter_all_media">所有媒体</string>
     <string name="media_discovery_filter_images">图片</string>
     <string name="media_discovery_filter_videos">视频</string>
+    <string name="search_pdf_placeholder">搜索文档</string>
+    <string name="pdf_viewer_search_placeholder">搜索文档</string>
+    <string name="folder_link_subtitle">文件夹链接</string>
+    <string name="pdf_viewer_dialog_title_enter_password">输入密码</string>
+    <string name="folder_link_unavailable_tos_violation">该文件夹链接因违反我们的服务条款而被移除。</string>
+    <string name="link_decryption_key_dialog_title">请输入解密密钥</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">解密密钥无效</string>
 </resources>

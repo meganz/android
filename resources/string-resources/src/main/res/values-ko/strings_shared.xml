@@ -2128,4 +2128,14 @@
     <string name="media_discovery_filter_all_media">모든 미디어</string>
     <string name="media_discovery_filter_images">이미지</string>
     <string name="media_discovery_filter_videos">동영상</string>
+    <string name="pdf_viewer_search_placeholder">문서 검색</string>
+    <string name="folder_link_subtitle">폴더 링크</string>
+    <string name="search_pdf_placeholder">문서 검색</string>
+    <string name="pdf_viewer_dialog_title_enter_password">암호 입력</string>
+    <string name="pdf_viewer_dialog_text_enter_password">이 파일을 열려면 암호를 입력하세요</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">잘못된 암호</string>
+    <string name="text_editor_fast_scroll_line_tooltip">줄 %1$d</string>
+    <string name="folder_link_unavailable_tos_violation">폴더 링크가 이용 약관 위반으로 삭제되었습니다.</string>
+    <string name="link_decryption_key_dialog_title">복호화 키를 입력하세요</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">잘못된 복호화 키</string>
 </resources>

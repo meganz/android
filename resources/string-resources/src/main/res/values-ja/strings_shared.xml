@@ -2139,4 +2139,17 @@
     <string name="media_discovery_filter_all_media">すべてのメディア</string>
     <string name="media_discovery_filter_images">画像</string>
     <string name="media_discovery_filter_videos">動画</string>
+    <string name="search_pdf_placeholder">ドキュメントを検索</string>
+    <string name="pdf_viewer_search_placeholder">ドキュメントを検索</string>
+    <string name="folder_link_subtitle">フォルダリンク</string>
+    <string name="pdf_viewer_dialog_title_enter_password">パスワードを入力</string>
+    <string name="pdf_viewer_dialog_text_enter_password">このファイルを開くにはパスワードを入力してください。</string>
+    <string name="pdf_viewer_dialog_error_incorrect_password">パスワードが間違っています</string>
+    <string name="text_editor_fast_scroll_line_tooltip">%1$d 行目</string>
+    <string name="select_videos_search_empty_view_description">クラウドドライブ内の動画を検索</string>
+    <string name="folder_link_unavailable_tos_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
+    <string name="new_text_file_invalid_extension_error_message">有効なファイル拡張子を使用してください（例：.txt）</string>
+    <string name="link_decryption_key_dialog_title">復号キーを入力してください</string>
+    <string name="link_decryption_key_dialog_error_invalid_key">復号キーが無効です</string>
+    <string name="link_decryption_key_dialog_message">このリンクを開くにはキーを入力してください。\nお持ちでない場合は、送信者に連絡してください。</string>
 </resources>
