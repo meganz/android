@@ -15,6 +15,14 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideoItemUiEntity
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.model.SelectVideosMenuAction
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_BOTTOM_VIEW_ROW_TEST_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_EMPTY_VIEW_TEST_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_GRID_VIEW_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_LIST_VIEW_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_LOADING_VIEW_TEST_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_SELECTION_TOP_APP_BAR_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideosSearchScreen
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -27,25 +35,26 @@ import org.robolectric.annotation.Config
 
 @Config(sdk = [34])
 @RunWith(AndroidJUnit4::class)
-class SelectVideosForPlaylistScreenTest {
+class SelectVideosSearchScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     private fun setComposeContent(
-        uiState: SelectVideosForPlaylistUiState = SelectVideosForPlaylistUiState.Data(),
+        uiState: SelectVideoSearchUiState = SelectVideoSearchUiState.Data(),
+        updateSearchQuery: (String?) -> Unit = {},
         onSortNodes: (NodeSortConfiguration) -> Unit = {},
         onChangeViewTypeClick: () -> Unit = {},
         onItemClicked: (SelectVideoItemUiEntity) -> Unit = {},
         confirmAddVideos: () -> Unit = {},
         onBackPressed: () -> Unit = {},
         selectAll: () -> Unit = {},
-        navigateToSearchScreen: () -> Unit = {},
         modifier: Modifier = Modifier,
     ) {
         composeTestRule.setContent {
-            SelectVideosForPlaylistScreen(
+            SelectVideosSearchScreen(
                 uiState = uiState,
+                updateSearchQuery = updateSearchQuery,
                 onSortNodes = onSortNodes,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 modifier = modifier,
@@ -53,35 +62,42 @@ class SelectVideosForPlaylistScreenTest {
                 confirmAddVideos = confirmAddVideos,
                 onBackPressed = onBackPressed,
                 selectAll = selectAll,
-                navigateToSearchScreen = navigateToSearchScreen,
             )
         }
     }
 
     @Test
     fun `test that loading view is displayed when uiState is Loading`() {
-        setComposeContent(uiState = SelectVideosForPlaylistUiState.Loading)
+        setComposeContent(uiState = SelectVideoSearchUiState.Loading)
 
-        composeTestRule.onAllNodesWithTag(SELECT_VIDEOS_LOADING_VIEW_TEST_TAG, true).onFirst()
-            .assertIsDisplayed()
-        SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
+        SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
+        composeTestRule.onAllNodesWithTag(SELECT_VIDEOS_SEARCH_LOADING_VIEW_TEST_TAG, true)
+            .onFirst().assertIsDisplayed()
+
+        listOf(
+            SELECT_VIDEOS_SEARCH_EMPTY_VIEW_TEST_TAG,
+        ).assertIsNotDisplayedWithTag()
     }
 
     @Test
     fun `test that empty view is displayed when Data state has no items`() {
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Title"),
                 items = emptyList(),
             )
         )
 
-        SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG.assertIsDisplayedWithTag()
-        SELECT_VIDEOS_LOADING_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
+        listOf(
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_SEARCH_EMPTY_VIEW_TEST_TAG,
+        ).assertIsDisplayedWithTag()
+
+        SELECT_VIDEOS_SEARCH_LOADING_VIEW_TEST_TAG.assertIsNotDisplayedWithTag()
     }
 
     @Test
-    fun `test that list view is displayed when Data state has items and currentViewType is LIST`() {
+    fun `test that list view is displayed when Data has items and currentViewType is LIST`() {
         val items = listOf(
             SelectVideoItemUiEntity(
                 id = NodeId(1L),
@@ -92,7 +108,7 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
@@ -100,19 +116,21 @@ class SelectVideosForPlaylistScreenTest {
         )
 
         listOf(
-            SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG,
-            SELECT_VIDEOS_LIST_VIEW_TAG
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_SEARCH_LIST_VIEW_TAG,
+            SELECT_VIDEOS_SEARCH_BOTTOM_VIEW_ROW_TEST_TAG,
         ).assertIsDisplayedWithTag()
 
         listOf(
-            SELECT_VIDEOS_GRID_VIEW_TAG,
-            SELECT_VIDEOS_LOADING_VIEW_TEST_TAG,
-            SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG,
+            SELECT_VIDEOS_SEARCH_SELECTION_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_SEARCH_GRID_VIEW_TAG,
+            SELECT_VIDEOS_SEARCH_LOADING_VIEW_TEST_TAG,
+            SELECT_VIDEOS_SEARCH_EMPTY_VIEW_TEST_TAG,
         ).assertIsNotDisplayedWithTag()
     }
 
     @Test
-    fun `test that list view is displayed when Data state has items and currentViewType is GRID`() {
+    fun `test that grid view is displayed when Data has items and currentViewType is GRID`() {
         val items = listOf(
             SelectVideoItemUiEntity(
                 id = NodeId(1L),
@@ -123,7 +141,7 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.GRID,
@@ -131,29 +149,30 @@ class SelectVideosForPlaylistScreenTest {
         )
 
         listOf(
-            SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG,
-            SELECT_VIDEOS_GRID_VIEW_TAG
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_SEARCH_GRID_VIEW_TAG,
+            SELECT_VIDEOS_SEARCH_BOTTOM_VIEW_ROW_TEST_TAG,
         ).assertIsDisplayedWithTag()
 
         listOf(
-            SELECT_VIDEOS_LIST_VIEW_TAG,
-            SELECT_VIDEOS_LOADING_VIEW_TEST_TAG,
-            SELECT_VIDEOS_EMPTY_VIEW_TEST_TAG,
+            SELECT_VIDEOS_SEARCH_SELECTION_TOP_APP_BAR_TAG,
+            SELECT_VIDEOS_SEARCH_LIST_VIEW_TAG,
+            SELECT_VIDEOS_SEARCH_EMPTY_VIEW_TEST_TAG,
         ).assertIsNotDisplayedWithTag()
     }
 
     @Test
-    fun `test that top bar is displayed as expected when selectedHandles is not empty`() {
+    fun `test that selection top bar is displayed when selectItemHandles is not empty`() {
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Cloud Drive"),
                 isCloudDriveRoot = true,
                 items = emptyList(),
-                selectItemHandles = setOf(1, 2)
+                selectItemHandles = setOf(1L, 2L),
             )
         )
-
-        SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
+        SELECT_VIDEOS_SEARCH_SELECTION_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
+        SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG.assertIsNotDisplayedWithTag()
     }
 
     @Test
@@ -168,7 +187,7 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
@@ -191,20 +210,24 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
             )
         )
 
-        SELECT_VIDEOS_BOTTOM_VIEW_ROW_TEST_TAG.assertIsDisplayedWithTag()
+        SELECT_VIDEOS_SEARCH_BOTTOM_VIEW_ROW_TEST_TAG.assertIsDisplayedWithTag()
     }
 
     @Test
     fun `test that selection top app bar is displayed for Data state`() {
-        setComposeContent(uiState = SelectVideosForPlaylistUiState.Data())
-        SELECT_VIDEOS_SELECTION_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
+        setComposeContent(
+            uiState = SelectVideoSearchUiState.Data(
+                selectItemHandles = setOf(1L, 2L)
+            )
+        )
+        SELECT_VIDEOS_SEARCH_SELECTION_TOP_APP_BAR_TAG.assertIsDisplayedWithTag()
     }
 
     @Test
@@ -213,53 +236,35 @@ class SelectVideosForPlaylistScreenTest {
         val items = listOf(
             SelectVideoItemUiEntity(
                 id = NodeId(1L),
-                name = "video.mp4",
-                title = LocalizedText.Literal("video.mp4"),
+                name = "a.mp4",
+                title = LocalizedText.Literal("a.mp4"),
+                isFolder = false,
+                isVideo = true,
+                iconRes = iconPackR.drawable.ic_folder_outgoing_medium_solid,
+            ),
+            SelectVideoItemUiEntity(
+                id = NodeId(2L),
+                name = "b.mp4",
+                title = LocalizedText.Literal("b.mp4"),
                 isFolder = false,
                 isVideo = true,
                 iconRes = iconPackR.drawable.ic_folder_outgoing_medium_solid,
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
+                selectItemHandles = setOf(1L),
             ),
-            selectAll = selectAll,
+            selectAll = selectAll
         )
 
         composeTestRule.onNodeWithTag(NodeSelectionAction.SelectAll.testTag, useUnmergedTree = true)
             .performClick()
 
         verify(selectAll).invoke()
-    }
-
-    @Test
-    fun `test that navigateToSearchScreen is invoked when Search action is clicked`() {
-        val navigateToSearchScreen = mock<() -> Unit>()
-        val items = listOf(
-            SelectVideoItemUiEntity(
-                id = NodeId(1L),
-                name = "video.mp4",
-                title = LocalizedText.Literal("video.mp4"),
-                isFolder = true,
-                iconRes = iconPackR.drawable.ic_folder_outgoing_medium_solid,
-            ),
-        )
-        setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
-                title = LocalizedText.Literal("Folder"),
-                items = items,
-                currentViewType = ViewType.LIST,
-            ),
-            navigateToSearchScreen = navigateToSearchScreen,
-        )
-
-        composeTestRule.onNodeWithTag(SelectVideosMenuAction.Search.testTag, useUnmergedTree = true)
-            .performClick()
-
-        verify(navigateToSearchScreen).invoke()
     }
 
     @Test
@@ -283,7 +288,7 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
@@ -308,7 +313,7 @@ class SelectVideosForPlaylistScreenTest {
             ),
         )
         setComposeContent(
-            uiState = SelectVideosForPlaylistUiState.Data(
+            uiState = SelectVideoSearchUiState.Data(
                 title = LocalizedText.Literal("Folder"),
                 items = items,
                 currentViewType = ViewType.LIST,
@@ -318,6 +323,21 @@ class SelectVideosForPlaylistScreenTest {
 
         composeTestRule.onNodeWithTag(SelectVideosMenuAction.Search.testTag, useUnmergedTree = true)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that searchText is shown in search top bar when Data has searchText`() {
+        setComposeContent(
+            uiState = SelectVideoSearchUiState.Data(
+                items = emptyList(),
+                searchText = "my query",
+                searchedQuery = "my query",
+            )
+        )
+        composeTestRule.onNodeWithTag(
+            SELECT_VIDEOS_SEARCH_TOP_APP_BAR_TAG,
+            useUnmergedTree = true
+        ).assertIsDisplayed()
     }
 
     private fun String.assertIsDisplayedWithTag() =

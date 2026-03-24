@@ -46,6 +46,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.videoselect.vi
 import mega.privacy.android.feature.photos.presentation.videos.VIDEO_TAB_SORT_BOTTOM_SHEET_TEST_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.navigation.destination.SelectVideosSearchNavKey
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
@@ -56,6 +57,8 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun SelectVideosForPlaylistRoute(
+    nodeHandle: Long,
+    nodeName: String?,
     isNewlyCreated: Boolean,
     playlistHandle: Long,
     navigate: (NavKey) -> Unit,
@@ -111,7 +114,14 @@ fun SelectVideosForPlaylistRoute(
         },
         selectAll = viewModel::selectAll,
         navigateToSearchScreen = {
-            //TODO will implement SelectVideosSearchScreen in another ticket
+            navigate(
+                SelectVideosSearchNavKey(
+                    nodeHandle,
+                    nodeName,
+                    playlistHandle,
+                    isNewlyCreated
+                )
+            )
         }
     )
 }
@@ -229,7 +239,8 @@ fun SelectVideosForPlaylistScreen(
                             showHiddenItems = uiState.showHiddenItems,
                             listContentPadding = PaddingValues(
                                 bottom = innerPadding.calculateSafeBottomPadding()
-                            )
+                            ),
+                            isSelectionMode = uiState.selectItemHandles.isNotEmpty()
                         )
                     } else {
                         SelectVideoGridView(
@@ -244,7 +255,8 @@ fun SelectVideosForPlaylistScreen(
                             showHiddenItems = uiState.showHiddenItems,
                             listContentPadding = PaddingValues(
                                 bottom = innerPadding.calculateSafeBottomPadding()
-                            )
+                            ),
+                            isSelectionMode = uiState.selectItemHandles.isNotEmpty()
                         )
                     }
                 }

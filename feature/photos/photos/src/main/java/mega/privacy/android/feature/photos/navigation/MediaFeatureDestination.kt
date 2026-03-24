@@ -55,5 +55,6 @@ class MediaFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent
             )
+            selectVideosSearchScreen(navigationHandler = navigationHandler)
         }
 }

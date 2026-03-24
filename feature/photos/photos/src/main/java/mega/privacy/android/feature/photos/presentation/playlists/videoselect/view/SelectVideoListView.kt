@@ -27,6 +27,7 @@ fun SelectVideoListView(
     onItemsClicked: (SelectVideoItemUiEntity) -> Unit,
     showHiddenItems: Boolean,
     modifier: Modifier = Modifier,
+    isSelectionMode: Boolean = false,
     isNextPageLoading: Boolean = false,
     showSortOrder: Boolean = true,
     showChangeViewType: Boolean = true,
@@ -75,7 +76,7 @@ fun SelectVideoListView(
                 isSensitive = showHiddenItems && item.isSensitive,
                 isTakenDown = item.isTakenDown,
                 thumbnailData = ThumbnailRequest(item.id),
-                isEnabled = item.isVideo || item.isFolder
+                isEnabled = item.isVideo || (!isSelectionMode && item.isFolder)
             )
         }
 

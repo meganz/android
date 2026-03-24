@@ -29,6 +29,7 @@ fun SelectVideoGridView(
     onChangeViewTypeClick: () -> Unit,
     showHiddenItems: Boolean,
     modifier: Modifier = Modifier,
+    isSelectionMode: Boolean = false,
     spanCount: Int = 2,
     showSortOrder: Boolean = true,
     showChangeViewType: Boolean = true,
@@ -83,7 +84,7 @@ fun SelectVideoGridView(
                 isTakenDown = item.isTakenDown,
                 isFolder = item.isFolder,
                 isAvailableSelected = item.isVideo,
-                isEnabled = item.isVideo || item.isFolder
+                isEnabled = item.isVideo || (!isSelectionMode && item.isFolder)
             )
         }
 

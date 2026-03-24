@@ -62,3 +62,16 @@ data class AlbumImportNavKey(val link: String?) : NoSessionNavKey.Optional
 
 @Serializable
 data object VideoRecentlyWatchedNavKey : NavKey
+
+@Serializable
+@Parcelize
+data class SelectVideosSearchNavKey(
+    val nodeHandle: Long = -1L,
+    val nodeName: String? = null,
+    val playlistHandle: Long = -1L,
+    val isNewlyCreated: Boolean = false,
+) : NavKey, Parcelable {
+    companion object {
+        const val RESULT = "SelectVideosSearchNavKey::result"
+    }
+}

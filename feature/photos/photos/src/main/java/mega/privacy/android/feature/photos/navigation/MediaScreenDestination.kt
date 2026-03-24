@@ -50,6 +50,8 @@ import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPl
 import mega.privacy.android.feature.photos.presentation.playlists.detail.VideoPlaylistDetailViewModel
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosForPlaylistRoute
 import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosForPlaylistViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.SelectVideosSearchViewModel
+import mega.privacy.android.feature.photos.presentation.playlists.videoselect.view.SelectVideosSearchRoute
 import mega.privacy.android.feature.photos.presentation.search.MediaSearchScreenM3
 import mega.privacy.android.feature.photos.presentation.search.PhotosSearchViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
@@ -74,6 +76,7 @@ import mega.privacy.android.navigation.destination.MediaSearchNavKey
 import mega.privacy.android.navigation.destination.OverDiskQuotaPaywallWarningNavKey
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.navigation.destination.SelectVideosForPlaylistNavKey
+import mega.privacy.android.navigation.destination.SelectVideosSearchNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.destination.VideoPlaylistDetailNavKey
 import mega.privacy.android.navigation.destination.VideoRecentlyWatchedNavKey
@@ -422,6 +425,8 @@ fun EntryProviderScope<NavKey>.selectVideosForPlaylistScreen(
                 )
             }
         SelectVideosForPlaylistRoute(
+            nodeHandle = key.nodeHandle,
+            nodeName = key.nodeName,
             isNewlyCreated = key.isNewlyCreated,
             playlistHandle = key.playlistHandle,
             navigate = navigationHandler::navigate,
@@ -600,6 +605,45 @@ fun EntryProviderScope<NavKey>.cloudDriveMediaDiscoveryScreen(
                     )
                 }
             },
+        )
+    }
+}
+
+fun EntryProviderScope<NavKey>.selectVideosSearchScreen(
+    navigationHandler: NavigationHandler,
+) {
+    entry<SelectVideosSearchNavKey> { key ->
+        val viewModel =
+            hiltViewModel<SelectVideosSearchViewModel, SelectVideosSearchViewModel.Factory> {
+                it.create(
+                    SelectVideosSearchViewModel.Args(
+                        nodeHandle = key.nodeHandle,
+                        nodeName = key.nodeName,
+                        playlistHandle = key.playlistHandle,
+                        isNewlyCreated = key.isNewlyCreated
+                    )
+                )
+            }
+        SelectVideosSearchRoute(
+            isNewlyCreated = key.isNewlyCreated,
+            playlistHandle = key.playlistHandle,
+            navigate = navigationHandler::navigate,
+            returnResult = navigationHandler::returnResult,
+            onBack = navigationHandler::back,
+            navigateAndClearTo = {
+                navigationHandler.navigateAndClearTo(
+                    destination = VideoPlaylistDetailNavKey(
+                        playlistHandle = key.playlistHandle,
+                        type = PlaylistType.User
+                    ),
+                    newParent = SelectVideosForPlaylistNavKey(
+                        playlistHandle = key.playlistHandle,
+                        isNewlyCreated = key.isNewlyCreated
+                    ),
+                    inclusive = true
+                )
+            },
+            viewModel = viewModel
         )
     }
 }
