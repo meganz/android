@@ -26,3 +26,8 @@ class NodeNameAlreadyExistsException : NodeNameException()
  * Exception thrown when folder name contains invalid characters
  */
 class InvalidNodeNameException : NodeNameException()
+
+/**
+ * Exception thrown when extension is invalid
+ */
+class InvalidNodeExtensionException : NodeNameException()

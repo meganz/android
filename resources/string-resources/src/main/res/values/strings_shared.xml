@@ -2470,4 +2470,6 @@
     <string name="select_videos_search_empty_view_description">Search videos in your Cloud drive</string>
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
     <string name="folder_link_unavailable_tos_violation">The folder link has been removed as it violated our Terms of Service.</string>
+    <!--Error message to show when adding a new text file with invalid text extension-->
+    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
 </resources>

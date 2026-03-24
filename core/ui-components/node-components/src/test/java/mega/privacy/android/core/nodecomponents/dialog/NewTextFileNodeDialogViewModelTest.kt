@@ -11,8 +11,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
+import mega.privacy.android.domain.exception.InvalidNodeExtensionException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -34,12 +36,14 @@ class NewTextFileNodeDialogViewModelTest {
 
     private val validateNodeNameUseCase = mock<ValidateNodeNameUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val isValidTextFileUseCase = mock<IsValidTextFileUseCase>()
 
     @BeforeEach
     fun setUp() {
         viewModel = NewTextFileNodeDialogViewModel(
             validateNodeNameUseCase = validateNodeNameUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
+            isValidTextFileUseCase = isValidTextFileUseCase,
         )
     }
 
@@ -47,7 +51,8 @@ class NewTextFileNodeDialogViewModelTest {
     fun resetMocks() {
         reset(
             validateNodeNameUseCase,
-            getRootNodeUseCase
+            getRootNodeUseCase,
+            isValidTextFileUseCase,
         )
     }
 
@@ -194,6 +199,22 @@ class NewTextFileNodeDialogViewModelTest {
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalStateException::class.java)
         verify(getRootNodeUseCase).invoke()
     }
+
+    @Test
+    fun `test that createTextFile with invalid extension triggers InvalidNodeExtensionException`() =
+        runTest {
+            val parentNodeId = NodeId(123L)
+            val fileName = "newFile.exe"
+
+            whenever(isValidTextFileUseCase(eq(fileName))).thenThrow(
+                InvalidNodeExtensionException()
+            )
+
+            val result = viewModel.createTextFile(fileName, parentNodeId)
+
+            assertThat(result.isFailure).isTrue()
+            assertThat(result.exceptionOrNull()).isInstanceOf(InvalidNodeExtensionException::class.java)
+        }
 
     @Test
     fun `test that createTextFile handles ValidateNodeNameUseCase failure`() = runTest {

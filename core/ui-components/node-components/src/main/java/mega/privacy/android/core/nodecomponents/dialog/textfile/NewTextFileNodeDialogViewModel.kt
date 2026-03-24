@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import javax.inject.Inject
 
@@ -15,6 +16,7 @@ import javax.inject.Inject
 class NewTextFileNodeDialogViewModel @Inject constructor(
     private val validateNodeNameUseCase: ValidateNodeNameUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val isValidTextFileUseCase: IsValidTextFileUseCase,
 ) : ViewModel() {
 
     /**
@@ -31,6 +33,7 @@ class NewTextFileNodeDialogViewModel @Inject constructor(
         val parentOrRootNodeId =
             if (parentNodeId.longValue != -1L) parentNodeId else getRootNodeUseCase()?.id
                 ?: throw IllegalStateException("Root node not found")
+        isValidTextFileUseCase(trimmedFileName)
         validateNodeNameUseCase(trimmedFileName, parentOrRootNodeId)
         parentOrRootNodeId to trimmedFileName
     }

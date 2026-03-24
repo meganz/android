@@ -26,6 +26,7 @@ import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.exception.DotNameException
 import mega.privacy.android.domain.exception.DoubleDotNameException
 import mega.privacy.android.domain.exception.EmptyNodeNameException
+import mega.privacy.android.domain.exception.InvalidNodeExtensionException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.exception.NodeNameException
@@ -108,6 +109,7 @@ private fun NodeNameException.text(): String = when (this) {
     )
 
     is NodeNameAlreadyExistsException -> stringResource(NodesR.string.same_file_name_warning)
+    is InvalidNodeExtensionException -> stringResource(sharedR.string.new_text_file_invalid_extension_error_message)
 }
 
 internal const val NEW_TEXT_FILE_NODE_DIALOG_TAG = "new_text_file_node:dialog"
