@@ -44,16 +44,8 @@ import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
 import mega.privacy.android.core.nodecomponents.action.rememberMultiNodeActionHandler
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
 import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.shared.nodes.components.NodesView
-import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
-import mega.privacy.android.shared.nodes.components.SortBottomSheet
-import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -70,7 +62,14 @@ import mega.privacy.android.feature.clouddrive.presentation.search.view.SearchTo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.nodes.components.NodesView
 import mega.privacy.android.shared.nodes.components.NodesViewSkeleton
+import mega.privacy.android.shared.nodes.components.SortBottomSheet
+import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
+import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 
 
@@ -298,6 +297,17 @@ fun SearchScreen(
             }
         )
     }
+}
+
+@Composable
+fun NodeSelectionModeAppBar(
+    count: Int,
+    isAllSelected: Boolean,
+    isSelecting: Boolean,
+    onSelectAllClicked: () -> Unit,
+    onCancelSelectionClicked: () -> Unit,
+) {
+    TODO("Not yet implemented")
 }
 
 @Composable

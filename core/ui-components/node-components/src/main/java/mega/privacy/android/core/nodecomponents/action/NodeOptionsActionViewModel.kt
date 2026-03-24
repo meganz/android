@@ -23,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.menu.MenuAction
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.core.nodecomponents.action.clickhandler.MultiNodeAction
 import mega.privacy.android.core.nodecomponents.action.clickhandler.SingleNodeAction
 import mega.privacy.android.core.nodecomponents.action.eventhandler.NodeOptionsActionEventSender
@@ -37,8 +36,6 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeSendToChatMes
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeVersionHistoryRemoveMessageMapper
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.RestoreData
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
@@ -95,6 +92,9 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction.Companion.DEFAULT_MAX_VISIBLE_ITEMS
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
 import java.io.File

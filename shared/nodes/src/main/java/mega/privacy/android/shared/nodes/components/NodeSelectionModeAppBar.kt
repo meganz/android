@@ -1,11 +1,11 @@
-package mega.privacy.android.core.nodecomponents.components.selectionmode
+package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.resources.R as sharedResR
 import java.util.Locale
 
@@ -40,4 +40,3 @@ fun NodeSelectionModeAppBar(
         }
     )
 }
-

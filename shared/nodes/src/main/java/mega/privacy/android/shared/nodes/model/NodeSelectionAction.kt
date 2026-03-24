@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.model
+package mega.privacy.android.shared.nodes.model
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -6,12 +6,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.android.core.ui.modifiers.infiniteRotation
-import mega.privacy.android.core.nodecomponents.menu.menuaction.CopyMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.DownloadMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.HideMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.ManageLinkMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.MoveMenuAction
-import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 

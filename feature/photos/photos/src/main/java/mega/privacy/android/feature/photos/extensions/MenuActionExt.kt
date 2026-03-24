@@ -11,7 +11,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.RemoveLinkMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAddToAlbumButtonPressedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenCopyButtonPressedEvent

@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.core.nodecomponents.sheet.nodeactions.NodeMoreOptionsBottomSheet
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 
 /**
  * A bottom bar component for node selection mode that displays action buttons

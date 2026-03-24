@@ -24,7 +24,6 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.SendToChatMenuAc
 import mega.privacy.android.core.nodecomponents.menu.menuaction.ShareMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.TrashMenuAction
 import mega.privacy.android.core.nodecomponents.model.NodeActionState
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
@@ -39,6 +38,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNorm
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotoModificationTimePeriod
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.core.event.identifier.EventIdentifier
 import mega.privacy.mobile.analytics.event.MediaScreenAlbumsTabEvent

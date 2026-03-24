@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.testTag
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.core.nodecomponents.model.NodeSelectionAction
+import mega.privacy.android.shared.nodes.model.NodeSelectionAction
 import java.util.Locale
 
 @Composable
