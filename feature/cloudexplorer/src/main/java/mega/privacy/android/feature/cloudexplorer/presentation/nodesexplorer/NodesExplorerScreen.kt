@@ -3,14 +3,13 @@ package mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.empty.MegaEmptyView
 import mega.android.core.ui.preview.BooleanProvider
@@ -21,6 +20,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeGridViewItem
 import mega.privacy.android.shared.nodes.components.NodeListViewItem
@@ -36,27 +37,25 @@ import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 fun NodesExplorerScreen(
-    viewModel: NodesExplorerViewModel,
+    explorerModeData: ExplorerModeData,
+    nodeExplorerId: NodeId,
+    nodeSourceType: NodeSourceType,
     onNavigateBack: () -> Unit,
-    onNavigateToFolder: (NodeId) -> Unit,
+    onNavigateToFolder: (NavKey) -> Unit,
 ) {
-    val uiState by viewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
-    val uiStateShared by viewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
-
-    NodesExplorerScreen(
-        uiState = uiState,
-        uiStateShared = uiStateShared,
+    ExplorerScreen(
+        explorerModeData = explorerModeData,
+        hideTabs = true,
+        nodeExplorerId = nodeExplorerId,
+        nodeSourceType = nodeSourceType,
         onNavigateBack = onNavigateBack,
-        consumeNavigateBack = viewModel::onNavigateBackEventConsumed,
-        onFolderClick = onNavigateToFolder,
-        onFileClick = viewModel::fileClicked,
-        onRefreshNodes = viewModel::refreshNodes,
+        onNavigateToFolder = onNavigateToFolder,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun NodesExplorerScreen(
+internal fun NodesExplorerScreenContent(
     uiState: NodesExplorerUiState,
     uiStateShared: NodesExplorerSharedUiState,
     onNavigateBack: () -> Unit,
@@ -115,6 +114,7 @@ internal fun NodesExplorerScreen(
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
                 onItemClicked = { onItemClicked(it) },
+                enabled = it.isFolderNode || isSelectionModeEnabled,
             )
         },
         itemGridView = {
@@ -135,6 +135,7 @@ internal fun NodesExplorerScreen(
                 showLink = it.showLink,
                 showFavourite = it.showFavourite,
                 label = it.nodeLabel,
+                enabled = it.isFolderNode || isSelectionModeEnabled,
             )
         },
         onRefreshNodes = onRefreshNodes,
@@ -162,7 +163,7 @@ private fun EmptyRoot() {
 
 @Composable
 @CombinedThemePreviews
-fun NodesExplorerScreenEmptyPreview() {
+fun NodesExplorerScreenContentEmptyPreview() {
     AndroidThemeForPreviews {
         CompositionLocalProvider(
             LocalNodeHeaderPreviewData provides NodeHeaderItemUiState.Data(
@@ -170,7 +171,7 @@ fun NodesExplorerScreenEmptyPreview() {
                 nodeSortConfiguration = NodeSortConfiguration.default,
             ),
         ) {
-            NodesExplorerScreen(
+            NodesExplorerScreenContent(
                 uiState = NodesExplorerUiState(),
                 uiStateShared = NodesExplorerSharedUiState(
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
@@ -187,7 +188,7 @@ fun NodesExplorerScreenEmptyPreview() {
 
 @Composable
 @CombinedThemePreviews
-fun NodesExplorerScreenPreview(
+fun NodesExplorerScreenContentPreview(
     @PreviewParameter(BooleanProvider::class) isList: Boolean,
 ) {
     AndroidThemeForPreviews {
@@ -197,7 +198,7 @@ fun NodesExplorerScreenPreview(
                 nodeSortConfiguration = NodeSortConfiguration.default,
             ),
         ) {
-            NodesExplorerScreen(
+            NodesExplorerScreenContent(
                 uiState = NodesExplorerUiState(),
                 uiStateShared = NodesExplorerSharedUiState(
                     nodesLoadingState = NodesLoadingState.FullyLoaded,
@@ -215,4 +216,5 @@ fun NodesExplorerScreenPreview(
     }
 }
 
-internal const val NODES_EXPLORER_EMPTY_VIEW_TAG = "nodes_explorer_view:empty_view"
+internal const val NODES_EXPLORER_VIEW_TAG = "nodes_explorer_view"
+internal const val NODES_EXPLORER_EMPTY_VIEW_TAG = "$NODES_EXPLORER_VIEW_TAG:empty_view"

@@ -2,6 +2,7 @@ package mega.privacy.android.navigation.destination
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -16,4 +17,5 @@ data object ChatExplorerNavKey : NavKey
 data class NodesExplorerNavKey(
     val nodeId: NodeId,
     val nodeSourceType: NodeSourceType,
+    val explorerMode: ExplorerMode,
 ) : NavKey

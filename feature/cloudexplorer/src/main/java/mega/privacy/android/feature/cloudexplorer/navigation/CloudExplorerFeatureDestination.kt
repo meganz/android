@@ -1,14 +1,17 @@
 package mega.privacy.android.feature.cloudexplorer.navigation
 
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerViewModel
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
+import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toData
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreen
-import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaScreen
+import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaViewModel
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -38,7 +41,18 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         entry<ShareToMegaNavKey>(
             metadata = transparentMetadata()
         ) { key ->
-            ShareToMegaScreen()
+            val viewModel =
+                hiltViewModel<ShareToMegaViewModel, ShareToMegaViewModel.Factory> { factory ->
+                    factory.create(ShareToMegaViewModel.Args(shareUris = key.shareUris))
+                }
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            ShareToMegaScreen(
+                uiState = uiState,
+                onNavigateBack = { onNavigateBack(key) },
+                onUpload = viewModel::upload,
+                onNavigateToFolder = onNavigate,
+            )
         }
     }
 
@@ -47,27 +61,12 @@ class CloudExplorerFeatureDestination : FeatureDestination {
         onNavigate: (NavKey) -> Unit,
     ) {
         entry<NodesExplorerNavKey> { key ->
-            val viewModel =
-                hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
-                    factory.create(
-                        args = NodeExplorerSharedViewModel.Args(
-                            key.nodeId,
-                            key.nodeSourceType
-                        )
-                    )
-                }
-
             NodesExplorerScreen(
-                viewModel = viewModel,
+                explorerModeData = key.explorerMode.toData(),
+                nodeExplorerId = key.nodeId,
+                nodeSourceType = key.nodeSourceType,
                 onNavigateBack = { onNavigateBack(key) },
-                onNavigateToFolder = {
-                    onNavigate(
-                        NodesExplorerNavKey(
-                            nodeId = it,
-                            nodeSourceType = key.nodeSourceType,
-                        )
-                    )
-                },
+                onNavigateToFolder = { onNavigate(it) },
             )
         }
     }
