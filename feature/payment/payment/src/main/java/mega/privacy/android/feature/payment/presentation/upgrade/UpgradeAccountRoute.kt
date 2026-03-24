@@ -81,7 +81,8 @@ fun UpgradeAccountRoute(
                 onFreeClick(
                     activity = it,
                     megaNavigator = megaNavigator,
-                    isSingleActivityEnabled = uiState.isSingleActivityEnabled
+                    isSingleActivityEnabled = uiState.isSingleActivityEnabled,
+                    onBack = onBack
                 )
             }
         },
@@ -93,7 +94,8 @@ fun UpgradeAccountRoute(
                 onFreeClick(
                     activity = it,
                     megaNavigator = megaNavigator,
-                    isSingleActivityEnabled = uiState.isSingleActivityEnabled
+                    isSingleActivityEnabled = uiState.isSingleActivityEnabled,
+                    onBack = onBack
                 )
             }
         },
@@ -158,9 +160,14 @@ private fun onFreeClick(
     activity: Activity,
     megaNavigator: MegaNavigator,
     isSingleActivityEnabled: Boolean,
+    onBack: () -> Unit,
 ) {
     if (isSingleActivityEnabled) {
-        activity.finish()
+        if (activity is UpgradeAccountActivity) {
+            activity.finish()
+        } else {
+            onBack()
+        }
     } else {
         val bundle = createNavigationBundle(activity, AccountType.FREE)
         navigateToManagerActivity(megaNavigator, activity, bundle)
