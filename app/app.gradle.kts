@@ -320,12 +320,9 @@ dependencies {
     implementation(google.media3.ui)
     implementation(google.flexbox)
     implementation(google.zxing)
-    implementation(google.accompanist.pager)
-    implementation(google.accompanist.flowlayout)
     implementation(google.accompanist.placeholder)
     implementation(google.accompanist.permissions)
     implementation(androidx.compose.material.navigation)
-    implementation(google.accompanist.navigationanimation)
     implementation(google.accompanist.systemui)
 
     // Google GMS
