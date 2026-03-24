@@ -43,7 +43,7 @@ class DriveSyncNavItem : MainNavItem {
     override val badge: Flow<MainNavItemBadge?>? = null
 
     @StringRes
-    override val label: Int = sharedR.string.general_section_cloud_drive
+    override val label: Int = sharedR.string.general_drive
     override val preferredSlot: PreferredSlot = PreferredSlot.Ordered(1)
     override val availableOffline: Boolean = false
     override val analyticsEventIdentifier: NavigationEventIdentifier =
