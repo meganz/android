@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.InlineAnchoredButtonGroup
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -53,6 +52,7 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.trac
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkAction
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DecryptionKeyDialog
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.ExpiredLinkView
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.icon.pack.IconPack
@@ -256,10 +256,14 @@ internal fun FolderLinkContent(
             }
 
             is FolderLinkContentState.DecryptionKeyRequired -> {
-                // TODO: show decryption key dialog in later MR
-                MegaText(
-                    modifier = Modifier.testTag(FOLDER_LINK_DECRYPTION_KEY_TAG),
-                    text = if (contentState.isKeyIncorrect) "Invalid decryption key" else "Decryption key required",
+                DecryptionKeyDialog(
+                    isKeyIncorrect = contentState.isKeyIncorrect,
+                    onDecryptionKeyEntered = { key ->
+                        onAction(FolderLinkAction.DecryptionKeyEntered(key))
+                    },
+                    onDismiss = {
+                        onAction(FolderLinkAction.DecryptionKeyDialogDismissed)
+                    },
                 )
             }
 
@@ -346,6 +350,5 @@ internal fun FolderLinkContent(
 internal const val FOLDER_LINK_APP_BAR_TAG = "folder_link_screen:main_app_bar"
 internal const val FOLDER_LINK_BOTTOM_BAR_TAG = "folder_link_screen:bottom_bar"
 internal const val FOLDER_LINK_LOADING_TAG = "folder_link_screen:loading"
-internal const val FOLDER_LINK_DECRYPTION_KEY_TAG = "folder_link_screen:decryption_key"
 internal const val FOLDER_LINK_EXPIRED_TAG = "folder_link_screen:expired"
 internal const val FOLDER_LINK_UNAVAILABLE_TAG = "folder_link_screen:unavailable"

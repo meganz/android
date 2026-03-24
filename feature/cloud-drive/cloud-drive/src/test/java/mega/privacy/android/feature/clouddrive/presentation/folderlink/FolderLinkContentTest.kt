@@ -10,6 +10,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.EMPTY_IMAGE_TAG
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkContentState
 import mega.privacy.android.feature.clouddrive.presentation.folderlink.model.FolderLinkUiState
+import mega.privacy.android.feature.clouddrive.presentation.folderlink.view.DECRYPTION_KEY_DIALOG_TAG
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +46,7 @@ class FolderLinkContentTest {
             )
         )
 
-        composeRule.onNodeWithTag(FOLDER_LINK_DECRYPTION_KEY_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(DECRYPTION_KEY_DIALOG_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -59,7 +60,7 @@ class FolderLinkContentTest {
             )
         )
 
-        composeRule.onNodeWithTag(FOLDER_LINK_DECRYPTION_KEY_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(DECRYPTION_KEY_DIALOG_TAG).assertIsDisplayed()
     }
 
     @Test

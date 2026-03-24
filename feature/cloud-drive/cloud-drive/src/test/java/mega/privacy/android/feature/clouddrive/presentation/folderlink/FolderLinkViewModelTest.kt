@@ -317,7 +317,7 @@ internal class FolderLinkViewModelTest {
     }
 
     @Test
-    fun `test that DecryptionKeyDialogDismissed updates state to Unavailable`() = runTest {
+    fun `test that DecryptionKeyDialogDismissed trigger back navigation event`() = runTest {
         val url = "https://mega.nz/folder/abc"
         whenever(hasCredentialsUseCase()).thenReturn(false)
         whenever(loginToFolderUseCase(url)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
@@ -327,7 +327,7 @@ internal class FolderLinkViewModelTest {
         underTest.processAction(FolderLinkAction.DecryptionKeyDialogDismissed)
 
         underTest.uiState.test {
-            assertThat(awaitItem().contentState).isEqualTo(FolderLinkContentState.Unavailable)
+            assertThat(awaitItem().navigateBackEvent).isEqualTo(triggered)
         }
     }
 

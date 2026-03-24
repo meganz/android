@@ -250,7 +250,13 @@ internal class FolderLinkViewModel @AssistedInject constructor(
     }
 
     private fun onDecryptionKeyDialogDismissed() {
-        _uiState.update { it.copy(contentState = FolderLinkContentState.Unavailable) }
+        // Exist folder link screen
+        _uiState.update {
+            it.copy(
+                contentState = FolderLinkContentState.Loading,
+                navigateBackEvent = triggered
+            )
+        }
     }
 
     private fun fetchNodes(folderSubHandle: String?) {

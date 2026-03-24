@@ -2470,6 +2470,12 @@
     <string name="select_videos_search_empty_view_description">Search videos in your Cloud drive</string>
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
     <string name="folder_link_unavailable_tos_violation">The folder link has been removed as it violated our Terms of Service.</string>
+    <!-- Title for the decryption key dialog when a folder/file link requires a key -->
+    <string name="link_decryption_key_dialog_title">Enter decryption key</string>
+    <!-- Two line message for the decryption key dialog prompting user to enter the key -->
+    <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the sender.</string>
+    <!-- Error message shown when an invalid decryption key is entered -->
+    <string name="link_decryption_key_dialog_error_invalid_key">Invalid decryption key</string>
     <!--Error message to show when adding a new text file with invalid text extension-->
     <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
 </resources>
