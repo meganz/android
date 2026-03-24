@@ -10,6 +10,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -253,11 +254,17 @@ private fun AlbumPhotosSelectionContent(
             )
         )
     } else {
+        var selectedGridSizeOrdinal by rememberSaveable {
+            mutableIntStateOf(TimelineGridSize.Default.ordinal)
+        }
+
         PhotosNodeGridView(
             items = state.photosNodeContentItems,
             selectedPhotoIds = state.selectedPhotoIds,
-            gridSize = TimelineGridSize.Default,
-            onGridSizeChange = {},
+            gridSize = TimelineGridSize.entries[selectedGridSizeOrdinal],
+            onGridSizeChange = {
+                selectedGridSizeOrdinal = it.ordinal
+            },
             onClick = { node ->
                 if (node.photo.id in state.selectedPhotoIds) {
                     unselectPhoto(node.photo)
