@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade
 
 import android.provider.MediaStore
+import androidx.concurrent.futures.await
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -284,30 +285,26 @@ class WorkManagerGatewayImpl @Inject constructor(
      *
      * @param tag
      */
-    private fun isWorkerRunning(tag: String): Boolean {
-        return workManager.get().getWorkInfosByTag(tag).get()
-            ?.map { workInfo ->
+    private suspend fun isWorkerRunning(tag: String): Boolean =
+        workManager.get().getWorkInfosByTag(tag).await()
+            .map { workInfo ->
                 Timber.d("isWorkerRunning() ${workInfo.tags}")
                 workInfo.state == WorkInfo.State.RUNNING
             }
-            ?.contains(true)
-            ?: false
-    }
+            .contains(true)
 
     /**
      * Check if a worker is currently enqueued or running given his tag
      *
      * @param tag
      */
-    private fun isWorkerEnqueuedOrRunning(tag: String): Boolean {
-        return workManager.get().getWorkInfosByTag(tag).get()
-            ?.map { workInfo ->
+    private suspend fun isWorkerEnqueuedOrRunning(tag: String): Boolean =
+        workManager.get().getWorkInfosByTag(tag).await()
+            .map { workInfo ->
                 Timber.d("isWorkerEnqueuedOrRunning() ${workInfo.tags}")
                 workInfo.state == WorkInfo.State.ENQUEUED || workInfo.state == WorkInfo.State.RUNNING
             }
-            ?.contains(true)
-            ?: false
-    }
+            .contains(true)
 
     override fun monitorCameraUploadsStatusInfo(): Flow<List<WorkInfo>> {
         val uploadFlow = workManager.get().getWorkInfosByTagFlow(CAMERA_UPLOAD_TAG)

@@ -27,6 +27,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.worker.ForegroundSetter
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.feature.sync.data.SyncWorker.Companion.SYNC_WORKER_RECHECK_DELAY_IN_SECONDS
@@ -90,6 +91,7 @@ internal class SyncWorkerTest {
     private val getSyncWorkerForegroundPreferenceUseCase: GetSyncWorkerForegroundPreferenceUseCase =
         mock()
     private val foregroundSetter: ForegroundSetter = mock()
+    private val crashReporter: CrashReporter = mock()
 
     @Before
     fun setUp() {
@@ -134,7 +136,8 @@ internal class SyncWorkerTest {
             syncPermissionManager = syncPermissionsManager,
             setSyncWorkerForegroundPreferenceUseCase = setSyncWorkerForegroundPreferenceUseCase,
             getSyncWorkerForegroundPreferenceUseCase = getSyncWorkerForegroundPreferenceUseCase,
-            foregroundSetter = foregroundSetter
+            foregroundSetter = foregroundSetter,
+            crashReporter = crashReporter
         )
     }
 

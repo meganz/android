@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.transfer.ActiveTransferTotals
 import mega.privacy.android.domain.entity.transfer.MonitorOngoingActiveTransfersResult
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.usecase.transfers.active.GetActiveTransferTot
 import mega.privacy.android.domain.usecase.transfers.completed.ClearCompletedTransfersCacheUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import timber.log.Timber
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -199,36 +201,57 @@ abstract class AbstractTransfersWorker(
     protected open fun hasCompleted(activeTransferTotals: ActiveTransferTotals) =
         activeTransferTotals.hasCompleted()
 
-    override suspend fun doWork() = withContext(ioDispatcher) {
-        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
-        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
+    override suspend fun doWork(): Result {
+        return try {
+            withContext(ioDispatcher) {
+                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Started")
+                crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Started")
 
-        if (loginMutex.isLocked) {
-            Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Login in progress, skipping")
-            return@withContext Result.success()
-        }
+                if (loginMutex.isLocked) {
+                    Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Login in progress, skipping")
+                    return@withContext Result.success()
+                }
 
-        correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
-        val doWorkJob = this.launch(ioDispatcher) {
-            doWorkInternal(this)
-        }
-        onStart()
-        val lastMonitorOngoingActiveTransfersResult = consumeProgress().lastOrNull()
+                correctActiveTransfersUseCase(type) //to be sure we haven't missed any event before monitoring them
+                val doWorkJob = this.launch(ioDispatcher) {
+                    doWorkInternal(this)
+                }
+                onStart()
+                // Safety net: withTimeoutOrNull bounds total execution time.
+                // consumeProgress() uses cooperative cancellation internally, but if the SDK stops
+                // emitting transfer events without completing them, doWork() can suspend indefinitely.
+                // The OS-level foreground service timeout fires at the process level before WorkManager's
+                // cooperative cancellation runs — so we must return from doWork() proactively.
+                val lastMonitorOngoingActiveTransfersResult =
+                    withTimeoutOrNull(MAX_WORKER_EXECUTION_DURATION) {
+                        consumeProgress().lastOrNull()
+                    }.also {
+                        if (it == null) {
+                            val simpleName = this@AbstractTransfersWorker::class.java.simpleName
+                            Timber.w("$simpleName reached max execution duration — forcing completion")
+                            crashReporter.log("$simpleName reached max execution duration")
+                        }
+                    }
 
-        stopWork(doWorkJob)
-        lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, _, _) ->
-            if (hasCompleted(lastActiveTransferTotals)) {
-                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
-                return@withContext Result.success()
-            } else {
-                Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
-                return@withContext Result.failure() // To retry in the future
+                stopWork(doWorkJob)
+                lastMonitorOngoingActiveTransfersResult?.let { (lastActiveTransferTotals, _, _, _) ->
+                    if (hasCompleted(lastActiveTransferTotals)) {
+                        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished Successful: $lastActiveTransferTotals")
+                        return@withContext Result.success()
+                    } else {
+                        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName}finished Failure: $lastActiveTransferTotals")
+                        return@withContext Result.failure() // To retry in the future
+                    }
+                }
+                return@withContext Result.success() // If there are no ongoing transfers it means no more work needed
             }
+        } catch (e: Exception) {
+            Timber.e(e, "${this@AbstractTransfersWorker::class.java.simpleName} error")
+            return Result.failure()
+        } finally {
+            crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
+            Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
         }
-        return@withContext Result.success() // If there are no ongoing transfers it means no more work needed
-    }.also {
-        crashReporter.log("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
-        Timber.d("${this@AbstractTransfersWorker::class.java.simpleName} Finished")
     }
 
     private fun hasAnyPausedChange(
@@ -445,6 +468,14 @@ abstract class AbstractTransfersWorker(
          * Milliseconds to sample the transfer progress updates
          */
         const val ON_TRANSFER_UPDATE_REFRESH_MILLIS = 2000L
+
+        /**
+         * Maximum total execution time for a transfer worker.
+         * If the SDK stops emitting progress events and the flow never completes, doWork() would
+         * suspend indefinitely — causing the OS-level foreground service timeout to fire.
+         * 5 hours keeps us safely under the Android dataSync service limit (~6 hours).
+         */
+        val MAX_WORKER_EXECUTION_DURATION = 5.hours
 
         /**
          * To improve performance, and avoid too much database transactions, transfer events are chunked this duration

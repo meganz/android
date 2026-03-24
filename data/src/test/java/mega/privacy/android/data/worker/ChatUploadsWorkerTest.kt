@@ -189,7 +189,7 @@ class ChatUploadsWorkerTest {
         runTest {
             commonStub()
             underTest.doWork()
-            verify(crashReporter, times(2)).log(any())
+            verify(crashReporter, times(3)).log(any())
         }
 
     @Test

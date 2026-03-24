@@ -12,7 +12,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -21,10 +20,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.data.worker.ForegroundSetter
+import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -67,6 +66,7 @@ internal class SyncWorker @AssistedInject constructor(
     private val setSyncWorkerForegroundPreferenceUseCase: SetSyncWorkerForegroundPreferenceUseCase,
     private val getSyncWorkerForegroundPreferenceUseCase: GetSyncWorkerForegroundPreferenceUseCase,
     private val foregroundSetter: ForegroundSetter? = null,
+    private val crashReporter: CrashReporter,
 ) : CoroutineWorker(context, workerParams) {
 
     private var monitorNotificationsJob: Job? = null
@@ -76,6 +76,7 @@ internal class SyncWorker @AssistedInject constructor(
         Timber.d("SyncWorker started")
         runCatching {
             val isForeground = tryPromoteToForeground()
+            crashReporter.log("${SyncWorker::class.java.simpleName} Started with isForeground: $isForeground")
             if (isLoginSuccessful()) {
                 val timeoutDuration = if (isForeground) {
                     MAX_FOREGROUND_DURATION_IN_HOURS.hours
@@ -93,12 +94,14 @@ internal class SyncWorker @AssistedInject constructor(
                     Timber.d("SyncWorker timeout")
                     setSyncWorkerForegroundPreferenceUseCase(true)
                     cancelNotificationJob()
+                    crashReporter.log("${SyncWorker::class.java.simpleName} finished with timeout after $timeoutDuration")
                     Result.retry()
                 } else {
                     Timber.d("withTimeoutOrNull returned $result")
                     setSyncWorkerForegroundPreferenceUseCase(false)
                     cancelNotificationJob()
                     Timber.d("SyncWorker finished, result: $result")
+                    crashReporter.log("${SyncWorker::class.java.simpleName} finished")
                     result
                 }
             } else {
@@ -106,11 +109,13 @@ internal class SyncWorker @AssistedInject constructor(
                 Timber.d("Login failed")
                 cancelNotificationJob()
                 Timber.d("SyncWorker finished")
+                crashReporter.log("${SyncWorker::class.java.simpleName} finished with login failure")
                 return@coroutineScope Result.retry()
             }
         }.getOrElse {
             Timber.e(it)
             cancelNotificationJob()
+            crashReporter.log("${SyncWorker::class.java.simpleName} finished with exception: ${it.message}")
             return@coroutineScope Result.retry()
         }
     }
@@ -236,18 +241,19 @@ internal class SyncWorker @AssistedInject constructor(
         monitorShouldSyncUseCase()
             .onEach {
                 Timber.d("monitorShouldSyncUseCase: $it")
-                withContext(NonCancellable) {
+                runCatching {
                     pauseResumeSyncsBasedOnBatteryAndWiFiUseCase(it)
-                }
+                }.onFailure { e -> Timber.e(e, "pauseResumeSyncsBasedOnBatteryAndWiFi failed") }
+
             }
             .launchIn(this)
 
         Timber.d("monitorNotifications started $monitorNotificationsJob")
         monitorSyncNotificationsUseCase()
             .onEach {
-                withContext(NonCancellable) {
+                runCatching {
                     displayNotification(it)
-                }
+                }.onFailure { e -> Timber.e(e, "displayNotification failed") }
             }
             .launchIn(this)
 

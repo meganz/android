@@ -7,6 +7,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.provider.Settings.System.DEFAULT_NOTIFICATION_URI
 import androidx.core.app.ActivityCompat
@@ -323,7 +324,15 @@ class PushMessageWorker @AssistedInject constructor(
             else -> getNotification(iconPackR.drawable.ic_stat_notify)
         }
 
-        return ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(
+                NOTIFICATION_CHANNEL_ID,
+                notification,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            )
+        } else {
+            ForegroundInfo(NOTIFICATION_CHANNEL_ID, notification)
+        }
     }
 
     private fun getNotification(iconId: Int, titleId: Int? = null): Notification {
