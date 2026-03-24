@@ -4,6 +4,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -27,10 +28,10 @@ import mega.privacy.android.shared.nodes.components.NodeViewWithHeader
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.components.previewdata.previewFileNodeUiItem
 import mega.privacy.android.shared.nodes.components.previewdata.previewFolderNodeUiItem
-import mega.privacy.android.shared.nodes.components.rememberNodeItems
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -70,11 +71,14 @@ internal fun NodesExplorerScreen(
         onConsumed = consumeNavigateBack,
     ) { onNavigateBack() }
 
-    val visibleItems = rememberNodeItems(
-        nodeUIItems = items,
-        showHiddenItems = showHiddenNodes,
-        isHiddenNodesEnabled = isHiddenNodesEnabled,
-    )
+    val visibleItems = remember(showHiddenNodes, items.hashCode()) {
+        return@remember if (showHiddenNodes || !isHiddenNodesEnabled) {
+            items
+        } else {
+            items.filterNot { it.isSensitive }
+        }
+    }
+
     val onItemClicked: (NodeUiItem<TypedNode>) -> Unit = { item ->
         when {
             item.isFolderNode -> onFolderClick(item.id)
@@ -91,18 +95,46 @@ internal fun NodesExplorerScreen(
         },
         itemListView = {
             NodeListViewItem(
-                nodeUiItem = it,
+                title = it.title.text,
+                subtitle = it.subtitle.text(),
+                icon = it.iconRes,
+                description = it.formattedDescription?.text,
+                tags = it.tags,
+                thumbnailData = it.thumbnailData,
+                accessPermissionIcon = it.accessPermissionIcon,
+                showOffline = it.isAvailableOffline,
+                showVersion = it.hasVersion,
+                isSelected = it.isSelected,
                 isInSelectionMode = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                onItemClicked = onItemClicked
+                showIsVerified = it.showIsVerified,
+                isTakenDown = it.isTakenDown,
+                label = it.nodeLabel,
+                showLink = it.showLink,
+                showFavourite = it.showFavourite,
+                isSensitive = it.isSensitive && isHiddenNodesEnabled,
+                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+                isHighlighted = it.isHighlighted,
+                onItemClicked = { onItemClicked(it) },
             )
         },
         itemGridView = {
             NodeGridViewItem(
-                nodeUiItem = it,
+                name = it.title.text,
+                iconRes = it.iconRes,
+                thumbnailData = it.thumbnailData,
+                isTakenDown = it.isTakenDown,
+                duration = it.duration,
+                isSelected = it.isSelected,
                 isInSelectionMode = isSelectionModeEnabled,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                onItemClicked = onItemClicked
+                isFolderNode = it.isFolderNode,
+                isVideoNode = it.isVideoNode,
+                onClick = { onItemClicked(it) },
+                isSensitive = it.isSensitive && isHiddenNodesEnabled,
+                showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
+                isHighlighted = it.isHighlighted,
+                showLink = it.showLink,
+                showFavourite = it.showFavourite,
+                label = it.nodeLabel,
             )
         },
         onRefreshNodes = onRefreshNodes,

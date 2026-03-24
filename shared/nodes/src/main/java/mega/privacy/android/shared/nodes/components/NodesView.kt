@@ -18,12 +18,133 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.SelectableNodeItem
+import mega.privacy.android.shared.nodes.model.TypedNodeItem
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 
+
+/**
+ * NodesView
+ *
+ * @param items List of [NodeUiItem]
+ * @param onMenuClicked three dots click
+ * @param onItemClicked callback for item click
+ * @param onLongClicked callback for long item click
+ * @param sortConfiguration the sort order of the list
+ * @param isListView whether the current view is list view
+ * @param onSortOrderClick callback for sort order click
+ * @param onChangeViewTypeClicked callback for change view type click
+ * @param modifier
+ * @param isNextPageLoading whether to show shimmering skeleton at bottom
+ * @param listState the state of the list
+ * @param gridState the state of the grid
+ * @param spanCount the span count of the grid
+ * @param showHiddenNodes whether to forcefully show hidden nodes
+ * @param isHiddenNodesEnabled whether hidden nodes feature is enabled for the user
+ * @param showSortOrder whether to show change sort order button
+ * @param showLinkIcon whether to show public share link icon
+ * @param showChangeViewType whether to show change view type button
+ * @param showMediaDiscoveryButton whether to show media discovery button
+ * @param onEnterMediaDiscoveryClick callback for enter media discovery click
+ * @param listContentPadding the content padding of the list/lazyColumn
+ * @param isContactVerificationOn whether contact verification is enabled
+ */
+@Deprecated("Use NodesView with NodeSelectionState instead")
+@Composable
+fun <T : TypedNode> NodesView(
+    items: List<NodeUiItem<T>>,
+    onMenuClicked: (NodeUiItem<T>) -> Unit,
+    onItemClicked: (NodeUiItem<T>) -> Unit,
+    onLongClicked: (NodeUiItem<T>) -> Unit,
+    sortConfiguration: NodeSortConfiguration,
+    isListView: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    isNextPageLoading: Boolean = false,
+    listState: LazyListState = rememberLazyListState(),
+    gridState: LazyGridState = rememberLazyGridState(),
+    highlightText: String = "",
+    spanCount: Int = 2,
+    showHiddenNodes: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
+    showLinkIcon: Boolean = true,
+    showChangeViewType: Boolean = true,
+    showSortOrder: Boolean = true,
+    showMediaDiscoveryButton: Boolean = false,
+    isContactVerificationOn: Boolean = false,
+    inSelectionMode: Boolean = false,
+    onEnterMediaDiscoveryClick: () -> Unit = {},
+    bannerHeader: (@Composable () -> Unit)? = null,
+    listContentPadding: PaddingValues = PaddingValues(0.dp),
+) {
+    val nodeSelectionState = rememberNodeSelectionState(
+        initialSelectedIds = items.filter { it.isSelected }
+            .map { it.node.id }
+            .toSet(),
+        initialIsSelecting = inSelectionMode,
+    )
+
+    LaunchedEffect(inSelectionMode) {
+        if (inSelectionMode && !nodeSelectionState.selectAllAwaitingMoreItems) {
+            nodeSelectionState.startSelecting()
+        }
+    }
+
+    LaunchedEffect(items) {
+        val selectedItems = items.filter { it.isSelected }.map { it.node.id }.toSet()
+        nodeSelectionState.deselectAll()
+        nodeSelectionState.selectAll(selectedItems)
+    }
+
+    val onMenuNodeClicked: (TypedNode) -> Unit = { node ->
+        onMenuClicked(items.first { it.node.id == node.id })
+    }
+
+    val onNodeClicked: (TypedNode) -> Unit = { node ->
+        onItemClicked(items.first { it.node.id == node.id })
+    }
+
+    val onNodeLongClicked: (TypedNode) -> Unit = { node ->
+        onLongClicked(items.first { it.node.id == node.id })
+    }
+
+    NodesView(
+        items = items,
+        onMenuClicked = onMenuNodeClicked,
+        onItemClicked = onNodeClicked,
+        onLongClicked = onNodeLongClicked,
+        sortConfiguration = sortConfiguration,
+        isListView = isListView,
+        onSortOrderClick = onSortOrderClick,
+        onChangeViewTypeClicked = onChangeViewTypeClicked,
+        modifier = modifier,
+        isNextPageLoading = isNextPageLoading,
+        listState = listState,
+        gridState = gridState,
+        highlightText = highlightText,
+        spanCount = spanCount,
+        showHiddenNodes = showHiddenNodes,
+        isHiddenNodesEnabled = isHiddenNodesEnabled,
+        showLinkIcon = showLinkIcon,
+        showChangeViewType = showChangeViewType,
+        showSortOrder = showSortOrder,
+        showMediaDiscoveryButton = showMediaDiscoveryButton,
+        isContactVerificationOn = isContactVerificationOn,
+        inSelectionMode = inSelectionMode,
+        onEnterMediaDiscoveryClick = onEnterMediaDiscoveryClick,
+        bannerHeader = bannerHeader,
+        listContentPadding = listContentPadding,
+        nodeSelectionState = nodeSelectionState,
+    )
+
+}
 
 /**
  * NodesView
@@ -53,14 +174,15 @@ import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
  */
 @Composable
 fun <T : TypedNode> NodesView(
-    items: List<NodeUiItem<T>>,
-    onMenuClicked: (NodeUiItem<T>) -> Unit,
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClicked: (NodeUiItem<T>) -> Unit,
+    items: List<TypedNodeItem<T>>,
+    onMenuClicked: (T) -> Unit,
+    onItemClicked: (T) -> Unit,
+    onLongClicked: (T) -> Unit,
     sortConfiguration: NodeSortConfiguration,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClicked: () -> Unit,
+    nodeSelectionState: NodeSelectionState,
     modifier: Modifier = Modifier,
     isNextPageLoading: Boolean = false,
     listState: LazyListState = rememberLazyListState(),
@@ -99,15 +221,21 @@ fun <T : TypedNode> NodesView(
         }
     }
 
+    val nodeUiItems = remember(visibleItems, nodeSelectionState.selectedNodeIds) {
+        visibleItems.map {
+            SelectableNodeItem(it, nodeSelectionState.selectedNodeIds.contains(it.id))
+        }
+    }
+
     if (isListView) {
         NodeListView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItemList = visibleItems,
+            nodeUiItemList = nodeUiItems,
             isNextPageLoading = isNextPageLoading,
             onMenuClick = onMenuClicked,
             onItemClicked = {
-                if (it.isTakenDown && it.node !is FolderNode) {
+                if (it.isTakenDown && it !is FolderNode) {
                     showTakenDownDialog = true
                 } else {
                     onItemClicked(it)
@@ -133,11 +261,11 @@ fun <T : TypedNode> NodesView(
         NodeGridView(
             modifier = modifier,
             listContentPadding = listContentPadding,
-            nodeUiItems = visibleItems,
+            nodeUiItems = nodeUiItems,
             isNextPageLoading = isNextPageLoading,
             onMenuClicked = onMenuClicked,
             onItemClicked = {
-                if (it.isTakenDown && it.node !is FolderNode) {
+                if (it.isTakenDown && it !is FolderNode) {
                     showTakenDownDialog = true
                 } else {
                     onItemClicked(it)
@@ -173,13 +301,13 @@ fun <T : TypedNode> NodesView(
 
 /**
  * Remember function for node items to handle empty span count and to filter out sensitive nodes
- * @param nodeUIItems list of [NodeUiItem]
+ * @param nodeUIItems list of [TypedNodeItem]
  * @param showHiddenItems whether to show hidden items
  * @param isHiddenNodesEnabled whether hidden nodes are enabled
  */
 @Composable
-fun <T : TypedNode> rememberNodeItems(
-    nodeUIItems: List<NodeUiItem<T>>,
+internal fun <T : TypedNode> rememberNodeItems(
+    nodeUIItems: List<TypedNodeItem<T>>,
     showHiddenItems: Boolean,
     isHiddenNodesEnabled: Boolean,
 ) = remember(showHiddenItems, nodeUIItems.hashCode()) {

@@ -1,0 +1,129 @@
+package mega.privacy.android.shared.nodes.mapper
+
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.extension.Chunk
+import mega.privacy.android.domain.extension.ConcurrencyStrategy
+import mega.privacy.android.domain.extension.mapAsync
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.shared.nodes.R as NodesR
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.extension.getSharesIcon
+import mega.privacy.android.shared.nodes.model.NodeViewItem
+import javax.inject.Inject
+
+/**
+ * Mapper to convert [TypedNode] to [NodeViewItem] with all UI properties
+ * This mapper is designed for performance with thousands of items
+ */
+class NodeViewItemMapper @Inject constructor(
+    private val fileTypeIconMapper: FileTypeIconMapper,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
+    private val nodeSubtitleMapper: NodeSubtitleMapper,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+) {
+
+    /**
+     * Map a list of nodes to NodeUiItems
+     * @param nodeList List of nodes to map
+     * @param nodeSourceType Source type for determining specific logic
+     * @param showPublicLinkCreationTime Whether to show public link creation time, for root directory of links
+     * @param isPublicNodes Whether the nodes are public nodes like folder links
+     * @param highlightedNodeId Optional highlighted node ID
+     * @param highlightedNames Optional list of highlighted names
+     * @return List of mapped NodeUiItem
+     */
+    suspend operator fun invoke(
+        nodeList: List<TypedNode>,
+        nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        isPublicNodes: Boolean = false,
+        showPublicLinkCreationTime: Boolean = false,
+        highlightedNodeId: NodeId? = null,
+        highlightedNames: List<String>? = null,
+        isContactVerificationOn: Boolean = false,
+    ): List<NodeViewItem<TypedNode>> = withContext(ioDispatcher) {
+        val highlightedNamesSet = highlightedNames?.toSet()
+
+        nodeList.mapAsync(
+            ConcurrencyStrategy.ChunkedParallel(
+                Chunk.Count(if (nodeList.size <= 1000) 10 else 50)
+            )
+        ) { node ->
+            val isHighlighted = node.id == highlightedNodeId ||
+                    highlightedNamesSet?.contains(node.name) == true
+            val duration = if (node is TypedFileNode) {
+                node.type.toDuration()?.let { duration ->
+                    durationInSecondsTextMapper(duration)
+                }
+            } else null
+            val isSensitive = nodeSourceType !in setOf(
+                NodeSourceType.INCOMING_SHARES,
+                NodeSourceType.OUTGOING_SHARES,
+                NodeSourceType.LINKS,
+            ) && (node.isMarkedSensitive || node.isSensitiveInherited)
+            val isFolder = node is TypedFolderNode
+            NodeViewItem(
+                node = node,
+                isHighlighted = isHighlighted,
+                title = getNodeTitle(node),
+                subtitle = nodeSubtitleMapper(
+                    node = node,
+                    showPublicLinkCreationTime = showPublicLinkCreationTime
+                ),
+                formattedDescription = node.description?.replace("\n", " ")
+                    ?.let { LocalizedText.Literal(it) },
+                tags = node.tags.takeIf { nodeSourceType != NodeSourceType.RUBBISH_BIN },
+                iconRes = node.getIcon(fileTypeIconMapper),
+                thumbnailData = ThumbnailRequest(
+                    id = node.id,
+                    isPublicNode = isPublicNodes
+                ).takeIf { !isFolder }, // folders will use iconRes
+                accessPermissionIcon = (node as? ShareFolderNode)
+                    .getSharesIcon(isContactVerificationOn),
+                showIsVerified = isContactVerificationOn && node.isIncomingShare
+                        && (node as? ShareFolderNode)?.shareData?.isContactCredentialsVerified == true,
+                showLink = node.exportedData != null,
+                showFavourite = node.isFavourite && node.isIncomingShare.not(),
+                isSensitive = isSensitive,
+                showBlurEffect = shouldShowBlurEffect(isSensitive, node),
+                isFolderNode = isFolder,
+                isVideoNode = node is TypedFileNode && node.type is VideoFileTypeInfo,
+                duration = duration,
+            )
+        }
+    }
+
+    private fun getNodeTitle(node: TypedNode): LocalizedText {
+        return if (node.isNodeKeyDecrypted.not()) {
+            if (node is FileNode)
+                LocalizedText.PluralsRes(
+                    resId = NodesR.plurals.shared_items_verify_credentials_undecrypted_file,
+                    quantity = 1
+                )
+            else LocalizedText.StringRes(NodesR.string.shared_items_verify_credentials_undecrypted_folder)
+        } else {
+            LocalizedText.Literal(node.name)
+        }
+    }
+
+    private fun shouldShowBlurEffect(isSensitive: Boolean, node: TypedNode): Boolean {
+        return isSensitive && (node as? FileNode)?.type?.let { fileTypeInfo ->
+            fileTypeInfo is ImageFileTypeInfo || fileTypeInfo is VideoFileTypeInfo || fileTypeInfo is PdfFileTypeInfo || fileTypeInfo is AudioFileTypeInfo
+        } == true
+    }
+}

@@ -7,9 +7,8 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 
 /**
- * This class is used to display list items on screen
+ * This class is used to display node items on screen
  * @property node [mega.privacy.android.domain.entity.node.Node]
- * @param isSelected Node is selected
  * @param isHighlighted Node is highlighted because it comes from "Locate" action in notification
  * @param title Localized title for the node
  * @param subtitle NodeSubtitleText for the node that can be resolved to localized string in Composable
@@ -27,16 +26,10 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
  * @param isFolderNode Whether this node represents a folder (affects layout and styling)
  * @param isVideoNode Whether this node represents a video file (shows play icon overlay)
  * @param duration Optional duration string for video files (displayed as a badge)
- * @constructor Create empty Node UI Item
  */
-@Deprecated(
-    "Class is deprecated, please upgrade to new selection state pattern",
-    replaceWith = ReplaceWith("mega.privacy.android.shared.nodes.model.NodeViewItem")
-)
 @Immutable
-data class NodeUiItem<T : TypedNode>(
+data class NodeViewItem<T : TypedNode>(
     override val node: T,
-    override val isSelected: Boolean,
     override val isHighlighted: Boolean = false,
     override val title: LocalizedText = LocalizedText.Literal(""),
     override val subtitle: NodeSubtitleText = NodeSubtitleText.Empty,
@@ -53,4 +46,4 @@ data class NodeUiItem<T : TypedNode>(
     override val isVideoNode: Boolean = false,
     override val duration: String? = null,
     override val tags: List<String>? = node.tags,
-) : Node by node, TypedNodeItem<T>, Selectable
+) : Node by node, TypedNodeItem<T>

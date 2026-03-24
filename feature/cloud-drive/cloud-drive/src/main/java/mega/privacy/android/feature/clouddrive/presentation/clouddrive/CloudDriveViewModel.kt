@@ -8,19 +8,16 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
@@ -64,9 +61,8 @@ import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.Clo
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ViewModeGridMenuItemEvent
 import mega.privacy.mobile.analytics.event.ViewModeListMenuItemEvent
@@ -81,7 +77,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val nodeUiItemMapper: NodeUiItemMapper,
+    private val nodeViewItemMapper: NodeViewItemMapper,
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase,
     private val getNodesByIdInChunkUseCase: GetNodesByIdInChunkUseCase,
     private val setCloudSortOrderUseCase: SetCloudSortOrder,
@@ -114,7 +110,6 @@ class CloudDriveViewModel @AssistedInject constructor(
         )
     )
     internal val uiState = _uiState.asStateFlow()
-    private var nodeMultiSelectionJob: Job? = null
 
     init {
         monitorViewType()
@@ -131,12 +126,9 @@ class CloudDriveViewModel @AssistedInject constructor(
      */
     fun processAction(action: CloudDriveAction) {
         when (action) {
-            is CloudDriveAction.ItemClicked -> onItemClicked(action.nodeUiItem)
-            is CloudDriveAction.ItemLongClicked -> onItemLongClicked(action.nodeUiItem)
+            is CloudDriveAction.ItemClicked -> onItemClicked(action.node)
             is CloudDriveAction.ChangeViewTypeClicked -> onChangeViewTypeClicked()
             is CloudDriveAction.OpenedFileNodeHandled -> onOpenedFileNodeHandled()
-            is CloudDriveAction.SelectAllItems -> selectAllItems()
-            is CloudDriveAction.DeselectAllItems -> deselectAllItems()
             is CloudDriveAction.NavigateToFolderEventConsumed -> onNavigateToFolderEventConsumed()
             is CloudDriveAction.NavigateBackEventConsumed -> onNavigateBackEventConsumed()
             is CloudDriveAction.OverQuotaConsumptionWarning -> onConsumeOverQuotaWarning()
@@ -156,12 +148,11 @@ class CloudDriveViewModel @AssistedInject constructor(
                 .catch { Timber.e(it) }
                 .collect { (nodes, hasMore) ->
                     val hasMediaItems = containsMediaItemUseCase(nodes)
-                    val nodeUiItems = nodeUiItemMapper(
+                    val nodeUiItems = nodeViewItemMapper(
                         nodeList = nodes,
                         nodeSourceType = nodeSourceType,
                         highlightedNodeId = highlightedNodeId,
                         highlightedNames = highlightedNodeNames,
-                        existingItems = uiState.value.items,
                     )
                     _uiState.update { state ->
                         state.copy(
@@ -237,12 +228,11 @@ class CloudDriveViewModel @AssistedInject constructor(
             checkCurrentFolderContactVerification()
             val nodes = getFileBrowserNodeChildrenUseCase(folderId.longValue)
             val hasMediaItems = containsMediaItemUseCase(nodes)
-            val nodeUiItems = nodeUiItemMapper(
+            val nodeUiItems = nodeViewItemMapper(
                 nodeList = nodes,
                 nodeSourceType = nodeSourceType,
                 highlightedNodeId = highlightedNodeId,
                 highlightedNames = highlightedNodeNames,
-                existingItems = uiState.value.items,
             )
             _uiState.update { state ->
                 state.copy(
@@ -304,16 +294,12 @@ class CloudDriveViewModel @AssistedInject constructor(
     /**
      * Handle item click - navigate to folder if it's a folder
      */
-    private fun onItemClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        if (uiState.value.isInSelectionMode) {
-            toggleItemSelection(nodeUiItem)
-            return
-        }
-        when (nodeUiItem.node) {
+    private fun onItemClicked(node: TypedNode) {
+        when (node) {
             is TypedFolderNode -> {
                 _uiState.update { state ->
                     state.copy(
-                        navigateToFolderEvent = triggered(nodeUiItem.node)
+                        navigateToFolderEvent = triggered(node)
                     )
                 }
             }
@@ -321,7 +307,7 @@ class CloudDriveViewModel @AssistedInject constructor(
             is TypedFileNode -> {
                 _uiState.update { state ->
                     state.copy(
-                        openedFileNode = nodeUiItem.node as TypedFileNode
+                        openedFileNode = node as TypedFileNode
                     )
                 }
             }
@@ -343,82 +329,6 @@ class CloudDriveViewModel @AssistedInject constructor(
     private fun onNavigateBackEventConsumed() {
         _uiState.update { state ->
             state.copy(navigateBack = consumed)
-        }
-    }
-
-    /**
-     * Handle item long click - toggle selection state
-     */
-    private fun onItemLongClicked(nodeUiItem: NodeUiItem<TypedNode>) {
-        toggleItemSelection(nodeUiItem)
-    }
-
-    private fun toggleItemSelection(nodeUiItem: NodeUiItem<TypedNode>) {
-        val updatedItems = uiState.value.items.map { item ->
-            if (item.node.id == nodeUiItem.node.id) {
-                item.copy(isSelected = !item.isSelected)
-            } else {
-                item
-            }
-        }
-        _uiState.update { state ->
-            state.copy(items = updatedItems)
-        }
-
-        // Cancel any ongoing multi-selection job if user manually deselects all items
-        if (!uiState.value.isInSelectionMode) {
-            nodeMultiSelectionJob?.cancel()
-        }
-    }
-
-    /**
-     * Deselect all items and reset selection state
-     */
-    private fun deselectAllItems() {
-        nodeMultiSelectionJob?.cancel()
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = false) }
-        _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
-        }
-    }
-
-    /**
-     * Select all items
-     */
-    private fun selectAllItems() {
-        nodeMultiSelectionJob?.cancel()
-        nodeMultiSelectionJob = viewModelScope.launch {
-            runCatching {
-                // Select all items that are already loaded
-                performAllItemSelection()
-                // If nodes are still loading, wait until fully loaded then select all
-                if (uiState.value.nodesLoadingState != NodesLoadingState.FullyLoaded) {
-                    _uiState.update { state ->
-                        state.copy(isSelecting = true)
-                    }
-                    uiState.first { it.nodesLoadingState == NodesLoadingState.FullyLoaded }
-                    if (isActive) {
-                        performAllItemSelection()
-                    }
-                }
-            }.onFailure {
-                _uiState.update { state ->
-                    state.copy(isSelecting = false)
-                }
-            }
-        }
-    }
-
-    private fun performAllItemSelection() {
-        val updatedItems = uiState.value.items.map { it.copy(isSelected = true) }
-        _uiState.update { state ->
-            state.copy(
-                items = updatedItems,
-                isSelecting = false
-            )
         }
     }
 

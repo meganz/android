@@ -61,10 +61,10 @@ import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.nodes.mapper.NodeSortConfigurationUiMapper
-import mega.privacy.android.shared.nodes.mapper.NodeUiItemMapper
+import mega.privacy.android.shared.nodes.mapper.NodeViewItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
-import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.NodeViewItem
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -91,7 +91,7 @@ class CloudDriveViewModelTest {
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
-    private val nodeUiItemMapper: NodeUiItemMapper = mock()
+    private val nodeViewItemMapper: NodeViewItemMapper = mock()
     private val getRootNodeIdUseCase: GetRootNodeIdUseCase = mock()
     private val setCloudSortOrderUseCase: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
@@ -133,7 +133,7 @@ class CloudDriveViewModelTest {
             monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase,
             monitorNodeUpdatesByIdUseCase,
-            nodeUiItemMapper,
+            nodeViewItemMapper,
             getRootNodeIdUseCase,
             setCloudSortOrderUseCase,
             nodeSortConfigurationUiMapper,
@@ -163,7 +163,7 @@ class CloudDriveViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
-            nodeUiItemMapper = nodeUiItemMapper,
+            nodeViewItemMapper = nodeViewItemMapper,
             getRootNodeIdUseCase = getRootNodeIdUseCase,
             getNodesByIdInChunkUseCase = getNodesByIdInChunkUseCase,
             setCloudSortOrderUseCase = setCloudSortOrderUseCase,
@@ -211,15 +211,13 @@ class CloudDriveViewModelTest {
         )
 
         val nodeUiItems = items.map { node ->
-            NodeUiItem(
+            NodeViewItem(
                 node = node,
-                isSelected = false
             )
         }
         whenever(
-            nodeUiItemMapper(
+            nodeViewItemMapper(
                 nodeList = items,
-                existingItems = emptyList(),
                 nodeSourceType = nodeSourceType,
                 isPublicNodes = false,
                 showPublicLinkCreationTime = false,
@@ -260,66 +258,6 @@ class CloudDriveViewModelTest {
         whenever(monitorAccountDetailUseCase()) doReturn MutableStateFlow(accountDetail)
     }
 
-    private suspend fun setupTestDataWithPartialLoad(items: List<TypedNode>) {
-        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
-        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
-            NodeSortConfiguration.default
-        )
-        val nodeInfo = mock<NodeInfo> {
-            on { name }.thenReturn("Test folder")
-            on { isNodeKeyDecrypted }.thenReturn(true)
-        }
-        whenever(getNodeInfoByIdUseCase(eq(folderNodeId))).thenReturn(nodeInfo)
-        whenever(getFileBrowserNodeChildrenUseCase(folderNodeHandle)).thenReturn(items)
-
-        // Setup the new chunked use case to return a flow with the items and hasMore = true (partial load)
-        whenever(getNodesByIdInChunkUseCase.invoke(folderNodeId)).thenReturn(
-            flowOf(
-                Pair(
-                    items,
-                    true
-                )
-            )
-        )
-
-        val nodeUiItems = items.map { node ->
-            NodeUiItem(
-                node = node,
-                isSelected = false
-            )
-        }
-        whenever(
-            nodeUiItemMapper(
-                nodeList = items,
-                existingItems = emptyList(),
-                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
-                isPublicNodes = false,
-                showPublicLinkCreationTime = false,
-                highlightedNodeId = null,
-                highlightedNames = null,
-                isContactVerificationOn = false,
-            )
-        ).thenReturn(nodeUiItems)
-        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
-        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
-        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(false))
-        whenever(monitorNodeUpdatesByIdUseCase(folderNodeId)).thenReturn(flowOf())
-
-        // Setup quota monitoring mocks
-        whenever(monitorStorageStateUseCase()).thenReturn(
-            MutableStateFlow(StorageState.Green)
-        )
-        whenever(monitorTransferOverQuotaUseCase()).thenReturn(flowOf(false))
-
-        // Setup contact verification mocks
-        whenever(getContactVerificationWarningUseCase()).thenReturn(false)
-        whenever(areCredentialsVerifiedUseCase(any())).thenReturn(false)
-        whenever(getIncomingShareParentUserEmailUseCase(any())).thenReturn(null)
-
-        // Setup permission check mock
-        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.OWNER)
-    }
-
     @Test
     fun `test that initial state is set correctly`() = runTest {
         setupTestData(emptyList())
@@ -332,7 +270,6 @@ class CloudDriveViewModelTest {
             assertThat(initialState.isHiddenNodeSettingsLoading).isTrue()
             assertThat(initialState.isLoading).isTrue()
             assertThat(initialState.items).isEmpty()
-            assertThat(initialState.isInSelectionMode).isFalse()
             assertThat(initialState.navigateToFolderEvent).isEqualTo(consumed())
             assertThat(initialState.navigateBack).isEqualTo(consumed)
             assertThat(initialState.showHiddenNodes).isFalse()
@@ -416,16 +353,12 @@ class CloudDriveViewModelTest {
 
             // Ensure that nodeUiItemMapper is mocked for the node update scenario
             val updatedNodeUiItems = listOf(
-                NodeUiItem(node = node1, isSelected = false),
-                NodeUiItem(node = node2, isSelected = false)
+                NodeViewItem(node = node1),
+                NodeViewItem(node = node2)
             )
             whenever(
-                nodeUiItemMapper(
+                nodeViewItemMapper(
                     nodeList = listOf(node1, node2),
-                    existingItems = listOf(
-                        NodeUiItem(node = node1, isSelected = false),
-                        NodeUiItem(node = node2, isSelected = false)
-                    ),
                     nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                     isPublicNodes = false,
                     showPublicLinkCreationTime = false,
@@ -574,84 +507,17 @@ class CloudDriveViewModelTest {
             assertThat(loadedState.items).hasSize(2)
             assertThat(loadedState.items[0].node.id).isEqualTo(NodeId(1L))
             assertThat(loadedState.items[1].node.id).isEqualTo(NodeId(2L))
-            assertThat(loadedState.items[0].isSelected).isFalse()
-            assertThat(loadedState.items[1].isSelected).isFalse()
         }
     }
 
     @Test
-    fun `test that ItemLongClicked action toggles item selection and updates items state`() =
-        runTest {
-            val node1 = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-                on { name } doReturn "Test Node 1"
-            }
-            val node2 = mock<TypedNode> {
-                on { id } doReturn NodeId(2L)
-                on { name } doReturn "Test Node 2"
-            }
-
-            setupTestData(listOf(node1, node2))
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                awaitItem()
-                val loadedState = awaitItem()
-
-                val nodeUiItem1 = loadedState.items[0]
-                underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-                val updatedState = awaitItem()
-
-                assertThat(updatedState.isInSelectionMode).isTrue()
-                assertThat(updatedState.items[0].isSelected).isTrue()
-                assertThat(updatedState.items[1].isSelected).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that ItemClicked action in selection mode toggles item selection`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-            on { name } doReturn "Test Node 1"
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-            on { name } doReturn "Test Node 2"
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-            awaitItem()
-
-            val nodeUiItem2 = loadedState.items[1]
-            underTest.processAction(CloudDriveAction.ItemClicked(nodeUiItem2))
-            val updatedState = awaitItem()
-
-            assertThat(updatedState.isInSelectionMode).isTrue()
-            assertThat(updatedState.items[0].isSelected).isTrue()
-            assertThat(updatedState.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that ItemClicked action in normal mode navigates to folder`() = runTest {
+    fun `test that ItemClicked action navigates to folder`() = runTest {
         setupTestData(emptyList())
         val underTest = createViewModel()
 
         val folderNode = mock<TypedFolderNode>()
-        val nodeUiItem = NodeUiItem<TypedNode>(
-            node = folderNode,
-            isSelected = false
-        )
 
-        underTest.processAction(CloudDriveAction.ItemClicked(nodeUiItem))
+        underTest.processAction(CloudDriveAction.ItemClicked(folderNode))
 
         underTest.uiState.test {
             val updatedState = awaitItem()
@@ -661,367 +527,13 @@ class CloudDriveViewModelTest {
 
 
     @Test
-    fun `test that DeselectAllItems action deselects all items in state`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify initial state
-        val loadedState = underTest.uiState.value
-        assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
-
-        underTest.processAction(CloudDriveAction.SelectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        underTest.processAction(CloudDriveAction.DeselectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        val updatedState = underTest.uiState.value
-        assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
-        assertThat(updatedState.items[0].isSelected).isFalse()
-        assertThat(updatedState.items[1].isSelected).isFalse()
-    }
-
-    @Test
-    fun `test that DeselectAllItems action does nothing when no items are selected`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            underTest.processAction(CloudDriveAction.DeselectAllItems)
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-            assertThat(loadedState.items[0].isSelected).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that SelectAllItems action does nothing when no items exist`() = runTest {
-        setupTestData(emptyList())
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            underTest.processAction(CloudDriveAction.SelectAllItems)
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-            assertThat(loadedState.items).isEmpty()
-        }
-    }
-
-    @Test
-    fun `test that SelectAllItems selects all items when nodes are fully loaded`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify we're in fully loaded state
-        val fullyLoadedState = underTest.uiState.value
-        assertThat(fullyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
-
-        underTest.processAction(CloudDriveAction.SelectAllItems)
-        // Advance the coroutine to let it execute
-        testScheduler.advanceUntilIdle()
-
-        val stateAfterSelectAll = underTest.uiState.value
-        // Verify that isSelecting is false and all items are selected
-        assertThat(stateAfterSelectAll.isSelecting).isFalse()
-        assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
-        assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
-        assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
-    }
-
-    @Test
-    fun `test that SelectAllItems sets isSelecting to true when nodes are partially loaded`() =
-        runTest {
-            val node1 = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-            }
-            val node2 = mock<TypedNode> {
-                on { id } doReturn NodeId(2L)
-            }
-
-            // Setup test data with hasMore = true to simulate partially loaded state
-            setupTestDataWithPartialLoad(listOf(node1, node2))
-            val underTest = createViewModel()
-
-            // Wait for initial loading to complete
-            testScheduler.advanceUntilIdle()
-
-            // Verify we're in partially loaded state
-            val partiallyLoadedState = underTest.uiState.value
-            assertThat(partiallyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
-
-            underTest.processAction(CloudDriveAction.SelectAllItems)
-            // Advance the coroutine to let it execute
-            testScheduler.advanceUntilIdle()
-
-            val stateAfterSelectAll = underTest.uiState.value
-            // Verify that isSelecting is true because nodes are not fully loaded and selection is pending
-            assertThat(stateAfterSelectAll.isSelecting).isTrue()
-            assertThat(stateAfterSelectAll.isInSelectionMode).isTrue()
-            assertThat(stateAfterSelectAll.items[0].isSelected).isTrue()
-            assertThat(stateAfterSelectAll.items[1].isSelected).isTrue()
-        }
-
-    @Test
-    fun `test that DeselectAllItems sets isSelecting to false`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify initial state
-        val loadedState = underTest.uiState.value
-        assertThat(loadedState.nodesLoadingState).isEqualTo(NodesLoadingState.FullyLoaded)
-
-        // First select all items
-        underTest.processAction(CloudDriveAction.SelectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        // Then deselect all items
-        underTest.processAction(CloudDriveAction.DeselectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        val updatedState = underTest.uiState.value
-        assertThat(updatedState.isInSelectionMode).isFalse()
-        assertThat(updatedState.isSelecting).isFalse()
-        assertThat(updatedState.items[0].isSelected).isFalse()
-        assertThat(updatedState.items[1].isSelected).isFalse()
-    }
-
-    @Test
-    fun `test that DeselectAllItems cancels pending selection job`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        // Setup test data with hasMore = true to simulate partially loaded state
-        setupTestDataWithPartialLoad(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        // Wait for initial loading to complete
-        testScheduler.advanceUntilIdle()
-
-        // Verify we're in partially loaded state
-        val partiallyLoadedState = underTest.uiState.value
-        assertThat(partiallyLoadedState.nodesLoadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
-
-        // Trigger select all while partially loaded
-        underTest.processAction(CloudDriveAction.SelectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        val stateAfterSelectAll = underTest.uiState.value
-        // Verify isSelecting is true
-        assertThat(stateAfterSelectAll.isSelecting).isTrue()
-
-        // Now deselect all items - this should cancel the pending selection job
-        underTest.processAction(CloudDriveAction.DeselectAllItems)
-        testScheduler.advanceUntilIdle()
-
-        val stateAfterDeselect = underTest.uiState.value
-        // Verify isSelecting is false and items are not selected
-        assertThat(stateAfterDeselect.isSelecting).isFalse()
-        assertThat(stateAfterDeselect.isInSelectionMode).isFalse()
-        assertThat(stateAfterDeselect.items[0].isSelected).isFalse()
-        assertThat(stateAfterDeselect.items[1].isSelected).isFalse()
-    }
-
-
-    @Test
-    fun `test that toggleItemSelection removes item from selection when already selected`() =
-        runTest {
-            val node1 = mock<TypedNode> {
-                on { id } doReturn NodeId(1L)
-            }
-
-            setupTestData(listOf(node1))
-            val underTest = createViewModel()
-
-            underTest.uiState.test {
-                awaitItem()
-                val loadedState = awaitItem()
-
-                val nodeUiItem1 = loadedState.items[0]
-                underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-                val stateAfterSelection = awaitItem()
-
-                val updatedNodeUiItem1 = stateAfterSelection.items[0]
-                underTest.processAction(CloudDriveAction.ItemLongClicked(updatedNodeUiItem1))
-                val updatedState = awaitItem()
-
-                assertThat(updatedState.isInSelectionMode).isFalse()
-                assertThat(updatedState.items[0].isSelected).isFalse()
-            }
-        }
-
-    @Test
-    fun `test that isInSelectionMode is true when items are selected`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-            val state = awaitItem()
-
-            assertThat(state.isInSelectionMode).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that isInSelectionMode is false when no items are selected`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            assertThat(loadedState.isInSelectionMode).isFalse()
-        }
-    }
-
-    @Test
-    fun `test that multiple items can be selected`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-            awaitItem()
-
-            val nodeUiItem2 = loadedState.items[1]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem2))
-            val updatedState = awaitItem()
-
-            assertThat(updatedState.isInSelectionMode).isTrue()
-            assertThat(updatedState.items[0].isSelected).isTrue()
-            assertThat(updatedState.items[1].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that selection state is maintained when items are updated`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-
-        setupTestData(listOf(node1))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-            val state = awaitItem()
-
-            assertThat(state.isInSelectionMode).isTrue()
-            assertThat(state.items[0].isSelected).isTrue()
-        }
-    }
-
-    @Test
-    fun `test that selection state is preserved when loading new items`() = runTest {
-        val node1 = mock<TypedNode> {
-            on { id } doReturn NodeId(1L)
-        }
-        val node2 = mock<TypedNode> {
-            on { id } doReturn NodeId(2L)
-        }
-
-        setupTestData(listOf(node1, node2))
-        val underTest = createViewModel()
-
-        underTest.uiState.test {
-            awaitItem()
-            val loadedState = awaitItem()
-
-            val nodeUiItem1 = loadedState.items[0]
-            underTest.processAction(CloudDriveAction.ItemLongClicked(nodeUiItem1))
-            val stateAfterSelection = awaitItem()
-
-            assertThat(stateAfterSelection.isInSelectionMode).isTrue()
-            assertThat(stateAfterSelection.items[0].isSelected).isTrue()
-            assertThat(stateAfterSelection.items[1].isSelected).isFalse()
-        }
-    }
-
-    @Test
     fun `test that NavigateToFolderEventConsumed action consumes the navigation event`() = runTest {
         setupTestData(emptyList())
         val underTest = createViewModel()
 
         val folderNode = mock<TypedFolderNode>()
-        val nodeUiItem = mock<NodeUiItem<TypedNode>> {
-            on { node } doReturn folderNode
-            on { id } doReturn folderNodeId
-        }
 
-        underTest.processAction(CloudDriveAction.ItemClicked(nodeUiItem))
+        underTest.processAction(CloudDriveAction.ItemClicked(folderNode))
         underTest.uiState.test {
             val stateAfterClick = awaitItem()
             underTest.processAction(CloudDriveAction.NavigateToFolderEventConsumed)

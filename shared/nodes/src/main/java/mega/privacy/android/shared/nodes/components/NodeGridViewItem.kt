@@ -47,60 +47,9 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-
-/**
- * Node grid view item using NodeUiItem
- *
- * @param nodeUiItem The NodeUiItem containing all UI properties
- * @param modifier Optional [Modifier] to be applied to the component
- * @param isInSelectionMode Whether the grid is in selection mode (shows checkbox instead of more menu)
- * @param highlightText Text to highlight in the node name
- * @param onItemClicked Callback invoked when the item is clicked
- * @param onLongClicked Callback invoked when the item is long-pressed
- * @param onMenuClicked Callback invoked when the more options menu is clicked
- */
-@Composable
-fun <T : TypedNode> NodeGridViewItem(
-    nodeUiItem: NodeUiItem<T>,
-    modifier: Modifier = Modifier,
-    isInSelectionMode: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
-    enabled: Boolean = true,
-    highlightText: String = "",
-    onMenuClicked: ((NodeUiItem<T>) -> Unit)? = null,
-    onLongClicked: ((NodeUiItem<T>) -> Unit)? = null,
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-) {
-    NodeGridViewItem(
-        name = nodeUiItem.title.text,
-        iconRes = nodeUiItem.iconRes,
-        thumbnailData = nodeUiItem.thumbnailData,
-        isTakenDown = nodeUiItem.isTakenDown,
-        modifier = modifier,
-        duration = nodeUiItem.duration,
-        isSelected = nodeUiItem.isSelected,
-        isInSelectionMode = isInSelectionMode,
-        isFolderNode = nodeUiItem.isFolderNode,
-        isVideoNode = nodeUiItem.isVideoNode,
-        highlightText = highlightText,
-        onClick = { onItemClicked(nodeUiItem) },
-        onLongClick = onLongClicked?.let { { onLongClicked(nodeUiItem) } },
-        onMenuClick = onMenuClicked?.let { { onMenuClicked(nodeUiItem) } },
-        isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
-        enabled = enabled,
-        showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
-        isHighlighted = nodeUiItem.isHighlighted,
-        showLink = nodeUiItem.showLink,
-        showFavourite = nodeUiItem.showFavourite,
-        label = nodeUiItem.nodeLabel,
-    )
-}
-
 
 /**
  * Node grid view item component for displaying files and folders in a grid layout.

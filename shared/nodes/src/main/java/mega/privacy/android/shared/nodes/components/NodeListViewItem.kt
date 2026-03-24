@@ -29,7 +29,6 @@ import mega.android.core.ui.components.checkbox.Checkbox
 import mega.android.core.ui.components.chip.HighlightChip
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
-import mega.android.core.ui.components.text.HighlightedText
 import mega.android.core.ui.components.util.normalize
 import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.preview.CombinedThemePreviews
@@ -41,72 +40,10 @@ import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.domain.entity.NodeLabel
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.shared.nodes.model.text
 
-/**
- * Node list item using NodeUiItem
- *
- * @param nodeUiItem The NodeUiItem containing all UI properties
- * @param modifier [Modifier] to be applied to the item
- * @param titleColor Color for the title text
- * @param subtitleColor Color for the subtitle text
- * @param isInSelectionMode if true, the item is in selection mode
- * @param onMoreClicked Callback for when the more options icon is clicked
- * @param onItemClicked Callback for when the item is clicked
- * @param onLongClicked Callback for when the item is long clicked
- * @param onInfoClicked Callback for when the info icon is clicked
- */
-@Composable
-fun <T : TypedNode> NodeListViewItem(
-    nodeUiItem: NodeUiItem<T>,
-    modifier: Modifier = Modifier,
-    titleColor: TextColor = TextColor.Primary,
-    subtitleColor: TextColor = TextColor.Secondary,
-    isInSelectionMode: Boolean = false,
-    isHiddenNodesEnabled: Boolean = false,
-    enabled: Boolean = true,
-    highlightText: String = "",
-    onMoreClicked: ((NodeUiItem<T>) -> Unit)? = null,
-    onLongClicked: ((NodeUiItem<T>) -> Unit)? = null,
-    onInfoClicked: (() -> Unit)? = null,
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-) {
-    NodeListViewItem(
-        title = nodeUiItem.title.text,
-        subtitle = nodeUiItem.subtitle.text(),
-        icon = nodeUiItem.iconRes,
-        modifier = modifier,
-        description = nodeUiItem.formattedDescription?.text,
-        tags = nodeUiItem.tags,
-        thumbnailData = nodeUiItem.thumbnailData,
-        titleColor = titleColor,
-        subtitleColor = subtitleColor,
-        accessPermissionIcon = nodeUiItem.accessPermissionIcon,
-        highlightText = highlightText,
-        showOffline = nodeUiItem.isAvailableOffline,
-        showVersion = nodeUiItem.hasVersion,
-        isSelected = nodeUiItem.isSelected,
-        isInSelectionMode = isInSelectionMode,
-        showIsVerified = nodeUiItem.showIsVerified,
-        isTakenDown = nodeUiItem.isTakenDown,
-        label = nodeUiItem.nodeLabel,
-        showLink = nodeUiItem.showLink,
-        showFavourite = nodeUiItem.showFavourite,
-        isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
-        showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
-        enabled = enabled,
-        isHighlighted = nodeUiItem.isHighlighted,
-        onMoreClicked = onMoreClicked?.let { { onMoreClicked(nodeUiItem) } },
-        onInfoClicked = onInfoClicked,
-        onItemClicked = { onItemClicked(nodeUiItem) },
-        onLongClicked = onLongClicked?.let { { onLongClicked(nodeUiItem) } },
-    )
-}
 
 /**
  * Node list item
@@ -171,8 +108,8 @@ fun NodeListViewItem(
     enableClick: Boolean = enabled,
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
-    onItemClicked: () -> Unit,
     onLongClicked: (() -> Unit)? = null,
+    onItemClicked: () -> Unit,
 ) {
     GenericListItem(
         modifier = modifier,

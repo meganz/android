@@ -14,9 +14,10 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
 
 /**
  * Composable for showing a grid of [NodeUiItem] with optional header for sort and view type
@@ -39,11 +40,11 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun <T : TypedNode> NodeGridView(
-    nodeUiItems: List<NodeUiItem<T>>,
-    onMenuClicked: (NodeUiItem<T>) -> Unit,
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClicked: (NodeUiItem<T>) -> Unit,
+internal fun <T : TypedNode> NodeGridView(
+    nodeUiItems: List<SelectableTypedNode<T>>,
+    onMenuClicked: (T) -> Unit,
+    onItemClicked: (T) -> Unit,
+    onLongClicked: (T) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     sortConfiguration: NodeSortConfiguration,
     onSortOrderClick: () -> Unit,
@@ -103,14 +104,28 @@ fun <T : TypedNode> NodeGridView(
                 nodeUiItems[it].id.longValue
             },
         ) {
+            val nodeUiItem = nodeUiItems[it]
             NodeGridViewItem(
-                nodeUiItem = nodeUiItems[it],
+                name = nodeUiItem.title.text,
+                iconRes = nodeUiItem.iconRes,
+                thumbnailData = nodeUiItem.thumbnailData,
+                isTakenDown = nodeUiItem.isTakenDown,
+                modifier = modifier,
+                duration = nodeUiItem.duration,
+                isSelected = nodeUiItem.isSelected,
                 isInSelectionMode = inSelectionMode,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                isFolderNode = nodeUiItem.isFolderNode,
+                isVideoNode = nodeUiItem.isVideoNode,
                 highlightText = highlightText,
-                onItemClicked = onItemClicked,
-                onLongClicked = onLongClicked,
-                onMenuClicked = onMenuClicked,
+                onClick = { onItemClicked(nodeUiItem.node) },
+                onLongClick = { onLongClicked(nodeUiItem.node) },
+                onMenuClick = { onMenuClicked(nodeUiItem.node) },
+                isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
+                showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
+                isHighlighted = nodeUiItem.isHighlighted,
+                showLink = nodeUiItem.showLink,
+                showFavourite = nodeUiItem.showFavourite,
+                label = nodeUiItem.nodeLabel,
             )
         }
 

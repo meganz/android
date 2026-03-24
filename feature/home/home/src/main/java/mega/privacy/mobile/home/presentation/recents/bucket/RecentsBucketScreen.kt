@@ -28,20 +28,17 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
-import mega.privacy.android.core.nodecomponents.action.NodeSourceData
-import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
-import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
-import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
-import mega.privacy.android.shared.nodes.components.NodeListView
-import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
-import mega.privacy.android.shared.nodes.model.NodeUiItem
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.extensions.delayedTrue
 import mega.android.core.ui.modifiers.excludingBottomPadding
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
+import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.NodeSourceData
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeAppBar
+import mega.privacy.android.core.nodecomponents.components.selectionmode.NodeSelectionModeBottomBar
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -51,6 +48,9 @@ import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.TransfersNavKey
+import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.RecentsBucketScreenEvent
 import mega.privacy.mobile.home.presentation.recents.bucket.model.RecentsBucketUiState
@@ -264,22 +264,21 @@ internal fun RecentsBucketScreenContent(
                         onLongClick = onLongClick,
                     )
                 } else {
-                    NodeListView(
-                        nodeUiItemList = uiState.items,
-                        onMenuClick = onMenuClick,
-                        onItemClicked = { item ->
-                            onItemClicked(item)
-                        },
+                    NodesView(
+                        items = uiState.items,
+                        onMenuClicked = onMenuClick,
+                        onItemClicked = onItemClicked,
                         listContentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
-                        onLongClick = onLongClick,
+                        onLongClicked = onLongClick,
                         onEnterMediaDiscoveryClick = { /** No-op */ },
                         sortConfiguration = NodeSortConfiguration.default,
                         onSortOrderClick = { /** No-op */ },
-                        onChangeViewTypeClick = { /** No-op */ },
+                        onChangeViewTypeClicked = { /** No-op */ },
                         showSortOrder = false,
                         listState = listState,
                         showMediaDiscoveryButton = false,
                         showChangeViewType = false,
+                        isListView = true,
                     )
                 }
             }

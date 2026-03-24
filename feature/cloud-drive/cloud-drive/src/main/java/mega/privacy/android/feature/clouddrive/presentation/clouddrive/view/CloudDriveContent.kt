@@ -52,13 +52,13 @@ import mega.privacy.android.core.nodecomponents.upload.rememberCaptureHandler
 import mega.privacy.android.core.nodecomponents.upload.rememberUploadHandler
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ChangeViewTypeClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemClicked
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.ItemLongClicked
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateBackEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.NavigateToFolderEventConsumed
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.OpenedFileNodeHandled
@@ -76,6 +76,7 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveChildNodeMoreButtonPressedEvent
 import mega.privacy.mobile.analytics.event.CloudDriveEmptyStateAddFilesPressedEvent
@@ -101,6 +102,10 @@ internal fun CloudDriveContent(
     onNavigateBack: () -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
     onSortNodes: (NodeSortConfiguration) -> Unit,
+    selectionState: NodeSelectionState,
+    isInSelectionMode: Boolean,
+    selectedItemsCount: Int,
+    selectedNodes: List<TypedNode>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp, 0.dp),
     listState: LazyListState = rememberLazyListState(),
@@ -154,9 +159,9 @@ internal fun CloudDriveContent(
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(uiState.selectedItemsCount) {
+    LaunchedEffect(selectedItemsCount) {
         nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-            uiState.selectedNodes.toSet(),
+            selectedNodes.toSet(),
             nodeSourceType = uiState.nodeSourceType
         )
     }
@@ -165,14 +170,14 @@ internal fun CloudDriveContent(
         event = nodeActionState.actionTriggeredEvent,
         onConsumed = nodeOptionsActionViewModel::resetActionTriggered
     ) {
-        onAction(CloudDriveAction.DeselectAllItems)
+        selectionState.deselectAll()
     }
 
     EventEffect(
         event = nodeActionState.dismissEvent,
         onConsumed = nodeOptionsActionViewModel::resetDismiss
     ) {
-        onAction(CloudDriveAction.DeselectAllItems)
+        selectionState.deselectAll()
     }
 
     Column(
@@ -233,28 +238,35 @@ internal fun CloudDriveContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f),
-                    listContentPadding = PaddingValues(
-                        top = topPadding,
-                        bottom = contentPadding.calculateSafeBottomPadding()
-                    ),
-                    listState = listState,
-                    gridState = gridState,
-                    spanCount = spanCount,
-                    items = uiState.items,
-                    isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
-                    isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
-                    showHiddenNodes = uiState.showHiddenNodes,
-                    onMenuClicked = {
-                        Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
-                        navigationHandler.navigate(
-                            NodeOptionsBottomSheetNavKey(
-                                nodeHandle = it.id.longValue,
-                                nodeSourceType = uiState.nodeSourceType,
-                            )
+
+                listContentPadding = PaddingValues(
+                    top = topPadding,
+                    bottom = contentPadding.calculateSafeBottomPadding()
+                ),
+                listState = listState,
+                gridState = gridState,
+                spanCount = spanCount,
+                items = uiState.items,
+                isNextPageLoading = uiState.nodesLoadingState == NodesLoadingState.PartiallyLoaded,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
+                showHiddenNodes = uiState.showHiddenNodes,
+                onMenuClicked = {
+                    Analytics.tracker.trackEvent(CloudDriveChildNodeMoreButtonPressedEvent)
+                    navigationHandler.navigate(
+                        NodeOptionsBottomSheetNavKey(
+                            nodeHandle = it.id.longValue,
+                            nodeSourceType = uiState.nodeSourceType,
                         )
-                    },
-                    onItemClicked = { onAction(ItemClicked(it)) },
-                    onLongClicked = { onAction(ItemLongClicked(it)) },
+                    )
+                },
+                onItemClicked = {
+                    if (isInSelectionMode) {
+                        selectionState.toggleSelection(it.id)
+                    } else {
+                        onAction(ItemClicked(it))
+                    }
+                },
+                onLongClicked = { selectionState.toggleSelection(it.id) },
                     sortConfiguration = uiState.selectedSortConfiguration,
                     isListView = isListView,
                     onSortOrderClick = {
@@ -273,7 +285,7 @@ internal fun CloudDriveContent(
                             )
                         )
                     },
-                    inSelectionMode = uiState.isInSelectionMode,
+                    inSelectionMode = isInSelectionMode,
                     isContactVerificationOn = uiState.isContactVerificationOn,
                     bannerHeader = if (showOverQuotaWarning) {
                         {
@@ -287,9 +299,9 @@ internal fun CloudDriveContent(
                                 },
                             )
                         }
-                    } else null
-                )
-            }
+                    } else null,
+                nodeSelectionState = selectionState,
+            )}
         }
 
         EventEffect(

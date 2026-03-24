@@ -13,11 +13,13 @@ import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.tokens.theme.DSTokens
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.shared.nodes.components.previewdata.FolderNodePreviewDataProvider
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.model.NodeUiItem
+import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.SelectableTypedNode
 
 /**
  * Composable for showing a list of [NodeUiItem] in a lazy column with optional header for sort and view type
@@ -40,11 +42,11 @@ import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
  * @param isContactVerificationOn whether contact verification is enabled
  */
 @Composable
-fun <T : TypedNode> NodeListView(
-    nodeUiItemList: List<NodeUiItem<T>>,
-    onMenuClick: (NodeUiItem<T>) -> Unit,
-    onItemClicked: (NodeUiItem<T>) -> Unit,
-    onLongClick: (NodeUiItem<T>) -> Unit,
+internal fun <T : TypedNode> NodeListView(
+    nodeUiItemList: List<SelectableTypedNode<T>>,
+    onMenuClick: (T) -> Unit,
+    onItemClicked: (T) -> Unit,
+    onLongClick: (T) -> Unit,
     onEnterMediaDiscoveryClick: () -> Unit,
     sortConfiguration: NodeSortConfiguration,
     onSortOrderClick: () -> Unit,
@@ -98,14 +100,32 @@ fun <T : TypedNode> NodeListView(
                 nodeUiItemList[it].id.longValue
             }
         ) {
+            val nodeUiItem = nodeUiItemList[it]
             NodeListViewItem(
-                nodeUiItem = nodeUiItemList[it],
-                isInSelectionMode = inSelectionMode,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                title = nodeUiItem.title.text,
+                subtitle = nodeUiItem.subtitle.text(),
+                icon = nodeUiItem.iconRes,
+                modifier = modifier,
+                description = nodeUiItem.formattedDescription?.text,
+                tags = nodeUiItem.tags,
+                thumbnailData = nodeUiItem.thumbnailData,
+                accessPermissionIcon = nodeUiItem.accessPermissionIcon,
                 highlightText = highlightText,
-                onMoreClicked = onMenuClick,
-                onItemClicked = onItemClicked,
-                onLongClicked = onLongClick,
+                showOffline = nodeUiItem.isAvailableOffline,
+                showVersion = nodeUiItem.hasVersion,
+                isSelected = nodeUiItem.isSelected,
+                isInSelectionMode = inSelectionMode,
+                showIsVerified = nodeUiItem.showIsVerified,
+                isTakenDown = nodeUiItem.isTakenDown,
+                label = nodeUiItem.nodeLabel,
+                showLink = nodeUiItem.showLink,
+                showFavourite = nodeUiItem.showFavourite,
+                isSensitive = nodeUiItem.isSensitive && isHiddenNodesEnabled,
+                showBlurEffect = nodeUiItem.showBlurEffect && isHiddenNodesEnabled,
+                isHighlighted = nodeUiItem.isHighlighted,
+                onMoreClicked = { onMenuClick(nodeUiItem.node) },
+                onItemClicked = { onItemClicked(nodeUiItem.node) },
+                onLongClicked = { onLongClick(nodeUiItem.node) },
             )
         }
 
@@ -121,7 +141,7 @@ fun <T : TypedNode> NodeListView(
 @CombinedThemePreviews
 @Composable
 private fun NodeListViewPreview(
-    @PreviewParameter(FolderNodePreviewDataProvider::class) items: List<NodeUiItem<TypedFolderNode>>,
+    @PreviewParameter(FolderNodePreviewDataProvider::class) items: List<SelectableTypedNode<TypedFolderNode>>,
 ) {
     AndroidThemeForPreviews {
         NodeListView(

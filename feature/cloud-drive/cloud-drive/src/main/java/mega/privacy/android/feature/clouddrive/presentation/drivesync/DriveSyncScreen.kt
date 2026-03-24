@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -38,12 +40,10 @@ import mega.privacy.android.core.nodecomponents.upload.ScanDocumentViewModel
 import mega.privacy.android.core.sharedcomponents.menu.CommonAppBarAction
 import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.CloudDriveViewModel
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.DeselectAllItems
-import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.CloudDriveAction.SelectAllItems
+import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.computeSelectedItemsCount
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.model.searchNavKey
 import mega.privacy.android.feature.clouddrive.presentation.clouddrive.view.CloudDriveContent
 import mega.privacy.android.feature.sync.ui.settings.SyncSettingsBottomSheetViewM3
@@ -56,6 +56,7 @@ import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveBottomToolBarMoreMenuItemEvent
 import mega.privacy.mobile.analytics.event.CloudDriveFABPressedEvent
@@ -85,7 +86,40 @@ internal fun DriveSyncScreen(
 ) {
     val cloudDriveUiState by cloudDriveViewModel.uiState.collectAsStateWithLifecycle()
 
-    ReportSelectionMode(isInSelectionMode = cloudDriveUiState.isInSelectionMode)
+    val selectionState = rememberNodeSelectionState()
+
+    val isInSelectionMode by remember {
+        derivedStateOf { selectionState.isInSelectionMode }
+    }
+    val selectedItemsCount by remember {
+        derivedStateOf {
+            cloudDriveUiState.computeSelectedItemsCount(
+                selectedIds = selectionState.selectedNodeIds,
+            )
+        }
+    }
+    val isAllSelected by remember {
+        derivedStateOf {
+            selectedItemsCount == cloudDriveUiState.visibleItemsCount && cloudDriveUiState.visibleItemsCount > 0
+        }
+    }
+    val selectedNodes by remember {
+        derivedStateOf {
+            val ids = selectionState.selectedNodeIds
+            cloudDriveUiState.items.mapNotNull { item ->
+                if (item.node.id in ids) item.node else null
+            }
+        }
+    }
+
+    // Select-all-during-partial-load
+    LaunchedEffect(selectionState.selectAllAwaitingMoreItems, cloudDriveUiState.nodesLoadingState) {
+        if (selectionState.selectAllAwaitingMoreItems) {
+            selectionState.selectAll(cloudDriveUiState.items.map { it.node.id }.toSet(), cloudDriveUiState.nodesLoadingState)
+        }
+    }
+
+    ReportSelectionMode(isInSelectionMode = isInSelectionMode)
 
     val megaNavigator = viewModel.megaNavigator
     var showUploadOptionsBottomSheet by rememberSaveable { mutableStateOf(false) }
@@ -98,8 +132,8 @@ internal fun DriveSyncScreen(
         megaNavigator = megaNavigator
     )
 
-    BackHandler(enabled = cloudDriveUiState.isInSelectionMode) {
-        cloudDriveViewModel.processAction(DeselectAllItems)
+    BackHandler(enabled = isInSelectionMode) {
+        selectionState.deselectAll()
     }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -107,14 +141,17 @@ internal fun DriveSyncScreen(
             .fillMaxSize()
             .semantics { testTagsAsResourceId = true },
         topBar = {
-            if (cloudDriveUiState.isInSelectionMode) {
+            if (isInSelectionMode) {
                 NodeSelectionModeAppBar(
                     modifier = Modifier.testTag(DRIVE_SYNCS_SELECTION_MODE_APP_BAR_TAG),
-                    count = cloudDriveUiState.selectedItemsCount,
-                    isAllSelected = cloudDriveUiState.isAllSelected,
-                    isSelecting = cloudDriveUiState.nodesLoadingState != NodesLoadingState.FullyLoaded,
-                    onSelectAllClicked = { cloudDriveViewModel.processAction(SelectAllItems) },
-                    onCancelSelectionClicked = { cloudDriveViewModel.processAction(DeselectAllItems) }
+                    count = selectedItemsCount,
+                    isAllSelected = isAllSelected,
+                    isSelecting = selectionState.selectAllAwaitingMoreItems,
+                    onSelectAllClicked = {
+                        val allIds = cloudDriveUiState.items.map { it.node.id }.toSet()
+                        selectionState.selectAll(allIds, cloudDriveUiState.nodesLoadingState)
+                    },
+                    onCancelSelectionClicked = { selectionState.deselectAll() }
                 )
             } else {
                 MegaTopAppBar(
@@ -150,10 +187,10 @@ internal fun DriveSyncScreen(
                 modifier = Modifier.testTag(DRIVE_SYNCS_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
-                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && cloudDriveUiState.isInSelectionMode,
+                visible = nodeOptionsActionUiState.visibleActions.isNotEmpty() && isInSelectionMode,
                 multiNodeActionHandler = selectionModeActionHandler,
-                selectedNodes = cloudDriveUiState.selectedNodes,
-                isSelecting = cloudDriveUiState.isSelecting,
+                selectedNodes = selectedNodes,
+                isSelecting = selectionState.selectAllAwaitingMoreItems,
                 onMoreClicked = {
                     Analytics.tracker.trackEvent(CloudDriveBottomToolBarMoreMenuItemEvent)
                 }
@@ -161,7 +198,7 @@ internal fun DriveSyncScreen(
         },
         floatingActionButton = {
             val showFab =
-                selectedTabIndex == 0 && !cloudDriveUiState.isInSelectionMode && !cloudDriveUiState.isEmpty
+                selectedTabIndex == 0 && !isInSelectionMode && !cloudDriveUiState.isEmpty
 
             AddContentFab(
                 modifier = Modifier
@@ -180,8 +217,8 @@ internal fun DriveSyncScreen(
                 .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
             beyondViewportPageCount = 1,
-            hideTabs = cloudDriveUiState.isInSelectionMode,
-            pagerScrollEnabled = !cloudDriveUiState.isInSelectionMode,
+            hideTabs = isInSelectionMode,
+            pagerScrollEnabled = !isInSelectionMode,
             cells = {
                 addTextTabWithScrollableContent(
                     tabItem = TabItems(
@@ -204,6 +241,10 @@ internal fun DriveSyncScreen(
                         },
                         onSortNodes = cloudDriveViewModel::setCloudSortOrder,
                         nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+                        selectionState = selectionState,
+                        isInSelectionMode = isInSelectionMode,
+                        selectedItemsCount = selectedItemsCount,
+                        selectedNodes = selectedNodes,
                         modifier = modifier,
                     )
                 }
@@ -263,8 +304,8 @@ internal fun DriveSyncScreen(
         )
     }
 
-    LaunchedEffect(cloudDriveUiState.isInSelectionMode) {
-        setNavigationBarVisibility(!cloudDriveUiState.isInSelectionMode)
+    LaunchedEffect(isInSelectionMode) {
+        setNavigationBarVisibility(!isInSelectionMode)
     }
 
     @SuppressLint("ComposeViewModelForwarding")

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.clouddrive.presentation.clouddrive.model
 
-import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.domain.entity.node.TypedNode
 
 /**
@@ -11,12 +10,7 @@ sealed interface CloudDriveAction {
     /**
      * Item clicked action
      */
-    data class ItemClicked(val nodeUiItem: NodeUiItem<TypedNode>) : CloudDriveAction
-
-    /**
-     * Item long clicked action
-     */
-    data class ItemLongClicked(val nodeUiItem: NodeUiItem<TypedNode>) : CloudDriveAction
+    data class ItemClicked(val node: TypedNode) : CloudDriveAction
 
     /**
      * Change view type clicked action
@@ -27,16 +21,6 @@ sealed interface CloudDriveAction {
      * Opened file node handled action
      */
     data object OpenedFileNodeHandled : CloudDriveAction
-
-    /**
-     * Select all items action
-     */
-    data object SelectAllItems : CloudDriveAction
-
-    /**
-     * Deselect all items action
-     */
-    data object DeselectAllItems : CloudDriveAction
 
     /**
      * Navigate to folder event consumed action
