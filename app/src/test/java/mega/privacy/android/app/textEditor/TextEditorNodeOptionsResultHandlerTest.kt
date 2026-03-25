@@ -2,6 +2,8 @@ package mega.privacy.android.app.textEditor
 
 import androidx.navigation3.runtime.NavKey
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.node.AddVideoToPlaylistResult
 import mega.privacy.android.domain.entity.node.NodeId
@@ -66,6 +68,28 @@ internal class TextEditorNodeOptionsResultHandlerTest {
             shouldCloseTextEditorOnNodeOptionsResult(
                 NodeOptionsBottomSheetResult.NodeNameCollision(
                     collisionResult
+                )
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that shouldCloseTextEditorOnNodeOptionsResult returns false when navigation is ChangeLabelBottomSheet`() {
+        assertThat(
+            shouldCloseTextEditorOnNodeOptionsResult(
+                NodeOptionsBottomSheetResult.Navigation(
+                    ChangeLabelBottomSheet(nodeId = 1L)
+                )
+            )
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that shouldCloseTextEditorOnNodeOptionsResult returns false when navigation is ChangeLabelBottomSheetMultiple`() {
+        assertThat(
+            shouldCloseTextEditorOnNodeOptionsResult(
+                NodeOptionsBottomSheetResult.Navigation(
+                    ChangeLabelBottomSheetMultiple(nodeIds = listOf(1L, 2L))
                 )
             )
         ).isFalse()

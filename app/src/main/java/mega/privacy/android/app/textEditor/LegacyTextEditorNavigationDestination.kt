@@ -25,6 +25,8 @@ import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.INCOMING
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.LINKS_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.core.nodecomponents.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheet
+import mega.privacy.android.core.nodecomponents.sheet.changelabel.ChangeLabelBottomSheetMultiple
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -46,9 +48,14 @@ import nz.mega.sdk.MegaApiJava
  */
 internal fun shouldCloseTextEditorOnNodeOptionsResult(
     result: NodeOptionsBottomSheetResult?,
-): Boolean =
-    result is NodeOptionsBottomSheetResult.Navigation ||
-            result is NodeOptionsBottomSheetResult.Transfer
+): Boolean = when (result) {
+    is NodeOptionsBottomSheetResult.Transfer -> true
+    is NodeOptionsBottomSheetResult.Navigation ->
+        result.navKey !is ChangeLabelBottomSheet &&
+                result.navKey !is ChangeLabelBottomSheetMultiple
+
+    else -> false
+}
 
 /** True when adapter is rubbish bin, offline, folder link, zip, file link, chat, or versions (hides Get Link and Edit). */
 private fun inExcludedAdapterForGetLinkAndEdit(nodeSourceType: Int?): Boolean {
