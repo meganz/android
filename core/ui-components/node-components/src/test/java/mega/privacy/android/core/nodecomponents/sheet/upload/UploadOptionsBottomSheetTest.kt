@@ -13,7 +13,6 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.analytics.test.AnalyticsTestRule
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -58,10 +57,10 @@ class UploadOptionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithText(NodesR.string.upload_files).assertIsDisplayed()
-            onNodeWithText(NodesR.string.upload_folder).assertIsDisplayed()
-            onNodeWithText(NodesR.string.menu_scan_document).assertIsDisplayed()
-            onNodeWithText(NodesR.string.menu_take_picture).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_upload_files).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_upload_folder).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_menu_scan_document).assertIsDisplayed()
+            onNodeWithText(sharedR.string.upload_bottom_sheet_action_menu_take_picture).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_new_folder).assertIsDisplayed()
             onNodeWithText(sharedR.string.general_new_text_file).assertIsDisplayed()
         }

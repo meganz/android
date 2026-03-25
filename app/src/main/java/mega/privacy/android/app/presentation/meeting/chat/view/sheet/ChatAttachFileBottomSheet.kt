@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.NodeId
@@ -103,7 +104,7 @@ fun ChatAttachFileBottomSheet(
             modifier = Modifier.testTag(TEST_TAG_SEND_FROM_CLOUD)
         )
         MenuActionListTile(
-            text = stringResource(id = R.string.upload_files),
+            text = stringResource(id = sharedResR.string.upload_bottom_sheet_action_upload_files),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
             dividerType = null,
             onActionClicked = { openFilePicker(localLauncher) },

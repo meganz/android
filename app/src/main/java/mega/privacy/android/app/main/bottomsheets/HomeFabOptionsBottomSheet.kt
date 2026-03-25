@@ -49,7 +49,7 @@ fun HomeFabOptionsBottomSheet(
             style = MaterialTheme.typography.subtitle2,
         )
         MenuActionListTile(
-            text = stringResource(R.string.upload_files),
+            text = stringResource(sharedResR.string.upload_bottom_sheet_action_upload_files),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileUpload),
             dividerType = null,
             onActionClicked = {
@@ -59,7 +59,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         MenuActionListTile(
-            text = stringResource(R.string.upload_folder),
+            text = stringResource(sharedResR.string.upload_bottom_sheet_action_upload_folder),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderArrow),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {
@@ -69,7 +69,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         MenuActionListTile(
-            text = stringResource(R.string.menu_scan_document),
+            text = stringResource(sharedResR.string.upload_bottom_sheet_action_menu_scan_document),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FileScan),
             dividerType = null,
             onActionClicked = {
@@ -78,7 +78,7 @@ fun HomeFabOptionsBottomSheet(
             },
         )
         MenuActionListTile(
-            text = stringResource(R.string.menu_take_picture),
+            text = stringResource(sharedResR.string.upload_bottom_sheet_action_menu_take_picture),
             icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.Camera),
             dividerType = DividerType.BigStartPadding,
             onActionClicked = {

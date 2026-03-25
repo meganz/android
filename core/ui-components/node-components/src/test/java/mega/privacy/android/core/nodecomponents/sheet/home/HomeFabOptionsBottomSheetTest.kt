@@ -63,10 +63,10 @@ class HomeFabOptionsBottomSheetTest {
         initComposeTestRule()
 
         with(composeTestRule) {
-            onNodeWithText(NodesR.string.upload_files).assertExists()
-            onNodeWithText(NodesR.string.upload_folder).assertExists()
-            onNodeWithText(NodesR.string.menu_scan_document).assertExists()
-            onNodeWithText(NodesR.string.menu_take_picture).assertExists()
+            onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_files).assertExists()
+            onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_folder).assertExists()
+            onNodeWithText(sharedResR.string.upload_bottom_sheet_action_menu_scan_document).assertExists()
+            onNodeWithText(sharedResR.string.upload_bottom_sheet_action_menu_take_picture).assertExists()
             onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_syn_button_option).assertExists()
             onNodeWithText(sharedResR.string.device_center_sync_add_new_backup_button_option).assertExists()

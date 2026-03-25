@@ -22,7 +22,6 @@ import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.shared.nodes.R as NodesR
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CloudDriveCaptureMenuToolbarEvent
@@ -65,7 +64,7 @@ fun UploadOptionsBottomSheet(
                 .verticalScroll(rememberScrollState())
         ) {
             UploadOptionItem(
-                text = stringResource(id = NodesR.string.upload_files),
+                text = stringResource(id = sharedR.string.upload_bottom_sheet_action_upload_files),
                 icon = IconPack.Medium.Thin.Outline.FileUpload,
                 testTag = TEST_TAG_UPLOAD_FILES_ACTION,
                 onClick = {
@@ -75,7 +74,7 @@ fun UploadOptionsBottomSheet(
                 },
             )
             UploadOptionItem(
-                text = stringResource(id = NodesR.string.upload_folder),
+                text = stringResource(id = sharedR.string.upload_bottom_sheet_action_upload_folder),
                 icon = IconPack.Medium.Thin.Outline.FolderArrow,
                 testTag = TEST_TAG_UPLOAD_FOLDER_ACTION,
                 onClick = {
@@ -85,7 +84,7 @@ fun UploadOptionsBottomSheet(
                 },
             )
             UploadOptionItem(
-                text = stringResource(id = NodesR.string.menu_scan_document),
+                text = stringResource(id = sharedR.string.upload_bottom_sheet_action_menu_scan_document),
                 icon = IconPack.Medium.Thin.Outline.FileScan,
                 testTag = TEST_TAG_SCAN_DOCUMENT_ACTION,
                 onClick = {
@@ -95,7 +94,7 @@ fun UploadOptionsBottomSheet(
                 },
             )
             UploadOptionItem(
-                text = stringResource(id = NodesR.string.menu_take_picture),
+                text = stringResource(id = sharedR.string.upload_bottom_sheet_action_menu_take_picture),
                 icon = IconPack.Medium.Thin.Outline.Camera,
                 testTag = TEST_TAG_CAPTURE_ACTION,
                 onClick = {

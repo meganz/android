@@ -33,10 +33,10 @@ class HomeFabOptionsBottomSheetTest {
         initComposeRule()
         composeRule.onNodeWithText(sharedResR.string.general_upload_label)
             .assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.upload_files).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.upload_folder).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.menu_scan_document).assertExists().assertIsDisplayed()
-        composeRule.onNodeWithText(R.string.menu_take_picture).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_files).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_folder).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_menu_scan_document).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_menu_take_picture).assertExists().assertIsDisplayed()
         composeRule.onNodeWithText(sharedResR.string.general_new_text_file).assertExists()
             .assertIsDisplayed()
         composeRule.onNodeWithText(sharedResR.string.settings_section_sync).assertExists()
@@ -52,7 +52,7 @@ class HomeFabOptionsBottomSheetTest {
     @Test
     fun `test that click the Upload files option sends the right analytics tracker event`() {
         initComposeRule()
-        composeRule.onNodeWithText(R.string.upload_files).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_files).assertExists().assertIsDisplayed()
             .performClick()
         assertThat(analyticsRule.events).contains(HomeUploadFilesMenuToolbarEvent)
     }
@@ -60,7 +60,7 @@ class HomeFabOptionsBottomSheetTest {
     @Test
     fun `test that click the Upload folder option sends the right analytics tracker event`() {
         initComposeRule()
-        composeRule.onNodeWithText(R.string.upload_folder).assertExists().assertIsDisplayed()
+        composeRule.onNodeWithText(sharedResR.string.upload_bottom_sheet_action_upload_folder).assertExists().assertIsDisplayed()
             .performClick()
         assertThat(analyticsRule.events).contains(HomeUploadFolderMenuToolbarEvent)
     }
