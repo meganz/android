@@ -55,7 +55,7 @@ internal fun ContactInfoContent(
     ChatOptions()
     Divider(color = MaterialTheme.colors.grey_alpha_012_white_alpha_012)
     MenuActionListTile(
-        text = stringResource(id = R.string.title_incoming_shares_explorer),
+        text = stringResource(id = SharedR.string.general_title_incoming_shares),
         icon = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderIncoming),
     ) {
         Text(

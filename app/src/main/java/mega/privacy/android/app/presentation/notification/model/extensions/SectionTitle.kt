@@ -19,7 +19,7 @@ internal fun UserAlert.sectionTitle(): (Context) -> String = when (this) {
     }
 
     is IncomingShareAlert -> { context ->
-        context.getString(R.string.title_incoming_shares_explorer)
+        context.getString(sharedR.string.general_title_incoming_shares)
     }
 
     is ScheduledMeetingAlert -> { context ->

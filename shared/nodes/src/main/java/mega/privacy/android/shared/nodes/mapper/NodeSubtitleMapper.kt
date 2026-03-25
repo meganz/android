@@ -1,5 +1,6 @@
 package mega.privacy.android.shared.nodes.mapper
 
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -35,12 +36,7 @@ class NodeSubtitleMapper @Inject constructor() {
             is TypedFolderNode -> {
                 // Check if it's a shared folder first
                 (node as? ShareFolderNode)?.shareData?.let { shareData ->
-                    return NodeSubtitleText.SharedSubtitle(
-                        shareCount = shareData.count,
-                        user = shareData.user,
-                        userFullName = shareData.userFullName,
-                        isVerified = shareData.isVerified
-                    )
+                    return shareData.toSharedSubtitle()
                 }
 
                 // Regular folder
@@ -54,3 +50,11 @@ class NodeSubtitleMapper @Inject constructor() {
         }
     }
 }
+
+internal fun ShareData.toSharedSubtitle(): NodeSubtitleText.SharedSubtitle =
+    NodeSubtitleText.SharedSubtitle(
+        shareCount = count,
+        user = user,
+        userFullName = userFullName,
+        isVerified = isVerified,
+    )

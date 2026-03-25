@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
                 android:layout_toStartOf="@+id/incoming_storage_text"
-                android:text="@string/title_incoming_shares_explorer"
+                android:text="@string/general_title_incoming_shares"
                 android:textAppearance="@style/TextAppearance.Mega.Body2" />
 
             <TextView

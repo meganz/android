@@ -121,7 +121,7 @@ abstract class UtilWrapperModule {
                     context.getString(sharedR.string.general_section_rubbish_bin)
 
                 override fun getTitleIncomingSharesExplorer() =
-                    context.getString(R.string.title_incoming_shares_explorer)
+                    context.getString(sharedR.string.general_title_incoming_shares)
 
                 override fun getErrorStorageQuota() =
                     context.getString(R.string.error_share_owner_storage_quota)

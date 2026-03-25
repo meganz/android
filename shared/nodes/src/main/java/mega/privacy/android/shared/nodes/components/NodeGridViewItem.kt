@@ -68,7 +68,6 @@ import mega.privacy.android.icon.pack.R as IconPackR
  * @param onLongClick Callback invoked when the item is long-pressed
  * @param onMenuClick Callback invoked when the more options menu is clicked
  * @param isSensitive Whether the item contains sensitive content (reduces opacity)
- * @param isSensitive Whether the item contains sensitive content (reduces opacity)
  * @param showBlurEffect Whether to apply blur effect to thumbnails for sensitive content
  * @param isHighlighted Whether the item should be highlighted (different background color)
  * @param showLink Whether to show a link icon in the top-right corner (indicates shared link)

@@ -1165,6 +1165,8 @@
     <string name="button_text_install_mega_pass">Install MEGA&#160;Pass</string>
     <!-- title of how it works for mega vpn free trial in achivements section -->
     <string name="title_how_it_works_free_trial">How it works</string>
+    <!-- Label for any ‘Incoming shares’ button or title -->
+    <string name="general_title_incoming_shares">Incoming shares</string>
     <!-- text of how it works for mega vpn free trial in achivements section -->
     <string name="text_how_it_works_mega_vpn_free_trial">Install the MEGA&#160;VPN app, log in with your MEGA account, and start your free trial. Your bonus storage is added automatically after starting your free trial.</string>
     <!-- text of how it works for mega pass free trial in achivements section -->
@@ -2475,7 +2477,7 @@
     <!-- Title for the decryption key dialog when a folder/file link requires a key -->
     <string name="link_decryption_key_dialog_title">Enter decryption key</string>
     <!-- Two line message for the decryption key dialog prompting user to enter the key -->
-    <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the sender.</string>
+    <string name="link_decryption_key_dialog_message">Enter the key to open this link.\nDon’t have it? Contact the link owner.</string>
     <!-- Error message shown when an invalid decryption key is entered -->
     <string name="link_decryption_key_dialog_error_invalid_key">Invalid decryption key</string>
     <!--Upload bottom sheet actions to upload files-->

@@ -44,7 +44,6 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R
 
-
 /**
  * Node list item
  *

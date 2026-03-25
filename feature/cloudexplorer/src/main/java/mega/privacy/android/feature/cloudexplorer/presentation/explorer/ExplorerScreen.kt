@@ -26,6 +26,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.toMode
+import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerContent
+import mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesexplorer.IncomingSharesExplorerViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodeExplorerSharedViewModel
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerScreenContent
 import mega.privacy.android.feature.cloudexplorer.presentation.nodesexplorer.NodesExplorerViewModel
@@ -59,6 +61,11 @@ fun ExplorerScreen(
         }
     val nodesExplorerUiState by nodesExplorerViewModel.nodesExplorerUiState.collectAsStateWithLifecycle()
     val nodesExplorerUiStateShared by nodesExplorerViewModel.nodeExplorerSharedUiState.collectAsStateWithLifecycle()
+    val incomingSharesExplorerViewModel = if (!hideTabs && explorerModeData.isIncomingAvailable)
+        hiltViewModel<IncomingSharesExplorerViewModel>() else null
+    val incomingSharesExplorerUiStateShared =
+        incomingSharesExplorerViewModel?.nodeExplorerSharedUiState?.collectAsStateWithLifecycle()
+
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
@@ -131,7 +138,7 @@ fun ExplorerScreen(
         MegaCollapsibleTabRow(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = paddingValues.calculateTopPadding()),
+                .padding(paddingValues),
             beyondViewportPageCount = 1,
             hideTabs = hideTabs,
             cells = {
@@ -160,8 +167,31 @@ fun ExplorerScreen(
                         modifier = modifier,
                     )
                 }
-                if (explorerModeData.isIncomingAvailable) {
-                    //Add incoming tab
+                if (incomingSharesExplorerUiStateShared?.value != null) {
+                    addTextTabWithScrollableContent(
+                        tabItem = TabItems(
+                            title = stringResource(sharedR.string.general_title_incoming_shares),
+                            testTag = INCOMING_TAB_TAG
+                        ),
+                    ) { _, modifier ->
+                        IncomingSharesExplorerContent(
+                            uiStateShared = incomingSharesExplorerUiStateShared.value,
+                            onNavigateBack = onNavigateBack,
+                            consumeNavigateBack = incomingSharesExplorerViewModel::onNavigateBackEventConsumed,
+                            onFolderClick = {
+                                onNavigateToFolder(
+                                    NodesExplorerNavKey(
+                                        nodeId = it,
+                                        nodeSourceType = incomingSharesExplorerUiStateShared.value.nodeSourceType,
+                                        explorerMode = explorerModeData.toMode()
+                                    )
+                                )
+                            },
+                            onFileClick = {},
+                            onRefreshNodes = incomingSharesExplorerViewModel::refreshNodes,
+                            modifier = modifier
+                        )
+                    }
                 }
                 //Add favourites tab
                 if (explorerModeData.isChatAvailable) {
@@ -180,6 +210,7 @@ fun ExplorerScreen(
 internal const val CLOUD_EXPLORER_VIEW_TAG = "cloud_explorer_view"
 internal const val ACTION_BUTTONS_VIEW_TAG = "$CLOUD_EXPLORER_VIEW_TAG:action_buttons"
 internal const val CLOUD_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:cloud_tab"
+internal const val INCOMING_TAB_TAG = "$CLOUD_EXPLORER_VIEW_TAG:incoming_tab"
 internal const val CLOUD_TAB_INDEX = 0
 internal const val INCOMING_TAB_INDEX = 1
 internal const val FAVOURITES_TAB_INDEX = 2

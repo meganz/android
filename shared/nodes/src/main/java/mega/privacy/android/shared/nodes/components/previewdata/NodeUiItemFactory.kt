@@ -3,6 +3,7 @@ package mega.privacy.android.shared.nodes.components.previewdata
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.NodeLabel
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -10,7 +11,11 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.icon.pack.R as IconPackR
+import mega.privacy.android.shared.nodes.extension.getSharesIcon
+import mega.privacy.android.shared.nodes.mapper.toSharedSubtitle
 import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 
@@ -19,49 +24,83 @@ fun previewFolderNodeUiItem(
     id: Long = 1L,
     name: String = "Sample Folder $id",
     isSelected: Boolean = false,
+    childFolderCount: Int = 2,
+    childFileCount: Int = 5,
 ): NodeUiItem<TypedNode> =
     NodeUiItem(
         isSelected = isSelected,
         title = LocalizedText.Literal(name),
         subtitle = NodeSubtitleText.FolderSubtitle(
-            childFolderCount = 2,
-            childFileCount = 5,
+            childFolderCount = childFolderCount,
+            childFileCount = childFileCount,
         ),
         iconRes = IconPackR.drawable.ic_folder_medium_solid,
         isFolderNode = true,
-        node = object : TypedFolderNode {
-            override val isInRubbishBin = false
-            override val isShared = false
-            override val isPendingShare = false
-            override val isSynced = false
-            override val device = null
-            override val childFolderCount = 2
-            override val childFileCount = 5
-            override val isS4Container = false
-            override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
-            override val type = FolderType.Default
-            override val id = NodeId(id)
-            override val name = name
-            override val parentId = NodeId(0L)
-            override val base64Id = "1L"
-            override val restoreId: NodeId? = null
-            override val label = 0
-            override val nodeLabel = NodeLabel.BLUE
-            override val isFavourite = false
-            override val isMarkedSensitive = false
-            override val isSensitiveInherited = false
-            override val exportedData = null
-            override val isTakenDown = false
-            override val isIncomingShare = false
-            override val isNodeKeyDecrypted = true
-            override val creationTime = 1_700_000_000_000L
-            override val serializedData = null
-            override val isAvailableOffline = false
-            override val versionCount = 0
-            override val description = ""
-            override val tags: List<String> = emptyList()
-        },
+        node = previewTypedFolderNode(
+            id = id,
+            name = name,
+            childFolderCount = childFolderCount,
+            childFileCount = childFileCount,
+            isShared = false,
+            isIncomingShare = false,
+        ),
     ) as NodeUiItem<TypedNode>
+
+/**
+ * Preview [NodeUiItem] for incoming shared folders, with [NodeSubtitleText.SharedSubtitle] and
+ * access icons aligned with production mapping ([getSharesIcon]).
+ *
+ */
+@Suppress("UNCHECKED_CAST")
+fun previewIncomingShareFolderNodeUiItem(
+    id: Long = 1L,
+    name: String = "Shared folder $id",
+    isSelected: Boolean = false,
+    access: AccessPermission = AccessPermission.READWRITE,
+    shareCount: Int = 1,
+    user: String? = "preview.user@example.com",
+    userFullName: String? = "Preview User",
+    isVerified: Boolean = true,
+    isPending: Boolean = false,
+    isContactCredentialsVerified: Boolean = false,
+    subtitle: NodeSubtitleText.SharedSubtitle? = null,
+    isContactVerificationOn: Boolean = false,
+    childFolderCount: Int = 2,
+    childFileCount: Int = 5,
+): NodeUiItem<TypedNode> {
+    val shareData = ShareData(
+        user = user,
+        userFullName = userFullName,
+        nodeHandle = id,
+        access = access,
+        timeStamp = 1_700_000_000_000L,
+        isPending = isPending,
+        isVerified = isVerified,
+        isContactCredentialsVerified = isContactCredentialsVerified,
+        count = shareCount,
+    )
+    val baseFolder = previewTypedFolderNode(
+        id = id,
+        name = name,
+        childFolderCount = childFolderCount,
+        childFileCount = childFileCount,
+        isShared = true,
+        isIncomingShare = true,
+    )
+    val shareFolderNode = ShareFolderNode(baseFolder, shareData)
+    return NodeUiItem(
+        isSelected = isSelected,
+        title = LocalizedText.Literal(name),
+        subtitle = subtitle ?: shareData.toSharedSubtitle(),
+        iconRes = IconPackR.drawable.ic_folder_medium_solid,
+        isFolderNode = true,
+        accessPermissionIcon = shareFolderNode.getSharesIcon(isContactVerificationOn),
+        showIsVerified = isContactVerificationOn && shareFolderNode.isIncomingShare &&
+                shareData.isContactCredentialsVerified,
+        showFavourite = false,
+        node = shareFolderNode,
+    ) as NodeUiItem<TypedNode>
+}
 
 @Suppress("UNCHECKED_CAST")
 fun previewFileNodeUiItem(
@@ -111,3 +150,44 @@ fun previewFileNodeUiItem(
         override val hasPreview = false
     },
 ) as NodeUiItem<TypedNode>
+
+private fun previewTypedFolderNode(
+    id: Long,
+    name: String,
+    childFolderCount: Int,
+    childFileCount: Int,
+    isShared: Boolean,
+    isIncomingShare: Boolean,
+): TypedFolderNode =
+    object : TypedFolderNode {
+        override val isInRubbishBin = false
+        override val isShared = isShared
+        override val isPendingShare = false
+        override val isSynced = false
+        override val device = null
+        override val childFolderCount = childFolderCount
+        override val childFileCount = childFileCount
+        override val isS4Container = false
+        override val fetchChildren: suspend (SortOrder) -> List<UnTypedNode> = { emptyList() }
+        override val type = FolderType.Default
+        override val id = NodeId(id)
+        override val name = name
+        override val parentId = NodeId(0L)
+        override val base64Id = "${id}L"
+        override val restoreId: NodeId? = null
+        override val label = 0
+        override val nodeLabel = NodeLabel.BLUE
+        override val isFavourite = false
+        override val isMarkedSensitive = false
+        override val isSensitiveInherited = false
+        override val exportedData = null
+        override val isTakenDown = false
+        override val isIncomingShare = isIncomingShare
+        override val isNodeKeyDecrypted = true
+        override val creationTime = 1_700_000_000_000L
+        override val serializedData = null
+        override val isAvailableOffline = false
+        override val versionCount = 0
+        override val description = ""
+        override val tags: List<String> = emptyList()
+    }

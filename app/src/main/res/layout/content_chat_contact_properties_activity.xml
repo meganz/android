@@ -221,7 +221,7 @@
                 android:layout_gravity="start|center_vertical"
                 android:layout_toEndOf="@+id/chat_contact_properties_incoming_shares_icon"
                 android:layout_marginStart="16dp"
-                android:text="@string/title_incoming_shares_explorer"
+                android:text="@string/general_title_incoming_shares"
                 android:textAppearance="@style/TextAppearance.Mega.Body1.Variant3" />
 
             <Button

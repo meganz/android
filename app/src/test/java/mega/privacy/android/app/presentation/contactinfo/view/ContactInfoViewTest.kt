@@ -5,6 +5,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.resources.R as SharedResourcesR
 import mega.privacy.android.app.fromId
 import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.contactinfo.model.LegacyContactInfoUiState
@@ -103,7 +104,8 @@ class ContactInfoViewTest {
         setupRule(contactState)
         composeRule.onNodeWithText(fromId(R.string.online_status)).assertExists()
         //IncomingSharesView
-        composeRule.onNodeWithText(fromId(R.string.title_incoming_shares_explorer)).assertExists()
+        composeRule.onNodeWithText(fromId(SharedResourcesR.string.general_title_incoming_shares))
+            .assertExists()
         //ChatNotificationsView
         composeRule.onNodeWithText(fromId(R.string.title_properties_chat_notifications_contact))
             .assertExists()
@@ -134,7 +136,8 @@ class ContactInfoViewTest {
         )
         composeRule.onNodeWithText(fromId(R.string.online_status)).assertExists()
         //IncomingSharesView
-        composeRule.onNodeWithText(fromId(R.string.title_incoming_shares_explorer)).assertExists()
+        composeRule.onNodeWithText(fromId(SharedResourcesR.string.general_title_incoming_shares))
+            .assertExists()
         //ChatNotificationsView
         composeRule.onNodeWithText(fromId(R.string.title_properties_chat_notifications_contact))
             .assertExists()

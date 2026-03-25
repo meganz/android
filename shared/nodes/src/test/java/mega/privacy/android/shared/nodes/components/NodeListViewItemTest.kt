@@ -65,7 +65,7 @@ class NodeListViewItemTest {
                 onItemClicked = onItemClicked,
                 onLongClicked = onLongClicked,
                 isInSelectionMode = isInSelectionMode,
-                isSelected = isSelected
+                isSelected = isSelected,
             )
         }
     }
@@ -283,7 +283,7 @@ class NodeListViewItemTest {
     fun `test that verified icon is not displayed when showIsVerified is false`() {
         setContent(showIsVerified = false)
 
-        composeTestRule.onNodeWithTag(OFFLINE_ICON_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(VERIFIED_ICON_TAG).assertDoesNotExist()
     }
 
     @Test

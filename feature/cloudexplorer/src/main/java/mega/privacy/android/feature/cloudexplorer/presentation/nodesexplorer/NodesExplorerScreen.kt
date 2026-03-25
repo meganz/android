@@ -20,6 +20,8 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerGridViewItem
+import mega.privacy.android.feature.cloudexplorer.presentation.components.CloudExplorerListViewItem
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.model.ExplorerModeData
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -93,23 +95,18 @@ internal fun NodesExplorerScreenContent(
             else EmptyFolder()
         },
         itemListView = {
-            NodeListViewItem(
+            CloudExplorerListViewItem(
                 title = it.title.text,
                 subtitle = it.subtitle.text(),
                 icon = it.iconRes,
                 description = it.formattedDescription?.text,
                 tags = it.tags,
                 thumbnailData = it.thumbnailData,
-                accessPermissionIcon = it.accessPermissionIcon,
-                showOffline = it.isAvailableOffline,
-                showVersion = it.hasVersion,
                 isSelected = it.isSelected,
                 isInSelectionMode = isSelectionModeEnabled,
                 showIsVerified = it.showIsVerified,
                 isTakenDown = it.isTakenDown,
                 label = it.nodeLabel,
-                showLink = it.showLink,
-                showFavourite = it.showFavourite,
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
@@ -118,7 +115,7 @@ internal fun NodesExplorerScreenContent(
             )
         },
         itemGridView = {
-            NodeGridViewItem(
+            CloudExplorerGridViewItem(
                 name = it.title.text,
                 iconRes = it.iconRes,
                 thumbnailData = it.thumbnailData,
@@ -132,8 +129,6 @@ internal fun NodesExplorerScreenContent(
                 isSensitive = it.isSensitive && isHiddenNodesEnabled,
                 showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
                 isHighlighted = it.isHighlighted,
-                showLink = it.showLink,
-                showFavourite = it.showFavourite,
                 label = it.nodeLabel,
                 enabled = it.isFolderNode || isSelectionModeEnabled,
             )

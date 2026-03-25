@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,7 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
-import mega.android.core.ui.modifiers.conditional
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -47,6 +48,7 @@ fun NodeViewWithHeader(
     itemGridView: @Composable (NodeUiItem<TypedNode>) -> Unit,
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     loadingListContent: @Composable () -> Unit = {
         NodesViewSkeleton(
             isListView = true,
@@ -77,6 +79,7 @@ fun NodeViewWithHeader(
             loadingGridContent = loadingGridContent,
             onUpdateViewType = {},
             onUpdateNodeSortConfiguration = { },
+            contentPadding = contentPadding,
         )
     } else {
         val viewModel =
@@ -102,6 +105,7 @@ fun NodeViewWithHeader(
                 loadingGridContent = loadingGridContent,
                 onUpdateViewType = viewModel::updateViewType,
                 onUpdateNodeSortConfiguration = viewModel::updateNodeSortConfiguration,
+                contentPadding = contentPadding,
             )
         }
     }
@@ -118,6 +122,7 @@ private fun NodeViewWithHeaderLoaded(
     itemListView: @Composable (NodeUiItem<TypedNode>) -> Unit,
     itemGridView: @Composable (NodeUiItem<TypedNode>) -> Unit,
     onRefreshNodes: () -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier,
     loadingListContent: @Composable () -> Unit,
     loadingGridContent: @Composable (Int) -> Unit,
@@ -148,10 +153,7 @@ private fun NodeViewWithHeaderLoaded(
                     isListView = isList,
                     showSortOrder = true,
                     showChangeViewType = true,
-                    modifier = Modifier.conditional(isList) {
-                        padding(horizontal = 8.dp)
-                        padding(bottom = 8.dp)
-                    },
+                    modifier = Modifier.padding(top = DSTokens.spacings.s3),
                 )
             }
             if (isList) {
@@ -160,6 +162,7 @@ private fun NodeViewWithHeaderLoaded(
                     isNextPageLoading = isNextPageLoading,
                     itemView = itemListView,
                     nodeHeader = header,
+                    contentPadding = contentPadding,
                     modifier = modifier,
                 )
             } else {
@@ -169,6 +172,7 @@ private fun NodeViewWithHeaderLoaded(
                     spanCount = spanCount,
                     itemView = itemGridView,
                     nodeHeader = header,
+                    contentPadding = contentPadding,
                     modifier = modifier,
                 )
             }
@@ -209,6 +213,7 @@ private fun NodesListView(
     isNextPageLoading: Boolean,
     itemView: @Composable (NodeUiItem<TypedNode>) -> Unit,
     nodeHeader: @Composable () -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -217,9 +222,12 @@ private fun NodesListView(
         state = listState,
         totalItems = items.size,
         modifier = modifier.semantics { testTagsAsResourceId = true },
+        contentPadding = contentPadding
     ) {
         item(key = "header") {
-            nodeHeader()
+            Box(modifier = Modifier.padding(horizontal = DSTokens.spacings.s3)) {
+                nodeHeader()
+            }
         }
 
         items(
@@ -244,6 +252,7 @@ private fun NodesGridView(
     spanCount: Int,
     itemView: @Composable (NodeUiItem<TypedNode>) -> Unit,
     nodeHeader: @Composable () -> Unit,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
     val gridState = rememberLazyGridState()
@@ -253,11 +262,11 @@ private fun NodesGridView(
         columns = GridCells.Fixed(spanCount),
         totalItems = items.size,
         modifier = modifier
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = DSTokens.spacings.s3)
             .semantics { testTagsAsResourceId = true },
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(0.dp),
+        horizontalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
+        verticalArrangement = Arrangement.spacedBy(DSTokens.spacings.s3),
+        contentPadding = contentPadding,
     ) {
         item(
             key = "header",
