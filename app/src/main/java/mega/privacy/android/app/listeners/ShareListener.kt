@@ -104,7 +104,7 @@ class ShareListener(
         return when (typeShare) {
             SHARE_LISTENER -> {
                 context.resources.getQuantityString(
-                    R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
+                    sharedR.plurals.cloud_drive_sharing_folder_snackbar_failed,
                     numberErrors, numberErrors
                 )
             }

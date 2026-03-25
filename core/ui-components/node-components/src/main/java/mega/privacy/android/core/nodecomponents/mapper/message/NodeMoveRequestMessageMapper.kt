@@ -24,7 +24,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                     request.hasNoData -> throw RuntimeException("No moved data found!")
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.general_move_node_snackbar_fail,
+                            sharedResR.plurals.move_node_general_snackbar_fail,
                             request.count,
                             request.count
                         )
@@ -32,7 +32,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.general_move_node_snackbar_success,
+                            sharedResR.plurals.move_node_general_snackbar_success,
                             request.count,
                             request.count
                         )
@@ -40,12 +40,12 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     else -> {
                         val success = context.resources.getQuantityString(
-                            NodesR.plurals.general_move_node_snackbar_concat_success,
+                            sharedResR.plurals.move_node_snackbar_concat_success,
                             request.count - request.errorCount,
                             request.count - request.errorCount
                         )
                         val fail = context.resources.getQuantityString(
-                            NodesR.plurals.general_move_node_snackbar_concat_fail,
+                            sharedResR.plurals.move_node_snackbar_concat_fail,
                             request.errorCount,
                             request.errorCount
                         )
@@ -67,7 +67,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.number_correctly_moved_to_rubbish,
+                            sharedResR.plurals.count_items_moved_to_rubbish,
                             request.count,
                             request.count
                         )
@@ -75,7 +75,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.number_incorrectly_moved_to_rubbish,
+                            sharedResR.plurals.count_items_failed_move_to_rubbish,
                             request.errorCount,
                             request.errorCount,
                         )
@@ -83,7 +83,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.errorCount == 1 -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
+                            sharedResR.plurals.items_moved_and_one_failed_to_rubbish,
                             request.successCount,
                             request.successCount,
                         )
@@ -91,7 +91,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.successCount == 1 -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
+                            sharedResR.plurals.one_moved_and_items_failed_to_rubbish,
                             request.errorCount,
                             request.errorCount,
                         )
@@ -99,13 +99,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     else -> {
                         val success = context.resources.getQuantityString(
-                            NodesR.plurals.number_correctly_moved_to_rubbish,
+                            sharedResR.plurals.count_items_moved_to_rubbish,
                             request.successCount,
                             request.successCount
                         )
 
                         val failed = context.resources.getQuantityString(
-                            NodesR.plurals.number_incorrectly_moved_to_rubbish,
+                            sharedResR.plurals.count_items_failed_move_to_rubbish,
                             request.errorCount,
                             request.errorCount,
                         )
@@ -118,7 +118,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                 when {
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.rubbish_bin_remove_items_snackbar_success,
+                            sharedResR.plurals.rubbish_remove_items_snackbar_success,
                             request.count,
                             request.count,
                         )
@@ -126,7 +126,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.rubbish_bin_remove_items_snackbar_fail,
+                            sharedResR.plurals.rubbish_remove_items_snackbar_fail,
                             request.errorCount,
                             request.errorCount
                         )
@@ -134,13 +134,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     else -> "${
                         context.resources.getQuantityString(
-                            NodesR.plurals.rubbish_bin_remove_items_snackbar_success_concat,
+                            sharedResR.plurals.rubbish_remove_items_snackbar_concat_success,
                             request.count,
                             request.count
                         )
                     }${
                         context.resources.getQuantityString(
-                            NodesR.plurals.rubbish_bin_remove_items_snackbar_fail_concat,
+                            sharedResR.plurals.rubbish_remove_items_snackbar_concat_fail,
                             request.errorCount,
                             request.errorCount
                         )
@@ -152,7 +152,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                 when {
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.general_copy_snackbar_fail,
+                            sharedResR.plurals.copy_node_general_snackbar_fail,
                             request.count,
                             request.count
                         )
@@ -160,7 +160,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.general_copy_snackbar_success,
+                            sharedResR.plurals.copy_node_general_snackbar_success,
                             request.count,
                             request.count
                         )
@@ -169,13 +169,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                     else -> {
                         "${
                             context.resources.getQuantityString(
-                                NodesR.plurals.general_copy_snackbar_concat_success,
+                                sharedResR.plurals.copy_node_snackbar_concat_success,
                                 request.count - request.errorCount,
                                 request.count - request.errorCount
                             )
                         }${
                             context.resources.getQuantityString(
-                                NodesR.plurals.general_copy_snackbar_concat_fail,
+                                sharedResR.plurals.copy_node_snackbar_concat_fail,
                                 request.errorCount,
                                 request.errorCount
                             )
@@ -188,7 +188,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                 when {
                     request.isAllRequestError -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
+                            sharedResR.plurals.cloud_drive_sharing_folder_snackbar_failed,
                             request.count,
                             request.count
                         )
@@ -196,7 +196,7 @@ class NodeMoveRequestMessageMapper @Inject constructor(
 
                     request.isSuccess -> {
                         context.resources.getQuantityString(
-                            NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                            sharedResR.plurals.cloud_drive_sharing_folder_snackbar_success,
                             request.count,
                             request.count
                         )
@@ -205,13 +205,13 @@ class NodeMoveRequestMessageMapper @Inject constructor(
                     else -> {
                         "${
                             context.resources.getQuantityString(
-                                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_success,
+                                sharedResR.plurals.cloud_drive_sharing_folder_snackbar_success,
                                 request.count - request.errorCount,
                                 request.count - request.errorCount
                             )
                         }${
                             context.resources.getQuantityString(
-                                NodesR.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed_concat,
+                                sharedResR.plurals.cloud_drive_sharing_folder_snackbar_concat_failed,
                                 request.errorCount,
                                 request.errorCount
                             )

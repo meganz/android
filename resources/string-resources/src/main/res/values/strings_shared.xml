@@ -2521,4 +2521,109 @@
     </plurals>
     <!-- Two line message for the decryption key dialog prompting user to enter the password -->
     <string name="link_password_dialog_message">Enter the password to open this link.\nDon’t have it? Contact the sender.</string>
+    <!-- Snackbar message shown when moving nodes fails (standalone) -->
+    <plurals name="move_node_general_snackbar_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <!-- Snackbar message shown when moving nodes succeeds (standalone) -->
+    <plurals name="move_node_general_snackbar_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when move has mixed results -->
+    <plurals name="move_node_snackbar_concat_success">
+        <item quantity="one">%d item moved successfully</item>
+        <item quantity="other">%d items moved successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when move has mixed results -->
+    <plurals name="move_node_snackbar_concat_fail">
+        <item quantity="one">%d item failed to move</item>
+        <item quantity="other">%d items failed to move</item>
+    </plurals>
+    <!-- Snackbar message for items successfully moved to the rubbish bin -->
+    <plurals name="count_items_moved_to_rubbish">
+        <item quantity="one">%d item moved to rubbish</item>
+        <item quantity="other">%d items moved to rubbish</item>
+    </plurals>
+    <!-- Snackbar message for items that failed to move to the rubbish bin -->
+    <plurals name="count_items_failed_move_to_rubbish">
+        <item quantity="one">%d item failed to move to rubbish</item>
+        <item quantity="other">%d items failed to move to rubbish</item>
+    </plurals>
+    <!-- Combined message: multiple items moved to rubbish, but 1 item failed -->
+    <plurals name="items_moved_and_one_failed_to_rubbish">
+        <item quantity="one">%d item moved to rubbish, 1 item failed</item>
+        <item quantity="other">%d items moved to rubbish, 1 item failed</item>
+    </plurals>
+    <!-- Combined message: 1 item moved to rubbish, but multiple items failed -->
+    <plurals name="one_moved_and_items_failed_to_rubbish">
+        <item quantity="one">1 item moved to rubbish, %d items failed</item>
+        <item quantity="other">1 item moved to rubbish, %d items failed</item>
+    </plurals>
+    <!-- Snackbar message when items are successfully removed from rubbish bin (standalone) -->
+    <plurals name="rubbish_remove_items_snackbar_success">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <!-- Snackbar message when removing items from rubbish bin fails (standalone) -->
+    <plurals name="rubbish_remove_items_snackbar_fail">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when rubbish removal has mixed results -->
+    <plurals name="rubbish_remove_items_snackbar_concat_success">
+        <item quantity="one">%d item removed from rubbish</item>
+        <item quantity="other">%d items removed from rubbish</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when rubbish removal has mixed results -->
+    <plurals name="rubbish_remove_items_snackbar_concat_fail">
+        <item quantity="one">%d item failed to remove from rubbish</item>
+        <item quantity="other">%d items failed to remove from rubbish</item>
+    </plurals>
+    <!-- Snackbar message shown when copying nodes fails (standalone) -->
+    <plurals name="copy_node_general_snackbar_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <!-- Snackbar message shown when copying nodes succeeds (standalone) -->
+    <plurals name="copy_node_general_snackbar_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <!-- Success part of a concatenated snackbar when copy has mixed results -->
+    <plurals name="copy_node_snackbar_concat_success">
+        <item quantity="one">%d item copied successfully</item>
+        <item quantity="other">%d items copied successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when copy has mixed results -->
+    <plurals name="copy_node_snackbar_concat_fail">
+        <item quantity="one">%d item failed to copy</item>
+        <item quantity="other">%d items failed to copy</item>
+    </plurals>
+    <!-- Snackbar message when sharing folders from Cloud Drive fails (standalone) -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_failed">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <!-- Snackbar message when sharing folders from Cloud Drive succeeds (standalone) -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_success">
+        <item quantity="one">%d folder shared successfully</item>
+        <item quantity="other">%d folders shared successfully</item>
+    </plurals>
+    <!-- Failure part of a concatenated snackbar when folder sharing has mixed results -->
+    <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
+        <item quantity="one">%d folder failed to share</item>
+        <item quantity="other">%d folders failed to share</item>
+    </plurals>
+    <!-- Snackbar message for items that failed to restore from rubbish bin -->
+    <plurals name="count_items_failed_restore_from_rubbish">
+        <item quantity="one">%d item failed to restore from rubbish</item>
+        <item quantity="other">%d items failed to restore from rubbish</item>
+    </plurals>
+    <!-- Snackbar message for items successfully restored from rubbish bin -->
+    <plurals name="count_items_restored_from_rubbish">
+        <item quantity="one">%d item restored from rubbish</item>
+        <item quantity="other">%d items restored from rubbish</item>
+    </plurals>
 </resources>
